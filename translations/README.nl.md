@@ -334,7 +334,7 @@ De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
 
 - **Realistische data met presets**: Gebruik ingebouwde presets zoals `"name"`, `"email"`, `"address"`, `"phone"`, enz.
 - **User agent strings**: Genereer zeer gevarieerde, realistische browser user agent strings uit 17 browsercategorieën met meer dan 42.000 unieke combinaties
-- **Ondersteuning voor 50+ landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
+- **Ondersteuning voor 100 landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
 - **Veldbeperkingen**: Beheer bereiken, patronen, uniciteit en toegestane waarden
 - **Meerdere uitvoerformaten**: Retourneert standaard Polars DataFrames, maar ondersteunt ook Pandas (`output="pandas"`) of dictionaries (`output="dict"`)
 
@@ -344,7 +344,7 @@ De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
 - **Gebouwd voor samenwerking**: Deel resultaten met collega's via mooie interactieve rapporten
 - **Praktische uitvoer**: Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
 - **Flexibele implementatie**: Gebruik in notebooks, scripts of datapipelines
-- **Synthetische datageneratie**: Creëer realistische testdata met meer dan 30 presets, user agent strings, locale-bewuste opmaak en ondersteuning voor meer dan 50 landen
+- **Synthetische datageneratie**: Creëer realistische testdata met meer dan 30 presets, user agent strings, locale-bewuste opmaak en ondersteuning voor 100 landen
 - **Aanpasbaar**: Stem validatiestappen en rapportage af op jouw specifieke behoeften
 - **Internationalisatie**: Rapporten kunnen worden gegenereerd in 40 talen, waaronder Engels, Spaans, Frans en Duits
 

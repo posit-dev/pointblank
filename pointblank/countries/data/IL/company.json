@@ -1,0 +1,773 @@
+{
+  "suffixes": [
+    "Ltd.",
+    "Inc.",
+    "Technologies",
+    "Solutions",
+    "Group",
+    "Holdings",
+    "Industries",
+    "Systems",
+    "Ventures",
+    "Partners"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} and {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "Israeli",
+    "Tel Avivian",
+    "Jerusalem",
+    "Mediterranean",
+    "Global",
+    "International",
+    "Advanced",
+    "Modern",
+    "Innovative",
+    "Digital",
+    "Smart",
+    "Premier",
+    "Strategic",
+    "Dynamic",
+    "Creative",
+    "Leading",
+    "National",
+    "United",
+    "Central",
+    "Elite",
+    "First",
+    "New",
+    "Blue",
+    "Golden",
+    "Silicon",
+    "Cyber",
+    "Tech",
+    "Next"
+  ],
+  "nouns": [
+    "Solutions",
+    "Technologies",
+    "Systems",
+    "Industries",
+    "Services",
+    "Consulting",
+    "Management",
+    "Development",
+    "Marketing",
+    "Software",
+    "Hardware",
+    "Networks",
+    "Security",
+    "Analytics",
+    "Data",
+    "Research",
+    "Engineering",
+    "Construction",
+    "Real Estate",
+    "Insurance",
+    "Health",
+    "Logistics",
+    "Transport",
+    "Energy",
+    "Resources",
+    "Materials",
+    "Products",
+    "Trade",
+    "Communications",
+    "Media",
+    "Finance",
+    "Investments",
+    "Defense",
+    "Innovation",
+    "Ventures",
+    "Capital"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Check Point Software",
+      "cities": [
+        "Tel Aviv",
+        "Ramat Gan"
+      ]
+    },
+    {
+      "name": "Teva Pharmaceutical",
+      "cities": [
+        "Petah Tikva",
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Wix",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Monday.com",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "CyberArk",
+      "cities": [
+        "Petah Tikva",
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Nice Systems",
+      "cities": [
+        "Raanana"
+      ]
+    },
+    {
+      "name": "Mobileye",
+      "cities": [
+        "Jerusalem"
+      ]
+    },
+    {
+      "name": "IronSource",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "ICL Group",
+      "cities": [
+        "Tel Aviv",
+        "Beer Sheva"
+      ]
+    },
+    {
+      "name": "Elbit Systems",
+      "cities": [
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Israel Aerospace Industries",
+      "cities": [
+        "Lod"
+      ]
+    },
+    {
+      "name": "Rafael Advanced Defense Systems",
+      "cities": [
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Tower Semiconductor",
+      "cities": [
+        "Migdal HaEmek"
+      ]
+    },
+    {
+      "name": "Fiverr",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "SolarEdge",
+      "cities": [
+        "Herzliya"
+      ]
+    },
+    {
+      "name": "Sapiens International",
+      "cities": [
+        "Holon"
+      ]
+    },
+    {
+      "name": "Matrix IT",
+      "cities": [
+        "Herzliya"
+      ]
+    },
+    {
+      "name": "Amdocs",
+      "cities": [
+        "Raanana",
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Bank Leumi",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Bank Hapoalim",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Israel Discount Bank",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Mizrahi-Tefahot Bank",
+      "cities": [
+        "Ramat Gan"
+      ]
+    },
+    {
+      "name": "Partner Communications",
+      "cities": [
+        "Rosh HaAyin"
+      ]
+    },
+    {
+      "name": "Bezeq",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Cellcom",
+      "cities": [
+        "Netanya"
+      ]
+    },
+    {
+      "name": "El Al Israel Airlines",
+      "cities": [
+        "Tel Aviv",
+        "Lod"
+      ]
+    },
+    {
+      "name": "Delek Group",
+      "cities": [
+        "Herzliya",
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Strauss Group",
+      "cities": [
+        "Petah Tikva"
+      ]
+    },
+    {
+      "name": "Osem",
+      "cities": [
+        "Petah Tikva",
+        "Holon"
+      ]
+    },
+    {
+      "name": "Tnuva",
+      "cities": [
+        "Petah Tikva",
+        "Rehovot"
+      ]
+    },
+    {
+      "name": "Intel Israel",
+      "cities": [
+        "Haifa",
+        "Jerusalem",
+        "Kiryat Gat"
+      ]
+    },
+    {
+      "name": "Google Israel",
+      "cities": [
+        "Tel Aviv",
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Microsoft Israel",
+      "cities": [
+        "Herzliya",
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Amazon Israel",
+      "cities": [
+        "Tel Aviv",
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Apple Israel",
+      "cities": [
+        "Herzliya"
+      ]
+    },
+    {
+      "name": "Meta Israel",
+      "cities": [
+        "Tel Aviv"
+      ]
+    },
+    {
+      "name": "Nvidia Israel",
+      "cities": [
+        "Tel Aviv",
+        "Yokneam"
+      ]
+    },
+    {
+      "name": "Qualcomm Israel",
+      "cities": [
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Samsung Israel",
+      "cities": [
+        "Tel Aviv",
+        "Herzliya"
+      ]
+    },
+    {
+      "name": "HP Israel",
+      "cities": [
+        "Petah Tikva",
+        "Rehovot"
+      ]
+    },
+    {
+      "name": "IBM Israel",
+      "cities": [
+        "Petah Tikva",
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Cisco Israel",
+      "cities": [
+        "Tel Aviv",
+        "Netanya"
+      ]
+    },
+    {
+      "name": "Philips Israel",
+      "cities": [
+        "Haifa"
+      ]
+    },
+    {
+      "name": "Playtika",
+      "cities": [
+        "Herzliya",
+        "Tel Aviv"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Director",
+    "Financial Analyst",
+    "Project Manager",
+    "Business Analyst",
+    "Operations Manager",
+    "Account Manager",
+    "Accountant",
+    "Administrative Assistant",
+    "Graphic Designer",
+    "Web Developer",
+    "Network Administrator",
+    "Database Administrator",
+    "System Administrator",
+    "Quality Engineer",
+    "Technical Writer",
+    "UX Designer",
+    "DevOps Engineer",
+    "Cloud Architect",
+    "Security Analyst",
+    "Data Scientist",
+    "Consultant",
+    "Lawyer",
+    "Doctor",
+    "Pharmacist",
+    "Teacher",
+    "Professor",
+    "Social Worker",
+    "Chef",
+    "Hotel Manager",
+    "Real Estate Agent",
+    "Banker",
+    "Financial Advisor",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Civil Engineer",
+    "Architect",
+    "Construction Manager",
+    "CEO"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Dynamic",
+    "Leading",
+    "Premier",
+    "Revolutionary",
+    "Transformative",
+    "Scalable",
+    "Robust",
+    "Agile",
+    "Strategic",
+    "Customer-focused",
+    "Data-driven",
+    "Cloud-based",
+    "AI-powered",
+    "Sustainable",
+    "Future-ready",
+    "Efficient",
+    "Flexible",
+    "Reliable"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "platforms",
+    "ecosystems",
+    "strategies",
+    "technologies",
+    "innovations",
+    "experiences",
+    "transformations",
+    "optimizations",
+    "integrations",
+    "services",
+    "concepts",
+    "systems",
+    "processes"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "optimizes",
+    "transforms",
+    "revolutionizes",
+    "enables",
+    "accelerates",
+    "streamlines",
+    "maximizes",
+    "enhances",
+    "drives",
+    "unlocks",
+    "scales",
+    "modernizes",
+    "digitizes",
+    "develops"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.22,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "Web Developer",
+        "DevOps Engineer",
+        "Cloud Architect",
+        "Security Analyst",
+        "Data Scientist",
+        "Quality Engineer",
+        "Network Administrator",
+        "Database Administrator",
+        "System Administrator"
+      ],
+      "well_known": [
+        "Check Point Software",
+        "Wix",
+        "Monday.com",
+        "CyberArk",
+        "Nice Systems",
+        "Mobileye",
+        "IronSource",
+        "Fiverr",
+        "SolarEdge",
+        "Amdocs",
+        "Intel Israel",
+        "Google Israel",
+        "Microsoft Israel",
+        "Amazon Israel",
+        "Apple Israel",
+        "Meta Israel",
+        "Nvidia Israel"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks",
+        "Security"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "defense",
+      "weight": 0.08,
+      "jobs": [
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Quality Engineer",
+        "Project Manager"
+      ],
+      "well_known": [
+        "Elbit Systems",
+        "Israel Aerospace Industries",
+        "Rafael Advanced Defense Systems"
+      ],
+      "company_suffixes": [
+        "Systems",
+        "Industries",
+        "Solutions",
+        "Defense"
+      ],
+      "company_nouns": [
+        "Defense",
+        "Systems",
+        "Engineering",
+        "Solutions"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Banker",
+        "Financial Advisor"
+      ],
+      "well_known": [
+        "Bank Leumi",
+        "Bank Hapoalim",
+        "Israel Discount Bank",
+        "Mizrahi-Tefahot Bank",
+        "Delek Group"
+      ],
+      "company_suffixes": [
+        "Finance",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Finance",
+        "Consulting"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} and {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Doctor",
+        "Pharmacist"
+      ],
+      "well_known": [
+        "Teva Pharmaceutical"
+      ],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Pharma"
+      ],
+      "company_nouns": [
+        "Health",
+        "Medical",
+        "Pharma"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Teacher",
+        "Professor"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Hebrew University of {noun}",
+        "Technion - Israel Institute of Technology",
+        "{adjective} College of {noun}"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Lawyer"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} and {last_name}",
+        "{last_name}, {last_name} & Partners"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "Network Administrator",
+        "System Administrator",
+        "Sales Representative"
+      ],
+      "well_known": [
+        "Partner Communications",
+        "Bezeq",
+        "Cellcom"
+      ],
+      "company_suffixes": [
+        "Communications",
+        "Telecom",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Communications",
+        "Networks",
+        "Media"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "food_consumer",
+      "weight": 0.07,
+      "jobs": [
+        "Operations Manager",
+        "Marketing Manager",
+        "Account Manager"
+      ],
+      "well_known": [
+        "Strauss Group",
+        "Osem",
+        "Tnuva"
+      ],
+      "company_suffixes": [
+        "Group",
+        "Industries",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Products",
+        "Trade",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.05,
+      "jobs": [
+        "Real Estate Agent",
+        "Civil Engineer",
+        "Architect",
+        "Construction Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Real Estate",
+        "Construction",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Real Estate",
+        "Construction"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.07,
+      "jobs": [
+        "Operations Manager",
+        "Administrative Assistant",
+        "HR Director",
+        "Sales Representative",
+        "Account Manager",
+        "CEO"
+      ],
+      "well_known": [
+        "ICL Group",
+        "Matrix IT",
+        "Sapiens International",
+        "HP Israel",
+        "IBM Israel",
+        "Cisco Israel"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "Inc.",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    }
+  ]
+}

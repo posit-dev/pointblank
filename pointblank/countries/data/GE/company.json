@@ -1,0 +1,544 @@
+{
+  "suffixes": [
+    "შპს",
+    "სს",
+    "კოოპერატივი",
+    "Ltd",
+    "LLC",
+    "JSC",
+    "Corp",
+    "Inc",
+    "Group",
+    "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Georgian",
+    "Caucasian",
+    "Eastern",
+    "Western",
+    "Southern",
+    "Northern",
+    "Global",
+    "National",
+    "International",
+    "United",
+    "Central",
+    "Modern",
+    "Digital",
+    "Premier",
+    "Advanced",
+    "Dynamic",
+    "Strategic",
+    "Creative",
+    "Progressive",
+    "Innovative",
+    "Integrated",
+    "Collaborative",
+    "Superior",
+    "Elite",
+    "Professional",
+    "Reliable",
+    "Sustainable",
+    "Smart"
+  ],
+  "nouns": [
+    "Energy",
+    "Solutions",
+    "Services",
+    "Trading",
+    "Industries",
+    "Logistics",
+    "Construction",
+    "Development",
+    "Technologies",
+    "Consulting",
+    "Agriculture",
+    "Wine",
+    "Tourism",
+    "Hospitality",
+    "Transport",
+    "Communications",
+    "Finance",
+    "Mining",
+    "Real Estate",
+    "Insurance",
+    "Media",
+    "Pharmaceuticals",
+    "Textiles",
+    "Food",
+    "Beverages",
+    "Engineering",
+    "Aviation",
+    "Maritime",
+    "Electronics",
+    "Software",
+    "Design",
+    "Architecture",
+    "Education",
+    "Healthcare",
+    "Security",
+    "Ventures"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Bank of Georgia",
+      "weight": 0.08,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "TBC Bank",
+      "weight": 0.08,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Railway",
+      "weight": 0.06,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Oil and Gas Corporation",
+      "weight": 0.05,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Magticom",
+      "weight": 0.05,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Silknet",
+      "weight": 0.04,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Geocell",
+      "weight": 0.04,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Wissol Group",
+      "weight": 0.04,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Gulf Georgia",
+      "weight": 0.03,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Socar Georgia",
+      "weight": 0.03,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Nikora",
+      "weight": 0.04,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Carrefour Georgia",
+      "weight": 0.03,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Liberty Bank",
+      "weight": 0.03,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Credo Bank",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Airways",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Tegeta Motors",
+      "weight": 0.03,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Auto House",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "GPI Holding",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Water and Power",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Energo-Pro Georgia",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Teliani Valley",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi",
+        "Telavi"
+      ]
+    },
+    {
+      "name": "Georgian Beer Company",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Borjomi",
+      "weight": 0.03,
+      "cities": [
+        "Borjomi",
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Natakhtari",
+      "weight": 0.02,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Tbilisi City Hall",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Post",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Crystal",
+      "weight": 0.01,
+      "cities": [
+        "Kutaisi"
+      ]
+    },
+    {
+      "name": "Aldagi Insurance",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "PSP Insurance",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "IC Group",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Pace International",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Industrial Group",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Adjara Group",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi",
+        "Batumi"
+      ]
+    },
+    {
+      "name": "Rooms Hotels",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Stamba Hotel",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Manganese",
+      "weight": 0.01,
+      "cities": [
+        "Chiatura"
+      ]
+    },
+    {
+      "name": "RMG Gold",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Georgian Products",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Extra.ge",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "MyMarket",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "TBC Leasing",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Agrohub",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Caucasus Online",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    },
+    {
+      "name": "Aversi Pharma",
+      "weight": 0.01,
+      "cities": [
+        "Tbilisi"
+      ]
+    }
+  ],
+  "jobs": [
+    "პროგრამისტი",
+    "ბუღალტერი",
+    "იურისტი",
+    "ექიმი",
+    "მასწავლებელი",
+    "ინჟინერი",
+    "არქიტექტორი",
+    "დიზაინერი",
+    "მენეჯერი",
+    "ჟურნალისტი",
+    "ფარმაცევტი",
+    "მძღოლი",
+    "მწვანილე",
+    "მეღვინე",
+    "აგრონომი",
+    "ეკონომისტი",
+    "პოლიტიკოსი",
+    "მუსიკოსი",
+    "მხატვარი",
+    "მწერალი",
+    "მთარგმნელი",
+    "ოპერატორი",
+    "ტექნიკოსი",
+    "სტომატოლოგი",
+    "ვეტერინარი",
+    "ფსიქოლოგი",
+    "სოციოლოგი",
+    "ფილოსოფოსი",
+    "ისტორიკოსი",
+    "ქიმიკოსი",
+    "ფიზიკოსი",
+    "ბიოლოგი",
+    "მათემატიკოსი",
+    "გეოგრაფი",
+    "მეცნიერი",
+    "კომუნიკატორი",
+    "მარკეტოლოგი",
+    "ანალიტიკოსი",
+    "აუდიტორი",
+    "ნოტარიუსი",
+    "სასამართლო ექსპერტი",
+    "შეფ-მზარეული",
+    "სომელიე"
+  ],
+  "catch_phrase_adjectives": [
+    "საიმედო",
+    "თანამედროვე",
+    "ინოვაციური",
+    "პროფესიონალური",
+    "ხარისხიანი",
+    "მოქნილი",
+    "ეფექტური",
+    "გამჭვირვალე",
+    "მდგრადი",
+    "ტექნოლოგიური",
+    "სტრატეგიული",
+    "დინამიური",
+    "კრეატიული",
+    "პროგრესული",
+    "ერთგული",
+    "გლობალური",
+    "ლოკალური",
+    "კავკასიური",
+    "ქართული"
+  ],
+  "catch_phrase_nouns": [
+    "განვითარება",
+    "წარმატება",
+    "ხარისხი",
+    "სერვისი",
+    "ინოვაცია",
+    "მომავალი",
+    "პროგრესი",
+    "პარტნიორობა",
+    "გადაწყვეტილება",
+    "გამოცდილება",
+    "ტექნოლოგია",
+    "თანამშრომლობა",
+    "ლიდერობა",
+    "ტრადიცია"
+  ],
+  "catch_phrase_verbs": [
+    "ვქმნით",
+    "ვაშენებთ",
+    "ვავითარებთ",
+    "ვაერთიანებთ",
+    "ვუზრუნველყოფთ",
+    "ვაძლიერებთ",
+    "ვცვლით",
+    "ვაუმჯობესებთ",
+    "ვაჩვენებთ",
+    "ვამტკიცებთ",
+    "ვიზრდებით",
+    "ვინოვატიურობთ",
+    "ვხელმძღვანელობთ",
+    "ვთანამშრომლობთ",
+    "ვიბრძვით"
+  ],
+  "catch_phrase_connector": "და",
+  "industries": [
+    {
+      "name": "winemaking",
+      "weight": 0.18
+    },
+    {
+      "name": "tourism",
+      "weight": 0.16
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.14
+    },
+    {
+      "name": "energy",
+      "weight": 0.1
+    },
+    {
+      "name": "banking",
+      "weight": 0.1
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08
+    },
+    {
+      "name": "construction",
+      "weight": 0.08
+    },
+    {
+      "name": "retail",
+      "weight": 0.06
+    },
+    {
+      "name": "transport",
+      "weight": 0.05
+    },
+    {
+      "name": "technology",
+      "weight": 0.05
+    }
+  ]
+}

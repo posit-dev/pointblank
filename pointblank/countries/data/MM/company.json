@@ -1,0 +1,762 @@
+{
+  "suffixes": [
+    "Co., Ltd.",
+    "Ltd.",
+    "Group",
+    "Corp.",
+    "Trading",
+    "Holdings",
+    "Enterprise"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Myanmar",
+    "Golden",
+    "Shwe",
+    "Royal",
+    "Pacific",
+    "Global",
+    "National",
+    "United",
+    "Premier",
+    "Central",
+    "Oriental",
+    "Modern",
+    "Dynamic",
+    "International",
+    "Strategic",
+    "Progressive",
+    "Digital",
+    "Irrawaddy",
+    "Mandalay",
+    "Bagan",
+    "Imperial",
+    "Grand",
+    "Shwedagon",
+    "Ayeyarwady",
+    "Mekong",
+    "Asian",
+    "Continental",
+    "Yangon"
+  ],
+  "nouns": [
+    "Commerce",
+    "Industries",
+    "Construction",
+    "Technology",
+    "Foods",
+    "Textiles",
+    "Agriculture",
+    "Finance",
+    "Transport",
+    "Logistics",
+    "Energy",
+    "Tourism",
+    "Exports",
+    "Imports",
+    "Services",
+    "Communications",
+    "Investments",
+    "Capital",
+    "Development",
+    "Production",
+    "Distribution",
+    "Resources",
+    "Systems",
+    "Engineering",
+    "Properties",
+    "Education",
+    "Media",
+    "Pharma",
+    "Trading",
+    "Consulting",
+    "Mining",
+    "Petroleum"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Myanmar Brewery",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Yoma Strategic Holdings",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "KBZ Bank",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw", "Bago", "Mawlamyine", "Taunggyi"]
+    },
+    {
+      "name": "MPT",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw", "Bago", "Pathein", "Mawlamyine"]
+    },
+    {
+      "name": "Mytel",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw", "Bago"]
+    },
+    {
+      "name": "Ooredoo Myanmar",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "CB Bank",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw", "Bago", "Pathein"]
+    },
+    {
+      "name": "AYA Bank",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw", "Mawlamyine"]
+    },
+    {
+      "name": "Myanmar National Airlines",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "Air KBZ",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "Max Myanmar",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Eden Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Capital Diamond Star Group",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Shwe Taung Group",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "Myanmar Awba Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "City Mart Holdings",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "Dagon Group",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "FMI",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Htoo Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Loi Hein Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "IGE Group",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Grand Royal Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Asia World",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "MPRL E&P",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Mother Trading",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Mandalay Brewery",
+      "cities": ["Mandalay"]
+    },
+    {
+      "name": "Myanma Oil and Gas Enterprise",
+      "cities": ["Yangon", "Naypyidaw"]
+    },
+    {
+      "name": "Myawaddy Trading",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Myanmar Economic Corporation",
+      "cities": ["Yangon", "Naypyidaw"]
+    },
+    {
+      "name": "SPA Group",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Pan Myat Trading",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Yangon Electricity Supply Corporation",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Golden Land East Asia Development",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Myanmar Thilawa SEZ Holdings",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Super Seven Stars Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "HAGL Myanmar",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Parami Energy Group",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "U Aung Ko Win Group",
+      "cities": ["Yangon", "Mandalay"]
+    },
+    {
+      "name": "Myanmar Agribusiness Public Corporation",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    },
+    {
+      "name": "Royal Shwe Hinthar Hotel",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Ngwe Pinle",
+      "cities": ["Yangon"]
+    },
+    {
+      "name": "Atom Myanmar",
+      "cities": ["Yangon", "Mandalay", "Naypyidaw"]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrator",
+    "Architect",
+    "Bank Teller",
+    "Business Analyst",
+    "Carpenter",
+    "Cashier",
+    "Chef",
+    "Civil Engineer",
+    "Consultant",
+    "Customer Service Representative",
+    "Data Analyst",
+    "Dentist",
+    "Designer",
+    "Director",
+    "Doctor",
+    "Driver",
+    "Economist",
+    "Electrician",
+    "Engineer",
+    "Farmer",
+    "Financial Analyst",
+    "Fisherman",
+    "General Manager",
+    "Hotel Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Lawyer",
+    "Lecturer",
+    "Marketing Manager",
+    "Mechanic",
+    "Mining Engineer",
+    "Nurse",
+    "Pharmacist",
+    "Pilot",
+    "Programmer",
+    "Professor",
+    "Project Manager",
+    "Receptionist",
+    "Sales Manager",
+    "Secretary",
+    "Security Guard",
+    "Software Developer",
+    "Teacher",
+    "Technician",
+    "Tour Guide",
+    "Translator",
+    "Veterinarian",
+    "Waiter"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "modern",
+    "reliable",
+    "professional",
+    "digital",
+    "global",
+    "strategic",
+    "sustainable",
+    "efficient",
+    "dynamic",
+    "creative",
+    "leading",
+    "competitive",
+    "responsible",
+    "integrated"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "opportunities",
+    "results",
+    "growth",
+    "development",
+    "quality",
+    "technology",
+    "innovation",
+    "excellence",
+    "commitment",
+    "value",
+    "trust",
+    "future",
+    "transformation"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "builds",
+    "develops",
+    "innovates",
+    "transforms",
+    "empowers",
+    "connects",
+    "strengthens",
+    "creates",
+    "leads",
+    "drives",
+    "enables",
+    "inspires",
+    "achieves",
+    "unites"
+  ],
+  "catch_phrase_connector": [
+    "and",
+    "with",
+    "for"
+  ],
+  "industries": [
+    {
+      "name": "agriculture",
+      "weight": 0.14,
+      "jobs": [
+        "Farmer",
+        "Veterinarian",
+        "Technician",
+        "General Manager"
+      ],
+      "well_known": [
+        "Myanmar Awba Group",
+        "Myanmar Agribusiness Public Corporation"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Trading",
+        "Enterprise"
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Rice",
+        "Exports",
+        "Farming",
+        "Produce"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "mining",
+      "weight": 0.06,
+      "jobs": [
+        "Mining Engineer",
+        "Engineer",
+        "Technician",
+        "General Manager"
+      ],
+      "well_known": [
+        "Myanmar Economic Corporation"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Mining",
+        "Minerals",
+        "Resources",
+        "Gems"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "oil_gas",
+      "weight": 0.07,
+      "jobs": [
+        "Engineer",
+        "Technician",
+        "Project Manager",
+        "General Manager"
+      ],
+      "well_known": [
+        "MPRL E&P",
+        "Myanma Oil and Gas Enterprise",
+        "Parami Energy Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Petroleum",
+        "Energy",
+        "Oil",
+        "Gas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.08,
+      "jobs": [
+        "Engineer",
+        "Technician",
+        "General Manager",
+        "Mechanic",
+        "Designer"
+      ],
+      "well_known": [
+        "Myanmar Brewery",
+        "Mandalay Brewery",
+        "Grand Royal Group",
+        "Loi Hein Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Manufacturing",
+        "Industries",
+        "Production",
+        "Assembly"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.10,
+      "jobs": [
+        "Architect",
+        "Civil Engineer",
+        "Carpenter",
+        "Electrician",
+        "Project Manager"
+      ],
+      "well_known": [
+        "Shwe Taung Group",
+        "Asia World",
+        "Max Myanmar",
+        "Eden Group",
+        "Golden Land East Asia Development"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Engineering",
+        "Development",
+        "Properties",
+        "Building"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} Construction {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.10,
+      "jobs": [
+        "Accountant",
+        "Financial Analyst",
+        "Bank Teller",
+        "Business Analyst",
+        "Economist"
+      ],
+      "well_known": [
+        "KBZ Bank",
+        "CB Bank",
+        "AYA Bank",
+        "FMI",
+        "Yoma Strategic Holdings",
+        "Myanmar Thilawa SEZ Holdings"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Finance",
+        "Investments",
+        "Capital",
+        "Banking"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} Bank",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "Technician",
+        "Engineer",
+        "IT Specialist",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "MPT",
+        "Mytel",
+        "Ooredoo Myanmar",
+        "Atom Myanmar"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Communications",
+        "Telecom",
+        "Networks",
+        "Mobile"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.08,
+      "jobs": [
+        "Tour Guide",
+        "Hotel Manager",
+        "Receptionist",
+        "Waiter",
+        "Translator",
+        "Driver"
+      ],
+      "well_known": [
+        "Air KBZ",
+        "Myanmar National Airlines",
+        "Royal Shwe Hinthar Hotel",
+        "Htoo Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Group",
+        "Enterprise"
+      ],
+      "company_nouns": [
+        "Tourism",
+        "Travel",
+        "Hospitality",
+        "Adventures",
+        "Resorts"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "Hotel {last_name}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Dentist",
+        "Pharmacist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Co., Ltd."
+      ],
+      "company_nouns": [
+        "Health",
+        "Medical",
+        "Pharma",
+        "Clinic"
+      ],
+      "company_formats": [
+        "Hospital {last_name}",
+        "Clinic {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Lecturer",
+        "Administrator"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Education",
+        "Academy",
+        "Institute"
+      ],
+      "company_formats": [
+        "University of {city}",
+        "{adjective} Academy {suffix}",
+        "Institute of {noun}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.05,
+      "jobs": [
+        "Programmer",
+        "Software Developer",
+        "IT Specialist",
+        "Data Analyst",
+        "Designer"
+      ],
+      "well_known": [
+        "SPA Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Technology",
+        "Systems",
+        "Solutions",
+        "Digital",
+        "Software"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} Tech {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.07,
+      "jobs": [
+        "Engineer",
+        "Technician",
+        "Project Manager"
+      ],
+      "well_known": [
+        "Yangon Electricity Supply Corporation",
+        "Parami Energy Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Power",
+        "Electric",
+        "Renewables"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "trade_retail",
+      "weight": 0.08,
+      "jobs": [
+        "Sales Manager",
+        "Cashier",
+        "Marketing Manager",
+        "General Manager",
+        "Secretary"
+      ],
+      "well_known": [
+        "City Mart Holdings",
+        "Mother Trading",
+        "Pan Myat Trading",
+        "Myawaddy Trading",
+        "Super Seven Stars Group",
+        "Capital Diamond Star Group",
+        "Dagon Group",
+        "Ngwe Pinle"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Trading",
+        "Enterprise",
+        "Group"
+      ],
+      "company_nouns": [
+        "Trading",
+        "Commerce",
+        "Imports",
+        "Exports",
+        "Distribution"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} Trading {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
+}

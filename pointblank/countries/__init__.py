@@ -233,16 +233,20 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "AE",  # United Arab Emirates
+    "AM",  # Armenia
     "AR",  # Argentina
     "AT",  # Austria
     "AU",  # Australia
+    "AZ",  # Azerbaijan
     "BD",  # Bangladesh
     "BE",  # Belgium
     "BG",  # Bulgaria
+    "BO",  # Bolivia
     "BR",  # Brazil
     "CA",  # Canada
     "CH",  # Switzerland
     "CL",  # Chile
+    "CM",  # Cameroon
     "CN",  # China
     "CO",  # Colombia
     "CR",  # Costa Rica
@@ -250,6 +254,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "CZ",  # Czech Republic
     "DE",  # Germany
     "DK",  # Denmark
+    "DO",  # Dominican Republic
     "DZ",  # Algeria
     "EC",  # Ecuador
     "EE",  # Estonia
@@ -259,30 +264,43 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "FI",  # Finland
     "FR",  # France
     "GB",  # United Kingdom
+    "GE",  # Georgia
     "GH",  # Ghana
     "GR",  # Greece
+    "GT",  # Guatemala
     "HK",  # Hong Kong
+    "HN",  # Honduras
     "HR",  # Croatia
     "HU",  # Hungary
     "ID",  # Indonesia
     "IE",  # Ireland
+    "IL",  # Israel
     "IN",  # India
     "IS",  # Iceland
     "IT",  # Italy
+    "JM",  # Jamaica
+    "JO",  # Jordan
     "JP",  # Japan
     "KE",  # Kenya
+    "KH",  # Cambodia
     "KR",  # South Korea
+    "KZ",  # Kazakhstan
+    "LB",  # Lebanon
     "LK",  # Sri Lanka
     "LT",  # Lithuania
     "LU",  # Luxembourg
     "LV",  # Latvia
     "MA",  # Morocco
+    "MD",  # Moldova
+    "MM",  # Myanmar
     "MT",  # Malta
     "MX",  # Mexico
     "MY",  # Malaysia
+    "MZ",  # Mozambique
     "NG",  # Nigeria
     "NL",  # Netherlands
     "NO",  # Norway
+    "NP",  # Nepal
     "NZ",  # New Zealand
     "PA",  # Panama
     "PE",  # Peru
@@ -290,21 +308,28 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PK",  # Pakistan
     "PL",  # Poland
     "PT",  # Portugal
+    "PY",  # Paraguay
     "RO",  # Romania
+    "RS",  # Serbia
     "RU",  # Russia
+    "RW",  # Rwanda
     "SA",  # Saudi Arabia
     "SE",  # Sweden
     "SG",  # Singapore
     "SI",  # Slovenia
     "SK",  # Slovakia
     "SN",  # Senegal
+    "SV",  # El Salvador
     "TH",  # Thailand
     "TN",  # Tunisia
     "TR",  # Turkey
     "TW",  # Taiwan
+    "TZ",  # Tanzania
     "UA",  # Ukraine
     "UG",  # Uganda
     "US",  # United States
+    "UY",  # Uruguay
+    "UZ",  # Uzbekistan
     "VN",  # Vietnam
     "ZA",  # South Africa
 ]

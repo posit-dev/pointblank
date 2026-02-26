@@ -334,7 +334,7 @@ O gerador suporta geração de dados sofisticada com estas capacidades:
 
 - **Dados realistas com presets**: Use presets integrados como `"name"`, `"email"`, `"address"`, `"phone"`, etc.
 - **Strings de user agent**: Gere strings de user agent de navegador altamente variadas e realistas de 17 categorias de navegadores com mais de 42.000 combinações únicas
-- **Suporte a 50+ países**: Gere dados específicos de localização (ex., `country="DE"` para endereços alemães)
+- **Suporte a 100 países**: Gere dados específicos de localização (ex., `country="DE"` para endereços alemães)
 - **Restrições de campos**: Controle intervalos, padrões, unicidade e valores permitidos
 - **Múltiplos formatos de saída**: Retorna DataFrames Polars por padrão, mas também suporta Pandas (`output="pandas"`) ou dicionários (`output="dict"`)
 
@@ -344,7 +344,7 @@ O gerador suporta geração de dados sofisticada com estas capacidades:
 - **Construído para colaboração**: Compartilhe resultados com colegas através de relatórios interativos bonitos
 - **Saídas práticas**: Obtenha exatamente o que você precisa: contagens, extratos, resumos ou relatórios completos
 - **Implementação flexível**: Use em notebooks, scripts ou pipelines de dados
-- **Geração de dados sintéticos**: Crie dados de teste realistas com mais de 30 presets, strings de user agent, formatação adaptada ao locale e suporte a mais de 50 países
+- **Geração de dados sintéticos**: Crie dados de teste realistas com mais de 30 presets, strings de user agent, formatação adaptada ao locale e suporte a 100 países
 - **Personalizável**: Adapte etapas de validação e relatórios às suas necessidades específicas
 - **Internacionalização**: Os relatórios podem ser gerados em 40 idiomas, incluindo inglês, espanhol, francês e alemão
 
