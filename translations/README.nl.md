@@ -318,17 +318,17 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# Genereer 100 rijen realistische testdata
-data = pb.generate_dataset(schema, n=100, seed=23)
+# Genereer 10 rijen realistische testdata
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
 ```
 
-| user_id             | name             | email                       | age | status   |
-|---------------------|------------------|-----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
 
