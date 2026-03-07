@@ -17898,48 +17898,7 @@ class Validate:
         if "extract" in report_original:
             report_original.pop("extract")
 
-        # Remove keys to be dropped
-        # MEGHAN pick up Here!!!
-        # I need to
-        # 1) assess which keys should be turned innto columns - DONE
-        # 2) Determine which keys are used for conditionals (active = data from step shows, inactive replace with "-")
-        # 3) Create a schema - DONE
-        # 4) return the df
-
-        # Check for polars, raise if not installed
-        if tbl_type == "polars":
-            if not _is_lib_present(lib_name="polars"):
-                raise ImportError(
-                    "The Polars library is not installed but is required when specifying "
-                    '`tbl_type="polars".'
-                )
-            import polars as pl
-
-        # Create the schema for the df
-        schema = pl.Schema(
-            {
-                "active": pl.Boolean,
-                "i": pl.Int64,
-                "assertion_type": pl.String,
-                "column": pl.String,
-                "values": pl.Object,
-                "pre": pl.Object,
-                "segments": pl.String,
-                "eval_error": pl.Boolean,
-                "n": pl.Int64,
-                "all_passed": pl.Boolean,
-                "n_passed": pl.Int64,
-                "f_passed": pl.Float64,
-                "n_failed": pl.Int64,
-                "f_failed": pl.Float64,
-                "warning": pl.Boolean,
-                "error": pl.Boolean,
-                "critical": pl.Boolean,
-                "brief": pl.String,
-                "autobrief": pl.String,  # Default brief if none found
-            }
-        )
-
+        # Set a dictionary for converting column names for df
         names_dict = {
             "active": "active",
             "i": "step_number",
@@ -17962,37 +17921,142 @@ class Validate:
             "autobrief": "autobrief",
         }
 
-        report = {key: report_original[key] for key in names_dict.keys() if key in report_original}
+        final_report = {
+            key: report_original[key] for key in names_dict.keys() if key in report_original
+        }
 
-        df_validation_results = (
-            pl.DataFrame(data=report, schema=schema)
-            .rename(names_dict)
-            .with_columns(
-                brief=pl.coalesce("input_brief", "autobrief"),
-                preprocessed=pl.when(pl.col("original_pre").is_not_null())
-                .then(pl.lit(True))
-                .otherwise(pl.lit(False)),
-                segmented=pl.when(pl.col("original_segments").is_not_null())
-                .then(pl.lit(True))
-                .otherwise(pl.lit(False)),
-                # Extract pattern from values if it's a dict, otherwise keep as-is
-                values=pl.col("values").map_elements(
-                    lambda x: x.get("pattern") if isinstance(x, dict) and "pattern" in x else x,
-                    return_dtype=pl.Object
+        # Check for polars, raise if not installed
+        if tbl_type == "polars":
+            if not _is_lib_present(lib_name="polars"):
+                raise ImportError(
+                    "The Polars library is not installed but is required when specifying "
+                    '`tbl_type="polars".'
                 )
-            )
-            .with_columns(
-                pl.when(pl.col("active") == False)
-                .then(pl.lit("-"))
-                .otherwise(pl.col(col))
-                .alias(col)
-                for col in ["step_evaluated", "units", "all_units_passed", "pass_n", "pass_pct",
-                            "failed_n", "failed_pct", "warning", "error", "critical"]
-            )
-            .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
-        )
 
-        return df_validation_results
+            import polars as pl
+
+            # Create the schema for the df
+            pl_schema = pl.Schema(
+                {
+                    "active": pl.Boolean,
+                    "i": pl.Int64,
+                    "assertion_type": pl.String,
+                    "column": pl.String,
+                    "values": pl.Object,
+                    "pre": pl.Object,
+                    "segments": pl.String,
+                    "eval_error": pl.Boolean,
+                    "n": pl.Int64,
+                    "all_passed": pl.Boolean,
+                    "n_passed": pl.Int64,
+                    "f_passed": pl.Float64,
+                    "n_failed": pl.Int64,
+                    "f_failed": pl.Float64,
+                    "warning": pl.Boolean,
+                    "error": pl.Boolean,
+                    "critical": pl.Boolean,
+                    "brief": pl.String,
+                    "autobrief": pl.String,  # Default brief if none found
+                }
+            )
+
+            df_validation_results = (
+                pl.DataFrame(data=final_report, schema=pl_schema)
+                .rename(names_dict)
+                .with_columns(
+                    brief=pl.coalesce("input_brief", "autobrief"),
+                    preprocessed=pl.when(pl.col("original_pre").is_not_null())
+                    .then(pl.lit(True))
+                    .otherwise(pl.lit(False)),
+                    segmented=pl.when(pl.col("original_segments").is_not_null())
+                    .then(pl.lit(True))
+                    .otherwise(pl.lit(False)),
+                    # Extract pattern from values if it's a dict, otherwise keep as-is
+                    values=pl.col("values").map_elements(
+                        lambda x: x.get("pattern") if isinstance(x, dict) and "pattern" in x else x,
+                        return_dtype=pl.Object,
+                    ),
+                )
+                .with_columns(
+                    pl.when(pl.col("active") == False)
+                    .then(pl.lit("-"))
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                    for col in [
+                        "step_evaluated",
+                        "units",
+                        "all_units_passed",
+                        "pass_n",
+                        "pass_pct",
+                        "failed_n",
+                        "failed_pct",
+                        "warning",
+                        "error",
+                        "critical",
+                    ]
+                )
+                .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
+            )
+
+            return df_validation_results
+
+        if tbl_type == "pandas":
+            if not _is_lib_present(lib_name="pandas"):
+                raise ImportError(
+                    "The Pandas library is not installed but is required when specifying "
+                    '`tbl_type="pandas".'
+                )
+
+            import pandas as pd
+
+            def transform_validation_results(df):
+                # Coalesce: use fillna for first occurrence
+                df = df.assign(brief=df["input_brief"].fillna(df["autobrief"]))
+
+                # Boolean columns based on null checks
+                df = df.assign(
+                    preprocessed=df["original_pre"].notna(),
+                    segmented=df["original_segments"].notna(),
+                )
+
+                # Extract pattern from dict
+                df = df.assign(
+                    values=df["values"].apply(
+                        lambda x: x.get("pattern") if isinstance(x, dict) and "pattern" in x else x
+                    )
+                )
+
+                # Create conditional columns in a loop
+                conditional_cols = [
+                    "step_evaluated",
+                    "units",
+                    "all_units_passed",
+                    "pass_n",
+                    "pass_pct",
+                    "failed_n",
+                    "failed_pct",
+                    "warning",
+                    "error",
+                    "critical",
+                ]
+
+                for col in conditional_cols:
+                    df[col] = df[col].where(df["active"] != False, "-")
+
+                # Drop columns
+                df_validation_results = df.drop(
+                    columns=["input_brief", "autobrief", "original_pre", "original_segments"]
+                )
+
+                return df
+
+            df_validation_results = (
+                pd.DataFrame(data=final_report)
+                .rename(columns=names_dict)
+                .pipe(transform_validation_results)
+            )
+
+            return df_validation_results
 
     def _add_validation(self, validation_info):
         """
