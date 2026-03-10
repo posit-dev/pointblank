@@ -1150,12 +1150,15 @@ def test_brief_auto():
     # Check that brief is set to auto template
     assert validation.validation_info[0].brief == "{auto}"
 
-    # Check that the HTML report generates and contains meaningful content
+    # Check that the HTML report generates auto brief text
     html = validation.get_tabular_report().as_raw_html()
     assert html is not None
     assert len(html) > 0
-    # Auto briefs should mention validation details about the column
+
+    # Auto brief should contain references to the aggregation type and column
+    # Should mention "sum" and "amount" and the comparison
     assert "amount" in html
+    assert "sum" in html.lower()
 
 
 def test_brief_custom():
@@ -1177,7 +1180,7 @@ def test_brief_custom():
 
 
 def test_brief_mixed():
-    """Test mixing auto and custom briefs across multiple validation steps."""
+    """Test mixing custom and auto brief templates across multiple validation steps."""
     data = pl.DataFrame({"value_a": [10, 20, 30], "value_b": [100, 200, 300]})
 
     custom_brief_1 = "First check: sum validation"
@@ -1185,7 +1188,7 @@ def test_brief_mixed():
     validation = (
         Validate(data)
         .col_sum_gt(columns="value_a", value=50, brief=custom_brief_1)
-        .col_avg_lt(columns="value_b", value=400, brief=True)  # auto brief
+        .col_avg_lt(columns="value_b", value=400, brief=True)  # auto brief template
         .interrogate()
     )
 
@@ -1198,8 +1201,37 @@ def test_brief_mixed():
     # Both should appear in HTML report
     html = validation.get_tabular_report().as_raw_html()
     assert custom_brief_1 in html
-    # Auto briefs in the report should mention the column being validated
+    # Auto brief should mention the column and aggregation type
     assert "value_b" in html
+    assert "average" in html.lower()
 
 
-# test_brief_mixed()
+@pytest.mark.parametrize("method", load_validation_method_grid())
+def test_brief_auto_all_agg_methods(method: str):
+    """Test that auto briefs are generated for all aggregation methods.
+
+    This ensures that the agg_display_names mapping in _create_text_agg
+    has coverage for all aggregation types (sum, avg, sd).
+    """
+    from pointblank._agg import split_agg_name
+
+    data = pl.DataFrame({"col": [10.0, 20.0, 30.0, 40.0, 50.0]})
+
+    v = Validate(data)
+    v = getattr(v, method)(columns="col", value=100, brief=True)
+    v = v.interrogate()
+
+    assert v.validation_info[0].brief == "{auto}"
+
+    html = v.get_tabular_report().as_raw_html()
+    assert html is not None
+    assert len(html) > 0
+    assert "col" in html
+
+    # Extract agg type from method name to verify it appears in report
+    # e.g., "col_sum_eq" -> agg_type="sum"
+    agg_type, _ = split_agg_name(method)
+    agg_display_map = {"sum": "sum", "avg": "average", "sd": "standard deviation"}
+    agg_display = agg_display_map.get(agg_type, agg_type)
+
+    assert agg_display.lower() in html.lower()
