@@ -1139,3 +1139,67 @@ def test_agg_report_multiple_steps_formatting():
 
     # Step 3: Value with asymmetric tolerance
     assert "2.0<br/>tol=(0.1, 0.2)" in html
+
+
+def test_brief_auto():
+    """Test that auto briefs are generated correctly for aggregation methods."""
+    data = pl.DataFrame({"amount": [100, 200, 300]})
+
+    validation = Validate(data).col_sum_gt(columns="amount", value=500, brief=True).interrogate()
+
+    # Check that brief is set to auto template
+    assert validation.validation_info[0].brief == "{auto}"
+
+    # Check that the HTML report generates and contains meaningful content
+    html = validation.get_tabular_report().as_raw_html()
+    assert html is not None
+    assert len(html) > 0
+    # Auto briefs should mention validation details about the column
+    assert "amount" in html
+
+
+def test_brief_custom():
+    """Test that custom briefs are stored and displayed correctly."""
+    data = pl.DataFrame({"sales": [1000, 2000, 3000]})
+
+    custom_brief = "Validating that total sales exceeds minimum threshold"
+
+    validation = (
+        Validate(data).col_avg_eq(columns="sales", value=2000, brief=custom_brief).interrogate()
+    )
+
+    # Check that custom brief is stored
+    assert validation.validation_info[0].brief == custom_brief
+
+    # Check that custom brief appears in HTML report
+    html = validation.get_tabular_report().as_raw_html()
+    assert custom_brief in html
+
+
+def test_brief_mixed():
+    """Test mixing auto and custom briefs across multiple validation steps."""
+    data = pl.DataFrame({"value_a": [10, 20, 30], "value_b": [100, 200, 300]})
+
+    custom_brief_1 = "First check: sum validation"
+
+    validation = (
+        Validate(data)
+        .col_sum_gt(columns="value_a", value=50, brief=custom_brief_1)
+        .col_avg_lt(columns="value_b", value=400, brief=True)  # auto brief
+        .interrogate()
+    )
+
+    # First step should have custom brief
+    assert validation.validation_info[0].brief == custom_brief_1
+
+    # Second step should have auto brief template
+    assert validation.validation_info[1].brief == "{auto}"
+
+    # Both should appear in HTML report
+    html = validation.get_tabular_report().as_raw_html()
+    assert custom_brief_1 in html
+    # Auto briefs in the report should mention the column being validated
+    assert "value_b" in html
+
+
+# test_brief_mixed()
