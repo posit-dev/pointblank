@@ -27,11 +27,7 @@ from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
 
-from pointblank._agg import (
-    is_valid_agg,
-    load_validation_method_grid,
-    resolve_agg_registries,
-)
+from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
     CHECK_MARK_SPAN,
@@ -140,12 +136,7 @@ if TYPE_CHECKING:
     import polars as pl
     from narwhals.typing import IntoDataFrame, IntoFrame
 
-    from pointblank._typing import (
-        AbsoluteBounds,
-        Tolerance,
-        _CompliantValue,
-        _CompliantValues,
-    )
+    from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
 
 __all__ = [
@@ -788,9 +779,7 @@ def read_file(filepath: str | Path) -> Validate:
         raise RuntimeError(f"Failed to read validation object from {file_path}: {e}")
 
 
-def _check_for_unpicklable_objects(
-    validation: Validate,
-) -> tuple[dict[str, str], list[int]]:
+def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str], list[int]]:
     """
     Check for functions and capture source code for preservation across sessions.
 
@@ -849,11 +838,7 @@ def _check_for_unpicklable_objects(
                         f"Warning: Function '{func_name}' is picklable but source code could not be captured. "
                         f"It may not be available when loading in a different session."
                     )
-                except (
-                    pickle.PicklingError,
-                    AttributeError,
-                    TypeError,
-                ):  # pragma: no cover
+                except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
                     # Not picklable and no source: treat as problematic
                     print(  # pragma: no cover
                         f"Warning: Function '{func_name}' is not picklable and source could not be captured. "
@@ -943,11 +928,7 @@ def _provide_serialization_guidance(validation: Validate) -> None:
             try:  # pragma: no cover
                 pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
                 can_pickle = True  # pragma: no cover
-            except (
-                pickle.PicklingError,
-                AttributeError,
-                TypeError,
-            ):  # pragma: no cover
+            except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
                 can_pickle = False  # pragma: no cover
                 functions_analysis["unpicklable_functions"].append(
                     (i, func_name, func_module)
@@ -1342,10 +1323,7 @@ def write_file(
     function_sources, lambda_steps = _check_for_unpicklable_objects(validation_copy)
 
     # Create a validation package that includes both the object and function sources
-    validation_package = {
-        "validation": validation_copy,
-        "function_sources": function_sources,
-    }
+    validation_package = {"validation": validation_copy, "function_sources": function_sources}
 
     # Serialize to disk using pickle
     try:
@@ -2304,10 +2282,7 @@ def _generate_display_table(
 
         # Select the columns to display in the table with the `resolved_columns` value
         data = _select_columns(
-            data,
-            resolved_columns=resolved_columns,
-            ibis_tbl=ibis_tbl,
-            tbl_type=tbl_type,
+            data, resolved_columns=resolved_columns, ibis_tbl=ibis_tbl, tbl_type=tbl_type
         )
 
     # From an Ibis table:
@@ -3189,8 +3164,7 @@ def missing_vals_tbl(data: Any) -> GT:
         import polars.selectors as cs
 
         missing_vals_tbl = missing_vals_tbl.tab_style(
-            style=style.fill(color="lightblue"),
-            locations=loc.body(mask=cs.numeric().eq(0)),
+            style=style.fill(color="lightblue"), locations=loc.body(mask=cs.numeric().eq(0))
         )
 
     if df_lib_name_gt == "pandas":
@@ -13703,9 +13677,7 @@ class Validate:
                     ]:
                         # Process table for column validation
                         tbl = _column_test_prep(
-                            df=data_tbl_step,
-                            column=column,
-                            allowed_types=compatible_dtypes,
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
                         if assertion_method == "gt":
@@ -13801,9 +13773,7 @@ class Validate:
                             )
 
                         elif assertion_type == "col_vals_within_spec":
-                            from pointblank._interrogation import (
-                                interrogate_within_spec,
-                            )
+                            from pointblank._interrogation import interrogate_within_spec
 
                             results_tbl = interrogate_within_spec(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
@@ -13891,9 +13861,7 @@ class Validate:
                             schema_info=schema_validation_info
                         )
                         validation._add_note(
-                            key="schema_check",
-                            markdown=schema_note_html,
-                            text=schema_note_text,
+                            key="schema_check", markdown=schema_note_html, text=schema_note_text
                         )
 
                         validation.all_passed = result_bool
@@ -13920,9 +13888,7 @@ class Validate:
 
                     elif assertion_type == "col_count_match":
                         result_bool = col_count_match(
-                            data_tbl=data_tbl_step,
-                            count=value["count"],
-                            inverse=value["inverse"],
+                            data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
                         )
 
                         validation.all_passed = result_bool
@@ -14140,20 +14106,16 @@ class Validate:
                         if is_column_not_found:
                             note_html = _create_column_not_found_note_html(
                                 column_name=column,
-                                available_columns=(
-                                    list(data_tbl_step.columns)
-                                    if hasattr(data_tbl_step, "columns")
-                                    else []
-                                ),
+                                available_columns=list(data_tbl_step.columns)
+                                if hasattr(data_tbl_step, "columns")
+                                else [],
                                 locale=self.locale,
                             )
                             note_text = _create_column_not_found_note_text(
                                 column_name=column,
-                                available_columns=(
-                                    list(data_tbl_step.columns)
-                                    if hasattr(data_tbl_step, "columns")
-                                    else []
-                                ),
+                                available_columns=list(data_tbl_step.columns)
+                                if hasattr(data_tbl_step, "columns")
+                                else [],
                             )
                             validation._add_note(
                                 key="column_not_found",
@@ -14172,10 +14134,7 @@ class Validate:
 
                                 # Determine position for between/outside validations
                                 position = None
-                                if assertion_type in [
-                                    "col_vals_between",
-                                    "col_vals_outside",
-                                ]:
+                                if assertion_type in ["col_vals_between", "col_vals_outside"]:
                                     # Check if missing column is in left or right position
                                     from pointblank.column import Column
 
@@ -14193,21 +14152,17 @@ class Validate:
                                 note_html = _create_comparison_column_not_found_note_html(
                                     column_name=missing_col_name,
                                     position=position,
-                                    available_columns=(
-                                        list(data_tbl_step.columns)
-                                        if hasattr(data_tbl_step, "columns")
-                                        else []
-                                    ),
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
                                     locale=self.locale,
                                 )
                                 note_text = _create_comparison_column_not_found_note_text(
                                     column_name=missing_col_name,
                                     position=position,
-                                    available_columns=(
-                                        list(data_tbl_step.columns)
-                                        if hasattr(data_tbl_step, "columns")
-                                        else []
-                                    ),
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
                                 )
                                 validation._add_note(
                                     key="comparison_column_not_found",
@@ -14308,9 +14263,7 @@ class Validate:
                     validation,
                     level,
                     threshold._threshold_result(
-                        fraction_failing=validation.f_failed,
-                        test_units=validation.n,
-                        level=level,
+                        fraction_failing=validation.f_failed, test_units=validation.n, level=level
                     ),
                 )
 
@@ -14509,8 +14462,7 @@ class Validate:
                             validation_extract_native = (
                                 validation_extract_native.sample(  # pragma: no cover
                                     fraction=min(
-                                        1.0,
-                                        sample_n / validation_extract_native.count(),
+                                        1.0, sample_n / validation_extract_native.count()
                                     )  # pragma: no cover
                                 ).limit(sample_n)
                             )  # pragma: no cover
@@ -15947,9 +15899,7 @@ class Validate:
         return result
 
     def get_json_report(
-        self,
-        use_fields: list[str] | None = None,
-        exclude_fields: list[str] | None = None,
+        self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str:
         """
         Get a report of the validation results as a JSON-formatted string.
@@ -16661,8 +16611,7 @@ class Validate:
                 .opt_align_table_header(align=before)
                 .tab_style(style=style.css("height: 20px;"), locations=loc.body())
                 .tab_style(
-                    style=style.text(weight="bold", color="#666666"),
-                    locations=loc.column_labels(),
+                    style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
                 )
                 .tab_style(
                     style=style.text(size="28px", weight="bold", align=before, color="#444444"),
@@ -17332,8 +17281,7 @@ class Validate:
                 locations=loc.body(columns="i"),
             )
             .tab_style(
-                style=style.text(weight="bold", color="#666666"),
-                locations=loc.column_labels(),
+                style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
             )
             .tab_style(
                 style=style.text(size="28px", weight="bold", align=before, color="#444444"),
@@ -17344,14 +17292,7 @@ class Validate:
                     color="black", font=google_font(name="IBM Plex Mono"), size="11px"
                 ),
                 locations=loc.body(
-                    columns=[
-                        "type_upd",
-                        "columns_upd",
-                        "values_upd",
-                        "test_units",
-                        "pass",
-                        "fail",
-                    ]
+                    columns=["type_upd", "columns_upd", "values_upd", "test_units", "pass", "fail"]
                 ),
             )
             .tab_style(
@@ -17412,9 +17353,7 @@ class Validate:
             )
             .tab_style(
                 style=style.fill(
-                    color=(
-                        from_column(column="status_color") if interrogation_performed else "white"
-                    )
+                    color=from_column(column="status_color") if interrogation_performed else "white"
                 ),
                 locations=loc.body(columns="status_color"),
             )
@@ -17463,8 +17402,7 @@ class Validate:
                 }
             )
             .cols_align(
-                align="center",
-                columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
+                align="center", columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"]
             )
             .cols_align(align="right", columns=["test_units", "pass", "fail"])
             .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
@@ -17501,16 +17439,7 @@ class Validate:
             gt_tbl = gt_tbl.tab_style(
                 style=style.fill(color="#F2F2F2"),
                 locations=loc.body(
-                    columns=[
-                        "tbl",
-                        "eval",
-                        "test_units",
-                        "pass",
-                        "fail",
-                        "w_upd",
-                        "e_upd",
-                        "c_upd",
-                    ]
+                    columns=["tbl", "eval", "test_units", "pass", "fail", "w_upd", "e_upd", "c_upd"]
                 ),
             )
 
@@ -17535,8 +17464,7 @@ class Validate:
             gt_tbl = gt_tbl.tab_style(
                 style=style.text(color="#B22222"),
                 locations=loc.body(
-                    columns="columns_upd",
-                    rows=[i for i, error in enumerate(eval_error) if error],
+                    columns="columns_upd", rows=[i for i, error in enumerate(eval_error) if error]
                 ),
             )
 
@@ -19220,9 +19148,9 @@ def _create_autobrief_or_failure_text(
     if assertion_type == "prompt":
         return _create_text_prompt(
             lang=lang,
-            prompt=(
-                values["prompt"] if isinstance(values, dict) and "prompt" in values else str(values)
-            ),
+            prompt=values["prompt"]
+            if isinstance(values, dict) and "prompt" in values
+            else str(values),
             for_failure=for_failure,
         )
 
@@ -19292,11 +19220,7 @@ def _create_text_between(
 
 
 def _create_text_set(
-    lang: str,
-    column: str,
-    values: list[Any],
-    not_: bool = False,
-    for_failure: bool = False,
+    lang: str, column: str, values: list[Any], not_: bool = False, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -19431,33 +19355,6 @@ def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = Fal
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
-
-
-def _create_text_data_freshness(
-    lang: str,
-    column: str | None,
-    value: dict,
-    for_failure: bool = False,
-) -> str:
-    """Create text for data_freshness validation."""
-    type_ = _expect_failure_type(for_failure=for_failure)
-
-    column_text = _prep_column_text(column=column)
-    max_age_text = _format_timedelta(value.get("max_age"))
-
-    if for_failure:
-        age = value.get("age")
-        age_text = _format_timedelta(age) if age else "unknown"
-        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
-            column_text=column_text,
-            max_age_text=max_age_text,
-            age_text=age_text,
-        )
-    else:
-        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
-            column_text=column_text,
-            max_age_text=max_age_text,
-        )
 
 
 def _create_text_data_freshness(
@@ -20107,10 +20004,7 @@ def _get_preprocessed_table_icon(icon: list[str]) -> list[str]:
 
 
 def _transform_eval(
-    n: list[int],
-    interrogation_performed: bool,
-    eval_error: list[bool],
-    active: list[bool],
+    n: list[int], interrogation_performed: bool, eval_error: list[bool], active: list[bool]
 ) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
@@ -20284,7 +20178,9 @@ def _transform_w_e_c(values, color, interrogation_performed):
             else (
                 f'<span style="color: {color};">&#9679;</span>'
                 if value is True
-                else (f'<span style="color: {color};">&cir;</span>' if value is False else value)
+                else f'<span style="color: {color};">&cir;</span>'
+                if value is False
+                else value
             )
         )
         for value in values
@@ -20316,11 +20212,9 @@ def _transform_assertion_str(
         # If the template text `{auto}` is in the `brief_str` then replace it with
         # the corresponding `autobrief_str` entry
         brief_str = [
-            (
-                brief_str[i].replace("{auto}", autobrief_str[i])
-                if "{auto}" in brief_str[i]
-                else brief_str[i]
-            )
+            brief_str[i].replace("{auto}", autobrief_str[i])
+            if "{auto}" in brief_str[i]
+            else brief_str[i]
             for i in range(len(brief_str))
         ]
 
@@ -20331,7 +20225,7 @@ def _transform_assertion_str(
         # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
         # font-size from parent divs, so we add inline styles directly to the <p> tags
         brief_str = [
-            (re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x)
+            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
             for x in brief_str
         ]
 
@@ -20347,11 +20241,9 @@ def _transform_assertion_str(
 
     # Define the brief's HTML div tag for each row
     brief_divs = [
-        (
-            f"<div style=\"font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;{rtl_css_style}\">{brief}</div>"
-            if brief.strip()
-            else ""
-        )
+        f"<div style=\"font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;{rtl_css_style}\">{brief}</div>"
+        if brief.strip()
+        else ""
         for brief in brief_str
     ]
 
@@ -20685,10 +20577,7 @@ def _format_single_float_with_gt_custom(
 
     # Create GT object and format the column
     gt_obj = GT(df).fmt_number(
-        columns="value",
-        decimals=decimals,
-        drop_trailing_zeros=drop_trailing_zeros,
-        locale=locale,
+        columns="value", decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
     )
 
     # Extract the formatted value using _get_column_of_values
@@ -20698,11 +20587,7 @@ def _format_single_float_with_gt_custom(
 
 
 def _format_number_safe(
-    value: float,
-    decimals: int,
-    drop_trailing_zeros: bool = False,
-    locale: str = "en",
-    df_lib=None,
+    value: float, decimals: int, drop_trailing_zeros: bool = False, locale: str = "en", df_lib=None
 ) -> str:
     """
     Safely format a float value with locale support.
@@ -20883,11 +20768,7 @@ def _create_local_threshold_note_html(thresholds: Thresholds, locale: str = "en"
             else:
                 # Use shared formatting function with drop_trailing_zeros
                 formatted = _format_number_safe(
-                    fraction,
-                    decimals=2,
-                    drop_trailing_zeros=True,
-                    locale=locale,
-                    df_lib=df_lib,
+                    fraction, decimals=2, drop_trailing_zeros=True, locale=locale, df_lib=df_lib
                 )
                 return formatted
         elif count is not None:
@@ -21043,8 +20924,7 @@ def _create_no_columns_resolved_note_html(
     """
     # Get translated strings
     intro = NOTES_TEXT.get("column_not_found_intro", {}).get(
-        locale,
-        NOTES_TEXT.get("column_not_found_intro", {}).get("en", "The column expression"),
+        locale, NOTES_TEXT.get("column_not_found_intro", {}).get("en", "The column expression")
     )
     no_resolve = NOTES_TEXT.get("column_not_found_no_resolve", {}).get(
         locale,
@@ -21103,8 +20983,7 @@ def _create_column_not_found_note_html(
     """
     # Get translated strings
     intro = NOTES_TEXT.get("target_column_provided", {}).get(
-        locale,
-        NOTES_TEXT.get("target_column_provided", {}).get("en", "The target column provided"),
+        locale, NOTES_TEXT.get("target_column_provided", {}).get("en", "The target column provided")
     )
     not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
         locale,
@@ -21142,10 +21021,7 @@ def _create_column_not_found_note_text(column_name: str, available_columns: list
 
 
 def _create_comparison_column_not_found_note_html(
-    column_name: str,
-    position: str | None,
-    available_columns: list[str],
-    locale: str = "en",
+    column_name: str, position: str | None, available_columns: list[str], locale: str = "en"
 ) -> str:
     """
     Create an HTML note explaining that a comparison column was not found.
@@ -21263,8 +21139,7 @@ def _create_preprocessing_note_html(
     """
     # Get translated strings
     precondition_text = NOTES_TEXT.get("precondition_applied", {}).get(
-        locale,
-        NOTES_TEXT.get("precondition_applied", {}).get("en", "Precondition applied"),
+        locale, NOTES_TEXT.get("precondition_applied", {}).get("en", "Precondition applied")
     )
     table_dims_text = NOTES_TEXT.get("table_dimensions", {}).get(
         locale, NOTES_TEXT.get("table_dimensions", {}).get("en", "table dimensions")
@@ -21413,8 +21288,7 @@ def _create_synthetic_target_column_note_html(column_name: str, locale: str = "e
     """
     # Get translated strings
     synthetic_text = NOTES_TEXT.get("synthetic_target_column", {}).get(
-        locale,
-        NOTES_TEXT.get("synthetic_target_column", {}).get("en", "Synthetic target column"),
+        locale, NOTES_TEXT.get("synthetic_target_column", {}).get("en", "Synthetic target column")
     )
     created_via_text = NOTES_TEXT.get("created_via_preprocessing", {}).get(
         locale,
@@ -21485,8 +21359,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         locale, VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"]["en"]
     )
     settings_title_text = VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"].get(
-        locale,
-        VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"],
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"]
     )
 
     # Build summary message
@@ -21501,8 +21374,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         n_target = len(target_schema)
         if n_expect != n_target:
             count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
-                locale,
-                VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"],
+                locale, VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"]
             )
             failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
 
@@ -21555,11 +21427,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         )
     else:
         step_report_gt = _step_report_schema_any_order(
-            step=1,
-            schema_info=schema_info,
-            header=None,
-            lang=locale,
-            debug_return_df=False,
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
         )
 
     # Generate the settings HTML using the existing function
@@ -21725,10 +21593,7 @@ def _step_report_row_based(
                 locations=loc.body(columns=column),
             ).tab_style(
                 style=style.borders(
-                    sides=["left", "right"],
-                    color="#1B4D3E80",
-                    style="solid",
-                    weight="2px",
+                    sides=["left", "right"], color="#1B4D3E80", style="solid", weight="2px"
                 ),
                 locations=loc.column_labels(columns=column),
             )
@@ -21810,10 +21675,7 @@ def _step_report_row_based(
                     style.text(color="#B22222"),
                     style.fill(color="#FFC1C159"),
                     style.borders(
-                        sides=["left", "right"],
-                        color="black",
-                        style="solid",
-                        weight="2px",
+                        sides=["left", "right"], color="black", style="solid", weight="2px"
                     ),
                 ],
                 locations=loc.body(columns=column),
@@ -21849,15 +21711,13 @@ def _step_report_row_based(
         if limit < extract_length:
             extract_length_resolved = limit
             extract_text = STEP_REPORT_TEXT["extract_text_first"][lang].format(
-                extract_length_resolved=extract_length_resolved,
-                shown_failures=shown_failures,
+                extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
             )
 
         else:
             extract_length_resolved = extract_length
             extract_text = STEP_REPORT_TEXT["extract_text_all"][lang].format(
-                extract_length_resolved=extract_length_resolved,
-                shown_failures=shown_failures,
+                extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
             )
 
         details = (
@@ -22320,11 +22180,7 @@ def _step_report_aggregate(
 
 
 def _step_report_schema_in_order(
-    step: int,
-    schema_info: dict,
-    header: str | None,
-    lang: str,
-    debug_return_df: bool = False,
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
@@ -22682,11 +22538,7 @@ def _step_report_schema_in_order(
 
 
 def _step_report_schema_any_order(
-    step: int,
-    schema_info: dict,
-    header: str | None,
-    lang: str,
-    debug_return_df: bool = False,
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | pl.DataFrame:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
