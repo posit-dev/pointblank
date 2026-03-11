@@ -17999,10 +17999,7 @@ class Validate:
                     ),
                 )
                 .with_columns(
-                    pl.when(~pl.col("active"))
-                    .then(pl.lit("-"))
-                    .otherwise(pl.col(col))
-                    .alias(col)
+                    pl.when(~pl.col("active")).then(pl.lit("-")).otherwise(pl.col(col)).alias(col)
                     for col in [
                         "step_evaluated",
                         "units",
