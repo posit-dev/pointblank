@@ -14714,6 +14714,94 @@ Execute a YAML-based validation workflow.
     pipeline or version control system, allowing you to maintain validation rules alongside your
     code.
 
+    ### Governance Metadata
+
+    YAML workflows support governance metadata via `owner`, `consumers`, and `version` top-level
+    keys. These are forwarded to the `Validate` constructor and embedded in the validation report:
+
+    ```python
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: sales_pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance, Compliance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a, b]
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    print(f"Owner: {result.owner}")
+    print(f"Consumers: {result.consumers}")
+    print(f"Version: {result.version}")
+    ```
+
+    ### Aggregate Validations
+
+    YAML supports aggregate validation methods for checking column-level statistics. These methods
+    validate that a column's sum, average, or standard deviation meets a threshold:
+
+    ```python
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    - col_avg_le:
+        columns: [a]
+        value: 10
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    The 15 available aggregate methods follow the pattern `col_{stat}_{comparator}` where
+    `{stat}` is `sum`, `avg`, or `sd` and `{comparator}` is `gt`, `lt`, `ge`,
+    `le`, or `eq`.
+
+    ### Data Freshness
+
+    Check that a date/datetime column has recent data using `data_freshness`:
+
+    ```yaml
+    tbl: events.csv
+    steps:
+    - data_freshness:
+        columns: event_date
+        freshness: "24h"
+    ```
+
+    ### Active Parameter Shortcut
+
+    The `active=` parameter controls whether a validation step runs. It supports boolean values
+    and Python expression shortcuts:
+
+    ```yaml
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        active: false            # Skip this step
+
+    - col_vals_not_null:
+        columns: [a]
+        active: true             # Always run (default)
+    ```
+
+    ### Null Percentage Check
+
+    Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
+
+    ```yaml
+    steps:
+    - col_pct_null:
+        columns: [a, b]
+        value: 0.05
+    ```
+
     ### Using `set_tbl=` to Override the Table
 
     The `set_tbl=` parameter allows you to override the table specified in the YAML configuration.
@@ -14903,6 +14991,39 @@ Validate YAML configuration against the expected structure.
     source ('tbl') exists or is accessible. Data source validation occurs during execution with
     `yaml_interrogate()`.
 
+    Supported Top-level Keys
+    ------------------------
+    The following top-level keys are recognized in the YAML configuration:
+
+    - `tbl`: data source specification (required)
+    - `steps`: list of validation steps (required)
+    - `tbl_name`: human-readable table name
+    - `label`: validation description
+    - `df_library`: DataFrame library (`"polars"`, `"pandas"`, `"duckdb"`)
+    - `lang`: language code
+    - `locale`: locale setting
+    - `brief`: global brief template
+    - `thresholds`: global failure thresholds
+    - `actions`: global failure actions
+    - `final_actions`: actions triggered after all steps complete
+    - `owner`: data owner (governance metadata)
+    - `consumers`: data consumers (governance metadata)
+    - `version`: validation version string (governance metadata)
+    - `reference`: reference table for comparison-based validations
+
+    Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `step`.
+
+    Supported Validation Methods
+    ----------------------------
+    In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`,
+    `col_schema_match`), the following methods are also supported:
+
+    - `col_pct_null`: check the percentage of null values in a column
+    - `data_freshness`: check that data is recent
+    - aggregate methods: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`,
+      `col_sum_eq`, `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`,
+      `col_avg_eq`, `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`
+
     See Also
     --------
     yaml_interrogate : execute YAML-based validation workflows
@@ -14992,6 +15113,28 @@ Convert YAML validation configuration to equivalent Python code.
 
     The generated code includes all configuration parameters, thresholds, and maintains the exact
     same validation logic as the original YAML workflow.
+
+    Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
+    in the generated Python code:
+
+    ```python
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Sales Pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a]
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    '''
+
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
 
     This function is also useful for educational purposes, helping users understand how YAML
     configurations map to the underlying Python API calls.
@@ -15844,30 +15987,39 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 71 countries with full locale data:
+    The `country=` parameter currently supports 100 countries with full locale data:
 
-    **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
-    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
-    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
-    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
-    Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
-    Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+    **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+    Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+    Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+    France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+    Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+    Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+    Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
     Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
-    Switzerland (`"CH"`), United Kingdom (`"GB"`)
+    Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
 
-    **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`),
-    Peru (`"PE"`), United States (`"US"`)
+    **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+    Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+    Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+    Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+    Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+    Uruguay (`"UY"`)
 
-    **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
-    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
-    Japan (`"JP"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+    Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+    Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
     Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
-    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+    Vietnam (`"VN"`)
 
-    **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
-    Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`),
-    Nigeria (`"NG"`), Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`),
+    **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+    Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`),
+    Jordan (`"JO"`), Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`),
+    Mozambique (`"MZ"`), Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`),
+    Senegal (`"SN"`), South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`),
     Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
     Pytest Fixture
@@ -15981,7 +16133,7 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
         ),
     )
 
-    pb.generate_dataset(schema, n=50, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     
 
@@ -16273,7 +16425,8 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
     **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
     or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
     `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
-    `"postcode"`, `"latitude"`, `"longitude"`
+    `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
+    3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
 
     **Business:** `"company"` (company name), `"job"` (job title), `"catch_phrase"`
 
@@ -16818,7 +16971,7 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         ),
     )
 
-    pb.generate_dataset(schema, n=100, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
     Colon-separated strings can also be used for quick duration definitions:
@@ -16829,7 +16982,7 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
     )
 
-    pb.generate_dataset(schema, n=30, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
     ```
 
     Optional durations can be created with `nullable=True`, and duration fields work well
@@ -16849,7 +17002,106 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         ),
     )
 
-    pb.generate_dataset(schema, n=30, seed=7)
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+    
+
+profile_fields(*, set: "Literal['minimal', 'standard', 'full']" = 'standard', split_name: 'bool' = True, include: 'list[str] | None' = None, exclude: 'list[str] | None' = None, prefix: 'str | None' = None) -> 'dict[str, StringField]'
+
+    Create a dict of string field specifications representing a person profile.
+
+    Returns a dictionary of `StringField` objects suitable for `**`-unpacking into a `Schema()`.
+    Each field uses a preset that participates in the existing coherence system, so generated
+    data will have coherent names, emails, addresses, and phone numbers within each row.
+
+    Parameters
+    ----------
+    set
+        The base set of profile fields to include. Options are `"minimal"` (name, email, phone;
+        3-4 columns depending on `split_name=`), `"standard"` (name, email, city, state,
+        postcode, phone; 6-7 columns), and `"full"` (name, email, address, city, state,
+        postcode, phone, company, job; 9-10 columns). Default is `"standard"`.
+    split_name
+        Whether to split the name into separate `first_name` and `last_name` columns (`True`,
+        the default) or use a single combined `name` column (`False`).
+    include
+        List of additional preset names to add to the base set. For example,
+        `include=["company"]` adds a company column to the `"standard"` set. Presets already
+        in the base set are silently ignored.
+    exclude
+        List of preset names to remove from the (possibly augmented) set. For example,
+        `exclude=["postcode"]` removes the postcode column. Presets not in the set are silently
+        ignored.
+    prefix
+        Optional string to prepend to every column name. For example, `prefix="customer_"`
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+
+    Returns
+    -------
+    dict[str, StringField]
+        A dictionary mapping column names to `StringField` objects, ordered logically (name fields
+        first, then contact, address, phone, business).
+
+    Raises
+    ------
+    ValueError
+        If `set=` is not one of `"minimal"`, `"standard"`, or `"full"`; if `include=` or `exclude=`
+        contain unknown preset names; if a preset appears in both `include=` and `exclude=`; or if
+        `include=` contains name presets incompatible with the `split_name=` setting.
+
+    Examples
+    --------
+    The default call returns the `"standard"` set of profile columns. The `**` operator unpacks the
+    returned dictionary directly into `Schema()`, as if each `string_field()` call had been written
+    by hand. All coherence rules apply automatically: emails are derived from names, and
+    city/state/postcode/phone are internally consistent.
+
+    ```python
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(unique=True),
+        **pb.profile_fields(),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Use `set=` to control how many columns are generated. The `"minimal"` set includes only `name`,
+    `email`, and `phone`, while `"full"` adds `address`, `company`, and `job`. Setting
+    `split_name=False` collapses `first_name` and `last_name` into a single combined `name` column:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", split_name=False),
+        balance=pb.float_field(min_val=0, max_val=10000),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    The `include=` and `exclude=` parameters let you customize the column set without switching to a
+    different base set. Here we start from the `"full"` set but drop the business columns:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="full", exclude=["company", "job"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
+    ```
+
+    The `prefix=` parameter prepends a string to every column name, which is especially useful when
+    a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
+    maintains its own coherence:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     
 

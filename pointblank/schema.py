@@ -867,30 +867,40 @@ class Schema:
         -------------------
         The `country=` parameter controls the country used for generating realistic data with
         presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific formats
-        like addresses, phone numbers, and postal codes. Currently, **71 countries** are supported
+        like addresses, phone numbers, and postal codes. Currently, **100 countries** are supported
         with full locale data:
 
-        **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia
-        (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`),
-        Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`), Hungary (`"HU"`),
-        Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`), Lithuania (`"LT"`),
-        Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
-        Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Slovakia (`"SK"`), Slovenia (`"SI"`),
-        Spain (`"ES"`), Sweden (`"SE"`), Switzerland (`"CH"`), United Kingdom (`"GB"`)
+        **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+        Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+        Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+        France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+        Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+        Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+        Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
+        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+        Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
 
-        **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`), Chile
-        (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`), Peru (`"PE"`),
-        United States (`"US"`)
+        **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+        Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+        Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+        Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+        Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+        Uruguay (`"UY"`)
 
-        **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`), China (`"CN"`),
-        Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), Malaysia (`"MY"`),
-        New Zealand (`"NZ"`), Pakistan (`"PK"`), Philippines (`"PH"`), Singapore (`"SG"`),
-        South Korea (`"KR"`), Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`),
+        **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+        Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+        Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+        Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+        Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+        Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
         Vietnam (`"VN"`)
 
-        **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
-        Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`), Nigeria (`"NG"`),
-        Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`), Turkey (`"TR"`),
+        **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+        Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`), Jordan (`"JO"`),
+        Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`), Mozambique (`"MZ"`),
+        Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`), Senegal (`"SN"`),
+        South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`), Turkey (`"TR"`),
         Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
         Examples
@@ -1677,30 +1687,39 @@ def generate_dataset(
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 71 countries with full locale data:
+    The `country=` parameter currently supports 100 countries with full locale data:
 
-    **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
-    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
-    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
-    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
-    Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
-    Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+    **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+    Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+    Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+    France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+    Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+    Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+    Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
     Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
-    Switzerland (`"CH"`), United Kingdom (`"GB"`)
+    Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
 
-    **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`),
-    Peru (`"PE"`), United States (`"US"`)
+    **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+    Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+    Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+    Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+    Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+    Uruguay (`"UY"`)
 
-    **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
-    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
-    Japan (`"JP"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+    Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+    Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
     Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
-    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+    Vietnam (`"VN"`)
 
-    **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
-    Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`),
-    Nigeria (`"NG"`), Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`),
+    **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+    Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`),
+    Jordan (`"JO"`), Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`),
+    Mozambique (`"MZ"`), Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`),
+    Senegal (`"SN"`), South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`),
     Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
     Pytest Fixture
@@ -1821,7 +1840,7 @@ def generate_dataset(
         ),
     )
 
-    pb.generate_dataset(schema, n=50, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     """
     return schema.generate(

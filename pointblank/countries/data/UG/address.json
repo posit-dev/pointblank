@@ -121,9 +121,9 @@
         "state_abbr": "W",
         "postcode_prefix": "256",
         "lat_min": 0.18,
-        "lat_max": 0.20,
+        "lat_max": 0.2,
         "lon_min": 30.08,
-        "lon_max": 30.10
+        "lon_max": 30.1
       },
       {
         "city": "Soroti",
@@ -142,7 +142,7 @@
         "postcode_prefix": "256",
         "lat_min": 3.02,
         "lat_max": 3.04,
-        "lon_min": 30.90,
+        "lon_min": 30.9,
         "lon_max": 30.92
       },
       {
@@ -153,7 +153,7 @@
         "lat_min": -1.25,
         "lat_max": -1.23,
         "lon_min": 29.98,
-        "lon_max": 30.00
+        "lon_max": 30.0
       },
       {
         "city": "Tororo",
@@ -170,10 +170,10 @@
         "state": "Eastern",
         "state_abbr": "E",
         "postcode_prefix": "256",
-        "lat_min": 0.60,
+        "lat_min": 0.6,
         "lat_max": 0.62,
         "lon_min": 33.48,
-        "lon_max": 33.50
+        "lon_max": 33.5
       },
       {
         "city": "Hoima",
@@ -192,7 +192,7 @@
         "state": "Central",
         "state_abbr": "C",
         "postcode_prefix": "256",
-        "lat_min": 0.40,
+        "lat_min": 0.4,
         "lat_max": 0.42,
         "lon_min": 32.02,
         "lon_max": 32.04
@@ -203,8 +203,8 @@
         "state_abbr": "W",
         "postcode_prefix": "256",
         "lat_min": 1.68,
-        "lat_max": 1.70,
-        "lon_min": 31.70,
+        "lat_max": 1.7,
+        "lon_min": 31.7,
         "lon_max": 31.72
       },
       {
@@ -213,9 +213,9 @@
         "state_abbr": "N",
         "postcode_prefix": "256",
         "lat_min": 3.28,
-        "lat_max": 3.30,
+        "lat_max": 3.3,
         "lon_min": 32.88,
-        "lon_max": 32.90
+        "lon_max": 32.9
       },
       {
         "city": "Moroto",
@@ -235,7 +235,7 @@
         "lat_min": -0.55,
         "lat_max": -0.53,
         "lon_min": 30.18,
-        "lon_max": 30.20
+        "lon_max": 30.2
       },
       {
         "city": "Ntungamo",
@@ -265,7 +265,7 @@
         "lat_min": 0.45,
         "lat_max": 0.47,
         "lon_min": 34.08,
-        "lon_max": 34.10
+        "lon_max": 34.1
       },
       {
         "city": "Nebbi",
@@ -275,7 +275,7 @@
         "lat_min": 2.47,
         "lat_max": 2.49,
         "lon_min": 31.08,
-        "lon_max": 31.10
+        "lon_max": 31.1
       },
       {
         "city": "Mubende",
@@ -285,17 +285,17 @@
         "lat_min": 0.55,
         "lat_max": 0.57,
         "lon_min": 31.38,
-        "lon_max": 31.40
+        "lon_max": 31.4
       },
       {
         "city": "Kayunga",
         "state": "Central",
         "state_abbr": "C",
         "postcode_prefix": "256",
-        "lat_min": 0.70,
+        "lat_min": 0.7,
         "lat_max": 0.72,
         "lon_min": 32.88,
-        "lon_max": 32.90
+        "lon_max": 32.9
       },
       {
         "city": "Kisoro",
@@ -305,140 +305,386 @@
         "lat_min": -1.29,
         "lat_max": -1.27,
         "lon_min": 29.68,
-        "lon_max": 29.70
+        "lon_max": 29.7
       }
     ]
   },
   "streets_by_city": {
     "Kampala": [
-      "Kampala Road", "Jinja Road", "Entebbe Road", "Parliament Avenue",
-      "Bombo Road", "Sir Apollo Kaggwa Road", "Nile Avenue", "Kira Road",
-      "Makerere Hill Road", "Luwum Street", "Ben Kiwanuka Street", "Market Street",
-      "Burton Street", "Dewinton Road", "Nakasero Road", "Buganda Road",
-      "Speke Road", "Kimathi Avenue", "Portal Avenue", "Clement Hill Road",
-      "Sezibwa Road", "Windsor Crescent", "Acacia Avenue", "Spring Road",
-      "Tank Hill Road", "Mawanda Road", "Gayaza Road", "Ntinda Road",
-      "Bukoto Street", "Naguru Road"
+      "Kampala Road",
+      "Jinja Road",
+      "Entebbe Road",
+      "Parliament Avenue",
+      "Bombo Road",
+      "Sir Apollo Kaggwa Road",
+      "Nile Avenue",
+      "Kira Road",
+      "Makerere Hill Road",
+      "Luwum Street",
+      "Ben Kiwanuka Street",
+      "Market Street",
+      "Burton Street",
+      "Dewinton Road",
+      "Nakasero Road",
+      "Buganda Road",
+      "Speke Road",
+      "Kimathi Avenue",
+      "Portal Avenue",
+      "Clement Hill Road",
+      "Sezibwa Road",
+      "Windsor Crescent",
+      "Acacia Avenue",
+      "Spring Road",
+      "Tank Hill Road",
+      "Mawanda Road",
+      "Gayaza Road",
+      "Ntinda Road",
+      "Bukoto Street",
+      "Naguru Road",
+      "Ggaba Road",
+      "Nsambya Road",
+      "Kabalagala Road",
+      "Muyenga Road",
+      "Salama Road",
+      "Namuwongo Road",
+      "Port Bell Road",
+      "Bugolobi Road",
+      "Kitintale Road",
+      "Luzira Road",
+      "Mutungo Road",
+      "Kisaasi Road",
+      "Kyanja Road",
+      "Bukoto-Kisaasi Road",
+      "Kasubi Road",
+      "Nakulabye Road",
+      "Balintuma Road",
+      "Wandegeya Road",
+      "Mulago Hill Road",
+      "Mengo Hill Road",
+      "Lubaga Road",
+      "Namirembe Road",
+      "Rubaga Road",
+      "Old Kampala Road",
+      "Kisenyi Road",
+      "Owino Market Road",
+      "Nakivubo Road",
+      "Namasole Road",
+      "Industrial Area Road Kampala",
+      "Seventh Street Industrial",
+      "Fifth Street Industrial",
+      "Spring Road Kampala",
+      "Stretcher Road",
+      "Lugogo Bypass",
+      "Yusuf Lule Road",
+      "John Babiha Road",
+      "Kintu Road",
+      "Ternan Avenue",
+      "Malcolm X Avenue",
+      "Pilkington Road",
+      "Colville Street",
+      "Kampala Boulevard",
+      "Hannington Road",
+      "Dastur Street",
+      "Entebbe Express Highway",
+      "Northern Bypass Highway",
+      "Southern Bypass Kampala",
+      "Mukwano Road",
+      "Namanve Industrial Road",
+      "Bweyogerere Road Kampala",
+      "Namugongo Road",
+      "Kulambiro Road",
+      "Naguru Hill Road",
+      "Mbuya Hill Road",
+      "Wamala Road",
+      "Sentema Road",
+      "Masaka Highway",
+      "Mityana Road Kampala",
+      "Busega Road",
+      "Ndeeba Road",
+      "Natete Road",
+      "Nateete-Masaka Road",
+      "Lungujja Road",
+      "Mpererwe Road Kampala",
+      "Bakuli Road",
+      "Kibuli Road",
+      "Shimoni Road",
+      "Katwe Road",
+      "Nsambya Estate Road",
+      "Makindye Road"
     ],
     "Wakiso": [
-      "Hoima Road", "Mityana Road", "Gayaza Road", "Bombo Road",
-      "Nansana Road", "Buloba Road", "Matugga Road", "Kakiri Road",
-      "Mpererwe Road", "Bweyogerere Road"
+      "Hoima Road",
+      "Mityana Road",
+      "Gayaza Road",
+      "Bombo Road",
+      "Nansana Road",
+      "Buloba Road",
+      "Matugga Road",
+      "Kakiri Road",
+      "Mpererwe Road",
+      "Bweyogerere Road"
     ],
     "Mukono": [
-      "Jinja Road", "Kayunga Road", "Spring Road", "Wantoni Road",
-      "Seeta Road", "Namanve Road", "Industrial Road", "Station Road"
+      "Jinja Road",
+      "Kayunga Road",
+      "Spring Road",
+      "Wantoni Road",
+      "Seeta Road",
+      "Namanve Road",
+      "Industrial Road",
+      "Station Road"
     ],
     "Gulu": [
-      "Acholi Road", "Obote Avenue", "Churchill Road", "Market Road",
-      "Hospital Road", "Lacor Road", "Stadium Road", "Railway Road",
-      "Coronation Road", "Awach Road"
+      "Acholi Road",
+      "Obote Avenue",
+      "Churchill Road",
+      "Market Road",
+      "Hospital Road",
+      "Lacor Road",
+      "Stadium Road",
+      "Railway Road",
+      "Coronation Road",
+      "Awach Road"
     ],
     "Lira": [
-      "Soroti Road", "Gulu Road", "Market Road", "Station Road",
-      "Hospital Road", "Ogwang Road", "Commerce Road", "Barracks Road"
+      "Soroti Road",
+      "Gulu Road",
+      "Market Road",
+      "Station Road",
+      "Hospital Road",
+      "Ogwang Road",
+      "Commerce Road",
+      "Barracks Road"
     ],
     "Mbarara": [
-      "High Street", "Masaka Road", "Kabale Road", "Hospital Road",
-      "Bishop Stuart Road", "Bananuka Drive", "University Road", "Market Road",
-      "Stadium Road", "Buremba Road"
+      "High Street",
+      "Masaka Road",
+      "Kabale Road",
+      "Hospital Road",
+      "Bishop Stuart Road",
+      "Bananuka Drive",
+      "University Road",
+      "Market Road",
+      "Stadium Road",
+      "Buremba Road"
     ],
     "Jinja": [
-      "Main Street", "Bridge Street", "Clive Road", "Nile Crescent",
-      "Bell Avenue", "Gabula Road", "Nalufenya Road", "Ripon Road",
-      "Kiira Road", "Owen Falls Road"
+      "Main Street",
+      "Bridge Street",
+      "Clive Road",
+      "Nile Crescent",
+      "Bell Avenue",
+      "Gabula Road",
+      "Nalufenya Road",
+      "Ripon Road",
+      "Kiira Road",
+      "Owen Falls Road"
     ],
     "Entebbe": [
-      "Airport Road", "Lugard Avenue", "Portal Road", "Church Road",
-      "Circular Road", "Victoria Road", "Botanical Road", "Kitoro Road"
+      "Airport Road",
+      "Lugard Avenue",
+      "Portal Road",
+      "Church Road",
+      "Circular Road",
+      "Victoria Road",
+      "Botanical Road",
+      "Kitoro Road"
     ],
     "Mbale": [
-      "Republic Street", "Cathedral Avenue", "Pallisa Road", "Market Road",
-      "Naboa Road", "Hospital Road", "Malukhu Road", "Wanale Road"
+      "Republic Street",
+      "Cathedral Avenue",
+      "Pallisa Road",
+      "Market Road",
+      "Naboa Road",
+      "Hospital Road",
+      "Malukhu Road",
+      "Wanale Road"
     ],
     "Fort Portal": [
-      "Lugard Road", "Balya Road", "Bwamba Road", "Hospital Road",
-      "Market Road", "Kasese Road", "Link Road", "Rwenzori Road"
+      "Lugard Road",
+      "Balya Road",
+      "Bwamba Road",
+      "Hospital Road",
+      "Market Road",
+      "Kasese Road",
+      "Link Road",
+      "Rwenzori Road"
     ],
     "Masaka": [
-      "Kampala Road", "Mbarara Road", "Victoria Road", "Hospital Road",
-      "Market Road", "Edward Avenue", "Broadway Road", "Laston Road"
+      "Kampala Road",
+      "Mbarara Road",
+      "Victoria Road",
+      "Hospital Road",
+      "Market Road",
+      "Edward Avenue",
+      "Broadway Road",
+      "Laston Road"
     ],
     "Kasese": [
-      "Stanley Road", "Alexander Road", "Rwenzori Road", "Market Road",
-      "Kilembe Road", "Hospital Road", "Fort Portal Road", "Hima Road"
+      "Stanley Road",
+      "Alexander Road",
+      "Rwenzori Road",
+      "Market Road",
+      "Kilembe Road",
+      "Hospital Road",
+      "Fort Portal Road",
+      "Hima Road"
     ],
     "Soroti": [
-      "Gweri Road", "Kumi Road", "Market Road", "Hospital Road",
-      "Stadium Road", "Teso Road", "Lira Road", "Station Road"
+      "Gweri Road",
+      "Kumi Road",
+      "Market Road",
+      "Hospital Road",
+      "Stadium Road",
+      "Teso Road",
+      "Lira Road",
+      "Station Road"
     ],
     "Arua": [
-      "Avenue Road", "Market Road", "Hospital Road", "Rhino Camp Road",
-      "Pakwach Road", "Congo Road", "Adumi Road", "Ediofe Road"
+      "Avenue Road",
+      "Market Road",
+      "Hospital Road",
+      "Rhino Camp Road",
+      "Pakwach Road",
+      "Congo Road",
+      "Adumi Road",
+      "Ediofe Road"
     ],
     "Kabale": [
-      "Kabale Road", "Market Road", "Hospital Road", "Kisoro Road",
-      "Katuna Road", "Stadium Road", "Lake Road", "University Road"
+      "Kabale Road",
+      "Market Road",
+      "Hospital Road",
+      "Kisoro Road",
+      "Katuna Road",
+      "Stadium Road",
+      "Lake Road",
+      "University Road"
     ],
     "Tororo": [
-      "Jinja Road", "Market Road", "Hospital Road", "Mbale Road",
-      "Station Road", "Osukuru Road", "Rock Road", "Nagongera Road"
+      "Jinja Road",
+      "Market Road",
+      "Hospital Road",
+      "Mbale Road",
+      "Station Road",
+      "Osukuru Road",
+      "Rock Road",
+      "Nagongera Road"
     ],
     "Iganga": [
-      "Jinja Road", "Market Road", "Hospital Road", "Kaliro Road",
-      "Bugweri Road", "Namutumba Road", "Station Road", "Main Street"
+      "Jinja Road",
+      "Market Road",
+      "Hospital Road",
+      "Kaliro Road",
+      "Bugweri Road",
+      "Namutumba Road",
+      "Station Road",
+      "Main Street"
     ],
     "Hoima": [
-      "Fort Portal Road", "Masindi Road", "Market Road", "Hospital Road",
-      "Palace Road", "Bujumbura Road", "Duhaga Road", "Biseruka Road"
+      "Fort Portal Road",
+      "Masindi Road",
+      "Market Road",
+      "Hospital Road",
+      "Palace Road",
+      "Bujumbura Road",
+      "Duhaga Road",
+      "Biseruka Road"
     ],
     "Mityana": [
-      "Kampala Road", "Fort Portal Road", "Market Road", "Hospital Road",
-      "Mubende Road", "Station Road"
+      "Kampala Road",
+      "Fort Portal Road",
+      "Market Road",
+      "Hospital Road",
+      "Mubende Road",
+      "Station Road"
     ],
     "Masindi": [
-      "Port Road", "Market Road", "Hospital Road", "Hoima Road",
-      "Kinyara Road", "Budongo Road"
+      "Port Road",
+      "Market Road",
+      "Hospital Road",
+      "Hoima Road",
+      "Kinyara Road",
+      "Budongo Road"
     ],
     "Kitgum": [
-      "Gulu Road", "Market Road", "Hospital Road", "Lamwo Road",
-      "Padibe Road", "Stadium Road"
+      "Gulu Road",
+      "Market Road",
+      "Hospital Road",
+      "Lamwo Road",
+      "Padibe Road",
+      "Stadium Road"
     ],
     "Moroto": [
-      "Market Road", "Hospital Road", "Soroti Road", "Nakapiripirit Road",
-      "Kotido Road", "Barracks Road"
+      "Market Road",
+      "Hospital Road",
+      "Soroti Road",
+      "Nakapiripirit Road",
+      "Kotido Road",
+      "Barracks Road"
     ],
     "Bushenyi": [
-      "Mbarara Road", "Market Road", "Hospital Road", "Ishaka Road",
-      "Stadium Road", "University Road"
+      "Mbarara Road",
+      "Market Road",
+      "Hospital Road",
+      "Ishaka Road",
+      "Stadium Road",
+      "University Road"
     ],
     "Ntungamo": [
-      "Mbarara Road", "Market Road", "Hospital Road", "Kabale Road",
-      "Rubare Road", "Stadium Road"
+      "Mbarara Road",
+      "Market Road",
+      "Hospital Road",
+      "Kabale Road",
+      "Rubare Road",
+      "Stadium Road"
     ],
     "Rukungiri": [
-      "Kabale Road", "Market Road", "Hospital Road", "Kanungu Road",
-      "Stadium Road", "Bwambara Road"
+      "Kabale Road",
+      "Market Road",
+      "Hospital Road",
+      "Kanungu Road",
+      "Stadium Road",
+      "Bwambara Road"
     ],
     "Busia": [
-      "Custom Road", "Market Road", "Hospital Road", "Tororo Road",
-      "Border Road", "Dabani Road"
+      "Custom Road",
+      "Market Road",
+      "Hospital Road",
+      "Tororo Road",
+      "Border Road",
+      "Dabani Road"
     ],
     "Nebbi": [
-      "Arua Road", "Market Road", "Hospital Road", "Pakwach Road",
-      "Lake Albert Road", "Paidha Road"
+      "Arua Road",
+      "Market Road",
+      "Hospital Road",
+      "Pakwach Road",
+      "Lake Albert Road",
+      "Paidha Road"
     ],
     "Mubende": [
-      "Kampala Road", "Market Road", "Hospital Road", "Fort Portal Road",
-      "Kiboga Road", "Mityana Road"
+      "Kampala Road",
+      "Market Road",
+      "Hospital Road",
+      "Fort Portal Road",
+      "Kiboga Road",
+      "Mityana Road"
     ],
     "Kayunga": [
-      "Jinja Road", "Market Road", "Hospital Road", "Mukono Road",
-      "Kangulumira Road", "Nazigo Road"
+      "Jinja Road",
+      "Market Road",
+      "Hospital Road",
+      "Mukono Road",
+      "Kangulumira Road",
+      "Nazigo Road"
     ],
     "Kisoro": [
-      "Kabale Road", "Market Road", "Hospital Road", "Bunagana Road",
-      "Cyanika Road", "Gorilla Road"
+      "Kabale Road",
+      "Market Road",
+      "Hospital Road",
+      "Bunagana Road",
+      "Cyanika Road",
+      "Gorilla Road"
     ]
   },
   "postcode_format": "######",

@@ -318,23 +318,23 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# Generar 100 filas de datos de prueba realistas
-data = pb.generate_dataset(schema, n=100, seed=23)
+# Generar 10 filas de datos de prueba realistas
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
 ```
 
-| user_id             | name             | email                       | age | status   |
-|---------------------|------------------|-----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 El generador soporta generación de datos sofisticada con estas capacidades:
 
 - **Datos realistas con presets**: Usa presets integrados como `"name"`, `"email"`, `"address"`, `"phone"`, etc.
 - **Cadenas de user agent**: Genera cadenas de user agent de navegador altamente variadas y realistas de 17 categorías de navegadores con más de 42.000 combinaciones únicas
-- **Soporte de 50+ países**: Genera datos específicos de localización (ej., `country="DE"` para direcciones alemanas)
+- **Soporte de 100 países**: Genera datos específicos de localización (ej., `country="DE"` para direcciones alemanas)
 - **Restricciones de campos**: Controla rangos, patrones, unicidad y valores permitidos
 - **Múltiples formatos de salida**: Devuelve DataFrames de Polars por defecto, pero también soporta Pandas (`output="pandas"`) o diccionarios (`output="dict"`)
 
@@ -344,7 +344,7 @@ El generador soporta generación de datos sofisticada con estas capacidades:
 - **Construido para la colaboración**: Comparte resultados con colegas a través de hermosos informes interactivos
 - **Salidas prácticas**: Obtén exactamente lo que necesitas: recuentos, extractos, resúmenes o informes completos
 - **Implementación flexible**: Úsalo en notebooks, scripts o pipelines de datos
-- **Generación de datos sintéticos**: Crea datos de prueba realistas con más de 30 presets, cadenas de user agent, formateo adaptado al locale y soporte de más de 50 países
+- **Generación de datos sintéticos**: Crea datos de prueba realistas con más de 30 presets, cadenas de user agent, formateo adaptado al locale y soporte de 100 países
 - **Personalizable**: Adapta los pasos de validación e informes a tus necesidades específicas
 - **Internacionalización**: Los informes pueden generarse en 40 idiomas, incluidos inglés, español, francés y alemán
 

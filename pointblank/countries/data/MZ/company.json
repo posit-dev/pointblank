@@ -1,0 +1,715 @@
+{
+  "suffixes": [
+    "Lda.",
+    "S.A.",
+    "S.A.R.L.",
+    "E.P.",
+    "Corp.",
+    "Group",
+    "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} de Moçambique {suffix}",
+    "Grupo {last_name}"
+  ],
+  "adjectives": [
+    "Moçambicana",
+    "Nacional",
+    "Imperial",
+    "Colonial",
+    "Global",
+    "Continental",
+    "Austral",
+    "Solar",
+    "Sul",
+    "Norte",
+    "Grande",
+    "Nova",
+    "Alta",
+    "Real",
+    "Oriental",
+    "Índica",
+    "Tropical",
+    "Costeira",
+    "Moderna",
+    "Primeira"
+  ],
+  "nouns": [
+    "Trading",
+    "Indústrias",
+    "Mineira",
+    "Construtora",
+    "Alimentos",
+    "Serviços",
+    "Investimentos",
+    "Comercial",
+    "Agroindustrial",
+    "Têxtil",
+    "Transportes",
+    "Imobiliária",
+    "Financeira",
+    "Petrolífera",
+    "Energia",
+    "Tecnologia",
+    "Consultoria",
+    "Logística",
+    "Distribuidora",
+    "Exportadora"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Mozal (Mozambique Aluminium Smelter)",
+      "cities": ["Maputo", "Matola"]
+    },
+    {
+      "name": "Cervejas de Moçambique (CDM)",
+      "cities": ["Maputo", "Beira", "Nampula"]
+    },
+    {
+      "name": "mCel",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Vodacom Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "BCI (Banco Comercial e de Investimentos)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Millennium BIM",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Vale Moçambique",
+      "cities": ["Tete"]
+    },
+    {
+      "name": "Sasol Petroleum Temane",
+      "cities": ["Inhambane"]
+    },
+    {
+      "name": "ENH (Empresa Nacional de Hidrocarbonetos)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "EDM (Electricidade de Moçambique)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "TDM (Telecomunicações de Moçambique)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "LAM (Linhas Aéreas de Moçambique)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "CFM (Caminhos de Ferro de Moçambique)",
+      "cities": ["Maputo", "Beira"]
+    },
+    {
+      "name": "Petromoc",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "STAE (Secretariado Técnico de Administração Eleitoral)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Kenmare Resources (Moma Mine)",
+      "cities": ["Nampula"]
+    },
+    {
+      "name": "Anadarko Moçambique (TotalEnergies)",
+      "cities": ["Maputo", "Cabo Delgado"]
+    },
+    {
+      "name": "Standard Bank Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Banco Único",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "FNB Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Shoprite Moçambique",
+      "cities": ["Maputo", "Matola", "Beira"]
+    },
+    {
+      "name": "Coca-Cola Sabco Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Cimentos de Moçambique",
+      "cities": ["Maputo", "Matola"]
+    },
+    {
+      "name": "EMOSE (Empresa Moçambicana de Seguros)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Cornelder de Moçambique",
+      "cities": ["Beira"]
+    },
+    {
+      "name": "IGEPE (Instituto de Gestão das Participações do Estado)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Moçambique Celular (Movitel)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Portos e Caminhos de Ferro do Norte",
+      "cities": ["Nampula"]
+    },
+    {
+      "name": "FACIM (Feira Agro-Pecuária, Comercial e Industrial de Moçambique)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "BancABC Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Mcel (Moçambique Celular)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Cahora Bassa (HCB)",
+      "cities": ["Tete"]
+    },
+    {
+      "name": "Grupo Madal",
+      "cities": ["Quelimane"]
+    },
+    {
+      "name": "JFS (João Ferreira dos Santos)",
+      "cities": ["Nampula"]
+    },
+    {
+      "name": "Companhia de Sena",
+      "cities": ["Beira"]
+    },
+    {
+      "name": "AMREC (Associação Moçambicana de Reciclagem)",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Moçambique Previdente",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "TAP Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Toyota de Moçambique",
+      "cities": ["Maputo"]
+    },
+    {
+      "name": "Manica Freight Services",
+      "cities": ["Beira"]
+    },
+    {
+      "name": "Sociedade Mineira de Catoca",
+      "cities": ["Tete"]
+    },
+    {
+      "name": "Portos do Norte",
+      "cities": ["Nacala"]
+    }
+  ],
+  "jobs": [
+    "Engenheiro Civil",
+    "Contabilista",
+    "Advogado",
+    "Médico",
+    "Engenheiro de Sistemas",
+    "Administrador",
+    "Economista",
+    "Arquitecto",
+    "Professor",
+    "Enfermeiro",
+    "Executivo de Marketing",
+    "Gerente de Vendas",
+    "Gerente de Recursos Humanos",
+    "Analista Financeiro",
+    "Engenheiro de Minas",
+    "Engenheiro Agrónomo",
+    "Gerente de Projectos",
+    "Desenvolvedor de Software",
+    "Analista de Dados",
+    "Gerente de Operações",
+    "Auditor",
+    "Consultor Empresarial",
+    "Engenheiro Químico",
+    "Engenheiro Ambiental",
+    "Geólogo",
+    "Jornalista",
+    "Designer Gráfico",
+    "Farmacêutico",
+    "Veterinário",
+    "Dentista",
+    "Psicólogo",
+    "Assistente Social",
+    "Técnico de Electricidade",
+    "Mecânico Industrial",
+    "Piloto Comercial",
+    "Chef de Cozinha",
+    "Guia Turístico",
+    "Topógrafo",
+    "Biólogo",
+    "Nutricionista",
+    "Engenheiro Petroleiro",
+    "Técnico de Telecomunicações"
+  ],
+  "catch_phrase_adjectives": [
+    "inovador",
+    "confiável",
+    "líder",
+    "qualidade",
+    "premium",
+    "sustentável",
+    "dinâmico",
+    "progressivo",
+    "eficiente",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "soluções",
+    "serviços",
+    "produtos",
+    "excelência",
+    "qualidade",
+    "valor",
+    "crescimento",
+    "aliança",
+    "inovação",
+    "rendimento"
+  ],
+  "catch_phrase_verbs": [
+    "oferece",
+    "cria",
+    "constrói",
+    "impulsiona",
+    "permite",
+    "assegura",
+    "providencia",
+    "alcança",
+    "transforma",
+    "conecta"
+  ],
+  "catch_phrase_connector": [
+    "e",
+    "com",
+    "para"
+  ],
+  "industries": [
+    {
+      "name": "agriculture",
+      "weight": 0.15,
+      "jobs": [
+        "Engenheiro Agrónomo",
+        "Gerente de Fazenda",
+        "Coordenador de Exportação",
+        "Inspector de Qualidade",
+        "Técnico Agrícola"
+      ],
+      "well_known": [
+        "Grupo Madal",
+        "Companhia de Sena",
+        "JFS (João Ferreira dos Santos)",
+        "FACIM"
+      ],
+      "company_suffixes": [
+        "Agroindustrial",
+        "Agro",
+        "Foods",
+        "Export"
+      ],
+      "company_nouns": [
+        "Agro",
+        "Agroindustrial",
+        "Alimentos",
+        "Exportadora"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda.",
+        "Empresa {noun} de Moçambique"
+      ]
+    },
+    {
+      "name": "mining",
+      "weight": 0.13,
+      "jobs": [
+        "Engenheiro de Minas",
+        "Geólogo",
+        "Oficial de Segurança",
+        "Operador de Planta",
+        "Especialista Ambiental"
+      ],
+      "well_known": [
+        "Vale Moçambique",
+        "Kenmare Resources",
+        "Sociedade Mineira de Catoca",
+        "Mozal"
+      ],
+      "company_suffixes": [
+        "Mineira",
+        "Mining",
+        "Resources"
+      ],
+      "company_nouns": [
+        "Mineira",
+        "Mining",
+        "Mineral",
+        "Resources"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.",
+        "Companhia {noun} de Moçambique"
+      ]
+    },
+    {
+      "name": "oil_gas",
+      "weight": 0.12,
+      "jobs": [
+        "Engenheiro Petroleiro",
+        "Geólogo de Petróleo",
+        "Operador de Perfuração",
+        "Engenheiro de Processos",
+        "Técnico de Campo"
+      ],
+      "well_known": [
+        "ENH",
+        "Sasol Petroleum Temane",
+        "Anadarko Moçambique",
+        "Petromoc"
+      ],
+      "company_suffixes": [
+        "Petrolífera",
+        "Energy",
+        "Gas"
+      ],
+      "company_nouns": [
+        "Petrolífera",
+        "Energia",
+        "Hidrocarbonetos",
+        "Gas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.",
+        "Empresa {noun} de Moçambique"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.07,
+      "jobs": [
+        "Engenheiro Industrial",
+        "Gerente de Produção",
+        "Inspector de Qualidade",
+        "Técnico de Manufactura"
+      ],
+      "well_known": [
+        "Mozal",
+        "Cimentos de Moçambique",
+        "Cervejas de Moçambique"
+      ],
+      "company_suffixes": [
+        "Industrial",
+        "Manufacturing",
+        "Indústrias"
+      ],
+      "company_nouns": [
+        "Industrial",
+        "Manufactura",
+        "Produção",
+        "Indústrias"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.08,
+      "jobs": [
+        "Oficial de Banco",
+        "Analista de Crédito",
+        "Consultor Financeiro",
+        "Auditor",
+        "Gerente de Risco"
+      ],
+      "well_known": [
+        "BCI",
+        "Millennium BIM",
+        "Standard Bank Moçambique",
+        "Banco Único",
+        "FNB Moçambique",
+        "BancABC Moçambique"
+      ],
+      "company_suffixes": [
+        "Financeira",
+        "Bank",
+        "Capital",
+        "Investimentos"
+      ],
+      "company_nouns": [
+        "Financeira",
+        "Capital",
+        "Banco",
+        "Investimentos"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.07,
+      "jobs": [
+        "Engenheiro Civil",
+        "Arquitecto",
+        "Gerente de Projectos",
+        "Topógrafo",
+        "Engenheiro de Obra"
+      ],
+      "well_known": [
+        "Cimentos de Moçambique",
+        "Cornelder de Moçambique"
+      ],
+      "company_suffixes": [
+        "Construtora",
+        "Imobiliária",
+        "Engenharia"
+      ],
+      "company_nouns": [
+        "Construtora",
+        "Imobiliária",
+        "Engenharia",
+        "Cimentos"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.07,
+      "jobs": [
+        "Engenheiro de Redes",
+        "Representante de Atendimento ao Cliente",
+        "Gerente de Vendas",
+        "Suporte Técnico"
+      ],
+      "well_known": [
+        "Vodacom Moçambique",
+        "mCel",
+        "Movitel",
+        "TDM"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Comunicações",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Rede",
+        "Comunicações",
+        "Connect"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.07,
+      "jobs": [
+        "Guia Turístico",
+        "Gerente de Hotel",
+        "Chef de Cozinha",
+        "Consultor de Viagens",
+        "Recepcionista"
+      ],
+      "well_known": [
+        "LAM",
+        "TAP Moçambique"
+      ],
+      "company_suffixes": [
+        "Tours",
+        "Travel",
+        "Hotels",
+        "Turismo"
+      ],
+      "company_nouns": [
+        "Tours",
+        "Travel",
+        "Hotel",
+        "Turismo"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Médico",
+        "Enfermeiro",
+        "Farmacêutico",
+        "Administrador Hospitalar",
+        "Técnico de Laboratório"
+      ],
+      "well_known": [
+        "Hospital Central de Maputo",
+        "Clínica de Sommerschield"
+      ],
+      "company_suffixes": [
+        "Saúde",
+        "Healthcare",
+        "Medical",
+        "Clínica"
+      ],
+      "company_nouns": [
+        "Saúde",
+        "Medical",
+        "Health",
+        "Clínica"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Professor",
+        "Director Académico",
+        "Investigador",
+        "Coordenador Educativo",
+        "Psicólogo Educativo"
+      ],
+      "well_known": [
+        "Universidade Eduardo Mondlane",
+        "Universidade Pedagógica",
+        "Universidade Católica de Moçambique"
+      ],
+      "company_suffixes": [
+        "Educativa",
+        "Academy",
+        "Instituto"
+      ],
+      "company_nouns": [
+        "Educação",
+        "Academia",
+        "Instituto",
+        "Centro"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.04,
+      "jobs": [
+        "Desenvolvedor de Software",
+        "Analista de Dados",
+        "Engenheiro de Sistemas",
+        "Designer UX",
+        "Administrador de Base de Dados"
+      ],
+      "well_known": [
+        "VM Tecnologia",
+        "UX Moçambique"
+      ],
+      "company_suffixes": [
+        "Tech",
+        "Software",
+        "Solutions",
+        "Digital"
+      ],
+      "company_nouns": [
+        "Tecnologia",
+        "Software",
+        "Digital",
+        "Sistemas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.05,
+      "jobs": [
+        "Engenheiro Eléctrico",
+        "Operador de Central Eléctrica",
+        "Engenheiro de Projectos",
+        "Gerente HSE"
+      ],
+      "well_known": [
+        "EDM",
+        "Cahora Bassa (HCB)"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Energia",
+        "Power"
+      ],
+      "company_nouns": [
+        "Energia",
+        "Power",
+        "Eléctrica",
+        "Solar"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.",
+        "Empresa {noun} de Moçambique"
+      ]
+    },
+    {
+      "name": "fishing",
+      "weight": 0.04,
+      "jobs": [
+        "Capitão de Embarcação",
+        "Biólogo Marinho",
+        "Técnico de Pesca",
+        "Gerente de Processamento",
+        "Especialista em Aquacultura"
+      ],
+      "well_known": [
+        "Pescamar",
+        "Efripel"
+      ],
+      "company_suffixes": [
+        "Pesca",
+        "Fishing",
+        "Marítima"
+      ],
+      "company_nouns": [
+        "Pesca",
+        "Pescado",
+        "Marítima",
+        "Aquacultura"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Lda."
+      ]
+    }
+  ]
+}

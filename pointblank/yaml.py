@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
 
 import yaml
 
+from pointblank._agg import is_valid_agg
 from pointblank._utils import _is_lib_present
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
@@ -241,11 +242,13 @@ class YAMLValidator:
         "col_vals_increasing": "col_vals_increasing",
         "col_vals_decreasing": "col_vals_decreasing",
         "col_vals_within_spec": "col_vals_within_spec",
+        "col_pct_null": "col_pct_null",
         "rows_distinct": "rows_distinct",
         "rows_complete": "rows_complete",
         "col_count_match": "col_count_match",
         "row_count_match": "row_count_match",
         "col_schema_match": "col_schema_match",
+        "data_freshness": "data_freshness",
         "tbl_match": "tbl_match",
         "prompt": "prompt",
         "conjointly": "conjointly",
@@ -323,6 +326,33 @@ class YAMLValidator:
         YAMLValidationError
             If the schema is invalid.
         """
+        # Define known top-level keys
+        known_keys = {
+            "tbl",
+            "steps",
+            "tbl_name",
+            "label",
+            "thresholds",
+            "actions",
+            "final_actions",
+            "brief",
+            "lang",
+            "locale",
+            "df_library",
+            "owner",
+            "consumers",
+            "version",
+            "reference",
+        }
+
+        # Warn about unknown top-level keys (likely typos)
+        unknown_keys = set(config.keys()) - known_keys
+        if unknown_keys:
+            raise YAMLValidationError(
+                f"Unknown top-level key(s): {sorted(unknown_keys)}. "
+                f"Valid keys are: {sorted(known_keys)}"
+            )
+
         # Check required fields
         if "tbl" not in config:
             raise YAMLValidationError("YAML must contain 'tbl' field")
@@ -620,9 +650,13 @@ class YAMLValidator:
         else:
             raise YAMLValidationError(f"Invalid step configuration type: {type(step_config)}")
 
-        # Validate that we know this method
-        if method_name not in self.validation_method_map:
-            available_methods = list(self.validation_method_map.keys())
+        # Validate that we know this method (static map or dynamic aggregate method)
+        if method_name not in self.validation_method_map and not is_valid_agg(method_name):
+            available_methods = list(self.validation_method_map.keys()) + [
+                "col_sum_*",
+                "col_avg_*",
+                "col_sd_*",
+            ]
             raise YAMLValidationError(
                 f"Unknown validation method '{method_name}'. Available methods: {available_methods}"
             )
@@ -637,6 +671,10 @@ class YAMLValidator:
             # Special case: `pre=` parameter can use shortcut syntax (like `expr=`)
             elif key == "pre" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+            # Special case: `active=` parameter can use shortcut syntax for callables
+            # (e.g., `active: pb.has_columns("col_a")` or `active: false`)
+            elif key == "active" and isinstance(value, str):
                 processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             else:
                 # Normal processing (requires python: block syntax)
@@ -693,7 +731,14 @@ class YAMLValidator:
         if "inclusive" in parameters and isinstance(parameters["inclusive"], list):
             parameters["inclusive"] = tuple(parameters["inclusive"])
 
-        return self.validation_method_map[method_name], parameters
+        # Resolve the method name: static map takes priority, then dynamic aggregate methods
+        if method_name in self.validation_method_map:
+            resolved_name = self.validation_method_map[method_name]
+        else:
+            # Dynamic aggregate method (col_sum_gt, col_avg_eq, etc.)
+            resolved_name = method_name
+
+        return resolved_name, parameters
 
     def build_validation(
         self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
@@ -749,6 +794,41 @@ class YAMLValidator:
         # Set global brief if provided
         if "brief" in config:
             validate_kwargs["brief"] = config["brief"]
+
+        # Set owner if provided (governance)
+        if "owner" in config:
+            validate_kwargs["owner"] = config["owner"]
+
+        # Set consumers if provided (governance)
+        if "consumers" in config:
+            validate_kwargs["consumers"] = config["consumers"]
+
+        # Set version if provided (governance)
+        if "version" in config:
+            validate_kwargs["version"] = config["version"]
+
+        # Set final_actions if provided
+        if "final_actions" in config:
+            from pointblank.thresholds import FinalActions
+
+            final_actions_spec = config["final_actions"]
+            # Process Python expressions in final_actions
+            processed_final_actions = _process_python_expressions(
+                final_actions_spec, namespaces=namespaces
+            )
+            if isinstance(processed_final_actions, list):
+                validate_kwargs["final_actions"] = FinalActions(*processed_final_actions)
+            elif callable(processed_final_actions):
+                validate_kwargs["final_actions"] = FinalActions(processed_final_actions)
+            else:
+                validate_kwargs["final_actions"] = processed_final_actions
+
+        # Set reference data if provided
+        if "reference" in config:
+            ref_spec = config["reference"]
+            # Process as a data source (could be a dataset name, file path, or python expression)
+            ref_data = self._load_data_source(ref_spec, df_library)
+            validate_kwargs["reference"] = ref_data
 
         validation = Validate(data, **validate_kwargs)
 
@@ -1002,6 +1082,94 @@ def yaml_interrogate(
     pipeline or version control system, allowing you to maintain validation rules alongside your
     code.
 
+    ### Governance Metadata
+
+    YAML workflows support governance metadata via `owner`, `consumers`, and `version` top-level
+    keys. These are forwarded to the `Validate` constructor and embedded in the validation report:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: sales_pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance, Compliance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a, b]
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    print(f"Owner: {result.owner}")
+    print(f"Consumers: {result.consumers}")
+    print(f"Version: {result.version}")
+    ```
+
+    ### Aggregate Validations
+
+    YAML supports aggregate validation methods for checking column-level statistics. These methods
+    validate that a column's sum, average, or standard deviation meets a threshold:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    - col_avg_le:
+        columns: [a]
+        value: 10
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    The 15 available aggregate methods follow the pattern `col_{stat}_{comparator}` where
+    `{stat}` is `sum`, `avg`, or `sd` and `{comparator}` is `gt`, `lt`, `ge`,
+    `le`, or `eq`.
+
+    ### Data Freshness
+
+    Check that a date/datetime column has recent data using `data_freshness`:
+
+    ```yaml
+    tbl: events.csv
+    steps:
+    - data_freshness:
+        columns: event_date
+        freshness: "24h"
+    ```
+
+    ### Active Parameter Shortcut
+
+    The `active=` parameter controls whether a validation step runs. It supports boolean values
+    and Python expression shortcuts:
+
+    ```yaml
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        active: false            # Skip this step
+
+    - col_vals_not_null:
+        columns: [a]
+        active: true             # Always run (default)
+    ```
+
+    ### Null Percentage Check
+
+    Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
+
+    ```yaml
+    steps:
+    - col_pct_null:
+        columns: [a, b]
+        value: 0.05
+    ```
+
     ### Using `set_tbl=` to Override the Table
 
     The `set_tbl=` parameter allows you to override the table specified in the YAML configuration.
@@ -1234,6 +1402,39 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
     source ('tbl') exists or is accessible. Data source validation occurs during execution with
     `yaml_interrogate()`.
 
+    Supported Top-level Keys
+    ------------------------
+    The following top-level keys are recognized in the YAML configuration:
+
+    - `tbl`: data source specification (required)
+    - `steps`: list of validation steps (required)
+    - `tbl_name`: human-readable table name
+    - `label`: validation description
+    - `df_library`: DataFrame library (`"polars"`, `"pandas"`, `"duckdb"`)
+    - `lang`: language code
+    - `locale`: locale setting
+    - `brief`: global brief template
+    - `thresholds`: global failure thresholds
+    - `actions`: global failure actions
+    - `final_actions`: actions triggered after all steps complete
+    - `owner`: data owner (governance metadata)
+    - `consumers`: data consumers (governance metadata)
+    - `version`: validation version string (governance metadata)
+    - `reference`: reference table for comparison-based validations
+
+    Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `step`.
+
+    Supported Validation Methods
+    ----------------------------
+    In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`,
+    `col_schema_match`), the following methods are also supported:
+
+    - `col_pct_null`: check the percentage of null values in a column
+    - `data_freshness`: check that data is recent
+    - aggregate methods: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`,
+      `col_sum_eq`, `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`,
+      `col_avg_eq`, `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`
+
     See Also
     --------
     yaml_interrogate : execute YAML-based validation workflows
@@ -1336,6 +1537,28 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     The generated code includes all configuration parameters, thresholds, and maintains the exact
     same validation logic as the original YAML workflow.
 
+    Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
+    in the generated Python code:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Sales Pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a]
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    '''
+
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
+
     This function is also useful for educational purposes, helping users understand how YAML
     configurations map to the underlying Python API calls.
     """
@@ -1371,6 +1594,11 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     if isinstance(raw_config.get("tbl"), dict) and "python" in raw_config["tbl"]:
         original_tbl_expression = raw_config["tbl"]["python"].strip()
 
+    # Extract the original reference python expression if it exists
+    original_reference_expression = None
+    if isinstance(raw_config.get("reference"), dict) and "python" in raw_config["reference"]:
+        original_reference_expression = raw_config["reference"]["python"].strip()
+
     # Extract original Actions expressions if they exist
     original_actions_expressions = {}
     if "actions" in raw_config:
@@ -1387,9 +1615,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             else:
                 for key, value in obj.items():
                     new_path = f"{path}.{key}" if path else key
-                    # Special handling for `expr=` and `pre=` parameters that
-                    # can use shortcut syntax
-                    if key in ["expr", "pre"] and isinstance(value, str):
+                    # Special handling for `expr=`, `pre=`, and `active=` parameters
+                    # that can use shortcut syntax
+                    if key in ["expr", "pre", "active"] and isinstance(value, str):
                         expressions[new_path] = value.strip()
                     # Special handling for actions that might contain python: expressions
                     elif key == "actions" and isinstance(value, dict):
@@ -1496,6 +1724,41 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         else:
             validate_args.append(f'brief="{config["brief"]}"')
 
+    # Add owner if present (governance)
+    if "owner" in config:
+        validate_args.append(f'owner="{config["owner"]}"')
+
+    # Add consumers if present (governance)
+    if "consumers" in config:
+        consumers = config["consumers"]
+        if isinstance(consumers, list):
+            if len(consumers) == 1:
+                validate_args.append(f'consumers="{consumers[0]}"')
+            else:
+                consumers_str = "[" + ", ".join([f'"{c}"' for c in consumers]) + "]"
+                validate_args.append(f"consumers={consumers_str}")
+        elif isinstance(consumers, str):
+            validate_args.append(f'consumers="{consumers}"')
+
+    # Add version if present (governance)
+    if "version" in config:
+        validate_args.append(f'version="{config["version"]}"')
+
+    # Add reference if present
+    if "reference" in config:
+        ref_spec = config["reference"]
+        if original_reference_expression:
+            validate_args.append(f"reference={original_reference_expression}")
+        elif isinstance(ref_spec, str):
+            if ref_spec.endswith((".csv", ".parquet")):
+                validate_args.append(
+                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
+                )
+            else:
+                validate_args.append(
+                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
+                )
+
     # Create the `pb.Validate()` call
     if len(validate_args) == 1:
         # Single argument fits on one line
@@ -1514,6 +1777,13 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     for step_index, step_config in enumerate(config["steps"]):
         # Get original expressions before parsing
         original_expressions = {}
+
+        # Handle string steps (parameterless methods like "rows_distinct")
+        if isinstance(step_config, str):
+            method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
+            code_lines.append(f"    .{method_name}()")
+            continue
+
         step_method = list(step_config.keys())[
             0
         ]  # Get the method name (conjointly, specially, etc.)

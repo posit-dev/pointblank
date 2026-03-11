@@ -722,6 +722,111 @@ Brief Templating Options:
   - `{value}`: the comparison value used in the validation (for single-value comparisons)
   - `{pattern}`: for regex validations, the pattern being matched
 
+### Governance Metadata
+
+YAML workflows support governance metadata that identifies ownership and usage of validation
+workflows. These fields are embedded in the validation report:
+
+```yaml
+tbl: sales_data.csv
+tbl_name: "Sales Pipeline"
+owner: "Data Engineering"
+consumers: [Analytics Team, Finance, Compliance]
+version: "2.1.0"
+steps:
+  - col_vals_not_null:
+      columns: [customer_id, revenue]
+  - col_vals_gt:
+      columns: [revenue]
+      value: 0
+```
+
+The `owner`, `consumers`, and `version` fields are forwarded to the `Validate` constructor and
+appear in the validation report header. These fields are optional and do not affect validation
+behavior.
+
+### Data Freshness and Null Percentage
+
+Two additional validation methods support common data quality checks:
+
+**`data_freshness`**: Validate that a date/datetime column has recent data:
+
+```yaml
+steps:
+  - data_freshness:
+      columns: event_date
+      freshness: "24h"
+```
+
+**`col_pct_null`**: Validate that the percentage of null values is within bounds:
+
+```yaml
+steps:
+  - col_pct_null:
+      columns: [email, phone]
+      value: 0.05
+```
+
+### Aggregate Validations
+
+Aggregate methods validate column-level statistics like sum, average, and standard deviation:
+
+```yaml
+steps:
+  # Check that total revenue is positive
+  - col_sum_gt:
+      columns: [revenue]
+      value: 0
+
+  # Validate average rating is at most 5
+  - col_avg_le:
+      columns: [rating]
+      value: 5
+
+  # Ensure temperature variation is bounded
+  - col_sd_lt:
+      columns: [temperature]
+      value: 10
+```
+
+Available methods follow the `col_{stat}_{comparator}` pattern where `{stat}` is `sum`, `avg`, or
+`sd`, and `{comparator}` is `gt`, `lt`, `ge`, `le`, `eq`, `between`, or `outside`.
+
+### Step Activation Control
+
+The `active` parameter allows you to temporarily disable validation steps without removing them
+from the configuration:
+
+```yaml
+steps:
+  # This step is disabled
+  - col_vals_gt:
+      columns: [amount]
+      value: 0
+      active: false
+
+  # This step runs normally (active: true is the default)
+  - col_vals_not_null:
+      columns: [customer_id]
+```
+
+This is useful for debugging, phased rollouts, or temporarily skipping steps that are known to fail.
+
+### Reference Tables
+
+The `reference` top-level key specifies a reference table for comparison-based validations:
+
+```yaml
+tbl: current_data.csv
+reference:
+  python: |
+    pb.load_dataset("baseline_data", tbl_type="polars")
+steps:
+  - tbl_match:
+      tbl_compare:
+        python: |
+          pb.load_dataset("baseline_data", tbl_type="polars")
+```
 
 ## Working with YAML Files
 

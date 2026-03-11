@@ -3944,11 +3944,19 @@ def make_template(output_file: str | None):
 tbl: small_table  # Replace with your data source
                   # Can be: dataset name, CSV file, Parquet file, database connection, etc.
 
+# Optional: DataFrame library ("polars", "pandas", "duckdb")
+# df_library: polars
+
 # Optional: Table name for reporting (defaults to filename if not specified)
 tbl_name: "Example Validation"
 
 # Optional: Label for this validation run
 label: "Validation Template"
+
+# Optional: Governance metadata
+# owner: "Data Engineering"
+# consumers: [Analytics, Finance]
+# version: "1.0.0"
 
 # Optional: Validation thresholds (defaults shown below)
 # thresholds:
@@ -3992,6 +4000,27 @@ steps:
   # - col_vals_in_set:
   #     columns: status
   #     set: [active, inactive, pending]
+
+  # Aggregate validations (uncomment and modify as needed)
+  # - col_sum_gt:
+  #     columns: revenue
+  #     value: 0
+  #     brief: "Total revenue is positive"
+
+  # - col_avg_between:
+  #     columns: rating
+  #     left: 1
+  #     right: 5
+
+  # Check null percentage (uncomment and modify as needed)
+  # - col_pct_null:
+  #     columns: [email, phone]
+  #     value: 0.05
+
+  # Data freshness check (uncomment and modify as needed)
+  # - data_freshness:
+  #     columns: event_date
+  #     freshness: "24h"
 
 # Add more validation steps as needed
 # See the Pointblank documentation for the full list of available validation functions
