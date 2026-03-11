@@ -1,4 +1,3 @@
-# ruff: noqa
 from __future__ import annotations
 
 import base64
@@ -18044,7 +18043,7 @@ class Validate:
                     df[col] = df[col].where(df["active"] != False, "-")
 
                 # Drop columns
-                df_validation_results = df.drop(
+                df = df.drop(
                     columns=["input_brief", "autobrief", "original_pre", "original_segments"]
                 )
 
@@ -18055,6 +18054,79 @@ class Validate:
                 .rename(columns=names_dict)
                 .pipe(transform_validation_results)
             )
+
+            return df_validation_results
+
+        if tbl_type == "duckdb":
+            if not _is_lib_present(lib_name="ibis"):
+                raise ImportError(
+                    "The Ibis library is not installed but is required when specifying "
+                    '`tbl_type="duckdb".'
+                )
+
+            import ibis
+            import ibis.expr.datatypes as dt
+
+            ibis_schema = {
+                "active": dt.Boolean(),
+                "i": dt.Int64(),
+                "assertion_type": dt.String(),
+                "column": dt.String(),
+                "values": dt.json(),
+                "pre": dt.json(),
+                "segments": dt.String(),
+                "eval_error": dt.Boolean(),
+                "n": dt.Int64(),
+                "all_passed": dt.Boolean(),
+                "n_passed": dt.Int64(),
+                "f_passed": dt.Float64(),
+                "n_failed": dt.Int64(),
+                "f_failed": dt.Float64(),
+                "warning": dt.Boolean(),
+                "error": dt.Boolean(),
+                "critical": dt.Boolean(),
+                "brief": dt.String(),
+                "autobrief": dt.String(),
+            }
+
+            # Pulling out clean regex pattern if needed
+            final_report["values"] = [
+                values.get("pattern")
+                if isinstance(values, dict) and "pattern" in values
+                else values
+                for values in final_report["values"]
+            ]
+
+            report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
+                {values: keys for keys, values in names_dict.items()}
+            )
+
+            conditional_cols = [
+                "step_evaluated",
+                "units",
+                "all_units_passed",
+                "pass_n",
+                "pass_pct",
+                "failed_n",
+                "failed_pct",
+                "warning",
+                "error",
+                "critical",
+            ]
+
+            df_validation_results = report_table.mutate(
+                brief=ibis.coalesce(report_table.input_brief, report_table.autobrief),
+                preprocessed=report_table.original_pre.notnull(),
+                segmented=report_table.original_segments.notnull(),
+                **{
+                    col: ibis.ifelse(
+                        report_table.active == False,
+                        ibis.literal("-"),
+                        report_table[col].cast("string"),
+                    )
+                    for col in conditional_cols
+                },
+            ).drop("input_brief", "autobrief", "original_pre", "original_segments")
 
             return df_validation_results
 
