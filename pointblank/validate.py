@@ -17977,7 +17977,7 @@ class Validate:
                     ),
                 )
                 .with_columns(
-                    pl.when(pl.col("active") == False)
+                    pl.when(~pl.col("active"))
                     .then(pl.lit("-"))
                     .otherwise(pl.col(col))
                     .alias(col)
@@ -18040,7 +18040,7 @@ class Validate:
                 ]
 
                 for col in conditional_cols:
-                    df[col] = df[col].where(df["active"] != False, "-")
+                    df[col] = df[col].where(df["active"], "-")
 
                 # Drop columns
                 df = df.drop(
@@ -18120,7 +18120,7 @@ class Validate:
                 segmented=report_table.original_segments.notnull(),
                 **{
                     col: ibis.ifelse(
-                        report_table.active == False,
+                        ~report_table.active,
                         ibis.literal("-"),
                         report_table[col].cast("string"),
                     )
