@@ -1,0 +1,761 @@
+{
+  "suffixes": [
+    "LLC",
+    "CJSC",
+    "OJSC",
+    "Ltd.",
+    "Group",
+    "Corp.",
+    "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Armenian",
+    "Global",
+    "National",
+    "International",
+    "United",
+    "Central",
+    "Modern",
+    "Digital",
+    "Premier",
+    "Advanced",
+    "Dynamic",
+    "Strategic",
+    "Creative",
+    "Progressive",
+    "Innovative",
+    "Integrated",
+    "Collaborative",
+    "Superior",
+    "Elite",
+    "Professional",
+    "Reliable",
+    "Sustainable",
+    "Smart",
+    "Highland",
+    "Caucasian",
+    "Ararat",
+    "Eastern",
+    "Western"
+  ],
+  "nouns": [
+    "Energy",
+    "Solutions",
+    "Services",
+    "Trading",
+    "Industries",
+    "Logistics",
+    "Construction",
+    "Development",
+    "Technologies",
+    "Consulting",
+    "Agriculture",
+    "Tourism",
+    "Hospitality",
+    "Transport",
+    "Communications",
+    "Finance",
+    "Mining",
+    "Real Estate",
+    "Insurance",
+    "Media",
+    "Pharmaceuticals",
+    "Food",
+    "Beverages",
+    "Engineering",
+    "Electronics",
+    "Software",
+    "Design",
+    "Architecture",
+    "Education",
+    "Healthcare",
+    "Security",
+    "Ventures",
+    "Telecom",
+    "Jewellery",
+    "Cognac",
+    "Textiles"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Ameriabank",
+      "weight": 0.06,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Ararat Brandy Company",
+      "weight": 0.06,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Yerevan Brandy Company",
+      "weight": 0.05,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Ucom",
+      "weight": 0.05,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Beeline Armenia",
+      "weight": 0.04,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "VivaCell-MTS",
+      "weight": 0.05,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "SAS Group",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "GazProm Armenia",
+      "weight": 0.04,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Electric Networks of Armenia",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Zangezur Copper Molybdenum Combine",
+      "weight": 0.03,
+      "cities": ["Kapan"]
+    },
+    {
+      "name": "Armenian Nuclear Power Plant",
+      "weight": 0.02,
+      "cities": ["Metsamor"]
+    },
+    {
+      "name": "Inecobank",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Ardshinbank",
+      "weight": 0.04,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "ACBA Bank",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Converse Bank",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Synopsys Armenia",
+      "weight": 0.04,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Picsart",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "TeamViewer Armenia",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "ServiceTitan",
+      "weight": 0.03,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Digitain",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "BetConstruct",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "SoftConstruct",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "National Instruments Armenia",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "EPAM Armenia",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Krisp",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Menu Group",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Deem Communications",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Grand Holding",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Alex Textile",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Multi Group",
+      "weight": 0.02,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "ArmSwissBank",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Lydian Armenia",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Armenia Wine",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Karas Wines",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Kotayk Brewery",
+      "weight": 0.01,
+      "cities": ["Abovyan"]
+    },
+    {
+      "name": "Bjni Mineral Water",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Jermuk Group",
+      "weight": 0.01,
+      "cities": ["Jermuk"]
+    },
+    {
+      "name": "GeoProMining",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Haypost",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "South Caucasus Railway",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Zvartnots International Airport",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    },
+    {
+      "name": "Veolia Djur",
+      "weight": 0.01,
+      "cities": ["Yerevan"]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Accountant",
+    "Lawyer",
+    "Doctor",
+    "Teacher",
+    "Engineer",
+    "Architect",
+    "Designer",
+    "Manager",
+    "Journalist",
+    "Pharmacist",
+    "Driver",
+    "Farmer",
+    "Winemaker",
+    "Agronomist",
+    "Economist",
+    "Musician",
+    "Artist",
+    "Writer",
+    "Translator",
+    "Operator",
+    "Technician",
+    "Dentist",
+    "Veterinarian",
+    "Psychologist",
+    "Sociologist",
+    "Historian",
+    "Chemist",
+    "Physicist",
+    "Biologist",
+    "Mathematician",
+    "Geographer",
+    "Scientist",
+    "Marketing Specialist",
+    "Analyst",
+    "Auditor",
+    "Chef",
+    "Data Scientist",
+    "Project Manager",
+    "HR Manager",
+    "Financial Advisor",
+    "Jeweller",
+    "Surgeon",
+    "Nurse"
+  ],
+  "catch_phrase_adjectives": [
+    "reliable",
+    "modern",
+    "innovative",
+    "professional",
+    "quality",
+    "flexible",
+    "effective",
+    "transparent",
+    "sustainable",
+    "technological",
+    "strategic",
+    "dynamic",
+    "creative",
+    "progressive",
+    "dedicated",
+    "global",
+    "local",
+    "trusted",
+    "advanced"
+  ],
+  "catch_phrase_nouns": [
+    "development",
+    "success",
+    "quality",
+    "service",
+    "innovation",
+    "future",
+    "progress",
+    "partnership",
+    "solution",
+    "experience",
+    "technology",
+    "collaboration",
+    "leadership",
+    "tradition"
+  ],
+  "catch_phrase_verbs": [
+    "build",
+    "create",
+    "develop",
+    "unite",
+    "ensure",
+    "strengthen",
+    "change",
+    "improve",
+    "deliver",
+    "grow",
+    "innovate",
+    "lead",
+    "collaborate",
+    "empower",
+    "transform"
+  ],
+  "catch_phrase_connector": ["and", "with", "for"],
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.20,
+      "jobs": [
+        "Software Engineer",
+        "Data Scientist",
+        "DevOps Engineer",
+        "QA Engineer",
+        "Product Manager",
+        "UX Designer"
+      ],
+      "well_known": [
+        "Synopsys Armenia",
+        "Picsart",
+        "ServiceTitan",
+        "Digitain",
+        "BetConstruct"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "CJSC",
+        "Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Technologies",
+        "Software",
+        "Digital",
+        "Systems",
+        "Solutions"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "mining",
+      "weight": 0.10,
+      "jobs": [
+        "Mining Engineer",
+        "Geologist",
+        "Metallurgist",
+        "Safety Officer",
+        "Drill Operator"
+      ],
+      "well_known": [
+        "Zangezur Copper Molybdenum Combine",
+        "Lydian Armenia",
+        "GeoProMining"
+      ],
+      "company_suffixes": [
+        "CJSC",
+        "OJSC",
+        "LLC"
+      ],
+      "company_nouns": [
+        "Mining",
+        "Minerals",
+        "Resources",
+        "Metals",
+        "Exploration"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.10,
+      "jobs": [
+        "Agronomist",
+        "Farmer",
+        "Veterinarian",
+        "Food Technologist",
+        "Agricultural Engineer"
+      ],
+      "well_known": [
+        "SAS Group",
+        "Armenia Wine",
+        "Karas Wines"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "CJSC",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Farming",
+        "Produce",
+        "AgroTech",
+        "Harvest"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Auditor",
+        "Bank Teller",
+        "Investment Manager",
+        "Risk Analyst"
+      ],
+      "well_known": [
+        "Ameriabank",
+        "Ardshinbank",
+        "ACBA Bank",
+        "Inecobank",
+        "Converse Bank"
+      ],
+      "company_suffixes": [
+        "CJSC",
+        "OJSC",
+        "LLC",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Finance",
+        "Capital",
+        "Banking",
+        "Investments",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.08,
+      "jobs": [
+        "Architect",
+        "Civil Engineer",
+        "Construction Manager",
+        "Surveyor",
+        "Electrician"
+      ],
+      "well_known": [
+        "Grand Holding",
+        "Multi Group"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "CJSC",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Construction",
+        "Building",
+        "Development",
+        "Infrastructure"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08,
+      "jobs": [
+        "Network Engineer",
+        "Telecom Technician",
+        "Customer Service Representative",
+        "Sales Manager"
+      ],
+      "well_known": [
+        "Ucom",
+        "VivaCell-MTS",
+        "Beeline Armenia"
+      ],
+      "company_suffixes": [
+        "CJSC",
+        "LLC",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Communications",
+        "Networks",
+        "Mobile"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.08,
+      "jobs": [
+        "Tour Guide",
+        "Hotel Manager",
+        "Receptionist",
+        "Travel Agent",
+        "Chef"
+      ],
+      "well_known": [
+        "Menu Group",
+        "Zvartnots International Airport"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "Ltd.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Tourism",
+        "Travel",
+        "Hospitality",
+        "Adventures",
+        "Tours"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "Hotel {last_name}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.07,
+      "jobs": [
+        "Doctor",
+        "Surgeon",
+        "Nurse",
+        "Pharmacist",
+        "Dentist",
+        "Lab Technician"
+      ],
+      "well_known": [
+        "Natali Pharm",
+        "Alfa Pharm"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "CJSC",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Pharmaceuticals",
+        "Clinic",
+        "Health"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Researcher",
+        "Administrator",
+        "Librarian"
+      ],
+      "well_known": [
+        "Yerevan State University",
+        "American University of Armenia"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Education",
+        "Academy",
+        "Institute",
+        "Learning",
+        "Training"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "food_beverage",
+      "weight": 0.07,
+      "jobs": [
+        "Food Technologist",
+        "Winemaker",
+        "Brewer",
+        "Quality Controller",
+        "Production Manager"
+      ],
+      "well_known": [
+        "Ararat Brandy Company",
+        "Yerevan Brandy Company",
+        "Kotayk Brewery",
+        "Bjni Mineral Water",
+        "Jermuk Group"
+      ],
+      "company_suffixes": [
+        "LLC",
+        "CJSC",
+        "Ltd.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Foods",
+        "Beverages",
+        "Wines",
+        "Dairy",
+        "Brandy"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.05,
+      "jobs": [
+        "Electrical Engineer",
+        "Power Plant Operator",
+        "Energy Auditor",
+        "Renewable Energy Specialist"
+      ],
+      "well_known": [
+        "GazProm Armenia",
+        "Electric Networks of Armenia",
+        "Armenian Nuclear Power Plant"
+      ],
+      "company_suffixes": [
+        "CJSC",
+        "OJSC",
+        "LLC"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Power",
+        "Electric",
+        "Renewable",
+        "Gas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
+    }
+  ]
+}

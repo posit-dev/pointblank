@@ -1,0 +1,544 @@
+{
+  "suffixes": [
+    "LLC",
+    "Ltd.",
+    "Co.",
+    "PLC",
+    "Inc.",
+    "Corp.",
+    "Group",
+    "Holdings",
+    "Est.",
+    "Trading"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{last_name} {noun} {suffix}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Royal",
+    "Golden",
+    "National",
+    "Central",
+    "United",
+    "International",
+    "Premier",
+    "Advanced",
+    "Modern",
+    "Strategic",
+    "Global",
+    "Arab",
+    "Jordanian",
+    "Eastern",
+    "Integrated",
+    "Dynamic",
+    "Progressive",
+    "Creative",
+    "Innovative",
+    "Elite",
+    "Professional",
+    "Leading",
+    "Smart",
+    "Digital",
+    "Green",
+    "Reliable",
+    "Superior",
+    "Prime"
+  ],
+  "nouns": [
+    "Solutions",
+    "Industries",
+    "Enterprises",
+    "Technologies",
+    "Systems",
+    "Services",
+    "Consulting",
+    "Trading",
+    "Construction",
+    "Engineering",
+    "Logistics",
+    "Development",
+    "Investments",
+    "Properties",
+    "Communications",
+    "Finance",
+    "Energy",
+    "Transport",
+    "Health",
+    "Agriculture",
+    "Media",
+    "Pharma",
+    "Insurance",
+    "Tourism",
+    "Security",
+    "Resources",
+    "Minerals",
+    "Hospitality",
+    "Aviation",
+    "Education",
+    "Commerce",
+    "Software",
+    "Electronics",
+    "Architecture",
+    "Mining",
+    "Capital"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Arab Bank",
+      "weight": 0.05,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Royal Jordanian Airlines",
+      "weight": 0.05,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Telecom",
+      "weight": 0.05,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Orange Jordan",
+      "weight": 0.05,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Aramex",
+      "weight": 0.05,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Phosphate Mines",
+      "weight": 0.03,
+      "cities": [
+        "Amman",
+        "Aqaba"
+      ]
+    },
+    {
+      "name": "Arab Potash Company",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Cement Factories",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Umniah",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Zain Jordan",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Housing Bank for Trade and Finance",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Cairo Amman Bank",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Kuwait Bank",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Capital Bank of Jordan",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Ahli Bank",
+      "weight": 0.03,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Insurance Company",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Nuqul Group",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Hikma Pharmaceuticals",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Steel",
+      "weight": 0.02,
+      "cities": [
+        "Zarqa"
+      ]
+    },
+    {
+      "name": "Safeway Jordan",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Manaseer Group",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "National Electric Power Company",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Petroleum Refinery",
+      "weight": 0.02,
+      "cities": [
+        "Zarqa"
+      ]
+    },
+    {
+      "name": "Greater Amman Municipality",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Aqaba Development Corporation",
+      "weight": 0.02,
+      "cities": [
+        "Aqaba"
+      ]
+    },
+    {
+      "name": "Jordan Industrial Estates Company",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Enterprise Development Corporation",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Maktoob",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Mawdoo3",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Atypon",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jamalon",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "OpenSooq",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Careem Jordan",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Talabat Jordan",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Fawry Jordan",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Estarta Solutions",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "LTUC",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "King Abdullah II Design and Development Bureau",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan News Agency",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Royal Scientific Society",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Fastlink",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Jordan Press Foundation",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "Dar Al Dawa",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    },
+    {
+      "name": "United Insurance Company",
+      "weight": 0.02,
+      "cities": [
+        "Amman"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrative Assistant",
+    "Analyst",
+    "Architect",
+    "Business Consultant",
+    "Civil Engineer",
+    "Computer Programmer",
+    "Data Scientist",
+    "Designer",
+    "Doctor",
+    "Economist",
+    "Electrical Engineer",
+    "Financial Advisor",
+    "Graphic Designer",
+    "Human Resources Manager",
+    "IT Manager",
+    "Journalist",
+    "Lawyer",
+    "Logistics Manager",
+    "Mechanical Engineer",
+    "Marketing Manager",
+    "Network Administrator",
+    "Operations Manager",
+    "Pharmacist",
+    "Project Manager",
+    "Quality Assurance Engineer",
+    "Research Scientist",
+    "Sales Manager",
+    "Software Developer",
+    "Systems Administrator",
+    "Teacher",
+    "Technical Writer",
+    "Translator",
+    "Urban Planner",
+    "Veterinarian",
+    "Web Developer",
+    "Agronomist",
+    "Petroleum Engineer",
+    "Tourism Guide",
+    "Pilot",
+    "Nurse",
+    "Security Officer",
+    "Bank Teller"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "pioneering",
+    "comprehensive",
+    "sustainable",
+    "premium",
+    "efficient",
+    "cutting-edge",
+    "strategic",
+    "dynamic",
+    "professional",
+    "leading",
+    "modern",
+    "advanced",
+    "integrated",
+    "creative",
+    "smart",
+    "digital",
+    "robust"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "partnerships",
+    "opportunities",
+    "excellence",
+    "innovation",
+    "performance",
+    "results",
+    "growth",
+    "value",
+    "quality",
+    "expertise",
+    "leadership",
+    "vision",
+    "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "achieve",
+    "transform",
+    "build",
+    "create",
+    "empower",
+    "enhance",
+    "develop",
+    "drive",
+    "enable",
+    "connect",
+    "inspire",
+    "advance",
+    "optimize",
+    "lead"
+  ],
+  "catch_phrase_connector": "to",
+  "industries": [
+    {
+      "name": "finance",
+      "weight": 0.18
+    },
+    {
+      "name": "technology",
+      "weight": 0.15
+    },
+    {
+      "name": "pharmaceuticals",
+      "weight": 0.12
+    },
+    {
+      "name": "energy",
+      "weight": 0.1
+    },
+    {
+      "name": "tourism",
+      "weight": 0.1
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08
+    },
+    {
+      "name": "construction",
+      "weight": 0.08
+    },
+    {
+      "name": "mining",
+      "weight": 0.07
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06
+    },
+    {
+      "name": "education",
+      "weight": 0.06
+    }
+  ]
+}

@@ -318,23 +318,23 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# Générer 100 lignes de données de test réalistes
-data = pb.generate_dataset(schema, n=100, seed=23)
+# Générer 10 lignes de données de test réalistes
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
 ```
 
-| user_id             | name             | email                       | age | status   |
-|---------------------|------------------|-----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 Le générateur prend en charge une génération de données sophistiquée avec ces capacités :
 
 - **Données réalistes avec presets** : Utilisez des presets intégrés comme `"name"`, `"email"`, `"address"`, `"phone"`, etc.
 - **Chaînes user agent** : Générez des chaînes user agent de navigateur très variées et réalistes à partir de 17 catégories de navigateurs avec plus de 42 000 combinaisons uniques
-- **Support de 50+ pays** : Générez des données spécifiques à la locale (par ex., `country="DE"` pour des adresses allemandes)
+- **Support de 100 pays** : Générez des données spécifiques à la locale (par ex., `country="DE"` pour des adresses allemandes)
 - **Contraintes de champs** : Contrôlez les plages, patterns, unicité et valeurs autorisées
 - **Formats de sortie multiples** : Retourne des DataFrames Polars par défaut, mais supporte aussi Pandas (`output="pandas"`) ou dictionnaires (`output="dict"`)
 
@@ -344,7 +344,7 @@ Le générateur prend en charge une génération de données sophistiquée avec 
 - **Conçu pour la collaboration** : Partagez les résultats avec vos collègues grâce à des rapports interactifs ben stylés
 - **Sorties pratiques** : Obtenez exactement ce que vous avez besoin: comptages, extraits, résumés ou rapports complets
 - **Déploiement flexible** : Utilisez-le dans des notebooks, des scripts ou des pipelines de données
-- **Génération de données synthétiques** : Créez des données de test réalistes avec plus de 30 presets, chaînes user agent, formatage adapté aux locales, et support de 50+ pays
+- **Génération de données synthétiques** : Créez des données de test réalistes avec plus de 30 presets, chaînes user agent, formatage adapté aux locales, et support de 100 pays
 - **Personnalisable** : Adaptez les étapes de validation et les rapports selon vos besoins spécifiques
 - **Internationalisation** : Les rapports peuvent être générés dans 40 langues, incluant l'anglais, l'espagnol, le français et l'allemand
 

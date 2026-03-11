@@ -373,27 +373,20 @@ schema = pb.Schema(
 # Generate 10 rows of realistic test data
 data = pb.generate_dataset(schema, n=10, seed=23)
 
-data
+pb.preview(data)
 ```
 
-| user_id             | name             | email                      | age | status   |
-|---------------------|------------------|----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com        | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com     | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com            | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com| 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com    | 57  | pending  |
-| 3497364383162086858 | Zachary Marsh    | zmarsh23@zoho.com          | 72  | pending  |
-| 3302703640991750415 | Gemma Gonzalez   | gemmagonzalez@yahoo.com    | 66  | pending  |
-| 6695746877064448147 | Brian Haley      | brian437@yandex.com        | 85  | inactive |
-| 2466163118311913924 | Nora Hernandez   | norahernandez@aol.com      | 63  | pending  |
-| 129827878195925732  | Diana Novak      | diana922@protonmail.com    | 34  | active   |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 The generator supports sophisticated data generation with these capabilities:
 
 - **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
 - **User agent strings**: Generate highly varied, realistic browser user agent strings from 17 browser categories with over 42,000 unique combinations
-- **50+ country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
+- **100 country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
 - **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
 - **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
 
@@ -405,7 +398,7 @@ This makes it easy to generate test data that matches your validation rules, hel
 - **Built for collaboration**: Share results with colleagues through beautiful interactive reports
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
-- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 50+ country support
+- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
 - **Customizable**: Tailor validation steps and reporting to your specific needs
 - **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 

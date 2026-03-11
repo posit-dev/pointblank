@@ -315,23 +315,23 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# 生成 100 行真实的测试数据
-data = pb.generate_dataset(schema, n=100, seed=23)
+# 生成 10 行真实的测试数据
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
 ```
 
-| user_id             | name             | email                       | age | status   |
-|---------------------|------------------|-----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 该生成器支持具有以下功能的复杂数据生成：
 
 - **使用预设的真实数据**：使用内置预设，如 `"name"`、`"email"`、`"address"`、`"phone"` 等
 - **用户代理字符串**：从 17 个浏览器类别生成高度多样化、真实的浏览器用户代理字符串，超过 42,000 种唯一组合
-- **支持 50+ 个国家/地区**：生成特定区域的数据（例如，`country="DE"` 用于德国地址）
+- **支持 100 个国家/地区**：生成特定区域的数据（例如，`country="DE"` 用于德国地址）
 - **字段约束**：控制范围、模式、唯一性和允许的值
 - **多种输出格式**：默认返回 Polars DataFrame，也支持 Pandas（`output="pandas"`）或字典（`output="dict"`）
 
@@ -341,7 +341,7 @@ data = pb.generate_dataset(schema, n=100, seed=23)
 - **为协作而构建**: 通过精美的交互式报告与同事分享结果
 - **实用的输出**: 获取您所需的内容：计数、提取、摘要或完整报告
 - **灵活部署**: 可用于笔记本、脚本或数据管道
-- **合成数据生成**: 使用超过 30 个预设、用户代理字符串、区域感知格式化和 50+ 个国家支持创建真实的测试数据
+- **合成数据生成**: 使用超过 30 个预设、用户代理字符串、区域感知格式化和 100 个国家支持创建真实的测试数据
 - **可定制**: 根据您的特定需求定制验证步骤和报告
 - **国际化**: 报告可以用 40 种语言生成，包括英语、西班牙语、法语和德语
 

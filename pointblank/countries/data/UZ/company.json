@@ -1,0 +1,949 @@
+{
+  "suffixes": [
+    "MCHJ",
+    "AJ",
+    "QK",
+    "XK",
+    "OK",
+    "MChJ",
+    "QMJ",
+    "JShCh",
+    "YaTT",
+    "KFX"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}",
+    "{last_name} va {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Milliy",
+    "Zamonaviy",
+    "Innovatsion",
+    "Strategik",
+    "Global",
+    "Mintaqaviy",
+    "Markaziy",
+    "Professional",
+    "Texnologik",
+    "Raqamli",
+    "Ijodiy",
+    "Mustahkam",
+    "Barqaror",
+    "Kuchli",
+    "Ishonchli",
+    "Sifatli",
+    "Tezkor",
+    "Ilg'or",
+    "Yetakchi",
+    "Bosh",
+    "Asosiy",
+    "Yangi",
+    "Hamkor",
+    "Birga",
+    "Universal",
+    "Maxsus",
+    "Ilmiy",
+    "Amaliy"
+  ],
+  "nouns": [
+    "Savdo",
+    "Sanoat",
+    "Texnologiya",
+    "Moliya",
+    "Qurilish",
+    "Energiya",
+    "Transport",
+    "Logistika",
+    "Agro",
+    "Kimyo",
+    "Metal",
+    "Neft",
+    "Gaz",
+    "Elektr",
+    "Telekom",
+    "Media",
+    "Turizm",
+    "Oziq-ovqat",
+    "To'qimachilik",
+    "Farmatsevtika",
+    "Tibbiyot",
+    "Ta'lim",
+    "Xizmat",
+    "Invest",
+    "Kapital",
+    "Holding",
+    "Biznes",
+    "Ishlab chiqarish",
+    "Konsalting",
+    "Eksport",
+    "Import",
+    "Taraqqiyot",
+    "Rivojlanish",
+    "Baraka",
+    "Farovonlik",
+    "Madaniyat"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Uzbekneftegaz",
+      "cities": [
+        "Tashkent",
+        "Bukhara",
+        "Qarshi",
+        "Mubarek"
+      ]
+    },
+    {
+      "name": "Uzbekistan Airways",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Fergana",
+        "Nukus",
+        "Urgench",
+        "Namangan",
+        "Termiz"
+      ]
+    },
+    {
+      "name": "Uzpromstroybank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Almalyk Mining and Metallurgical Combine",
+      "cities": [
+        "Olmaliq",
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Navoi Mining and Metallurgical Combine",
+      "cities": [
+        "Navoi",
+        "Zarafshon",
+        "Uchquduq",
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Beeline Uzbekistan",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Ucell",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan"
+      ]
+    },
+    {
+      "name": "UzAuto Motors",
+      "cities": [
+        "Asaka",
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Uztelecom",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan",
+        "Fergana",
+        "Nukus",
+        "Qarshi"
+      ]
+    },
+    {
+      "name": "National Bank of Uzbekistan",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan",
+        "Fergana",
+        "Nukus"
+      ]
+    },
+    {
+      "name": "Asaka Bank",
+      "cities": [
+        "Tashkent",
+        "Asaka",
+        "Andijan",
+        "Samarkand",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Kapitalbank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Ipoteka Bank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan"
+      ]
+    },
+    {
+      "name": "Hamkorbank",
+      "cities": [
+        "Andijan",
+        "Tashkent",
+        "Namangan",
+        "Fergana",
+        "Samarkand"
+      ]
+    },
+    {
+      "name": "Uzagrosugurta",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Jizzakh"
+      ]
+    },
+    {
+      "name": "Uzdonmahsulot",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan"
+      ]
+    },
+    {
+      "name": "Uzbekenergo",
+      "cities": [
+        "Tashkent",
+        "Navoi",
+        "Angren",
+        "Chirchiq"
+      ]
+    },
+    {
+      "name": "Uzbekiston Temir Yollari",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Qarshi",
+        "Navoi"
+      ]
+    },
+    {
+      "name": "Uzkimyosanoat",
+      "cities": [
+        "Tashkent",
+        "Navoi",
+        "Fergana",
+        "Chirchiq"
+      ]
+    },
+    {
+      "name": "Uzbektelecom",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Namangan",
+        "Andijan",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Silk Road Airlines",
+      "cities": [
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Orient Finans Bank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Davr Bank",
+      "cities": [
+        "Tashkent",
+        "Andijan",
+        "Namangan"
+      ]
+    },
+    {
+      "name": "InFinBank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Turonbank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Aloqabank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Namangan",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Qishloq Qurilish Bank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Jizzakh"
+      ]
+    },
+    {
+      "name": "Asia Alliance Bank",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Savdogar Bank",
+      "cities": [
+        "Tashkent",
+        "Namangan",
+        "Andijan"
+      ]
+    },
+    {
+      "name": "Universal Bank",
+      "cities": [
+        "Tashkent",
+        "Samarkand"
+      ]
+    },
+    {
+      "name": "Mobiuz",
+      "cities": [
+        "Tashkent",
+        "Samarkand",
+        "Bukhara",
+        "Namangan",
+        "Andijan",
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Premium Textile",
+      "cities": [
+        "Tashkent",
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Artel Electronics",
+      "cities": [
+        "Tashkent",
+        "Namangan"
+      ]
+    },
+    {
+      "name": "Uzbekistan GTL",
+      "cities": [
+        "Tashkent",
+        "Qarshi"
+      ]
+    },
+    {
+      "name": "Maxam-Chirchiq",
+      "cities": [
+        "Chirchiq",
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "UzAuto Trailer",
+      "cities": [
+        "Tashkent",
+        "Samarkand"
+      ]
+    },
+    {
+      "name": "Tashkent Mechanical Plant",
+      "cities": [
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Fergana Oil Refinery",
+      "cities": [
+        "Fergana"
+      ]
+    },
+    {
+      "name": "Bukhara Oil Refinery",
+      "cities": [
+        "Bukhara"
+      ]
+    },
+    {
+      "name": "Navoiy Azot",
+      "cities": [
+        "Navoi"
+      ]
+    },
+    {
+      "name": "Kungrad Soda Plant",
+      "cities": [
+        "Kungrad"
+      ]
+    },
+    {
+      "name": "UzEltechSanoat",
+      "cities": [
+        "Tashkent",
+        "Chirchiq"
+      ]
+    },
+    {
+      "name": "Sharq Taronalari",
+      "cities": [
+        "Samarkand",
+        "Tashkent"
+      ]
+    },
+    {
+      "name": "Samarkand Winery",
+      "cities": [
+        "Samarkand"
+      ]
+    }
+  ],
+  "jobs": [
+    "Boshqaruvchi",
+    "Muhandis",
+    "Shifokor",
+    "O'qituvchi",
+    "Hisobchi",
+    "Dasturchi",
+    "Haydovchi",
+    "Dehqon",
+    "Tikuvchi",
+    "Oshpaz",
+    "Huquqshunos",
+    "Iqtisodchi",
+    "Me'mor",
+    "Dizayner",
+    "Jurnalist",
+    "Sotuvchi",
+    "Menejer",
+    "Direktor",
+    "Kassir",
+    "Qo'riqchi",
+    "Elektrik",
+    "Mexanik",
+    "Tarjimon",
+    "Farmatsevt",
+    "Stomatolog",
+    "Veterinar",
+    "Kutubxonachi",
+    "Arxitektor",
+    "Geolog",
+    "Kimyogar",
+    "Fizik",
+    "Matematik",
+    "Biolog",
+    "Tarixchi",
+    "Filolog",
+    "Psixolog",
+    "Sotsialog",
+    "Pedagog",
+    "Musiqachi",
+    "Rassom",
+    "Aktyor",
+    "Rejissyor",
+    "Operator"
+  ],
+  "catch_phrase_adjectives": [
+    "innovatsion",
+    "zamonaviy",
+    "ishonchli",
+    "professional",
+    "raqamli",
+    "global",
+    "strategik",
+    "barqaror",
+    "sifatli",
+    "tezkor",
+    "ilg'or",
+    "kuchli",
+    "mustahkam",
+    "universal",
+    "milliy"
+  ],
+  "catch_phrase_nouns": [
+    "yechimlar",
+    "texnologiyalar",
+    "xizmatlar",
+    "imkoniyatlar",
+    "tizimlar",
+    "mahsulotlar",
+    "loyihalar",
+    "natijalar",
+    "taraqqiyot",
+    "rivojlanish",
+    "hamkorlik",
+    "sifat",
+    "samaradorlik",
+    "muvaffaqiyat",
+    "innovatsiya"
+  ],
+  "catch_phrase_verbs": [
+    "taqdim etamiz",
+    "ishlab chiqamiz",
+    "rivojlantiramiz",
+    "qo'llab-quvvatlaymiz",
+    "ta'minlaymiz",
+    "yaratamiz",
+    "himoya qilamiz",
+    "boshqaramiz",
+    "optimallashtiramiz",
+    "joriy etamiz"
+  ],
+  "catch_phrase_connector": [
+    "va",
+    "hamda",
+    "bilan",
+    "orqali",
+    "uchun"
+  ],
+  "industries": [
+    {
+      "name": "oil_gas",
+      "weight": 0.12,
+      "jobs": [
+        "Muhandis",
+        "Geolog"
+      ],
+      "well_known": [
+        "Uzbekneftegaz",
+        "Uzbekistan GTL",
+        "Fergana Oil Refinery",
+        "Bukhara Oil Refinery"
+      ],
+      "company_suffixes": [
+        "AJ",
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Neft",
+        "Gaz",
+        "Energiya"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "mining_metallurgy",
+      "weight": 0.1,
+      "jobs": [
+        "Muhandis",
+        "Geolog"
+      ],
+      "well_known": [
+        "Almalyk Mining and Metallurgical Combine",
+        "Navoi Mining and Metallurgical Combine",
+        "Navoiy Azot",
+        "Kungrad Soda Plant"
+      ],
+      "company_suffixes": [
+        "AJ",
+        "QK"
+      ],
+      "company_nouns": [
+        "Metal",
+        "Sanoat"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.1,
+      "jobs": [
+        "Dehqon",
+        "Veterinar"
+      ],
+      "well_known": [
+        "Uzdonmahsulot"
+      ],
+      "company_suffixes": [
+        "MCHJ",
+        "QK",
+        "KFX"
+      ],
+      "company_nouns": [
+        "Agro",
+        "Oziq-ovqat"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Hisobchi",
+        "Iqtisodchi",
+        "Menejer"
+      ],
+      "well_known": [
+        "National Bank of Uzbekistan",
+        "Uzpromstroybank",
+        "Asaka Bank",
+        "Kapitalbank",
+        "Ipoteka Bank",
+        "Hamkorbank",
+        "Orient Finans Bank",
+        "Davr Bank",
+        "InFinBank",
+        "Turonbank",
+        "Aloqabank",
+        "Qishloq Qurilish Bank",
+        "Asia Alliance Bank",
+        "Savdogar Bank",
+        "Universal Bank"
+      ],
+      "company_suffixes": [
+        "AJ",
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Moliya",
+        "Invest",
+        "Kapital",
+        "Biznes"
+      ],
+      "company_formats": [
+        "{adjective} Bank",
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom_it",
+      "weight": 0.08,
+      "jobs": [
+        "Dasturchi",
+        "Muhandis",
+        "Operator"
+      ],
+      "well_known": [
+        "Beeline Uzbekistan",
+        "Ucell",
+        "Uztelecom",
+        "Uzbektelecom",
+        "Mobiuz"
+      ],
+      "company_suffixes": [
+        "MCHJ",
+        "MChJ"
+      ],
+      "company_nouns": [
+        "Telekom",
+        "Texnologiya"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "automotive",
+      "weight": 0.06,
+      "jobs": [
+        "Muhandis",
+        "Mexanik"
+      ],
+      "well_known": [
+        "UzAuto Motors",
+        "UzAuto Trailer"
+      ],
+      "company_suffixes": [
+        "AJ",
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Avto",
+        "Mashina"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.06,
+      "jobs": [
+        "Muhandis",
+        "Me'mor",
+        "Arxitektor"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "MCHJ",
+        "QK"
+      ],
+      "company_nouns": [
+        "Qurilish"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.05,
+      "jobs": [
+        "Muhandis",
+        "Elektrik"
+      ],
+      "well_known": [
+        "Uzbekenergo",
+        "UzEltechSanoat"
+      ],
+      "company_suffixes": [
+        "AJ"
+      ],
+      "company_nouns": [
+        "Energiya",
+        "Elektr"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "textile",
+      "weight": 0.06,
+      "jobs": [
+        "Tikuvchi",
+        "Dizayner"
+      ],
+      "well_known": [
+        "Premium Textile"
+      ],
+      "company_suffixes": [
+        "MCHJ",
+        "MChJ"
+      ],
+      "company_nouns": [
+        "To'qimachilik"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "transport",
+      "weight": 0.04,
+      "jobs": [
+        "Haydovchi"
+      ],
+      "well_known": [
+        "Uzbekistan Airways",
+        "Silk Road Airlines",
+        "Uzbekiston Temir Yollari"
+      ],
+      "company_suffixes": [
+        "AJ",
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Transport",
+        "Logistika"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.05,
+      "jobs": [
+        "Shifokor",
+        "Stomatolog",
+        "Farmatsevt"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Tibbiyot",
+        "Farmatsevtika"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.04,
+      "jobs": [
+        "O'qituvchi",
+        "Pedagog"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Ta'lim"
+      ],
+      "company_formats": [
+        "{city} Universiteti",
+        "{last_name} Instituti"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.08,
+      "jobs": [
+        "Boshqaruvchi",
+        "Direktor",
+        "Menejer",
+        "Huquqshunos",
+        "Jurnalist",
+        "Sotuvchi",
+        "Kassir",
+        "Qo'riqchi",
+        "Tarjimon",
+        "Kutubxonachi",
+        "Tarixchi",
+        "Filolog",
+        "Psixolog",
+        "Sotsialog",
+        "Musiqachi",
+        "Rassom",
+        "Aktyor",
+        "Rejissyor",
+        "Kimyogar",
+        "Fizik",
+        "Matematik",
+        "Biolog"
+      ],
+      "well_known": [
+        "Artel Electronics",
+        "Tashkent Mechanical Plant",
+        "Maxam-Chirchiq",
+        "Uzkimyosanoat",
+        "Uzagrosugurta",
+        "Samarkand Winery",
+        "Sharq Taronalari"
+      ],
+      "company_suffixes": [
+        "MCHJ",
+        "AJ",
+        "QK",
+        "XK"
+      ],
+      "company_nouns": [
+        "Holding",
+        "Biznes",
+        "Xizmat",
+        "Savdo"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} va {last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "insurance",
+      "weight": 0.03,
+      "jobs": [
+        "Hisobchi"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "AJ",
+        "MCHJ"
+      ],
+      "company_nouns": [
+        "Sug'urta"
+      ],
+      "company_formats": [
+        "{adjective} Sug'urta {suffix}"
+      ]
+    },
+    {
+      "name": "food_processing",
+      "weight": 0.03,
+      "jobs": [
+        "Oshpaz"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "MCHJ",
+        "MChJ"
+      ],
+      "company_nouns": [
+        "Oziq-ovqat"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
+}

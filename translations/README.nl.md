@@ -318,23 +318,23 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# Genereer 100 rijen realistische testdata
-data = pb.generate_dataset(schema, n=100, seed=23)
+# Genereer 10 rijen realistische testdata
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
 ```
 
-| user_id             | name             | email                       | age | status   |
-|---------------------|------------------|-----------------------------|-----|----------|
-| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
-| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
-| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
-| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
-| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
 
 De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
 
 - **Realistische data met presets**: Gebruik ingebouwde presets zoals `"name"`, `"email"`, `"address"`, `"phone"`, enz.
 - **User agent strings**: Genereer zeer gevarieerde, realistische browser user agent strings uit 17 browsercategorieën met meer dan 42.000 unieke combinaties
-- **Ondersteuning voor 50+ landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
+- **Ondersteuning voor 100 landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
 - **Veldbeperkingen**: Beheer bereiken, patronen, uniciteit en toegestane waarden
 - **Meerdere uitvoerformaten**: Retourneert standaard Polars DataFrames, maar ondersteunt ook Pandas (`output="pandas"`) of dictionaries (`output="dict"`)
 
@@ -344,7 +344,7 @@ De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
 - **Gebouwd voor samenwerking**: Deel resultaten met collega's via mooie interactieve rapporten
 - **Praktische uitvoer**: Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
 - **Flexibele implementatie**: Gebruik in notebooks, scripts of datapipelines
-- **Synthetische datageneratie**: Creëer realistische testdata met meer dan 30 presets, user agent strings, locale-bewuste opmaak en ondersteuning voor meer dan 50 landen
+- **Synthetische datageneratie**: Creëer realistische testdata met meer dan 30 presets, user agent strings, locale-bewuste opmaak en ondersteuning voor 100 landen
 - **Aanpasbaar**: Stem validatiestappen en rapportage af op jouw specifieke behoeften
 - **Internationalisatie**: Rapporten kunnen worden gegenereerd in 40 talen, waaronder Engels, Spaans, Frans en Duits
 

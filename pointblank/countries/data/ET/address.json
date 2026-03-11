@@ -8,7 +8,7 @@
         "postcode_prefix": "1000",
         "lat_min": 8.95,
         "lat_max": 9.08,
-        "lon_min": 38.70,
+        "lon_min": 38.7,
         "lon_max": 38.82
       },
       {
@@ -29,7 +29,7 @@
         "lat_min": 8.52,
         "lat_max": 8.56,
         "lon_min": 39.26,
-        "lon_max": 39.30
+        "lon_max": 39.3
       }
     ],
     "common": [
@@ -41,7 +41,7 @@
         "lat_min": 7.04,
         "lat_max": 7.07,
         "lon_min": 38.47,
-        "lon_max": 38.50
+        "lon_max": 38.5
       },
       {
         "city": "Bahir Dar",
@@ -61,7 +61,7 @@
         "lat_min": 13.48,
         "lat_max": 13.52,
         "lon_min": 39.46,
-        "lon_max": 39.50
+        "lon_max": 39.5
       },
       {
         "city": "Gondar",
@@ -100,7 +100,7 @@
         "state": "Harari",
         "state_abbr": "HR",
         "postcode_prefix": "1600",
-        "lat_min": 9.30,
+        "lat_min": 9.3,
         "lat_max": 9.33,
         "lon_min": 42.12,
         "lon_max": 42.15
@@ -141,7 +141,7 @@
         "state_abbr": "OR",
         "postcode_prefix": "1800",
         "lat_min": 9.08,
-        "lat_max": 9.10,
+        "lat_max": 9.1,
         "lon_min": 36.53,
         "lon_max": 36.55
       },
@@ -153,7 +153,7 @@
         "lat_min": 9.34,
         "lat_max": 9.36,
         "lon_min": 42.78,
-        "lon_max": 42.80
+        "lon_max": 42.8
       },
       {
         "city": "Debre Birhan",
@@ -161,7 +161,7 @@
         "state_abbr": "AM",
         "postcode_prefix": "6500",
         "lat_min": 9.67,
-        "lat_max": 9.70,
+        "lat_max": 9.7,
         "lon_min": 39.52,
         "lon_max": 39.55
       },
@@ -180,9 +180,9 @@
         "state": "Sidama",
         "state_abbr": "SI",
         "postcode_prefix": "1410",
-        "lat_min": 6.40,
+        "lat_min": 6.4,
         "lat_max": 6.42,
-        "lon_min": 38.30,
+        "lon_min": 38.3,
         "lon_max": 38.32
       }
     ],
@@ -215,7 +215,7 @@
         "lat_min": 8.24,
         "lat_max": 8.26,
         "lon_min": 34.58,
-        "lon_max": 34.60
+        "lon_max": 34.6
       },
       {
         "city": "Semera",
@@ -223,8 +223,8 @@
         "state_abbr": "AF",
         "postcode_prefix": "3000",
         "lat_min": 11.78,
-        "lat_max": 11.80,
-        "lon_min": 41.00,
+        "lat_max": 11.8,
+        "lon_min": 41.0,
         "lon_max": 41.02
       },
       {
@@ -233,7 +233,7 @@
         "state_abbr": "AM",
         "postcode_prefix": "6350",
         "lat_min": 11.08,
-        "lat_max": 11.10,
+        "lat_max": 11.1,
         "lon_min": 39.73,
         "lon_max": 39.75
       },
@@ -244,7 +244,7 @@
         "postcode_prefix": "6700",
         "lat_min": 11.82,
         "lat_max": 11.84,
-        "lon_min": 39.60,
+        "lon_min": 39.6,
         "lon_max": 39.62
       },
       {
@@ -263,7 +263,7 @@
         "state_abbr": "OR",
         "postcode_prefix": "1900",
         "lat_min": 8.98,
-        "lat_max": 9.00,
+        "lat_max": 9.0,
         "lon_min": 37.85,
         "lon_max": 37.87
       },
@@ -275,7 +275,7 @@
         "lat_min": 8.74,
         "lat_max": 8.76,
         "lon_min": 38.98,
-        "lon_max": 39.00
+        "lon_max": 39.0
       },
       {
         "city": "Hosaena",
@@ -311,140 +311,408 @@
   },
   "streets_by_city": {
     "Addis Ababa": [
-      "Churchill Avenue", "Bole Road", "Meskel Square Road", "Africa Avenue",
-      "Haile Gebreselassie Road", "Entoto Avenue", "Ras Desta Damtew Street",
-      "Queen Elizabeth II Street", "Ras Mekonnen Avenue", "Cunningham Street",
-      "Wavel Street", "De Gaulle Square Road", "Gambia Street", "Guinea Street",
-      "Cameroon Street", "Nigeria Street", "Congo Street", "Libya Street",
-      "Rwanda Street", "Senegal Street", "Kenya Street", "Tanzania Street",
-      "Sudan Street", "Olympia Road", "Kazanchis Road", "Arat Kilo Road",
-      "Sidist Kilo Road", "Piassa Road", "Merkato Road", "Megenagna Road"
+      "Churchill Avenue",
+      "Bole Road",
+      "Meskel Square Road",
+      "Africa Avenue",
+      "Haile Gebreselassie Road",
+      "Entoto Avenue",
+      "Ras Desta Damtew Street",
+      "Queen Elizabeth II Street",
+      "Ras Mekonnen Avenue",
+      "Cunningham Street",
+      "Wavel Street",
+      "De Gaulle Square Road",
+      "Gambia Street",
+      "Guinea Street",
+      "Cameroon Street",
+      "Nigeria Street",
+      "Congo Street",
+      "Libya Street",
+      "Rwanda Street",
+      "Senegal Street",
+      "Kenya Street",
+      "Tanzania Street",
+      "Sudan Street",
+      "Olympia Road",
+      "Kazanchis Road",
+      "Arat Kilo Road",
+      "Sidist Kilo Road",
+      "Piassa Road",
+      "Merkato Road",
+      "Megenagna Road",
+      "Bole Medhanealem Road",
+      "Sarbet Road",
+      "Gerji Road",
+      "Gotera Road",
+      "Lebu Road",
+      "Megenagna Ring Road",
+      "Arat Kilo Avenue",
+      "Lideta Road",
+      "Autobus Tera Road",
+      "Teklehaimanot Road",
+      "Afincho Ber Road",
+      "Kebena Road",
+      "Yeka Road",
+      "Gulele Road",
+      "Ferensay Legasion Road",
+      "Bole Atlas Road",
+      "Old Airport Road",
+      "CMC Road",
+      "Hayahulet Mazoria Road",
+      "Urael Road",
+      "Kera Road",
+      "Nifas Silk Road",
+      "Kaliti Road",
+      "Akaki Road",
+      "Kotebe Road",
+      "Yerer Ber Road",
+      "Kolfe Road",
+      "Gelan Road",
+      "Saris Road",
+      "Jemo Road",
+      "Ayat Road",
+      "Summit Road",
+      "Bisrate Gebriel Road",
+      "Shola Road",
+      "Lamberet Road",
+      "Jackros Road",
+      "Alem Bank Road",
+      "Bole Bulbula Road",
+      "Tuludimtu Road",
+      "Stadium Road Addis",
+      "La Gare Road",
+      "St. George Avenue",
+      "Itegue Taitu Street",
+      "Menilik II Avenue",
+      "Tewodros Square Road",
+      "Mexico Square Road",
+      "Meskel Flower Road",
+      "Bole International Road",
+      "Total Road",
+      "Cathedral Road Addis",
+      "Hilton Road Addis",
+      "Sheraton Road Addis",
+      "Ghion Road",
+      "ECA Road",
+      "Africa Union Avenue",
+      "Ring Road Addis",
+      "Bethel Road",
+      "Wollo Sefer Road",
+      "Bambis Road",
+      "Dembel City Road",
+      "National Theatre Road",
+      "Ethio-China Road",
+      "Adey Abeba Road",
+      "Wossen Road",
+      "Emperor Haile Selassie Road",
+      "Dejazmatch Balcha Road",
+      "Fitawrari Habtegiorgis Road",
+      "Ras Bitwoded Road",
+      "Queen Sheba Road",
+      "Unity Park Road"
     ],
     "Dire Dawa": [
-      "Kezira Road", "Sabean Road", "Megala Road", "Taiwan Road",
-      "Addis Ketema Road", "Gendekore Road", "Dire Dawa Station Road",
-      "Chat Road", "Lega Hare Road", "Industrial Road",
-      "Harar Road", "Airport Road", "Market Road", "Commercial Road"
+      "Kezira Road",
+      "Sabean Road",
+      "Megala Road",
+      "Taiwan Road",
+      "Addis Ketema Road",
+      "Gendekore Road",
+      "Dire Dawa Station Road",
+      "Chat Road",
+      "Lega Hare Road",
+      "Industrial Road",
+      "Harar Road",
+      "Airport Road",
+      "Market Road",
+      "Commercial Road"
     ],
     "Adama": [
-      "Haile Selassie Road", "Dembela Road", "Francon Road", "Bosset Road",
-      "Boku Road", "Station Road", "Hospital Road", "Market Road",
-      "Bank Road", "Stadium Road", "Commercial Road", "Wonji Road"
+      "Haile Selassie Road",
+      "Dembela Road",
+      "Francon Road",
+      "Bosset Road",
+      "Boku Road",
+      "Station Road",
+      "Hospital Road",
+      "Market Road",
+      "Bank Road",
+      "Stadium Road",
+      "Commercial Road",
+      "Wonji Road"
     ],
     "Hawassa": [
-      "Lake Shore Road", "University Road", "Stadium Road", "Market Road",
-      "Hospital Road", "Piassa Road", "Tabor Road", "Alamura Road",
-      "Atote Road", "Industrial Road", "Referendum Road", "Fish Market Road"
+      "Lake Shore Road",
+      "University Road",
+      "Stadium Road",
+      "Market Road",
+      "Hospital Road",
+      "Piassa Road",
+      "Tabor Road",
+      "Alamura Road",
+      "Atote Road",
+      "Industrial Road",
+      "Referendum Road",
+      "Fish Market Road"
     ],
     "Bahir Dar": [
-      "Lake Tana Shore Road", "University Road", "Stadium Road", "Market Road",
-      "Airport Road", "Abay Mado Road", "Kebele 14 Road", "Tis Abay Road",
-      "Blue Nile Road", "Gish Abay Road", "Papyrus Road", "Felege Hiwot Road"
+      "Lake Tana Shore Road",
+      "University Road",
+      "Stadium Road",
+      "Market Road",
+      "Airport Road",
+      "Abay Mado Road",
+      "Kebele 14 Road",
+      "Tis Abay Road",
+      "Blue Nile Road",
+      "Gish Abay Road",
+      "Papyrus Road",
+      "Felege Hiwot Road"
     ],
     "Mekelle": [
-      "Martyrs Avenue", "Alula Aba Nega Avenue", "Hawelti Road", "University Road",
-      "Ayder Road", "Market Road", "Stadium Road", "Romanat Road",
-      "Quiha Road", "Adi Haki Road", "Industrial Road", "Kebessa Road"
+      "Martyrs Avenue",
+      "Alula Aba Nega Avenue",
+      "Hawelti Road",
+      "University Road",
+      "Ayder Road",
+      "Market Road",
+      "Stadium Road",
+      "Romanat Road",
+      "Quiha Road",
+      "Adi Haki Road",
+      "Industrial Road",
+      "Kebessa Road"
     ],
     "Gondar": [
-      "Royal Enclosure Road", "Piassa Road", "Stadium Road", "Market Road",
-      "Azezo Road", "University Road", "Fasil Road", "Castle Road",
-      "Amba Giorgis Road", "Hospital Road", "Airport Road", "Maraki Road"
+      "Royal Enclosure Road",
+      "Piassa Road",
+      "Stadium Road",
+      "Market Road",
+      "Azezo Road",
+      "University Road",
+      "Fasil Road",
+      "Castle Road",
+      "Amba Giorgis Road",
+      "Hospital Road",
+      "Airport Road",
+      "Maraki Road"
     ],
     "Jimma": [
-      "Market Road", "Hospital Road", "University Road", "Stadium Road",
-      "Agaro Road", "Seka Road", "Airport Road", "Coffee Road",
-      "Jiren Road", "Becho Road", "Abay Road", "Hermata Road"
+      "Market Road",
+      "Hospital Road",
+      "University Road",
+      "Stadium Road",
+      "Agaro Road",
+      "Seka Road",
+      "Airport Road",
+      "Coffee Road",
+      "Jiren Road",
+      "Becho Road",
+      "Abay Road",
+      "Hermata Road"
     ],
     "Dessie": [
-      "Market Road", "Hospital Road", "Stadium Road", "Kombolcha Road",
-      "Kutaber Road", "Haik Road", "Airport Road", "University Road",
-      "Wollo Road", "Segno Gebeya Road", "Tossa Road", "Ajibar Road"
+      "Market Road",
+      "Hospital Road",
+      "Stadium Road",
+      "Kombolcha Road",
+      "Kutaber Road",
+      "Haik Road",
+      "Airport Road",
+      "University Road",
+      "Wollo Road",
+      "Segno Gebeya Road",
+      "Tossa Road",
+      "Ajibar Road"
     ],
     "Harar": [
-      "Shoa Gate Road", "Duke Gate Road", "Buda Gate Road", "Erer Gate Road",
-      "Fallana Gate Road", "Jugol Road", "Market Road", "Hospital Road",
-      "Hakim Road", "Rimbaud Road"
+      "Shoa Gate Road",
+      "Duke Gate Road",
+      "Buda Gate Road",
+      "Erer Gate Road",
+      "Fallana Gate Road",
+      "Jugol Road",
+      "Market Road",
+      "Hospital Road",
+      "Hakim Road",
+      "Rimbaud Road"
     ],
     "Debre Markos": [
-      "Market Road", "Hospital Road", "University Road", "Stadium Road",
-      "Bahir Dar Road", "Addis Ababa Road", "Bichena Road", "Dejen Road"
+      "Market Road",
+      "Hospital Road",
+      "University Road",
+      "Stadium Road",
+      "Bahir Dar Road",
+      "Addis Ababa Road",
+      "Bichena Road",
+      "Dejen Road"
     ],
     "Shashamane": [
-      "Market Road", "Hospital Road", "Rastafari Road", "Station Road",
-      "Alaba Road", "Hawassa Road", "Arsi Negele Road", "Jamaica Road"
+      "Market Road",
+      "Hospital Road",
+      "Rastafari Road",
+      "Station Road",
+      "Alaba Road",
+      "Hawassa Road",
+      "Arsi Negele Road",
+      "Jamaica Road"
     ],
     "Arba Minch": [
-      "Market Road", "Hospital Road", "University Road", "Airport Road",
-      "Nech Sar Road", "Chamo Road", "Secha Road", "Sikela Road"
+      "Market Road",
+      "Hospital Road",
+      "University Road",
+      "Airport Road",
+      "Nech Sar Road",
+      "Chamo Road",
+      "Secha Road",
+      "Sikela Road"
     ],
     "Nekemte": [
-      "Market Road", "Hospital Road", "Gimbi Road", "Stadium Road",
-      "Wollega Road", "Station Road", "Bako Road", "Ghimbi Road"
+      "Market Road",
+      "Hospital Road",
+      "Gimbi Road",
+      "Stadium Road",
+      "Wollega Road",
+      "Station Road",
+      "Bako Road",
+      "Ghimbi Road"
     ],
     "Jijiga": [
-      "Market Road", "Hospital Road", "Airport Road", "Stadium Road",
-      "Bank Road", "University Road", "Harar Road", "Kebri Dahar Road"
+      "Market Road",
+      "Hospital Road",
+      "Airport Road",
+      "Stadium Road",
+      "Bank Road",
+      "University Road",
+      "Harar Road",
+      "Kebri Dahar Road"
     ],
     "Debre Birhan": [
-      "Market Road", "Hospital Road", "Addis Ababa Road", "University Road",
-      "Ankober Road", "Menz Road", "Stadium Road", "Angolela Road"
+      "Market Road",
+      "Hospital Road",
+      "Addis Ababa Road",
+      "University Road",
+      "Ankober Road",
+      "Menz Road",
+      "Stadium Road",
+      "Angolela Road"
     ],
     "Asella": [
-      "Market Road", "Hospital Road", "Stadium Road", "Adama Road",
-      "Bekoji Road", "Chilalo Road", "Arsi Road", "University Road"
+      "Market Road",
+      "Hospital Road",
+      "Stadium Road",
+      "Adama Road",
+      "Bekoji Road",
+      "Chilalo Road",
+      "Arsi Road",
+      "University Road"
     ],
     "Dilla": [
-      "Market Road", "Hospital Road", "University Road", "Yirgacheffe Road",
-      "Gedeo Road", "Coffee Road", "Station Road", "Aposto Road"
+      "Market Road",
+      "Hospital Road",
+      "University Road",
+      "Yirgacheffe Road",
+      "Gedeo Road",
+      "Coffee Road",
+      "Station Road",
+      "Aposto Road"
     ],
     "Axum": [
-      "Stelae Road", "Market Road", "Hospital Road", "Palace Road",
-      "Adwa Road", "Church Road"
+      "Stelae Road",
+      "Market Road",
+      "Hospital Road",
+      "Palace Road",
+      "Adwa Road",
+      "Church Road"
     ],
     "Lalibela": [
-      "Church Road", "Market Road", "Hospital Road", "Airport Road",
-      "Yemrehanna Road", "Rock Hewn Road"
+      "Church Road",
+      "Market Road",
+      "Hospital Road",
+      "Airport Road",
+      "Yemrehanna Road",
+      "Rock Hewn Road"
     ],
     "Gambela": [
-      "Market Road", "Hospital Road", "River Road", "Airport Road",
-      "Nuer Road", "Openo Road"
+      "Market Road",
+      "Hospital Road",
+      "River Road",
+      "Airport Road",
+      "Nuer Road",
+      "Openo Road"
     ],
     "Semera": [
-      "Market Road", "Hospital Road", "Airport Road", "Administration Road",
-      "Afar Road", "Salt Road"
+      "Market Road",
+      "Hospital Road",
+      "Airport Road",
+      "Administration Road",
+      "Afar Road",
+      "Salt Road"
     ],
     "Kombolcha": [
-      "Market Road", "Hospital Road", "Industrial Road", "Dessie Road",
-      "Borkena Road", "Station Road"
+      "Market Road",
+      "Hospital Road",
+      "Industrial Road",
+      "Dessie Road",
+      "Borkena Road",
+      "Station Road"
     ],
     "Woldia": [
-      "Market Road", "Hospital Road", "Lalibela Road", "Addis Ababa Road",
-      "Hayq Road", "Mersa Road"
+      "Market Road",
+      "Hospital Road",
+      "Lalibela Road",
+      "Addis Ababa Road",
+      "Hayq Road",
+      "Mersa Road"
     ],
     "Adigrat": [
-      "Market Road", "Hospital Road", "Axum Road", "University Road",
-      "Cathedral Road", "Agame Road"
+      "Market Road",
+      "Hospital Road",
+      "Axum Road",
+      "University Road",
+      "Cathedral Road",
+      "Agame Road"
     ],
     "Ambo": [
-      "Market Road", "Hospital Road", "Mineral Water Road", "University Road",
-      "Addis Ababa Road", "Nekemte Road"
+      "Market Road",
+      "Hospital Road",
+      "Mineral Water Road",
+      "University Road",
+      "Addis Ababa Road",
+      "Nekemte Road"
     ],
     "Bishoftu": [
-      "Lake Road", "Market Road", "Hospital Road", "Air Force Road",
-      "Hora Road", "Addis Ababa Road"
+      "Lake Road",
+      "Market Road",
+      "Hospital Road",
+      "Air Force Road",
+      "Hora Road",
+      "Addis Ababa Road"
     ],
     "Hosaena": [
-      "Market Road", "Hospital Road", "Stadium Road", "Hadiya Road",
-      "University Road", "Durame Road"
+      "Market Road",
+      "Hospital Road",
+      "Stadium Road",
+      "Hadiya Road",
+      "University Road",
+      "Durame Road"
     ],
     "Wolaita Sodo": [
-      "Market Road", "Hospital Road", "University Road", "Stadium Road",
-      "Arba Minch Road", "Boditi Road"
+      "Market Road",
+      "Hospital Road",
+      "University Road",
+      "Stadium Road",
+      "Arba Minch Road",
+      "Boditi Road"
     ],
     "Asosa": [
-      "Market Road", "Hospital Road", "Airport Road", "Administration Road",
-      "Kurmuk Road", "Bambasi Road"
+      "Market Road",
+      "Hospital Road",
+      "Airport Road",
+      "Administration Road",
+      "Kurmuk Road",
+      "Bambasi Road"
     ]
   },
   "postcode_format": "####",

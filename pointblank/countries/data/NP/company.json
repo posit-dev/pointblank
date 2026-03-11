@@ -1,0 +1,906 @@
+{
+  "suffixes": [
+    "Pvt. Ltd.",
+    "Ltd.",
+    "Co.",
+    "Industries",
+    "Enterprises",
+    "Group",
+    "Holdings",
+    "International",
+    "Associates",
+    "Corporation"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}"
+  ],
+  "adjectives": [
+    "Himalayan",
+    "Nepali",
+    "Everest",
+    "Golden",
+    "United",
+    "National",
+    "First",
+    "Grand",
+    "Royal",
+    "Global",
+    "Modern",
+    "Premier",
+    "Advanced",
+    "Creative",
+    "Dynamic",
+    "Elite",
+    "Innovative",
+    "Progressive",
+    "Strategic",
+    "Supreme",
+    "Mountain",
+    "Sacred",
+    "Eastern",
+    "Alpine",
+    "Heritage",
+    "Premium",
+    "Cedar",
+    "Lotus"
+  ],
+  "nouns": [
+    "Commerce",
+    "Trading",
+    "Consulting",
+    "Industries",
+    "Solutions",
+    "Technology",
+    "Construction",
+    "Development",
+    "Finance",
+    "Investment",
+    "Properties",
+    "Logistics",
+    "Engineering",
+    "Media",
+    "Design",
+    "Foods",
+    "Agriculture",
+    "Transport",
+    "Energy",
+    "Textiles",
+    "Handicrafts",
+    "Telecommunications",
+    "Services",
+    "Pharmaceuticals",
+    "Education",
+    "Tourism",
+    "Insurance",
+    "Banking",
+    "Hydropower",
+    "Trekking",
+    "Hospitality",
+    "Tea",
+    "Healthcare",
+    "Mining",
+    "Electronics",
+    "Software"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Nepal Telecom",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Ncell",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Nabil Bank",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Nepal Rastra Bank",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Standard Chartered Bank Nepal",
+      "cities": [
+        "Kathmandu",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Himalayan Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Everest Bank",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "NIC Asia Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Bhaktapur"
+      ]
+    },
+    {
+      "name": "Chaudhary Group",
+      "cities": [
+        "Kathmandu",
+        "Biratnagar",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Dabur Nepal",
+      "cities": [
+        "Kathmandu",
+        "Hetauda"
+      ]
+    },
+    {
+      "name": "Unilever Nepal",
+      "cities": [
+        "Kathmandu",
+        "Hetauda"
+      ]
+    },
+    {
+      "name": "Surya Nepal",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Nepal Airlines",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Buddha Air",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Yeti Airlines",
+      "cities": [
+        "Kathmandu",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Nepal Electricity Authority",
+      "cities": [
+        "Kathmandu",
+        "Hetauda",
+        "Butwal"
+      ]
+    },
+    {
+      "name": "Nepal Oil Corporation",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Salt Trading Corporation",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Bottlers Nepal",
+      "cities": [
+        "Kathmandu",
+        "Bharatpur"
+      ]
+    },
+    {
+      "name": "Gorkha Brewery",
+      "cities": [
+        "Kathmandu",
+        "Hetauda"
+      ]
+    },
+    {
+      "name": "Wai Wai Nepal",
+      "cities": [
+        "Kathmandu",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Nepal SBI Bank",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Prabhu Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Siddhartha Bank",
+      "cities": [
+        "Kathmandu",
+        "Butwal",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Mega Bank Nepal",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur"
+      ]
+    },
+    {
+      "name": "Laxmi Sunrise Bank",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Nepal Life Insurance",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur"
+      ]
+    },
+    {
+      "name": "IME Group",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Hulas Steel Industries",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Nepal Lever Ltd",
+      "cities": [
+        "Kathmandu",
+        "Hetauda"
+      ]
+    },
+    {
+      "name": "Asian Paints Nepal",
+      "cities": [
+        "Kathmandu",
+        "Birgunj"
+      ]
+    },
+    {
+      "name": "Soaltee Hotel",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Hyatt Regency Kathmandu",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Durbarmarg Kathmandu",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Nepal Investment Bank",
+      "cities": [
+        "Kathmandu",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Global IME Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Pokhara",
+        "Biratnagar"
+      ]
+    },
+    {
+      "name": "Kumari Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur"
+      ]
+    },
+    {
+      "name": "Sanima Bank",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Citizen Bank International",
+      "cities": [
+        "Kathmandu",
+        "Lalitpur"
+      ]
+    },
+    {
+      "name": "Tara Air",
+      "cities": [
+        "Kathmandu",
+        "Pokhara"
+      ]
+    },
+    {
+      "name": "Nepal Insurance Company",
+      "cities": [
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Janakpur Cigarette Factory",
+      "cities": [
+        "Janakpur"
+      ]
+    },
+    {
+      "name": "Butwal Power Company",
+      "cities": [
+        "Butwal",
+        "Kathmandu"
+      ]
+    },
+    {
+      "name": "Chilime Hydropower",
+      "cities": [
+        "Kathmandu"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Architect",
+    "Banker",
+    "Business Analyst",
+    "Chef",
+    "Civil Engineer",
+    "Consultant",
+    "Dentist",
+    "Designer",
+    "Developer",
+    "Doctor",
+    "Economist",
+    "Editor",
+    "Electrician",
+    "Engineer",
+    "Entrepreneur",
+    "Financial Analyst",
+    "Graphic Designer",
+    "Hotel Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Lawyer",
+    "Lecturer",
+    "Manager",
+    "Marketing Director",
+    "Mechanic",
+    "Nurse",
+    "Pharmacist",
+    "Photographer",
+    "Pilot",
+    "Professor",
+    "Project Manager",
+    "Real Estate Agent",
+    "Researcher",
+    "Sales Manager",
+    "Secretary",
+    "Software Engineer",
+    "Surgeon",
+    "Teacher",
+    "Translator",
+    "Writer",
+    "Web Developer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "sustainable",
+    "premium",
+    "dynamic",
+    "trusted",
+    "leading",
+    "progressive",
+    "integrated",
+    "exceptional",
+    "strategic",
+    "comprehensive",
+    "efficient",
+    "advanced",
+    "visionary",
+    "distinguished",
+    "global",
+    "cutting-edge",
+    "pioneering"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "excellence",
+    "quality",
+    "innovation",
+    "service",
+    "performance",
+    "growth",
+    "value",
+    "integrity",
+    "partnership",
+    "vision",
+    "development",
+    "progress",
+    "success",
+    "leadership"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "drive",
+    "empower",
+    "transform",
+    "achieve",
+    "inspire",
+    "connect",
+    "develop",
+    "elevate",
+    "maximize",
+    "optimize",
+    "pioneer",
+    "sustain"
+  ],
+  "catch_phrase_connector": "with",
+  "industries": [
+    {
+      "name": "banking",
+      "weight": 0.14,
+      "jobs": [
+        "Banker",
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Nabil Bank",
+        "Nepal Rastra Bank",
+        "Standard Chartered Bank Nepal",
+        "Himalayan Bank",
+        "Everest Bank",
+        "NIC Asia Bank",
+        "Nepal SBI Bank",
+        "Prabhu Bank",
+        "Siddhartha Bank",
+        "Mega Bank Nepal",
+        "Laxmi Sunrise Bank",
+        "Nepal Investment Bank",
+        "Global IME Bank",
+        "Kumari Bank",
+        "Sanima Bank",
+        "Citizen Bank International"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "Pvt. Ltd."
+      ],
+      "company_nouns": [
+        "Finance",
+        "Investment",
+        "Banking",
+        "Capital"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} Bank",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "IT Specialist",
+        "Engineer"
+      ],
+      "well_known": [
+        "Nepal Telecom",
+        "Ncell"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "Pvt. Ltd."
+      ],
+      "company_nouns": [
+        "Telecommunications",
+        "Technology"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.08,
+      "jobs": [
+        "Engineer"
+      ],
+      "well_known": [
+        "Nepal Electricity Authority",
+        "Butwal Power Company",
+        "Chilime Hydropower"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "Co."
+      ],
+      "company_nouns": [
+        "Energy",
+        "Hydropower"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{city} Hydropower {suffix}"
+      ]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.08,
+      "jobs": [
+        "Hotel Manager",
+        "Photographer"
+      ],
+      "well_known": [
+        "Soaltee Hotel",
+        "Hyatt Regency Kathmandu"
+      ],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Tourism",
+        "Trekking",
+        "Hospitality"
+      ],
+      "company_formats": [
+        "Hotel {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{adjective} Trekking"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Professor",
+        "Lecturer",
+        "Teacher",
+        "Researcher"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Education"
+      ],
+      "company_formats": [
+        "{city} University",
+        "College of {city}",
+        "{last_name} Academy"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.07,
+      "jobs": [
+        "Doctor",
+        "Surgeon",
+        "Nurse",
+        "Dentist",
+        "Pharmacist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Pvt. Ltd."
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical"
+      ],
+      "company_formats": [
+        "{city} Hospital",
+        "{last_name} Clinic",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.06,
+      "jobs": [
+        "Civil Engineer",
+        "Architect",
+        "Electrician"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Ltd.",
+        "Co."
+      ],
+      "company_nouns": [
+        "Construction",
+        "Engineering",
+        "Development"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "food_beverage",
+      "weight": 0.07,
+      "jobs": [
+        "Chef",
+        "Manager"
+      ],
+      "well_known": [
+        "Bottlers Nepal",
+        "Gorkha Brewery",
+        "Wai Wai Nepal"
+      ],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Ltd.",
+        "Industries"
+      ],
+      "company_nouns": [
+        "Foods",
+        "Agriculture"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "retail_trade",
+      "weight": 0.06,
+      "jobs": [
+        "Sales Manager",
+        "Business Analyst"
+      ],
+      "well_known": [
+        "Salt Trading Corporation",
+        "Nepal Oil Corporation"
+      ],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Ltd.",
+        "Enterprises"
+      ],
+      "company_nouns": [
+        "Commerce",
+        "Trading",
+        "Handicrafts"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "media",
+      "weight": 0.03,
+      "jobs": [
+        "Journalist",
+        "Editor",
+        "Writer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Pvt. Ltd."
+      ],
+      "company_nouns": [
+        "Media",
+        "Design"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.07,
+      "jobs": [
+        "Software Engineer",
+        "Web Developer",
+        "Developer",
+        "Designer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Technology",
+        "Solutions",
+        "Software",
+        "Electronics"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.06,
+      "jobs": [
+        "Engineer",
+        "Mechanic"
+      ],
+      "well_known": [
+        "Hulas Steel Industries",
+        "Nepal Lever Ltd",
+        "Asian Paints Nepal",
+        "Janakpur Cigarette Factory",
+        "Dabur Nepal",
+        "Unilever Nepal",
+        "Surya Nepal"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "Industries",
+        "Pvt. Ltd."
+      ],
+      "company_nouns": [
+        "Industries",
+        "Manufacturing"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.08,
+      "jobs": [
+        "Manager",
+        "Consultant",
+        "Lawyer",
+        "Economist",
+        "Entrepreneur",
+        "Marketing Director",
+        "HR Manager",
+        "Project Manager",
+        "Translator",
+        "Secretary",
+        "Graphic Designer",
+        "Real Estate Agent"
+      ],
+      "well_known": [
+        "Chaudhary Group",
+        "IME Group",
+        "Nepal Airlines",
+        "Buddha Air",
+        "Yeti Airlines",
+        "Tara Air",
+        "Nepal Life Insurance",
+        "Nepal Insurance Company"
+      ],
+      "company_suffixes": [
+        "Group",
+        "Holdings",
+        "International",
+        "Associates",
+        "Corporation"
+      ],
+      "company_nouns": [
+        "Services",
+        "Logistics",
+        "Solutions"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "insurance",
+      "weight": 0.04,
+      "jobs": [
+        "Business Analyst",
+        "Accountant"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Insurance"
+      ],
+      "company_formats": [
+        "{adjective} Insurance {suffix}",
+        "{city} Insurance"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.04,
+      "jobs": [
+        "Entrepreneur"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Pvt. Ltd.",
+        "Enterprises"
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Tea"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
+}

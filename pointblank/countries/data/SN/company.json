@@ -1,152 +1,546 @@
 {
-  "suffixes": ["SA", "SARL", "SAS", "GIE", "SUARL"],
+  "suffixes": [
+    "SA",
+    "SARL",
+    "SAS",
+    "GIE",
+    "SUARL"
+  ],
   "formats": [
     "{adjective} {noun} {suffix}",
     "{noun} {suffix}",
     "{adjective} {noun}"
   ],
   "adjectives": [
-    "Sénégalaise", "Africaine", "Nationale", "Générale", "Nouvelle",
-    "Grande", "Première", "Moderne", "Internationale", "Continentale",
-    "Sahélienne", "Atlantique", "Teranga", "Unie", "Centrale",
-    "Progressive", "Dynamique", "Avancée", "Pionnière", "Solidaire"
+    "Sénégalaise",
+    "Africaine",
+    "Nationale",
+    "Générale",
+    "Nouvelle",
+    "Grande",
+    "Première",
+    "Moderne",
+    "Internationale",
+    "Continentale",
+    "Sahélienne",
+    "Atlantique",
+    "Teranga",
+    "Unie",
+    "Centrale",
+    "Progressive",
+    "Dynamique",
+    "Avancée",
+    "Pionnière",
+    "Solidaire"
   ],
   "nouns": [
-    "Commerce", "Construction", "Agriculture", "Investissement", "Transport",
-    "Industrie", "Pêche", "Tourisme", "Immobilier", "Énergie",
-    "Technologie", "Finance", "Logistique", "Services", "Alimentation",
-    "Développement", "Communication", "Distribution", "Production", "Entreprise"
+    "Commerce",
+    "Construction",
+    "Agriculture",
+    "Investissement",
+    "Transport",
+    "Industrie",
+    "Pêche",
+    "Tourisme",
+    "Immobilier",
+    "Énergie",
+    "Technologie",
+    "Finance",
+    "Logistique",
+    "Services",
+    "Alimentation",
+    "Développement",
+    "Communication",
+    "Distribution",
+    "Production",
+    "Entreprise"
   ],
   "well_known_companies": [
-    {"name": "Sonatel", "cities": ["Dakar"]},
-    {"name": "Banque de Dakar", "cities": ["Dakar"]},
-    {"name": "Industries Chimiques du Sénégal", "cities": ["Dakar", "Thies"]},
-    {"name": "Compagnie Sucrière Sénégalaise", "cities": ["Richard-Toll"]},
-    {"name": "Société Africaine de Raffinage", "cities": ["Dakar"]},
-    {"name": "Senelec", "cities": ["Dakar"]},
-    {"name": "La Poste du Sénégal", "cities": ["Dakar"]},
-    {"name": "Port Autonome de Dakar", "cities": ["Dakar"]},
-    {"name": "Patisen", "cities": ["Dakar", "Thies"]},
-    {"name": "Tigo Sénégal", "cities": ["Dakar"]},
-    {"name": "Société Générale Sénégal", "cities": ["Dakar"]},
-    {"name": "CBAO Groupe Attijariwafa", "cities": ["Dakar"]},
-    {"name": "Eiffage Sénégal", "cities": ["Dakar"]},
-    {"name": "Total Sénégal", "cities": ["Dakar", "Mbour"]},
-    {"name": "Brasseries du Sénégal", "cities": ["Dakar"]}
+    {
+      "name": "Sonatel",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Banque de Dakar",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Industries Chimiques du Sénégal",
+      "cities": [
+        "Dakar",
+        "Thies"
+      ]
+    },
+    {
+      "name": "Compagnie Sucrière Sénégalaise",
+      "cities": [
+        "Richard-Toll"
+      ]
+    },
+    {
+      "name": "Société Africaine de Raffinage",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Senelec",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "La Poste du Sénégal",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Port Autonome de Dakar",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Patisen",
+      "cities": [
+        "Dakar",
+        "Thies"
+      ]
+    },
+    {
+      "name": "Tigo Sénégal",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Société Générale Sénégal",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "CBAO Groupe Attijariwafa",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Eiffage Sénégal",
+      "cities": [
+        "Dakar"
+      ]
+    },
+    {
+      "name": "Total Sénégal",
+      "cities": [
+        "Dakar",
+        "Mbour"
+      ]
+    },
+    {
+      "name": "Brasseries du Sénégal",
+      "cities": [
+        "Dakar"
+      ]
+    }
   ],
   "jobs": [
-    "Développeur", "Comptable", "Ingénieur Civil", "Enseignant", "Infirmier",
-    "Médecin", "Agronome", "Banquier", "Directeur Marketing", "Chauffeur",
-    "Architecte", "Pharmacien", "Avocat", "Économiste", "Journaliste",
-    "Directeur Hôtelier", "Cuisinier", "Commercial", "Auditeur", "Pêcheur",
-    "Douanier", "Professeur", "Technicien", "Gestionnaire", "Consultant"
+    "Développeur",
+    "Comptable",
+    "Ingénieur Civil",
+    "Enseignant",
+    "Infirmier",
+    "Médecin",
+    "Agronome",
+    "Banquier",
+    "Directeur Marketing",
+    "Chauffeur",
+    "Architecte",
+    "Pharmacien",
+    "Avocat",
+    "Économiste",
+    "Journaliste",
+    "Directeur Hôtelier",
+    "Cuisinier",
+    "Commercial",
+    "Auditeur",
+    "Pêcheur",
+    "Douanier",
+    "Professeur",
+    "Technicien",
+    "Gestionnaire",
+    "Consultant"
   ],
   "catch_phrase_adjectives": [
-    "fiable", "innovant", "efficace", "reconnu", "leader",
-    "durable", "professionnel", "qualitatif", "moderne", "dévoué",
-    "engagé", "pionnier", "dynamique", "excellent", "progressif"
+    "fiable",
+    "innovant",
+    "efficace",
+    "reconnu",
+    "leader",
+    "durable",
+    "professionnel",
+    "qualitatif",
+    "moderne",
+    "dévoué",
+    "engagé",
+    "pionnier",
+    "dynamique",
+    "excellent",
+    "progressif"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "excellence", "partenariat", "croissance",
-    "innovation", "développement", "progrès", "qualité", "succès",
-    "prospérité", "avancement", "réussite", "engagement", "transformation"
+    "solutions",
+    "services",
+    "excellence",
+    "partenariat",
+    "croissance",
+    "innovation",
+    "développement",
+    "progrès",
+    "qualité",
+    "succès",
+    "prospérité",
+    "avancement",
+    "réussite",
+    "engagement",
+    "transformation"
   ],
   "catch_phrase_verbs": [
-    "livrer", "fournir", "bâtir", "créer", "transformer",
-    "atteindre", "impulser", "inspirer", "autonomiser", "connecter",
-    "avancer", "innover", "renforcer", "développer", "permettre"
+    "livrer",
+    "fournir",
+    "bâtir",
+    "créer",
+    "transformer",
+    "atteindre",
+    "impulser",
+    "inspirer",
+    "autonomiser",
+    "connecter",
+    "avancer",
+    "innover",
+    "renforcer",
+    "développer",
+    "permettre"
   ],
   "catch_phrase_connector": "qui",
   "industries": [
     {
-      "name": "agriculture_peche",
+      "name": "agriculture",
       "weight": 0.18,
-      "jobs": ["Agronome", "Pêcheur", "Ingénieur Agricole", "Inspecteur Qualité", "Directeur Export"],
-      "well_known": ["Compagnie Sucrière Sénégalaise", "SODEFITEX"],
-      "company_suffixes": ["Agro SA", "Pêche SARL", "Agriculture"],
-      "company_nouns": ["Agriculture", "Pêche", "Céréales", "Arachide", "Élevage"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Agronome",
+        "Pêcheur",
+        "Ingénieur Agricole",
+        "Inspecteur Qualité",
+        "Directeur Export"
+      ],
+      "well_known": [
+        "Compagnie Sucrière Sénégalaise",
+        "SODEFITEX"
+      ],
+      "company_suffixes": [
+        "Agro SA",
+        "Pêche SARL",
+        "Agriculture"
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Pêche",
+        "Céréales",
+        "Arachide",
+        "Élevage"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
       "name": "telecom",
       "weight": 0.12,
-      "jobs": ["Ingénieur Réseau", "Administrateur Systèmes", "Service Client", "Directeur Commercial", "Spécialiste IT"],
-      "well_known": ["Sonatel", "Orange Sénégal", "Tigo Sénégal"],
-      "company_suffixes": ["Telecom", "Communications", "Réseaux"],
-      "company_nouns": ["Telecom", "Digital", "Réseau", "Communications", "Tech"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Ingénieur Réseau",
+        "Administrateur Systèmes",
+        "Service Client",
+        "Directeur Commercial",
+        "Spécialiste IT"
+      ],
+      "well_known": [
+        "Sonatel",
+        "Orange Sénégal",
+        "Tigo Sénégal"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "Réseaux"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Digital",
+        "Réseau",
+        "Communications",
+        "Tech"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
       "name": "finance",
       "weight": 0.12,
-      "jobs": ["Banquier", "Comptable", "Agent de Crédit", "Auditeur", "Analyste Financier"],
-      "well_known": ["CBAO", "Société Générale Sénégal", "Banque de Dakar"],
-      "company_suffixes": ["Banque", "Assurance", "Microfinance"],
-      "company_nouns": ["Finance", "Capital", "Crédit", "Épargne", "Investissement"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Banquier",
+        "Comptable",
+        "Agent de Crédit",
+        "Auditeur",
+        "Analyste Financier"
+      ],
+      "well_known": [
+        "CBAO",
+        "Société Générale Sénégal",
+        "Banque de Dakar"
+      ],
+      "company_suffixes": [
+        "Banque",
+        "Assurance",
+        "Microfinance"
+      ],
+      "company_nouns": [
+        "Finance",
+        "Capital",
+        "Crédit",
+        "Épargne",
+        "Investissement"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
       "name": "construction",
-      "weight": 0.10,
-      "jobs": ["Ingénieur Civil", "Chef de Chantier", "Architecte", "Géomètre", "Chef de Projet"],
-      "well_known": ["Eiffage Sénégal", "CSE"],
-      "company_suffixes": ["Construction SA", "BTP", "Bâtiment"],
-      "company_nouns": ["Construction", "Bâtiment", "Ingénierie", "Infrastructure", "Immobilier"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "weight": 0.1,
+      "jobs": [
+        "Ingénieur Civil",
+        "Chef de Chantier",
+        "Architecte",
+        "Géomètre",
+        "Chef de Projet"
+      ],
+      "well_known": [
+        "Eiffage Sénégal",
+        "CSE"
+      ],
+      "company_suffixes": [
+        "Construction SA",
+        "BTP",
+        "Bâtiment"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Bâtiment",
+        "Ingénierie",
+        "Infrastructure",
+        "Immobilier"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "tourisme",
-      "weight": 0.10,
-      "jobs": ["Directeur Hôtelier", "Guide Touristique", "Réceptionniste", "Cuisinier", "Agent de Voyage"],
-      "well_known": ["Teranga Hotels", "Club Med Saly"],
-      "company_suffixes": ["Hôtels", "Tourisme", "Voyages"],
-      "company_nouns": ["Hôtel", "Resort", "Tourisme", "Voyage", "Loisirs"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "name": "tourism",
+      "weight": 0.1,
+      "jobs": [
+        "Directeur Hôtelier",
+        "Guide Touristique",
+        "Réceptionniste",
+        "Cuisinier",
+        "Agent de Voyage"
+      ],
+      "well_known": [
+        "Teranga Hotels",
+        "Club Med Saly"
+      ],
+      "company_suffixes": [
+        "Hôtels",
+        "Tourisme",
+        "Voyages"
+      ],
+      "company_nouns": [
+        "Hôtel",
+        "Resort",
+        "Tourisme",
+        "Voyage",
+        "Loisirs"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "industrie",
-      "weight": 0.10,
-      "jobs": ["Directeur Usine", "Contrôle Qualité", "Chef de Production", "Ingénieur Industriel", "Technicien"],
-      "well_known": ["Industries Chimiques du Sénégal", "Société Africaine de Raffinage"],
-      "company_suffixes": ["Industries SA", "Production", "Entreprise"],
-      "company_nouns": ["Chimie", "Ciment", "Phosphate", "Textile", "Alimentaire"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "name": "manufacturing",
+      "weight": 0.1,
+      "jobs": [
+        "Directeur Usine",
+        "Contrôle Qualité",
+        "Chef de Production",
+        "Ingénieur Industriel",
+        "Technicien"
+      ],
+      "well_known": [
+        "Industries Chimiques du Sénégal",
+        "Société Africaine de Raffinage"
+      ],
+      "company_suffixes": [
+        "Industries SA",
+        "Production",
+        "Entreprise"
+      ],
+      "company_nouns": [
+        "Chimie",
+        "Ciment",
+        "Phosphate",
+        "Textile",
+        "Alimentaire"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
       "name": "transport",
       "weight": 0.08,
-      "jobs": ["Chauffeur", "Logisticien", "Capitaine", "Mécanicien", "Dispatcher"],
-      "well_known": ["Port Autonome de Dakar", "Dakar Dem Dikk"],
-      "company_suffixes": ["Transport", "Logistique", "Maritime"],
-      "company_nouns": ["Transport", "Cargo", "Logistique", "Maritime", "Fret"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Chauffeur",
+        "Logisticien",
+        "Capitaine",
+        "Mécanicien",
+        "Dispatcher"
+      ],
+      "well_known": [
+        "Port Autonome de Dakar",
+        "Dakar Dem Dikk"
+      ],
+      "company_suffixes": [
+        "Transport",
+        "Logistique",
+        "Maritime"
+      ],
+      "company_nouns": [
+        "Transport",
+        "Cargo",
+        "Logistique",
+        "Maritime",
+        "Fret"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "energie",
+      "name": "energy",
       "weight": 0.07,
-      "jobs": ["Ingénieur Électrique", "Opérateur Centrale", "Analyste Énergie", "Technicien", "Installateur Solaire"],
-      "well_known": ["Senelec", "Total Sénégal"],
-      "company_suffixes": ["Énergie", "Power", "Solaire"],
-      "company_nouns": ["Énergie", "Électricité", "Solaire", "Pétrole", "Gaz"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Ingénieur Électrique",
+        "Opérateur Centrale",
+        "Analyste Énergie",
+        "Technicien",
+        "Installateur Solaire"
+      ],
+      "well_known": [
+        "Senelec",
+        "Total Sénégal"
+      ],
+      "company_suffixes": [
+        "Énergie",
+        "Power",
+        "Solaire"
+      ],
+      "company_nouns": [
+        "Énergie",
+        "Électricité",
+        "Solaire",
+        "Pétrole",
+        "Gaz"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "sante",
+      "name": "healthcare",
       "weight": 0.07,
-      "jobs": ["Médecin", "Infirmier", "Pharmacien", "Laborantin", "Sage-femme"],
-      "well_known": ["Hôpital Principal de Dakar", "Hôpital Fann"],
-      "company_suffixes": ["Santé", "Clinique", "Pharmaceutique"],
-      "company_nouns": ["Santé", "Médical", "Pharma", "Clinique", "Soins"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Médecin",
+        "Infirmier",
+        "Pharmacien",
+        "Laborantin",
+        "Sage-femme"
+      ],
+      "well_known": [
+        "Hôpital Principal de Dakar",
+        "Hôpital Fann"
+      ],
+      "company_suffixes": [
+        "Santé",
+        "Clinique",
+        "Pharmaceutique"
+      ],
+      "company_nouns": [
+        "Santé",
+        "Médical",
+        "Pharma",
+        "Clinique",
+        "Soins"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
       "name": "education",
       "weight": 0.06,
-      "jobs": ["Enseignant", "Professeur", "Directeur Scolaire", "Chercheur", "Formateur"],
-      "well_known": ["Université Cheikh Anta Diop", "Université Gaston Berger"],
-      "company_suffixes": ["Académie", "Institut", "École"],
-      "company_nouns": ["Éducation", "Formation", "Académie", "Savoir", "Connaissance"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Enseignant",
+        "Professeur",
+        "Directeur Scolaire",
+        "Chercheur",
+        "Formateur"
+      ],
+      "well_known": [
+        "Université Cheikh Anta Diop",
+        "Université Gaston Berger"
+      ],
+      "company_suffixes": [
+        "Académie",
+        "Institut",
+        "École"
+      ],
+      "company_nouns": [
+        "Éducation",
+        "Formation",
+        "Académie",
+        "Savoir",
+        "Connaissance"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     }
   ]
 }

@@ -1,5 +1,11 @@
 {
-  "suffixes": ["SA", "SARL", "SAS", "SARL AU", "Group"],
+  "suffixes": [
+    "SA",
+    "SARL",
+    "SAS",
+    "SARL AU",
+    "Group"
+  ],
   "formats": [
     "{last_name} {suffix}",
     "{adjective} {noun} {suffix}",
@@ -7,67 +13,261 @@
     "{last_name} & {last_name} {suffix}"
   ],
   "adjectives": [
-    "Marocain", "National", "Moderne", "International", "Global",
-    "Royal", "Atlantic", "Méditerranéen", "Maghrébin", "Uni",
-    "Nouveau", "Avancé", "Premier", "Grand", "Central",
-    "Impérial", "Dynamique", "Saharien", "Général", "Continental"
+    "Marocain",
+    "National",
+    "Moderne",
+    "International",
+    "Global",
+    "Royal",
+    "Atlantic",
+    "Méditerranéen",
+    "Maghrébin",
+    "Uni",
+    "Nouveau",
+    "Avancé",
+    "Premier",
+    "Grand",
+    "Central",
+    "Impérial",
+    "Dynamique",
+    "Saharien",
+    "Général",
+    "Continental"
   ],
   "nouns": [
-    "Commerce", "Industries", "Construction", "Ingénierie", "Agroalimentaire",
-    "Technologies", "Agriculture", "Logistique", "Pharma", "Transport",
-    "Télécom", "Services", "Solutions", "Investissements", "Holding",
-    "Développement", "Ressources", "Immobilier", "Systèmes", "Assurances"
+    "Commerce",
+    "Industries",
+    "Construction",
+    "Ingénierie",
+    "Agroalimentaire",
+    "Technologies",
+    "Agriculture",
+    "Logistique",
+    "Pharma",
+    "Transport",
+    "Télécom",
+    "Services",
+    "Solutions",
+    "Investissements",
+    "Holding",
+    "Développement",
+    "Ressources",
+    "Immobilier",
+    "Systèmes",
+    "Assurances"
   ],
   "well_known_companies": [
-    {"name": "OCP Group", "cities": ["Casablanca", "Khouribga"]},
-    {"name": "Maroc Telecom", "cities": ["Rabat"]},
-    {"name": "Royal Air Maroc", "cities": ["Casablanca"]},
-    {"name": "Attijariwafa Bank", "cities": ["Casablanca"]},
-    {"name": "BMCE Bank of Africa", "cities": ["Casablanca"]},
-    {"name": "Banque Populaire", "cities": ["Casablanca"]},
-    {"name": "Managem Group", "cities": ["Casablanca"]},
-    {"name": "Addoha Group", "cities": ["Casablanca"]},
-    {"name": "Inwi", "cities": ["Rabat"]},
-    {"name": "Orange Maroc", "cities": ["Rabat"]},
-    {"name": "ONCF", "cities": ["Rabat"]},
-    {"name": "Cosumar", "cities": ["Casablanca"]},
-    {"name": "Marjane Holding", "cities": ["Casablanca"]},
-    {"name": "LafargeHolcim Maroc", "cities": ["Casablanca"]},
-    {"name": "Wafa Assurance", "cities": ["Casablanca"]}
+    {
+      "name": "OCP Group",
+      "cities": [
+        "Casablanca",
+        "Khouribga"
+      ]
+    },
+    {
+      "name": "Maroc Telecom",
+      "cities": [
+        "Rabat"
+      ]
+    },
+    {
+      "name": "Royal Air Maroc",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Attijariwafa Bank",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "BMCE Bank of Africa",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Banque Populaire",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Managem Group",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Addoha Group",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Inwi",
+      "cities": [
+        "Rabat"
+      ]
+    },
+    {
+      "name": "Orange Maroc",
+      "cities": [
+        "Rabat"
+      ]
+    },
+    {
+      "name": "ONCF",
+      "cities": [
+        "Rabat"
+      ]
+    },
+    {
+      "name": "Cosumar",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Marjane Holding",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "LafargeHolcim Maroc",
+      "cities": [
+        "Casablanca"
+      ]
+    },
+    {
+      "name": "Wafa Assurance",
+      "cities": [
+        "Casablanca"
+      ]
+    }
   ],
   "jobs": [
-    "Ingénieur logiciel", "Enseignant", "Médecin", "Ingénieur", "Comptable",
-    "Pharmacien", "Avocat", "Architecte", "Directeur marketing", "Commercial",
-    "Chef de projet", "Designer graphique", "Journaliste", "Fonctionnaire", "Banquier",
-    "Mécanicien", "Électricien", "Chef cuisinier", "Dentiste", "Professeur",
-    "Guide touristique", "Traducteur", "Infirmier", "Pilote", "Policier"
+    "Ingénieur logiciel",
+    "Enseignant",
+    "Médecin",
+    "Ingénieur",
+    "Comptable",
+    "Pharmacien",
+    "Avocat",
+    "Architecte",
+    "Directeur marketing",
+    "Commercial",
+    "Chef de projet",
+    "Designer graphique",
+    "Journaliste",
+    "Fonctionnaire",
+    "Banquier",
+    "Mécanicien",
+    "Électricien",
+    "Chef cuisinier",
+    "Dentiste",
+    "Professeur",
+    "Guide touristique",
+    "Traducteur",
+    "Infirmier",
+    "Pilote",
+    "Policier"
   ],
   "catch_phrase_adjectives": [
-    "innovant", "fiable", "professionnel", "de confiance", "leader",
-    "premier", "dynamique", "efficace", "durable", "moderne",
-    "visionnaire", "stratégique", "créatif", "intégré", "digital"
+    "innovant",
+    "fiable",
+    "professionnel",
+    "de confiance",
+    "leader",
+    "premier",
+    "dynamique",
+    "efficace",
+    "durable",
+    "moderne",
+    "visionnaire",
+    "stratégique",
+    "créatif",
+    "intégré",
+    "digital"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "excellence", "innovation", "croissance",
-    "partenariat", "qualité", "succès", "technologie", "avenir",
-    "développement", "progrès", "stratégie", "résultats", "valeur"
+    "solutions",
+    "services",
+    "excellence",
+    "innovation",
+    "croissance",
+    "partenariat",
+    "qualité",
+    "succès",
+    "technologie",
+    "avenir",
+    "développement",
+    "progrès",
+    "stratégie",
+    "résultats",
+    "valeur"
   ],
   "catch_phrase_verbs": [
-    "livre", "crée", "construit", "stimule", "façonne",
-    "transforme", "inspire", "renforce", "connecte", "accomplit",
-    "permet", "avance", "consolide", "optimise", "maintient"
+    "livre",
+    "crée",
+    "construit",
+    "stimule",
+    "façonne",
+    "transforme",
+    "inspire",
+    "renforce",
+    "connecte",
+    "accomplit",
+    "permet",
+    "avance",
+    "consolide",
+    "optimise",
+    "maintient"
   ],
   "catch_phrase_connector": "pour",
   "industries": [
-    {"name": "Agriculture", "weight": 0.14},
-    {"name": "Mining & Phosphates", "weight": 0.10},
-    {"name": "Tourism", "weight": 0.12},
-    {"name": "Banking & Finance", "weight": 0.10},
-    {"name": "Telecommunications", "weight": 0.08},
-    {"name": "Manufacturing", "weight": 0.10},
-    {"name": "Construction", "weight": 0.10},
-    {"name": "Retail & Distribution", "weight": 0.08},
-    {"name": "Energy", "weight": 0.08},
-    {"name": "Technology", "weight": 0.10}
+    {
+      "name": "agriculture",
+      "weight": 0.14
+    },
+    {
+      "name": "mining",
+      "weight": 0.1
+    },
+    {
+      "name": "tourism",
+      "weight": 0.12
+    },
+    {
+      "name": "finance",
+      "weight": 0.1
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.1
+    },
+    {
+      "name": "construction",
+      "weight": 0.1
+    },
+    {
+      "name": "retail",
+      "weight": 0.08
+    },
+    {
+      "name": "energy",
+      "weight": 0.08
+    },
+    {
+      "name": "technology",
+      "weight": 0.1
+    }
   ]
 }
