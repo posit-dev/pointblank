@@ -133,7 +133,7 @@ class Field:
     # Custom generator
     generator: Callable[[], Any] | None = field(default=None, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate field constraints after initialization."""
         self._validate()
 

@@ -285,7 +285,7 @@ class Schema:
         ) = None,
         tbl: Any | None = None,
         **kwargs,
-    ):
+    ) -> None:
         if tbl is None and columns is None and not kwargs:
             raise ValueError(
                 "Either `columns`, `tbl`, or individual column arguments must be provided."
@@ -304,7 +304,7 @@ class Schema:
 
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.columns is not None:
             self._validate_schema_inputs()
         if self.tbl is not None:
@@ -314,14 +314,14 @@ class Schema:
         if self.tbl is not None:
             self.tbl_type = _get_tbl_type(self.tbl)
 
-    def _validate_schema_inputs(self):
+    def _validate_schema_inputs(self) -> None:
         if not isinstance(self.columns, list):
             raise ValueError("`columns` must be a list.")
 
         if not all(isinstance(col, tuple) for col in self.columns):
             raise ValueError("All elements of `columns` must be tuples.")
 
-    def _collect_schema_from_table(self):
+    def _collect_schema_from_table(self) -> None:
         # Determine if this table can be converted to a Narwhals DataFrame
         table_type = _get_tbl_type(self.tbl)
 
@@ -776,7 +776,7 @@ class Schema:
             "Supported conversions: pandas->polars, polars->pandas."
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         formatted_columns = []
         if self.columns is None:
             return "Pointblank Schema (empty)"
@@ -788,7 +788,7 @@ class Schema:
 
         return "Pointblank Schema\n" + "\n".join(formatted_columns)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Schema(columns={self.columns})"
 
     def generate(

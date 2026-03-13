@@ -391,7 +391,7 @@ class PointblankConfig:
     report_incl_footer_notes: bool = True
     preview_incl_header: bool = True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"PointblankConfig(report_incl_header={self.report_incl_header}, "
             f"report_incl_footer={self.report_incl_footer}, "
@@ -2898,7 +2898,7 @@ def missing_vals_tbl(data: Any) -> GT:
         col_names = list(data.columns)
 
         # Helper function for DataFrame missing value calculation (Polars/Pandas)
-        def _calculate_missing_proportions_dataframe(is_polars=False):
+        def _calculate_missing_proportions_dataframe(is_polars: bool = False):
             null_method = "is_null" if is_polars else "isnull"
 
             missing_vals = {
@@ -4877,7 +4877,7 @@ class Validate:
     consumers: str | list[str] | None = None
     version: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
 
@@ -16067,7 +16067,7 @@ class Validate:
 
         return json.dumps(report, indent=4, default=str)
 
-    def get_sundered_data(self, type="pass") -> Any:
+    def get_sundered_data(self, type: str = "pass") -> Any:
         """
         Get the data that passed or failed the validation steps.
 
@@ -18024,7 +18024,7 @@ class Validate:
             if validation.i in i
         }
 
-    def _execute_final_actions(self):
+    def _execute_final_actions(self) -> None:
         """Execute any final actions after interrogation is complete."""
         if self.final_actions is None:
             return
@@ -18085,7 +18085,7 @@ class Validate:
                     elif callable(single_action):
                         single_action()
 
-    def _get_highest_severity_level(self):
+    def _get_highest_severity_level(self) -> str:
         """Get the highest severity level reached across all validation steps."""
         if any(step.critical for step in self.validation_info):
             return "critical"
@@ -21698,7 +21698,7 @@ def _step_report_aggregate(
         difference = None
 
     # Format values for display
-    def format_value(v):
+    def format_value(v) -> str:
         if v is None:
             return "&mdash;"
         if isinstance(v, float):

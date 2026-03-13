@@ -608,7 +608,7 @@ def _get_assertion_from_fname() -> str | None:
     return ASSERTION_TYPE_METHOD_MAP.get(func_name)
 
 
-def _check_invalid_fields(fields: list[str], valid_fields: list[str]):
+def _check_invalid_fields(fields: list[str], valid_fields: list[str]) -> None:
     """
     Check if any fields in the list are not in the valid fields list.
 

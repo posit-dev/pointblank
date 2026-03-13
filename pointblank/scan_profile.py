@@ -131,7 +131,7 @@ class ColumnProfile(_ColumnProfileABC):
 class _DateProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.DATE
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         res = data.rename({self.colname: "_col"}).select(_min=MinStat.expr, _max=MaxStat.expr)
 
         physical = _as_physical(res).to_dict()
@@ -168,7 +168,7 @@ class _BoolProfile(ColumnProfile):
 class _StringProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.STRING
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         str_data = data.select(nw.all().cast(nw.String).str.len_chars())
 
         # TODO: We should get an FreqStat here; estimate cardinality first
@@ -211,7 +211,7 @@ class _StringProfile(ColumnProfile):
 class _NumericProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.NUMERIC
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         res = (
             data.rename({self.colname: "_col"})
             .select(
@@ -252,7 +252,7 @@ class _DataProfile:  # TODO: feels redundant and weird
         table_name: str | None,
         columns: list[str],
         implementation: nw.Implementation,
-    ):
+    ) -> None:
         self.table_name: str | None = table_name
         self.columns: list[str] = columns
         self.implementation = implementation
