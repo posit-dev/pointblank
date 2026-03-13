@@ -260,12 +260,10 @@ class _DataProfile:  # TODO: feels redundant and weird
 
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
-
-        slim = data.select(nw.col(self.columns[0]))
-
-        physical = _as_physical(slim)
-
-        self.row_count = len(physical)
+        if hasattr(data, "collect"):
+            self.row_count = data.select(nw.len()).collect().item()
+        else:
+            self.row_count = len(data)
 
     def as_dataframe(self, *, strict: bool = True) -> DataFrame:
         assert self.column_profiles
