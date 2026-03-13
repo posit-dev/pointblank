@@ -30,11 +30,18 @@ def ibis_tbl():
     return ibis.memtable({"x": [1, 2, 3]})
 
 
+@pytest.fixture
+def arrow_tbl():
+    pa = pytest.importorskip("pyarrow")
+    return pa.Table.from_pydict({"x": [1, 2, 3]})
+
+
 @pytest.fixture(
     params=[
         pytest.param("pandas_tbl", id="pandas"),
         pytest.param("polars_tbl", id="polars"),
         pytest.param("ibis_tbl", id="ibis"),
+        pytest.param("arrow_tbl", id="pyarrow"),
     ]
 )
 def backend_tbl(request):

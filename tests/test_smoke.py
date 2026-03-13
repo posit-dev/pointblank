@@ -8,6 +8,8 @@ def test_import():
     assert pb.__version__
 
 
+# Iterate over backend tables and to a little validation. Checks whether
+# we can do basic things without certain backends (polars, pandas, etc.)
 def test_validate_basic(backend_tbl):
     v = (
         pb.Validate(backend_tbl)
