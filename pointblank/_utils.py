@@ -3,12 +3,12 @@ from __future__ import annotations
 import inspect
 import re
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Collection
 
 import narwhals as nw
 from great_tables import GT
-from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
 from great_tables.gt import _get_column_of_values
+from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
@@ -568,8 +568,12 @@ def _column_subset_test_prep(
     return dfn
 
 
-_PBUnresolvedColumn = str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals
-_PBResolvedColumn = Column | ColumnLiteral | ColumnSelectorNarwhals | list[Column] | list[str]
+_PBUnresolvedColumn = (
+    str | Collection[str] | Collection[Column] | Column | ColumnSelector | ColumnSelectorNarwhals
+)
+_PBResolvedColumn = (
+    Column | ColumnLiteral | ColumnSelectorNarwhals | Collection[Column] | Collection[str]
+)
 
 
 def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
@@ -580,7 +584,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        columns = [columns]
+        columns: list[Column] | list[str] = [columns]
 
     return columns
 
