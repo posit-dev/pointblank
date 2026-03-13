@@ -3673,7 +3673,8 @@ def get_row_count(data: Any) -> int:
     try:
         import narwhals as nw
 
-        df_nw = nw.from_native(data)
+        df_nw = nw.from_native(data, allow_series=False)
+
         # For LazyFrames, use lazy aggregation to avoid materializing entire frame
         if hasattr(df_nw, "collect"):
             # Use lazy len() aggregation instead of collecting entire frame
