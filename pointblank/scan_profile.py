@@ -260,8 +260,8 @@ class _DataProfile:  # TODO: feels redundant and weird
 
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
-        if hasattr(data, "collect"):
-            self.row_count = data.select(nw.len()).collect().item()
+        if hasattr(data, "collect"):  # there's no canonical way (yet) to check in narwhals
+            self.row_count = data.select(nw.len()).collect().item()  # ty: ignore
         else:
             self.row_count = len(data)
 
