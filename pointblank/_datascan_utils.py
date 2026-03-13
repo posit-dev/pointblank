@@ -20,11 +20,11 @@ def _compact_integer_fmt(value: float | int) -> str:
         formatted: str = "0"
     elif abs(value) >= 1 and abs(value) < 10_000:
         formatted = fmt_integer(value, use_seps=False)
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
     else:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
 
     return formatted
@@ -35,23 +35,23 @@ def _compact_decimal_fmt(value: float | int) -> str:
         formatted = "0.00"
     elif abs(value) < 1 and abs(value) >= 0.01:
         formatted = fmt_number(value, decimals=2)
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
     elif abs(value) < 0.01:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
     elif abs(value) >= 1 and abs(value) < 1000:
         formatted = fmt_number(value, n_sigfig=3)
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
     elif abs(value) >= 1000 and abs(value) < 10_000:
         formatted = fmt_number(value, decimals=0, use_seps=False)
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
     else:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         formatted: str = formatted[0]
 
     return formatted
@@ -69,7 +69,7 @@ def _compact_0_1_fmt(value: float | int | None) -> str | None:
 
     if abs(value) < 1 and abs(value) >= 0.01:
         formatted = fmt_number(value, decimals=2)
-        assert isinstance(formatted, list)
+        assert isinstance(formatted, list) and isinstance(formatted[0], str)
         return " " + formatted[0]
 
     if abs(value) < 0.01:
@@ -79,5 +79,5 @@ def _compact_0_1_fmt(value: float | int | None) -> str | None:
         return ">0.99"
 
     formatted = fmt_number(value, n_sigfig=3)
-    assert isinstance(formatted, list)
+    assert isinstance(formatted, list) and isinstance(formatted[0], str)
     return formatted[0]
