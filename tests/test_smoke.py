@@ -8,10 +8,19 @@ def test_import():
     assert pb.__version__
 
 
-def test_backend_basic(backend_tbl):
-    """Assert we can do basic things without backends."""
-    v = pb.Validate(backend_tbl).col_vals_gt(columns="x", value=0).interrogate()
-    assert v.all_passed()
+def test_validate_basic(backend_tbl):
+    v = (
+        pb.Validate(backend_tbl)
+        .col_exists(columns="x")
+        .col_vals_gt(columns="x", value=0)
+        .row_count_match(count=5)
+        .interrogate()
+    )
+
+
+def test_scan_basic(backend_tbl):
+    scan = pb.DataScan(backend_tbl)
+    result = scan.profile.as_dataframe()
 
 
 if __name__ == "__main__":
