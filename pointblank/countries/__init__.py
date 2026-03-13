@@ -894,7 +894,7 @@ _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 def _is_tiered(data: Any) -> bool:
     """Return True if *data* is a dict whose keys are frequency tier names."""
-    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
 
 def _flatten_tiered(data: dict[str, list]) -> list:
