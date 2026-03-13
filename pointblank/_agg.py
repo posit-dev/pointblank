@@ -6,8 +6,7 @@ from typing import Any
 
 import narwhals as nw
 
-# TODO: Should take any frame type
-Aggregator = Callable[[nw.DataFrame], float | int]
+Aggregator = Callable[[nw.DataFrame | nw.LazyFrame], float | int]
 Comparator = Callable[[Any, Any, Any], bool]
 
 AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
@@ -29,18 +28,27 @@ def register(fn):
 
 ## Aggregator Functions
 @register
-def agg_sum(column: nw.DataFrame) -> float:
-    return column.select(nw.all().sum()).item()
+def agg_sum(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().sum())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    assert isinstance(result, (int, float))
+    return result
 
 
 @register
-def agg_avg(column: nw.DataFrame) -> float:
-    return column.select(nw.all().mean()).item()
+def agg_avg(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().mean())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    assert isinstance(result, (int, float))
+    return result
 
 
 @register
-def agg_sd(column: nw.DataFrame) -> float:
-    return column.select(nw.all().std()).item()
+def agg_sd(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().std())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    assert isinstance(result, (int, float))
+    return result
 
 
 ## Comparator functions:

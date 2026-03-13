@@ -14030,8 +14030,8 @@ class Validate:
                         agg, comp = resolve_agg_registries(assertion_type)
 
                         # Produce a 1-column Narwhals DataFrame
-                        # TODO: Should be able to take lazy too
-                        vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
+                        # Note: lazy frames are materialized in agg() to compute aggregates
+                        vec = nw.from_native(data_tbl_step).select(column)
                         real = agg(vec)
 
                         raw_value = value["value"]
@@ -14045,9 +14045,7 @@ class Validate:
                                     "setting reference data on the Validate object. "
                                     "Use Validate(data=..., reference=...) to set reference data."
                                 )
-                            ref_vec: nw.DataFrame = nw.from_native(self.reference).select(
-                                raw_value.column_name
-                            )
+                            ref_vec = nw.from_native(self.reference).select(raw_value.column_name)
                             target: float | int = agg(ref_vec)
                         else:
                             target = raw_value
