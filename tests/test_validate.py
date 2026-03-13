@@ -1,31 +1,5 @@
 from __future__ import annotations
 
-from sqlglot.expressions import Table
-from ibis import Table
-from ibis.expr.types import Table
-from pyarrow import Table
-from pyarrow.__lib_pxi.table import Table
-from pyspark.sql.catalog import Table
-from ibis.expr.types.relations import Table
-from openpyxl.worksheet.table import Table
-from rich.table import Table
-from narwhals import DataFrame
-from pyspark.pandas import DataFrame
-from polars.dataframe import DataFrame
-from shiny.render._data_frame_utils._types import DataFrame
-from pandas import DataFrame
-from narwhals.stable.v1 import DataFrame
-from polars.interchange.protocol import DataFrame
-from pyspark.sql import DataFrame
-from narwhals.stable.v2 import DataFrame
-from pyspark.sql.connect.dataframe import DataFrame
-from narwhals.dataframe import DataFrame
-from polars import DataFrame
-from pyspark.pandas.frame import DataFrame
-from pyspark.sql.dataframe import DataFrame
-from pandas.core.frame import DataFrame
-from polars.dataframe.frame import DataFrame
-
 
 import pathlib
 import warnings
@@ -264,17 +238,17 @@ if PYSPARK_AVAILABLE:
 
 
 @pytest.fixture
-def tbl_pd() -> DataFrame:
+def tbl_pd():
     return pd.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
 
 
 @pytest.fixture
-def tbl_missing_pd() -> DataFrame:
+def tbl_missing_pd():
     return pd.DataFrame({"x": [1, 2, pd.NA, 4], "y": [4, pd.NA, 6, 7], "z": [8, pd.NA, 8, 8]})
 
 
 @pytest.fixture
-def tbl_dates_times_text_pd() -> DataFrame:
+def tbl_dates_times_text_pd():
     return pd.DataFrame(
         {
             "date": ["2021-01-01", "2021-02-01", pd.NA],
@@ -285,7 +259,7 @@ def tbl_dates_times_text_pd() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_true_dates_times_pd() -> DataFrame:
+def tbl_true_dates_times_pd() -> pd.DataFrame:
     df = pd.DataFrame(
         {
             "date_1": pd.to_datetime(["2021-01-01", "2021-02-01"]),
@@ -302,17 +276,17 @@ def tbl_true_dates_times_pd() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_pl() -> DataFrame:
+def tbl_pl() -> pl.DataFrame:
     return pl.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
 
 
 @pytest.fixture
-def tbl_missing_pl() -> DataFrame:
+def tbl_missing_pl() -> pl.DataFrame:
     return pl.DataFrame({"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]})
 
 
 @pytest.fixture
-def tbl_dates_times_text_pl() -> DataFrame:
+def tbl_dates_times_text_pl():
     return pl.DataFrame(
         {
             "date": ["2021-01-01", "2021-02-01", None],
@@ -323,7 +297,7 @@ def tbl_dates_times_text_pl() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_true_dates_times_pl() -> DataFrame:
+def tbl_true_dates_times_pl():
     pl_df = pl.DataFrame(
         {
             "date_1": ["2021-01-01", "2021-02-01"],
@@ -416,7 +390,7 @@ def tbl_dates_times_text_sqlite():
 
 
 @pytest.fixture
-def tbl_pl_variable_names() -> DataFrame:
+def tbl_pl_variable_names():
     return pl.DataFrame(
         {
             "word": ["apple", "banana"],
@@ -433,7 +407,7 @@ def tbl_pl_variable_names() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_pd_variable_names() -> DataFrame:
+def tbl_pd_variable_names():
     return pd.DataFrame(
         {
             "word": ["apple", "banana"],
@@ -469,7 +443,7 @@ def tbl_memtable_variable_names() -> Table:
 
 
 @pytest.fixture
-def tbl_schema_tests() -> DataFrame:
+def tbl_schema_tests():
     return pl.DataFrame(
         {
             "a": ["apple", "banana", "cherry", "date"],
@@ -481,7 +455,7 @@ def tbl_schema_tests() -> DataFrame:
 
 # PySpark fixtures
 @pytest.fixture
-def tbl_pyspark() -> DataFrame:
+def tbl_pyspark():
     """Basic PySpark DataFrame fixture matching tbl_pd structure."""
     if not PYSPARK_AVAILABLE:
         pytest.skip("PySpark not available")
@@ -493,7 +467,7 @@ def tbl_pyspark() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_missing_pyspark() -> DataFrame:
+def tbl_missing_pyspark():
     """PySpark DataFrame fixture with missing values matching tbl_missing_pd structure."""
     if not PYSPARK_AVAILABLE:
         pytest.skip("PySpark not available")
@@ -505,7 +479,7 @@ def tbl_missing_pyspark() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_dates_times_text_pyspark() -> DataFrame:
+def tbl_dates_times_text_pyspark():
     """PySpark DataFrame fixture with dates, times, and text matching tbl_dates_times_text_pd structure."""
     if not PYSPARK_AVAILABLE:
         pytest.skip("PySpark not available")
@@ -521,7 +495,7 @@ def tbl_dates_times_text_pyspark() -> DataFrame:
 
 
 @pytest.fixture
-def tbl_true_dates_times_pyspark() -> DataFrame:
+def tbl_true_dates_times_pyspark():
     """PySpark DataFrame fixture with proper datetime types matching tbl_true_dates_times_pd structure."""
     if not PYSPARK_AVAILABLE:
         pytest.skip("PySpark not available")
@@ -18247,7 +18221,7 @@ class MixedEnum(Enum):
 
 # Test fixtures for enum tests
 @pytest.fixture
-def sample_data_polars() -> DataFrame:
+def sample_data_polars():
     """Create sample Polars DataFrame for testing."""
     return pl.DataFrame(
         {
@@ -18259,7 +18233,7 @@ def sample_data_polars() -> DataFrame:
 
 
 @pytest.fixture
-def sample_data_pandas() -> DataFrame:
+def sample_data_pandas():
     """Create sample Pandas DataFrame for testing."""
     return pd.DataFrame(
         {
@@ -19052,7 +19026,7 @@ def test_original_table_never_modified_without_pre(request, tbl_fixture) -> None
 
 
 @pytest.fixture
-def timezone_datetime_polars() -> DataFrame:
+def timezone_datetime_polars():
     """Polars DataFrame with timezone-aware datetime values."""
     return pl.DataFrame(
         {
@@ -19067,7 +19041,7 @@ def timezone_datetime_polars() -> DataFrame:
 
 
 @pytest.fixture
-def timezone_datetime_pandas() -> DataFrame:
+def timezone_datetime_pandas():
     """Pandas DataFrame with timezone-aware datetime values."""
     return pd.DataFrame(
         {
@@ -19822,7 +19796,7 @@ def test_write_file_with_module_level_function() -> None:
 
 
 @pytest.fixture
-def column_selector_test_data() -> DataFrame:
+def column_selector_test_data():
     """Create test data with diverse column names for column selector testing."""
     return pl.DataFrame(
         {
