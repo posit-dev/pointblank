@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import itertools
 from collections.abc import Callable
-from typing import Any
 
 import narwhals as nw
 
-Aggregator = Callable[[nw.DataFrame | nw.LazyFrame], float | int]
-Comparator = Callable[[Any, Any, Any], bool]
+from pointblank._typing import SupportsOrder, supports_order
+
+Aggregator = Callable[[nw.DataFrame | nw.LazyFrame], SupportsOrder]
+Comparator = Callable[[SupportsOrder, SupportsOrder, SupportsOrder], bool]
 
 AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
 
@@ -28,58 +29,58 @@ def register(fn):
 
 ## Aggregator Functions
 @register
-def agg_sum(column: nw.DataFrame | nw.LazyFrame) -> float:
+def agg_sum(column: nw.DataFrame | nw.LazyFrame) -> SupportsOrder:
     plan = column.select(nw.all().sum())
     result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
-    assert isinstance(result, (int, float))
+    assert supports_order(result), "INTERNAL: Query scalar would not support ordering."
     return result
 
 
 @register
-def agg_avg(column: nw.DataFrame | nw.LazyFrame) -> float:
+def agg_avg(column: nw.DataFrame | nw.LazyFrame) -> SupportsOrder:
     plan = column.select(nw.all().mean())
     result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
-    assert isinstance(result, (int, float))
+    assert supports_order(result), "INTERNAL: Query scalar would not support ordering."
     return result
 
 
 @register
-def agg_sd(column: nw.DataFrame | nw.LazyFrame) -> float:
+def agg_sd(column: nw.DataFrame | nw.LazyFrame) -> SupportsOrder:
     plan = column.select(nw.all().std())
     result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
-    assert isinstance(result, (int, float))
+    assert supports_order(result), "INTERNAL: Query scalar would not support ordering."
     return result
 
 
 ## Comparator functions:
 @register
-def comp_eq(real: float, lower: float, upper: float) -> bool:
+def comp_eq(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     if lower == upper:
         return bool(real == lower)
     return _generic_between(real, lower, upper)
 
 
 @register
-def comp_gt(real: float, lower: float, upper: float) -> bool:
+def comp_gt(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     return bool(real > lower)
 
 
 @register
-def comp_ge(real: Any, lower: float, upper: float) -> bool:
+def comp_ge(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     return bool(real >= lower)
 
 
 @register
-def comp_lt(real: float, lower: float, upper: float) -> bool:
+def comp_lt(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     return bool(real < upper)
 
 
 @register
-def comp_le(real: float, lower: float, upper: float) -> bool:
+def comp_le(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     return bool(real <= upper)
 
 
-def _generic_between(real: Any, lower: Any, upper: Any) -> bool:
+def _generic_between(real: SupportsOrder, lower: SupportsOrder, upper: SupportsOrder) -> bool:
     """Call if comparator needs to check between two values."""
     return bool(lower <= real <= upper)
 
