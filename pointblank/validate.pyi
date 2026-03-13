@@ -1,17 +1,20 @@
+from pointblank import Actions, Thresholds
+from pointblank._utils import _PBUnresolvedColumn
+from pointblank.column import Column, ReferenceColumn
+from pointblank._typing import Tolerance
+
+import datetime
 from collections.abc import Collection
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Callable, Literal, ParamSpec, TypeVar
-
 from great_tables import GT
-from narwhals.typing import FrameT, IntoFrame
-
-from pointblank import Actions, Thresholds
+from narwhals.typing import IntoDataFrame, IntoFrame
+from pathlib import Path
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.schema import Schema
 from pointblank.thresholds import Actions, FinalActions, Thresholds
+from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 __all__ = [
     "Validate",
@@ -54,7 +57,7 @@ def config(
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
-) -> FrameT | Any: ...
+) -> Any: ...
 def read_file(filepath: str | Path) -> Validate: ...
 def write_file(
     validation: Validate,
@@ -69,7 +72,7 @@ def get_data_path(
     file_type: Literal["csv", "parquet", "duckdb"] = "csv",
 ) -> str: ...
 def preview(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -77,11 +80,11 @@ def preview(
     show_row_numbers: bool = True,
     max_col_width: int = 250,
     min_tbl_width: int = 500,
-    incl_header: bool = None,
+    incl_header: bool | None = None,
 ) -> GT: ...
-def missing_vals_tbl(data: FrameT | Any) -> GT: ...
-def get_column_count(data: FrameT | Any) -> int: ...
-def get_row_count(data: FrameT | Any) -> int: ...
+def missing_vals_tbl(data: Any) -> GT: ...
+def get_column_count(data: Any) -> int: ...
+def get_row_count(data: Any) -> int: ...
 @dataclass
 class _ValidationInfo:
     @classmethod
@@ -102,7 +105,7 @@ class _ValidationInfo:
     sha1: str | None = ...
     assertion_type: str | None = ...
     column: Any | None = ...
-    values: Any | list[any] | tuple | None = ...
+    values: Any | list[Any] | tuple | None = ...
     inclusive: tuple[bool, bool] | None = ...
     na_pass: bool | None = ...
     pre: Callable | None = ...
@@ -124,13 +127,13 @@ class _ValidationInfo:
     error: bool | None = ...
     critical: bool | None = ...
     failure_text: str | None = ...
-    tbl_checked: FrameT | None = ...
-    extract: FrameT | None = ...
-    val_info: dict[str, any] | None = ...
+    tbl_checked: Any = ...
+    extract: Any = ...
+    val_info: dict[str, Any] | None = ...
     time_processed: str | None = ...
     proc_duration_s: float | None = ...
     notes: dict[str, dict[str, str]] | None = ...
-    def get_val_info(self) -> dict[str, any]: ...
+    def get_val_info(self) -> dict[str, Any] | None: ...
     def _add_note(self, key: str, markdown: str, text: str | None = None) -> None: ...
     def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None: ...
     def _get_note(self, key: str, format: str = "dict") -> dict[str, str] | str | None: ...
@@ -140,7 +143,7 @@ def connect_to_table(connection_string: str) -> Any: ...
 def print_database_tables(connection_string: str) -> list[str]: ...
 @dataclass
 class Validate:
-    data: FrameT | Any
+    data: IntoDataFrame
     reference: IntoFrame | None = ...
     tbl_name: str | None = ...
     label: str | None = ...
@@ -150,6 +153,9 @@ class Validate:
     brief: str | bool | None = ...
     lang: str | None = ...
     locale: str | None = ...
+    owner: str | None = ...
+    consumers: str | list[str] | None = ...
+    version: str | None = ...
     col_names = ...
     col_types = ...
     time_start = ...
@@ -166,10 +172,10 @@ class Validate:
         thresholds=None,
         brief: bool = False,
         actions=None,
-        active: bool | Callable = True,
+        active: bool = True,
     ): ...
     def set_tbl(
-        self, tbl: FrameT | Any, tbl_name: str | None = None, label: str | None = None
+        self, tbl: Any, tbl_name: str | None = None, label: str | None = None
     ) -> Validate: ...
     def _repr_html_(self) -> str: ...
     def col_vals_gt(
@@ -179,7 +185,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -191,7 +197,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -203,7 +209,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -215,7 +221,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -227,7 +233,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -239,7 +245,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -253,7 +259,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -267,7 +273,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -278,7 +284,7 @@ class Validate:
         set: Collection[Any],
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -289,7 +295,7 @@ class Validate:
         set: Collection[Any],
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -302,7 +308,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -315,7 +321,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -325,7 +331,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -335,7 +341,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -348,7 +354,7 @@ class Validate:
         inverse: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -360,7 +366,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -370,7 +376,7 @@ class Validate:
         expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -378,7 +384,7 @@ class Validate:
     def col_exists(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -398,7 +404,7 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -408,7 +414,7 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -422,7 +428,7 @@ class Validate:
         max_concurrent: int = 3,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -436,37 +442,50 @@ class Validate:
         case_sensitive_dtypes: bool = True,
         full_match_dtypes: bool = True,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
     ) -> Validate: ...
     def row_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         tol: Tolerance = 0,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate: ...
+    def data_freshness(
+        self,
+        column: str,
+        max_age: str | datetime.timedelta,
+        reference_time: datetime.datetime | str | None = None,
+        timezone: str | None = None,
+        allow_tz_mismatch: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
     ) -> Validate: ...
     def col_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
     ) -> Validate: ...
     def tbl_match(
         self,
-        tbl_compare: FrameT | Any,
+        tbl_compare: Any,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -475,7 +494,7 @@ class Validate:
         self,
         *exprs: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -484,7 +503,7 @@ class Validate:
         self,
         expr: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
@@ -528,11 +547,11 @@ class Validate:
     ) -> dict[int, bool] | bool: ...
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
-    ) -> dict[int, FrameT | None] | FrameT | None: ...
+    ) -> dict[int, Any] | Any: ...
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str: ...
-    def get_sundered_data(self, type: str = "pass") -> FrameT: ...
+    def get_sundered_data(self, type: str = "pass") -> Any: ...
     def get_notes(
         self, i: int, format: str = "dict"
     ) -> dict[str, dict[str, str]] | list[str] | None: ...
@@ -557,7 +576,7 @@ class Validate:
     def _evaluate_segments(self, validation_info): ...
     def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, int]: ...
     def _execute_final_actions(self) -> None: ...
-    def _get_highest_severity_level(self): ...
+    def _get_highest_severity_level(self) -> str: ...
     # === GENERATED START ===
     def col_sum_eq(
         self,
@@ -567,7 +586,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value eq some `value`.
 
@@ -603,7 +622,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value gt some `value`.
 
@@ -639,7 +658,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value ge some `value`.
 
@@ -675,7 +694,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value lt some `value`.
 
@@ -711,7 +730,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value le some `value`.
 
@@ -747,7 +766,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value eq some `value`.
 
@@ -783,7 +802,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value gt some `value`.
 
@@ -819,7 +838,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value ge some `value`.
 
@@ -855,7 +874,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value lt some `value`.
 
@@ -891,7 +910,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value le some `value`.
 
@@ -927,7 +946,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value eq some `value`.
 
@@ -963,7 +982,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value gt some `value`.
 
@@ -999,7 +1018,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value ge some `value`.
 
@@ -1035,7 +1054,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value lt some `value`.
 
@@ -1071,7 +1090,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool | Callable = True,
+        active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value le some `value`.
 
