@@ -9,6 +9,7 @@ import narwhals as nw
 from great_tables import GT
 from great_tables.gt import _get_column_of_values
 from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
+from narwhals.utils import Implementation
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
@@ -89,7 +90,12 @@ def _get_tbl_type(data: Any) -> str:
         #       we either extract the backend name from the table name or get the backend name
         #       from the get_backend() method and name attribute
 
-        backend = ibis.get_backend(data).name
+        try:
+            backend = ibis.get_backend(data).name
+        except Exception:  # sometimes this will fail. Not an expert on why - Tyler Riccio
+            namespace = nw.get_native_namespace(nw.from_native(data))
+            backend = Implementation.from_native_namespace(namespace).name
+            return backend.lower()
 
         # Try using the get_name() method to get the table name, this is important for elucidating
         # the original table type since it sometimes gets handled by duckdb
