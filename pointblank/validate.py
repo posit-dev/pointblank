@@ -3674,11 +3674,12 @@ def get_row_count(data: Any) -> int:
         import narwhals as nw
 
         df_nw = nw.from_native(data)
-        # Handle LazyFrames by collecting them first
+        # For LazyFrames, use lazy aggregation to avoid materializing entire frame
         if hasattr(df_nw, "collect"):
-            df_nw = df_nw.collect()
-        # Try different ways to get row count
-        if hasattr(df_nw, "shape"):
+            # Use lazy len() aggregation instead of collecting entire frame
+            return df_nw.select(nw.len()).collect().item()
+        # Try different ways to get row count for eager frames
+        elif hasattr(df_nw, "shape"):
             return df_nw.shape[0]
         elif hasattr(df_nw, "height"):  # pragma: no cover
             return df_nw.height  # pragma: no cover
