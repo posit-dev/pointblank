@@ -1,23 +1,18 @@
 from __future__ import annotations
 
 import functools
-from ast import Expr
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 from zoneinfo import ZoneInfo
 
 import narwhals as nw
-from narwhals import Expr
 from narwhals.dependencies import (
     is_narwhals_dataframe,
     is_narwhals_lazyframe,
     is_pandas_dataframe,
     is_polars_dataframe,
 )
-from narwhals.expr import Expr
-from narwhals.stable.v1 import Expr
-from narwhals.stable.v2 import Expr
 
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._spec_utils import (
@@ -36,14 +31,7 @@ from pointblank._utils import (
 from pointblank.column import Column
 
 if TYPE_CHECKING:
-    from ibis import Expr
-    from ibis.expr.types import Expr
-    from ibis.expr.types.core import Expr
     from narwhals.typing import IntoFrame
-    from pandas.core.computation.expr import Expr
-    from polars import Expr
-    from polars.expr import Expr
-    from polars.expr.expr import Expr
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -187,7 +175,7 @@ def _safe_is_nan_or_null_expr(
 
 
 class ConjointlyValidation:
-    def __init__(self, data_tbl, expressions: type[Expr], threshold, tbl_type) -> None:
+    def __init__(self, data_tbl, expressions: type[nw.Expr], threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expressions = expressions
         self.threshold = threshold
