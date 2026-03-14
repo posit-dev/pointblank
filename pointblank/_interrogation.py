@@ -45,10 +45,10 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
         # First try to get column dtype from schema for LazyFrames
         column_dtype = None
 
-        if hasattr(data_frame, "collect_schema"):
+        if is_narwhals_lazyframe(data_frame):
             schema = data_frame.collect_schema()
             column_dtype = schema.get(column)
-        elif hasattr(data_frame, "schema"):
+        elif is_narwhals_dataframe(data_frame):
             schema = data_frame.schema
             column_dtype = schema.get(column)
 
@@ -143,9 +143,9 @@ def _safe_is_nan_or_null_expr(
 
     # For non-Ibis backends, try to use `is_nan()` if the column type supports it
     try:
-        if hasattr(data_frame, "collect_schema"):
+        if is_narwhals_lazyframe(data_frame):
             schema = data_frame.collect_schema()
-        elif hasattr(data_frame, "schema"):
+        elif is_narwhals_dataframe(data_frame):
             schema = data_frame.schema
         else:  # pragma: no cover
             schema = None  # pragma: no cover

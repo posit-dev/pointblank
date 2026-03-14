@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import narwhals as nw
 from narwhals.dataframe import DataFrame
+from narwhals.dependencies import is_narwhals_lazyframe
 
 from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
 from pointblank._utils import transpose_dicts
@@ -260,7 +261,7 @@ class _DataProfile:  # TODO: feels redundant and weird
 
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
-        if hasattr(data, "collect"):  # there's no canonical way (yet) to check in narwhals
+        if is_narwhals_lazyframe(data):
             self.row_count = data.select(nw.len()).collect().item()  # ty: ignore
         else:
             self.row_count = len(data)

@@ -22,6 +22,7 @@ from zoneinfo import ZoneInfo
 
 import commonmark
 import narwhals as nw
+from narwhals.dependencies import is_narwhals_lazyframe
 from great_tables import GT, from_column, google_font, html, loc, md, style, vals
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
@@ -3260,7 +3261,7 @@ def _get_column_names_safe(data: Any) -> list[str]:
 
         df_nw = nw.from_native(data)
         # Use `collect_schema()` for LazyFrames to avoid performance warnings
-        if hasattr(df_nw, "collect_schema"):
+        if is_narwhals_lazyframe(df_nw):
             return list(df_nw.collect_schema().keys())
         else:
             return list(df_nw.columns)  # pragma: no cover
@@ -3462,7 +3463,7 @@ def get_column_count(data: Any) -> int:
 
         df_nw = nw.from_native(data)
         # Use `collect_schema()` for LazyFrames to avoid performance warnings
-        if hasattr(df_nw, "collect_schema"):
+        if is_narwhals_lazyframe(df_nw):
             return len(df_nw.collect_schema())
         else:
             return len(df_nw.columns)  # pragma: no cover
@@ -3676,7 +3677,7 @@ def get_row_count(data: Any) -> int:
         df_nw = nw.from_native(data, allow_series=False)
 
         # For LazyFrames, use lazy aggregation to avoid materializing entire frame
-        if hasattr(df_nw, "collect"):
+        if is_narwhals_lazyframe(df_nw):
             # Use lazy len() aggregation instead of collecting entire frame
             return df_nw.select(nw.len()).collect().item()
         # Try different ways to get row count for eager frames
@@ -14540,7 +14541,7 @@ class Validate:
 
                 # Ensure that the extract is collected and set to its native format
                 # For LazyFrames (like PySpark), we need to collect before converting to native
-                if hasattr(validation_extract_nw, "collect"):
+                if is_narwhals_lazyframe(validation_extract_nw):
                     validation_extract_nw = validation_extract_nw.collect()
                 validation.extract = nw.to_native(validation_extract_nw)
 
@@ -17151,7 +17152,7 @@ class Validate:
             except TypeError:  # pragma: no cover
                 # For LazyFrames, collect() first to get length
                 n_rows = (
-                    len(extract_nw.collect()) if hasattr(extract_nw, "collect") else 0
+                    len(extract_nw.collect()) if is_narwhals_lazyframe(extract_nw) else 0
                 )  # pragma: no cover
 
             # If the number of rows is zero, then produce an em dash then go to the next iteration
@@ -17160,7 +17161,7 @@ class Validate:
                 continue
 
             # Write the CSV text (ensure LazyFrames are collected first)
-            if hasattr(extract_nw, "collect"):  # pragma: no cover
+            if is_narwhals_lazyframe(extract_nw):  # pragma: no cover
                 extract_nw = extract_nw.collect()
             csv_text = extract_nw.write_csv()
 
