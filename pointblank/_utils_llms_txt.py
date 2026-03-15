@@ -12,7 +12,7 @@ except ImportError:
     SCRAPING_AVAILABLE = False
 
 
-def get_api_details(module, exported_list):
+def get_api_details(module, exported_list) -> str:
     """
     Retrieve the signatures and docstrings of the functions/classes in the exported list.
 
@@ -691,7 +691,7 @@ def generate_llms_full_txt(output_path: Optional[str] = None) -> str:
     return content
 
 
-def main():
+def main() -> None:
     """
     Main function to generate both llms.txt and llms-full.txt files.
     """

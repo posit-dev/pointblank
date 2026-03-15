@@ -56,7 +56,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
         if column_dtype is not None:
             # Create a mock column object for _modify_datetime_compare_val
             class MockColumn:
-                def __init__(self, dtype):
+                def __init__(self, dtype) -> None:
                     self.dtype = dtype
 
             mock_column = MockColumn(column_dtype)
@@ -71,7 +71,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
                 if column_dtype:
 
                     class MockColumn:
-                        def __init__(self, dtype):
+                        def __init__(self, dtype) -> None:
                             self.dtype = dtype
 
                     mock_column = MockColumn(column_dtype)
@@ -87,7 +87,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
                 column_dtype = data_frame.dtypes[column]
 
                 class MockColumn:
-                    def __init__(self, dtype):
+                    def __init__(self, dtype) -> None:
                         self.dtype = dtype
 
                 mock_column = MockColumn(column_dtype)
@@ -175,7 +175,7 @@ def _safe_is_nan_or_null_expr(
 
 
 class ConjointlyValidation:
-    def __init__(self, data_tbl, expressions, threshold, tbl_type):
+    def __init__(self, data_tbl, expressions: type[nw.Expr], threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expressions = expressions
         self.threshold = threshold
@@ -423,7 +423,7 @@ class ConjointlyValidation:
 
 
 class SpeciallyValidation:
-    def __init__(self, data_tbl, expression, threshold, tbl_type):
+    def __init__(self, data_tbl, expression, threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expression = expression
         self.threshold = threshold
@@ -555,7 +555,7 @@ class NumberOfTestUnits:
         if tbl_type in IBIS_BACKENDS:
             # Get the count of test units and convert to a native format
             # TODO: check whether pandas or polars is available
-            return self.df.count().to_polars()  # type: ignore[union-attr]
+            return self.df.count().to_polars()
 
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
@@ -772,14 +772,14 @@ def col_pct_null(
     # is numpy-like, we might get a scalar from `item()`. `int()` expects a certain signature though
     # and `object` does not satisfy so we have to go with the type ignore.
     total_rows: object = nw_frame.select(nw.len()).item()
-    total_rows: int = int(total_rows)  # type: ignore
+    total_rows: int = int(total_rows)
 
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
 
     # Count null values (see above comment on typing shenanigans)
     n_null: object = nw_frame.select(nw.col(column).is_null().sum()).item()
-    n_null: int = int(n_null)  # type: ignore
+    n_null: int = int(n_null)
 
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
@@ -1029,21 +1029,21 @@ def tbl_match(data_tbl: IntoFrame, tbl_compare: IntoFrame) -> bool:
         values_1: list[Any]
         values_2: list[Any]
         if hasattr(col_1_native, "to_list"):  # Polars DataFrame
-            values_1 = col_1_native[col_name].to_list()  # type: ignore[index]
-            values_2 = col_2_native[col_name].to_list()  # type: ignore[index]
+            values_1 = col_1_native[col_name].to_list()
+            values_2 = col_2_native[col_name].to_list()
 
         elif hasattr(col_1_native, "tolist"):  # Pandas DataFrame
-            values_1 = col_1_native[col_name].tolist()  # type: ignore[index]
-            values_2 = col_2_native[col_name].tolist()  # type: ignore[index]
+            values_1 = col_1_native[col_name].tolist()
+            values_2 = col_2_native[col_name].tolist()
 
         elif hasattr(col_1_native, "collect"):  # Ibis
-            values_1 = col_1_native[col_name].to_pandas().tolist()  # type: ignore[index]
-            values_2 = col_2_native[col_name].to_pandas().tolist()  # type: ignore[index]
+            values_1 = col_1_native[col_name].to_pandas().tolist()
+            values_2 = col_2_native[col_name].to_pandas().tolist()
 
         else:
             # Fallback: try direct comparison
-            values_1 = list(col_1_native[col_name])  # type: ignore[index]
-            values_2 = list(col_2_native[col_name])  # type: ignore[index]
+            values_1 = list(col_1_native[col_name])
+            values_2 = list(col_2_native[col_name])
 
         # Compare the two lists element by element, handling NaN/None
         if len(values_1) != len(values_2):
@@ -1195,8 +1195,8 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                 elif "cannot compare" in str(e).lower():
                     # Handle genuine type incompatibility - native_df type varies by backend
                     native_df = result_tbl.to_native()
-                    col_dtype = str(native_df[column].dtype)  # type: ignore[index]
-                    compare_dtype = str(native_df[compare.name].dtype)  # type: ignore[index]
+                    col_dtype = str(native_df[column].dtype)
+                    compare_dtype = str(native_df[compare.name].dtype)
 
                     raise TypeError(
                         f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
@@ -1237,11 +1237,11 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                     try:
                         native_df = result_tbl.to_native()
                         if hasattr(native_df, "dtypes"):
-                            col_dtype = str(native_df.dtypes.get(column, "unknown"))  # type: ignore[union-attr]
-                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))  # type: ignore[union-attr]
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
                         elif hasattr(native_df, "schema"):
-                            col_dtype = str(native_df.schema.get(column, "unknown"))  # type: ignore[union-attr]
-                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))  # type: ignore[union-attr]
+                            col_dtype = str(native_df.schema.get(column, "unknown"))
+                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
                     except Exception:
                         pass
 
@@ -1297,9 +1297,9 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                 try:
                     native_df = result_tbl.to_native()
                     if hasattr(native_df, "dtypes"):
-                        col_dtype = str(native_df.dtypes.get(column, "unknown"))  # type: ignore[union-attr]
+                        col_dtype = str(native_df.dtypes.get(column, "unknown"))
                     elif hasattr(native_df, "schema"):
-                        col_dtype = str(native_df.schema.get(column, "unknown"))  # type: ignore[union-attr]
+                        col_dtype = str(native_df.schema.get(column, "unknown"))
                 except Exception:
                     pass
 

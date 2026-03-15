@@ -894,7 +894,7 @@ _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 def _is_tiered(data: Any) -> bool:
     """Return True if *data* is a dict whose keys are frequency tier names."""
-    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
 
 def _flatten_tiered(data: dict[str, list]) -> list:
@@ -925,7 +925,7 @@ class LocaleGenerator:
     addresses, etc. based on country-specific patterns and data.
     """
 
-    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True):
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True) -> None:
         """
         Initialize the country data generator.
 

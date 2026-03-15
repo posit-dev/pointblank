@@ -31,6 +31,9 @@ test-core: ## Run core libraries only; useful for local CI
 		-n auto \
 		--durations=10
 
+.PHONY: tox
+tox: ## Run tox tests across isolated environments (pandas, polars, ibis)
+	@tox
 
 test-update:
 	pytest --snapshot-update
