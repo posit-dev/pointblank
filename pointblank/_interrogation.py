@@ -102,9 +102,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
     return compare_val
 
 
-def _safe_is_nan_or_null_expr(
-    data_frame: nw.DataFrame | nw.LazyFrame, column_expr: nw.Expr, column_name: str
-) -> Any:
+def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, column_name: str) -> Any:
     """
     Create an expression that safely checks for both Null and NaN values.
 
@@ -126,14 +124,10 @@ def _safe_is_nan_or_null_expr(
     Any
         A narwhals expression that returns `True` for Null or NaN values.
     """
-    # Always check for null values
     null_check = column_expr.is_null()
 
-    df = nw.from_native(data_frame, allow_series=False)
-    if is_narwhals_lazyframe(df):
-        schema: nw.Schema = data_frame.collect_schema()
-    else:
-        schema: nw.Schema = data_frame.schema
+    df: nw.DataFrame | nw.LazyFrame = nw.from_native(data_frame, allow_series=False)
+    schema: nw.Schema = df.collect_schema()
 
     dtype: nw.dtypes.DType = schema[column_name]
 
