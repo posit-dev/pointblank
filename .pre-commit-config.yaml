@@ -5,9 +5,9 @@ repos:
       - id: check-pyi-sync
         name: validate.pyi must be up to date
         language: system
-        entry: bash -c 'uv run python scripts/generate_agg_validate_pyi.py && git diff --exit-code pointblank/validate.pyi'
+        entry: bash -c 'make pyi && git diff --exit-code pointblank/validate.pyi'
         pass_filenames: false
-        stages: [pre-commit]
+        stages: [commit]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
