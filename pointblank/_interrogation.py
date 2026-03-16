@@ -103,7 +103,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
 
 
 def _safe_is_nan_or_null_expr(
-    data_frame: Any, column_expr: Any, column_name: str | None = None
+    data_frame: nw.DataFrame | nw.LazyFrame, column_expr: nw.Expr, column_name: str
 ) -> Any:
     """
     Create an expression that safely checks for both Null and NaN values.
@@ -129,49 +129,18 @@ def _safe_is_nan_or_null_expr(
     # Always check for null values
     null_check = column_expr.is_null()
 
-    # For Ibis backends, many don't support `is_nan()` so we stick to Null checks only;
-    # use `narwhals.get_native_namespace()` for reliable backend detection
-    try:
-        native_namespace = nw.get_native_namespace(data_frame)
+    df = nw.from_native(data_frame, allow_series=False)
+    if is_narwhals_lazyframe(df):
+        schema: nw.Schema = data_frame.collect_schema()
+    else:
+        schema: nw.Schema = data_frame.schema
 
-        # If it's an Ibis backend, only check for null values
-        # The namespace is the actual module, so we check its name
-        if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
-            return null_check
-    except Exception:  # pragma: no cover
-        pass  # pragma: no cover
+    dtype: nw.dtypes.DType = schema[column_name]
 
-    # For non-Ibis backends, try to use `is_nan()` if the column type supports it
-    try:
-        if is_narwhals_lazyframe(data_frame):
-            schema = data_frame.collect_schema()
-        elif is_narwhals_dataframe(data_frame):
-            schema = data_frame.schema
-        else:  # pragma: no cover
-            schema = None  # pragma: no cover
+    if not dtype.is_numeric():
+        return null_check
 
-        if schema and column_name:
-            column_dtype = schema.get(column_name)
-            if column_dtype:
-                dtype_str = str(column_dtype).lower()
-
-                # Check if it's a numeric type that supports NaN
-                is_numeric = any(
-                    num_type in dtype_str for num_type in ["float", "double", "f32", "f64"]
-                )
-
-                if is_numeric:
-                    try:
-                        # For numeric types, try to check both Null and NaN
-                        return null_check | column_expr.is_nan()
-                    except Exception:
-                        # If `is_nan()` fails for any reason, fall back to Null only
-                        pass
-    except Exception:  # pragma: no cover
-        pass  # pragma: no cover
-
-    # Fallback: just check Null values
-    return null_check
+    return null_check | column_expr.is_nan()
 
 
 class ConjointlyValidation:
