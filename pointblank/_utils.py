@@ -3,12 +3,13 @@ from __future__ import annotations
 import inspect
 import re
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Collection
 
 import narwhals as nw
 from great_tables import GT
-from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
 from great_tables.gt import _get_column_of_values
+from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
+from narwhals.utils import Implementation
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
@@ -89,7 +90,12 @@ def _get_tbl_type(data: Any) -> str:
         #       we either extract the backend name from the table name or get the backend name
         #       from the get_backend() method and name attribute
 
-        backend = ibis.get_backend(data).name
+        try:
+            backend = ibis.get_backend(data).name
+        except Exception:  # sometimes this will fail. Not an expert on why - Tyler Riccio
+            namespace = nw.get_native_namespace(nw.from_native(data))
+            backend = Implementation.from_native_namespace(namespace).name
+            return backend.lower()
 
         # Try using the get_name() method to get the table name, this is important for elucidating
         # the original table type since it sometimes gets handled by duckdb
@@ -568,8 +574,12 @@ def _column_subset_test_prep(
     return dfn
 
 
-_PBUnresolvedColumn = str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals
-_PBResolvedColumn = Column | ColumnLiteral | ColumnSelectorNarwhals | list[Column] | list[str]
+_PBUnresolvedColumn = (
+    str | Collection[str] | Collection[Column] | Column | ColumnSelector | ColumnSelectorNarwhals
+)
+_PBResolvedColumn = (
+    Column | ColumnLiteral | ColumnSelectorNarwhals | Collection[Column] | Collection[str]
+)
 
 
 def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
@@ -580,7 +590,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        columns = [columns]
+        columns: list[Column] | list[str] = [columns]
 
     return columns
 
@@ -604,7 +614,7 @@ def _get_assertion_from_fname() -> str | None:
     return ASSERTION_TYPE_METHOD_MAP.get(func_name)
 
 
-def _check_invalid_fields(fields: list[str], valid_fields: list[str]):
+def _check_invalid_fields(fields: list[str], valid_fields: list[str]) -> None:
     """
     Check if any fields in the list are not in the valid fields list.
 

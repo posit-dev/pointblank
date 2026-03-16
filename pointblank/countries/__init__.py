@@ -894,7 +894,7 @@ _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 def _is_tiered(data: Any) -> bool:
     """Return True if *data* is a dict whose keys are frequency tier names."""
-    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
 
 def _flatten_tiered(data: dict[str, list]) -> list:
@@ -925,7 +925,7 @@ class LocaleGenerator:
     addresses, etc. based on country-specific patterns and data.
     """
 
-    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True):
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True) -> None:
         """
         Initialize the country data generator.
 
@@ -1839,6 +1839,31 @@ class LocaleGenerator:
             self.clear_location()
         return result
 
+    # NANP countries use +1 country code and share exchange code rules
+    _NANP_COUNTRIES = {"US", "CA", "JM", "DO"}
+
+    # N11 service codes that must not be used as exchange codes
+    _NANP_RESERVED_EXCHANGES = {
+        "211",
+        "311",
+        "411",
+        "511",
+        "611",
+        "711",
+        "811",
+        "911",
+    }
+
+    def _nanp_exchange(self) -> str:
+        """Generate a valid NANP exchange code (NXX where N=2-9, not N11 or 555)."""
+        while True:
+            n = str(self.rng.randint(2, 9))
+            x1 = str(self.rng.randint(0, 9))
+            x2 = str(self.rng.randint(0, 9))
+            code = n + x1 + x2
+            if code not in self._NANP_RESERVED_EXCHANGES and code != "555":
+                return code
+
     def phone_number(self) -> str:
         """Generate a phone number with area code matching the current location's state."""
         location = self._get_current_location()
@@ -1852,12 +1877,22 @@ class LocaleGenerator:
         # Use country-specific phone format if available
         phone_format = self._data.address.get("phone_format", "({area_code}) ###-####")
 
+        # For NANP countries, replace the exchange code portion (first 3 # chars)
+        # with a valid NXX code (N=2-9, not N11, not 555)
+        is_nanp = self.country_code in self._NANP_COUNTRIES
+
         # Substitute {area_code} and replace # with random digits
         result = phone_format.replace("{area_code}", area_code)
         chars = []
+        hash_count = 0
+        nanp_exchange = self._nanp_exchange() if is_nanp else None
         for ch in result:
             if ch == "#":
-                chars.append(str(self.rng.randint(0, 9)))
+                if is_nanp and hash_count < 3:
+                    chars.append(nanp_exchange[hash_count])
+                else:
+                    chars.append(str(self.rng.randint(0, 9)))
+                hash_count += 1
             else:
                 chars.append(ch)
         return "".join(chars)

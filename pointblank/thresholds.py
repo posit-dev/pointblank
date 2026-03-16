@@ -103,12 +103,12 @@ class Thresholds:
     critical_fraction: float | None = field(default=None, init=False)
     critical_count: int | None = field(default=None, init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self._process_threshold("warning", "warning")
         self._process_threshold("error", "error")
         self._process_threshold("critical", "critical")
 
-    def _process_threshold(self, attribute_name, base_name):
+    def _process_threshold(self, attribute_name: str, base_name: str) -> None:
         value = getattr(self, attribute_name)
         if value is not None:
             if value == 0:
@@ -466,7 +466,7 @@ class Actions:
     default: str | Callable | list[str | Callable] | None = None
     highest_only: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.warning = self._ensure_list(self.warning)
         self.error = self._ensure_list(self.error)
         self.critical = self._ensure_list(self.critical)
@@ -605,7 +605,7 @@ class FinalActions:
 
     actions: list | str | Callable
 
-    def __init__(self, *args):
+    def __init__(self, *args) -> None:
         # Check that all arguments are either strings or callables
         for arg in args:
             if not isinstance(arg, (str, Callable)) and not (

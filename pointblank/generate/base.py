@@ -53,7 +53,7 @@ class GeneratorConfig:
     weighted: bool = True
     max_unique_retries: int = 1000
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.n < 0:
             raise ValueError(f"n must be non-negative, got {self.n}")
         if self.max_unique_retries < 1:

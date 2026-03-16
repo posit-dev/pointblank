@@ -169,7 +169,7 @@ class Column:
 
         raise TypeError(f"Unsupported type: {type(self.exprs)}")  # pragma: no cover
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.exprs if isinstance(self.exprs, str) else repr(self.exprs)
 
 
@@ -190,7 +190,7 @@ class ColumnLiteral(Column):
     def name(self) -> str:
         return self.exprs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.exprs
 
 
@@ -206,7 +206,7 @@ class ReferenceColumn:
 
     column_name: str
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"ref({self.column_name!r})"
 
 
@@ -1745,7 +1745,7 @@ class ColumnExpression:
         operation: str | None = None,
         left: ColumnExpression | None = None,
         right: ColumnExpression | str | int | float | None = None,
-    ):
+    ) -> None:
         self.column_name = column_name  # Name of the column (for leaf nodes)
         self.operation = operation  # Operation type (gt, lt, add, etc.)
         self.left = left  # Left operand (ColumnExpression or None for column reference)
@@ -1966,49 +1966,49 @@ class ColumnExpression:
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="gt", left=self, right=other)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="lt", left=self, right=other)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="eq", left=self, right=other)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="ne", left=self, right=other)
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="ge", left=self, right=other)
 
-    def __le__(self, other):
+    def __le__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="le", left=self, right=other)
 
-    def __add__(self, other):
+    def __add__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="add", left=self, right=other)
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="sub", left=self, right=other)
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="mul", left=self, right=other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="div", left=self, right=other)
 
-    def is_null(self):
+    def is_null(self) -> ColumnExpression:
         """Check if values are null."""
         return ColumnExpression(operation="is_null", left=self, right=None)
 
-    def is_not_null(self):
+    def is_not_null(self) -> ColumnExpression:
         """Check if values are not null."""
         return ColumnExpression(operation="is_not_null", left=self, right=None)
 
-    def __or__(self, other):
+    def __or__(self, other) -> ColumnExpression:
         """Logical OR operation."""
         return ColumnExpression(operation="or", left=self, right=other)
 
-    def __and__(self, other):
+    def __and__(self, other) -> ColumnExpression:
         """Logical AND operation."""
         return ColumnExpression(operation="and", left=self, right=other)
 
