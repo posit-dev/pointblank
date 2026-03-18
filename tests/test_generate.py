@@ -1406,20 +1406,23 @@ class TestCountrySupport:
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
+        from pointblank.countries import LocaleGenerator
 
-        # Known exonym mappings: exonym -> native name
-        # Cities where the city() preset returns English name but address uses native
-        EXONYM_TO_NATIVE = {
-            "Brussels": "Bruxelles",
-            "Copenhagen": "København",
-            "Gothenburg": "Göteborg",
-            "Istanbul": "İstanbul",
-            "Izmir": "İzmir",
-            "Krakow": "Kraków",
-            "Lisbon": "Lisboa",
-            "Vienna": "Wien",
-            "Warsaw": "Warszawa",
-        }
+        # Build exonym -> native mapping dynamically from locale data
+        EXONYM_TO_NATIVE = {}
+        for cc in COUNTRIES_WITH_FULL_DATA:
+            gen = LocaleGenerator(country=cc, seed=1)
+            raw_locations = gen._data.address.get("locations", {})
+            locs = []
+            if isinstance(raw_locations, dict):
+                for tier_locs in raw_locations.values():
+                    if isinstance(tier_locs, list):
+                        locs.extend(tier_locs)
+            elif isinstance(raw_locations, list):
+                locs = raw_locations
+            for loc in locs:
+                if isinstance(loc, dict) and "exonym" in loc:
+                    EXONYM_TO_NATIVE[loc["exonym"]] = loc["city"]
 
         schema = Schema(
             columns=[
@@ -1452,6 +1455,23 @@ class TestCountrySupport:
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
+        from pointblank.countries import LocaleGenerator
+
+        # Build exonym -> native mapping dynamically from locale data
+        EXONYM_TO_NATIVE = {}
+        for cc in COUNTRIES_WITH_FULL_DATA:
+            gen = LocaleGenerator(country=cc, seed=1)
+            raw_locations = gen._data.address.get("locations", {})
+            locs = []
+            if isinstance(raw_locations, dict):
+                for tier_locs in raw_locations.values():
+                    if isinstance(tier_locs, list):
+                        locs.extend(tier_locs)
+            elif isinstance(raw_locations, list):
+                locs = raw_locations
+            for loc in locs:
+                if isinstance(loc, dict) and "exonym" in loc:
+                    EXONYM_TO_NATIVE[loc["exonym"]] = loc["city"]
 
         schema = Schema(
             columns=[
@@ -1474,8 +1494,12 @@ class TestCountrySupport:
             for i, row in enumerate(df.iter_rows()):
                 address, city, state = row
 
-                if city not in address:
-                    mismatches.append(f"Row {i}: city='{city}' not in address='{address}'")
+                # For cities with exonyms, check the native name instead
+                native_name = EXONYM_TO_NATIVE.get(city, city)
+                if native_name not in address:
+                    mismatches.append(
+                        f"Row {i}: city='{city}' (native='{native_name}') not in address='{address}'"
+                    )
 
             assert len(mismatches) == 0
 
