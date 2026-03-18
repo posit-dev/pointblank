@@ -257,6 +257,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `file_extension`: file extension
 - `mime_type`: MIME type
 - `user_agent`: browser user agent string (country-weighted)
+- `locale_code`: locale identifier (e.g., `"en_US"`, `"de_DE"`; multilingual countries return a random official locale)
 
 ## Profile Fields
 

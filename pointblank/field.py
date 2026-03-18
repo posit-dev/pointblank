@@ -94,6 +94,7 @@ AVAILABLE_PRESETS = frozenset(
         "file_extension",
         "mime_type",
         "user_agent",
+        "locale_code",
     }
 )
 
@@ -881,7 +882,9 @@ def string_field(
     (up to 10 years back), `"time"`
 
     **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
-    `"user_agent"` (browser user agent string with country-specific browser weighting)
+    `"user_agent"` (browser user agent string with country-specific browser weighting),
+    `"locale_code"` (locale identifier like `"en_US"`, `"de_DE"`; multilingual countries
+    return a random official locale)
 
     Coherent Data Generation
     ------------------------

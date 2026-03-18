@@ -952,6 +952,78 @@ class TestCountrySupport:
 
         assert validation.all_passed()
 
+    def test_locale_code_preset_single_language_countries(self):
+        """Test locale_code preset returns correct codes for single-language countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        expected = {
+            "US": ["en_US"],
+            "DE": ["de_DE"],
+            "FR": ["fr_FR"],
+            "JP": ["ja_JP"],
+            "BR": ["pt_BR"],
+            "PL": ["pl_PL"],
+            "IT": ["it_IT"],
+            "KR": ["ko_KR"],
+        }
+
+        for country, codes in expected.items():
+            df = generate_dataset(schema, n=5, seed=23, country=country)
+
+            validation = (
+                Validate(df)
+                .col_vals_not_null(columns="locale_code")
+                .col_vals_in_set(columns="locale_code", set=codes)
+                .interrogate()
+            )
+
+            assert validation.all_passed(), f"Failed for country {country}"
+
+    def test_locale_code_preset_multilingual_countries(self):
+        """Test locale_code preset returns valid codes for multilingual countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        multilingual = {
+            "BE": ["nl_BE", "fr_BE", "de_BE"],
+            "CH": ["de_CH", "fr_CH", "it_CH"],
+            "CA": ["en_CA", "fr_CA"],
+            "SG": ["en_SG", "zh_SG", "ms_SG", "ta_SG"],
+            "ZA": ["en_ZA", "af_ZA", "zu_ZA"],
+        }
+
+        for country, valid_codes in multilingual.items():
+            df = generate_dataset(schema, n=50, seed=23, country=country)
+
+            validation = (
+                Validate(df)
+                .col_vals_not_null(columns="locale_code")
+                .col_vals_in_set(columns="locale_code", set=valid_codes)
+                .interrogate()
+            )
+
+            assert validation.all_passed(), f"Failed for country {country}"
+
+    def test_locale_code_preset_format(self):
+        """Test locale_code values match the expected xx_XX pattern."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        for country in ["US", "DE", "CH", "JP", "IN"]:
+            df = generate_dataset(schema, n=10, seed=23, country=country)
+            for val in df["locale_code"].to_list():
+                parts = val.split("_")
+                assert len(parts) == 2, f"Bad format: {val}"
+                assert parts[0].islower(), f"Language part not lowercase: {val}"
+                assert parts[1].isupper(), f"Country part not uppercase: {val}"
+
     def test_business_presets_across_countries(self):
         """Test business data presets work across multiple countries."""
         pytest.importorskip("polars")

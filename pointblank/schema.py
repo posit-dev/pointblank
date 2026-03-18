@@ -1662,6 +1662,9 @@ def generate_dataset(
       integer columns named `age` are automatically constrained to working-age range (22--65).
     - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
       format used by the specified country.
+    - **Locale preset** (`"locale_code"`): returns a locale identifier (e.g., `"en_US"`,
+      `"de_DE"`) derived from the country. Multilingual countries randomly select among their
+      official locale codes (e.g., `"CH"` yields `"de_CH"`, `"fr_CH"`, or `"it_CH"`).
 
     When multiple columns in the same schema use related presets, the generated data is
     automatically coherent across those columns within each row. Person-related presets will share

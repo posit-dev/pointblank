@@ -335,6 +335,112 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
 ]
 
 # Comprehensive country info mapping: alpha-2 -> (alpha-3, English name)
+# Maps each supported country code to its locale code(s).
+# For multilingual countries, multiple locale codes are listed in order of prevalence;
+# the generator randomly selects one per row.
+_COUNTRY_LOCALE_CODES: dict[str, list[str]] = {
+    "AE": ["ar_AE"],
+    "AM": ["hy_AM"],
+    "AR": ["es_AR"],
+    "AT": ["de_AT"],
+    "AU": ["en_AU"],
+    "AZ": ["az_AZ"],
+    "BD": ["bn_BD"],
+    "BE": ["nl_BE", "fr_BE", "de_BE"],
+    "BG": ["bg_BG"],
+    "BO": ["es_BO"],
+    "BR": ["pt_BR"],
+    "CA": ["en_CA", "fr_CA"],
+    "CH": ["de_CH", "fr_CH", "it_CH"],
+    "CL": ["es_CL"],
+    "CM": ["fr_CM", "en_CM"],
+    "CN": ["zh_CN"],
+    "CO": ["es_CO"],
+    "CR": ["es_CR"],
+    "CY": ["el_CY", "tr_CY"],
+    "CZ": ["cs_CZ"],
+    "DE": ["de_DE"],
+    "DK": ["da_DK"],
+    "DO": ["es_DO"],
+    "DZ": ["ar_DZ", "fr_DZ"],
+    "EC": ["es_EC"],
+    "EE": ["et_EE"],
+    "EG": ["ar_EG"],
+    "ES": ["es_ES"],
+    "ET": ["am_ET"],
+    "FI": ["fi_FI"],
+    "FR": ["fr_FR"],
+    "GB": ["en_GB"],
+    "GE": ["ka_GE"],
+    "GH": ["en_GH"],
+    "GR": ["el_GR"],
+    "GT": ["es_GT"],
+    "HK": ["zh_HK", "en_HK"],
+    "HN": ["es_HN"],
+    "HR": ["hr_HR"],
+    "HU": ["hu_HU"],
+    "ID": ["id_ID"],
+    "IE": ["en_IE", "ga_IE"],
+    "IL": ["he_IL", "ar_IL"],
+    "IN": ["hi_IN", "en_IN"],
+    "IS": ["is_IS"],
+    "IT": ["it_IT"],
+    "JM": ["en_JM"],
+    "JO": ["ar_JO"],
+    "JP": ["ja_JP"],
+    "KE": ["en_KE", "sw_KE"],
+    "KH": ["km_KH"],
+    "KR": ["ko_KR"],
+    "KZ": ["kk_KZ", "ru_KZ"],
+    "LB": ["ar_LB", "fr_LB"],
+    "LK": ["si_LK", "ta_LK"],
+    "LT": ["lt_LT"],
+    "LU": ["lb_LU", "fr_LU", "de_LU"],
+    "LV": ["lv_LV"],
+    "MA": ["ar_MA", "fr_MA"],
+    "MD": ["ro_MD", "ru_MD"],
+    "MM": ["my_MM"],
+    "MT": ["mt_MT", "en_MT"],
+    "MX": ["es_MX"],
+    "MY": ["ms_MY", "en_MY"],
+    "MZ": ["pt_MZ"],
+    "NG": ["en_NG"],
+    "NL": ["nl_NL"],
+    "NO": ["nb_NO", "nn_NO"],
+    "NP": ["ne_NP"],
+    "NZ": ["en_NZ"],
+    "PA": ["es_PA"],
+    "PE": ["es_PE"],
+    "PH": ["en_PH", "tl_PH"],
+    "PK": ["ur_PK", "en_PK"],
+    "PL": ["pl_PL"],
+    "PT": ["pt_PT"],
+    "PY": ["es_PY", "gn_PY"],
+    "RO": ["ro_RO"],
+    "RS": ["sr_RS"],
+    "RU": ["ru_RU"],
+    "RW": ["rw_RW", "en_RW", "fr_RW"],
+    "SA": ["ar_SA"],
+    "SE": ["sv_SE"],
+    "SG": ["en_SG", "zh_SG", "ms_SG", "ta_SG"],
+    "SI": ["sl_SI"],
+    "SK": ["sk_SK"],
+    "SN": ["fr_SN"],
+    "SV": ["es_SV"],
+    "TH": ["th_TH"],
+    "TN": ["ar_TN", "fr_TN"],
+    "TR": ["tr_TR"],
+    "TW": ["zh_TW"],
+    "TZ": ["sw_TZ", "en_TZ"],
+    "UA": ["uk_UA"],
+    "UG": ["en_UG", "sw_UG"],
+    "US": ["en_US"],
+    "UY": ["es_UY"],
+    "UZ": ["uz_UZ", "ru_UZ"],
+    "VN": ["vi_VN"],
+    "ZA": ["en_ZA", "af_ZA", "zu_ZA"],
+}
+
 COUNTRY_INFO: dict[str, tuple[str, str]] = {
     "AD": ("AND", "Andorra"),
     "AE": ("ARE", "United Arab Emirates"),
@@ -1731,6 +1837,18 @@ class LocaleGenerator:
             if normalized == self.country_code and len(code) == 3:
                 return code
         return self.country_code
+
+    def locale_code(self) -> str:
+        """Generate a locale code derived from this country.
+
+        Returns a standard locale identifier in ``language_COUNTRY`` format
+        (e.g., ``"en_US"``, ``"de_DE"``). For multilingual countries, one of
+        the country's official locale codes is selected at random.
+        """
+        codes = _COUNTRY_LOCALE_CODES.get(self.country_code, [f"en_{self.country_code}"])
+        if len(codes) == 1:
+            return codes[0]
+        return self.rng.choice(codes)
 
     def postcode(self) -> str:
         """Generate a random postal code (coherent with current location context)."""
