@@ -183,6 +183,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `name_full`: full name with optional prefix/suffix (e.g., "Dr. Ana Sousa", "Prof. Tanaka Yuki")
 - `first_name`: first name only
 - `last_name`: last name only
+- `gender`: person's gender (`"male"` or `"female"`), coherent with name fields
 - `email`: email address
 - `phone_number`: phone number in country-specific format
 

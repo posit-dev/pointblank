@@ -107,6 +107,7 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "name_full": generator.name_full,
         "first_name": generator.first_name,
         "last_name": generator.last_name,
+        "gender": generator.gender,
         "email": generator.email,
         "phone_number": generator.phone_number,
         "address": generator.address,
@@ -464,7 +465,15 @@ ADDRESS_RELATED_PRESETS = {
     "longitude",
     "license_plate",
 }
-PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
+PERSON_RELATED_PRESETS = {
+    "name",
+    "name_full",
+    "first_name",
+    "last_name",
+    "gender",
+    "email",
+    "user_name",
+}
 BUSINESS_RELATED_PRESETS = {"job", "company"}
 
 # Default working-age bounds applied when business coherence is active

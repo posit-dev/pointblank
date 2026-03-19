@@ -1262,6 +1262,16 @@ class LocaleGenerator:
         person = self._get_current_person()
         return person.get("last_name", "Smith")
 
+    def gender(self) -> str:
+        """Return the gender of the current person (coherent with other person fields).
+
+        Returns 'male' or 'female' based on the current person context. When used
+        alongside other person-related presets (first_name, last_name, email, etc.),
+        the gender will be coherent with those fields.
+        """
+        person = self._get_current_person()
+        return person.get("gender", "female")
+
     def name(self, gender: str | None = None) -> str:
         """Generate a simple full name (first + last, coherent with current person context).
 

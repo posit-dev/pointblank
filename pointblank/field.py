@@ -39,6 +39,7 @@ AVAILABLE_PRESETS = frozenset(
         "name_full",
         "first_name",
         "last_name",
+        "gender",
         "email",
         "phone_number",
         "address",
@@ -856,8 +857,9 @@ def string_field(
     for region-specific formatting (e.g., address formats, phone number patterns).
 
     **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
-    or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
-    `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
+    or suffix), `"first_name"`, `"last_name"`, `"gender"` (person's gender, coherent with
+    name), `"email"` (realistic email address), `"phone_number"`, `"address"` (full street
+    address), `"city"`, `"state"`, `"country"`,
     `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
     3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
 
@@ -892,7 +894,8 @@ def string_field(
     coherent across those columns within each row. Specifically:
 
     - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
-      `"email"`, `"user_name"`): the email and username will be derived from the person's name.
+      `"gender"`, `"email"`, `"user_name"`): the email and username will be derived from the
+      person's name, and `"gender"` will match the person's first name.
     - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
       `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
       correspond to the same location within the address.
