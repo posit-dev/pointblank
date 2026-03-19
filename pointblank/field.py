@@ -39,6 +39,7 @@ AVAILABLE_PRESETS = frozenset(
         "name_full",
         "first_name",
         "last_name",
+        "gender",
         "email",
         "phone_number",
         "address",
