@@ -2484,10 +2484,57 @@ class LocaleGenerator:
     # Financial
     # =========================================================================
 
+    # Credit card prefix caching for coherence between credit_card_number and
+    # credit_card_provider
+    _row_card_prefixes: list[str] | None = None
+
+    # Map card prefixes to provider names
+    _CARD_PREFIX_TO_PROVIDER: dict[str, str] = {
+        "4": "Visa",
+        "5": "Mastercard",
+        "37": "American Express",
+        "6011": "Discover",
+    }
+
+    # All supported card prefixes
+    _CARD_PREFIXES: list[str] = ["4", "5", "37", "6011"]
+
+    def init_row_card_prefixes(self, n_rows: int) -> None:
+        """Pre-generate card prefixes for multiple rows to ensure coherence.
+
+        When both credit_card_number and credit_card_provider are generated for each row,
+        this ensures they are consistent (e.g., a Visa card number and "Visa" provider).
+        """
+        self._row_card_prefixes = [self.rng.choice(self._CARD_PREFIXES) for _ in range(n_rows)]
+
+    def clear_row_card_prefixes(self) -> None:
+        """Clear pre-generated card prefixes."""
+        self._row_card_prefixes = None
+
+    def _get_current_card_prefix(self) -> str:
+        """Get the current card prefix, using row context if available.
+
+        When row-level coherence is active (both credit_card_number and credit_card_provider
+        in the schema), returns the pre-generated prefix for the current row.
+
+        When used standalone (without coherence), generates a fresh random prefix each call
+        so each row gets independent values.
+        """
+        # If row-level prefixes are active (coherence mode), use those
+        if self._row_card_prefixes is not None and self._current_row is not None:
+            return self._row_card_prefixes[self._current_row]
+
+        # Standalone mode: generate fresh prefix each call (no caching)
+        return self.rng.choice(self._CARD_PREFIXES)
+
     def credit_card_number(self) -> str:
-        """Generate a random credit card number (not valid for transactions)."""
-        # Generate a 16-digit number with valid Luhn checksum
-        prefix = self.rng.choice(["4", "5", "37", "6011"])  # Visa, MC, Amex, Discover
+        """Generate a random credit card number (not valid for transactions).
+
+        When used with credit_card_provider in the same schema, the card number
+        will be coherent with the provider (e.g., a Visa prefix for "Visa" provider).
+        """
+        # Use cached prefix for coherence with credit_card_provider
+        prefix = self._get_current_card_prefix()
         length = 15 if prefix == "37" else 16
 
         # Generate digits (minus check digit)
@@ -2500,6 +2547,17 @@ class LocaleGenerator:
         digits.append(str(check_digit))
 
         return "".join(digits)
+
+    def credit_card_provider(self) -> str:
+        """Return the credit card provider/network name.
+
+        Returns one of: "Visa", "Mastercard", "American Express", "Discover".
+
+        When used with credit_card_number in the same schema, the provider will be
+        coherent with the card number (e.g., "Visa" for a card starting with "4").
+        """
+        prefix = self._get_current_card_prefix()
+        return self._CARD_PREFIX_TO_PROVIDER[prefix]
 
     def _luhn_checksum(self, digits: list[str]) -> int:
         """Calculate Luhn check digit for a partial card number.

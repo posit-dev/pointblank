@@ -69,6 +69,7 @@ AVAILABLE_PRESETS = frozenset(
         "word",
         # Financial
         "credit_card_number",
+        "credit_card_provider",
         "iban",
         "currency_code",
         # Identifiers
@@ -869,7 +870,8 @@ def string_field(
 
     **Text:** `"text"` (paragraph of text), `"sentence"`, `"paragraph"`, `"word"`
 
-    **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
+    **Financial:** `"credit_card_number"`, `"credit_card_provider"` (Visa, Mastercard,
+    American Express, or Discover), `"iban"`, `"currency_code"`
 
     **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
     40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
@@ -899,6 +901,8 @@ def string_field(
     - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
       `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
       correspond to the same location within the address.
+    - **Credit card presets** (`"credit_card_number"`, `"credit_card_provider"`): the card
+      number prefix and provider name will be consistent (e.g., "Visa" with a "4"-prefixed number).
 
     This coherence is automatic and requires no additional configuration.
 
