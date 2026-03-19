@@ -1666,6 +1666,106 @@ class TestGeneratorValidation:
 
         assert validation.all_passed()
 
+    def test_credit_card_provider_returns_valid_providers(self):
+        """Ensure credit_card_provider returns valid card network names."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(columns=[("provider", string_field(preset="credit_card_provider"))])
+        df = generate_dataset(schema, n=100, seed=23, country="US")
+
+        valid_providers = {"Visa", "Mastercard", "American Express", "Discover"}
+
+        # Validate all providers are in the expected set
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns="provider")
+            .col_vals_in_set(columns="provider", set=valid_providers)
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+        # Verify we get a variety of providers (not all the same)
+        unique_providers = set(df["provider"].unique().to_list())
+        assert len(unique_providers) > 1, "Expected multiple different providers"
+
+    def test_credit_card_provider_and_number_coherence(self):
+        """Ensure credit_card_provider matches credit_card_number prefix."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("card_number", string_field(preset="credit_card_number")),
+                ("card_provider", string_field(preset="credit_card_provider")),
+            ]
+        )
+
+        df = generate_dataset(schema, n=100, seed=42, country="US")
+
+        # Map prefixes to expected providers
+        PREFIX_TO_PROVIDER = {
+            "4": "Visa",
+            "5": "Mastercard",
+            "37": "American Express",
+            "6011": "Discover",
+        }
+
+        # Verify coherence: each card number prefix should match its provider
+        for i, row in enumerate(df.iter_rows()):
+            card_number, provider = row
+
+            # Determine expected provider from card number prefix
+            if card_number.startswith("4"):
+                expected = "Visa"
+            elif card_number.startswith("5"):
+                expected = "Mastercard"
+            elif card_number.startswith("37"):
+                expected = "American Express"
+            elif card_number.startswith("6011"):
+                expected = "Discover"
+            else:
+                expected = None
+
+            assert provider == expected, (
+                f"Row {i}: card_number={card_number[:6]}... has provider={provider}, "
+                f"expected={expected}"
+            )
+
+    def test_credit_card_provider_standalone_varies(self):
+        """Ensure standalone credit_card_provider generates varied values."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        # Without credit_card_number, provider should still vary per row
+        schema = Schema(columns=[("provider", string_field(preset="credit_card_provider"))])
+        df = generate_dataset(schema, n=50, seed=42, country="US")
+
+        providers = df["provider"].to_list()
+
+        # Should not all be the same value
+        unique_count = len(set(providers))
+        assert unique_count > 1, "Standalone credit_card_provider should vary per row"
+
+    def test_credit_card_provider_reproducible_with_seed(self):
+        """Same seed produces same credit card providers."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("card_number", string_field(preset="credit_card_number")),
+                ("card_provider", string_field(preset="credit_card_provider")),
+            ]
+        )
+
+        df1 = generate_dataset(schema, n=20, seed=99, country="US")
+        df2 = generate_dataset(schema, n=20, seed=99, country="US")
+
+        assert df1["card_number"].to_list() == df2["card_number"].to_list()
+        assert df1["card_provider"].to_list() == df2["card_provider"].to_list()
+
 
 class TestUserAgentPreset:
     """Tests for the user_agent preset with country-specific browser weighting."""
