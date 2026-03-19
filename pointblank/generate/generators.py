@@ -137,6 +137,7 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "word": generator.word,
         # Financial
         "credit_card_number": generator.credit_card_number,
+        "credit_card_provider": generator.credit_card_provider,
         "iban": generator.iban,
         "currency_code": generator.currency_code,
         # Identifiers
@@ -475,6 +476,7 @@ PERSON_RELATED_PRESETS = {
     "user_name",
 }
 BUSINESS_RELATED_PRESETS = {"job", "company"}
+CREDIT_CARD_RELATED_PRESETS = {"credit_card_number", "credit_card_provider"}
 
 # Default working-age bounds applied when business coherence is active
 _WORKING_AGE_MIN = 22
@@ -484,14 +486,17 @@ _WORKING_AGE_MAX = 65
 _AGE_COLUMN_RE = re.compile(r"(?:^|_)age(?:$|_)", re.IGNORECASE)
 
 
-def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool]:
+def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool, bool]:
     """Check what coherence is needed for the given fields."""
     needs_address = False
     needs_person = False
     needs_business = False
+    needs_credit_card = False
 
     found_job = False
     found_company = False
+    found_card_number = False
+    found_card_provider = False
 
     for field in fields.values():
         preset = getattr(field, "preset", None)
@@ -503,12 +508,20 @@ def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool]:
             found_job = True
         if preset == "company":
             found_company = True
+        if preset == "credit_card_number":
+            found_card_number = True
+        if preset == "credit_card_provider":
+            found_card_provider = True
 
     # Business coherence only needed when BOTH job and company are present
     if found_job and found_company:
         needs_business = True
 
-    return needs_address, needs_person, needs_business
+    # Credit card coherence only needed when BOTH number and provider are present
+    if found_card_number and found_card_provider:
+        needs_credit_card = True
+
+    return needs_address, needs_person, needs_business, needs_credit_card
 
 
 def _generate_column_with_row_context(
@@ -587,8 +600,8 @@ def _generate_single_country(
 ) -> dict[str, list[Any]]:
     """Generate data for a single country (original code path)."""
     # Check what coherence is needed
-    needs_address, needs_person, needs_business = _get_coherence_needs(fields)
-    needs_coherence = needs_address or needs_person or needs_business
+    needs_address, needs_person, needs_business, needs_credit_card = _get_coherence_needs(fields)
+    needs_coherence = needs_address or needs_person or needs_business or needs_credit_card
 
     # Set up shared locale generator if any coherence is needed
     shared_locale_gen = None
@@ -604,6 +617,8 @@ def _generate_single_country(
             if not needs_address:
                 shared_locale_gen.init_row_locations(config.n)
             shared_locale_gen.init_row_employers(config.n)
+        if needs_credit_card:
+            shared_locale_gen.init_row_card_prefixes(config.n)
 
     # Determine which presets need row context
     coherent_presets = set()
@@ -613,6 +628,8 @@ def _generate_single_country(
         coherent_presets.update(PERSON_RELATED_PRESETS)
     if needs_business:
         coherent_presets.update(BUSINESS_RELATED_PRESETS)
+    if needs_credit_card:
+        coherent_presets.update(CREDIT_CARD_RELATED_PRESETS)
 
     # When business coherence is active, constrain age-like integer columns to
     # working-age range so generated data doesn't have 15-year-old professionals
@@ -652,6 +669,8 @@ def _generate_single_country(
             shared_locale_gen.clear_row_persons()
         if needs_business:
             shared_locale_gen.clear_row_employers()
+        if needs_credit_card:
+            shared_locale_gen.clear_row_card_prefixes()
 
     return data
 
