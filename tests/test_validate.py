@@ -99,6 +99,7 @@ from pointblank.validate import (
     get_action_metadata,
     get_column_count,
     get_data_path,
+    get_dataframe,
     get_row_count,
     get_validation_summary,
     global_config,
@@ -13894,6 +13895,10 @@ def test_get_step_report_schema_checks(schema):
         )
 
         assert isinstance(validation.get_step_report(i=1), GT.GT)
+
+def test_get_dataframe_tbl_type_messaging():
+
+
 
 
 def get_schema_info(

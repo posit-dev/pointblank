@@ -17801,7 +17801,7 @@ class Validate:
         Parameters
         ----------
         tbl_type :
-            The output backend for the dataframe. The named options are `"polars"`, `"pandas"`, and `"duckdb"`. Default is 'polars'.
+            The output backend for the dataframe. The named options are `"polars"`, `"pandas"`, and `"duckdb"`. Default is "polars".
 
         Supported DataFrame Types
         -------------------------
@@ -17851,7 +17851,7 @@ class Validate:
         names_dict = {
             "active": "active",
             "i": "step_number",
-            "assertion_type": "step_decription",
+            "assertion_type": "step_description",
             "column": "columns",
             "values": "values",
             "pre": "original_pre",
@@ -17913,7 +17913,7 @@ class Validate:
                 pl.DataFrame(data=final_report, schema=pl_schema)
                 .rename(names_dict)
                 .with_columns(
-                    brief=pl.coalesce("input_brief", "autobrief"),
+                    brief=pl.coalesce(pl.col("input_brief"), pl.col("autobrief")),
                     preprocessed=pl.when(pl.col("original_pre").is_not_null())
                     .then(pl.lit(True))
                     .otherwise(pl.lit(False)),
@@ -17927,18 +17927,23 @@ class Validate:
                     ),
                 )
                 .with_columns(
-                    pl.when(~pl.col("active")).then(pl.lit("-")).otherwise(pl.col(col)).alias(col)
-                    for col in [
-                        "step_evaluated",
-                        "units",
-                        "all_units_passed",
-                        "pass_n",
-                        "pass_pct",
-                        "failed_n",
-                        "failed_pct",
-                        "warning",
-                        "error",
-                        "critical",
+                    [
+                        pl.when(~pl.col("active"))
+                        .then(pl.lit("-"))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                        for col in [
+                            "step_evaluated",
+                            "units",
+                            "all_units_passed",
+                            "pass_n",
+                            "pass_pct",
+                            "failed_n",
+                            "failed_pct",
+                            "warning",
+                            "error",
+                            "critical",
+                        ]
                     ]
                 )
                 .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
@@ -18045,7 +18050,7 @@ class Validate:
             ]
 
             report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
-                {values: keys for keys, values in names_dict.items()}
+                {k: v for k, v in names_dict.items()}
             )
 
             conditional_cols = [
