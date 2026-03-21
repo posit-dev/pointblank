@@ -14093,9 +14093,12 @@ class Validate:
 
                     is_column_not_found = "column" in error_msg and "not found" in error_msg
 
+                    # Older Polars versions (< ~1.33) raise KeyError instead of
+                    # ColumnNotFoundError for missing columns in expressions, so we
+                    # need to catch both error shapes.
                     is_comparison_column_not_found = (
                         "unable to find column" in error_msg and "valid columns" in error_msg
-                    )
+                    ) or isinstance(e, KeyError)
 
                     if (
                         is_comparison_error or is_column_not_found or is_comparison_column_not_found
@@ -14127,12 +14130,16 @@ class Validate:
                         # Add a note for comparison column not found errors
                         elif is_comparison_column_not_found:
                             # Extract column name from error message
-                            # Error format: 'unable to find column "col_name"; valid columns: ...'
+                            # ColumnNotFoundError: 'unable to find column "col_name"; valid columns: ...'
+                            # KeyError (older Polars): "'col_name'"
                             match = re.search(r'unable to find column "([^"]+)"', str(e))
-
+                            missing_col_name = None
                             if match:
                                 missing_col_name = match.group(1)
+                            elif isinstance(e, KeyError) and e.args:
+                                missing_col_name = e.args[0]
 
+                            if missing_col_name is not None:
                                 # Determine position for between/outside validations
                                 position = None
                                 if assertion_type in ["col_vals_between", "col_vals_outside"]:
