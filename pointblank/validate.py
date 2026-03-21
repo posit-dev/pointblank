@@ -22,6 +22,7 @@ from zoneinfo import ZoneInfo
 
 import commonmark
 import narwhals as nw
+from narwhals.dependencies import is_narwhals_lazyframe
 from great_tables import GT, from_column, google_font, html, loc, md, style, vals
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
@@ -3260,7 +3261,7 @@ def _get_column_names_safe(data: Any) -> list[str]:
 
         df_nw = nw.from_native(data)
         # Use `collect_schema()` for LazyFrames to avoid performance warnings
-        if hasattr(df_nw, "collect_schema"):
+        if is_narwhals_lazyframe(df_nw):
             return list(df_nw.collect_schema().keys())
         else:
             return list(df_nw.columns)  # pragma: no cover
@@ -3462,7 +3463,7 @@ def get_column_count(data: Any) -> int:
 
         df_nw = nw.from_native(data)
         # Use `collect_schema()` for LazyFrames to avoid performance warnings
-        if hasattr(df_nw, "collect_schema"):
+        if is_narwhals_lazyframe(df_nw):
             return len(df_nw.collect_schema())
         else:
             return len(df_nw.columns)  # pragma: no cover
@@ -3673,12 +3674,14 @@ def get_row_count(data: Any) -> int:
     try:
         import narwhals as nw
 
-        df_nw = nw.from_native(data)
-        # Handle LazyFrames by collecting them first
-        if hasattr(df_nw, "collect"):
-            df_nw = df_nw.collect()
-        # Try different ways to get row count
-        if hasattr(df_nw, "shape"):
+        df_nw = nw.from_native(data, allow_series=False)
+
+        # For LazyFrames, use lazy aggregation to avoid materializing entire frame
+        if is_narwhals_lazyframe(df_nw):
+            # Use lazy len() aggregation instead of collecting entire frame
+            return df_nw.select(nw.len()).collect().item()
+        # Try different ways to get row count for eager frames
+        elif hasattr(df_nw, "shape"):
             return df_nw.shape[0]
         elif hasattr(df_nw, "height"):  # pragma: no cover
             return df_nw.height  # pragma: no cover
@@ -14028,8 +14031,8 @@ class Validate:
                         agg, comp = resolve_agg_registries(assertion_type)
 
                         # Produce a 1-column Narwhals DataFrame
-                        # TODO: Should be able to take lazy too
-                        vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
+                        # Note: lazy frames are materialized in agg() to compute aggregates
+                        vec = nw.from_native(data_tbl_step).select(column)
                         real = agg(vec)
 
                         raw_value = value["value"]
@@ -14043,9 +14046,7 @@ class Validate:
                                     "setting reference data on the Validate object. "
                                     "Use Validate(data=..., reference=...) to set reference data."
                                 )
-                            ref_vec: nw.DataFrame = nw.from_native(self.reference).select(
-                                raw_value.column_name
-                            )
+                            ref_vec = nw.from_native(self.reference).select(raw_value.column_name)
                             target: float | int = agg(ref_vec)
                         else:
                             target = raw_value
@@ -14092,9 +14093,12 @@ class Validate:
 
                     is_column_not_found = "column" in error_msg and "not found" in error_msg
 
+                    # Older Polars versions (< ~1.33) raise KeyError instead of
+                    # ColumnNotFoundError for missing columns in expressions, so we
+                    # need to catch both error shapes.
                     is_comparison_column_not_found = (
                         "unable to find column" in error_msg and "valid columns" in error_msg
-                    )
+                    ) or isinstance(e, KeyError)
 
                     if (
                         is_comparison_error or is_column_not_found or is_comparison_column_not_found
@@ -14126,12 +14130,16 @@ class Validate:
                         # Add a note for comparison column not found errors
                         elif is_comparison_column_not_found:
                             # Extract column name from error message
-                            # Error format: 'unable to find column "col_name"; valid columns: ...'
+                            # ColumnNotFoundError: 'unable to find column "col_name"; valid columns: ...'
+                            # KeyError (older Polars): "'col_name'"
                             match = re.search(r'unable to find column "([^"]+)"', str(e))
-
+                            missing_col_name = None
                             if match:
                                 missing_col_name = match.group(1)
+                            elif isinstance(e, KeyError) and e.args:
+                                missing_col_name = e.args[0]
 
+                            if missing_col_name is not None:
                                 # Determine position for between/outside validations
                                 position = None
                                 if assertion_type in ["col_vals_between", "col_vals_outside"]:
@@ -14540,7 +14548,7 @@ class Validate:
 
                 # Ensure that the extract is collected and set to its native format
                 # For LazyFrames (like PySpark), we need to collect before converting to native
-                if hasattr(validation_extract_nw, "collect"):
+                if is_narwhals_lazyframe(validation_extract_nw):
                     validation_extract_nw = validation_extract_nw.collect()
                 validation.extract = nw.to_native(validation_extract_nw)
 
@@ -17151,7 +17159,7 @@ class Validate:
             except TypeError:  # pragma: no cover
                 # For LazyFrames, collect() first to get length
                 n_rows = (
-                    len(extract_nw.collect()) if hasattr(extract_nw, "collect") else 0
+                    len(extract_nw.collect()) if is_narwhals_lazyframe(extract_nw) else 0
                 )  # pragma: no cover
 
             # If the number of rows is zero, then produce an em dash then go to the next iteration
@@ -17160,7 +17168,7 @@ class Validate:
                 continue
 
             # Write the CSV text (ensure LazyFrames are collected first)
-            if hasattr(extract_nw, "collect"):  # pragma: no cover
+            if is_narwhals_lazyframe(extract_nw):  # pragma: no cover
                 extract_nw = extract_nw.collect()
             csv_text = extract_nw.write_csv()
 

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import narwhals as nw
+from narwhals.dependencies import is_narwhals_lazyframe
 from narwhals.typing import IntoDataFrame
 
 __all__ = [
@@ -240,7 +241,7 @@ class ColumnSelectorNarwhals(Column):
         # Use the selector to select columns and return their names
         selected_df = dfn.select(self.exprs.exprs)  # type: ignore[attr-defined]
         # Use `collect_schema()` for LazyFrame to avoid performance warnings
-        if hasattr(selected_df, "collect_schema"):
+        if is_narwhals_lazyframe(selected_df):
             return list(selected_df.collect_schema().keys())
         else:  # pragma: no cover
             return list(selected_df.columns)

@@ -1,4 +1,5 @@
 import pytest
+from itertools import product
 
 from pointblank import Validate, ref
 import polars as pl
@@ -1139,3 +1140,43 @@ def test_agg_report_multiple_steps_formatting():
 
     # Step 3: Value with asymmetric tolerance
     assert "2.0<br/>tol=(0.1, 0.2)" in html
+
+
+@pytest.mark.parametrize(
+    ("data_eager", "ref_eager"),
+    list(product([True, False], repeat=2)),
+    ids=[
+        "data=eager,ref=eager",
+        "data=eager,ref=lazy",
+        "data=lazy,ref=eager",
+        "data=lazy,ref=lazy",
+    ],
+)
+def test_agg_with_reference_dataframe_types(
+    matching_data: pl.DataFrame,
+    reference_data: pl.DataFrame,
+    data_eager: bool,
+    ref_eager: bool,
+):
+    data = matching_data if data_eager else matching_data.lazy()
+    reference = reference_data if ref_eager else reference_data.lazy()
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a", ref("a"))
+        .col_sum_eq("b", ref("b"))
+        .col_avg_eq("a", ref("a"))
+        .col_avg_eq("b", ref("b"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")
+        .col_sum_eq("b")
+        .col_avg_eq("a")
+        .col_avg_eq("b")
+        .interrogate()
+    )
+    v.assert_passing()

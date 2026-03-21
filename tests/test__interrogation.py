@@ -1,3 +1,4 @@
+import pyexpat
 import pytest
 import pandas as pd
 import polars as pl
@@ -51,37 +52,32 @@ COLUMN_LIST_DISTINCT = ["col_1", "col_2", "col_3", "pb_is_good_"]
 
 
 def test_safe_modify_datetime_with_collect_schema():
-    """Test using collect_schema method."""
+    """Test _safe_modify_datetime_compare_val with a LazyFrame (collect_schema path)."""
+    import datetime
+    import narwhals as nw
 
-    # Create a mock dataframe with collect_schema
-    mock_df = Mock()
-    mock_schema = {"date_col": "datetime64[ns]"}
-    mock_df.collect_schema.return_value = mock_schema
+    df = nw.from_native(pl.DataFrame({"date_col": [datetime.date(2023, 6, 1)]})).lazy()
+    compare_val = datetime.datetime(2023, 1, 1, 12, 0, 0)
 
-    # Mock the _modify_datetime_compare_val function
-    with patch("pointblank._interrogation._modify_datetime_compare_val") as mock_modify:
-        mock_modify.return_value = "modified_value"
+    result = _safe_modify_datetime_compare_val(df, "date_col", compare_val)
 
-        result = _safe_modify_datetime_compare_val(mock_df, "date_col", "2023-01-01")
-
-        assert result == "modified_value"
-        mock_modify.assert_called_once()
+    # datetime should be coerced to date to match the column dtype
+    assert isinstance(result, datetime.date)
+    assert not isinstance(result, datetime.datetime)
 
 
 def test_safe_modify_datetime_with_schema_attribute():
-    """Test using schema attribute."""
+    """Test _safe_modify_datetime_compare_val with an eager DataFrame (schema path)."""
+    import datetime
+    import narwhals as nw
 
-    # Create a mock dataframe with schema attribute
-    mock_df = Mock()
-    del mock_df.collect_schema  # Remove collect_schema
-    mock_df.schema = {"date_col": "datetime64[ns]"}
+    df = nw.from_native(pl.DataFrame({"date_col": [datetime.date(2023, 6, 1)]}))
+    compare_val = datetime.datetime(2023, 1, 1, 12, 0, 0)
 
-    with patch("pointblank._interrogation._modify_datetime_compare_val") as mock_modify:
-        mock_modify.return_value = "modified_value"
+    result = _safe_modify_datetime_compare_val(df, "date_col", compare_val)
 
-        result = _safe_modify_datetime_compare_val(mock_df, "date_col", "2023-01-01")
-
-        assert result == "modified_value"
+    assert isinstance(result, datetime.date)
+    assert not isinstance(result, datetime.datetime)
 
 
 def test_safe_modify_datetime_fallback_sample_collect():
@@ -325,76 +321,118 @@ def test_modify_datetime_column_isinstance_check():
 
 
 def test_safe_is_nan_or_null_expr_with_schema_attribute():
-    """Test _safe_is_nan_or_null_expr() using schema attribute."""
+    """Test _safe_is_nan_or_null_expr with an eager DataFrame and float column."""
+    import narwhals as nw
 
-    # Create a mock dataframe with schema attribute
-    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
+    df = nw.from_native(pl.DataFrame({"float_col": [1.0, float("nan"), None]}))
+    col_expr = nw.col("float_col")
 
-    # Set up schema attribute with a float column
-    mock_df.schema = {"float_col": "Float64"}
+    result = _safe_is_nan_or_null_expr(df, col_expr, "float_col")
 
-    # Create a mock column expression
-    mock_col_expr = Mock()
-    mock_is_null = Mock()
-    mock_is_nan = Mock()
-    mock_col_expr.is_null.return_value = mock_is_null
-    mock_col_expr.is_nan.return_value = mock_is_nan
-
-    # Mock the OR operation
-    mock_is_null.__or__ = Mock(return_value="null_or_nan_check")
-
-    # Call the function
-    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "float_col")
-
-    # Should have called is_nan() for numeric type
-    assert result == "null_or_nan_check"
-    mock_col_expr.is_null.assert_called_once()
-    mock_col_expr.is_nan.assert_called_once()
+    evaluated = df.select(result).to_native()["float_col"].to_list()
+    assert evaluated == [False, True, True]
 
 
 def test_safe_is_nan_or_null_expr_schema_non_numeric():
-    """Test _safe_is_nan_or_null_expr() with schema attribute for non-numeric column."""
+    """String columns should only get null checks, not NaN checks."""
+    import narwhals as nw
 
-    # Create a mock dataframe with schema attribute (but not collect_schema)
-    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
+    df = nw.from_native(pl.DataFrame({"str_col": ["a", None, "b"]}))
+    col_expr = nw.col("str_col")
+    result = _safe_is_nan_or_null_expr(df, col_expr, "str_col")
 
-    # Set up schema attribute with a string column (non-numeric)
-    mock_df.schema = {"string_col": "String"}
-
-    # Create a mock column expression
-    mock_col_expr = Mock()
-    mock_is_null_result = "null_check"
-    mock_col_expr.is_null.return_value = mock_is_null_result
-
-    # Call the function
-    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "string_col")
-
-    # Should only check for null (not NaN) for string column
-    # The result is what is_null() returned (null_check = column_expr.is_null())
-    assert result == mock_is_null_result
-    mock_col_expr.is_null.assert_called_once()
-    # is_nan should not be called for string column
-    mock_col_expr.is_nan.assert_not_called()
+    evaluated = df.select(result).to_native()["str_col"].to_list()
+    assert evaluated == [False, True, False]
 
 
 def test_safe_is_nan_or_null_expr_schema_is_nan_fails():
-    """Test _safe_is_nan_or_null_expr() when is_nan() raises exception."""
+    """Test _safe_is_nan_or_null_expr falls back to null-only for string columns."""
+    import narwhals as nw
 
-    # Create a mock dataframe with schema attribute
-    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
-    mock_df.schema = {"float_col": "Float64"}
+    df = nw.from_native(pl.DataFrame({"str_col": ["a", None, "b"]}))
+    col_expr = nw.col("str_col")
 
-    # Create a mock column expression where is_nan() fails
-    mock_col_expr = Mock()
-    mock_is_null_result = "null_check_only"
-    mock_col_expr.is_null.return_value = mock_is_null_result
-    mock_col_expr.is_nan.side_effect = Exception("is_nan not supported")
+    result = _safe_is_nan_or_null_expr(df, col_expr, "str_col")
 
-    # Call the function
-    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "float_col")
+    evaluated = df.select(result).to_native()["str_col"].to_list()
+    assert evaluated == [False, True, False]
 
-    # Should fall back to null check only when is_nan() fails
-    # The result is what is_null() returned (since null_check = column_expr.is_null())
-    assert result == mock_is_null_result
-    mock_col_expr.is_null.assert_called_once()
-    mock_col_expr.is_nan.assert_called_once()
+
+def test_safe_is_nan_or_null_expr_lazy_polars():
+    """Works with a Polars LazyFrame."""
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"x": [1.0, float("nan"), None]}).lazy())
+    col_expr = nw.col("x")
+    result = _safe_is_nan_or_null_expr(df, col_expr, "x")
+
+    evaluated = df.select(result).collect().to_native()["x"].to_list()
+    assert evaluated == [False, True, True]
+
+
+def test_safe_is_nan_or_null_expr_eager_polars():
+    """Works with an eager Polars DataFrame."""
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"x": [1.0, float("nan"), None]}))
+    col_expr = nw.col("x")
+    result = _safe_is_nan_or_null_expr(df, col_expr, "x")
+
+    evaluated = df.select(result).to_native()["x"].to_list()
+    assert evaluated == [False, True, True]
+
+
+def test_safe_is_nan_or_null_expr_eager_pandas():
+    """Works with an eager Pandas DataFrame."""
+    import narwhals as nw
+
+    df = nw.from_native(pd.DataFrame({"x": [1.0, float("nan"), None]}))
+    col_expr = nw.col("x")
+    result = _safe_is_nan_or_null_expr(df, col_expr, "x")
+
+    evaluated = df.select(result).to_native()["x"].tolist()
+    assert evaluated == [False, True, True]
+
+
+def test_safe_is_nan_or_null_expr_ibis_sqlite():
+    """Works with an Ibis SQLite backend (should only do null checks)."""
+    import ibis
+    import narwhals as nw
+
+    con = ibis.sqlite.connect()
+    t = con.create_table("test", pd.DataFrame({"x": [1.0, None, 3.0]}))
+    nw_tbl = nw.from_native(t)
+    col_expr = nw.col("x")
+
+    result = _safe_is_nan_or_null_expr(nw_tbl, col_expr, "x")
+
+    evaluated = nw_tbl.select(result).to_native().to_pandas()["x"].tolist()
+    assert evaluated == [False, True, False]
+
+
+def test_safe_modify_datetime_lazy_polars():
+    """Works with a Polars LazyFrame."""
+    import datetime
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"d": [datetime.date(2023, 6, 1)]}).lazy())
+    result = _safe_modify_datetime_compare_val(df, "d", datetime.datetime(2023, 1, 1, 12, 0))
+
+    assert isinstance(result, datetime.date)
+    assert not isinstance(result, datetime.datetime)
+
+
+def test_safe_modify_datetime_eager_pandas():
+    """Works with an eager Pandas DataFrame."""
+    import datetime
+    import narwhals as nw
+
+    df = nw.from_native(pd.DataFrame({"d": [datetime.date(2023, 6, 1)]}))
+    result = _safe_modify_datetime_compare_val(df, "d", datetime.datetime(2023, 1, 1, 12, 0))
+
+    assert isinstance(result, datetime.date)
+    assert not isinstance(result, datetime.datetime)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])
