@@ -5,7 +5,7 @@ import string
 from re import U
 
 try:
-    import re._parser as sre_parse  # Python 3.11+
+    import re._parser as sre_parse  # type: ignore[import-untyped] # Python 3.11+
 except ImportError:
     from re import sre_parse  # type: ignore[attr-defined]
 

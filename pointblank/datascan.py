@@ -492,7 +492,7 @@ class DataScan:
 
         return json.dumps(prof_dict, indent=4, default=str)
 
-    def save_to_json(self, output_file: str):
+    def save_to_json(self, output_file: str) -> None:
         json_string: str = self.to_json()
         with open(output_file, "w") as f:
             json.dump(json_string, f, indent=4)

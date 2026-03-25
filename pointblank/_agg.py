@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import itertools
 from collections.abc import Callable
-from typing import Any
 
 import narwhals as nw
 
-# TODO: Should take any frame type
-Aggregator = Callable[[nw.DataFrame], float | int]
-Comparator = Callable[[Any, Any, Any], bool]
+Aggregator = Callable[[nw.DataFrame | nw.LazyFrame], float]
+Comparator = Callable[[float, float, float], bool]
 
 AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
 
@@ -29,18 +27,30 @@ def register(fn):
 
 ## Aggregator Functions
 @register
-def agg_sum(column: nw.DataFrame) -> float:
-    return column.select(nw.all().sum()).item()
+def agg_sum(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().sum())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    result = nw.to_py_scalar(result)
+    assert isinstance(result, (int, float)), "INTERNAL: Query scalar would not be numeric."
+    return result
 
 
 @register
-def agg_avg(column: nw.DataFrame) -> float:
-    return column.select(nw.all().mean()).item()
+def agg_avg(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().mean())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    result = nw.to_py_scalar(result)
+    assert isinstance(result, (int, float)), "INTERNAL: Query scalar would not be numeric."
+    return result
 
 
 @register
-def agg_sd(column: nw.DataFrame) -> float:
-    return column.select(nw.all().std()).item()
+def agg_sd(column: nw.DataFrame | nw.LazyFrame) -> float:
+    plan = column.select(nw.all().std())
+    result = plan.collect().item() if isinstance(plan, nw.LazyFrame) else plan.item()
+    result = nw.to_py_scalar(result)
+    assert isinstance(result, (int, float)), "INTERNAL: Query scalar would not be numeric."
+    return result
 
 
 ## Comparator functions:
@@ -57,7 +67,7 @@ def comp_gt(real: float, lower: float, upper: float) -> bool:
 
 
 @register
-def comp_ge(real: Any, lower: float, upper: float) -> bool:
+def comp_ge(real: float, lower: float, upper: float) -> bool:
     return bool(real >= lower)
 
 
@@ -71,7 +81,7 @@ def comp_le(real: float, lower: float, upper: float) -> bool:
     return bool(real <= upper)
 
 
-def _generic_between(real: Any, lower: Any, upper: Any) -> bool:
+def _generic_between(real: float, lower: float, upper: float) -> bool:
     """Call if comparator needs to check between two values."""
     return bool(lower <= real <= upper)
 

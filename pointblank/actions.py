@@ -387,7 +387,7 @@ def send_slack_notification(
 
         return None
 
-    def notify():  # pragma: no cover
+    def notify() -> None:  # pragma: no cover
         try:
             message = None
 

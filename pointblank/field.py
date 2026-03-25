@@ -39,6 +39,7 @@ AVAILABLE_PRESETS = frozenset(
         "name_full",
         "first_name",
         "last_name",
+        "gender",
         "email",
         "phone_number",
         "address",
@@ -68,6 +69,7 @@ AVAILABLE_PRESETS = frozenset(
         "word",
         # Financial
         "credit_card_number",
+        "credit_card_provider",
         "iban",
         "currency_code",
         # Identifiers
@@ -94,6 +96,7 @@ AVAILABLE_PRESETS = frozenset(
         "file_extension",
         "mime_type",
         "user_agent",
+        "locale_code",
     }
 )
 
@@ -133,7 +136,7 @@ class Field:
     # Custom generator
     generator: Callable[[], Any] | None = field(default=None, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate field constraints after initialization."""
         self._validate()
 
@@ -855,8 +858,9 @@ def string_field(
     for region-specific formatting (e.g., address formats, phone number patterns).
 
     **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
-    or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
-    `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
+    or suffix), `"first_name"`, `"last_name"`, `"gender"` (person's gender, coherent with
+    name), `"email"` (realistic email address), `"phone_number"`, `"address"` (full street
+    address), `"city"`, `"state"`, `"country"`,
     `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
     3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
 
@@ -866,7 +870,8 @@ def string_field(
 
     **Text:** `"text"` (paragraph of text), `"sentence"`, `"paragraph"`, `"word"`
 
-    **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
+    **Financial:** `"credit_card_number"`, `"credit_card_provider"` (Visa, Mastercard,
+    American Express, or Discover), `"iban"`, `"currency_code"`
 
     **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
     40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
@@ -881,7 +886,9 @@ def string_field(
     (up to 10 years back), `"time"`
 
     **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
-    `"user_agent"` (browser user agent string with country-specific browser weighting)
+    `"user_agent"` (browser user agent string with country-specific browser weighting),
+    `"locale_code"` (locale identifier like `"en_US"`, `"de_DE"`; multilingual countries
+    return a random official locale)
 
     Coherent Data Generation
     ------------------------
@@ -889,10 +896,13 @@ def string_field(
     coherent across those columns within each row. Specifically:
 
     - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
-      `"email"`, `"user_name"`): the email and username will be derived from the person's name.
+      `"gender"`, `"email"`, `"user_name"`): the email and username will be derived from the
+      person's name, and `"gender"` will match the person's first name.
     - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
       `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
       correspond to the same location within the address.
+    - **Credit card presets** (`"credit_card_number"`, `"credit_card_provider"`): the card
+      number prefix and provider name will be consistent (e.g., "Visa" with a "4"-prefixed number).
 
     This coherence is automatic and requires no additional configuration.
 

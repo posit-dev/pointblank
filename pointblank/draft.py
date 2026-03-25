@@ -228,7 +228,7 @@ class DraftValidation:
     verify_ssl: bool = True
     response: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # Check that the chatlas package is installed
         try:
             import chatlas  # noqa

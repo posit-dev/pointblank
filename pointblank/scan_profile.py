@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import narwhals as nw
 from narwhals.dataframe import DataFrame
+from narwhals.dependencies import is_narwhals_lazyframe
 
 from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
 from pointblank._utils import transpose_dicts
@@ -131,7 +132,7 @@ class ColumnProfile(_ColumnProfileABC):
 class _DateProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.DATE
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         res = data.rename({self.colname: "_col"}).select(_min=MinStat.expr, _max=MaxStat.expr)
 
         physical = _as_physical(res).to_dict()
@@ -168,7 +169,7 @@ class _BoolProfile(ColumnProfile):
 class _StringProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.STRING
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         str_data = data.select(nw.all().cast(nw.String).str.len_chars())
 
         # TODO: We should get an FreqStat here; estimate cardinality first
@@ -211,7 +212,7 @@ class _StringProfile(ColumnProfile):
 class _NumericProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.NUMERIC
 
-    def calc_stats(self, data: Frame):
+    def calc_stats(self, data: Frame) -> None:
         res = (
             data.rename({self.colname: "_col"})
             .select(
@@ -252,7 +253,7 @@ class _DataProfile:  # TODO: feels redundant and weird
         table_name: str | None,
         columns: list[str],
         implementation: nw.Implementation,
-    ):
+    ) -> None:
         self.table_name: str | None = table_name
         self.columns: list[str] = columns
         self.implementation = implementation
@@ -260,12 +261,10 @@ class _DataProfile:  # TODO: feels redundant and weird
 
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
-
-        slim = data.select(nw.col(self.columns[0]))
-
-        physical = _as_physical(slim)
-
-        self.row_count = len(physical)
+        if is_narwhals_lazyframe(data):
+            self.row_count = data.select(nw.len()).collect().item()  # ty: ignore
+        else:
+            self.row_count = len(data)
 
     def as_dataframe(self, *, strict: bool = True) -> DataFrame:
         assert self.column_profiles
