@@ -151,6 +151,7 @@ __all__ = [
     "missing_vals_tbl",
     "get_action_metadata",
     "get_column_count",
+    "get_dataframe",
     "get_data_path",
     "get_row_count",
     "get_validation_summary",
@@ -4157,6 +4158,7 @@ def connect_to_table(connection_string: str) -> Any:
                 available_tables = []
 
             conn.disconnect()
+            conn.close()
 
             # Create helpful error message
             if available_tables:
@@ -18049,11 +18051,13 @@ class Validate:
                 for values in final_report["values"]
             ]
 
+            # Pick up here
             report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
                 {k: v for k, v in names_dict.items()}
             )
 
             conditional_cols = [
+                "step_number",
                 "step_evaluated",
                 "units",
                 "all_units_passed",

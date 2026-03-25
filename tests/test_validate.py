@@ -99,7 +99,6 @@ from pointblank.validate import (
     get_action_metadata,
     get_column_count,
     get_data_path,
-    get_dataframe,
     get_row_count,
     get_validation_summary,
     global_config,
@@ -4527,6 +4526,7 @@ def test_nan_none_null_handling_ibis_sqlite():
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("test_data", ibis_table, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Test using connection string (this triggers our backend detection logic)
         table_ref = f"sqlite:///{temp_db_path}::test_data"
@@ -12676,6 +12676,7 @@ def test_print_database_tables_names_returned():
         conn.create_table("supercooltable_2", tbl_ibis, overwrite=True)
         conn.create_table("supercooltable_3", tbl_ibis, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Test the actual function without mocking
         # Use single slash for Windows absolute paths
@@ -12811,6 +12812,7 @@ def test_print_database_tables_filters_memtables():
 
         # Close the connection
         conn.disconnect()
+        conn.close()
 
         connection_string = f"duckdb://{temp_db_path}"
         table_names = print_database_tables(connection_string)
@@ -12860,6 +12862,7 @@ def test_connect_to_table_success():
         tbl_ibis = ibis.memtable(df_test.to_pandas())
         conn.create_table("test_table", tbl_ibis, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Connect to the table
         connection_string = f"duckdb://{temp_db_path}::test_table"
@@ -13046,6 +13049,7 @@ def test_connection_string_duckdb_in_memory():
         conn.create_table("test_users", ibis_table, overwrite=True)
         conn.create_table("test_scores", ibis_table, overwrite=True)  # Second table for testing
         conn.disconnect()
+        conn.close()
 
         # Test 1: Connection string with table specification should work
         validation = (
@@ -13099,6 +13103,7 @@ def test_connection_string_sqlite_in_memory():
         conn.create_table("orders", ibis_table, overwrite=True)
         conn.create_table("customers", ibis_table, overwrite=True)  # Second table for testing
         conn.disconnect()
+        conn.close()
 
         # Test 1: Connection string with table specification should work
         validation = (
@@ -13141,6 +13146,7 @@ def test_connection_string_no_table_specified_error():
         conn.create_table("table_b", ibis_table, overwrite=True)
         conn.create_table("users", ibis_table, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Test: Connection string without table specification should error with helpful message
         with pytest.raises(ValueError) as exc_info:
@@ -13182,6 +13188,7 @@ def test_connection_string_no_tables_in_database():
 
     # Clean up
     conn.disconnect()
+    conn.close()
 
 
 def test_connection_string_invalid_table_name():
@@ -13202,6 +13209,7 @@ def test_connection_string_invalid_table_name():
 
     # Clean up
     conn.disconnect()
+    conn.close()
 
 
 def test_connection_string_backend_specific_error_guidance():
@@ -13284,6 +13292,7 @@ def test_connection_string_temporary_file_database():
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("products", ibis_table, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Test connection string with file path
         connection_string = f"sqlite:///{temp_db_path}::products"
@@ -13348,6 +13357,7 @@ def test_connection_string_integration_with_validation_methods():
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("comprehensive_test", ibis_table, overwrite=True)
         conn.disconnect()
+        conn.close()
 
         # Test comprehensive validation using connection string
         validation = (
@@ -13896,10 +13906,43 @@ def test_get_step_report_schema_checks(schema):
 
         assert isinstance(validation.get_step_report(i=1), GT.GT)
 
-def test_get_dataframe_tbl_type_messaging():
+
+def test_get_dataframe_wrong_tbl_type_messaging():
+    tbl = pl.DataFrame({"name": ["Monica", "Erica", "Rita", "Tina"], "mambo_no": [2, 3, 4, 5]})
+
+    validation = Validate(data=tbl).col_vals_gt(columns="mambo_no", value=5).interrogate()
+
+    with pytest.raises(ValueError, match="The DataFrame type `polar` is not valid. Choose one of"):
+        validation.get_dataframe("polar")
 
 
+@pytest.mark.parametrize(
+    "library, tbl_type", [("Polars", "polars"), ("Pandas", "pandas"), ("Ibis", "duckdb")]
+)
+def test_get_dataframe_missing_libraries(library, tbl_type):
 
+    validation = Validate(data="small_table")
+
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = False  # library not present
+
+        with pytest.raises(ImportError, match=f"The {library} library is not installed"):
+            validation.get_dataframe(tbl_type)
+
+def test_get_dataframe_returns_polars_df():
+    validation = Validate(data="small_table")
+    df_polars = validation.get_dataframe("polars")
+    assert isinstance(df_polars, pl.DataFrame)
+
+def test_get_dataframe_returns_pandas_df():
+    validation = Validate(data="small_table")
+    df_pandas = validation.get_dataframe("pandas")
+    assert isinstance(df_pandas, pd.DataFrame)
+
+def test_get_dataframe_returns_duckdb_df():
+    validation = Validate(data="small_table")
+    df_duckdb = validation.get_dataframe("duckdb")
+    assert isinstance(df_duckdb, pd.DataFrame)
 
 def get_schema_info(
     data_tbl,
