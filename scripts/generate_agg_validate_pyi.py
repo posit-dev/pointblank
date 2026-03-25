@@ -1,7 +1,9 @@
+import ast
 import inspect
 import itertools
 import subprocess
 import sys
+import textwrap
 from pathlib import Path
 
 from pointblank._agg import AGGREGATOR_REGISTRY, COMPARATOR_REGISTRY, is_valid_agg
@@ -14,6 +16,32 @@ from tests.test_agg_doctests import _TEST_FUNCTION_REGISTRY
 
 VALIDATE_PYI_PATH = Path("pointblank/validate.pyi")
 
+
+def _extract_body(func) -> str:
+    """Extract method body from doctest function using AST parsing.
+
+    Reliably finds the first non-docstring statement and returns the
+    remaining function body as source code.
+    """
+    source = textwrap.dedent(inspect.getsource(func))
+    tree = ast.parse(source)
+    func_def = tree.body[0]
+    stmts = func_def.body  # ty: ignore
+
+    # Skip leading docstring if present
+    if stmts and isinstance(stmts[0], ast.Expr) and isinstance(stmts[0].value, ast.Constant):
+        stmts = stmts[1:]
+
+    if not stmts:
+        raise ValueError(f"No body found in {func.__name__}")
+
+    source_lines = source.splitlines()
+    first_line = stmts[0].lineno - 1  # ast line numbers are 1-indexed
+    last_line = func_def.end_lineno  # inclusive
+
+    return "\n".join(line.strip() for line in source_lines[first_line:last_line])
+
+
 SIGNATURE = """
         self,
         columns: _PBUnresolvedColumn,
@@ -22,7 +50,7 @@ SIGNATURE = """
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
 """
 
 DOCSTRING = """
@@ -53,32 +81,47 @@ from pointblank.column import Column, ReferenceColumn
 from pointblank._typing import Tolerance
 """
 
-# Write the headers to the end. Ruff will take care of sorting imports.
+# ensure all methods have tests before generating
+all_methods = [
+    f"col_{agg}_{comp}"
+    for agg, comp in itertools.product(AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys())
+]
+
+missing_tests = [m for m in all_methods if m not in _TEST_FUNCTION_REGISTRY]
+if missing_tests:
+    raise SystemExit(f"Missing doctest entries for: {missing_tests}")
+
+# all method names should be valid aggregator methods; sanity check
+invalid = [m for m in all_methods if not is_valid_agg(m)]
+if invalid:
+    raise SystemExit(f"Invalid agg method names: {invalid}")
+
+# Read the file and remove any previously generated sections
 with VALIDATE_PYI_PATH.open() as f:
     content = f.read()
-with VALIDATE_PYI_PATH.open("w") as f:
-    f.write(IMPORT_HEADER + "\n\n" + content)
+
+# Remove the GENERATED section if it exists (but keep everything before it)
+if "# === GENERATED START ===" in content:
+    content = content[: content.find("# === GENERATED START ===")].rstrip()
+else:
+    content = content.rstrip()
+
+# Ensure content ends with newline before appending generated section
+content += "\n"
 
 ## Create grid of aggs and comparators
-with VALIDATE_PYI_PATH.open("a") as f:
+with VALIDATE_PYI_PATH.open("w") as f:
+    f.write(content)
     f.write("    # === GENERATED START ===\n")
 
     for agg_name, comp_name in itertools.product(
         AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys()
     ):
         method = f"col_{agg_name}_{comp_name}"
-        assert is_valid_agg(method)  # internal sanity check
 
-        # Extract examples from the doctest registry.
+        # Extract examples from the doctest registry using robust AST parsing
         doctest_fn = _TEST_FUNCTION_REGISTRY[method]
-        try:
-            lines_to_skip = len(doctest_fn.__doc__.split("\n"))
-        except AttributeError:
-            lines_to_skip = 0
-
-        lines: list[str] = inspect.getsourcelines(doctest_fn)[0]
-        cleaned_lines: list[str] = [line.strip() for line in lines]
-        body: str = "\n".join(cleaned_lines[lines_to_skip + 2 :])
+        body: str = _extract_body(doctest_fn)
 
         # Add >>> to each line in the body so doctest can run it
         body_with_arrows: str = "\n".join(f"\t>>> {line}" for line in body.split("\n"))
@@ -100,6 +143,5 @@ with VALIDATE_PYI_PATH.open("a") as f:
 
     f.write("    # === GENERATED END ===\n")
 
-## Run formatter and linter on the generated file:
+## Run formatter on the generated file:
 subprocess.run(["uv", "run", "ruff", "format", str(VALIDATE_PYI_PATH)])
-subprocess.run(["uv", "run", "ty", "check", str(VALIDATE_PYI_PATH)])
