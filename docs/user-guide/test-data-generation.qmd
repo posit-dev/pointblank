@@ -183,6 +183,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `name_full`: full name with optional prefix/suffix (e.g., "Dr. Ana Sousa", "Prof. Tanaka Yuki")
 - `first_name`: first name only
 - `last_name`: last name only
+- `gender`: person's gender (`"male"` or `"female"`), coherent with name fields
 - `email`: email address
 - `phone_number`: phone number in country-specific format
 
@@ -216,6 +217,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 **Financial Data:**
 
 - `credit_card_number`: credit card number
+- `credit_card_provider`: card network name (Visa, Mastercard, American Express, or Discover); coherent with `credit_card_number`
 - `iban`: International Bank Account Number
 - `currency_code`: currency code (USD, EUR, etc.)
 
@@ -257,6 +259,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `file_extension`: file extension
 - `mime_type`: MIME type
 - `user_agent`: browser user agent string (country-weighted)
+- `locale_code`: locale identifier (e.g., `"en_US"`, `"de_DE"`; multilingual countries return a random official locale)
 
 ## Profile Fields
 

@@ -952,6 +952,78 @@ class TestCountrySupport:
 
         assert validation.all_passed()
 
+    def test_locale_code_preset_single_language_countries(self):
+        """Test locale_code preset returns correct codes for single-language countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        expected = {
+            "US": ["en_US"],
+            "DE": ["de_DE"],
+            "FR": ["fr_FR"],
+            "JP": ["ja_JP"],
+            "BR": ["pt_BR"],
+            "PL": ["pl_PL"],
+            "IT": ["it_IT"],
+            "KR": ["ko_KR"],
+        }
+
+        for country, codes in expected.items():
+            df = generate_dataset(schema, n=5, seed=23, country=country)
+
+            validation = (
+                Validate(df)
+                .col_vals_not_null(columns="locale_code")
+                .col_vals_in_set(columns="locale_code", set=codes)
+                .interrogate()
+            )
+
+            assert validation.all_passed(), f"Failed for country {country}"
+
+    def test_locale_code_preset_multilingual_countries(self):
+        """Test locale_code preset returns valid codes for multilingual countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        multilingual = {
+            "BE": ["nl_BE", "fr_BE", "de_BE"],
+            "CH": ["de_CH", "fr_CH", "it_CH"],
+            "CA": ["en_CA", "fr_CA"],
+            "SG": ["en_SG", "zh_SG", "ms_SG", "ta_SG"],
+            "ZA": ["en_ZA", "af_ZA", "zu_ZA"],
+        }
+
+        for country, valid_codes in multilingual.items():
+            df = generate_dataset(schema, n=50, seed=23, country=country)
+
+            validation = (
+                Validate(df)
+                .col_vals_not_null(columns="locale_code")
+                .col_vals_in_set(columns="locale_code", set=valid_codes)
+                .interrogate()
+            )
+
+            assert validation.all_passed(), f"Failed for country {country}"
+
+    def test_locale_code_preset_format(self):
+        """Test locale_code values match the expected xx_XX pattern."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(locale_code=string_field(preset="locale_code"))
+
+        for country in ["US", "DE", "CH", "JP", "IN"]:
+            df = generate_dataset(schema, n=10, seed=23, country=country)
+            for val in df["locale_code"].to_list():
+                parts = val.split("_")
+                assert len(parts) == 2, f"Bad format: {val}"
+                assert parts[0].islower(), f"Language part not lowercase: {val}"
+                assert parts[1].isupper(), f"Country part not uppercase: {val}"
+
     def test_business_presets_across_countries(self):
         """Test business data presets work across multiple countries."""
         pytest.importorskip("polars")
@@ -1406,20 +1478,23 @@ class TestCountrySupport:
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
+        from pointblank.countries import LocaleGenerator
 
-        # Known exonym mappings: exonym -> native name
-        # Cities where the city() preset returns English name but address uses native
-        EXONYM_TO_NATIVE = {
-            "Brussels": "Bruxelles",
-            "Copenhagen": "København",
-            "Gothenburg": "Göteborg",
-            "Istanbul": "İstanbul",
-            "Izmir": "İzmir",
-            "Krakow": "Kraków",
-            "Lisbon": "Lisboa",
-            "Vienna": "Wien",
-            "Warsaw": "Warszawa",
-        }
+        # Build exonym -> native mapping dynamically from locale data
+        EXONYM_TO_NATIVE = {}
+        for cc in COUNTRIES_WITH_FULL_DATA:
+            gen = LocaleGenerator(country=cc, seed=1)
+            raw_locations = gen._data.address.get("locations", {})
+            locs = []
+            if isinstance(raw_locations, dict):
+                for tier_locs in raw_locations.values():
+                    if isinstance(tier_locs, list):
+                        locs.extend(tier_locs)
+            elif isinstance(raw_locations, list):
+                locs = raw_locations
+            for loc in locs:
+                if isinstance(loc, dict) and "exonym" in loc:
+                    EXONYM_TO_NATIVE[loc["exonym"]] = loc["city"]
 
         schema = Schema(
             columns=[
@@ -1452,6 +1527,23 @@ class TestCountrySupport:
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
+        from pointblank.countries import LocaleGenerator
+
+        # Build exonym -> native mapping dynamically from locale data
+        EXONYM_TO_NATIVE = {}
+        for cc in COUNTRIES_WITH_FULL_DATA:
+            gen = LocaleGenerator(country=cc, seed=1)
+            raw_locations = gen._data.address.get("locations", {})
+            locs = []
+            if isinstance(raw_locations, dict):
+                for tier_locs in raw_locations.values():
+                    if isinstance(tier_locs, list):
+                        locs.extend(tier_locs)
+            elif isinstance(raw_locations, list):
+                locs = raw_locations
+            for loc in locs:
+                if isinstance(loc, dict) and "exonym" in loc:
+                    EXONYM_TO_NATIVE[loc["exonym"]] = loc["city"]
 
         schema = Schema(
             columns=[
@@ -1474,8 +1566,12 @@ class TestCountrySupport:
             for i, row in enumerate(df.iter_rows()):
                 address, city, state = row
 
-                if city not in address:
-                    mismatches.append(f"Row {i}: city='{city}' not in address='{address}'")
+                # For cities with exonyms, check the native name instead
+                native_name = EXONYM_TO_NATIVE.get(city, city)
+                if native_name not in address:
+                    mismatches.append(
+                        f"Row {i}: city='{city}' (native='{native_name}') not in address='{address}'"
+                    )
 
             assert len(mismatches) == 0
 
@@ -1569,6 +1665,106 @@ class TestGeneratorValidation:
         )
 
         assert validation.all_passed()
+
+    def test_credit_card_provider_returns_valid_providers(self):
+        """Ensure credit_card_provider returns valid card network names."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(columns=[("provider", string_field(preset="credit_card_provider"))])
+        df = generate_dataset(schema, n=100, seed=23, country="US")
+
+        valid_providers = {"Visa", "Mastercard", "American Express", "Discover"}
+
+        # Validate all providers are in the expected set
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns="provider")
+            .col_vals_in_set(columns="provider", set=valid_providers)
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+        # Verify we get a variety of providers (not all the same)
+        unique_providers = set(df["provider"].unique().to_list())
+        assert len(unique_providers) > 1, "Expected multiple different providers"
+
+    def test_credit_card_provider_and_number_coherence(self):
+        """Ensure credit_card_provider matches credit_card_number prefix."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("card_number", string_field(preset="credit_card_number")),
+                ("card_provider", string_field(preset="credit_card_provider")),
+            ]
+        )
+
+        df = generate_dataset(schema, n=100, seed=42, country="US")
+
+        # Map prefixes to expected providers
+        PREFIX_TO_PROVIDER = {
+            "4": "Visa",
+            "5": "Mastercard",
+            "37": "American Express",
+            "6011": "Discover",
+        }
+
+        # Verify coherence: each card number prefix should match its provider
+        for i, row in enumerate(df.iter_rows()):
+            card_number, provider = row
+
+            # Determine expected provider from card number prefix
+            if card_number.startswith("4"):
+                expected = "Visa"
+            elif card_number.startswith("5"):
+                expected = "Mastercard"
+            elif card_number.startswith("37"):
+                expected = "American Express"
+            elif card_number.startswith("6011"):
+                expected = "Discover"
+            else:
+                expected = None
+
+            assert provider == expected, (
+                f"Row {i}: card_number={card_number[:6]}... has provider={provider}, "
+                f"expected={expected}"
+            )
+
+    def test_credit_card_provider_standalone_varies(self):
+        """Ensure standalone credit_card_provider generates varied values."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        # Without credit_card_number, provider should still vary per row
+        schema = Schema(columns=[("provider", string_field(preset="credit_card_provider"))])
+        df = generate_dataset(schema, n=50, seed=42, country="US")
+
+        providers = df["provider"].to_list()
+
+        # Should not all be the same value
+        unique_count = len(set(providers))
+        assert unique_count > 1, "Standalone credit_card_provider should vary per row"
+
+    def test_credit_card_provider_reproducible_with_seed(self):
+        """Same seed produces same credit card providers."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("card_number", string_field(preset="credit_card_number")),
+                ("card_provider", string_field(preset="credit_card_provider")),
+            ]
+        )
+
+        df1 = generate_dataset(schema, n=20, seed=99, country="US")
+        df2 = generate_dataset(schema, n=20, seed=99, country="US")
+
+        assert df1["card_number"].to_list() == df2["card_number"].to_list()
+        assert df1["card_provider"].to_list() == df2["card_provider"].to_list()
 
 
 class TestUserAgentPreset:

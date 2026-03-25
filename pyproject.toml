@@ -74,7 +74,7 @@ docs = [
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
     "quartodoc>=0.8.1; python_version >= '3.9'",
-    "griffe>=0.38.1,<2",                          # Pin below griffe 2.0 which removed parse_numpy(options)
+    "griffe>=0.38.1,<2",                         # Pin below griffe 2.0 which removed parse_numpy(options)
     "pandas>=2.2.3",
     "polars>=1.17.1",
     "pyspark==3.5.6",
@@ -112,7 +112,7 @@ dev = [
     "openpyxl>=3.0.0",
     "mcp[cli]>=1.10.1",
     "fastmcp>=2.10.5",
-    "ty>=0.0.1a31",
+    "ty>=0.0.23",
     "mypy>=1.19.0",
     "tox-uv>=1.33.4",
     "tox>=4.49.1",

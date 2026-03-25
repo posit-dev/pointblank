@@ -61,7 +61,8 @@
         "lat_min": 33.88,
         "lat_max": 33.9,
         "lon_min": 10.09,
-        "lon_max": 10.11
+        "lon_max": 10.11,
+        "exonym": "Gabes"
       },
       {
         "city": "Ariana",
@@ -123,7 +124,8 @@
         "lat_min": 33.34,
         "lat_max": 33.36,
         "lon_min": 10.49,
-        "lon_max": 10.51
+        "lon_max": 10.51,
+        "exonym": "Medenine"
       },
       {
         "city": "Kasserine",
@@ -153,7 +155,8 @@
         "lat_min": 36.72,
         "lat_max": 36.74,
         "lon_min": 9.18,
-        "lon_max": 9.2
+        "lon_max": 9.2,
+        "exonym": "Beja"
       },
       {
         "city": "Jendouba",
@@ -275,7 +278,8 @@
         "lat_min": 33.7,
         "lat_max": 33.72,
         "lon_min": 8.96,
-        "lon_max": 8.98
+        "lon_max": 8.98,
+        "exonym": "Kebili"
       },
       {
         "city": "Manouba",
@@ -311,261 +315,363 @@
   },
   "streets_by_city": {
     "Tunis": [
-      "Avenue Habib Bourguiba", "Avenue de France", "Rue de Marseille",
-      "Avenue Mohamed V", "Rue Charles de Gaulle",
-      "Avenue de la Liberté", "Rue de Rome", "Avenue de Paris",
-      "Rue d'Angleterre", "Boulevard du 9 Avril 1938",
-      "Rue Al Jazira", "Avenue Farhat Hached",
-      "Rue de Hollande", "Boulevard Bab Bnet",
-      "Avenue de Carthage", "Rue d'Espagne",
-      "Boulevard du 7 Novembre", "Rue Ibn Khaldoun",
-      "Avenue de la République", "Rue de Yougoslavie",
-      "Boulevard Bab Menara", "Rue de Grèce",
-      "Avenue Hédi Chaker", "Rue du Pacha",
-      "Avenue Habib Thameur", "Rue de Turquie",
-      "Boulevard Mohamed Bouazizi", "Rue Pierre de Coubertin",
-      "Avenue Slimane Ben Slimane", "Rue de Palestine",
-      "Avenue Mongi Slim", "Rue de Kairouan",
-      "Boulevard du 14 Janvier", "Rue El Moez",
-      "Avenue de l'Environnement", "Rue Zitouna",
-      "Boulevard de la Terre", "Rue Sidi Ben Arous",
-      "Avenue du Japon", "Rue de la Commission"
+      "Avenue Habib Bourguiba",
+      "Avenue de France",
+      "Rue de Marseille",
+      "Avenue Mohamed V",
+      "Rue Charles de Gaulle",
+      "Avenue de la Liberté",
+      "Rue de Rome",
+      "Avenue de Paris",
+      "Rue d'Angleterre",
+      "Boulevard du 9 Avril 1938",
+      "Rue Al Jazira",
+      "Avenue Farhat Hached",
+      "Rue de Hollande",
+      "Boulevard Bab Bnet",
+      "Avenue de Carthage",
+      "Rue d'Espagne",
+      "Boulevard du 7 Novembre",
+      "Rue Ibn Khaldoun",
+      "Avenue de la République",
+      "Rue de Yougoslavie",
+      "Boulevard Bab Menara",
+      "Rue de Grèce",
+      "Avenue Hédi Chaker",
+      "Rue du Pacha",
+      "Avenue Habib Thameur",
+      "Rue de Turquie",
+      "Boulevard Mohamed Bouazizi",
+      "Rue Pierre de Coubertin",
+      "Avenue Slimane Ben Slimane",
+      "Rue de Palestine",
+      "Avenue Mongi Slim",
+      "Rue de Kairouan",
+      "Boulevard du 14 Janvier",
+      "Rue El Moez",
+      "Avenue de l'Environnement",
+      "Rue Zitouna",
+      "Boulevard de la Terre",
+      "Rue Sidi Ben Arous",
+      "Avenue du Japon",
+      "Rue de la Commission"
     ],
     "Sfax": [
-      "Avenue Habib Bourguiba", "Avenue Hedi Chaker",
-      "Rue de la République", "Avenue Ali Belhouane",
-      "Boulevard du Commandant Bejaoui", "Rue de Tunis",
-      "Avenue Majida Boulila", "Rue de Bizerte",
-      "Boulevard de l'Environnement", "Rue Mongi Slim",
-      "Avenue des Martyrs", "Rue du Commerce",
-      "Boulevard du 2 Mars", "Rue de Kairouan",
-      "Avenue Farhat Hached", "Rue des Notaires",
-      "Boulevard de Palestine", "Rue de l'Hôpital",
-      "Avenue Taieb Mehiri", "Rue des Aghlabides",
-      "Boulevard de Tripoli", "Rue Alexandre Dumas",
-      "Avenue du 18 Janvier", "Rue du Port",
-      "Boulevard Majida Boulila", "Rue de Sousse",
-      "Avenue Ali Bach Hamba", "Rue de Gabès",
-      "Boulevard du 14 Janvier", "Rue des Oliviers",
-      "Avenue de l'Armée", "Rue Abou El Kacem Chebbi",
-      "Boulevard du 5 Août", "Rue de Monastir",
-      "Avenue de la Médina", "Rue du Bey",
-      "Boulevard Libya", "Rue de l'Indépendance",
-      "Avenue de Carthage", "Rue de la Kasbah"
+      "Avenue Habib Bourguiba",
+      "Avenue Hedi Chaker",
+      "Rue de la République",
+      "Avenue Ali Belhouane",
+      "Boulevard du Commandant Bejaoui",
+      "Rue de Tunis",
+      "Avenue Majida Boulila",
+      "Rue de Bizerte",
+      "Boulevard de l'Environnement",
+      "Rue Mongi Slim",
+      "Avenue des Martyrs",
+      "Rue du Commerce",
+      "Boulevard du 2 Mars",
+      "Rue de Kairouan",
+      "Avenue Farhat Hached",
+      "Rue des Notaires",
+      "Boulevard de Palestine",
+      "Rue de l'Hôpital",
+      "Avenue Taieb Mehiri",
+      "Rue des Aghlabides",
+      "Boulevard de Tripoli",
+      "Rue Alexandre Dumas",
+      "Avenue du 18 Janvier",
+      "Rue du Port",
+      "Boulevard Majida Boulila",
+      "Rue de Sousse",
+      "Avenue Ali Bach Hamba",
+      "Rue de Gabès",
+      "Boulevard du 14 Janvier",
+      "Rue des Oliviers",
+      "Avenue de l'Armée",
+      "Rue Abou El Kacem Chebbi",
+      "Boulevard du 5 Août",
+      "Rue de Monastir",
+      "Avenue de la Médina",
+      "Rue du Bey",
+      "Boulevard Libya",
+      "Rue de l'Indépendance",
+      "Avenue de Carthage",
+      "Rue de la Kasbah"
     ],
     "Sousse": [
-      "Avenue Habib Bourguiba", "Boulevard du 14 Janvier",
-      "Rue de France", "Avenue de la République",
-      "Boulevard Yahia Ibn Omar", "Rue des Remparts",
-      "Avenue Mohamed Maarouf", "Rue de Paris",
-      "Boulevard du 7 Novembre", "Rue du Commandant Bejaoui",
-      "Avenue Farhat Hached", "Rue de la Grande Mosquée",
-      "Boulevard de la Corniche", "Rue de Kairouan",
-      "Avenue Hédi Chaker", "Rue des Aghlabides",
-      "Boulevard Abdelhamid El Kadhi", "Rue de l'Indépendance",
-      "Avenue du Port", "Rue de la Médina",
-      "Boulevard de l'Environnement", "Rue Abou El Kacem Chebbi",
-      "Avenue Taïeb Mehiri", "Rue de Monastir",
-      "Boulevard Khezama", "Rue du Ribat",
-      "Avenue de Carthage", "Rue du Commerce",
-      "Boulevard Sahloul", "Rue du Souk"
+      "Avenue Habib Bourguiba",
+      "Boulevard du 14 Janvier",
+      "Rue de France",
+      "Avenue de la République",
+      "Boulevard Yahia Ibn Omar",
+      "Rue des Remparts",
+      "Avenue Mohamed Maarouf",
+      "Rue de Paris",
+      "Boulevard du 7 Novembre",
+      "Rue du Commandant Bejaoui",
+      "Avenue Farhat Hached",
+      "Rue de la Grande Mosquée",
+      "Boulevard de la Corniche",
+      "Rue de Kairouan",
+      "Avenue Hédi Chaker",
+      "Rue des Aghlabides",
+      "Boulevard Abdelhamid El Kadhi",
+      "Rue de l'Indépendance",
+      "Avenue du Port",
+      "Rue de la Médina",
+      "Boulevard de l'Environnement",
+      "Rue Abou El Kacem Chebbi",
+      "Avenue Taïeb Mehiri",
+      "Rue de Monastir",
+      "Boulevard Khezama",
+      "Rue du Ribat",
+      "Avenue de Carthage",
+      "Rue du Commerce",
+      "Boulevard Sahloul",
+      "Rue du Souk"
     ],
     "Kairouan": [
-      "Avenue de la République", "Rue Okba Ibn Nafaa",
-      "Boulevard de l'Environnement", "Rue de Tunis",
-      "Avenue Habib Bourguiba", "Rue des Aghlabides",
-      "Boulevard du 7 Novembre", "Rue de la Grande Mosquée",
-      "Avenue Farhat Hached", "Rue du Bey",
-      "Boulevard du 14 Janvier", "Rue du Souk",
-      "Avenue Hédi Chaker", "Rue de la Médina",
-      "Boulevard Zama", "Rue Sidi Abid El Ghariani"
+      "Avenue de la République", "Rue Okba Ibn Nafaa", "Boulevard de l'Environnement", "Rue de Tunis",
+      "Avenue Habib Bourguiba", "Rue des Aghlabides", "Boulevard du 7 Novembre", "Rue de la Grande Mosquée",
+      "Avenue Farhat Hached", "Rue du Bey", "Boulevard du 14 Janvier", "Rue du Souk",
+      "Avenue Hédi Chaker", "Rue de la Médina", "Boulevard Zama", "Rue Sidi Abid El Ghariani",
+      "Rue de l'Indépendance", "Avenue Ali Belhouane", "Rue Ibn Khaldoun", "Boulevard de la Paix",
+      "Rue Sidi Sahbi", "Avenue de Sfax", "Rue des Remparts", "Boulevard du Patrimoine",
+      "Rue Bir Barouta"
     ],
     "Bizerte": [
-      "Avenue Habib Bourguiba", "Rue de Constantinople",
-      "Boulevard Hassan En Nouri", "Rue de Tunis",
-      "Avenue d'Espagne", "Rue des Armuriers",
-      "Boulevard du 7 Novembre", "Rue de la Kasbah",
-      "Avenue de la Corniche", "Rue du Port",
-      "Boulevard du 14 Janvier", "Rue de la Médina",
-      "Avenue Farhat Hached", "Rue du Commerce",
-      "Boulevard de l'Environnement", "Rue de France"
+      "Avenue Habib Bourguiba", "Rue de Constantinople", "Boulevard Hassan En Nouri", "Rue de Tunis",
+      "Avenue d'Espagne", "Rue des Armuriers", "Boulevard du 7 Novembre", "Rue de la Kasbah",
+      "Avenue de la Corniche", "Rue du Port", "Boulevard du 14 Janvier", "Rue de la Médina",
+      "Avenue Farhat Hached", "Rue du Commerce", "Boulevard de l'Environnement", "Rue de France",
+      "Rue de la Liberté", "Avenue Taieb Mehiri", "Rue du Vieux Port", "Boulevard de la Mer",
+      "Rue des Andalous", "Avenue du Canal", "Rue Kheireddine", "Boulevard de la République",
+      "Rue de l'Arsenal"
     ],
     "Gabès": [
-      "Avenue Habib Bourguiba", "Rue Mongi Slim",
-      "Boulevard de l'Environnement", "Rue de Tunis",
-      "Avenue Farhat Hached", "Rue de l'Oasis",
-      "Boulevard du 7 Novembre", "Rue du Port",
-      "Avenue Hédi Chaker", "Rue du Commerce",
-      "Boulevard du 14 Janvier", "Rue de la Médina"
+      "Avenue Habib Bourguiba", "Rue Mongi Slim", "Boulevard de l'Environnement", "Rue de Tunis",
+      "Avenue Farhat Hached", "Rue de l'Oasis", "Boulevard du 7 Novembre", "Rue du Port",
+      "Avenue Hédi Chaker", "Rue du Commerce", "Boulevard du 14 Janvier", "Rue de la Médina",
+      "Rue des Palmiers", "Avenue Ali Belhouane", "Rue du Canal", "Boulevard de Djerba",
+      "Rue de Matmata", "Avenue de la Mer", "Rue de Mareth", "Boulevard de Chenini",
+      "Rue du Souk", "Avenue du Sahel", "Rue Ibn Khaldoun", "Boulevard de la Paix",
+      "Rue El Hamma"
     ],
     "Ariana": [
-      "Avenue Habib Bourguiba", "Rue du Lac",
-      "Boulevard du 7 Novembre", "Rue de Bizerte",
-      "Avenue de la République", "Rue de Carthage",
-      "Boulevard du 14 Janvier", "Rue du Parc",
-      "Avenue Hédi Nouira", "Rue de l'Indépendance",
-      "Boulevard de l'Ariana", "Rue des Jardins"
+      "Avenue Habib Bourguiba", "Rue du Lac", "Boulevard du 7 Novembre", "Rue de Bizerte",
+      "Avenue de la République", "Rue de Carthage", "Boulevard du 14 Janvier", "Rue du Parc",
+      "Avenue Hédi Nouira", "Rue de l'Indépendance", "Boulevard de l'Ariana", "Rue des Jardins",
+      "Rue Mohamed V", "Avenue de la Liberté", "Rue de Tunis", "Boulevard de l'Environnement",
+      "Rue du Commerce", "Avenue Farhat Hached", "Rue de France", "Boulevard des Roses",
+      "Rue du Lac de Tunis", "Avenue Taïeb Mehiri", "Rue de Sousse", "Boulevard Ennasr",
+      "Rue des Oliviers"
     ],
     "Gafsa": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue Farhat Hached", "Rue de Tozeur",
-      "Boulevard du 14 Janvier", "Rue de la Kasbah",
-      "Avenue Hédi Chaker", "Rue des Phosphates"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue Farhat Hached", "Rue de Tozeur", "Boulevard du 14 Janvier", "Rue de la Kasbah",
+      "Avenue Hédi Chaker", "Rue des Phosphates",
+      "Rue de la République", "Avenue Ali Belhouane", "Boulevard du 7 Novembre", "Rue de Sfax",
+      "Rue Ibn Khaldoun", "Avenue de la Liberté", "Rue du Commerce", "Boulevard de la Paix",
+      "Rue de Sened", "Avenue Mongi Slim", "Rue de Metlaoui", "Boulevard des Oasis",
+      "Rue de l'Indépendance", "Avenue du Sahara", "Rue des Mines"
     ],
     "Monastir": [
-      "Avenue Habib Bourguiba", "Rue de la Corniche",
-      "Boulevard de l'Environnement", "Rue du Ribat",
-      "Avenue Farhat Hached", "Rue de Sousse",
-      "Boulevard du 14 Janvier", "Rue de la Médina",
-      "Avenue de la République", "Rue du Port"
+      "Avenue Habib Bourguiba", "Rue de la Corniche", "Boulevard de l'Environnement", "Rue du Ribat",
+      "Avenue Farhat Hached", "Rue de Sousse", "Boulevard du 14 Janvier", "Rue de la Médina",
+      "Avenue de la République", "Rue du Port",
+      "Rue du Mausolée", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Tunis",
+      "Rue de la Marina", "Avenue de la Plage", "Rue Ibn Khaldoun", "Boulevard de la Mer",
+      "Rue Tahar Sfar", "Avenue du Palais des Congrès", "Rue de la Falaise", "Boulevard du Sahel",
+      "Rue de Mahdia", "Avenue de Skanes", "Rue de la Kasbah"
     ],
     "Ben Arous": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue de la République", "Rue du Lac",
-      "Boulevard de l'Environnement", "Rue de Carthage",
-      "Avenue Farhat Hached", "Rue de la Gare"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue de la République", "Rue du Lac", "Boulevard de l'Environnement", "Rue de Carthage",
+      "Avenue Farhat Hached", "Rue de la Gare",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Radès",
+      "Rue de l'Industrie", "Avenue de la Liberté", "Rue d'Ezzahra", "Boulevard de Mégrine",
+      "Rue de Fouchana", "Avenue Mongi Slim", "Rue du Lac Ichkeul", "Boulevard de la Zone Industrielle",
+      "Rue de Mourouj", "Avenue de Hammam Lif", "Rue du Stade"
     ],
     "Nabeul": [
-      "Avenue Habib Bourguiba", "Rue de la Céramique",
-      "Boulevard de l'Environnement", "Rue de Tunis",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard du 14 Janvier", "Rue des Potiers",
-      "Avenue Hédi Chaker", "Rue de la Médina"
+      "Avenue Habib Bourguiba", "Rue de la Céramique", "Boulevard de l'Environnement", "Rue de Tunis",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard du 14 Janvier", "Rue des Potiers",
+      "Avenue Hédi Chaker", "Rue de la Médina",
+      "Rue de Hammamet", "Avenue de la République", "Boulevard du 7 Novembre", "Rue des Orangers",
+      "Rue du Commerce", "Avenue Ali Belhouane", "Rue de la Mer", "Boulevard de la Corniche",
+      "Rue Ibn Khaldoun", "Avenue du Cap Bon", "Rue de Kélibia", "Boulevard des Jardins",
+      "Rue de Menzel Temime", "Avenue de la Plage", "Rue de l'Artisanat"
     ],
     "Médenine": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue de Djerba",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue de la République", "Rue des Ksour"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue de Djerba", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue de la République", "Rue des Ksour",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Tataouine",
+      "Rue de Zarzis", "Avenue de la Liberté", "Rue de Ben Gardane", "Boulevard du Sahara",
+      "Rue de Matmata", "Avenue Mongi Slim", "Rue de la Synagogue", "Boulevard de la Paix",
+      "Rue de Beni Khédache", "Avenue du Sud", "Rue de l'Oasis"
     ],
     "Kasserine": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard de l'Environnement", "Rue de Sbeitla",
-      "Avenue de la République", "Rue de la Kasbah"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard de l'Environnement", "Rue de Sbeitla",
+      "Avenue de la République", "Rue de la Kasbah",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Fériana",
+      "Rue de Thala", "Avenue de la Liberté", "Rue de Foussana", "Boulevard de Chambi",
+      "Rue de Sbeïtla", "Avenue Mongi Slim", "Rue du Stade", "Boulevard de la Montagne",
+      "Rue de Haïdra", "Avenue du 17 Décembre", "Rue de la Résistance"
     ],
     "Mahdia": [
-      "Avenue Habib Bourguiba", "Rue de la Skifa",
-      "Boulevard de la Corniche", "Rue du Port",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard du 14 Janvier", "Rue de la Grande Mosquée",
-      "Avenue de Carthage", "Rue de la Médina"
+      "Avenue Habib Bourguiba", "Rue de la Skifa", "Boulevard de la Corniche", "Rue du Port",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard du 14 Janvier", "Rue de la Grande Mosquée",
+      "Avenue de Carthage", "Rue de la Médina",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de El Jem",
+      "Rue de Chebba", "Avenue de la République", "Rue de Ksour Essef", "Boulevard de la Mer",
+      "Rue de la Pêche", "Avenue de la Plage", "Rue du Borj", "Boulevard des Remparts",
+      "Rue de Sousse", "Avenue Ali Belhouane", "Rue de la Kasbah"
     ],
     "Béja": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard de l'Environnement", "Rue de la Kasbah",
-      "Avenue de la République", "Rue des Oliviers"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard de l'Environnement", "Rue de la Kasbah",
+      "Avenue de la République", "Rue des Oliviers",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Testour",
+      "Rue de Thibar", "Avenue de la Liberté", "Rue de Medjez El Bab", "Boulevard de la Medjerda",
+      "Rue de Nefza", "Avenue Mongi Slim", "Rue du Marché", "Boulevard de la Paix",
+      "Rue de Téboursouk", "Avenue de Dougga", "Rue de l'Indépendance"
     ],
     "Jendouba": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue de Bulla Regia",
-      "Avenue Farhat Hached", "Rue du Commerce",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue de la République", "Rue de Tabarka"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue de Bulla Regia",
+      "Avenue Farhat Hached", "Rue du Commerce", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue de la République", "Rue de Tabarka",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Chemtou",
+      "Rue de Ghardimaou", "Avenue de la Liberté", "Rue de Ain Draham", "Boulevard de la Medjerda",
+      "Rue de Fernana", "Avenue Mongi Slim", "Rue du Barrage", "Boulevard de la Forêt",
+      "Rue de Béja", "Avenue de l'Algérie", "Rue de l'Indépendance"
     ],
     "Sidi Bou Said": [
-      "Rue Habib Thameur", "Rue Sidi Bou Said",
-      "Avenue de la Baie", "Rue du Phare",
-      "Rue des Jasmins", "Rue de l'Horizon",
-      "Avenue de Carthage", "Rue de la Falaise",
-      "Rue du Café des Nattes", "Rue Sidi Dhrif"
+      "Rue Habib Thameur", "Rue Sidi Bou Said", "Avenue de la Baie", "Rue du Phare",
+      "Rue des Jasmins", "Rue de l'Horizon", "Avenue de Carthage", "Rue de la Falaise",
+      "Rue du Café des Nattes", "Rue Sidi Dhrif",
+      "Rue des Bougainvilliers", "Avenue Habib Bourguiba", "Rue de la Mer", "Boulevard de la Colline",
+      "Rue du Musée", "Avenue de la Marsa", "Rue de Dar Zarrouk", "Boulevard des Artistes",
+      "Rue de la Mosquée", "Avenue de Tunis", "Rue du Golf", "Boulevard de la Médina",
+      "Rue Dar Ennejma Ezzahra", "Avenue du Panorama", "Rue de l'Amitié"
     ],
     "Hammamet": [
-      "Avenue Habib Bourguiba", "Rue de la Médina",
-      "Boulevard de la Corniche", "Rue des Remparts",
-      "Avenue de la République", "Rue du Souk",
-      "Boulevard du 14 Janvier", "Rue de Nabeul",
-      "Avenue de Carthage", "Rue de la Kasbah"
+      "Avenue Habib Bourguiba", "Rue de la Médina", "Boulevard de la Corniche", "Rue des Remparts",
+      "Avenue de la République", "Rue du Souk", "Boulevard du 14 Janvier", "Rue de Nabeul",
+      "Avenue de Carthage", "Rue de la Kasbah",
+      "Rue de la Plage", "Avenue Farhat Hached", "Boulevard de Yasmine", "Rue des Jasmins",
+      "Rue du Port", "Avenue de la Mer", "Rue de Mrezga", "Boulevard de la Marina",
+      "Rue Ibn Khaldoun", "Avenue des Hotels", "Rue de la Zone Touristique", "Boulevard de Hammamet Sud",
+      "Rue de Birbou", "Avenue de l'Orangeraie", "Rue du Casino"
     ],
     "Tozeur": [
-      "Avenue Habib Bourguiba", "Rue du Paradis",
-      "Boulevard de l'Environnement", "Rue de la Palmeraie",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard du 14 Janvier", "Rue de Nefta",
-      "Avenue de la République", "Rue de l'Oasis"
+      "Avenue Habib Bourguiba", "Rue du Paradis", "Boulevard de l'Environnement", "Rue de la Palmeraie",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard du 14 Janvier", "Rue de Nefta",
+      "Avenue de la République", "Rue de l'Oasis",
+      "Rue Ibn Chabbat", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Degache",
+      "Rue de Tamerza", "Avenue de la Liberté", "Rue du Chott El Jerid", "Boulevard des Dattes",
+      "Rue de Chebika", "Avenue de Gafsa", "Rue de la Corbeille", "Boulevard du Sahara",
+      "Rue de Mides", "Avenue du Festival", "Rue du Désert"
     ],
     "Tabarka": [
-      "Avenue Habib Bourguiba", "Rue du Port",
-      "Boulevard de la Corniche", "Rue des Aiguilles",
-      "Avenue de la République", "Rue du Fort",
-      "Boulevard du 14 Janvier", "Rue du Corail",
-      "Avenue Farhat Hached", "Rue de la Plage"
+      "Avenue Habib Bourguiba", "Rue du Port", "Boulevard de la Corniche", "Rue des Aiguilles",
+      "Avenue de la République", "Rue du Fort", "Boulevard du 14 Janvier", "Rue du Corail",
+      "Avenue Farhat Hached", "Rue de la Plage",
+      "Rue de la Forêt", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Jendouba",
+      "Rue de Ain Draham", "Avenue de la Mer", "Rue du Festival de Jazz", "Boulevard de la Montagne",
+      "Rue Ibn Khaldoun", "Avenue du Casino", "Rue de la Basilique", "Boulevard des Rochers",
+      "Rue de Kroumirie", "Avenue de la Marina", "Rue de l'Île"
     ],
     "Djerba": [
-      "Avenue Habib Bourguiba", "Rue de la Synagogue El Ghriba",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue Farhat Hached", "Rue de la Médina",
-      "Boulevard de la Corniche", "Rue du Port",
-      "Avenue de la Plage", "Rue de Houmt Souk"
+      "Avenue Habib Bourguiba", "Rue de la Synagogue El Ghriba", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue Farhat Hached", "Rue de la Médina", "Boulevard de la Corniche", "Rue du Port",
+      "Avenue de la Plage", "Rue de Houmt Souk",
+      "Rue de Midoun", "Avenue Hédi Chaker", "Boulevard de la Zone Touristique", "Rue d'Ajim",
+      "Rue de Guellala", "Avenue de la République", "Rue de Sidi Mahrez", "Boulevard de la Mer",
+      "Rue Ibn Khaldoun", "Avenue de Zarzis", "Rue de la Poterie", "Boulevard de l'Aéroport",
+      "Rue de Sedghiane", "Avenue du Golf", "Rue de la Causeway"
     ],
     "Le Kef": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue de la Kasbah",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard de l'Environnement", "Rue de Jugurtha",
-      "Avenue de la République", "Rue du Commerce"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue de la Kasbah",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard de l'Environnement", "Rue de Jugurtha",
+      "Avenue de la République", "Rue du Commerce",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Jérissa",
+      "Rue de Tajerouine", "Avenue de la Liberté", "Rue de Sers", "Boulevard de la Montagne",
+      "Rue de Kalaat Senan", "Avenue Mongi Slim", "Rue du Musée", "Boulevard de la Paix",
+      "Rue de Dahmani", "Avenue de l'Algérie", "Rue de la Médina"
     ],
     "Siliana": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard de l'Environnement", "Rue de Dougga",
-      "Avenue de la République", "Rue de la Paix"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard de l'Environnement", "Rue de Dougga",
+      "Avenue de la République", "Rue de la Paix",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Makthar",
+      "Rue de Gaafour", "Avenue de la Liberté", "Rue de Kesra", "Boulevard de Bargou",
+      "Rue de Bourada", "Avenue Mongi Slim", "Rue de Rouhia", "Boulevard de la Vallée",
+      "Rue de Bou Arada", "Avenue du 14 Janvier", "Rue du Barrage"
     ],
     "Tataouine": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue des Ksour",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue de la République", "Rue du Sahara"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue des Ksour", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue de la République", "Rue du Sahara",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Ghomrassen",
+      "Rue de Remada", "Avenue de la Liberté", "Rue de Chenini", "Boulevard du Désert",
+      "Rue de Douiret", "Avenue Mongi Slim", "Rue de Ksar Ouled Soltane", "Boulevard de la Paix",
+      "Rue de Bir Lahmar", "Avenue du Sud", "Rue de Ksar Ghilane"
     ],
     "Zaghouan": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Temple des Eaux",
-      "Avenue Farhat Hached", "Rue du Commerce",
-      "Boulevard de l'Environnement", "Rue du Souk",
-      "Avenue de la République", "Rue de l'Aqueduc"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Temple des Eaux",
+      "Avenue Farhat Hached", "Rue du Commerce", "Boulevard de l'Environnement", "Rue du Souk",
+      "Avenue de la République", "Rue de l'Aqueduc",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Nabeul",
+      "Rue de Zriba", "Avenue de la Liberté", "Rue de Djebel Zaghouan", "Boulevard de la Montagne",
+      "Rue de Bir Mcherga", "Avenue Mongi Slim", "Rue des Nymphes", "Boulevard de la Paix",
+      "Rue de Saouaf", "Avenue de Carthage", "Rue de la Source"
     ],
     "Douz": [
-      "Avenue Habib Bourguiba", "Rue du Sahara",
-      "Boulevard de l'Environnement", "Rue du Festival",
-      "Avenue Farhat Hached", "Rue du Souk",
-      "Boulevard du 14 Janvier", "Rue de la Palmeraie",
-      "Avenue de la République", "Rue des Méharis"
+      "Avenue Habib Bourguiba", "Rue du Sahara", "Boulevard de l'Environnement", "Rue du Festival",
+      "Avenue Farhat Hached", "Rue du Souk", "Boulevard du 14 Janvier", "Rue de la Palmeraie",
+      "Avenue de la République", "Rue des Méharis",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Kébili",
+      "Rue de Zaafrane", "Avenue de la Liberté", "Rue du Désert", "Boulevard des Dunes",
+      "Rue de El Faouar", "Avenue du Festival du Sahara", "Rue des Dromadaires", "Boulevard de l'Oasis",
+      "Rue de Nouiel", "Avenue du Chott El Jerid", "Rue de la Porte du Sahara"
     ],
     "Kébili": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue de la Palmeraie",
-      "Avenue Farhat Hached", "Rue du Commerce",
-      "Boulevard de l'Environnement", "Rue de Douz",
-      "Avenue de la République", "Rue des Dattes"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue de la Palmeraie",
+      "Avenue Farhat Hached", "Rue du Commerce", "Boulevard de l'Environnement", "Rue de Douz",
+      "Avenue de la République", "Rue des Dattes",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Tozeur",
+      "Rue de Souk Lahad", "Avenue de la Liberté", "Rue du Chott El Jerid", "Boulevard de l'Oasis",
+      "Rue de Blidet", "Avenue Mongi Slim", "Rue de Jemna", "Boulevard du Désert",
+      "Rue de Negga", "Avenue des Palmeraies", "Rue de la Paix"
     ],
     "Manouba": [
-      "Avenue Habib Bourguiba", "Rue de Tunis",
-      "Boulevard du 14 Janvier", "Rue du Commerce",
-      "Avenue Farhat Hached", "Rue de l'Université",
-      "Boulevard de l'Environnement", "Rue du Lac",
-      "Avenue de la République", "Rue de la Manouba"
+      "Avenue Habib Bourguiba", "Rue de Tunis", "Boulevard du 14 Janvier", "Rue du Commerce",
+      "Avenue Farhat Hached", "Rue de l'Université", "Boulevard de l'Environnement", "Rue du Lac",
+      "Avenue de la République", "Rue de la Manouba",
+      "Rue Ibn Khaldoun", "Avenue Hédi Chaker", "Boulevard du 7 Novembre", "Rue de Denden",
+      "Rue de Oued Ellil", "Avenue de la Liberté", "Rue de Tebourba", "Boulevard de la Médina",
+      "Rue de Borj El Amri", "Avenue Mongi Slim", "Rue de Jedaïda", "Boulevard de la Paix",
+      "Rue de Douar Hicher", "Avenue de Carthage", "Rue du Campus"
     ],
     "La Marsa": [
-      "Avenue Habib Bourguiba", "Rue du Café Saf Saf",
-      "Boulevard de la Corniche", "Rue de la Plage",
-      "Avenue de la République", "Rue du Marché",
-      "Boulevard du 14 Janvier", "Rue de Gammarth",
-      "Avenue de Carthage", "Rue du Casino"
+      "Avenue Habib Bourguiba", "Rue du Café Saf Saf", "Boulevard de la Corniche", "Rue de la Plage",
+      "Avenue de la République", "Rue du Marché", "Boulevard du 14 Janvier", "Rue de Gammarth",
+      "Avenue de Carthage", "Rue du Casino",
+      "Rue des Jasmins", "Avenue Farhat Hached", "Boulevard de la Mer", "Rue de Sidi Bou Said",
+      "Rue de la Baie", "Avenue Hédi Chaker", "Rue du Port", "Boulevard de la Marina",
+      "Rue Ibn Khaldoun", "Avenue de Tunis", "Rue de la Colline", "Boulevard des Jardins",
+      "Rue du Golf", "Avenue de la Résidence", "Rue de l'Orangeraie"
     ],
     "Carthage": [
-      "Avenue Habib Bourguiba", "Rue Hannibal",
-      "Boulevard de l'Environnement", "Rue des Thermes",
-      "Avenue de la République", "Rue du Tophet",
-      "Boulevard du 14 Janvier", "Rue de Byrsa",
-      "Avenue de Carthage", "Rue de l'Amphithéâtre"
+      "Avenue Habib Bourguiba", "Rue Hannibal", "Boulevard de l'Environnement", "Rue des Thermes",
+      "Avenue de la République", "Rue du Tophet", "Boulevard du 14 Janvier", "Rue de Byrsa",
+      "Avenue de Carthage", "Rue de l'Amphithéâtre",
+      "Rue des Romains", "Avenue Farhat Hached", "Boulevard de la Mer", "Rue de la Cathédrale",
+      "Rue du Musée", "Avenue Hédi Chaker", "Rue de Salammbo", "Boulevard de la Colline",
+      "Rue Ibn Khaldoun", "Avenue de Tunis", "Rue de Hamilcar", "Boulevard des Antiquités",
+      "Rue de Didon", "Avenue de la Présidence", "Rue de Magon"
     ]
   },
   "postcode_format": "####",
@@ -576,29 +682,75 @@
   "country": "Tunisia",
   "country_code": "TN",
   "phone_area_codes": {
-    "Tunis": ["71"],
-    "Sfax": ["74"],
-    "Sousse": ["73"],
-    "Kairouan": ["77"],
-    "Bizerte": ["72"],
-    "Gabès": ["75"],
-    "Ariana": ["71"],
-    "Gafsa": ["76"],
-    "Monastir": ["73"],
-    "Ben Arous": ["71"],
-    "Nabeul": ["72"],
-    "Médenine": ["75"],
-    "Kasserine": ["77"],
-    "Mahdia": ["73"],
-    "Béja": ["78"],
-    "Jendouba": ["78"],
-    "Le Kef": ["78"],
-    "Siliana": ["78"],
-    "Tataouine": ["75"],
-    "Zaghouan": ["72"],
-    "Kébili": ["76"],
-    "Manouba": ["71"],
-    "Tozeur": ["76"]
+    "Tunis": [
+      "71"
+    ],
+    "Sfax": [
+      "74"
+    ],
+    "Sousse": [
+      "73"
+    ],
+    "Kairouan": [
+      "77"
+    ],
+    "Bizerte": [
+      "72"
+    ],
+    "Gabès": [
+      "75"
+    ],
+    "Ariana": [
+      "71"
+    ],
+    "Gafsa": [
+      "76"
+    ],
+    "Monastir": [
+      "73"
+    ],
+    "Ben Arous": [
+      "71"
+    ],
+    "Nabeul": [
+      "72"
+    ],
+    "Médenine": [
+      "75"
+    ],
+    "Kasserine": [
+      "77"
+    ],
+    "Mahdia": [
+      "73"
+    ],
+    "Béja": [
+      "78"
+    ],
+    "Jendouba": [
+      "78"
+    ],
+    "Le Kef": [
+      "78"
+    ],
+    "Siliana": [
+      "78"
+    ],
+    "Tataouine": [
+      "75"
+    ],
+    "Zaghouan": [
+      "72"
+    ],
+    "Kébili": [
+      "76"
+    ],
+    "Manouba": [
+      "71"
+    ],
+    "Tozeur": [
+      "76"
+    ]
   },
   "phone_format": "+216 {area_code} ### ###"
 }
