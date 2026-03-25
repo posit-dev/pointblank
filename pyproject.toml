@@ -107,7 +107,7 @@ dev = [
     "pytest-xdist>=3.6.1",
     "pytz>=2025.2",
     "quartodoc>=0.8.1; python_version >= '3.9'",
-    "ruff>=0.9.9",
+    "ruff==0.14.10",  # NOTE: must match rev in .pre-commit-config.yaml
     "shiny>=1.4.0",
     "openpyxl>=3.0.0",
     "mcp[cli]>=1.10.1",

@@ -13,8 +13,9 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+  # NOTE: ruff version must match the pin in pyproject.toml [dependency-groups] dev
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.14.10
     hooks:
       - id: ruff
         args: [--fix]
