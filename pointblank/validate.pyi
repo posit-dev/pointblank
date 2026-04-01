@@ -1,15 +1,17 @@
 import datetime
 from collections.abc import Collection
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable, Literal, ParamSpec, TypeVar
+
 from great_tables import GT
 from narwhals.typing import IntoDataFrame, IntoFrame
-from pathlib import Path
+
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.schema import Schema
 from pointblank.thresholds import Actions, FinalActions, Thresholds
-from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 __all__ = [
     "get_action_metadata",
