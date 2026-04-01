@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5ba67e2123d9b6565102333d0b4868d3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-268d4943898fdc921a96423155a50391.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -273,7 +273,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Convert a basic YAML configuration to Python code:</p>
-<div id="90516688" class="cell" data-execution_count="2">
+<div id="b5af980b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a YAML validation workflow</span></span>
@@ -309,7 +309,7 @@ import pointblank as pb
 </div>
 <p>The generated Python code shows exactly how to replicate the YAML workflow programmatically. This is particularly useful when transitioning from YAML-based workflows to code-based workflows, or when generating documentation that shows both YAML and Python approaches.</p>
 <p>For more complex workflows with thresholds and metadata:</p>
-<div id="3bdba642" class="cell" data-execution_count="3">
+<div id="b94aafb8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -351,7 +351,7 @@ import pointblank as pb
 </div>
 <p>The generated code includes all configuration parameters, thresholds, and maintains the exact same validation logic as the original YAML workflow.</p>
 <p>Governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>) and <code>reference</code> are also rendered in the generated Python code:</p>
-<div id="bc12e7e4" class="cell" data-execution_count="4">
+<div id="e9bf0db5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Sales Pipeline</span></span>
