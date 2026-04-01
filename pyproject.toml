@@ -136,7 +136,7 @@ testpaths = ["tests"]
 line-length = 100
 
 [tool.ruff.lint]
-exclude = ["docs", ".venv", "tests/*"]
+exclude = ["docs", ".venv", "tests/*", "pointblank/validate.pyi"]
 
 ignore = [
     "E402", # module level import not at top of file
