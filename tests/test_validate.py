@@ -74,10 +74,10 @@ try:
     PYSPARK_AVAILABLE = True
 except ImportError:
     PYSPARK_AVAILABLE = False
-
+_
 ## If we specifically disable tests in pytest set the availability to False
 if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
-    PYSPARK_AVAILABLE = False
+    PYSPARKAVAILABLE = False
 SQLITE_AVAILABLE = True
 if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
     SQLITE_AVAILABLE = False
@@ -13942,7 +13942,7 @@ def test_get_dataframe_returns_pandas_df():
 def test_get_dataframe_returns_duckdb_df():
     validation = Validate(data="small_table")
     df_duckdb = validation.get_dataframe("duckdb")
-    assert isinstance(df_duckdb, pd.DataFrame)
+    assert isinstance(df_duckdb, ibis.expr.types.relations.Table)
 
 def get_schema_info(
     data_tbl,

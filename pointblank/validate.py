@@ -18051,9 +18051,8 @@ class Validate:
                 for values in final_report["values"]
             ]
 
-            # Pick up here
             report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
-                {k: v for k, v in names_dict.items()}
+                {v: k for k, v in names_dict.items()}
             )
 
             conditional_cols = [
