@@ -75,7 +75,7 @@ try:
     PYSPARK_AVAILABLE = True
 except ImportError:
     PYSPARK_AVAILABLE = False
-_
+
 ## If we specifically disable tests in pytest set the availability to False
 if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
     PYSPARKAVAILABLE = False
@@ -13932,20 +13932,24 @@ def test_get_dataframe_missing_libraries(library, tbl_type):
         with pytest.raises(ImportError, match=f"The {library} library is not installed"):
             validation.get_dataframe(tbl_type)
 
+
 def test_get_dataframe_returns_polars_df():
     validation = Validate(data="small_table")
     df_polars = validation.get_dataframe("polars")
     assert isinstance(df_polars, pl.DataFrame)
+
 
 def test_get_dataframe_returns_pandas_df():
     validation = Validate(data="small_table")
     df_pandas = validation.get_dataframe("pandas")
     assert isinstance(df_pandas, pd.DataFrame)
 
+
 def test_get_dataframe_returns_duckdb_df():
     validation = Validate(data="small_table")
     df_duckdb = validation.get_dataframe("duckdb")
     assert isinstance(df_duckdb, ibis.expr.types.relations.Table)
+
 
 def get_schema_info(
     data_tbl,
