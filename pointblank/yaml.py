@@ -255,7 +255,7 @@ class YAMLValidator:
         "specially": "specially",
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the YAML validator."""
         pass
 

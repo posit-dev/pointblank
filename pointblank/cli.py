@@ -21,7 +21,7 @@ console = Console()
 class OrderedGroup(click.Group):
     """A Click Group that displays commands in a custom order."""
 
-    def list_commands(self, ctx):
+    def list_commands(self, ctx) -> list[str]:
         """Return commands in the desired logical order."""
         # Define the desired order
         desired_order = [
@@ -1240,7 +1240,7 @@ def _display_validation_summary(validation: Any) -> None:
 @click.group(cls=OrderedGroup)
 @click.version_option(pb.__version__, "-v", "--version", prog_name="pb")
 @click.help_option("-h", "--help")
-def cli():
+def cli() -> None:
     """
     Pointblank CLI: Data validation and quality tools for data engineers.
 
@@ -1262,7 +1262,7 @@ def cli():
 
 @cli.command()
 @click.argument("data_source", type=str, required=False)
-def info(data_source: str | None):
+def info(data_source: str | None) -> None:
     """
     Display information about a data source.
 
@@ -1348,7 +1348,7 @@ def preview(
     min_table_width: int,
     no_header: bool,
     output_html: str | None,
-):
+) -> None:
     """
     Preview a data table showing head and tail rows.
 
@@ -1589,7 +1589,7 @@ def scan(
     data_source: str | None,
     output_html: str | None,
     columns: str | None,
-):
+) -> None:
     """
     Generate a data scan profile report.
 
@@ -1732,7 +1732,7 @@ def scan(
 @cli.command()
 @click.argument("data_source", type=str, required=False)
 @click.option("--output-html", type=click.Path(), help="Save HTML output to file")
-def missing(data_source: str | None, output_html: str | None):
+def missing(data_source: str | None, output_html: str | None) -> None:
     """
     Generate a missing values report for a data table.
 
@@ -1913,7 +1913,7 @@ def validate(
     limit: int,
     exit_code: bool,
     list_checks: bool,
-):
+) -> None:
     """
     Perform single or multiple data validations.
 
@@ -2330,7 +2330,7 @@ def validate(
 
 
 @cli.command()
-def datasets():
+def datasets() -> None:
     """
     List available built-in datasets.
     """
@@ -2370,7 +2370,7 @@ def datasets():
 
 
 @cli.command()
-def requirements():
+def requirements() -> None:
     """
     Check installed dependencies and their availability.
     """
@@ -3157,7 +3157,7 @@ def _map_parameters_to_checks(
     return mapped_columns, mapped_sets, mapped_values
 
 
-def _resolve_column_indices(columns_list, data):
+def _resolve_column_indices(columns_list: list[str], data):
     """
     Replace any '#N' entries in columns_list with the actual column name from data (1-based).
     """
@@ -3891,7 +3891,7 @@ def _show_extract_and_summary(
 
 @cli.command()
 @click.argument("output_file", type=click.Path(), required=False)
-def make_template(output_file: str | None):
+def make_template(output_file: str | None) -> None:
     """
     Create a validation script or YAML configuration template.
 
@@ -4134,7 +4134,7 @@ def run(
     write_extract: str | None,
     limit: int,
     fail_on: str | None,
-):
+) -> None:
     """
     Run a Pointblank validation script or YAML configuration.
 
@@ -4662,7 +4662,7 @@ def pl(
     output_html: str | None,
     pipe: bool,
     pipe_format: str,
-):
+) -> None:
     """
     Execute Polars expressions and display results.
 

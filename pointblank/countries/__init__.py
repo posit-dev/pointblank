@@ -335,6 +335,112 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
 ]
 
 # Comprehensive country info mapping: alpha-2 -> (alpha-3, English name)
+# Maps each supported country code to its locale code(s).
+# For multilingual countries, multiple locale codes are listed in order of prevalence;
+# the generator randomly selects one per row.
+_COUNTRY_LOCALE_CODES: dict[str, list[str]] = {
+    "AE": ["ar_AE"],
+    "AM": ["hy_AM"],
+    "AR": ["es_AR"],
+    "AT": ["de_AT"],
+    "AU": ["en_AU"],
+    "AZ": ["az_AZ"],
+    "BD": ["bn_BD"],
+    "BE": ["nl_BE", "fr_BE", "de_BE"],
+    "BG": ["bg_BG"],
+    "BO": ["es_BO"],
+    "BR": ["pt_BR"],
+    "CA": ["en_CA", "fr_CA"],
+    "CH": ["de_CH", "fr_CH", "it_CH"],
+    "CL": ["es_CL"],
+    "CM": ["fr_CM", "en_CM"],
+    "CN": ["zh_CN"],
+    "CO": ["es_CO"],
+    "CR": ["es_CR"],
+    "CY": ["el_CY", "tr_CY"],
+    "CZ": ["cs_CZ"],
+    "DE": ["de_DE"],
+    "DK": ["da_DK"],
+    "DO": ["es_DO"],
+    "DZ": ["ar_DZ", "fr_DZ"],
+    "EC": ["es_EC"],
+    "EE": ["et_EE"],
+    "EG": ["ar_EG"],
+    "ES": ["es_ES"],
+    "ET": ["am_ET"],
+    "FI": ["fi_FI"],
+    "FR": ["fr_FR"],
+    "GB": ["en_GB"],
+    "GE": ["ka_GE"],
+    "GH": ["en_GH"],
+    "GR": ["el_GR"],
+    "GT": ["es_GT"],
+    "HK": ["zh_HK", "en_HK"],
+    "HN": ["es_HN"],
+    "HR": ["hr_HR"],
+    "HU": ["hu_HU"],
+    "ID": ["id_ID"],
+    "IE": ["en_IE", "ga_IE"],
+    "IL": ["he_IL", "ar_IL"],
+    "IN": ["hi_IN", "en_IN"],
+    "IS": ["is_IS"],
+    "IT": ["it_IT"],
+    "JM": ["en_JM"],
+    "JO": ["ar_JO"],
+    "JP": ["ja_JP"],
+    "KE": ["en_KE", "sw_KE"],
+    "KH": ["km_KH"],
+    "KR": ["ko_KR"],
+    "KZ": ["kk_KZ", "ru_KZ"],
+    "LB": ["ar_LB", "fr_LB"],
+    "LK": ["si_LK", "ta_LK"],
+    "LT": ["lt_LT"],
+    "LU": ["lb_LU", "fr_LU", "de_LU"],
+    "LV": ["lv_LV"],
+    "MA": ["ar_MA", "fr_MA"],
+    "MD": ["ro_MD", "ru_MD"],
+    "MM": ["my_MM"],
+    "MT": ["mt_MT", "en_MT"],
+    "MX": ["es_MX"],
+    "MY": ["ms_MY", "en_MY"],
+    "MZ": ["pt_MZ"],
+    "NG": ["en_NG"],
+    "NL": ["nl_NL"],
+    "NO": ["nb_NO", "nn_NO"],
+    "NP": ["ne_NP"],
+    "NZ": ["en_NZ"],
+    "PA": ["es_PA"],
+    "PE": ["es_PE"],
+    "PH": ["en_PH", "tl_PH"],
+    "PK": ["ur_PK", "en_PK"],
+    "PL": ["pl_PL"],
+    "PT": ["pt_PT"],
+    "PY": ["es_PY", "gn_PY"],
+    "RO": ["ro_RO"],
+    "RS": ["sr_RS"],
+    "RU": ["ru_RU"],
+    "RW": ["rw_RW", "en_RW", "fr_RW"],
+    "SA": ["ar_SA"],
+    "SE": ["sv_SE"],
+    "SG": ["en_SG", "zh_SG", "ms_SG", "ta_SG"],
+    "SI": ["sl_SI"],
+    "SK": ["sk_SK"],
+    "SN": ["fr_SN"],
+    "SV": ["es_SV"],
+    "TH": ["th_TH"],
+    "TN": ["ar_TN", "fr_TN"],
+    "TR": ["tr_TR"],
+    "TW": ["zh_TW"],
+    "TZ": ["sw_TZ", "en_TZ"],
+    "UA": ["uk_UA"],
+    "UG": ["en_UG", "sw_UG"],
+    "US": ["en_US"],
+    "UY": ["es_UY"],
+    "UZ": ["uz_UZ", "ru_UZ"],
+    "VN": ["vi_VN"],
+    "ZA": ["en_ZA", "af_ZA", "zu_ZA"],
+}
+
 COUNTRY_INFO: dict[str, tuple[str, str]] = {
     "AD": ("AND", "Andorra"),
     "AE": ("ARE", "United Arab Emirates"),
@@ -894,7 +1000,7 @@ _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 def _is_tiered(data: Any) -> bool:
     """Return True if *data* is a dict whose keys are frequency tier names."""
-    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
 
 def _flatten_tiered(data: dict[str, list]) -> list:
@@ -925,7 +1031,7 @@ class LocaleGenerator:
     addresses, etc. based on country-specific patterns and data.
     """
 
-    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True):
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True) -> None:
         """
         Initialize the country data generator.
 
@@ -1155,6 +1261,16 @@ class LocaleGenerator:
         """Generate a random last name (coherent with current person context)."""
         person = self._get_current_person()
         return person.get("last_name", "Smith")
+
+    def gender(self) -> str:
+        """Return the gender of the current person (coherent with other person fields).
+
+        Returns 'male' or 'female' based on the current person context. When used
+        alongside other person-related presets (first_name, last_name, email, etc.),
+        the gender will be coherent with those fields.
+        """
+        person = self._get_current_person()
+        return person.get("gender", "female")
 
     def name(self, gender: str | None = None) -> str:
         """Generate a simple full name (first + last, coherent with current person context).
@@ -1732,6 +1848,18 @@ class LocaleGenerator:
                 return code
         return self.country_code
 
+    def locale_code(self) -> str:
+        """Generate a locale code derived from this country.
+
+        Returns a standard locale identifier in ``language_COUNTRY`` format
+        (e.g., ``"en_US"``, ``"de_DE"``). For multilingual countries, one of
+        the country's official locale codes is selected at random.
+        """
+        codes = _COUNTRY_LOCALE_CODES.get(self.country_code, [f"en_{self.country_code}"])
+        if len(codes) == 1:
+            return codes[0]
+        return self.rng.choice(codes)
+
     def postcode(self) -> str:
         """Generate a random postal code (coherent with current location context)."""
         location = self._get_current_location()
@@ -1839,6 +1967,31 @@ class LocaleGenerator:
             self.clear_location()
         return result
 
+    # NANP countries use +1 country code and share exchange code rules
+    _NANP_COUNTRIES = {"US", "CA", "JM", "DO"}
+
+    # N11 service codes that must not be used as exchange codes
+    _NANP_RESERVED_EXCHANGES = {
+        "211",
+        "311",
+        "411",
+        "511",
+        "611",
+        "711",
+        "811",
+        "911",
+    }
+
+    def _nanp_exchange(self) -> str:
+        """Generate a valid NANP exchange code (NXX where N=2-9, not N11 or 555)."""
+        while True:
+            n = str(self.rng.randint(2, 9))
+            x1 = str(self.rng.randint(0, 9))
+            x2 = str(self.rng.randint(0, 9))
+            code = n + x1 + x2
+            if code not in self._NANP_RESERVED_EXCHANGES and code != "555":
+                return code
+
     def phone_number(self) -> str:
         """Generate a phone number with area code matching the current location's state."""
         location = self._get_current_location()
@@ -1852,12 +2005,22 @@ class LocaleGenerator:
         # Use country-specific phone format if available
         phone_format = self._data.address.get("phone_format", "({area_code}) ###-####")
 
+        # For NANP countries, replace the exchange code portion (first 3 # chars)
+        # with a valid NXX code (N=2-9, not N11, not 555)
+        is_nanp = self.country_code in self._NANP_COUNTRIES
+
         # Substitute {area_code} and replace # with random digits
         result = phone_format.replace("{area_code}", area_code)
         chars = []
+        hash_count = 0
+        nanp_exchange = self._nanp_exchange() if is_nanp else None
         for ch in result:
             if ch == "#":
-                chars.append(str(self.rng.randint(0, 9)))
+                if is_nanp and hash_count < 3:
+                    chars.append(nanp_exchange[hash_count])
+                else:
+                    chars.append(str(self.rng.randint(0, 9)))
+                hash_count += 1
             else:
                 chars.append(ch)
         return "".join(chars)
@@ -2321,10 +2484,57 @@ class LocaleGenerator:
     # Financial
     # =========================================================================
 
+    # Credit card prefix caching for coherence between credit_card_number and
+    # credit_card_provider
+    _row_card_prefixes: list[str] | None = None
+
+    # Map card prefixes to provider names
+    _CARD_PREFIX_TO_PROVIDER: dict[str, str] = {
+        "4": "Visa",
+        "5": "Mastercard",
+        "37": "American Express",
+        "6011": "Discover",
+    }
+
+    # All supported card prefixes
+    _CARD_PREFIXES: list[str] = ["4", "5", "37", "6011"]
+
+    def init_row_card_prefixes(self, n_rows: int) -> None:
+        """Pre-generate card prefixes for multiple rows to ensure coherence.
+
+        When both credit_card_number and credit_card_provider are generated for each row,
+        this ensures they are consistent (e.g., a Visa card number and "Visa" provider).
+        """
+        self._row_card_prefixes = [self.rng.choice(self._CARD_PREFIXES) for _ in range(n_rows)]
+
+    def clear_row_card_prefixes(self) -> None:
+        """Clear pre-generated card prefixes."""
+        self._row_card_prefixes = None
+
+    def _get_current_card_prefix(self) -> str:
+        """Get the current card prefix, using row context if available.
+
+        When row-level coherence is active (both credit_card_number and credit_card_provider
+        in the schema), returns the pre-generated prefix for the current row.
+
+        When used standalone (without coherence), generates a fresh random prefix each call
+        so each row gets independent values.
+        """
+        # If row-level prefixes are active (coherence mode), use those
+        if self._row_card_prefixes is not None and self._current_row is not None:
+            return self._row_card_prefixes[self._current_row]
+
+        # Standalone mode: generate fresh prefix each call (no caching)
+        return self.rng.choice(self._CARD_PREFIXES)
+
     def credit_card_number(self) -> str:
-        """Generate a random credit card number (not valid for transactions)."""
-        # Generate a 16-digit number with valid Luhn checksum
-        prefix = self.rng.choice(["4", "5", "37", "6011"])  # Visa, MC, Amex, Discover
+        """Generate a random credit card number (not valid for transactions).
+
+        When used with credit_card_provider in the same schema, the card number
+        will be coherent with the provider (e.g., a Visa prefix for "Visa" provider).
+        """
+        # Use cached prefix for coherence with credit_card_provider
+        prefix = self._get_current_card_prefix()
         length = 15 if prefix == "37" else 16
 
         # Generate digits (minus check digit)
@@ -2337,6 +2547,17 @@ class LocaleGenerator:
         digits.append(str(check_digit))
 
         return "".join(digits)
+
+    def credit_card_provider(self) -> str:
+        """Return the credit card provider/network name.
+
+        Returns one of: "Visa", "Mastercard", "American Express", "Discover".
+
+        When used with credit_card_number in the same schema, the provider will be
+        coherent with the card number (e.g., "Visa" for a card starting with "4").
+        """
+        prefix = self._get_current_card_prefix()
+        return self._CARD_PREFIX_TO_PROVIDER[prefix]
 
     def _luhn_checksum(self, digits: list[str]) -> int:
         """Calculate Luhn check digit for a partial card number.
