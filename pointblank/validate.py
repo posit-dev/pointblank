@@ -4146,6 +4146,8 @@ def connect_to_table(connection_string: str) -> Any:
             "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
         )
 
+    import os
+
     import ibis
 
     # Check if connection string includes table specification
@@ -4162,6 +4164,7 @@ def connect_to_table(connection_string: str) -> Any:
 
             conn.disconnect()
             conn.close()
+            os.unlink(base_connection)
 
             # Create helpful error message
             if available_tables:

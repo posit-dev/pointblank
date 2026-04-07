@@ -4527,7 +4527,6 @@ def test_nan_none_null_handling_ibis_sqlite() -> None:
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("test_data", ibis_table, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Test using connection string (this triggers our backend detection logic)
         table_ref = f"sqlite:///{temp_db_path}::test_data"
@@ -12679,7 +12678,6 @@ def test_print_database_tables_names_returned() -> None:
         conn.create_table("supercooltable_2", tbl_ibis, overwrite=True)
         conn.create_table("supercooltable_3", tbl_ibis, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Test the actual function without mocking
         # Use single slash for Windows absolute paths
@@ -12815,7 +12813,6 @@ def test_print_database_tables_filters_memtables() -> None:
 
         # Close the connection
         conn.disconnect()
-        conn.close()
 
         connection_string = f"duckdb://{temp_db_path}"
         table_names = print_database_tables(connection_string)
@@ -12865,7 +12862,6 @@ def test_connect_to_table_success() -> None:
         tbl_ibis = ibis.memtable(df_test.to_pandas())
         conn.create_table("test_table", tbl_ibis, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Connect to the table
         connection_string = f"duckdb://{temp_db_path}::test_table"
@@ -13052,7 +13048,6 @@ def test_connection_string_duckdb_in_memory() -> None:
         conn.create_table("test_users", ibis_table, overwrite=True)
         conn.create_table("test_scores", ibis_table, overwrite=True)  # Second table for testing
         conn.disconnect()
-        conn.close()
 
         # Test 1: Connection string with table specification should work
         validation = (
@@ -13106,7 +13101,6 @@ def test_connection_string_sqlite_in_memory() -> None:
         conn.create_table("orders", ibis_table, overwrite=True)
         conn.create_table("customers", ibis_table, overwrite=True)  # Second table for testing
         conn.disconnect()
-        conn.close()
 
         # Test 1: Connection string with table specification should work
         validation = (
@@ -13149,7 +13143,6 @@ def test_connection_string_no_table_specified_error() -> None:
         conn.create_table("table_b", ibis_table, overwrite=True)
         conn.create_table("users", ibis_table, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Test: Connection string without table specification should error with helpful message
         with pytest.raises(ValueError) as exc_info:
@@ -13191,7 +13184,6 @@ def test_connection_string_no_tables_in_database() -> None:
 
     # Clean up
     conn.disconnect()
-    conn.close()
 
 
 def test_connection_string_invalid_table_name() -> None:
@@ -13212,7 +13204,6 @@ def test_connection_string_invalid_table_name() -> None:
 
     # Clean up
     conn.disconnect()
-    conn.close()
 
 
 def test_connection_string_backend_specific_error_guidance() -> None:
@@ -13295,7 +13286,6 @@ def test_connection_string_temporary_file_database() -> None:
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("products", ibis_table, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Test connection string with file path
         connection_string = f"sqlite:///{temp_db_path}::products"
@@ -13360,7 +13350,6 @@ def test_connection_string_integration_with_validation_methods() -> None:
         ibis_table = ibis.memtable(test_data.to_pandas())
         conn.create_table("comprehensive_test", ibis_table, overwrite=True)
         conn.disconnect()
-        conn.close()
 
         # Test comprehensive validation using connection string
         validation = (
@@ -13945,10 +13934,10 @@ def test_get_dataframe_returns_pandas_df():
     assert isinstance(df_pandas, pd.DataFrame)
 
 
-def test_get_dataframe_returns_duckdb_df():
+def test_get_dataframe_returns_ibis_memtable():
     validation = Validate(data="small_table")
-    df_duckdb = validation.get_dataframe("duckdb")
-    assert isinstance(df_duckdb, ibis.expr.types.relations.Table)
+    df_ibis = validation.get_dataframe("duckdb")
+    assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
 
 def get_schema_info(
@@ -19369,6 +19358,7 @@ def test_col_vals_ge_timezone_datetime_duckdb() -> None:
 
     finally:
         conn.close()
+        os.unlink(temp_db_path)
 
 
 @pytest.mark.xfail(reason="Mixed timezone comparisons may not work correctly yet")
