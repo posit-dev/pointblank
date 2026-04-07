@@ -86,6 +86,20 @@ def _generic_between(real: float, lower: float, upper: float) -> bool:
     return bool(lower <= real <= upper)
 
 
+def split_agg_name(name: str) -> tuple[str, str]:
+    """Split an aggregation method name into aggregator and comparator names.
+
+    Args:
+        name (str): The aggregation method name (e.g., "col_sum_eq" or "sum_eq").
+
+    Returns:
+        tuple[str, str]: A tuple of (agg_name, comp_name) e.g., ("sum", "eq").
+    """
+    name = name.removeprefix("col_")
+    agg_name, comp_name = name.rsplit("_", 1)
+    return agg_name, comp_name
+
+
 def resolve_agg_registries(name: str) -> tuple[Aggregator, Comparator]:
     """Resolve the assertion name to a valid aggregator
 
@@ -95,8 +109,7 @@ def resolve_agg_registries(name: str) -> tuple[Aggregator, Comparator]:
     Returns:
         tuple[Aggregator, Comparator]: The aggregator and comparator functions.
     """
-    name = name.removeprefix("col_")
-    agg_name, comp_name = name.split("_")[-2:]
+    agg_name, comp_name = split_agg_name(name)
 
     aggregator = AGGREGATOR_REGISTRY.get(agg_name)
     comparator = COMPARATOR_REGISTRY.get(comp_name)

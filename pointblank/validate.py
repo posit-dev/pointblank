@@ -28,7 +28,12 @@ from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
 
-from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
+from pointblank._agg import (
+    is_valid_agg,
+    load_validation_method_grid,
+    resolve_agg_registries,
+    split_agg_name,
+)
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
     CHECK_MARK_SPAN,
@@ -19174,6 +19179,15 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if is_valid_agg(assertion_type):
+        return _create_text_agg(
+            lang=lang,
+            assertion_type=assertion_type,
+            column=column,
+            values=values,
+            for_failure=for_failure,
+        )
+
     return None
 
 
@@ -19203,6 +19217,52 @@ def _create_text_comparison(
 
     return compare_expectation_text.format(
         column_text=column_text,
+        operator=operator,
+        values_text=values_text,
+    )
+
+
+def _create_text_agg(
+    lang: str,
+    assertion_type: str,
+    column: str | list[str],
+    values: dict[str, Any],
+    for_failure: bool = False,
+) -> str:
+    """Create autobrief text for aggregation methods like col_sum_eq, col_avg_gt, etc."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    agg_type, comp_type = split_agg_name(assertion_type)
+
+    # this is covered by the test `test_brief_auto_all_agg_methods` to make sure we don't
+    # create any weird secret agg constants.
+    agg_display_names: dict[str, str] = {
+        "sum": "sum",
+        "avg": "average",
+        "sd": "standard deviation",
+    }
+    try:
+        agg_display: str = agg_display_names[agg_type]
+    except KeyError as ke:  # pragma: no cover
+        raise AssertionError from ke  # This should never happen in prod, it's caught in CI.
+
+    # Get the operator
+    comparison_assertion = f"col_vals_{comp_type}"
+    if lang == "ar":  # pragma: no cover
+        operator = COMPARISON_OPERATORS_AR.get(comparison_assertion, comp_type)
+    else:
+        operator = COMPARISON_OPERATORS.get(comparison_assertion, comp_type)
+
+    column_text = _prep_column_text(column=column)
+
+    value = values.get("value", values) if isinstance(values, dict) else values
+    values_text = _prep_values_text(values=str(value), lang=lang, limit=3)
+
+    # "Expect that the {agg} of {column} should be {operator} {value}."
+    agg_expectation_text = EXPECT_FAIL_TEXT[f"compare_{type_}_text"][lang]
+
+    return agg_expectation_text.format(
+        column_text=f"the {agg_display} of {column_text}",
         operator=operator,
         values_text=values_text,
     )

@@ -1,8 +1,3 @@
-from pointblank import Actions, Thresholds
-from pointblank._utils import _PBUnresolvedColumn
-from pointblank.column import Column, ReferenceColumn
-from pointblank._typing import Tolerance
-
 import datetime
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -17,20 +12,20 @@ from pointblank.thresholds import Actions, FinalActions, Thresholds
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 __all__ = [
-    "Validate",
+    "get_action_metadata",
+    "get_validation_summary",
+    "config",
     "load_dataset",
     "read_file",
     "write_file",
-    "config",
-    "connect_to_table",
-    "print_database_tables",
+    "get_data_path",
     "preview",
     "missing_vals_tbl",
-    "get_action_metadata",
     "get_column_count",
-    "get_data_path",
     "get_row_count",
-    "get_validation_summary",
+    "connect_to_table",
+    "print_database_tables",
+    "Validate",
 ]
 
 P = ParamSpec("P")
@@ -586,7 +581,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value eq some `value`.
 
@@ -622,7 +617,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value gt some `value`.
 
@@ -658,7 +653,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value ge some `value`.
 
@@ -694,7 +689,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value lt some `value`.
 
@@ -730,7 +725,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value le some `value`.
 
@@ -766,7 +761,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value eq some `value`.
 
@@ -802,7 +797,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value gt some `value`.
 
@@ -838,7 +833,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value ge some `value`.
 
@@ -874,7 +869,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value lt some `value`.
 
@@ -910,7 +905,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value le some `value`.
 
@@ -946,7 +941,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value eq some `value`.
 
@@ -982,7 +977,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value gt some `value`.
 
@@ -1018,7 +1013,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value ge some `value`.
 
@@ -1054,7 +1049,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value lt some `value`.
 
@@ -1090,7 +1085,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value le some `value`.
 
