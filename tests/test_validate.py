@@ -13939,6 +13939,8 @@ def test_get_dataframe_returns_ibis_memtable():
     df_ibis = validation.get_dataframe("duckdb")
     assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
+# TODO: MEGHAN - test col names, brief coalescing, values to dict check, test inactive steps output, empty validation check
+
 def get_schema_info(
     data_tbl,
     schema,
