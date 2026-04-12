@@ -13939,7 +13939,6 @@ def test_get_dataframe_returns_ibis_memtable():
     df_ibis = validation.get_dataframe("duckdb")
     assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
-
 def get_schema_info(
     data_tbl,
     schema,
