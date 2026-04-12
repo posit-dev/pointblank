@@ -6,6 +6,8 @@ pyi: ## Generate .pyi stub files
 		--include-private \
 		-o  .
 	@uv run scripts/generate_agg_validate_pyi.py
+	@uv run ruff check --fix pointblank/validate.pyi
+	@uv run ruff format pointblank/validate.pyi
 
 .PHONY: test
 test:

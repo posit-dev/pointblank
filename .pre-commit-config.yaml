@@ -1,15 +1,22 @@
 exclude: "(.*\\.svg)|(.*\\.qmd)|(.*\\.ambr)|(.*\\.csv)|(.*\\.txt)|(.*\\.json)|(.*\\.ipynb)|(.*\\.html)"
 repos:
+  - repo: local
+    hooks:
+      - id: check-pyi-sync
+        name: validate.pyi must be up to date
+        language: system
+        entry: bash -c 'make pyi && git diff --exit-code pointblank/validate.pyi'
+        pass_filenames: false
+        stages: [commit]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+  # NOTE: ruff version must match the pin in pyproject.toml [dependency-groups] dev
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.14.10
     hooks:
-      # Run the linter.
       - id: ruff
         args: [--fix]
-      # Run the formatter.
       - id: ruff-format

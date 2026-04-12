@@ -1142,6 +1142,102 @@ def test_agg_report_multiple_steps_formatting():
     assert "2.0<br/>tol=(0.1, 0.2)" in html
 
 
+def test_brief_auto():
+    """Test that auto briefs are generated correctly for aggregation methods."""
+    data = pl.DataFrame({"amount": [100, 200, 300]})
+
+    validation = Validate(data).col_sum_gt(columns="amount", value=500, brief=True).interrogate()
+
+    # Check that brief is set to auto template
+    assert validation.validation_info[0].brief == "{auto}"
+
+    # Check that the HTML report generates auto brief text
+    html = validation.get_tabular_report().as_raw_html()
+    assert html is not None
+    assert len(html) > 0
+
+    # Auto brief should contain references to the aggregation type and column
+    # Should mention "sum" and "amount" and the comparison
+    assert "amount" in html
+    assert "sum" in html.lower()
+
+
+def test_brief_custom():
+    """Test that custom briefs are stored and displayed correctly."""
+    data = pl.DataFrame({"sales": [1000, 2000, 3000]})
+
+    custom_brief = "Validating that total sales exceeds minimum threshold"
+
+    validation = (
+        Validate(data).col_avg_eq(columns="sales", value=2000, brief=custom_brief).interrogate()
+    )
+
+    # Check that custom brief is stored
+    assert validation.validation_info[0].brief == custom_brief
+
+    # Check that custom brief appears in HTML report
+    html = validation.get_tabular_report().as_raw_html()
+    assert custom_brief in html
+
+
+def test_brief_mixed():
+    """Test mixing custom and auto brief templates across multiple validation steps."""
+    data = pl.DataFrame({"value_a": [10, 20, 30], "value_b": [100, 200, 300]})
+
+    custom_brief_1 = "First check: sum validation"
+
+    validation = (
+        Validate(data)
+        .col_sum_gt(columns="value_a", value=50, brief=custom_brief_1)
+        .col_avg_lt(columns="value_b", value=400, brief=True)  # auto brief template
+        .interrogate()
+    )
+
+    # First step should have custom brief
+    assert validation.validation_info[0].brief == custom_brief_1
+
+    # Second step should have auto brief template
+    assert validation.validation_info[1].brief == "{auto}"
+
+    # Both should appear in HTML report
+    html = validation.get_tabular_report().as_raw_html()
+    assert custom_brief_1 in html
+    # Auto brief should mention the column and aggregation type
+    assert "value_b" in html
+    assert "average" in html.lower()
+
+
+@pytest.mark.parametrize("method", load_validation_method_grid())
+def test_brief_auto_all_agg_methods(method: str):
+    """Test that auto briefs are generated for all aggregation methods.
+
+    This ensures that the agg_display_names mapping in _create_text_agg
+    has coverage for all aggregation types (sum, avg, sd).
+    """
+    from pointblank._agg import split_agg_name
+
+    data = pl.DataFrame({"col": [10.0, 20.0, 30.0, 40.0, 50.0]})
+
+    v = Validate(data)
+    v = getattr(v, method)(columns="col", value=100, brief=True)
+    v = v.interrogate()
+
+    assert v.validation_info[0].brief == "{auto}"
+
+    html = v.get_tabular_report().as_raw_html()
+    assert html is not None
+    assert len(html) > 0
+    assert "col" in html
+
+    # Extract agg type from method name to verify it appears in report
+    # e.g., "col_sum_eq" -> agg_type="sum"
+    agg_type, _ = split_agg_name(method)
+    agg_display_map = {"sum": "sum", "avg": "average", "sd": "standard deviation"}
+    agg_display = agg_display_map.get(agg_type, agg_type)
+
+    assert agg_display.lower() in html.lower()
+
+
 @pytest.mark.parametrize(
     ("data_eager", "ref_eager"),
     list(product([True, False], repeat=2)),
