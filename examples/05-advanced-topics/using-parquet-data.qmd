@@ -1,0 +1,58 @@
+---
+title: "Using Parquet Data"
+description: "A Parquet dataset can be used for data validation, thanks to Ibis."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+```{python}
+# | echo: false
+
+import pointblank as pb
+import ibis
+
+game_revenue = ibis.read_parquet("../data/game_revenue.parquet")
+
+validation = (
+    pb.Validate(data=game_revenue, label="Example using a Parquet dataset.")
+    .col_vals_lt(columns="item_revenue", value=200)
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_gt(columns="session_duration", value=5)
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+import ibis
+
+game_revenue = ibis.read_parquet("data/game_revenue.parquet")
+
+validation = (
+    pb.Validate(data=game_revenue, label="Example using a Parquet dataset.")
+    .col_vals_lt(columns="item_revenue", value=200)
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_gt(columns="session_duration", value=5)
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(game_revenue)
+```
+
+</details>
