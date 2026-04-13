@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index – Pointblank</title>
+<title>API Reference – Pointblank | Pointblank</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -33,17 +33,17 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../assets/fav-logo.png" rel="icon" type="image/png">
+<link href="../favicon.ico" rel="icon">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-268d4943898fdc921a96423155a50391.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5864d2c5cf85e8c6f619c1992905b265.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -56,7 +56,7 @@ ul.task-list li input[type="checkbox"] {
     "/",
     "s"
   ],
-  "show-item-context": true,
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -71,72 +71,83 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XSFKYZM9GW"></script>
-
-<script type="text/javascript">
-
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
-</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="../theme-init.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
-<script async="" src="https://plausible.io/js/pa-71QkMiRx8iHcMxnqr8Iw5.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/">
+  <meta name="description" content="When performing data validation, use the Validate class to get the process started. It takes the target table and options for metadata and failure...">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Pointblank",
+  "description": "Find out if your data is what you think it is.",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://posit-dev.github.io/pointblank",
+  "documentation": "https://posit-dev.github.io/pointblank",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "Python"
+  }
+}
 </script>
-
-
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="reference/_styles-quartodoc.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="API Reference – Pointblank | Pointblank">
+  <meta property="og:description" content="When performing data validation, use the Validate class to get the process started. It takes the target table and options for metadata and failure...">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="API Reference – Pointblank | Pointblank">
+  <meta name="twitter:description" content="When performing data validation, use the Validate class to get the process started. It takes the target table and options for metadata and failure...">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-reference quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/pointblank_logo_small.svg" alt="" class="navbar-logo light-content">
-    <img src="../assets/pointblank_logo_small.svg" alt="" class="navbar-logo dark-content">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.23.0</code><br>Released 2026-04-01">
+    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
+            <div id="quarto-search" class=""></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
-<span class="menu-text">Get Started</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../demos/index.html"> 
-<span class="menu-text">Examples</span></a>
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../blog/index.html"> 
-<span class="menu-text">Pointblog</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://discord.com/invite/YH7CybCNCQ"> <i class="bi bi-discord" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/posit-dev/pointblank"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+    </span>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -144,19 +155,798 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Index</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container" style="padding-bottom: 0.5rem; padding-top: 0.25rem;"> 
+  <a href="../reference/index.html" style="font-family: &quot;Open Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">API Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validate</span></a>
+</div>
+      <ul id="quarto-sidebar-section-1" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">Validate</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">Thresholds</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">Actions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/FinalActions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">FinalActions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Schema.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">Schema</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DraftValidation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validation Steps</span></a>
+</div>
+      <ul id="quarto-sidebar-section-2" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_gt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_lt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_ge()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_le()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_eq()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_ne.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_ne()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_between.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_between()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_outside.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_outside()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_in_set.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_in_set()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_not_in_set.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_not_in_set()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_increasing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_increasing()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_decreasing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_decreasing()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_null()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_not_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_not_null()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_regex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_regex()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_within_spec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_within_spec()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_expr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_vals_expr()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_exists.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_exists()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_pct_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_null()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.rows_distinct.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.rows_distinct()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.rows_complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.rows_complete()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_schema_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_schema_match()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.row_count_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.row_count_match()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_count_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_count_match()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.data_freshness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.data_freshness()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.tbl_match()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.conjointly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.conjointly()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.specially.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.specially()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.prompt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.prompt()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Aggregation Steps</span></a>
+</div>
+      <ul id="quarto-sidebar-section-3" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sum_gt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sum_lt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sum_ge()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sum_le()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sum_eq()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_avg_gt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_avg_lt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_avg_ge()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_avg_le()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_avg_eq()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sd_gt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sd_lt()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sd_ge()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sd_le()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_sd_eq()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Column Selection</span></a>
+</div>
+      <ul id="quarto-sidebar-section-4" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/col.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">col()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/starts_with.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">starts_with()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ends_with.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">ends_with()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/contains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">contains()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/matches.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">matches()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/everything.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">everything()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/first_n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">first_n()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/last_n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">last_n()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/expr_col.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">expr_col()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Segment Groups</span></a>
+</div>
+      <ul id="quarto-sidebar-section-5" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/seg_group.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">seg_group()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Interrogation and Reporting</span></a>
+</div>
+      <ul id="quarto-sidebar-section-6" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.interrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.interrogate()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.set_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.set_tbl()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_tabular_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_step_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_step_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_json_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_json_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_sundered_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_sundered_data()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_data_extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_data_extracts()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.all_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.all_passed()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_passing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_passing()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_below_threshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_below_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.above_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.n()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.n_passed()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.n_failed()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.f_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.f_passed()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.f_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.f_failed()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.warning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.warning()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.error()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.critical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.critical()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Inspection and Assistance</span></a>
+</div>
+      <ul id="quarto-sidebar-section-7" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">DataScan</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">preview()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/col_summary_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">col_summary_tbl()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/missing_vals_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">missing_vals_tbl()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/load_dataset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">load_dataset()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_data_path.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">get_data_path()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/connect_to_table.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">connect_to_table()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/print_database_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">print_database_tables()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Pre-checks</span></a>
+</div>
+      <ul id="quarto-sidebar-section-8" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">has_columns()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/has_rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">has_rows()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">YAML</span></a>
+</div>
+      <ul id="quarto-sidebar-section-9" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">yaml_interrogate()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_yaml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">validate_yaml()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">yaml_to_python()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Utility Functions</span></a>
+</div>
+      <ul id="quarto-sidebar-section-10" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">get_column_count()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_row_count.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">get_row_count()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_action_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">get_action_metadata()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_validation_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">get_validation_summary()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/write_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">write_file()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/read_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">read_file()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ref.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">ref()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Test Data Generation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">generate_dataset()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/int_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">int_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/float_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">float_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/string_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">string_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/bool_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">bool_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/date_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">date_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/datetime_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">datetime_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/time_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">time_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/duration_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">duration_field()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/profile_fields.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">profile_fields()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Prebuilt Actions</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
-  <ul>
-  
-  <li><a href="#validate" id="toc-validate" class="nav-link" data-scroll-target="#validate">Validate</a></li>
+  <ul class="collapse">
+  <li><a href="#validate" id="toc-validate" class="nav-link active" data-scroll-target="#validate">Validate</a></li>
   <li><a href="#validation-steps" id="toc-validation-steps" class="nav-link" data-scroll-target="#validation-steps">Validation Steps</a></li>
+  <li><a href="#aggregation-steps" id="toc-aggregation-steps" class="nav-link" data-scroll-target="#aggregation-steps">Aggregation Steps</a></li>
   <li><a href="#column-selection" id="toc-column-selection" class="nav-link" data-scroll-target="#column-selection">Column Selection</a></li>
   <li><a href="#segment-groups" id="toc-segment-groups" class="nav-link" data-scroll-target="#segment-groups">Segment Groups</a></li>
   <li><a href="#interrogation-and-reporting" id="toc-interrogation-and-reporting" class="nav-link" data-scroll-target="#interrogation-and-reporting">Interrogation and Reporting</a></li>
@@ -170,447 +960,564 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
 
-
-
-
-<section id="api-reference" class="level1 doc doc-index">
-<h1 class="doc doc-index">API Reference</h1>
-<section id="validate" class="level2">
-<h2 class="anchored" data-anchor-id="validate">Validate</h2>
-<p>When performing data validation, you’ll need the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class to get the process started. It’s given the target table and you can optionally provide some metadata and/or failure thresholds (using the <a href="../reference/Thresholds.html#pointblank.Thresholds" title="0"><code>Thresholds</code></a> class or through shorthands for this task). The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/Validate.html#pointblank.Validate">Validate</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Workflow for defining a set of validations on a table and interrogating for results.</dd>
-
-<dt><a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Definition of threshold values.</dd>
-
-<dt><a href="../reference/Actions.html#pointblank.Actions">Actions</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Definition of action values.</dd>
-
-<dt><a href="../reference/FinalActions.html#pointblank.FinalActions">FinalActions</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Define actions to be taken after validation is complete.</dd>
-
-<dt><a href="../reference/Schema.html#pointblank.Schema">Schema</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Definition of a schema object.</dd>
-
-<dt><a href="../reference/DraftValidation.html#pointblank.DraftValidation">DraftValidation</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Draft a validation plan for a given table using an LLM.</dd>
-
-</dl>
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">API Reference</h1>
 </div>
-</section>
-<section id="validation-steps" class="level2">
-<h2 class="anchored" data-anchor-id="validation-steps">Validation Steps</h2>
-<p>Validation steps can be thought of as sequential validations on the target data. We call <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a>’s validation methods to build up a validation plan: a collection of steps that, in the aggregate, provides good validation coverage.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
 
-<dt><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt">Validate.col_vals_gt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data greater than a fixed value or data in another column?</dd>
 
-<dt><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt">Validate.col_vals_lt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data less than a fixed value or data in another column?</dd>
 
-<dt><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge">Validate.col_vals_ge()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data greater than or equal to a fixed value or data in another column?</dd>
+<div class="quarto-title-meta">
 
-<dt><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le">Validate.col_vals_le()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data less than or equal to a fixed value or data in another column?</dd>
+    
+  
+    
+  </div>
+  
 
-<dt><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq">Validate.col_vals_eq()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data equal to a fixed value or data in another column?</dd>
 
-<dt><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne">Validate.col_vals_ne()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data not equal to a fixed value or data in another column?</dd>
+</header>
 
-<dt><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between">Validate.col_vals_between()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Do column data lie between two specified values or data in other columns?</dd>
 
-<dt><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside">Validate.col_vals_outside()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Do column data lie outside of two specified values or data in other columns?</dd>
-
-<dt><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set">Validate.col_vals_in_set()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values are in a set of values.</dd>
-
-<dt><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set">Validate.col_vals_not_in_set()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values are not in a set of values.</dd>
-
-<dt><a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing">Validate.col_vals_increasing()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data increasing by row?</dd>
-
-<dt><a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing">Validate.col_vals_decreasing()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Are column data decreasing by row?</dd>
-
-<dt><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null">Validate.col_vals_null()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether values in a column are Null.</dd>
-
-<dt><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null">Validate.col_vals_not_null()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether values in a column are not Null.</dd>
-
-<dt><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex">Validate.col_vals_regex()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values match a regular expression pattern.</dd>
-
-<dt><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec">Validate.col_vals_within_spec()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values fit within a specification.</dd>
-
-<dt><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr">Validate.col_vals_expr()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate column values using a custom expression.</dd>
-
-<dt><a href="../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt">Validate.col_sum_gt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column sum satisfy a greater than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sum_lt.html#pointblank.Validate.col_sum_lt">Validate.col_sum_lt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column sum satisfy a less than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge">Validate.col_sum_ge()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column sum satisfy a greater than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sum_le.html#pointblank.Validate.col_sum_le">Validate.col_sum_le()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column sum satisfy a less than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sum_eq.html#pointblank.Validate.col_sum_eq">Validate.col_sum_eq()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column sum satisfy an equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_avg_gt.html#pointblank.Validate.col_avg_gt">Validate.col_avg_gt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column average satisfy a greater than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt">Validate.col_avg_lt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column average satisfy a less than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_avg_ge.html#pointblank.Validate.col_avg_ge">Validate.col_avg_ge()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column average satisfy a greater than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_avg_le.html#pointblank.Validate.col_avg_le">Validate.col_avg_le()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column average satisfy a less than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_avg_eq.html#pointblank.Validate.col_avg_eq">Validate.col_avg_eq()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column average satisfy an equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sd_gt.html#pointblank.Validate.col_sd_gt">Validate.col_sd_gt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column standard deviation satisfy a greater than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt">Validate.col_sd_lt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column standard deviation satisfy a less than comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sd_ge.html#pointblank.Validate.col_sd_ge">Validate.col_sd_ge()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column standard deviation satisfy a greater than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sd_le.html#pointblank.Validate.col_sd_le">Validate.col_sd_le()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column standard deviation satisfy a less than or equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.col_sd_eq.html#pointblank.Validate.col_sd_eq">Validate.col_sd_eq()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Does the column standard deviation satisfy an equal to comparison?</dd>
-
-<dt><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct">Validate.rows_distinct()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether rows in the table are distinct.</dd>
-
-<dt><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete">Validate.rows_complete()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether row data are complete by having no missing values.</dd>
-
-<dt><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists">Validate.col_exists()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether one or more columns exist in the table.</dd>
-
-<dt><a href="../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null">Validate.col_pct_null()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether a column has a specific percentage of Null values.</dd>
-
-<dt><a href="../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness">Validate.data_freshness()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate that data in a datetime column is not older than a specified maximum age.</dd>
-
-<dt><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match">Validate.col_schema_match()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Do columns in the table (and their types) match a predefined schema?</dd>
-
-<dt><a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match">Validate.row_count_match()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether the row count of the table matches a specified count.</dd>
-
-<dt><a href="../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match">Validate.col_count_match()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether the column count of the table matches a specified count.</dd>
-
-<dt><a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match">Validate.tbl_match()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate whether the target table matches a comparison table.</dd>
-
-<dt><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly">Validate.conjointly()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Perform multiple row-wise validations for joint validity.</dd>
-
-<dt><a href="../reference/Validate.specially.html#pointblank.Validate.specially">Validate.specially()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Perform a specialized validation with customized logic.</dd>
-
-<dt><a href="../reference/Validate.prompt.html#pointblank.Validate.prompt">Validate.prompt()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate rows using AI/LLM-powered analysis.</dd>
-
-</dl>
+<section id="validate" class="level2 doc-group">
+<h2 class="doc-group">Validate</h2>
+<div class="doc-description">
+<p>When performing data validation, use the <code>Validate</code> class to get the process started. It takes the target table and options for metadata and failure thresholds (using the <code>Thresholds</code> class or shorthands). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
 </div>
-</section>
-<section id="column-selection" class="level2">
-<h2 class="anchored" data-anchor-id="column-selection">Column Selection</h2>
-<p>A flexible way to select columns for validation is to use the <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> function along with column selection helper functions. A combination of <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> + <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a>, <a href="../reference/matches.html#pointblank.matches" title="0"><code>matches()</code></a>, etc., allows for the selection of multiple target columns (mapping a validation across many steps). Furthermore, the <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> function can be used to declare a comparison column (e.g., for the <code>value=</code> argument in many <code>col_vals_*()</code> methods) when you can’t use a fixed value for comparison.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/col.html#pointblank.col">col()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Helper function for referencing a column in the input table.</dd>
-
-<dt><a href="../reference/starts_with.html#pointblank.starts_with">starts_with()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select columns that start with specified text.</dd>
-
-<dt><a href="../reference/ends_with.html#pointblank.ends_with">ends_with()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select columns that end with specified text.</dd>
-
-<dt><a href="../reference/contains.html#pointblank.contains">contains()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select columns that contain specified text.</dd>
-
-<dt><a href="../reference/matches.html#pointblank.matches">matches()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select columns that match a specified regular expression pattern.</dd>
-
-<dt><a href="../reference/everything.html#pointblank.everything">everything()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select all columns.</dd>
-
-<dt><a href="../reference/first_n.html#pointblank.first_n">first_n()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select the first <code>n</code> columns in the column list.</dd>
-
-<dt><a href="../reference/last_n.html#pointblank.last_n">last_n()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Select the last <code>n</code> columns in the column list.</dd>
-
-<dt><a href="../reference/expr_col.html#pointblank.expr_col">expr_col()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a column expression for use in <code>conjointly()</code> validation.</dd>
-
+<dl>
+<dt><a href="../reference/Validate.html#pointblank.Validate" class="doc-class doc-label doc-label-dataclass">Validate</a></dt>
+<dd>
+<p>Workflow for defining a set of validations on a table and interrogating for results.</p>
+</dd>
+<dt><a href="../reference/Thresholds.html#pointblank.Thresholds" class="doc-class doc-label doc-label-dataclass">Thresholds</a></dt>
+<dd>
+<p>Definition of threshold values.</p>
+</dd>
+<dt><a href="../reference/Actions.html#pointblank.Actions" class="doc-class doc-label doc-label-dataclass">Actions</a></dt>
+<dd>
+<p>Definition of action values.</p>
+</dd>
+<dt><a href="../reference/FinalActions.html#pointblank.FinalActions" class="doc-class doc-label doc-label-dataclass">FinalActions</a></dt>
+<dd>
+<p>Define actions to be taken after validation is complete.</p>
+</dd>
+<dt><a href="../reference/Schema.html#pointblank.Schema" class="doc-class doc-label doc-label-dataclass">Schema</a></dt>
+<dd>
+<p>Definition of a schema object.</p>
+</dd>
+<dt><a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="doc-class doc-label doc-label-dataclass">DraftValidation</a></dt>
+<dd>
+<p>Draft a validation plan for a given table using an LLM.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="segment-groups" class="level2">
-<h2 class="anchored" data-anchor-id="segment-groups">Segment Groups</h2>
+<section id="validation-steps" class="level2 doc-group">
+<h2 class="doc-group">Validation Steps</h2>
+<div class="doc-description">
+<p>Validation steps are sequential validations on the target data. Call Validate’s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</p>
+</div>
+<dl>
+<dt><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="doc-function doc-label doc-label-method">Validate.col_vals_gt()</a></dt>
+<dd>
+<p>Are column data greater than a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="doc-function doc-label doc-label-method">Validate.col_vals_lt()</a></dt>
+<dd>
+<p>Are column data less than a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="doc-function doc-label doc-label-method">Validate.col_vals_ge()</a></dt>
+<dd>
+<p>Are column data greater than or equal to a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="doc-function doc-label doc-label-method">Validate.col_vals_le()</a></dt>
+<dd>
+<p>Are column data less than or equal to a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="doc-function doc-label doc-label-method">Validate.col_vals_eq()</a></dt>
+<dd>
+<p>Are column data equal to a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="doc-function doc-label doc-label-method">Validate.col_vals_ne()</a></dt>
+<dd>
+<p>Are column data not equal to a fixed value or data in another column?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="doc-function doc-label doc-label-method">Validate.col_vals_between()</a></dt>
+<dd>
+<p>Do column data lie between two specified values or data in other columns?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="doc-function doc-label doc-label-method">Validate.col_vals_outside()</a></dt>
+<dd>
+<p>Do column data lie outside of two specified values or data in other columns?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="doc-function doc-label doc-label-method">Validate.col_vals_in_set()</a></dt>
+<dd>
+<p>Validate whether column values are in a set of values.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="doc-function doc-label doc-label-method">Validate.col_vals_not_in_set()</a></dt>
+<dd>
+<p>Validate whether column values are not in a set of values.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="doc-function doc-label doc-label-method">Validate.col_vals_increasing()</a></dt>
+<dd>
+<p>Are column data increasing by row?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="doc-function doc-label doc-label-method">Validate.col_vals_decreasing()</a></dt>
+<dd>
+<p>Are column data decreasing by row?</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="doc-function doc-label doc-label-method">Validate.col_vals_null()</a></dt>
+<dd>
+<p>Validate whether values in a column are Null.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="doc-function doc-label doc-label-method">Validate.col_vals_not_null()</a></dt>
+<dd>
+<p>Validate whether values in a column are not Null.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="doc-function doc-label doc-label-method">Validate.col_vals_regex()</a></dt>
+<dd>
+<p>Validate whether column values match a regular expression pattern.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="doc-function doc-label doc-label-method">Validate.col_vals_within_spec()</a></dt>
+<dd>
+<p>Validate whether column values fit within a specification.</p>
+</dd>
+<dt><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="doc-function doc-label doc-label-method">Validate.col_vals_expr()</a></dt>
+<dd>
+<p>Validate column values using a custom expression.</p>
+</dd>
+<dt><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="doc-function doc-label doc-label-method">Validate.col_exists()</a></dt>
+<dd>
+<p>Validate whether one or more columns exist in the table.</p>
+</dd>
+<dt><a href="../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="doc-function doc-label doc-label-method">Validate.col_pct_null()</a></dt>
+<dd>
+<p>Validate whether a column has a specific percentage of Null values.</p>
+</dd>
+<dt><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="doc-function doc-label doc-label-method">Validate.rows_distinct()</a></dt>
+<dd>
+<p>Validate whether rows in the table are distinct.</p>
+</dd>
+<dt><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="doc-function doc-label doc-label-method">Validate.rows_complete()</a></dt>
+<dd>
+<p>Validate whether row data are complete by having no missing values.</p>
+</dd>
+<dt><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="doc-function doc-label doc-label-method">Validate.col_schema_match()</a></dt>
+<dd>
+<p>Do columns in the table (and their types) match a predefined schema?</p>
+</dd>
+<dt><a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="doc-function doc-label doc-label-method">Validate.row_count_match()</a></dt>
+<dd>
+<p>Validate whether the row count of the table matches a specified count.</p>
+</dd>
+<dt><a href="../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="doc-function doc-label doc-label-method">Validate.col_count_match()</a></dt>
+<dd>
+<p>Validate whether the column count of the table matches a specified count.</p>
+</dd>
+<dt><a href="../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="doc-function doc-label doc-label-method">Validate.data_freshness()</a></dt>
+<dd>
+<p>Validate that data in a datetime column is not older than a specified maximum age.</p>
+</dd>
+<dt><a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="doc-function doc-label doc-label-method">Validate.tbl_match()</a></dt>
+<dd>
+<p>Validate whether the target table matches a comparison table.</p>
+</dd>
+<dt><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="doc-function doc-label doc-label-method">Validate.conjointly()</a></dt>
+<dd>
+<p>Perform multiple row-wise validations for joint validity.</p>
+</dd>
+<dt><a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="doc-function doc-label doc-label-method">Validate.specially()</a></dt>
+<dd>
+<p>Perform a specialized validation with customized logic.</p>
+</dd>
+<dt><a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="doc-function doc-label doc-label-method">Validate.prompt()</a></dt>
+<dd>
+<p>Validate rows using AI/LLM-powered analysis.</p>
+</dd>
+</dl>
+</section>
+<section id="aggregation-steps" class="level2 doc-group">
+<h2 class="doc-group">Aggregation Steps</h2>
+<div class="doc-description">
+<p>These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.</p>
+</div>
+<dl>
+<dt><a href="../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="doc-function doc-label doc-label-method">Validate.col_sum_gt()</a></dt>
+<dd>
+<p>Does the column sum satisfy a greater than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sum_lt.html#pointblank.Validate.col_sum_lt" class="doc-function doc-label doc-label-method">Validate.col_sum_lt()</a></dt>
+<dd>
+<p>Does the column sum satisfy a less than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="doc-function doc-label doc-label-method">Validate.col_sum_ge()</a></dt>
+<dd>
+<p>Does the column sum satisfy a greater than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sum_le.html#pointblank.Validate.col_sum_le" class="doc-function doc-label doc-label-method">Validate.col_sum_le()</a></dt>
+<dd>
+<p>Does the column sum satisfy a less than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sum_eq.html#pointblank.Validate.col_sum_eq" class="doc-function doc-label doc-label-method">Validate.col_sum_eq()</a></dt>
+<dd>
+<p>Does the column sum satisfy an equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_avg_gt.html#pointblank.Validate.col_avg_gt" class="doc-function doc-label doc-label-method">Validate.col_avg_gt()</a></dt>
+<dd>
+<p>Does the column average satisfy a greater than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="doc-function doc-label doc-label-method">Validate.col_avg_lt()</a></dt>
+<dd>
+<p>Does the column average satisfy a less than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_avg_ge.html#pointblank.Validate.col_avg_ge" class="doc-function doc-label doc-label-method">Validate.col_avg_ge()</a></dt>
+<dd>
+<p>Does the column average satisfy a greater than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_avg_le.html#pointblank.Validate.col_avg_le" class="doc-function doc-label doc-label-method">Validate.col_avg_le()</a></dt>
+<dd>
+<p>Does the column average satisfy a less than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_avg_eq.html#pointblank.Validate.col_avg_eq" class="doc-function doc-label doc-label-method">Validate.col_avg_eq()</a></dt>
+<dd>
+<p>Does the column average satisfy an equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sd_gt.html#pointblank.Validate.col_sd_gt" class="doc-function doc-label doc-label-method">Validate.col_sd_gt()</a></dt>
+<dd>
+<p>Does the column standard deviation satisfy a greater than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt" class="doc-function doc-label doc-label-method">Validate.col_sd_lt()</a></dt>
+<dd>
+<p>Does the column standard deviation satisfy a less than comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sd_ge.html#pointblank.Validate.col_sd_ge" class="doc-function doc-label doc-label-method">Validate.col_sd_ge()</a></dt>
+<dd>
+<p>Does the column standard deviation satisfy a greater than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sd_le.html#pointblank.Validate.col_sd_le" class="doc-function doc-label doc-label-method">Validate.col_sd_le()</a></dt>
+<dd>
+<p>Does the column standard deviation satisfy a less than or equal to comparison?</p>
+</dd>
+<dt><a href="../reference/Validate.col_sd_eq.html#pointblank.Validate.col_sd_eq" class="doc-function doc-label doc-label-method">Validate.col_sd_eq()</a></dt>
+<dd>
+<p>Does the column standard deviation satisfy an equal to comparison?</p>
+</dd>
+</dl>
+</section>
+<section id="column-selection" class="level2 doc-group">
+<h2 class="doc-group">Column Selection</h2>
+<div class="doc-description">
+<p>Use the <code>col()</code> function along with column selection helpers to flexibly select columns for validation. Combine <code>col()</code> with <code>starts_with()</code>, <code>matches()</code>, etc. for selecting multiple target columns.</p>
+</div>
+<dl>
+<dt><a href="../reference/col.html#pointblank.col" class="doc-function doc-label doc-label-function">col()</a></dt>
+<dd>
+<p>Helper function for referencing a column in the input table.</p>
+</dd>
+<dt><a href="../reference/starts_with.html#pointblank.starts_with" class="doc-function doc-label doc-label-function">starts_with()</a></dt>
+<dd>
+<p>Select columns that start with specified text.</p>
+</dd>
+<dt><a href="../reference/ends_with.html#pointblank.ends_with" class="doc-function doc-label doc-label-function">ends_with()</a></dt>
+<dd>
+<p>Select columns that end with specified text.</p>
+</dd>
+<dt><a href="../reference/contains.html#pointblank.contains" class="doc-function doc-label doc-label-function">contains()</a></dt>
+<dd>
+<p>Select columns that contain specified text.</p>
+</dd>
+<dt><a href="../reference/matches.html#pointblank.matches" class="doc-function doc-label doc-label-function">matches()</a></dt>
+<dd>
+<p>Select columns that match a specified regular expression pattern.</p>
+</dd>
+<dt><a href="../reference/everything.html#pointblank.everything" class="doc-function doc-label doc-label-function">everything()</a></dt>
+<dd>
+<p>Select all columns.</p>
+</dd>
+<dt><a href="../reference/first_n.html#pointblank.first_n" class="doc-function doc-label doc-label-function">first_n()</a></dt>
+<dd>
+<p>Select the first <code>n</code> columns in the column list.</p>
+</dd>
+<dt><a href="../reference/last_n.html#pointblank.last_n" class="doc-function doc-label doc-label-function">last_n()</a></dt>
+<dd>
+<p>Select the last <code>n</code> columns in the column list.</p>
+</dd>
+<dt><a href="../reference/expr_col.html#pointblank.expr_col" class="doc-function doc-label doc-label-function">expr_col()</a></dt>
+<dd>
+<p>Create a column expression for use in <code>conjointly()</code> validation.</p>
+</dd>
+</dl>
+</section>
+<section id="segment-groups" class="level2 doc-group">
+<h2 class="doc-group">Segment Groups</h2>
+<div class="doc-description">
 <p>Combine multiple values into a single segment using <code>seg_*()</code> helper functions.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/seg_group.html#pointblank.seg_group">seg_group()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Group together values for segmentation.</dd>
-
-</dl>
 </div>
-</section>
-<section id="interrogation-and-reporting" class="level2">
-<h2 class="anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
-<p>The validation plan is put into action when <code>interrogate()</code> is called. The workflow for performing a comprehensive validation is then: (1) <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate()</code></a>, (2) adding validation steps, (3) <code>interrogate()</code>. After interrogation of the data, we can view a validation report table (by printing the object or using <code>get_tabular_report()</code>), extract key metrics, or we can split the data based on the validation results (with <code>get_sundered_data()</code>).</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate">Validate.interrogate()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Execute each validation step against the table and store the results.</dd>
-
-<dt><a href="../reference/Validate.set_tbl.html#pointblank.Validate.set_tbl">Validate.set_tbl()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Set or replace the table associated with the Validate object.</dd>
-
-<dt><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report">Validate.get_tabular_report()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validation report as a GT table.</dd>
-
-<dt><a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report">Validate.get_step_report()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get a detailed report for a single validation step.</dd>
-
-<dt><a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report">Validate.get_json_report()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get a report of the validation results as a JSON-formatted string.</dd>
-
-<dt><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data">Validate.get_sundered_data()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the data that passed or failed the validation steps.</dd>
-
-<dt><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts">Validate.get_data_extracts()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the rows that failed for each validation step.</dd>
-
-<dt><a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed">Validate.all_passed()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Determine if every validation step passed perfectly, with no failing test units.</dd>
-
-<dt><a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing">Validate.assert_passing()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Raise an <code>AssertionError</code> if all tests are not passing.</dd>
-
-<dt><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold">Validate.assert_below_threshold()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Raise an <code>AssertionError</code> if validation steps exceed a specified threshold level.</dd>
-
-<dt><a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold">Validate.above_threshold()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Check if any validation steps exceed a specified threshold level.</dd>
-
-<dt><a href="../reference/Validate.n.html#pointblank.Validate.n">Validate.n()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units for each validation step.</dd>
-
-<dt><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed">Validate.n_passed()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units that passed for each validation step.</dd>
-
-<dt><a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed">Validate.n_failed()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units that failed for each validation step.</dd>
-
-<dt><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed">Validate.f_passed()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the fraction of test units that passed for each validation step.</dd>
-
-<dt><a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed">Validate.f_failed()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the fraction of test units that failed for each validation step.</dd>
-
-<dt><a href="../reference/Validate.warning.html#pointblank.Validate.warning">Validate.warning()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘warning’ level status for each validation step.</dd>
-
-<dt><a href="../reference/Validate.error.html#pointblank.Validate.error">Validate.error()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘error’ level status for each validation step.</dd>
-
-<dt><a href="../reference/Validate.critical.html#pointblank.Validate.critical">Validate.critical()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘critical’ level status for each validation step.</dd>
-
+<dl>
+<dt><a href="../reference/seg_group.html#pointblank.seg_group" class="doc-function doc-label doc-label-function">seg_group()</a></dt>
+<dd>
+<p>Group together values for segmentation.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="inspection-and-assistance" class="level2">
-<h2 class="anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
-<p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class to get a quick overview of the data, <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> to see the first and last few rows of a table, <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> for a column-level summary of a table, and <a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" title="0"><code>missing_vals_tbl()</code></a> to see where there are missing values in a table. Several datasets included in the package can be accessed via the <a href="../reference/load_dataset.html#pointblank.load_dataset" title="0"><code>load_dataset()</code></a> function. On the assistance side, the <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> function can be used to get help with Pointblank.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get a summary of a dataset.</dd>
-
-<dt><a href="../reference/preview.html#pointblank.preview">preview()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Display a table preview that shows some rows from the top, some from the bottom.</dd>
-
-<dt><a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl">col_summary_tbl()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Generate a column-level summary table of a dataset.</dd>
-
-<dt><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl">missing_vals_tbl()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Display a table that shows the missing values in the input table.</dd>
-
-<dt><a href="../reference/assistant.html#pointblank.assistant">assistant()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Chat with the PbA (Pointblank Assistant) about your data validation needs.</dd>
-
-<dt><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Load a dataset hosted in the library as specified table type.</dd>
-
-<dt><a href="../reference/get_data_path.html#pointblank.get_data_path">get_data_path()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the file path to a dataset included with the Pointblank package.</dd>
-
-<dt><a href="../reference/connect_to_table.html#pointblank.connect_to_table">connect_to_table()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Connect to a database table using a connection string.</dd>
-
-<dt><a href="../reference/print_database_tables.html#pointblank.print_database_tables">print_database_tables()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">List all tables in a database from a connection string.</dd>
-
+<section id="interrogation-and-reporting" class="level2 doc-group">
+<h2 class="doc-group">Interrogation and Reporting</h2>
+<div class="doc-description">
+<p>The validation plan is executed when <code>interrogate()</code> is called. After interrogation, view validation reports, extract metrics, or split data based on results.</p>
+</div>
+<dl>
+<dt><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="doc-function doc-label doc-label-method">Validate.interrogate()</a></dt>
+<dd>
+<p>Execute each validation step against the table and store the results.</p>
+</dd>
+<dt><a href="../reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="doc-function doc-label doc-label-method">Validate.set_tbl()</a></dt>
+<dd>
+<p>Set or replace the table associated with the Validate object.</p>
+</dd>
+<dt><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="doc-function doc-label doc-label-method">Validate.get_tabular_report()</a></dt>
+<dd>
+<p>Validation report as a GT table.</p>
+</dd>
+<dt><a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="doc-function doc-label doc-label-method">Validate.get_step_report()</a></dt>
+<dd>
+<p>Get a detailed report for a single validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report" class="doc-function doc-label doc-label-method">Validate.get_json_report()</a></dt>
+<dd>
+<p>Get a report of the validation results as a JSON-formatted string.</p>
+</dd>
+<dt><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="doc-function doc-label doc-label-method">Validate.get_sundered_data()</a></dt>
+<dd>
+<p>Get the data that passed or failed the validation steps.</p>
+</dd>
+<dt><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="doc-function doc-label doc-label-method">Validate.get_data_extracts()</a></dt>
+<dd>
+<p>Get the rows that failed for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="doc-function doc-label doc-label-method">Validate.all_passed()</a></dt>
+<dd>
+<p>Determine if every validation step passed perfectly, with no failing test units.</p>
+</dd>
+<dt><a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="doc-function doc-label doc-label-method">Validate.assert_passing()</a></dt>
+<dd>
+<p>Raise an <code>AssertionError</code> if all tests are not passing.</p>
+</dd>
+<dt><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="doc-function doc-label doc-label-method">Validate.assert_below_threshold()</a></dt>
+<dd>
+<p>Raise an <code>AssertionError</code> if validation steps exceed a specified threshold level.</p>
+</dd>
+<dt><a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="doc-function doc-label doc-label-method">Validate.above_threshold()</a></dt>
+<dd>
+<p>Check if any validation steps exceed a specified threshold level.</p>
+</dd>
+<dt><a href="../reference/Validate.n.html#pointblank.Validate.n" class="doc-function doc-label doc-label-method">Validate.n()</a></dt>
+<dd>
+<p>Provides a dictionary of the number of test units for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="doc-function doc-label doc-label-method">Validate.n_passed()</a></dt>
+<dd>
+<p>Provides a dictionary of the number of test units that passed for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed" class="doc-function doc-label doc-label-method">Validate.n_failed()</a></dt>
+<dd>
+<p>Provides a dictionary of the number of test units that failed for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed" class="doc-function doc-label doc-label-method">Validate.f_passed()</a></dt>
+<dd>
+<p>Provides a dictionary of the fraction of test units that passed for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed" class="doc-function doc-label doc-label-method">Validate.f_failed()</a></dt>
+<dd>
+<p>Provides a dictionary of the fraction of test units that failed for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="doc-function doc-label doc-label-method">Validate.warning()</a></dt>
+<dd>
+<p>Get the ‘warning’ level status for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.error.html#pointblank.Validate.error" class="doc-function doc-label doc-label-method">Validate.error()</a></dt>
+<dd>
+<p>Get the ‘error’ level status for each validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="doc-function doc-label doc-label-method">Validate.critical()</a></dt>
+<dd>
+<p>Get the ‘critical’ level status for each validation step.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="table-pre-checks" class="level2">
-<h2 class="anchored" data-anchor-id="table-pre-checks">Table Pre-checks</h2>
-<p>The <em>Table Pre-checks</em> group contains helper functions that are designed for use with the <code>active=</code> parameter of validation methods. These callables inspect the target table before a validation step runs and conditionally skip the step when a precondition is not met (e.g., a required column is missing or the table does not have enough rows). A descriptive, locale-aware note is automatically attached to any step that is skipped.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/has_columns.html#pointblank.has_columns">has_columns()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Check whether one or more columns exist in a table.</dd>
-
-<dt><a href="../reference/has_rows.html#pointblank.has_rows">has_rows()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Check whether a table has a certain number of rows.</dd>
-
+<section id="inspection-and-assistance" class="level2 doc-group">
+<h2 class="doc-group">Inspection and Assistance</h2>
+<div class="doc-description">
+<p>Functions for getting to grips with a new data table. Use DataScan for a quick overview, <code>preview()</code> for first/last rows, <code>col_summary_tbl()</code> for column summaries, and <code>missing_vals_tbl()</code> for missing value analysis.</p>
+</div>
+<dl>
+<dt><a href="../reference/DataScan.html#pointblank.DataScan" class="doc-class doc-label doc-label-class">DataScan</a></dt>
+<dd>
+<p>Get a summary of a dataset.</p>
+</dd>
+<dt><a href="../reference/preview.html#pointblank.preview" class="doc-function doc-label doc-label-function">preview()</a></dt>
+<dd>
+<p>Display a table preview that shows some rows from the top, some from the bottom.</p>
+</dd>
+<dt><a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="doc-function doc-label doc-label-function">col_summary_tbl()</a></dt>
+<dd>
+<p>Generate a column-level summary table of a dataset.</p>
+</dd>
+<dt><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="doc-function doc-label doc-label-function">missing_vals_tbl()</a></dt>
+<dd>
+<p>Display a table that shows the missing values in the input table.</p>
+</dd>
+<dt><a href="../reference/load_dataset.html#pointblank.load_dataset" class="doc-function doc-label doc-label-function">load_dataset()</a></dt>
+<dd>
+<p>Load a dataset hosted in the library as specified table type.</p>
+</dd>
+<dt><a href="../reference/get_data_path.html#pointblank.get_data_path" class="doc-function doc-label doc-label-function">get_data_path()</a></dt>
+<dd>
+<p>Get the file path to a dataset included with the Pointblank package.</p>
+</dd>
+<dt><a href="../reference/connect_to_table.html#pointblank.connect_to_table" class="doc-function doc-label doc-label-function">connect_to_table()</a></dt>
+<dd>
+<p>Connect to a database table using a connection string.</p>
+</dd>
+<dt><a href="../reference/print_database_tables.html#pointblank.print_database_tables" class="doc-function doc-label doc-label-function">print_database_tables()</a></dt>
+<dd>
+<p>List all tables in a database from a connection string.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="yaml" class="level2">
-<h2 class="anchored" data-anchor-id="yaml">YAML</h2>
-<p>The <em>YAML</em> group contains functions that allow for the use of YAML to orchestrate validation workflows. The <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" title="0"><code>yaml_interrogate()</code></a> function can be used to run a validation workflow from YAML strings or files. The <a href="../reference/validate_yaml.html#pointblank.validate_yaml" title="0"><code>validate_yaml()</code></a> function checks if the YAML configuration passes its own validity checks. The <a href="../reference/yaml_to_python.html#pointblank.yaml_to_python" title="0"><code>yaml_to_python()</code></a> function converts YAML configuration to equivalent Python code.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate">yaml_interrogate()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Execute a YAML-based validation workflow.</dd>
-
-<dt><a href="../reference/validate_yaml.html#pointblank.validate_yaml">validate_yaml()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Validate YAML configuration against the expected structure.</dd>
-
-<dt><a href="../reference/yaml_to_python.html#pointblank.yaml_to_python">yaml_to_python()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Convert YAML validation configuration to equivalent Python code.</dd>
-
+<section id="table-pre-checks" class="level2 doc-group">
+<h2 class="doc-group">Table Pre-checks</h2>
+<div class="doc-description">
+<p>Helper functions for use with the <code>active=</code> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</p>
+</div>
+<dl>
+<dt><a href="../reference/has_columns.html#pointblank.has_columns" class="doc-function doc-label doc-label-function">has_columns()</a></dt>
+<dd>
+<p>Check whether one or more columns exist in a table.</p>
+</dd>
+<dt><a href="../reference/has_rows.html#pointblank.has_rows" class="doc-function doc-label doc-label-function">has_rows()</a></dt>
+<dd>
+<p>Check whether a table has a certain number of rows.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="utility-functions" class="level2">
-<h2 class="anchored" data-anchor-id="utility-functions">Utility Functions</h2>
-<p>The <em>Utility Functions</em> group contains functions that are useful accessing metadata about the target data. Use <a href="../reference/get_column_count.html#pointblank.get_column_count" title="0"><code>get_column_count()</code></a> or <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> to get the number of columns or rows in a table. The <a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" title="0"><code>get_action_metadata()</code></a> function is useful when building custom actions since it returns metadata about the validation step that’s triggering the action. Lastly, the <a href="../reference/config.html#pointblank.config" title="0"><code>config()</code></a> utility lets us set global configuration parameters.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/get_column_count.html#pointblank.get_column_count">get_column_count()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the number of columns in a table.</dd>
-
-<dt><a href="../reference/get_row_count.html#pointblank.get_row_count">get_row_count()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Get the number of rows in a table.</dd>
-
-<dt><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata">get_action_metadata()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Access step-level metadata when authoring custom actions.</dd>
-
-<dt><a href="../reference/get_validation_summary.html#pointblank.get_validation_summary">get_validation_summary()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Access validation summary information when authoring final actions.</dd>
-
-<dt><a href="../reference/write_file.html#pointblank.write_file">write_file()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Write a Validate object to disk as a serialized file.</dd>
-
-<dt><a href="../reference/read_file.html#pointblank.read_file">read_file()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Read a Validate object from disk that was previously saved with <a href="../reference/write_file.html#pointblank.write_file" title="0"><code>write_file()</code></a>.</dd>
-
-<dt><a href="../reference/config.html#pointblank.config">config()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Configuration settings for the Pointblank library.</dd>
-
+<section id="yaml" class="level2 doc-group">
+<h2 class="doc-group">YAML</h2>
+<div class="doc-description">
+<p>Functions for using YAML to orchestrate validation workflows.</p>
+</div>
+<dl>
+<dt><a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="doc-function doc-label doc-label-function">yaml_interrogate()</a></dt>
+<dd>
+<p>Execute a YAML-based validation workflow.</p>
+</dd>
+<dt><a href="../reference/validate_yaml.html#pointblank.validate_yaml" class="doc-function doc-label doc-label-function">validate_yaml()</a></dt>
+<dd>
+<p>Validate YAML configuration against the expected structure.</p>
+</dd>
+<dt><a href="../reference/yaml_to_python.html#pointblank.yaml_to_python" class="doc-function doc-label doc-label-function">yaml_to_python()</a></dt>
+<dd>
+<p>Convert YAML validation configuration to equivalent Python code.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="test-data-generation" class="level2">
-<h2 class="anchored" data-anchor-id="test-data-generation">Test Data Generation</h2>
-<p>Generate synthetic test data based on schema definitions. Use <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> to create data from a <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema</code></a> object. The helper functions define typed fields with constraints for realistic test data generation. The <a href="../reference/profile_fields.html#pointblank.profile_fields" title="0"><code>profile_fields()</code></a> helper creates a complete person-profile schema (name, email, address, phone, etc.) in a single call.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/generate_dataset.html#pointblank.generate_dataset">generate_dataset()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Generate synthetic test data from a schema.</dd>
-
-<dt><a href="../reference/int_field.html#pointblank.int_field">int_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create an integer column specification for use in a schema.</dd>
-
-<dt><a href="../reference/float_field.html#pointblank.float_field">float_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a floating-point column specification for use in a schema.</dd>
-
-<dt><a href="../reference/string_field.html#pointblank.string_field">string_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a string column specification for use in a schema.</dd>
-
-<dt><a href="../reference/bool_field.html#pointblank.bool_field">bool_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a boolean column specification for use in a schema.</dd>
-
-<dt><a href="../reference/date_field.html#pointblank.date_field">date_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a date column specification for use in a schema.</dd>
-
-<dt><a href="../reference/datetime_field.html#pointblank.datetime_field">datetime_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a datetime column specification for use in a schema.</dd>
-
-<dt><a href="../reference/time_field.html#pointblank.time_field">time_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a time column specification for use in a schema.</dd>
-
-<dt><a href="../reference/duration_field.html#pointblank.duration_field">duration_field()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a duration column specification for use in a schema.</dd>
-
-<dt><a href="../reference/profile_fields.html#pointblank.profile_fields">profile_fields()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a dict of string field specifications representing a person profile.</dd>
-
+<section id="utility-functions" class="level2 doc-group">
+<h2 class="doc-group">Utility Functions</h2>
+<div class="doc-description">
+<p>Functions for accessing metadata about the target data and managing configuration.</p>
+</div>
+<dl>
+<dt><a href="../reference/get_column_count.html#pointblank.get_column_count" class="doc-function doc-label doc-label-function">get_column_count()</a></dt>
+<dd>
+<p>Get the number of columns in a table.</p>
+</dd>
+<dt><a href="../reference/get_row_count.html#pointblank.get_row_count" class="doc-function doc-label doc-label-function">get_row_count()</a></dt>
+<dd>
+<p>Get the number of rows in a table.</p>
+</dd>
+<dt><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" class="doc-function doc-label doc-label-function">get_action_metadata()</a></dt>
+<dd>
+<p>Access step-level metadata when authoring custom actions.</p>
+</dd>
+<dt><a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="doc-function doc-label doc-label-function">get_validation_summary()</a></dt>
+<dd>
+<p>Access validation summary information when authoring final actions.</p>
+</dd>
+<dt><a href="../reference/write_file.html#pointblank.write_file" class="doc-function doc-label doc-label-function">write_file()</a></dt>
+<dd>
+<p>Write a Validate object to disk as a serialized file.</p>
+</dd>
+<dt><a href="../reference/read_file.html#pointblank.read_file" class="doc-function doc-label doc-label-function">read_file()</a></dt>
+<dd>
+<p>Read a Validate object from disk that was previously saved with <code>write_file()</code>.</p>
+</dd>
+<dt><a href="../reference/ref.html#pointblank.ref" class="doc-function doc-label doc-label-function">ref()</a></dt>
+<dd>
+<p>Reference a column from the reference data for aggregate comparisons.</p>
+</dd>
 </dl>
-</div>
 </section>
-<section id="prebuilt-actions" class="level2">
-<h2 class="anchored" data-anchor-id="prebuilt-actions">Prebuilt Actions</h2>
-<p>The <em>Prebuilt Actions</em> group contains a function that can be used to send a Slack notification when validation steps exceed failure threshold levels or just to provide a summary of the validation results, including the status, number of steps, passing and failing steps, table information, and timing details.</p>
-<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
-<dl style="margin-top: 10px;">
-
-<dt><a href="../reference/send_slack_notification.html#pointblank.send_slack_notification">send_slack_notification()</a></dt>
-<dd style="text-indent: 20px; margin-top: -3px;">Create a Slack notification function using a webhook URL.</dd>
-
+<section id="test-data-generation" class="level2 doc-group">
+<h2 class="doc-group">Test Data Generation</h2>
+<div class="doc-description">
+<p>Generate synthetic test data based on schema definitions. Use <code>generate_dataset()</code> to create data from a Schema object.</p>
+</div>
+<dl>
+<dt><a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="doc-function doc-label doc-label-function">generate_dataset()</a></dt>
+<dd>
+<p>Generate synthetic test data from a schema.</p>
+</dd>
+<dt><a href="../reference/int_field.html#pointblank.int_field" class="doc-function doc-label doc-label-function">int_field()</a></dt>
+<dd>
+<p>Create an integer column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/float_field.html#pointblank.float_field" class="doc-function doc-label doc-label-function">float_field()</a></dt>
+<dd>
+<p>Create a floating-point column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/string_field.html#pointblank.string_field" class="doc-function doc-label doc-label-function">string_field()</a></dt>
+<dd>
+<p>Create a string column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/bool_field.html#pointblank.bool_field" class="doc-function doc-label doc-label-function">bool_field()</a></dt>
+<dd>
+<p>Create a boolean column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/date_field.html#pointblank.date_field" class="doc-function doc-label doc-label-function">date_field()</a></dt>
+<dd>
+<p>Create a date column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/datetime_field.html#pointblank.datetime_field" class="doc-function doc-label doc-label-function">datetime_field()</a></dt>
+<dd>
+<p>Create a datetime column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/time_field.html#pointblank.time_field" class="doc-function doc-label doc-label-function">time_field()</a></dt>
+<dd>
+<p>Create a time column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/duration_field.html#pointblank.duration_field" class="doc-function doc-label doc-label-function">duration_field()</a></dt>
+<dd>
+<p>Create a duration column specification for use in a schema.</p>
+</dd>
+<dt><a href="../reference/profile_fields.html#pointblank.profile_fields" class="doc-function doc-label doc-label-function">profile_fields()</a></dt>
+<dd>
+<p>Create a dict of string field specifications representing a person profile.</p>
+</dd>
 </dl>
-</div>
-
-
 </section>
+<section id="prebuilt-actions" class="level2 doc-group">
+<h2 class="doc-group">Prebuilt Actions</h2>
+<div class="doc-description">
+<p>Prebuilt action functions for common notification patterns.</p>
+</div>
+<dl>
+<dt><a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="doc-function doc-label doc-label-function">send_slack_notification()</a></dt>
+<dd>
+<p>Create a Slack notification function using a webhook URL.</p>
+</dd>
+</dl>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -623,71 +1530,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       icon: icon
     };
     anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -1017,17 +1862,24 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">
-<p>Proudly supported by <a href="https://www.posit.co/" class="no-icon"><img src="../assets/posit-logo-black.svg" alt="Posit" width="80" style="padding-left: 3px;vertical-align:text-top;"></a></p>
-</div>   
-    <div class="nav-footer-center">
-      &nbsp;
-    </div>
-    <div class="nav-footer-right">
-<p>© 2024–2026 Posit Software, PBC.</p>
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong> and <strong>Rich&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
 </div>
-  </div>
+</div>
 </footer>
+<script src="../github-widget.js"></script>
+<script src="../sidebar-wrap.js"></script>
+<script src="../sidebar-filter.js"></script>
+<script src="../dark-mode-toggle.js"></script>
+<script src="../back-to-top.js"></script>
+<script src="../keyboard-nav.js"></script>
+<script src="../copy-code.js"></script>
+<script src="../mermaid-renderer.js"></script>
+<script src="../reference-switcher.js"></script>
+<script src="../tooltips.js"></script>
+<script src="../responsive-tables.js"></script>
+<script src="video-embed.js"></script>
+<script src="../navbar-widgets.js"></script>
 
 
 

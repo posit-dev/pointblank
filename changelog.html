@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Changelog – Pointblank | Pointblank</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-5864d2c5cf85e8c6f619c1992905b265.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="theme-init.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/changelog.html">
+  <meta name="description" content="This changelog is generated automatically from GitHub Releases.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Changelog – Pointblank | Pointblank">
+  <meta property="og:description" content="This changelog is generated automatically from GitHub Releases.">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/changelog.html">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Changelog – Pointblank | Pointblank">
+  <meta name="twitter:description" content="This changelog is generated automatically from GitHub Releases.">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.23.0</code><br>Released 2026-04-01">
+    <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class=""></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./reference/index.html"> 
+<span class="menu-text">API Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./changelog.html" aria-current="page"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+    </span>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#v0.23.0" id="toc-v0.23.0" class="nav-link active" data-scroll-target="#v0.23.0">v0.23.0</a>
+  <ul class="collapse">
+  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
+  <li><a href="#fixes" id="toc-fixes" class="nav-link" data-scroll-target="#fixes">Fixes:</a></li>
+  </ul></li>
+  <li><a href="#v0.22.0" id="toc-v0.22.0" class="nav-link" data-scroll-target="#v0.22.0">v0.22.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New Features</a></li>
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug Fixes</a></li>
+  <li><a href="#docs" id="toc-docs" class="nav-link" data-scroll-target="#docs">Docs</a></li>
+  </ul></li>
+  <li><a href="#v0.21.0" id="toc-v0.21.0" class="nav-link" data-scroll-target="#v0.21.0">v0.21.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New Features</a></li>
+  <li><a href="#docs-1" id="toc-docs-1" class="nav-link" data-scroll-target="#docs-1">Docs</a></li>
+  </ul></li>
+  <li><a href="#v0.20.0" id="toc-v0.20.0" class="nav-link" data-scroll-target="#v0.20.0">v0.20.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-2" id="toc-new-features-2" class="nav-link" data-scroll-target="#new-features-2">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.19.0" id="toc-v0.19.0" class="nav-link" data-scroll-target="#v0.19.0">v0.19.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-3" id="toc-new-features-3" class="nav-link" data-scroll-target="#new-features-3">New Features</a></li>
+  <li><a href="#fixes-1" id="toc-fixes-1" class="nav-link" data-scroll-target="#fixes-1">Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.18.0" id="toc-v0.18.0" class="nav-link" data-scroll-target="#v0.18.0">v0.18.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-4" id="toc-new-features-4" class="nav-link" data-scroll-target="#new-features-4">New Features</a></li>
+  <li><a href="#fixes-2" id="toc-fixes-2" class="nav-link" data-scroll-target="#fixes-2">Fixes</a></li>
+  <li><a href="#docs-2" id="toc-docs-2" class="nav-link" data-scroll-target="#docs-2">Docs</a></li>
+  </ul></li>
+  <li><a href="#v0.17.0" id="toc-v0.17.0" class="nav-link" data-scroll-target="#v0.17.0">v0.17.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-5" id="toc-new-features-5" class="nav-link" data-scroll-target="#new-features-5">New Features</a></li>
+  <li><a href="#fixes-3" id="toc-fixes-3" class="nav-link" data-scroll-target="#fixes-3">Fixes</a></li>
+  <li><a href="#new-contributors" id="toc-new-contributors" class="nav-link" data-scroll-target="#new-contributors">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.16.0" id="toc-v0.16.0" class="nav-link" data-scroll-target="#v0.16.0">v0.16.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-6" id="toc-new-features-6" class="nav-link" data-scroll-target="#new-features-6">New Features</a></li>
+  <li><a href="#fixes-4" id="toc-fixes-4" class="nav-link" data-scroll-target="#fixes-4">Fixes</a></li>
+  <li><a href="#docs-3" id="toc-docs-3" class="nav-link" data-scroll-target="#docs-3">Docs</a></li>
+  <li><a href="#new-contributors-1" id="toc-new-contributors-1" class="nav-link" data-scroll-target="#new-contributors-1">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.15.0" id="toc-v0.15.0" class="nav-link" data-scroll-target="#v0.15.0">v0.15.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-7" id="toc-new-features-7" class="nav-link" data-scroll-target="#new-features-7">New Features</a></li>
+  <li><a href="#fixes-5" id="toc-fixes-5" class="nav-link" data-scroll-target="#fixes-5">Fixes</a></li>
+  <li><a href="#docs-4" id="toc-docs-4" class="nav-link" data-scroll-target="#docs-4">Docs</a></li>
+  </ul></li>
+  <li><a href="#v0.14.0" id="toc-v0.14.0" class="nav-link" data-scroll-target="#v0.14.0">v0.14.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-8" id="toc-new-features-8" class="nav-link" data-scroll-target="#new-features-8">New Features</a></li>
+  <li><a href="#docs-5" id="toc-docs-5" class="nav-link" data-scroll-target="#docs-5">Docs</a></li>
+  <li><a href="#fixes-6" id="toc-fixes-6" class="nav-link" data-scroll-target="#fixes-6">Fixes</a></li>
+  <li><a href="#chores" id="toc-chores" class="nav-link" data-scroll-target="#chores">Chores</a></li>
+  </ul></li>
+  <li><a href="#v0.13.4" id="toc-v0.13.4" class="nav-link" data-scroll-target="#v0.13.4">v0.13.4</a>
+  <ul class="collapse">
+  <li><a href="#new-features-9" id="toc-new-features-9" class="nav-link" data-scroll-target="#new-features-9">New Features</a></li>
+  <li><a href="#fixes-7" id="toc-fixes-7" class="nav-link" data-scroll-target="#fixes-7">Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.13.3" id="toc-v0.13.3" class="nav-link" data-scroll-target="#v0.13.3">v0.13.3</a>
+  <ul class="collapse">
+  <li><a href="#new-features-10" id="toc-new-features-10" class="nav-link" data-scroll-target="#new-features-10">New Features</a></li>
+  <li><a href="#fixes-8" id="toc-fixes-8" class="nav-link" data-scroll-target="#fixes-8">Fixes</a></li>
+  <li><a href="#new-contributors-2" id="toc-new-contributors-2" class="nav-link" data-scroll-target="#new-contributors-2">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.13.2" id="toc-v0.13.2" class="nav-link" data-scroll-target="#v0.13.2">v0.13.2</a>
+  <ul class="collapse">
+  <li><a href="#new-features-11" id="toc-new-features-11" class="nav-link" data-scroll-target="#new-features-11">New Features</a></li>
+  <li><a href="#fixes-9" id="toc-fixes-9" class="nav-link" data-scroll-target="#fixes-9">Fixes</a></li>
+  <li><a href="#chores-1" id="toc-chores-1" class="nav-link" data-scroll-target="#chores-1">Chores</a></li>
+  </ul></li>
+  <li><a href="#v0.13.1" id="toc-v0.13.1" class="nav-link" data-scroll-target="#v0.13.1">v0.13.1</a>
+  <ul class="collapse">
+  <li><a href="#fixes-10" id="toc-fixes-10" class="nav-link" data-scroll-target="#fixes-10">Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.13.0" id="toc-v0.13.0" class="nav-link" data-scroll-target="#v0.13.0">v0.13.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-12" id="toc-new-features-12" class="nav-link" data-scroll-target="#new-features-12">New Features</a></li>
+  <li><a href="#docs-6" id="toc-docs-6" class="nav-link" data-scroll-target="#docs-6">Docs</a></li>
+  <li><a href="#chores-2" id="toc-chores-2" class="nav-link" data-scroll-target="#chores-2">Chores</a></li>
+  <li><a href="#new-contributors-3" id="toc-new-contributors-3" class="nav-link" data-scroll-target="#new-contributors-3">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.12.2" id="toc-v0.12.2" class="nav-link" data-scroll-target="#v0.12.2">v0.12.2</a>
+  <ul class="collapse">
+  <li><a href="#new-features-13" id="toc-new-features-13" class="nav-link" data-scroll-target="#new-features-13">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.12.1" id="toc-v0.12.1" class="nav-link" data-scroll-target="#v0.12.1">v0.12.1</a>
+  <ul class="collapse">
+  <li><a href="#new-features-14" id="toc-new-features-14" class="nav-link" data-scroll-target="#new-features-14">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.12.0" id="toc-v0.12.0" class="nav-link" data-scroll-target="#v0.12.0">v0.12.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-15" id="toc-new-features-15" class="nav-link" data-scroll-target="#new-features-15">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.11.6" id="toc-v0.11.6" class="nav-link" data-scroll-target="#v0.11.6">v0.11.6</a>
+  <ul class="collapse">
+  <li><a href="#docs-7" id="toc-docs-7" class="nav-link" data-scroll-target="#docs-7">Docs</a></li>
+  <li><a href="#fixes-11" id="toc-fixes-11" class="nav-link" data-scroll-target="#fixes-11">Fixes</a></li>
+  <li><a href="#new-contributors-4" id="toc-new-contributors-4" class="nav-link" data-scroll-target="#new-contributors-4">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.11.5" id="toc-v0.11.5" class="nav-link" data-scroll-target="#v0.11.5">v0.11.5</a></li>
+  <li><a href="#v0.11.4" id="toc-v0.11.4" class="nav-link" data-scroll-target="#v0.11.4">v0.11.4</a>
+  <ul class="collapse">
+  <li><a href="#new-features-16" id="toc-new-features-16" class="nav-link" data-scroll-target="#new-features-16">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.11.3" id="toc-v0.11.3" class="nav-link" data-scroll-target="#v0.11.3">v0.11.3</a>
+  <ul class="collapse">
+  <li><a href="#new-features-17" id="toc-new-features-17" class="nav-link" data-scroll-target="#new-features-17">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.11.2" id="toc-v0.11.2" class="nav-link" data-scroll-target="#v0.11.2">v0.11.2</a>
+  <ul class="collapse">
+  <li><a href="#fixes-12" id="toc-fixes-12" class="nav-link" data-scroll-target="#fixes-12">Fixes</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  </ul></li>
+  <li><a href="#v0.11.1" id="toc-v0.11.1" class="nav-link" data-scroll-target="#v0.11.1">v0.11.1</a>
+  <ul class="collapse">
+  <li><a href="#new-features-18" id="toc-new-features-18" class="nav-link" data-scroll-target="#new-features-18">New Features</a></li>
+  <li><a href="#fixes-13" id="toc-fixes-13" class="nav-link" data-scroll-target="#fixes-13">Fixes</a></li>
+  <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
+  </ul></li>
+  <li><a href="#v0.11.0" id="toc-v0.11.0" class="nav-link" data-scroll-target="#v0.11.0">v0.11.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-19" id="toc-new-features-19" class="nav-link" data-scroll-target="#new-features-19">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.10.0" id="toc-v0.10.0" class="nav-link" data-scroll-target="#v0.10.0">v0.10.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-20" id="toc-new-features-20" class="nav-link" data-scroll-target="#new-features-20">New Features</a></li>
+  <li><a href="#fixes-14" id="toc-fixes-14" class="nav-link" data-scroll-target="#fixes-14">Fixes</a></li>
+  <li><a href="#documentation-2" id="toc-documentation-2" class="nav-link" data-scroll-target="#documentation-2">Documentation</a></li>
+  <li><a href="#new-contributors-5" id="toc-new-contributors-5" class="nav-link" data-scroll-target="#new-contributors-5">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.9.6" id="toc-v0.9.6" class="nav-link" data-scroll-target="#v0.9.6">v0.9.6</a>
+  <ul class="collapse">
+  <li><a href="#minor-improvements-and-bug-fixes" id="toc-minor-improvements-and-bug-fixes" class="nav-link" data-scroll-target="#minor-improvements-and-bug-fixes">Minor Improvements and bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.9.5" id="toc-v0.9.5" class="nav-link" data-scroll-target="#v0.9.5">v0.9.5</a>
+  <ul class="collapse">
+  <li><a href="#minor-improvements-and-bug-fixes-1" id="toc-minor-improvements-and-bug-fixes-1" class="nav-link" data-scroll-target="#minor-improvements-and-bug-fixes-1">Minor improvements and bug fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.9.4" id="toc-v0.9.4" class="nav-link" data-scroll-target="#v0.9.4">v0.9.4</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes" id="toc-new-features-and-fixes" class="nav-link" data-scroll-target="#new-features-and-fixes">New Features and Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.9.2" id="toc-v0.9.2" class="nav-link" data-scroll-target="#v0.9.2">v0.9.2</a>
+  <ul class="collapse">
+  <li><a href="#whats-changed" id="toc-whats-changed" class="nav-link" data-scroll-target="#whats-changed">What’s Changed</a></li>
+  </ul></li>
+  <li><a href="#v0.9.1" id="toc-v0.9.1" class="nav-link" data-scroll-target="#v0.9.1">v0.9.1</a>
+  <ul class="collapse">
+  <li><a href="#new-features-21" id="toc-new-features-21" class="nav-link" data-scroll-target="#new-features-21">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.9.0" id="toc-v0.9.0" class="nav-link" data-scroll-target="#v0.9.0">v0.9.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-22" id="toc-new-features-22" class="nav-link" data-scroll-target="#new-features-22">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.7" id="toc-v0.8.7" class="nav-link" data-scroll-target="#v0.8.7">v0.8.7</a>
+  <ul class="collapse">
+  <li><a href="#new-features-23" id="toc-new-features-23" class="nav-link" data-scroll-target="#new-features-23">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.6" id="toc-v0.8.6" class="nav-link" data-scroll-target="#v0.8.6">v0.8.6</a>
+  <ul class="collapse">
+  <li><a href="#new-features-24" id="toc-new-features-24" class="nav-link" data-scroll-target="#new-features-24">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.5" id="toc-v0.8.5" class="nav-link" data-scroll-target="#v0.8.5">v0.8.5</a>
+  <ul class="collapse">
+  <li><a href="#new-features-25" id="toc-new-features-25" class="nav-link" data-scroll-target="#new-features-25">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.4" id="toc-v0.8.4" class="nav-link" data-scroll-target="#v0.8.4">v0.8.4</a>
+  <ul class="collapse">
+  <li><a href="#new-features-26" id="toc-new-features-26" class="nav-link" data-scroll-target="#new-features-26">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.3" id="toc-v0.8.3" class="nav-link" data-scroll-target="#v0.8.3">v0.8.3</a>
+  <ul class="collapse">
+  <li><a href="#new-features-27" id="toc-new-features-27" class="nav-link" data-scroll-target="#new-features-27">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.8.2" id="toc-v0.8.2" class="nav-link" data-scroll-target="#v0.8.2">v0.8.2</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-1" id="toc-new-features-and-fixes-1" class="nav-link" data-scroll-target="#new-features-and-fixes-1">New Features and Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.8.1" id="toc-v0.8.1" class="nav-link" data-scroll-target="#v0.8.1">v0.8.1</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-2" id="toc-new-features-and-fixes-2" class="nav-link" data-scroll-target="#new-features-and-fixes-2">New Features and Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.8.0" id="toc-v0.8.0" class="nav-link" data-scroll-target="#v0.8.0">v0.8.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-28" id="toc-new-features-28" class="nav-link" data-scroll-target="#new-features-28">New Features</a></li>
+  <li><a href="#fixes-and-documentation" id="toc-fixes-and-documentation" class="nav-link" data-scroll-target="#fixes-and-documentation">Fixes and Documentation</a></li>
+  </ul></li>
+  <li><a href="#v0.7.3" id="toc-v0.7.3" class="nav-link" data-scroll-target="#v0.7.3">v0.7.3</a>
+  <ul class="collapse">
+  <li><a href="#new-features-29" id="toc-new-features-29" class="nav-link" data-scroll-target="#new-features-29">New Features</a></li>
+  </ul></li>
+  <li><a href="#v0.7.2" id="toc-v0.7.2" class="nav-link" data-scroll-target="#v0.7.2">v0.7.2</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-3" id="toc-new-features-and-fixes-3" class="nav-link" data-scroll-target="#new-features-and-fixes-3">New Features and Fixes</a></li>
+  <li><a href="#new-contributors-6" id="toc-new-contributors-6" class="nav-link" data-scroll-target="#new-contributors-6">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.7.1" id="toc-v0.7.1" class="nav-link" data-scroll-target="#v0.7.1">v0.7.1</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-4" id="toc-new-features-and-fixes-4" class="nav-link" data-scroll-target="#new-features-and-fixes-4">New Features and Fixes</a></li>
+  <li><a href="#new-contributors-7" id="toc-new-contributors-7" class="nav-link" data-scroll-target="#new-contributors-7">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.7.0" id="toc-v0.7.0" class="nav-link" data-scroll-target="#v0.7.0">v0.7.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-5" id="toc-new-features-and-fixes-5" class="nav-link" data-scroll-target="#new-features-and-fixes-5">New Features and Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.6.3" id="toc-v0.6.3" class="nav-link" data-scroll-target="#v0.6.3">v0.6.3</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-6" id="toc-new-features-and-fixes-6" class="nav-link" data-scroll-target="#new-features-and-fixes-6">New Features and Fixes</a></li>
+  <li><a href="#new-contributors-8" id="toc-new-contributors-8" class="nav-link" data-scroll-target="#new-contributors-8">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.6.2" id="toc-v0.6.2" class="nav-link" data-scroll-target="#v0.6.2">v0.6.2</a>
+  <ul class="collapse">
+  <li><a href="#new-features-and-fixes-7" id="toc-new-features-and-fixes-7" class="nav-link" data-scroll-target="#new-features-and-fixes-7">New Features and Fixes</a></li>
+  </ul></li>
+  <li><a href="#v0.6.1" id="toc-v0.6.1" class="nav-link" data-scroll-target="#v0.6.1">v0.6.1</a>
+  <ul class="collapse">
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
+  <li><a href="#new-features-30" id="toc-new-features-30" class="nav-link" data-scroll-target="#new-features-30">New Features</a></li>
+  <li><a href="#fixes-15" id="toc-fixes-15" class="nav-link" data-scroll-target="#fixes-15">Fixes</a></li>
+  <li><a href="#new-contributors-9" id="toc-new-contributors-9" class="nav-link" data-scroll-target="#new-contributors-9">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.6.0" id="toc-v0.6.0" class="nav-link" data-scroll-target="#v0.6.0">v0.6.0</a>
+  <ul class="collapse">
+  <li><a href="#features-1" id="toc-features-1" class="nav-link" data-scroll-target="#features-1">Features</a></li>
+  <li><a href="#fixes-and-documentation-1" id="toc-fixes-and-documentation-1" class="nav-link" data-scroll-target="#fixes-and-documentation-1">Fixes and Documentation</a></li>
+  <li><a href="#new-contributors-10" id="toc-new-contributors-10" class="nav-link" data-scroll-target="#new-contributors-10">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.5.0" id="toc-v0.5.0" class="nav-link" data-scroll-target="#v0.5.0">v0.5.0</a>
+  <ul class="collapse">
+  <li><a href="#features-2" id="toc-features-2" class="nav-link" data-scroll-target="#features-2">Features</a></li>
+  <li><a href="#fixes-and-documentation-2" id="toc-fixes-and-documentation-2" class="nav-link" data-scroll-target="#fixes-and-documentation-2">Fixes and Documentation</a></li>
+  <li><a href="#new-contributors-11" id="toc-new-contributors-11" class="nav-link" data-scroll-target="#new-contributors-11">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.4.0" id="toc-v0.4.0" class="nav-link" data-scroll-target="#v0.4.0">v0.4.0</a>
+  <ul class="collapse">
+  <li><a href="#features-3" id="toc-features-3" class="nav-link" data-scroll-target="#features-3">Features</a></li>
+  <li><a href="#fixes-and-documentation-3" id="toc-fixes-and-documentation-3" class="nav-link" data-scroll-target="#fixes-and-documentation-3">Fixes and Documentation</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Changelog</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This changelog is generated automatically from <a href="https://github.com/posit-dev/pointblank/releases">GitHub Releases</a>.</p>
+<section id="v0.23.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.23.0</h1>
+<p><em>2026-04-01</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.23.0">GitHub</a></p>
+<section id="features" class="level2">
+<h2 class="anchored" data-anchor-id="features">Features</h2>
+<ul>
+<li>We now run pyrefly to infer types. (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/374">#374</a>)</li>
+<li>Data generation now offers a locale code string preset. (<a href="https://github.com/posit-dev/pointblank/issues/375">#375</a>)</li>
+<li>A credit card provider is now a string preset for data generation. (<a href="https://github.com/posit-dev/pointblank/issues/377">#377</a>)</li>
+</ul>
+</section>
+<section id="fixes" class="level2">
+<h2 class="anchored" data-anchor-id="fixes">Fixes:</h2>
+<ul>
+<li>Audit the performance of lazy transformations by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/373</li>
+<li>Aggregation and Reference Column Hardening by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/372</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.22.0...v0.23.0">https://github.com/posit-dev/pointblank/compare/v0.22.0…v0.23.0</a></p>
+</section>
+</section>
+<section id="v0.22.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.22.0</h1>
+<p><em>2026-02-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.22.0">GitHub</a></p>
+<section id="new-features" class="level2">
+<h2 class="anchored" data-anchor-id="new-features">New Features</h2>
+<ul>
+<li>Expanded <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> country support with 29 new countries (EC, PA, SA, UA, AM, AZ, BO, CM, DO, GE, GT, HN, IL, JM, JO, KH, KZ, LB, MD, MM, MZ, NP, PY, RS, RW, SV, TZ, UY, UZ), bringing the total to 100 supported countries, along with expanded street lists and normalized industry names across existing countries. (<a href="https://github.com/posit-dev/pointblank/issues/370">#370</a>, <a href="https://github.com/posit-dev/pointblank/issues/371">#371</a>)</li>
+<li>Added <a href="reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> as a composite helper that creates a dictionary of person-profile <code>StringField</code> objects for direct unpacking into a <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema()</a>. Supports three tiers (<code>"minimal"</code>, <code>"standard"</code>, <code>"full"</code>), name splitting, column include/exclude, and a <code>prefix=</code> parameter for namespacing. (<a href="https://github.com/posit-dev/pointblank/issues/367">#367</a>)</li>
+<li>Significantly expanded YAML workflow support with governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>), <code>final_actions</code> and <code>reference</code> top-level keys, aggregate validation methods (<a href="reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt</a>, <a href="reference/Validate.col_avg_le.html#pointblank.Validate.col_avg_le" class="gdls-link gdls-code">col_avg_le</a>, etc.), <a href="reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null</a>, <a href="reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness</a>, shortcut syntax for the <code>active</code> parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. (<a href="https://github.com/posit-dev/pointblank/issues/369">#369</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h2>
+<ul>
+<li>Fixed <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> failing on tables with duration (timedelta) columns by casting them to strings before display. (<a href="https://github.com/posit-dev/pointblank/issues/368">#368</a>)</li>
+</ul>
+</section>
+<section id="docs" class="level2">
+<h2 class="anchored" data-anchor-id="docs">Docs</h2>
+<ul>
+<li>Added YAML reference and validation workflow guides covering governance metadata and aggregate methods. (<a href="https://github.com/posit-dev/pointblank/issues/369">#369</a>)</li>
+<li>Updated data generation documentation with <a href="reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> usage and 100-country support. (<a href="https://github.com/posit-dev/pointblank/issues/367">#367</a>, <a href="https://github.com/posit-dev/pointblank/issues/370">#370</a>, <a href="https://github.com/posit-dev/pointblank/issues/371">#371</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.21.0...v0.22.0">https://github.com/posit-dev/pointblank/compare/v0.21.0…v0.22.0</a></p>
+</section>
+</section>
+<section id="v0.21.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.21.0</h1>
+<p><em>2026-02-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.21.0">GitHub</a></p>
+<section id="new-features-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-1">New Features</h2>
+<ul>
+<li>Significantly enhanced <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> with locale mixing (<code>country=</code> now accepts lists or weighted dicts), frequency-weighted sampling via a 4-tier system, a <code>user_agent</code> preset with country-weighted browser selection, presets for hash digests (<code>md5</code>, <code>sha1</code>, <code>sha256</code>), barcodes (<code>ean8</code>, <code>ean13</code>), date strings (<code>date_between</code>, <code>date_range</code>, <code>future_date</code>, <code>past_date</code>), and ISO 3166-1 country codes (<code>country_code_2</code>, <code>country_code_3</code>), country-specific license plate formats, industry-coherent person-company pairing, a <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture with automatic per-test seeding, and expanded country support (bringing the total to 71). (<a href="https://github.com/posit-dev/pointblank/issues/352">#352</a>, <a href="https://github.com/posit-dev/pointblank/issues/354">#354</a>, <a href="https://github.com/posit-dev/pointblank/issues/355">#355</a>, <a href="https://github.com/posit-dev/pointblank/issues/358">#358</a>, <a href="https://github.com/posit-dev/pointblank/issues/360">#360</a>, <a href="https://github.com/posit-dev/pointblank/issues/361">#361</a>, <a href="https://github.com/posit-dev/pointblank/issues/362">#362</a>, <a href="https://github.com/posit-dev/pointblank/issues/363">#363</a>, <a href="https://github.com/posit-dev/pointblank/issues/364">#364</a>, <a href="https://github.com/posit-dev/pointblank/issues/365">#365</a>, <a href="https://github.com/posit-dev/pointblank/issues/366">#366</a>)</li>
+<li>Added expressions support for the <code>active=</code> parameter to provide for more flexible and dynamic validation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/349">#349</a>)</li>
+</ul>
+</section>
+<section id="docs-1" class="level2">
+<h2 class="anchored" data-anchor-id="docs-1">Docs</h2>
+<ul>
+<li>Added validation report notes output display in documentation examples. (<a href="https://github.com/posit-dev/pointblank/issues/350">#350</a>)</li>
+<li>Improved docstrings for <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> and all <code>*_field()</code> functions. (<a href="https://github.com/posit-dev/pointblank/issues/353">#353</a>)</li>
+<li>Fixed broken links in <code>quickstart.qmd</code> by removing incorrect path prefixes. (<a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/357">#357</a>)</li>
+<li>Updated data generation documentation with new presets and features. (<a href="https://github.com/posit-dev/pointblank/issues/359">#359</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.20.0...v0.21.0">https://github.com/posit-dev/pointblank/compare/v0.20.0…v0.21.0</a></p>
+</section>
+</section>
+<section id="v0.20.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.20.0</h1>
+<p><em>2026-02-04</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.20.0">GitHub</a></p>
+<section id="new-features-2" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-2">New Features</h2>
+<ul>
+<li>Added the <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> function for creating realistic synthetic test data from <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> definitions, with a suite of field helper functions (<a href="reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>, <a href="reference/date_field.html#pointblank.date_field" class="gdls-link gdls-code">date_field()</a>, <code>name_field()</code>, etc.) and support for 50 country locales via the <code>country=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/348">#348</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.19.0...v0.20.0">https://github.com/posit-dev/pointblank/compare/v0.19.0…v0.20.0</a></p>
+</section>
+</section>
+<section id="v0.19.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.19.0</h1>
+<p><em>2026-01-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.19.0">GitHub</a></p>
+<section id="new-features-3" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-3">New Features</h2>
+<ul>
+<li>We can now specify <code>owner</code>, <code>consumers</code>, and <code>version</code> metadata for data validations within the <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class. (<a href="https://github.com/posit-dev/pointblank/issues/344">#344</a>)</li>
+<li>The new <a href="reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> validation method has been added for easily checking the freshness of data. (<a href="https://github.com/posit-dev/pointblank/issues/345">#345</a>)</li>
+</ul>
+</section>
+<section id="fixes-1" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-1">Fixes</h2>
+<ul>
+<li>Added the <code>.step_report()</code> capability for the aggregate validation methods (e.g., <a href="reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>, <a href="reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt" class="gdls-link gdls-code">col_sd_lt()</a>, etc.). (<a href="https://github.com/posit-dev/pointblank/issues/343">#343</a>)</li>
+<li>Updated SVG icons for all of the aggregate validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/346">#346</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.18.0...v0.19.0">https://github.com/posit-dev/pointblank/compare/v0.18.0…v0.19.0</a></p>
+</section>
+</section>
+<section id="v0.18.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.18.0</h1>
+<p><em>2026-01-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.18.0">GitHub</a></p>
+<section id="new-features-4" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-4">New Features</h2>
+<ul>
+<li>Added several validation methods that work on aggregates of column values (e.g.,<a href="reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>, <a href="reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt" class="gdls-link gdls-code">col_sd_lt()</a>, etc.). (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/332">#332</a>)</li>
+</ul>
+</section>
+<section id="fixes-2" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-2">Fixes</h2>
+<ul>
+<li>Implemented fix for handling datetime strings in <code>_apply_segments()</code>. (<a href="https://github.com/posit-dev/pointblank/issues/337">#337</a>)</li>
+<li>Added reference data as a default for aggregation comparison values. (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/339">#339</a>)</li>
+<li>Add experimental gradual typing for development. (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/198">#198</a>, <a href="https://github.com/posit-dev/pointblank/issues/338">#338</a>)</li>
+<li>Improved the display of aggregation-type methods in the validation report. (<a href="https://github.com/posit-dev/pointblank/issues/342">#342</a>)</li>
+</ul>
+</section>
+<section id="docs-2" class="level2">
+<h2 class="anchored" data-anchor-id="docs-2">Docs</h2>
+<ul>
+<li>Updated the reference API with aggregate check methods. (<a href="https://github.com/posit-dev/pointblank/issues/340">#340</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.17.0...v0.18.0">https://github.com/posit-dev/pointblank/compare/v0.17.0…v0.18.0</a></p>
+</section>
+</section>
+<section id="v0.17.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.17.0</h1>
+<p><em>2025-12-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.17.0">GitHub</a></p>
+<section id="new-features-5" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-5">New Features</h2>
+<ul>
+<li>All <a href="reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> validation steps are now accompanied by notes that describe the results. (<a href="https://github.com/posit-dev/pointblank/issues/325">#325</a>)</li>
+<li>Notes appear in validation reports notes when columns are not found or none are resolved by use of column selectors. (<a href="https://github.com/posit-dev/pointblank/issues/326">#326</a>)</li>
+<li>Validation reports now have informative notes for steps that use the <code>pre=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/328">#328</a>)</li>
+<li>New options are available (in <a href="reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> and globally in <code>config()</code>) for enabling/disabling validation report footer sections. (<a href="https://github.com/posit-dev/pointblank/issues/327">#327</a>)</li>
+<li>Added the <code>test-core</code> target for running core tests (large time savings compared to running all tests). (<a href="https://github.com/posit-dev/pointblank/issues/331">#331</a>)</li>
+<li>New validation method added, <a href="reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null()</a>, for checking the percentage of Null values in a column. (<a href="https://github.com/posit-dev/pointblank/issues/290">#290</a>, <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>)</li>
+</ul>
+</section>
+<section id="fixes-3" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-3">Fixes</h2>
+<ul>
+<li>Removed a duplicate paragraph in the docs. (<a href="https://github.com/posit-dev/pointblank/issues/329">#329</a>, <a href="https://github.com/dpprdan"><span class="citation" data-cites="dpprdan">@dpprdan</span></a>)</li>
+</ul>
+</section>
+<section id="new-contributors" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/dpprdan"><span class="citation" data-cites="dpprdan">@dpprdan</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/329</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.16.0...v0.17.0">https://github.com/posit-dev/pointblank/compare/v0.16.0…v0.17.0</a></p>
+</section>
+</section>
+<section id="v0.16.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.16.0</h1>
+<p><em>2025-11-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.16.0">GitHub</a></p>
+<section id="new-features-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-6">New Features</h2>
+<ul>
+<li>Use of local thresholds settings will now produce notes at the bottom of the validation report table. (<a href="https://github.com/posit-dev/pointblank/issues/318">#318</a>)</li>
+<li>Added the <a href="reference/print_database_tables.html#pointblank.print_database_tables" class="gdls-link gdls-code">print_database_tables()</a> function for printing a list of tables in a database connection. (<a href="https://github.com/posit-dev/pointblank/issues/322">#322</a>, <a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>)</li>
+<li>Added YAML support for several recently added validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/312">#312</a>)</li>
+<li>There are now report translations for all official EU languages. (<a href="https://github.com/posit-dev/pointblank/issues/314">#314</a>)</li>
+</ul>
+</section>
+<section id="fixes-4" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-4">Fixes</h2>
+<ul>
+<li>Ensured that Pointblank is compatible with Python 3.14 (<a href="https://github.com/posit-dev/pointblank/issues/320">#320</a>)</li>
+</ul>
+</section>
+<section id="docs-3" class="level2">
+<h2 class="anchored" data-anchor-id="docs-3">Docs</h2>
+<ul>
+<li>Revised project website navigation to put the User Guide front and center. (<a href="https://github.com/posit-dev/pointblank/issues/307">#307</a>, <a href="https://github.com/posit-dev/pointblank/issues/321">#321</a>)</li>
+<li>Modified logo used in website. (<a href="https://github.com/posit-dev/pointblank/issues/308">#308</a>)</li>
+<li>Added both the <code>llms.txt</code> and <code>llms-full.txt</code> files to the project website. (<a href="https://github.com/posit-dev/pointblank/issues/310">#310</a>)</li>
+<li>Updated documentation with newly-added validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/311">#311</a>)</li>
+<li>Added a PDF version of the User Guide to the website (<a href="https://github.com/posit-dev/pointblank/issues/313">#313</a>)</li>
+<li>Improved the appearance of the website’s sidebar button (visible at constrained screen widths). (<a href="https://github.com/posit-dev/pointblank/issues/315">#315</a>)</li>
+<li>Fixed broken contributor info links. (<a href="https://github.com/posit-dev/pointblank/issues/316">#316</a>, <a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>)</li>
+</ul>
+</section>
+<section id="new-contributors-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-1">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/316</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.15.0...v0.16.0">https://github.com/posit-dev/pointblank/compare/v0.15.0…v0.16.0</a></p>
+</section>
+</section>
+<section id="v0.15.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.15.0</h1>
+<p><em>2025-10-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.15.0">GitHub</a></p>
+<section id="new-features-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-7">New Features</h2>
+<ul>
+<li>Several new validation methods were incorporated: <a href="reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a>, <a href="reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link gdls-code">col_vals_increasing()</a>, <a href="reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link gdls-code">col_vals_decreasing()</a>, and <a href="reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/304">#304</a>, <a href="https://github.com/posit-dev/pointblank/issues/305">#305</a>, <a href="https://github.com/posit-dev/pointblank/issues/306">#306</a>)</li>
+<li>The option to ignore SSL verification was added to the <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class via the new <code>verify_ssl=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/302">#302</a>)</li>
+<li>Added the (internal for now) ‘notes’ functionality for validation step, which will allow for useful information in individual validation steps to be available post-interrogation. (<a href="https://github.com/posit-dev/pointblank/issues/303">#303</a>)</li>
+</ul>
+</section>
+<section id="fixes-5" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-5">Fixes</h2>
+<ul>
+<li>Altered the HTML tags of ‘brief’ text in validation reports for better display across different publishing environments. (<a href="https://github.com/posit-dev/pointblank/issues/299">#299</a>)</li>
+</ul>
+</section>
+<section id="docs-4" class="level2">
+<h2 class="anchored" data-anchor-id="docs-4">Docs</h2>
+<ul>
+<li>Added a User Guide page on validation reports. (<a href="https://github.com/posit-dev/pointblank/issues/300">#300</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.14.0...v0.15.0">https://github.com/posit-dev/pointblank/compare/v0.14.0…v0.15.0</a></p>
+</section>
+</section>
+<section id="v0.14.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.14.0</h1>
+<p><em>2025-10-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.14.0">GitHub</a></p>
+<section id="new-features-8" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-8">New Features</h2>
+<ul>
+<li>Added the <code>.prompt()</code> validation method to enable data validation using LLMs, evaluating data in rows against natural language descriptions instead of programmatic rules. (<a href="https://github.com/posit-dev/pointblank/issues/287">#287</a>)</li>
+<li>The new <a href="reference/write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a> and <a href="reference/read_file.html#pointblank.read_file" class="gdls-link gdls-code">read_file()</a> functions allow for writing/reading validation objects to and from disk. (<a href="https://github.com/posit-dev/pointblank/issues/291">#291</a>)</li>
+<li>More translation languages added (<code>"id"</code>, <code>"uk"</code>, <code>"he"</code>, <code>"th"</code>, and <code>"fa"</code>). (<a href="https://github.com/posit-dev/pointblank/issues/293">#293</a>)</li>
+</ul>
+</section>
+<section id="docs-5" class="level2">
+<h2 class="anchored" data-anchor-id="docs-5">Docs</h2>
+<ul>
+<li>Summary fields in the <a href="reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> docs examples were updated. (<a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/284">#284</a>)</li>
+<li>The <a href="reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> function now has published docs on the project website. (<a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/288">#288</a>)</li>
+<li>There’s now a Posit badge in the header of the project website. (<a href="https://github.com/posit-dev/pointblank/issues/292">#292</a>)</li>
+</ul>
+</section>
+<section id="fixes-6" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-6">Fixes</h2>
+<ul>
+<li>Zero-row tables are now better handled in the validation workflow. (<a href="https://github.com/posit-dev/pointblank/issues/297">#297</a>)</li>
+</ul>
+</section>
+<section id="chores" class="level2">
+<h2 class="anchored" data-anchor-id="chores">Chores</h2>
+<ul>
+<li>Added many tests to improve code coverage. (<a href="https://github.com/posit-dev/pointblank/issues/294">#294</a>, <a href="https://github.com/posit-dev/pointblank/issues/298">#298</a>)</li>
+<li>New tests and documentation now available for validations involving datetime + timezone comparisons. (<a href="https://github.com/posit-dev/pointblank/issues/289">#289</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.13.4...v0.14.0">https://github.com/posit-dev/pointblank/compare/v0.13.4…v0.14.0</a></p>
+</section>
+</section>
+<section id="v0.13.4" class="level1 changelog-version">
+<h1 class="changelog-version">v0.13.4</h1>
+<p><em>2025-09-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.4">GitHub</a></p>
+<section id="new-features-9" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-9">New Features</h2>
+<ul>
+<li>Add Enum support to <a href="reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> and <a href="reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/280">#280</a>)</li>
+<li>The <a href="reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> validation method now has the <code>inverse=</code> parameter to enable negative regex matching. (<a href="https://github.com/posit-dev/pointblank/issues/282">#282</a>)</li>
+</ul>
+</section>
+<section id="fixes-7" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-7">Fixes</h2>
+<ul>
+<li>The usage of <code>pre=</code> is now better isolated to the steps using it. (<a href="https://github.com/posit-dev/pointblank/issues/283">#283</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.13.3...v0.13.4">https://github.com/posit-dev/pointblank/compare/v0.13.3…v0.13.4</a></p>
+</section>
+</section>
+<section id="v0.13.3" class="level1 changelog-version">
+<h1 class="changelog-version">v0.13.3</h1>
+<p><em>2025-09-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.3">GitHub</a></p>
+<section id="new-features-10" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-10">New Features</h2>
+<ul>
+<li>Added the <code>namespaces=</code> parameter to <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> to facilitate authoring of custom actions. (<a href="https://github.com/mark-druffel"><span class="citation" data-cites="mark-druffel">@mark-druffel</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/277">#277</a>)</li>
+</ul>
+</section>
+<section id="fixes-8" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-8">Fixes</h2>
+<ul>
+<li>Fixed error when using <code>brief=</code> with <code>segments=seg_group()</code>. (<a href="https://github.com/posit-dev/pointblank/issues/275">#275</a>)</li>
+</ul>
+</section>
+<section id="new-contributors-2" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-2">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/mark-druffel"><span class="citation" data-cites="mark-druffel">@mark-druffel</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/277</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.13.2...v0.13.3">https://github.com/posit-dev/pointblank/compare/v0.13.2…v0.13.3</a></p>
+</section>
+</section>
+<section id="v0.13.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.13.2</h1>
+<p><em>2025-09-05</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.2">GitHub</a></p>
+<section id="new-features-11" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-11">New Features</h2>
+<ul>
+<li>String-based comparisons are now possible in the <a href="reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> and <a href="reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a> validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/272">#272</a>)</li>
+</ul>
+</section>
+<section id="fixes-9" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-9">Fixes</h2>
+<ul>
+<li>We can now enable passing of <code>NaN</code> values during interrogation when <code>na_pass=True</code>. (<a href="https://github.com/posit-dev/pointblank/issues/271">#271</a>)</li>
+<li>A <a href="reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a>-based step can now be used with the <a href="reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> method. (<a href="https://github.com/posit-dev/pointblank/issues/273">#273</a>)</li>
+</ul>
+</section>
+<section id="chores-1" class="level2">
+<h2 class="anchored" data-anchor-id="chores-1">Chores</h2>
+<ul>
+<li>Fixed all CI test failures and warnings. (<a href="https://github.com/posit-dev/pointblank/issues/270">#270</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.13.1...v0.13.2">https://github.com/posit-dev/pointblank/compare/v0.13.1…v0.13.2</a></p>
+</section>
+</section>
+<section id="v0.13.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.13.1</h1>
+<p><em>2025-08-29</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.1">GitHub</a></p>
+<section id="fixes-10" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-10">Fixes</h2>
+<ul>
+<li>Several MCP server issues have been fixed. (<a href="https://github.com/posit-dev/pointblank/issues/265">#265</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.13.0...v0.13.1">https://github.com/posit-dev/pointblank/compare/v0.13.0…v0.13.1</a></p>
+</section>
+</section>
+<section id="v0.13.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.13.0</h1>
+<p><em>2025-08-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.0">GitHub</a></p>
+<section id="new-features-12" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-12">New Features</h2>
+<ul>
+<li>Incorporated a Model Context Protocol (MCP) server implementation. (<a href="https://github.com/posit-dev/pointblank/issues/239">#239</a>, <a href="https://github.com/posit-dev/pointblank/issues/264">#264</a>, <a href="https://github.com/pipaber"><span class="citation" data-cites="pipaber">@pipaber</span></a>)</li>
+</ul>
+</section>
+<section id="docs-6" class="level2">
+<h2 class="anchored" data-anchor-id="docs-6">Docs</h2>
+<ul>
+<li>New installation instructions for adding Pointblank to pixi projects. (<a href="https://github.com/posit-dev/pointblank/issues/263">#263</a>, <a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a>)</li>
+</ul>
+</section>
+<section id="chores-2" class="level2">
+<h2 class="anchored" data-anchor-id="chores-2">Chores</h2>
+<ul>
+<li>Added Makefile pre-commit targets. (<a href="https://github.com/posit-dev/pointblank/issues/262">#262</a>, <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>)</li>
+<li>Reorganized tests and added new ones. (<a href="https://github.com/posit-dev/pointblank/issues/261">#261</a>)</li>
+</ul>
+</section>
+<section id="new-contributors-3" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-3">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/pipaber"><span class="citation" data-cites="pipaber">@pipaber</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/239</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.12.2...v0.13.0">https://github.com/posit-dev/pointblank/compare/v0.12.2…v0.13.0</a></p>
+</section>
+</section>
+<section id="v0.12.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.12.2</h1>
+<p><em>2025-08-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.2">GitHub</a></p>
+<section id="new-features-13" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-13">New Features</h2>
+<ul>
+<li>Added the <a href="reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method and also the <code>set_tbl=</code> parameter to <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/260">#260</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.12.1...v0.12.2">https://github.com/posit-dev/pointblank/compare/v0.12.1…v0.12.2</a></p>
+</section>
+</section>
+<section id="v0.12.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.12.1</h1>
+<p><em>2025-08-11</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.1">GitHub</a></p>
+<section id="new-features-14" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-14">New Features</h2>
+<ul>
+<li>Pointblank now internally handles all Ibis tables using Narwhals. (<a href="https://github.com/posit-dev/pointblank/issues/257">#257</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.12.0...v0.12.1">https://github.com/posit-dev/pointblank/compare/v0.12.0…v0.12.1</a></p>
+</section>
+</section>
+<section id="v0.12.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.12.0</h1>
+<p><em>2025-08-07</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.0">GitHub</a></p>
+<section id="new-features-15" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-15">New Features</h2>
+<ul>
+<li>The segmentation feature was expanded by way of the new <a href="reference/seg_group.html#pointblank.seg_group" class="gdls-link gdls-code">seg_group()</a> helper function. (<a href="https://github.com/posit-dev/pointblank/issues/243">#243</a>)</li>
+<li>You can now validate Spark DataFrames without using Ibis (we now internally process those using Narwhals). (<a href="https://github.com/posit-dev/pointblank/issues/256">#256</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.6...v0.12.0">https://github.com/posit-dev/pointblank/compare/v0.11.6…v0.12.0</a></p>
+</section>
+</section>
+<section id="v0.11.6" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.6</h1>
+<p><em>2025-07-29</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.6">GitHub</a></p>
+<section id="docs-7" class="level2">
+<h2 class="anchored" data-anchor-id="docs-7">Docs</h2>
+<ul>
+<li>Enhanced YAML documentation by creating two new articles for the User Guide. (<a href="https://github.com/posit-dev/pointblank/issues/249">#249</a>)</li>
+</ul>
+</section>
+<section id="fixes-11" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-11">Fixes</h2>
+<ul>
+<li>Specify <code>ignore_nulls=True</code> in <code>nw.all_horizontal</code>. (<a href="https://github.com/MarcoGorelli"><span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/251">#251</a>)</li>
+</ul>
+</section>
+<section id="new-contributors-4" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-4">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/MarcoGorelli"><span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/251</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.5...v0.11.6">https://github.com/posit-dev/pointblank/compare/v0.11.5…v0.11.6</a></p>
+</section>
+</section>
+<section id="v0.11.5" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.5</h1>
+<p><em>2025-07-24</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.5">GitHub</a></p>
+<ul>
+<li>Added <code>pyyaml</code> as a dependency.</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.4...v0.11.5">https://github.com/posit-dev/pointblank/compare/v0.11.4…v0.11.5</a></p>
+</section>
+<section id="v0.11.4" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.4</h1>
+<p><em>2025-07-23</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.4">GitHub</a></p>
+<section id="new-features-16" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-16">New Features</h2>
+<ul>
+<li>It’s now possible to define YAML configuration files for validation workflows and run the YAML validations through <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> or in the Pointblank CLI via <code>pb run</code> (<a href="https://github.com/posit-dev/pointblank/issues/247">#247</a>, <a href="https://github.com/posit-dev/pointblank/issues/248">#248</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.3...v0.11.4">https://github.com/posit-dev/pointblank/compare/v0.11.3…v0.11.4</a></p>
+</section>
+</section>
+<section id="v0.11.3" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.3</h1>
+<p><em>2025-07-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.3">GitHub</a></p>
+<section id="new-features-17" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-17">New Features</h2>
+<ul>
+<li>The CLI has the new <code>pb pl</code> command, allowing you to run Polars at the command line. (<a href="https://github.com/posit-dev/pointblank/issues/246">#246</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.2...v0.11.3">https://github.com/posit-dev/pointblank/compare/v0.11.2…v0.11.3</a></p>
+</section>
+</section>
+<section id="v0.11.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.2</h1>
+<p><em>2025-07-08</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.2">GitHub</a></p>
+<section id="fixes-12" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-12">Fixes</h2>
+<ul>
+<li>The display of the CLI’s <code>pb run</code> output is much improved and more closely follows the tabular HTML output of the Python API. (<a href="https://github.com/posit-dev/pointblank/issues/240">#240</a>)</li>
+<li>For the CLI’s <code>pb validate</code> and <code>pb run</code> commands, the extract limit is now correctly applied to written CSVs (while displayed extracts will always have a limit of 10). (<a href="https://github.com/posit-dev/pointblank/issues/242">#242</a>)</li>
+</ul>
+</section>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<ul>
+<li>Improved the CLI articles in the User Guide. (<a href="https://github.com/posit-dev/pointblank/issues/236">#236</a>)</li>
+<li>Updated the CLI demonstration gif for the project website. (<a href="https://github.com/posit-dev/pointblank/issues/241">#241</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.1...v0.11.2">https://github.com/posit-dev/pointblank/compare/v0.11.1…v0.11.2</a></p>
+</section>
+</section>
+<section id="v0.11.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.1</h1>
+<p><em>2025-06-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.1">GitHub</a></p>
+<section id="new-features-18" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-18">New Features</h2>
+<ul>
+<li>Have consistent input ingestion for all classes/functions with a <code>data=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/223">#223</a>)</li>
+<li>Enable data to be obtained via GitHub URLs. (<a href="https://github.com/posit-dev/pointblank/issues/224">#224</a>)</li>
+<li>Allow CLI’s <code>pb validate</code> to perform multiple validations. (<a href="https://github.com/posit-dev/pointblank/issues/231">#231</a>)</li>
+<li>For CLI’s <code>pb validate</code> allow <code>--column</code> to use column index. (<a href="https://github.com/posit-dev/pointblank/issues/233">#233</a>)</li>
+</ul>
+</section>
+<section id="fixes-13" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-13">Fixes</h2>
+<ul>
+<li>Use <code>_process_data()</code> to centralize data ingest functionality. (<a href="https://github.com/posit-dev/pointblank/issues/225">#225</a>, <a href="https://github.com/posit-dev/pointblank/issues/226">#226</a>)</li>
+<li>Improve display of tables in CLI. (<a href="https://github.com/posit-dev/pointblank/issues/227">#227</a>)</li>
+<li>Simplify use of extracts in CLI. (<a href="https://github.com/posit-dev/pointblank/issues/228">#228</a>)</li>
+<li>Rework <code>pb validate</code> to primarily be a validation script runner. (<a href="https://github.com/posit-dev/pointblank/issues/229">#229</a>)</li>
+<li>Make CLI table styling consistent across all commands. (<a href="https://github.com/posit-dev/pointblank/issues/234">#234</a>)</li>
+<li>Improve messages with <code>pb validate &lt;data&gt;</code> default and add <code>--list-checks</code> option. (<a href="https://github.com/posit-dev/pointblank/issues/230">#230</a>)</li>
+</ul>
+</section>
+<section id="documentation-1" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-1">Documentation</h2>
+<ul>
+<li>Update VHS-based terminal recordings. (<a href="https://github.com/posit-dev/pointblank/issues/232">#232</a>)</li>
+<li>Create two new CLI utility articles. (<a href="https://github.com/posit-dev/pointblank/issues/235">#235</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.11.0...v0.11.1">https://github.com/posit-dev/pointblank/compare/v0.11.0…v0.11.1</a></p>
+</section>
+</section>
+<section id="v0.11.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.11.0</h1>
+<p><em>2025-06-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.0">GitHub</a></p>
+<section id="new-features-19" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-19">New Features</h2>
+<ul>
+<li>The <code>pb</code> CLI utility has been added to enable: (1) quick data quality checks, (2) exploration of data at the command line, and (3) easy integration with shell scripts and automation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/221">#221</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.10.0...v0.11.0">https://github.com/posit-dev/pointblank/compare/v0.10.0…v0.11.0</a></p>
+</section>
+</section>
+<section id="v0.10.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.10.0</h1>
+<p><em>2025-06-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.10.0">GitHub</a></p>
+<section id="new-features-20" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-20">New Features</h2>
+<ul>
+<li>It’s now possible to validate Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/200">#200</a>)</li>
+<li>Paths to CSV and Parquet files can now be used as inputs for <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> and <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/213">#213</a>, <a href="https://github.com/posit-dev/pointblank/issues/214">#214</a>, <a href="https://github.com/posit-dev/pointblank/issues/217">#217</a>)</li>
+<li>The <a href="reference/get_data_path.html#pointblank.get_data_path" class="gdls-link gdls-code">get_data_path()</a> function was added so that paths to internal CSV and Parquet example datasets can be accessed. (<a href="https://github.com/posit-dev/pointblank/issues/215">#215</a>)</li>
+<li>Data connection strings can be used directly with <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> to connect to DB tables via Ibis. (<a href="https://github.com/posit-dev/pointblank/issues/216">#216</a>)</li>
+</ul>
+</section>
+<section id="fixes-14" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-14">Fixes</h2>
+<ul>
+<li>The <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class was refactored to expose data and statistics consistently. (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/94">#94</a>)</li>
+<li>Pass/fail result counting during interrogation is now more computationally efficient. (<a href="https://github.com/posit-dev/pointblank/issues/203">#203</a>)</li>
+<li>Validation steps using <a href="reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> can now correctly return data extracts (and produce a CSV button in the validation report table). (<a href="https://github.com/zilto"><span class="citation" data-cites="zilto">@zilto</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/197">#197</a>)</li>
+<li>A dependency on Pandas during the rendering validation report tables was eliminated. (<a href="https://github.com/posit-dev/pointblank/issues/220">#220</a>)</li>
+<li>An unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. (<a href="https://github.com/matt-humphrey"><span class="citation" data-cites="matt-humphrey">@matt-humphrey</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/218">#218</a>)</li>
+</ul>
+</section>
+<section id="documentation-2" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-2">Documentation</h2>
+<ul>
+<li>The project website’s API reference underwent several layout and typesetting changes for the better. (<a href="https://github.com/posit-dev/pointblank/issues/204">#204</a>, <a href="https://github.com/posit-dev/pointblank/issues/205">#205</a>, <a href="https://github.com/posit-dev/pointblank/issues/208">#208</a>, <a href="https://github.com/posit-dev/pointblank/issues/209">#209</a>)</li>
+<li>Terminology throughout the documentation was improved so that users can better distinguish column- and row-based validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/199">#199</a>)</li>
+<li>A few more Pointblank demos were added to the project website’s Examples page. (<a href="https://github.com/posit-dev/pointblank/issues/210">#210</a>)</li>
+<li>Several posts were added to the Pointblog. (<a href="https://github.com/posit-dev/pointblank/issues/177">#177</a>, <a href="https://github.com/posit-dev/pointblank/issues/202">#202</a>)</li>
+<li>Improved the interlinking in the User Guide thanks to new functionality in quartodoc. (<a href="https://github.com/posit-dev/pointblank/issues/191">#191</a>, <a href="https://github.com/posit-dev/pointblank/issues/212">#212</a>)</li>
+</ul>
+</section>
+<section id="new-contributors-5" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-5">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/zilto"><span class="citation" data-cites="zilto">@zilto</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/197</li>
+<li><a href="https://github.com/matt-humphrey"><span class="citation" data-cites="matt-humphrey">@matt-humphrey</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/218</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.6...v0.10.0">https://github.com/posit-dev/pointblank/compare/v0.9.6…v0.10.0</a></p>
+</section>
+</section>
+<section id="v0.9.6" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.6</h1>
+<p><em>2025-05-23</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.6">GitHub</a></p>
+<section id="minor-improvements-and-bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="minor-improvements-and-bug-fixes">Minor Improvements and bug Fixes</h2>
+<ul>
+<li>Added the <a href="reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method to determine whether steps exceeded a specific threshold level. (<a href="https://github.com/posit-dev/pointblank/issues/184">#184</a>)</li>
+<li>There’s now support for BigQuery Ibis-backend tables. (<a href="https://github.com/posit-dev/pointblank/issues/190">#190</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.5...v0.9.6">https://github.com/posit-dev/pointblank/compare/v0.9.5…v0.9.6</a></p>
+</section>
+</section>
+<section id="v0.9.5" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.5</h1>
+<p><em>2025-05-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.5">GitHub</a></p>
+<section id="minor-improvements-and-bug-fixes-1" class="level2">
+<h2 class="anchored" data-anchor-id="minor-improvements-and-bug-fixes-1">Minor improvements and bug fixes</h2>
+<ul>
+<li>Added the <a href="reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link gdls-code">assert_below_threshold()</a> method to raise an <code>AssertionError</code> if validation steps exceed a specified threshold level. (<a href="https://github.com/posit-dev/pointblank/issues/183">#183</a>)</li>
+<li>We now allow <a href="reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> to use <a href="reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> when needed. (<a href="https://github.com/posit-dev/pointblank/issues/182">#182</a>)</li>
+<li>The printing of a <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> object no longer errors if a column doesn’t have a declared data type. (<a href="https://github.com/posit-dev/pointblank/issues/181">#181</a>)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.4...v0.9.5">https://github.com/posit-dev/pointblank/compare/v0.9.4…v0.9.5</a></p>
+</section>
+</section>
+<section id="v0.9.4" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.4</h1>
+<p><em>2025-05-08</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.4">GitHub</a></p>
+<section id="new-features-and-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes">New Features and Fixes</h2>
+<ul>
+<li>Add the <code>global_sales</code> dataset, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/174</li>
+<li>Use Python 3.8 and 3.9 compatible type aliases, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/175</li>
+<li>Incorporate templating variables for segments in <code>brief=</code>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/176</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.2...v0.9.4">https://github.com/posit-dev/pointblank/compare/v0.9.2…v0.9.4</a></p>
+</section>
+</section>
+<section id="v0.9.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.2</h1>
+<p><em>2025-05-06</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.2">GitHub</a></p>
+<section id="whats-changed" class="level2">
+<h2 class="anchored" data-anchor-id="whats-changed">What’s Changed</h2>
+<ul>
+<li>Added the <a href="reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/172</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.1...v0.9.2">https://github.com/posit-dev/pointblank/compare/v0.9.1…v0.9.2</a></p>
+</section>
+</section>
+<section id="v0.9.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.1</h1>
+<p><em>2025-05-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.1">GitHub</a></p>
+<section id="new-features-21" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-21">New Features</h2>
+<ul>
+<li>Added the <a href="reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/171</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.9.0...v0.9.1">https://github.com/posit-dev/pointblank/compare/v0.9.0…v0.9.1</a></p>
+</section>
+</section>
+<section id="v0.9.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.9.0</h1>
+<p><em>2025-04-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.0">GitHub</a></p>
+<section id="new-features-22" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-22">New Features</h2>
+<ul>
+<li>There’s now support for data segmentation within a wide variety of validation methods (with the new <code>segments=</code> argument), by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/170</li>
+<li>Implemented parallelization of tests to decrease the overall duration of tests, by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/165</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.7...v0.9.0">https://github.com/posit-dev/pointblank/compare/v0.8.7…v0.9.0</a></p>
+</section>
+</section>
+<section id="v0.8.7" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.7</h1>
+<p><em>2025-04-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.7">GitHub</a></p>
+<section id="new-features-23" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-23">New Features</h2>
+<ul>
+<li>Allow <code>None</code> in <a href="reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, https://github.com/posit-dev/pointblank/pull/162</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.6...v0.8.7">https://github.com/posit-dev/pointblank/compare/v0.8.6…v0.8.7</a></p>
+</section>
+</section>
+<section id="v0.8.6" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.6</h1>
+<p><em>2025-04-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.6">GitHub</a></p>
+<section id="new-features-24" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-24">New Features</h2>
+<ul>
+<li>Added the <a href="reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.5...v0.8.6">https://github.com/posit-dev/pointblank/compare/v0.8.5…v0.8.6</a></p>
+</section>
+</section>
+<section id="v0.8.5" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.5</h1>
+<p><em>2025-04-15</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.5">GitHub</a></p>
+<section id="new-features-25" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-25">New Features</h2>
+<ul>
+<li>Added step report functionality for <a href="reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> validation steps, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/157</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.4...v0.8.5">https://github.com/posit-dev/pointblank/compare/v0.8.4…v0.8.5</a></p>
+</section>
+</section>
+<section id="v0.8.4" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.4</h1>
+<p><em>2025-04-12</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.4">GitHub</a></p>
+<section id="new-features-26" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-26">New Features</h2>
+<ul>
+<li>All step reports are now translated according to the <code>Validate(lang=)</code> value, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/155</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.3...v0.8.4">https://github.com/posit-dev/pointblank/compare/v0.8.3…v0.8.4</a></p>
+</section>
+</section>
+<section id="v0.8.3" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.3</h1>
+<p><em>2025-04-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.3">GitHub</a></p>
+<section id="new-features-27" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-27">New Features</h2>
+<ul>
+<li>Added Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.2...v0.8.3">https://github.com/posit-dev/pointblank/compare/v0.8.2…v0.8.3</a></p>
+</section>
+</section>
+<section id="v0.8.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.2</h1>
+<p><em>2025-04-09</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.2">GitHub</a></p>
+<section id="new-features-and-fixes-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-1">New Features and Fixes</h2>
+<ul>
+<li>Added the <a href="reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a> function for creating a Slack notification action, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/147</li>
+<li>Updated the <code>get_api_text()</code> utility function, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/148</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.1...v0.8.2">https://github.com/posit-dev/pointblank/compare/v0.8.1…v0.8.2</a></p>
+</section>
+</section>
+<section id="v0.8.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.1</h1>
+<p><em>2025-04-08</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.1">GitHub</a></p>
+<section id="new-features-and-fixes-2" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-2">New Features and Fixes</h2>
+<ul>
+<li>Added the ability to define final actions for validation (post interrogation), by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/146</li>
+<li>Refined translations for the <code>zh-Hant</code> lang, by <a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> in https://github.com/posit-dev/pointblank/pull/143</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.8.0...v0.8.1">https://github.com/posit-dev/pointblank/compare/v0.8.0…v0.8.1</a></p>
+</section>
+</section>
+<section id="v0.8.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.8.0</h1>
+<p><em>2025-04-03</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.0">GitHub</a></p>
+<section id="new-features-28" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-28">New Features</h2>
+<ul>
+<li>Added <code>highest_level=</code> and <code>default=</code> parameters to the <a href="reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> class, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)</li>
+<li>The <code>brief=</code> text now appears in the validation report table, plus we enabled more templating features for <code>brief=</code>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/127</li>
+<li>Add the global setting option for <code>brief=</code> in <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/128</li>
+<li>We now allow for flexible validations using dates or datetimes, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/134, https://github.com/posit-dev/pointblank/pull/135, https://github.com/posit-dev/pointblank/pull/136)</li>
+<li>The <code>lang=</code> value in <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> now translates the validation report table to <code>lang=</code>’s spoken language, and several more language translations were added, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/131, https://github.com/posit-dev/pointblank/pull/138, https://github.com/posit-dev/pointblank/pull/139)</li>
+<li>We can now better customize the header in step reports through <code>.get_step_report(header=...)</code>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/142</li>
+</ul>
+</section>
+<section id="fixes-and-documentation" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-and-documentation">Fixes and Documentation</h2>
+<ul>
+<li>There’s now a configurable limit (with set default) on extract rows (no matter which scheme was used for their collection), by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/130</li>
+<li>Renamed internal references to threshold levels, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/140</li>
+<li>Enhanced the docs for <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> and the validation methods, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/137</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.3...v0.8.0">https://github.com/posit-dev/pointblank/compare/v0.7.3…v0.8.0</a></p>
+</section>
+</section>
+<section id="v0.7.3" class="level1 changelog-version">
+<h1 class="changelog-version">v0.7.3</h1>
+<p><em>2025-03-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.3">GitHub</a></p>
+<section id="new-features-29" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-29">New Features</h2>
+<ul>
+<li>Added the <code>limit=</code> parameter to <a href="reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/115</li>
+<li>The new <code>min_tbl_width=</code> arg in <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> can improve the display of narrow preview tables by default, and, allows for customization, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/117</li>
+<li>Added the <a href="reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link gdls-code">get_action_metadata()</a> function to help users make more powerful <a href="reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> callables, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/118</li>
+<li>We now include failure text in the <code>_ValidationInfo</code> object after interrogation, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/119</li>
+<li>Basic customization of the header in <a href="reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> is now possible, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/120</li>
+<li>Added the ability to select a subset of columns in row-based step reports, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/123</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.2...v0.7.3">https://github.com/posit-dev/pointblank/compare/v0.7.2…v0.7.3</a></p>
+</section>
+</section>
+<section id="v0.7.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.7.2</h1>
+<p><em>2025-03-24</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.2">GitHub</a></p>
+<section id="new-features-and-fixes-3" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-3">New Features and Fixes</h2>
+<ul>
+<li>Pointblank now supports the Traditional Chinese (<code>zh-Hant</code>) locale (for localization of autobriefs), by <a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> in https://github.com/posit-dev/pointblank/pull/109</li>
+<li>Allow validations to work with dates/datetime comparisons across columns, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/110</li>
+<li>Revised <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> for better operability with the Ibis PySpark backend, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/112</li>
+</ul>
+</section>
+<section id="new-contributors-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-6">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/109</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.1...v0.7.2">https://github.com/posit-dev/pointblank/compare/v0.7.1…v0.7.2</a></p>
+</section>
+</section>
+<section id="v0.7.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.7.1</h1>
+<p><em>2025-03-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.1">GitHub</a></p>
+<section id="new-features-and-fixes-4" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-4">New Features and Fixes</h2>
+<ul>
+<li>Added the <code>assistant()</code> function to chat with the API by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/104</li>
+<li>Add note about getting a validation report from the REPL by <a href="https://github.com/aborruso"><span class="citation" data-cites="aborruso">@aborruso</span></a> in https://github.com/posit-dev/pointblank/pull/99</li>
+</ul>
+</section>
+<section id="new-contributors-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-7">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/aborruso"><span class="citation" data-cites="aborruso">@aborruso</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/99</li>
+<li><a href="https://github.com/albersonmiranda"><span class="citation" data-cites="albersonmiranda">@albersonmiranda</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/103</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.0...v0.7.1">https://github.com/posit-dev/pointblank/compare/v0.7.0…v0.7.1</a></p>
+</section>
+</section>
+<section id="v0.7.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.7.0</h1>
+<p><em>2025-03-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.0">GitHub</a></p>
+<section id="new-features-and-fixes-5" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-5">New Features and Fixes</h2>
+<ul>
+<li>Added the <a href="reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> method to <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> and the <a href="reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/86, https://github.com/posit-dev/pointblank/pull/88, https://github.com/posit-dev/pointblank/pull/93)</li>
+<li>Introduced a <code>Code Checks</code> CI workflow to incorporate Ruff and pre-commit by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/87</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.3...v0.7.0">https://github.com/posit-dev/pointblank/compare/v0.6.3…v0.7.0</a></p>
+</section>
+</section>
+<section id="v0.6.3" class="level1 changelog-version">
+<h1 class="changelog-version">v0.6.3</h1>
+<p><em>2025-03-11</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.6.3">GitHub</a></p>
+<section id="new-features-and-fixes-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-6">New Features and Fixes</h2>
+<ul>
+<li>Templating options are now available for strings used in <code>brief=</code> (all validation methods) and for any <a href="reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> consisting of text printed to the console, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/78</li>
+<li>Much more information about a table is now collected through a <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/84</li>
+<li>Any tables generated by Pointblank should no longer yield warnings in a Quarto publishing environment when Great Tables <code>0.17.0</code> (or higher) is installed, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/85</li>
+<li>Fixed a display issue concerning value sets within step reports, by <a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> in https://github.com/posit-dev/pointblank/pull/80</li>
+</ul>
+</section>
+<section id="new-contributors-8" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-8">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/80</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.2...v0.6.3">https://github.com/posit-dev/pointblank/compare/v0.6.2…v0.6.3</a></p>
+</section>
+</section>
+<section id="v0.6.2" class="level1 changelog-version">
+<h1 class="changelog-version">v0.6.2</h1>
+<p><em>2025-03-04</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.6.2">GitHub</a></p>
+<section id="new-features-and-fixes-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-and-fixes-7">New Features and Fixes</h2>
+<ul>
+<li>Ollama LLM provider support was added to the <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/70</li>
+<li>We can now add ‘briefs’ and Pointblank will generate ‘autobriefs’ as needed by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/71</li>
+<li>Added a tolerance parameter (<code>tol=</code>) to the <a href="reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a> validation method by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/73</li>
+<li>Incorporated the use of ruff in the project by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/76</li>
+<li>Enhanced the <a href="reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method to indicate which tests failed by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/72</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.1...v0.6.2">https://github.com/posit-dev/pointblank/compare/v0.6.1…v0.6.2</a></p>
+</section>
+</section>
+<section id="v0.6.1" class="level1 changelog-version">
+<h1 class="changelog-version">v0.6.1</h1>
+<p><em>2025-02-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.6.1">GitHub</a></p>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
+<ul>
+<li>thresholds level names have been renamed to better align with standard log levels by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/69</li>
+</ul>
+</section>
+<section id="new-features-30" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-30">New Features</h2>
+<ul>
+<li>Added the ability to execute actions when exceeding threshold levels by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/66</li>
+<li>Added AWS Bedrock support to <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> by <a href="https://github.com/kmasiello"><span class="citation" data-cites="kmasiello">@kmasiello</span></a> in https://github.com/posit-dev/pointblank/pull/67</li>
+</ul>
+</section>
+<section id="fixes-15" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-15">Fixes</h2>
+<ul>
+<li>Improved the implementation of <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/68</li>
+</ul>
+</section>
+<section id="new-contributors-9" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-9">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/kmasiello"><span class="citation" data-cites="kmasiello">@kmasiello</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/67</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.0...v0.6.1">https://github.com/posit-dev/pointblank/compare/v0.6.0…v0.6.1</a></p>
+</section>
+</section>
+<section id="v0.6.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.6.0</h1>
+<p><em>2025-02-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.6.0">GitHub</a></p>
+<section id="features-1" class="level2">
+<h2 class="anchored" data-anchor-id="features-1">Features</h2>
+<ul>
+<li>Added the experimental <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class for drafting a validation plan based on a provided dataset by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/60, https://github.com/posit-dev/pointblank/pull/50)</li>
+<li>Added the experimental <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class, which creates a succinct summary of any supported table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/59</li>
+<li>Added the <a href="reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link gdls-code">missing_vals_tbl()</a> function for providing an HTML summary of missing values in any supported table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/53</li>
+<li>Added the <a href="reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method for <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> as a convenience for test suites by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/64</li>
+<li>The <code>nycflights</code> dataset is now available in <a href="reference/load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/54</li>
+</ul>
+</section>
+<section id="fixes-and-documentation-1" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-and-documentation-1">Fixes and Documentation</h2>
+<ul>
+<li>Integer and decimal values are now better formatted in HTML displays by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/55</li>
+<li>Fixed usage of the Ibis <code>head()</code> method call (changed in recent versions of Ibis) by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/52</li>
+<li>Revised appearance of step reports for validations based on checks of column values by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/49</li>
+<li>Improved the documentation of the <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> class by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/61</li>
+<li>Added interlinks throughout the Reference API pages by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/65</li>
+<li>Fixed a typo in the <code>README.md</code> file by <a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a> in https://github.com/posit-dev/pointblank/pull/56</li>
+</ul>
+</section>
+<section id="new-contributors-10" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-10">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/56</li>
+<li><a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/64</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.5.0...v0.6.0">https://github.com/posit-dev/pointblank/compare/v0.5.0…v0.6.0</a></p>
+</section>
+</section>
+<section id="v0.5.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.5.0</h1>
+<p><em>2025-01-30</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.5.0">GitHub</a></p>
+<section id="features-2" class="level2">
+<h2 class="anchored" data-anchor-id="features-2">Features</h2>
+<ul>
+<li>Incorporate the use of Narwhals selectors to select multiple columns for validation by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/45</li>
+<li>View a report for a single validation step with the new <a href="reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> method by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/rich-iannone/pointblank/pull/31, https://github.com/rich-iannone/pointblank/pull/42, https://github.com/rich-iannone/pointblank/pull/43, https://github.com/rich-iannone/pointblank/pull/44, https://github.com/rich-iannone/pointblank/pull/47, https://github.com/rich-iannone/pointblank/pull/48)</li>
+</ul>
+</section>
+<section id="fixes-and-documentation-2" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-and-documentation-2">Fixes and Documentation</h2>
+<ul>
+<li>When collecting target table schema, avoid conversion to Narwhals (use native DF schemas) by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/40</li>
+<li>Corrected installation instructions in the contributing guide by <a href="https://github.com/malcolmbarrett"><span class="citation" data-cites="malcolmbarrett">@malcolmbarrett</span></a> in https://github.com/rich-iannone/pointblank/pull/41</li>
+<li>Fix issues with <code>n_failing()</code> correctness (when Null values present) by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/46</li>
+<li>Added the Examples page on the project website by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/rich-iannone/pointblank/pull/32, https://github.com/rich-iannone/pointblank/pull/33)</li>
+</ul>
+</section>
+<section id="new-contributors-11" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-11">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/malcolmbarrett"><span class="citation" data-cites="malcolmbarrett">@malcolmbarrett</span></a> made their first contribution in https://github.com/rich-iannone/pointblank/pull/41</li>
+</ul>
+<p><strong>Full Changelog</strong>: https://github.com/rich-iannone/pointblank/compare/v0.4.0…v0.5.0</p>
+</section>
+</section>
+<section id="v0.4.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.4.0</h1>
+<p><em>2025-01-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.4.0">GitHub</a></p>
+<section id="features-3" class="level2">
+<h2 class="anchored" data-anchor-id="features-3">Features</h2>
+<ul>
+<li>Add the <a href="reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a> and <a href="reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match()</a> validation methods by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/rich-iannone/pointblank/pull/24, https://github.com/rich-iannone/pointblank/pull/25)</li>
+<li>Add the <a href="reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> validation method by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/30</li>
+<li>Add the <a href="reference/get_column_count.html#pointblank.get_column_count" class="gdls-link gdls-code">get_column_count()</a> and <a href="reference/get_row_count.html#pointblank.get_row_count" class="gdls-link gdls-code">get_row_count()</a> functions by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/23</li>
+<li>Add the <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> function by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/20</li>
+<li>Incorporate row numbers to preview by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/21</li>
+<li>Add option for info header in <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/22</li>
+</ul>
+</section>
+<section id="fixes-and-documentation-3" class="level2">
+<h2 class="anchored" data-anchor-id="fixes-and-documentation-3">Fixes and Documentation</h2>
+<ul>
+<li>Make corrections to step indexing by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/26</li>
+<li>Improve visual display of <a href="reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> steps in validation report by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/27</li>
+<li>In <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> function, make a copy of the input table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/29</li>
+<li>Use <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> with datasets throughout documentation by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/28</li>
+</ul>
+<p><strong>Full Changelog</strong>: https://github.com/rich-iannone/pointblank/compare/v0.3.0…v0.4.0</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong> and <strong>Rich&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+</div>
+</footer>
+<script src="github-widget.js"></script>
+<script src="copy-page.js"></script>
+<script src="sidebar-wrap.js"></script>
+<script src="sidebar-filter.js"></script>
+<script src="dark-mode-toggle.js"></script>
+<script src="back-to-top.js"></script>
+<script src="keyboard-nav.js"></script>
+<script src="copy-code.js"></script>
+<script src="mermaid-renderer.js"></script>
+<script src="reference-switcher.js"></script>
+<script src="tooltips.js"></script>
+<script src="responsive-tables.js"></script>
+<script src="video-embed.js"></script>
+<script src="navbar-widgets.js"></script>
+
+
+
+
+</body></html>

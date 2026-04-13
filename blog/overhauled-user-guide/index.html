@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Rich Iannone and Michael Chow">
 <meta name="dcterms.date" content="2025-05-20">
 
-<title>Overhauling Pointblank’s User Guide – Pointblank</title>
+<title>Overhauling Pointblank’s User Guide – Pointblank | Pointblank</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -35,17 +35,17 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../assets/fav-logo.png" rel="icon" type="image/png">
+<link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-268d4943898fdc921a96423155a50391.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5864d2c5cf85e8c6f619c1992905b265.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -58,7 +58,7 @@ ul.task-list li input[type="checkbox"] {
     "/",
     "s"
   ],
-  "show-item-context": true,
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -73,25 +73,22 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XSFKYZM9GW"></script>
-
-<script type="text/javascript">
-
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
-</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="../../theme-init.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
-<script async="" src="https://plausible.io/js/pa-71QkMiRx8iHcMxnqr8Iw5.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
-</script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="reference/_styles-quartodoc.css">
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/">
+  <meta name="description" content="Find out if your data is what you think it is.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Overhauling Pointblank’s User Guide – Pointblank | Pointblank">
+  <meta property="og:description" content="Find out if your data is what you think it is.">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Overhauling Pointblank’s User Guide – Pointblank | Pointblank">
+  <meta name="twitter:description" content="Find out if your data is what you think it is.">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -101,44 +98,43 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/pointblank_logo_small.svg" alt="" class="navbar-logo light-content">
-    <img src="../../assets/pointblank_logo_small.svg" alt="" class="navbar-logo dark-content">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.23.0</code><br>Released 2026-04-01">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
+            <div id="quarto-search" class=""></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
-<span class="menu-text">Get Started</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../demos/index.html"> 
-<span class="menu-text">Examples</span></a>
+    <a class="nav-link" href="../../user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../blog/index.html"> 
-<span class="menu-text">Pointblog</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://discord.com/invite/YH7CybCNCQ"> <i class="bi bi-discord" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/posit-dev/pointblank"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+    </span>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -155,7 +151,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
-  <ul>
+  <ul class="collapse">
   <li><a href="#introduction-embracing-the-spiral-sequence" id="toc-introduction-embracing-the-spiral-sequence" class="nav-link active" data-scroll-target="#introduction-embracing-the-spiral-sequence">Introduction: Embracing the Spiral Sequence</a></li>
   <li><a href="#improving-examples" id="toc-improving-examples" class="nav-link" data-scroll-target="#improving-examples">Improving Examples</a></li>
   <li><a href="#rounding-out-api-coverage" id="toc-rounding-out-api-coverage" class="nav-link" data-scroll-target="#rounding-out-api-coverage">Rounding Out API Coverage</a></li>
@@ -214,16 +210,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>surfacing advanced topics</li>
 </ul>
 <p>Let us walk you through the key improvements in our refreshed <a href="../../user-guide/index.html"><strong>User Guide</strong></a>!</p>
-<section id="introduction-embracing-the-spiral-sequence" class="level2">
-<h2 class="anchored" data-anchor-id="introduction-embracing-the-spiral-sequence">Introduction: Embracing the Spiral Sequence</h2>
+<section id="introduction-embracing-the-spiral-sequence" class="level1">
+<h1>Introduction: Embracing the Spiral Sequence</h1>
 <p>We chose to use a spiral sequence for our <a href="../../user-guide/index.html">Introduction</a> and <em>Validation Plan</em> section. The <a href="../../user-guide/index.html">Introduction</a> quickly covers parts of validation plan, while each article of the <em>Validation Plan</em> section dives deeper into different aspects of defining validation rules.</p>
 <div style="text-align: center;">
 <p><img src="breadth-and-depth.png" class="img-fluid" style="width:50.0%"></p>
 </div>
 <p>The introduction does a broad pass on the validation plan table diagram, identifying the core pieces of the output and then giving a quick overview of the code that produced it. This sets people up for the <em>Validation Plan</em> section in the guide, where each concept is discussed in depth.</p>
 </section>
-<section id="improving-examples" class="level2">
-<h2 class="anchored" data-anchor-id="improving-examples">Improving Examples</h2>
+<section id="improving-examples" class="level1">
+<h1>Improving Examples</h1>
 <p>Examples are everywhere in the <a href="../../user-guide/index.html"><strong>User Guide</strong></a>. We’ve tightened up our approach to examples by:</p>
 <ul>
 <li>presenting example code, output, or both, early in each section</li>
@@ -234,18 +230,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><img src="explanation-of-visual.png" class="img-fluid" style="width:80.0%"></p>
 <p>The blue arrow marks the flow of reading and the red arrows map where we anticipate people will look from the text to the output. Focusing explicitly on where we think attention will go forces us to think carefully about exactly what readers will get from the output. The hope is that readers get to work more quickly on new concepts.</p>
 </section>
-<section id="rounding-out-api-coverage" class="level2">
-<h2 class="anchored" data-anchor-id="rounding-out-api-coverage">Rounding Out API Coverage</h2>
+<section id="rounding-out-api-coverage" class="level1">
+<h1>Rounding Out API Coverage</h1>
 <p>Documentation has to balance jobs between a user guide and an API Reference:</p>
 <ul>
-<li>User Guide: explains concepts that cut across functions (like common arguments across <a href="../../user-guide/validation-methods.html">validation methods</a>)</li>
+<li>User Guide: explains concepts that cut across functions (like common arguments across <a href="../../user-guide/validation-plan/validation-methods.html">validation methods</a>)</li>
 <li>API Reference: explains each individual function</li>
 </ul>
 <p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> that shows links marked:</p>
 <p><img src="links-in-guide.png" class="img-fluid" style="width:80.0%"></p>
 </section>
-<section id="surfacing-advanced-topics" class="level2">
-<h2 class="anchored" data-anchor-id="surfacing-advanced-topics">Surfacing Advanced Topics</h2>
+<section id="surfacing-advanced-topics" class="level1">
+<h1>Surfacing Advanced Topics</h1>
 <p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
 <ul>
 <li>segmentation: splitting a column into groups, and validating each group</li>
@@ -255,24 +251,24 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div style="text-align: center;">
 <p><img src="advanced-in-sidebar.png" class="img-fluid" style="width:35.0%"></p>
 </div>
-<section id="segmentation" class="level3">
-<h3 class="anchored" data-anchor-id="segmentation">Segmentation</h3>
+<section id="segmentation" class="level2">
+<h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
 <p>Here’s a screenshot of a validation report with two validation steps, one for each segment (<code>"low"</code> and <code>"high"</code>) in the <code>f</code> column of the <code>small_table</code> dataset.</p>
 <p><img src="segments.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice that segments split columns into groups and apply the same validation to each of the groups. Each group is given its own step.</p>
-<p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the <a href="../../user-guide/segmentation.html">Segmentation article in the User Guide</a> is to describe this cross-cutting behavior in a single place.</p>
-<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>) and the <a href="../../user-guide/segmentation.html">Segmentation article</a> to get a feel for how each location documents the segments feature.</p>
+<p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the <a href="../../user-guide/validation-plan/segmentation.html">Segmentation article in the User Guide</a> is to describe this cross-cutting behavior in a single place.</p>
+<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> and the <a href="../../user-guide/validation-plan/segmentation.html">Segmentation article</a> to get a feel for how each location documents the segments feature.</p>
 </section>
-<section id="step-report" class="level3">
-<h3 class="anchored" data-anchor-id="step-report">Step Report</h3>
+<section id="step-report" class="level2">
+<h2 class="anchored" data-anchor-id="step-report">Step Report</h2>
 <p>Step reports display failing cases (e.g., rows) for a validation step, so you can dig deeper into validation failures. Here’s a screenshot of a step report for some validation step 2:</p>
 <p><img src="step-report.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice the arrow pointing to ‘Step 2’ in the title. Failing values are highlighted in red. Once we know we have failures, it’s important to take action and discover <em>why</em> data is failing. Looking at failing cases in step reports often uncovers obvious causes behind failures.</p>
-<p>The <code>get_step_report()</code> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
+<p>The <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
 </section>
 </section>
-<section id="looking-forward" class="level2">
-<h2 class="anchored" data-anchor-id="looking-forward">Looking Forward</h2>
+<section id="looking-forward" class="level1">
+<h1>Looking Forward</h1>
 <p>The refreshed <strong>User Guide</strong> is just the beginning of our documentation improvements. We’re committed to continuously enhancing our documentation to support your data validation needs.</p>
 <p>Michael Chow gave feedback on this <strong>User Guide</strong> in preparation for his <a href="https://cfp.scipy.org/scipy2025/talk/NRMNDX/">upcoming talk at SciPy 2025</a>.</p>
 <p>We’d love to hear your feedback on the new User Guide! Feel free to open an issue on our <a href="https://github.com/posit-dev/pointblank/issues">GitHub repository</a> with suggestions, corrections, or requests for additional topics you’d like to see covered. You can also join our community discussions in the dedicated <code>#Documentation</code> channel on our <a href="https://discord.com/invite/YH7CybCNCQ">Discord server</a>, where you can share ideas, ask questions, and get help directly from the Pointblank team and other users.</p>
@@ -290,71 +286,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       icon: icon
     };
     anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -684,17 +618,25 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">
-<p>Proudly supported by <a href="https://www.posit.co/" class="no-icon"><img src="../../assets/posit-logo-black.svg" alt="Posit" width="80" style="padding-left: 3px;vertical-align:text-top;"></a></p>
-</div>   
-    <div class="nav-footer-center">
-      &nbsp;
-    </div>
-    <div class="nav-footer-right">
-<p>© 2024–2026 Posit Software, PBC.</p>
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong> and <strong>Rich&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
 </div>
-  </div>
+</div>
 </footer>
+<script src="../../github-widget.js"></script>
+<script src="../../copy-page.js"></script>
+<script src="../../sidebar-wrap.js"></script>
+<script src="../../sidebar-filter.js"></script>
+<script src="../../dark-mode-toggle.js"></script>
+<script src="../../back-to-top.js"></script>
+<script src="../../keyboard-nav.js"></script>
+<script src="../../copy-code.js"></script>
+<script src="../../mermaid-renderer.js"></script>
+<script src="../../reference-switcher.js"></script>
+<script src="../../tooltips.js"></script>
+<script src="../../responsive-tables.js"></script>
+<script src="video-embed.js"></script>
+<script src="../../navbar-widgets.js"></script>
 
 
 
