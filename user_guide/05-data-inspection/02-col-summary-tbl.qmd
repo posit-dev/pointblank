@@ -1,0 +1,102 @@
+---
+title: Column Summaries
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+```
+
+While previewing a table with `preview()` is undoubtedly a good thing to do, sometimes you need
+more. This is where summarizing a table comes in. When you view a summary of a table, the
+column-by-column info can quickly increase your understanding of a dataset. Plus, it allows you to
+quickly catch anomalies in your data (e.g., the maximum value of a column could be far outside the
+realm of possibility).
+
+Pointblank provides a function to make it extremely easy to view column-level summaries in a single
+table. That function is called `col_summary_tbl()` and, just like `preview()` does, it supports the
+use of any table that Pointblank can use for validation. And no matter what the input data is, the
+resultant reporting table is consistent in its design and construction.
+
+## Trying out `col_summary_tbl()`{.qd-no-link}
+
+The function only requires a table. Let's use the `small_table` dataset (a very simple table) to
+start us off:
+
+```{python}
+import pointblank as pb
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+pb.col_summary_tbl(small_table)
+```
+
+The header provides the type of table we're looking at (`POLARS`, since this is a Polars DataFrame)
+and the table dimensions. The rest of the table focuses on the column-level summaries. As such, each
+row represents a summary of a column in the `small_table` dataset. There's a lot of information in
+this summary table to digest. Some of it is intuitive since this sort of table summarization isn't
+all that uncommon, but other aspects of it could also give some pause. So we'll carefully wade
+through how to interpret this report.
+
+## Data Categories in the Column Summary Table
+
+On the left side of the table are icons of different colors. These represent categories that the
+columns fall into. There are only five categories and columns can only be of one type. The
+categories (and their letter marks) are:
+
+- `N`: numeric
+- `S`: string-based
+- `D`: date/datetime
+- `T/F`: boolean
+- `O`: object
+
+The numeric category (`N`) takes data types such as floats and integers. The `S` category is for
+string-based columns. Date or datetime values are lumped into the `D` category. Boolean columns
+(`T/F`) have their own category and are *not* considered numeric (e.g., `0`/`1`). The `O` category
+is a catchall for all other types of columns. Given the disparity of these categories and that we
+want them in the same table, some statistical measures will be sensible for certain column
+categories but not for others. Given that, we'll explain how each category is represented in the
+column summary table.
+
+## Numeric Data
+
+Three columns in `small_table` are numeric: `a` (`Int64`), `c` (`Int64`), and `d` (`Float64`). The
+common measures of the missing count/proportion (`NA`) and the unique value count/proportion (`UQ`)
+are provided for the numeric data type. For these two measures, the top number is the absolute count
+of missing values and the count of unique values. The bottom number is a proportion of the absolute
+count divided by the row count; this makes each proportion a value between `0` and `1` (bounds
+included).
+
+The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minumum
+(`Min`), maximum, (`Max`) and a set of quantiles occupy the next few columns (includes `P5`, `Q1`,
+`Med` for median, `Q3`, and `P95`). Finally, the interquartile range (`IQR`: `Q3` - `Q1`) is the
+last measure provided.
+
+## String Data
+
+String data is present in `small_table`, being in columns `b` and `f`. The missing value (`NA`) and
+uniqueness (`UQ`) measures are accounted for here. The statistical measures are all based on string
+lengths, so what happens is that all strings in a column are converted to those numeric values and a
+subset of stats values is presented. To avoid some understandable confusion when reading the table,
+the stats values in each of the cells with values are annotated with the text `"SL"`. It makes less
+sense to provide a full suite of quantile values so only the minimum (`Min`), median (`Med`), and
+maximum (`Max`) are provided.
+
+## Date/Datetime Data and Boolean Data
+
+We see that in the first two rows of our summary table there are summaries of the `date_time` and
+`date` columns. The summaries we provide for a date/datetime category (notice the green `D` to the
+left of the column names) are:
+
+1. the missing count/proportion (`NA`)
+2. the unique value count/proportion (`UQ`)
+3. the minimum and maximum dates/datetimes
+
+One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`,
+`False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of
+`True` and `False` values (under `UQ`).

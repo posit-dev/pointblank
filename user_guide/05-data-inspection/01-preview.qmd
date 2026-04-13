@@ -1,0 +1,136 @@
+---
+title: Previewing Data
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+```
+
+In many cases, it's *good* to look at your data tables. Before validating a table, you'll likely
+want to inspect a portion of it before diving into the creation of data-quality rules. This is
+pretty easily done with Polars and Pandas DataFrames, however, it's not as easy with database tables
+and each table backend displays things differently.
+
+To make this common task a little better, you can use the `preview()` function in Pointblank. It has
+been designed to work with every table that the package supports (i.e., DataFrames and Ibis-backend
+tables, the latter of which are largely database tables). Plus, what's shown in the output is
+consistent, no matter what type of data you're looking at.
+
+## Viewing a Table with `preview()`{.qd-no-link}
+
+Let's look at how `preview()` works. It requires only a table and, for this first example, let's use
+the `nycflights` dataset:
+
+```{python}
+import pointblank as pb
+
+nycflights = pb.load_dataset(dataset="nycflights", tbl_type="polars")
+
+pb.preview(nycflights)
+```
+
+This is an HTML table using the style of the other reporting tables in the library. The header is
+more minimal here, only showing the type of table we're looking at (`POLARS` in this case) along
+with the table dimensions. The column headers provide both the column names and the column data
+types.
+
+By default, we're getting the first five rows and the last five rows. Row numbers (from the original
+dataset) provide an indication of which rows are the head and tail rows. The blue lines provide
+additional demarcation of the column containing the row numbers and the head and tail row groups.
+Finally, any cells with missing values are prominently styled with red lettering and a lighter red
+background.
+
+If you'd rather not see the row numbers in the table, you can use the `show_row_numbers=False`
+option. Let's try that with the `game_revenue` dataset as a DuckDB table:
+
+```{python}
+game_revenue = pb.load_dataset(dataset="game_revenue", tbl_type="duckdb")
+
+pb.preview(game_revenue, show_row_numbers=False)
+```
+
+With the above preview, the row numbers are gone. The horizontal blue line still serves to divide
+the top and bottom rows of the table, however.
+
+## Adjusting the Number of Rows Shown
+
+It could be that displaying the five top and bottom rows is not preferred. This can be changed with
+the `n_head=` and `n_tail=`. Maybe, you want three from the top along with the last row? Let's try
+that out with the `small_table` dataset as a Pandas DataFrame:
+
+```{python}
+small_table = pb.load_dataset(dataset="small_table", tbl_type="pandas")
+
+pb.preview(small_table, n_head=3, n_tail=1)
+```
+
+If you're looking at a small table and want to see the entirety of it, you can enlarge the `n_head=`
+and `n_tail=` values:
+
+```{python}
+small_table = pb.load_dataset(dataset="small_table", tbl_type="pandas")
+
+pb.preview(small_table, n_head=10, n_tail=10)
+```
+
+Given that the table has 13 rows, asking for 20 rows to be displayed effectively shows the entire
+table.
+
+## Previewing a Subset of Columns
+
+The preview scales well to tables that have many columns by allowing for a horizontal scroll.
+However, previewing data from all columns can be impractical if you're only concerned with a key set
+of them. To preview only a subset of a table's columns, we can use the `columns_subset=` argument.
+Let's do this with the `nycflights` dataset and provide a list of six columns from that table.
+
+```{python}
+pb.preview(
+    nycflights,
+    columns_subset=["hour", "minute", "sched_dep_time", "year", "month", "day"]
+)
+```
+
+What we see are the six columns we specified from the `nycflights` dataset.
+
+Note that the columns are displayed in the order provided in the `columns_subset=` list. This can be
+useful for making quick, side-by-side comparisons. In the example above, we placed `hour` and
+`minute` next to the `sched_dep_time` column. In the original dataset, `sched_dep_time` is far
+apart from the other two columns, but, it's useful to have them next to each other in the preview
+since `hour` and `minute` are derived from `sched_dep_time` (and this lets us spot check any
+issues).
+
+We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns
+that have `"dep_"` or `"arr_"` in the name. To do that, we use the `matches()` column selector
+function:
+
+```{python}
+pb.preview(nycflights, columns_subset=pb.matches("dep_|arr_"))
+```
+
+Several selectors can be combined together through use of the `col()` function and operators such as
+`&` (*and*), `|` (*or*), `-` (*difference*), and `~` (*not*). Let's look at a column selection case
+where:
+
+- the first three columns are selected
+- all columns containing `"dep_"` or `"arr_"` are selected
+- any columns beginning with `"sched"` are omitted
+
+This is how we put that together within `col()`:
+
+```{python}
+pb.preview(
+    nycflights,
+    columns_subset=pb.col((pb.first_n(3) | pb.matches("dep_|arr_")) & ~ pb.starts_with("sched"))
+)
+```
+
+This gives us a preview with only the columns that fit the specific selection rules. Incidentally,
+using selectors with a dataset through `preview()` is a good way to test out the use of selectors
+more generally. Since they are primarily used to select columns for validation, trying them
+beforehand with `preview()` can help verify that your selection logic is sound.
