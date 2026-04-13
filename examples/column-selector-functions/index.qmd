@@ -1,0 +1,82 @@
+---
+title: "Column Selector Functions: Easily Pick Columns"
+description: "Use column selector functions in the columns= argument to conveniently choose columns."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Column Selector Functions: Easily Pick Columns
+
+Use column selector functions in the `columns=` argument to conveniently choose columns.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+import narwhals.selectors as ncs
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars")
+    )
+    .col_vals_ge(
+        columns=pb.matches("rev|dur"),  # check values in columns having 'rev' or 'dur' in name
+        value=0
+    )
+    .col_vals_regex(
+        columns=pb.ends_with("_id"),    # check values in columns with names ending in '_id'
+        pattern=r"^[A-Z]{12}\d{3}"
+    )
+    .col_vals_not_null(
+        columns=pb.last_n(2)            # check that the last two columns don't have Null values
+    )
+    .col_vals_regex(
+        columns=ncs.string(),           # check that all string columns are non-empty strings
+        pattern=r"(.|\s)*\S(.|\s)*"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+import narwhals.selectors as ncs
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars")
+    )
+    .col_vals_ge(
+        columns=pb.matches("rev|dur"),  # check values in columns having 'rev' or 'dur' in name
+        value=0
+    )
+    .col_vals_regex(
+        columns=pb.ends_with("_id"),    # check values in columns with names ending in '_id'
+        pattern=r"^[A-Z]{12}\d{3}"
+    )
+    .col_vals_not_null(
+        columns=pb.last_n(2)            # check that the last two columns don't have Null values
+    )
+    .col_vals_regex(
+        columns=ncs.string(),           # check that all string columns are non-empty strings
+        pattern=r"(.|\s)*\S(.|\s)*"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="game_revenue", tbl_type="polars"))
+```
+
+</details>

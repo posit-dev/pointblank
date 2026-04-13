@@ -1,0 +1,69 @@
+---
+title: "Sundered Data"
+description: "Splitting your data into 'pass' and 'fail' subsets."
+image: "img/sundered_data.png"
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Sundered Data
+
+Splitting your data into 'pass' and 'fail' subsets.
+
+```{python}
+# | echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="pandas"),
+        tbl_name="small_table",
+        label="Sundering Data"
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_le(columns="c", value=5)
+    .interrogate()
+)
+
+validation
+```
+
+```{python}
+#| echo: false
+pb.preview(validation.get_sundered_data(type="pass"))
+```
+
+```python
+import pointblank as pb
+import polars as pl
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="pandas"),
+        tbl_name="small_table",
+        label="Sundering Data"
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_le(columns="c", value=5)
+    .interrogate()
+)
+
+validation
+```
+
+```python
+pb.preview(validation.get_sundered_data(type="pass"))
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table", tbl_type="pandas"), n_head=20, n_tail=20)
+```
+
+</details>
