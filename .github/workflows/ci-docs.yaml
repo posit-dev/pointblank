@@ -24,6 +24,7 @@ jobs:
           python -m pip install -e ".[docs]"
           python -m pip install "great-docs[svg] @ git+https://github.com/posit-dev/great-docs.git"
           python -m pip install ibis-framework[duckdb]
+          python -m pip install pandera patito validoopsie
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Build docs
