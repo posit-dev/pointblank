@@ -50,7 +50,7 @@ If you create new tests involving snapshots, please ensure that the resulting sn
 Aggregation methods are generated dynamically! This is done because they all have the same signature and they're registered on the `Validate` class in the same way. So, to add a new method, go to `pointblank/_agg.py` and add either a comparison or statistical aggregation function.
 
 Comparison functions are defined by `comp_*`, for example `comp_gt` for "greater than". Statistical functions are defined by `agg_*`, for example `agg_sum` for "sum". At build time, these are registered and a grid of all combinations are created:
-```{python}
+```python
 Aggregator = Callable[[nw.DataFrame], Any]
 Comparator = Callable[[Any, Any], bool]
 
@@ -60,7 +60,7 @@ COMPARATOR_REGISTRY: dict[str, Comparator] = {}
 ```
 
 Once you've added a new method(s), run `make pyi` to generate the updated type stubs in `pointblank/validate.pyi` which contains the new signatures for the aggregation methods. At runtime, or import time to be precise, the methods are added to the `Validate` class and resolved internally through the registry.
-```{python}
+```python
 # pointblank/validate.py
 for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, etc.
     setattr(Validate, method, make_agg_validator(method))

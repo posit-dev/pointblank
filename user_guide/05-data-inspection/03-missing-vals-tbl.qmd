@@ -1,0 +1,83 @@
+---
+title: Missing Values Reporting
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+```
+
+Sometimes values just aren't there: they're missing. This can either be expected or another thing to
+worry about. Either way, we can dig a little deeper if need be and use the `missing_vals_tbl()`
+function to generate a summary table that can elucidate how many values are missing, and roughly
+where.
+
+## Using and Understanding `missing_vals_tbl()`{.qd-no-link}
+
+The missing values table is arranged a lot like the column summary table (generated via the
+`col_summary_tbl()` function) in that columns of the input table are arranged as rows in the
+reporting table. Let's use `missing_vals_tbl()` on the `nycflights` dataset, which has a lot of
+missing values:
+
+```{python}
+import pointblank as pb
+
+nycflights = pb.load_dataset(dataset="nycflights", tbl_type="polars")
+
+pb.missing_vals_tbl(nycflights)
+```
+
+There are 18 columns in `nycflights` and they're arranged down the missing values table as rows. To
+the right we see column headers indicating 10 columns that are row sectors. Row sectors are groups
+of rows and each sector contains a tenth of the total rows in the table. The leftmost sectors are
+the rows at the top of the table whereas the sectors on the right are closer to the bottom. If you'd
+like to know which rows make up each row sector, there are details on this in the table footer area
+(click the `ROW SECTORS` text or the disclosure triangle).
+
+Now that we know about row sectors, we need to understand the visuals here. A light blue cell
+indicates there are no (`0`) missing values within a given row sector of a column. For `nycflights`
+we can see that several columns have no missing values at all (i.e., the light blue color makes up
+the entire row in the missing values table).
+
+When there are missing values in a column's row sector, you'll be met with a grayscale color. The
+proportion of missing values corresponds to the color ramp from light gray to solid black.
+Interestingly, most of the columns that have missing values appear to be related to each other in
+terms of the extent of missing values (i.e., the appearance in the reporting table looks roughly the
+same, indicating a sort of systematic missingness). These columns are `dep_time`, `dep_delay`,
+`arr_time`, `arr_delay`, and `air_time`.
+
+The odd column out with regard to the distribution of missing values is `tailnum`. By scanning the
+row and observing that the grayscale color values are all a little different we see that the degree
+of missingness of more variable and not related to the other columns containing missing values.
+
+## Missing Value Tables from the Other Datasets
+
+The `small_table` dataset has only 13 rows to it. Let's use that as a Pandas DataFrame with
+`missing_vals_tbl()`:
+
+```{python}
+small_table = pb.load_dataset(dataset="small_table", tbl_type="pandas")
+
+pb.missing_vals_tbl(small_table)
+```
+
+It appears that only column `c` has missing values. And since the table is very small in terms of
+row count, most of the row sectors contain only a single row.
+
+The `game_revenue` dataset has *no* missing values. And this can be easily proven by using
+`missing_vals_tbl()` with it:
+
+```{python}
+game_revenue = pb.load_dataset(dataset="game_revenue", tbl_type="duckdb")
+
+pb.missing_vals_tbl(game_revenue)
+```
+
+We see nothing but light blue in this report! The header also indicates that there are no missing
+values by displaying a large green check mark (the other report tables provided a count of total
+missing values across all columns).

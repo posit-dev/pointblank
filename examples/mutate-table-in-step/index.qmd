@@ -1,0 +1,98 @@
+---
+title: "Mutate the Table in a Validation Step"
+description: "For far more specialized validations, modify the table with the pre= argument before checking it."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Mutate the Table in a Validation Step
+
+For far more specialized validations, modify the table with the `pre=` argument before checking it.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+import polars as pl
+import narwhals as nw
+
+# Define preprocessing functions
+def get_median_a(df):
+    """Use a Polars expression to aggregate column `a`."""
+    return df.select(pl.median("a"))
+
+def add_b_length_column(df):
+    """Use Narwhals to add a string length column `b_len`."""
+    return (
+        nw.from_native(df)
+        .with_columns(b_len=nw.col("b").str.len_chars())
+    )
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_between(
+        columns="a",
+        left=3, right=6,
+        pre=get_median_a
+    )
+    .col_vals_eq(
+        columns="b_len",
+        value=9,
+        pre=add_b_length_column
+    )
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+import polars as pl
+import narwhals as nw
+
+# Define preprocessing functions
+def get_median_a(df):
+    """Use a Polars expression to aggregate column `a`."""
+    return df.select(pl.median("a"))
+
+def add_b_length_column(df):
+    """Use Narwhals to add a string length column `b_len`."""
+    return (
+        nw.from_native(df)
+        .with_columns(b_len=nw.col("b").str.len_chars())
+    )
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_between(
+        columns="a",
+        left=3, right=6,
+        pre=get_median_a
+    )
+    .col_vals_eq(
+        columns="b_len",
+        value=9,
+        pre=add_b_length_column
+    )
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table", tbl_type="polars"), n_head=20, n_tail=20)
+```
+
+</details>

@@ -1,0 +1,77 @@
+---
+title: "Step Reports for Column Data Checks"
+description: "A step report for column checks shows what went wrong."
+image: "img/step_report_column_values.png"
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Step Report: Column Data Checks
+
+A step report for column checks shows what went wrong.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        tbl_name="small_table",
+        label="Step reports for column data checks"
+    )
+    .col_vals_ge(columns="c", value=4, na_pass=True)
+    .col_vals_regex(columns="b", pattern=r"\d-[a-z]{3}-\d{3}")
+    .interrogate()
+)
+
+validation
+```
+
+```{python}
+#| echo: false
+validation.get_step_report(i=1)
+```
+
+```{python}
+#| echo: false
+validation.get_step_report(i=2)
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        tbl_name="small_table",
+        label="Step reports for column data checks"
+    )
+    .col_vals_ge(columns="c", value=4, na_pass=True)                # has failing test units
+    .col_vals_regex(columns="b", pattern=r"\d-[a-z]{3}-\d{3}")      # no failing test units
+    .interrogate()
+)
+
+validation
+```
+
+```python
+validation.get_step_report(i=1)
+```
+
+```python
+validation.get_step_report(i=2)
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table"), n_head=20, n_tail=20)
+```
+
+</details>

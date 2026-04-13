@@ -1,0 +1,54 @@
+---
+title: "Apply Validation Rules to Multiple Columns"
+description: "Create multiple validation steps by using a list of column names with columns=."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Apply Validation Rules to Multiple Columns
+
+Create multiple validation steps by using a list of column names with `columns=`.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_ge(columns=["a", "c", "d"], value=0)   # check values in 'a', 'c', and 'd'
+    .col_exists(columns=["date_time", "date"])       # check for the existence of two columns
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_ge(columns=["a", "c", "d"], value=0)   # check values in 'a', 'c', and 'd'
+    .col_exists(columns=["date_time", "date"])       # check for the existence of two columns
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table", tbl_type="polars"), n_head=20, n_tail=20)
+```
+
+</details>

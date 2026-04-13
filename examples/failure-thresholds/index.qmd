@@ -1,0 +1,78 @@
+---
+title: "Set Failure Threshold Levels"
+description: "Set threshold levels to better gauge adverse data quality."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Set Failure Threshold Levels
+
+Set threshold levels to better gauge adverse data quality.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(  # setting relative threshold defaults for all steps
+            warning=0.05,          # 5% failing test units: warning threshold (gray)
+            error=0.10,            # 10% failed test units: error threshold (yellow)
+            critical=0.15          # 15% failed test units: critical threshold (red)
+        ),
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(
+        columns="session_duration",
+        value=4,
+        thresholds=(5, 10, 20)     # setting absolute thresholds for *this* step (W, E, C)
+    )
+    .col_exists(columns="end_day")
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(  # setting relative threshold defaults for all steps
+            warning=0.05,          # 5% failing test units: warning threshold (gray)
+            error=0.10,            # 10% failed test units: error threshold (yellow)
+            critical=0.15          # 15% failed test units: critical threshold (red)
+        ),
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(
+        columns="session_duration",
+        value=4,
+        thresholds=(5, 10, 20)     # setting absolute thresholds for *this* step (W, E, C)
+    )
+    .col_exists(columns="end_day")
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"))
+```
+
+</details>

@@ -1,0 +1,61 @@
+---
+title: "Starter Validation"
+description: "A validation with the basics."
+image: "img/starter_validation.png"
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Starter Validation
+
+A validation with the basics.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate( # Use pb.Validate to start
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        tbl_name="small_table",
+        label="A starter validation"
+    )
+    .col_vals_gt(columns="d", value=1000)       # STEP 1 |
+    .col_vals_le(columns="c", value=5)          # STEP 2 | <-- Build up a validation plan
+    .col_exists(columns=["date", "date_time"])  # STEP 3 |
+    .interrogate()  # This will execute all validation steps and collect intel
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate( # Use pb.Validate to start
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        tbl_name="small_table",
+        label="A starter validation"
+    )
+    .col_vals_gt(columns="d", value=1000)       # STEP 1 |
+    .col_vals_le(columns="c", value=5)          # STEP 2 | <-- Build up a validation plan
+    .col_exists(columns=["date", "date_time"])  # STEP 3 |
+    .interrogate()  # This will execute all validation steps and collect intel
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table"), n_head=20, n_tail=20)
+```
+
+</details>
