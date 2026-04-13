@@ -1,0 +1,82 @@
+---
+title: ""
+jupyter: python3
+html-table-processing: none
+---
+
+Pointblank is a data validation framework for Python that makes data quality checks beautiful,
+powerful, and stakeholder-friendly. Instead of cryptic error messages, get stunning interactive
+reports that turn data issues into conversations.
+
+Here's what a validation looks like (click "Show the code" to see how it's done):
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+import pointblank as pb
+import polars as pl
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars"),
+        tbl_name="game_revenue",
+        label="Comprehensive validation of game revenue data",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35),
+        brief=True
+    )
+    .col_vals_regex(columns="player_id", pattern=r"^[A-Z]{12}[0-9]{3}$")
+    .col_vals_gt(columns="session_duration", value=20)
+    .col_vals_ge(columns="item_revenue", value=0.20)
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_in_set(
+        columns="acquisition",
+        set=["google", "facebook", "organic", "crosspromo", "other_campaign"]
+    )
+    .col_vals_not_in_set(columns="country", set=["Mongolia", "Germany"])
+    .col_vals_between(
+        columns="session_duration",
+        left=10, right=50,
+        pre=lambda df: df.select(pl.median("session_duration")),
+        brief="Expect that the median of `session_duration` should be between `10` and `50`."
+    )
+    .rows_distinct(columns_subset=["player_id", "session_id", "time"])
+    .row_count_match(count=2000)
+    .col_count_match(count=11)
+    .col_vals_not_null(columns="item_type")
+    .col_exists(columns="start_day")
+    .interrogate()
+)
+
+validation.get_tabular_report(title="Game Revenue Validation Report")
+```
+
+That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
+your team.
+
+## What is Data Validation?
+
+Data validation ensures your data meets quality standards before it's used in analysis, reports, or
+downstream systems. Pointblank provides a structured way to define validation rules, execute them,
+and communicate results to both technical and non-technical stakeholders.
+
+With Pointblank you can:
+
+- **Validate data** through a fluent, chainable API with 25+ validation methods
+- **Set thresholds** to define acceptable levels of data quality (warning, error, critical)
+- **Take actions** when thresholds are exceeded (notifications, logging, custom functions)
+- **Generate reports** that make data quality issues immediately understandable
+- **Inspect data** with built-in tools for previewing, summarizing, and finding missing values
+
+## Why Pointblank?
+
+Pointblank is designed for the entire data team, not just engineers:
+
+- 🎨 **Beautiful Reports**: Interactive validation reports that stakeholders actually want to read
+- 📊 **Threshold Management**: Define quality standards with warning, error, and critical levels
+- 🔍 **Error Drill-Down**: Inspect failing data to get to root causes quickly
+- 🔗 **Universal Compatibility**: Works with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, and more
+- 🌍 **Multilingual Support**: Reports available in 40 languages for global teams
+- 📝 **YAML Support**: Write validations in YAML for version control and team collaboration
+- ⚡ **CLI Tools**: Run validations from the command line for CI/CD pipelines or as quick checks
+- 📋 **Rich Inspection**: Preview data, analyze columns, and visualize missing values
