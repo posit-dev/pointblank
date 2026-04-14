@@ -146,20 +146,20 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "Validate",
+    "get_action_metadata",
+    "get_validation_summary",
+    "config",
     "load_dataset",
     "read_file",
     "write_file",
-    "config",
-    "connect_to_table",
-    "print_database_tables",
+    "get_data_path",
     "preview",
     "missing_vals_tbl",
-    "get_action_metadata",
     "get_column_count",
-    "get_data_path",
     "get_row_count",
-    "get_validation_summary",
+    "connect_to_table",
+    "print_database_tables",
+    "Validate",
 ]
 
 
