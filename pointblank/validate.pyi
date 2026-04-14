@@ -12,20 +12,20 @@ from pointblank.thresholds import Actions, FinalActions, Thresholds
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 __all__ = [
-    "get_action_metadata",
-    "get_validation_summary",
-    "config",
+    "Validate",
     "load_dataset",
     "read_file",
     "write_file",
-    "get_data_path",
-    "preview",
-    "missing_vals_tbl",
-    "get_column_count",
-    "get_row_count",
+    "config",
     "connect_to_table",
     "print_database_tables",
-    "Validate",
+    "preview",
+    "missing_vals_tbl",
+    "get_action_metadata",
+    "get_column_count",
+    "get_data_path",
+    "get_row_count",
+    "get_validation_summary",
 ]
 
 P = ParamSpec("P")
@@ -566,6 +566,9 @@ class Validate:
         header: str = ":default:",
         limit: int | None = 10,
     ) -> GT: ...
+    def get_dataframe_report(
+        self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"
+    ) -> Any: ...
     def _add_validation(self, validation_info): ...
     def _evaluate_column_exprs(self, validation_info): ...
     def _evaluate_segments(self, validation_info): ...

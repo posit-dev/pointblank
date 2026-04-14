@@ -157,7 +157,6 @@ __all__ = [
     "missing_vals_tbl",
     "get_action_metadata",
     "get_column_count",
-    "get_dataframe",
     "get_data_path",
     "get_row_count",
     "get_validation_summary",
@@ -4151,8 +4150,6 @@ def connect_to_table(connection_string: str) -> Any:
             "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
         )
 
-    import os
-
     import ibis
 
     # Check if connection string includes table specification
@@ -4168,8 +4165,6 @@ def connect_to_table(connection_string: str) -> Any:
                 available_tables = []
 
             conn.disconnect()
-            conn.close()
-            os.unlink(base_connection)
 
             # Create helpful error message
             if available_tables:
@@ -17810,176 +17805,169 @@ class Validate:
 
         return step_report
 
+    def get_dataframe_report(
+        self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"
+    ) -> Any:
+        """
+        Get a report of the validation results as a DataFrame.
 
-def get_dataframe(
-    self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"
-) -> Any:
-    """
-    Return validation results as a tabular object (Polars by default).
+        The `get_dataframe_report()` method returns a compact, row-wise summary of validation step
+        results as a DataFrame. Each row corresponds to a single validation step. This is useful for
+        logging, exporting (e.g., writing to CSV or Parquet), and programmatic analysis of
+        validation outcomes.
 
-    This method returns a compact, row-wise summary of validation step results that is suitable for
-    logging and exporting (e.g., writing to CSV). The returned object depends on `tbl_type`.
+        The output format depends on `tbl_type=`: Polars DataFrame (default), Pandas DataFrame, or
+        DuckDB via an Ibis memtable.
 
-    Parameters
-    ----------
-    tbl_type :
-        The output backend. One of `"polars"`, `"pandas"`, or `"duckdb"`. Default is `"polars"`.
+        Parameters
+        ----------
+        tbl_type
+            The output backend. One of `"polars"` (default), `"pandas"`, or `"duckdb"`.
 
-    Returns
-    -------
-    polars.DataFrame | pandas.DataFrame | ibis.expr.types.relations.Table
-        A tabular summary of validation results. When `tbl_type="duckdb"`, the return value is an Ibis memtable (a `Table` expression).
+        Returns
+        -------
+        polars.DataFrame | pandas.DataFrame | ibis.expr.types.relations.Table
+            A tabular summary of validation results. When `tbl_type="duckdb"`, the return value is
+            an Ibis memtable (a `Table` expression).
 
-    Supported DataFrame Types
-    -------------------------
-    The `tbl_type=` parameter can be set to one of the following:
+        Raises
+        ------
+        ValueError
+            If `tbl_type=` is not one of `"polars"`, `"pandas"`, or `"duckdb"`.
+        ImportError
+            If the required library for the chosen `tbl_type=` is not installed.
 
-    - `"polars"`: A Polars DataFrame.
-    - `"pandas"`: A Pandas DataFrame.
-    - `"duckdb"`: An Ibis memtable.
+        Output Columns
+        --------------
+        The returned DataFrame contains the following columns:
 
-    Examples
-    --------
-    ```{python}
-    import pointblank as pb
+        - `active`: Whether the validation step was active (`True`/`False`).
+        - `step_number`: The 1-indexed step number.
+        - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
+        - `columns`: The column name validated.
+        - `values`: The comparison value used in the validation. For regex validations, just the
+          pattern string is included.
+        - `step_evaluated`: Whether the step was evaluated without error.
+        - `units`: Total number of test units.
+        - `all_units_passed`: Whether every test unit passed.
+        - `pass_n`: Number of passing test units.
+        - `pass_pct`: Fraction of test units that passed (`0.0`-`1.0`).
+        - `failed_n`: Number of failing test units.
+        - `failed_pct`: Fraction of test units that failed (`0.0`-`1.0`).
+        - `warning`, `error`, `critical`: Whether the respective threshold was exceeded.
+        - `brief`: A coalesced description of the step (from manual brief or auto-generated brief).
+        - `preprocessed`: Whether a preprocessing function was applied.
+        - `segmented`: Whether the step used segmented validation.
 
-    validation = (
-        pb.Validate(data=pb.load_dataset("small_table", tbl_type="polars"), label="My validation")
-        .col_vals_gt(columns="d", value=100)
-        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
-        .interrogate()
-    )
+        For inactive steps (`active=False`), the result columns (`step_evaluated` through
+        `critical`) are set to `None`/`null`.
 
-    df_validation = validation.get_dataframe()
-    ```
-    """
-    allowed_tbl_types = ("polars", "pandas", "duckdb")
-    if tbl_type not in allowed_tbl_types:
-        raise ValueError(
-            f"The DataFrame type `{tbl_type}` is not valid. Choose one of the following:\n"
-            "- `polars`\n"
-            "- `pandas`\n"
-            "- `duckdb`"
+        Examples
+        --------
+        Create a validation, interrogate, and get the results as a Polars DataFrame:
+
+        ```{python}
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(
+                data=pb.load_dataset("small_table", tbl_type="polars"),
+                label="My validation",
+            )
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+            .interrogate()
         )
 
-    report_original = _validation_info_as_dict(self.validation_info)
+        validation.get_dataframe_report()
+        ```
 
-    # Remove extracts (can be large / nested; not intended for summary logging)
-    report_original.pop("extract", None)
+        Get the results as a Pandas DataFrame instead:
 
-    names_dict = {
-        "active": "active",
-        "i": "step_number",
-        "assertion_type": "step_description",
-        "column": "columns",
-        "values": "values",
-        "pre": "original_pre",
-        "segments": "original_segments",
-        "eval_error": "step_evaluated",
-        "n": "units",
-        "all_passed": "all_units_passed",
-        "n_passed": "pass_n",
-        "f_passed": "pass_pct",
-        "n_failed": "failed_n",
-        "f_failed": "failed_pct",
-        "warning": "warning",
-        "error": "error",
-        "critical": "critical",
-        "brief": "input_brief",
-        "autobrief": "autobrief",
-    }
+        ```{python}
+        validation.get_dataframe_report(tbl_type="pandas")
+        ```
+        """
+        allowed_tbl_types = ("polars", "pandas", "duckdb")
+        if tbl_type not in allowed_tbl_types:
+            raise ValueError(
+                f"The DataFrame type `{tbl_type}` is not valid. Choose one of the following:\n"
+                "- `polars`\n"
+                "- `pandas`\n"
+                "- `duckdb`"
+            )
 
-    final_report = {k: report_original[k] for k in names_dict if k in report_original}
+        report_original = _validation_info_as_dict(self.validation_info)
 
-    # Normalize `values`: if a dict contains a regex `pattern`, log just that pattern.
-    values = final_report.get("values")
-    if isinstance(values, list):
-        final_report = {
-            **final_report,
-            "values": [
-                v.get("pattern") if isinstance(v, dict) and "pattern" in v else v for v in values
-            ],
+        # Remove extracts (can be large / nested; not intended for summary logging)
+        report_original.pop("extract", None)
+
+        names_dict = {
+            "active": "active",
+            "i": "step_number",
+            "assertion_type": "step_description",
+            "column": "columns",
+            "values": "values",
+            "pre": "original_pre",
+            "segments": "original_segments",
+            "eval_error": "step_evaluated",
+            "n": "units",
+            "all_passed": "all_units_passed",
+            "n_passed": "pass_n",
+            "f_passed": "pass_pct",
+            "n_failed": "failed_n",
+            "f_failed": "failed_pct",
+            "warning": "warning",
+            "error": "error",
+            "critical": "critical",
+            "brief": "input_brief",
+            "autobrief": "autobrief",
         }
 
-    if tbl_type == "polars":
-        if not _is_lib_present(lib_name="polars"):
-            raise ImportError(
-                "The Polars library is not installed but is required when specifying "
-                '`tbl_type="polars".'
-            )
+        final_report = {k: report_original[k] for k in names_dict if k in report_original}
 
-        import polars as pl
-
-        pl_schema = pl.Schema(
-            {
-                "active": pl.Boolean,
-                "i": pl.Int64,
-                "assertion_type": pl.String,
-                "column": pl.String,
-                "values": pl.Object,
-                "pre": pl.Object,
-                "segments": pl.String,
-                "eval_error": pl.Boolean,
-                "n": pl.Int64,
-                "all_passed": pl.Boolean,
-                "n_passed": pl.Int64,
-                "f_passed": pl.Float64,
-                "n_failed": pl.Int64,
-                "f_failed": pl.Float64,
-                "warning": pl.Boolean,
-                "error": pl.Boolean,
-                "critical": pl.Boolean,
-                "brief": pl.String,
-                "autobrief": pl.String,
+        # Normalize `values`: if a dict contains a regex `pattern`, log just that pattern.
+        values = final_report.get("values")
+        if isinstance(values, list):
+            final_report = {
+                **final_report,
+                "values": [
+                    v.get("pattern") if isinstance(v, dict) and "pattern" in v else v
+                    for v in values
+                ],
             }
-        )
 
-        inactive_null_cols = [
-            "step_evaluated",
-            "units",
-            "all_units_passed",
-            "pass_n",
-            "pass_pct",
-            "failed_n",
-            "failed_pct",
-            "warning",
-            "error",
-            "critical",
-        ]
+        if tbl_type == "polars":
+            if not _is_lib_present(lib_name="polars"):
+                raise ImportError(
+                    "The Polars library is not installed but is required when specifying "
+                    '`tbl_type="polars".'
+                )
 
-        df_validation_results = (
-            pl.DataFrame(data=final_report, schema=pl_schema)
-            .rename(names_dict)
-            .with_columns(
-                brief=pl.coalesce(pl.col("input_brief"), pl.col("autobrief")),
-                preprocessed=pl.col("original_pre").is_not_null(),
-                segmented=pl.col("original_segments").is_not_null(),
-            )
-            .with_columns(
-                [
-                    pl.when(~pl.col("active")).then(pl.lit(None)).otherwise(pl.col(col)).alias(col)
-                    for col in inactive_null_cols
-                ]
-            )
-            .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
-        )
+            import polars as pl
 
-        return df_validation_results
-
-    elif tbl_type == "pandas":
-        if not _is_lib_present(lib_name="pandas"):
-            raise ImportError(
-                "The Pandas library is not installed but is required when specifying "
-                '`tbl_type="pandas".'
-            )
-
-        import pandas as pd
-
-        def transform_validation_results(df: pd.DataFrame) -> pd.DataFrame:
-            df = df.assign(brief=df["input_brief"].fillna(df["autobrief"]))
-            df = df.assign(
-                preprocessed=df["original_pre"].notna(),
-                segmented=df["original_segments"].notna(),
+            pl_schema = pl.Schema(
+                {
+                    "active": pl.Boolean,
+                    "i": pl.Int64,
+                    "assertion_type": pl.String,
+                    "column": pl.String,
+                    "values": pl.Object,
+                    "pre": pl.Object,
+                    "segments": pl.String,
+                    "eval_error": pl.Boolean,
+                    "n": pl.Int64,
+                    "all_passed": pl.Boolean,
+                    "n_passed": pl.Int64,
+                    "f_passed": pl.Float64,
+                    "n_failed": pl.Int64,
+                    "f_failed": pl.Float64,
+                    "warning": pl.Boolean,
+                    "error": pl.Boolean,
+                    "critical": pl.Boolean,
+                    "brief": pl.String,
+                    "autobrief": pl.String,
+                }
             )
 
             inactive_null_cols = [
@@ -17994,83 +17982,136 @@ def get_dataframe(
                 "error",
                 "critical",
             ]
-            for col in inactive_null_cols:
-                df[col] = df[col].where(df["active"], pd.NA)
 
-            return df.drop(
-                columns=["input_brief", "autobrief", "original_pre", "original_segments"]
-            )
-
-        df_validation_results = (
-            pd.DataFrame(data=final_report)
-            .rename(columns=names_dict)
-            .pipe(transform_validation_results)
-        )
-
-        return df_validation_results
-
-    else:  # tbl_type == "duckdb"
-        if not _is_lib_present(lib_name="ibis"):
-            raise ImportError(
-                "The Ibis library is not installed but is required when specifying "
-                '`tbl_type="duckdb".'
-            )
-
-        import ibis
-        import ibis.expr.datatypes as dt
-
-        ibis_schema = {
-            "active": dt.Boolean(),
-            "i": dt.Int64(),
-            "assertion_type": dt.String(),
-            "column": dt.String(),
-            "values": dt.json(),
-            "pre": dt.json(),
-            "segments": dt.String(),
-            "eval_error": dt.Boolean(),
-            "n": dt.Int64(),
-            "all_passed": dt.Boolean(),
-            "n_passed": dt.Int64(),
-            "f_passed": dt.Float64(),
-            "n_failed": dt.Int64(),
-            "f_failed": dt.Float64(),
-            "warning": dt.Boolean(),
-            "error": dt.Boolean(),
-            "critical": dt.Boolean(),
-            "brief": dt.String(),
-            "autobrief": dt.String(),
-        }
-
-        report_table = ibis.memtable(final_report, schema=ibis_schema).rename(names_dict)
-
-        inactive_null_cols = [
-            "step_evaluated",
-            "units",
-            "all_units_passed",
-            "pass_n",
-            "pass_pct",
-            "failed_n",
-            "failed_pct",
-            "warning",
-            "error",
-            "critical",
-        ]
-
-        df_validation_results = report_table.mutate(
-            brief=ibis.coalesce(report_table.input_brief, report_table.autobrief),
-            preprocessed=report_table.original_pre.notnull(),
-            segmented=report_table.original_segments.notnull(),
-            **{
-                col: ibis.ifelse(
-                    ~report_table.active,
-                    ibis.null().cast(report_table[col].type()),
-                    report_table[col],
+            df_validation_results = (
+                pl.DataFrame(data=final_report, schema=pl_schema)
+                .rename(names_dict)
+                .with_columns(
+                    brief=pl.coalesce(pl.col("input_brief"), pl.col("autobrief")),
+                    preprocessed=pl.col("original_pre").is_not_null(),
+                    segmented=pl.col("original_segments").is_not_null(),
                 )
-                for col in inactive_null_cols
-            },
-        ).drop("input_brief", "autobrief", "original_pre", "original_segments")
+                .with_columns(
+                    [
+                        pl.when(~pl.col("active"))
+                        .then(pl.lit(None))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                        for col in inactive_null_cols
+                    ]
+                )
+                .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
+            )
 
-        return df_validation_results
+            return df_validation_results
+
+        elif tbl_type == "pandas":
+            if not _is_lib_present(lib_name="pandas"):
+                raise ImportError(
+                    "The Pandas library is not installed but is required when specifying "
+                    '`tbl_type="pandas".'
+                )
+
+            import pandas as pd
+
+            def transform_validation_results(df: pd.DataFrame) -> pd.DataFrame:
+                df = df.assign(brief=df["input_brief"].fillna(df["autobrief"]))
+                df = df.assign(
+                    preprocessed=df["original_pre"].notna(),
+                    segmented=df["original_segments"].notna(),
+                )
+
+                inactive_null_cols = [
+                    "step_evaluated",
+                    "units",
+                    "all_units_passed",
+                    "pass_n",
+                    "pass_pct",
+                    "failed_n",
+                    "failed_pct",
+                    "warning",
+                    "error",
+                    "critical",
+                ]
+                for col in inactive_null_cols:
+                    df[col] = df[col].where(df["active"], pd.NA)
+
+                return df.drop(
+                    columns=["input_brief", "autobrief", "original_pre", "original_segments"]
+                )
+
+            df_validation_results = (
+                pd.DataFrame(data=final_report)
+                .rename(columns=names_dict)
+                .pipe(transform_validation_results)
+            )
+
+            return df_validation_results
+
+        else:  # tbl_type == "duckdb"
+            if not _is_lib_present(lib_name="ibis"):
+                raise ImportError(
+                    "The Ibis library is not installed but is required when specifying "
+                    '`tbl_type="duckdb".'
+                )
+
+            import ibis
+            import ibis.expr.datatypes as dt
+
+            ibis_schema = {
+                "active": dt.Boolean(),
+                "i": dt.Int64(),
+                "assertion_type": dt.String(),
+                "column": dt.String(),
+                "values": dt.json(),
+                "pre": dt.json(),
+                "segments": dt.String(),
+                "eval_error": dt.Boolean(),
+                "n": dt.Int64(),
+                "all_passed": dt.Boolean(),
+                "n_passed": dt.Int64(),
+                "f_passed": dt.Float64(),
+                "n_failed": dt.Int64(),
+                "f_failed": dt.Float64(),
+                "warning": dt.Boolean(),
+                "error": dt.Boolean(),
+                "critical": dt.Boolean(),
+                "brief": dt.String(),
+                "autobrief": dt.String(),
+            }
+
+            report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
+                {v: k for k, v in names_dict.items() if k != v}
+            )
+
+            inactive_null_cols = [
+                "step_evaluated",
+                "units",
+                "all_units_passed",
+                "pass_n",
+                "pass_pct",
+                "failed_n",
+                "failed_pct",
+                "warning",
+                "error",
+                "critical",
+            ]
+
+            df_validation_results = report_table.mutate(
+                brief=ibis.coalesce(report_table.input_brief, report_table.autobrief),
+                preprocessed=report_table.original_pre.notnull(),
+                segmented=report_table.original_segments.notnull(),
+                **{
+                    col: ibis.ifelse(
+                        ~report_table.active,
+                        ibis.null().cast(report_table[col].type()),
+                        report_table[col],
+                    )
+                    for col in inactive_null_cols
+                },
+            ).drop("input_brief", "autobrief", "original_pre", "original_segments")
+
+            return df_validation_results
 
     def _add_validation(self, validation_info):
         """
