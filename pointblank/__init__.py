@@ -47,6 +47,7 @@ from pointblank.field import (
 )
 from pointblank.generate.base import GeneratorConfig
 from pointblank.inspect import has_columns, has_rows
+from pointblank.integrations.otel import emit_otel
 from pointblank.schema import Schema, generate_dataset
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -107,6 +108,7 @@ __all__ = [
     "get_row_count",
     "seg_group",
     "send_slack_notification",
+    "emit_otel",
     # Data generation - Field classes
     "Field",
     "IntField",
