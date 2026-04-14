@@ -1,0 +1,48 @@
+---
+title: "Expect No Duplicate Rows"
+description: "We can check for duplicate rows in the table with rows_distinct()."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .rows_distinct()    # expect no duplicate rows
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .rows_distinct()    # expect no duplicate rows
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table", tbl_type="polars"), n_head=20, n_tail=20)
+```
+
+</details>

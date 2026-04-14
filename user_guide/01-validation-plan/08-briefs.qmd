@@ -1,0 +1,294 @@
+---
+title: Briefs
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+When validating data with Pointblank, it's often helpful to have descriptive labels for each
+validation step. This is where *briefs* come in. A brief is a short description of what a validation
+step is checking and it appears in the `STEP` column of the validation report table. Briefs make
+your validation reports more readable and they help others understand what each step is verifying
+without needing to look at the code.
+
+Briefs can be set in two ways:
+
+1. Globally: applied to all validation steps via the `brief=` parameter in `Validate`
+2. Locally: set for individual validation steps via the `brief=` parameter in each validation method
+
+Understanding these two approaches to adding briefs gives you flexibility in how you document your
+validation process. Global briefs provide consistency across all steps and save time when you want
+similar descriptions throughout, while step-level briefs allow for precise customization when
+specific validations need more detailed or unique explanations. In practice, many validation
+workflows will combine both approaches (i.e., setting a useful global brief template while
+overriding it for steps that require special attention).
+
+## Global Briefs
+
+To set a global brief that applies to all validation steps, use the `Validate(brief=)` parameter
+when creating a `Validate` object:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Sample data
+data = pl.DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "value": [10, 20, 30, 40, 50],
+    "category": ["A", "B", "C", "A", "B"]
+})
+
+# Create a validation with a global brief
+(
+    pb.Validate(
+        data=data,
+
+        # Global brief template ---
+        brief="Step {step}: {auto}"
+    )
+    .col_vals_gt(columns="value", value=5)
+    .col_vals_in_set(columns="category", set=["A", "B", "C"])
+    .interrogate()
+)
+```
+
+In this example, every validation step will have a brief description that follows the pattern
+`"Step X: [auto-generated description]"`.
+
+This is a simple example of template-based briefs. Later in this guide, we'll explore the full range
+of templating elements available for creating custom brief descriptions that precisely communicate
+what each validation step is checking.
+
+## Step-level Briefs
+
+You can also set briefs for individual validation steps:
+
+```{python}
+(
+    pb.Validate(data=data)
+    .col_vals_gt(
+        columns="value", value=5,
+        brief="Check if values exceed minimum threshold of 5"
+    )
+    .col_vals_in_set(
+        columns="category", set=["A", "B", "C"],
+        brief="Verify categories are valid"
+    )
+    .interrogate()
+)
+```
+
+Local briefs override any global briefs that might be set.
+
+## Brief Templating
+
+Briefs support templating elements that get replaced with specific values:
+
+- `{auto}`: an auto-generated description of the validation
+- `{step}`: the step number in the validation plan
+- `{col}`: the column name(s) being validated
+- `{value}`: the comparison value used in the validation (when applicable)
+- `{thresholds}`: a short summary of thresholds levels set (or unset) for the step
+- `{segment}`, `{segment_column}`, `{segment_value}`: information on the step's segment
+
+Here's how to use these templates:
+
+```{python}
+(
+    pb.Validate(data=data)
+    .col_vals_gt(
+        columns="value", value=5,
+        brief="Step {step}: Checking column '{col}' for values `> 5`"
+    )
+    .col_vals_in_set(
+        columns="category", set=["A", "B", "C"],
+        brief="{auto} **(Step {step})**"
+    )
+    .interrogate()
+)
+```
+
+These template elements make briefs highly flexible and customizable. You can combine multiple
+templating elements in a single brief to create descriptive yet concise validation step
+descriptions. The templates help maintain consistency across your validation reports while providing
+enough detail to understand what each step is checking.
+
+Note that not all templating elements will be relevant for every validation step. For instance,
+`{value}` is only applicable to validation functions that hold a comparison value like
+[`Validate.col_vals_gt()`](`Validate.col_vals_gt`). If you include a templating element that isn't relevant to a particular
+step, it will not be replaced with a corresponding value.
+
+Briefs support the use of Markdown formatting, allowing you to add emphasis with **bold** or
+_italic_ text, include `inline code` formatting, or other Markdown elements to make your briefs more
+visually distinctive and informative. This can be especially helpful when you want certain parts of
+your briefs to stand out in the validation report.
+
+## Automatic Briefs
+
+If you want Pointblank to generate briefs for you automatically, you can set `brief=True`. Here,
+we'll make that setting at the global level (by using `Validate(brief=True)`):
+
+```{python}
+(
+    pb.Validate(
+        data=data,
+
+        # Setting for automatically generated briefs ---
+        brief=True
+    )
+    .col_vals_gt(columns="value", value=5)
+    .col_vals_in_set(columns="category", set=["A", "B", "C"])
+    .interrogate()
+)
+```
+
+Automatic briefs are descriptive and include information about what's being validated, including the
+column names and the validation conditions.
+
+## Briefs Localized to a Specified Language
+
+When using the `lang=` parameter in `Validate`, automatically generated briefs will be created in
+the specified language (along with other elements of the validation report table):
+
+```{python}
+(
+    pb.Validate(
+        data=data,
+
+        # Setting the language as Spanish ---
+        lang="es",
+
+        # Automatically generate all briefs in Spanish
+        brief=True
+    )
+    .col_vals_gt(columns="value", value=5)
+    .col_vals_in_set(columns="category", set=["A", "B", "C"])
+    .interrogate()
+)
+```
+
+When using the `lang=` parameter in combination with the `{auto}` templating element, the
+auto-generated portion of the brief will also be translated to the specified language. This makes it
+possible to create fully localized validation reports where both custom text and auto-generated
+descriptions appear in the same language.
+
+Pointblank supports several languages for localized briefs, including French (`"fr"`), German
+(`"de"`), Spanish (`"es"`), Italian (`"it"`), and Portuguese (`"pt"`). For the complete list of
+supported languages, refer to the `Validate` documentation.
+
+## Disabling Briefs
+
+If you've set a global brief but want to disable it for specific validation steps, you can set
+`brief=False`:
+
+```{python}
+(
+    pb.Validate(
+        data=data,
+
+        # Global brief template ---
+        brief="Step {step}: {auto}"
+    )
+    .col_vals_gt(columns="value", value=5)  # This step uses the global brief setting
+    .col_vals_in_set(
+        columns="category",
+        set=["A", "B", "C"],
+
+        # No brief for this step ---
+        brief=False
+    )
+    .interrogate()
+)
+```
+
+## Practical Example: Comprehensive Validation with Briefs
+
+In real-world data validation scenarios, you'll likely work with more complex datasets and apply
+various types of validation checks. This final example brings together many of the brief-generating
+techniques we've covered, showing how you can mix different approaches in a single validation
+workflow.
+
+```{python}
+# Create a slightly larger dataset
+data_2 = pl.DataFrame({
+    "id": [1, 2, 3, 4, 5, 6, 7, 8],
+    "value": [10, 20, 30, 40, 50, 60, 70, 80],
+    "ratio": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+    "category": ["A", "B", "C", "A", "B", "C", "A", "B"],
+    "date": ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04",
+             "2023-01-05", "2023-01-06", "2023-01-07", "2023-01-08"]
+})
+
+(
+    pb.Validate(data=data_2)
+    .col_vals_gt(
+        columns="value", value=0,
+
+        # Plaintext brief ---
+        brief="All values must be positive."
+    )
+    .col_vals_between(
+        columns="ratio", left=0, right=1,
+
+        # Template-based brief ---
+        brief="**Step {step}**: Ratios should be between `0` and `1`."
+    )
+    .col_vals_in_set(
+        columns="category", set=["A", "B", "C"],
+
+        # Automatically generated brief ---
+        brief=True
+    )
+    .interrogate()
+)
+```
+
+The example above demonstrates:
+
+- plaintext briefs with direct messages
+- template-based briefs with Markdown formatting
+- automatically generated briefs (`brief=True`)
+
+By combining these different brief styles, you can create validation reports that are informative,
+consistent, and tailored to your specific data quality requirements.
+
+## Best Practices for Using Briefs
+
+Well-crafted briefs can significantly enhance the readability and usefulness of your validation
+reports. Here are some guidelines to follow:
+
+1. Be concise: briefs should be short and to the point; they're meant to quickly communicate the
+purpose of a validation step
+
+2. Be specific: include relevant details or conditions that make the validation meaningful
+
+3. Use templates consistently: if you're using template elements like `"{step}"` or `"{col}"`, try
+to use them consistently across all briefs for a cleaner look
+
+4. Use auto-generated briefs as a starting point: you can start with `Validate(brief=True)` to see
+what Pointblank generates automatically, then customize as needed
+
+5. Add custom briefs for complex validations: custom briefs are especially useful for complex
+validations where the purpose might not be immediately obvious from the code
+
+Following these best practices will help ensure your validation reports are easy to understand for
+everyone who needs to review them.
+
+## Conclusion
+
+Briefs help make validation reports more readable and understandable. By using global briefs,
+step-level briefs, or a combination of both, you can create validation reports that clearly
+communicate what each validation step is checking.
+
+Whether you want automatically generated descriptions or precisely tailored custom messages, the
+brief system provides the flexibility to make your data validation work more transparent and easier
+to interpret for all stakeholders.

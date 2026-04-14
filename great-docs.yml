@@ -1,0 +1,270 @@
+# Great Docs Configuration for Pointblank
+# See https://posit-dev.github.io/great-docs/user-guide/configuration.html
+
+display_name: Pointblank
+
+# Docstring Parser
+parser: numpy
+
+# Dynamic Introspection
+dynamic: true
+
+# Logo
+logo:
+  light: assets/pointblank_logo_small.svg
+  dark: assets/pointblank_logo_small.svg
+
+# Homepage
+# Use a simple index.qmd as the landing page
+homepage: index
+hero:
+  logo: assets/pointblank_logo.svg
+  logo_height: 250px
+
+# Scale-to-fit for Pointblank validation report tables
+scale_to_fit:
+  - "#pb_tbl"
+
+# GitHub Integration
+github_style: widget
+
+# Source Links
+source:
+  enabled: true
+  branch: main
+
+# CLI Documentation (Click-based)
+cli:
+  enabled: true
+  module: pointblank.cli
+  name: cli
+
+# Changelog
+changelog:
+  enabled: true
+
+# Custom Sections
+sections:
+  - title: Demos
+    dir: examples
+    index: true
+    index_columns: 2
+  - title: Blog
+    dir: blog
+    type: blog
+
+# Author Information
+authors:
+  - name: Rich Iannone
+    role: Maintainer
+    affiliation: Posit, PBC
+    email: riannone@me.com
+    github: rich-iannone
+    orcid: 0000-0003-3925-190X
+
+# Funding / Copyright Holder
+funding:
+  name: "Posit Software, PBC"
+  roles:
+    - Copyright holder
+    - funder
+  homepage: https://posit.co
+  ror: https://ror.org/03wc8by49
+
+# API Discovery
+exclude:
+  - config
+  - assistant.MODEL_PROVIDERS
+
+# API Reference Structure
+# Organized to match the current quartodoc sections
+reference:
+  title: "API Reference"
+  sections:
+    - title: Validate
+      desc: >
+        When performing data validation, use the `Validate` class to get the process started.
+        It takes the target table and options for metadata and failure thresholds (using the
+        `Thresholds` class or shorthands). The `Validate` class has numerous methods for
+        defining validation steps and for obtaining post-interrogation metrics and data.
+      contents:
+        - name: Validate
+          members: false
+        - Thresholds
+        - name: Actions
+          members: false
+        - FinalActions
+        - name: Schema
+          members: false
+        - name: DraftValidation
+          members: false
+
+    - title: Validation Steps
+      desc: >
+        Validation steps are sequential validations on the target data. Call Validate's
+        validation methods to build up a validation plan: a collection of steps that provides
+        good validation coverage.
+      contents:
+        - Validate.col_vals_gt
+        - Validate.col_vals_lt
+        - Validate.col_vals_ge
+        - Validate.col_vals_le
+        - Validate.col_vals_eq
+        - Validate.col_vals_ne
+        - Validate.col_vals_between
+        - Validate.col_vals_outside
+        - Validate.col_vals_in_set
+        - Validate.col_vals_not_in_set
+        - Validate.col_vals_increasing
+        - Validate.col_vals_decreasing
+        - Validate.col_vals_null
+        - Validate.col_vals_not_null
+        - Validate.col_vals_regex
+        - Validate.col_vals_within_spec
+        - Validate.col_vals_expr
+        - Validate.col_exists
+        - Validate.col_pct_null
+        - Validate.rows_distinct
+        - Validate.rows_complete
+        - Validate.col_schema_match
+        - Validate.row_count_match
+        - Validate.col_count_match
+        - Validate.data_freshness
+        - Validate.tbl_match
+        - Validate.conjointly
+        - Validate.specially
+        - Validate.prompt
+
+    - title: Aggregation Steps
+      desc: >
+        These validation methods check aggregated column values (sums, averages, standard
+        deviations) against fixed values or column references.
+      contents:
+        - Validate.col_sum_gt
+        - Validate.col_sum_lt
+        - Validate.col_sum_ge
+        - Validate.col_sum_le
+        - Validate.col_sum_eq
+        - Validate.col_avg_gt
+        - Validate.col_avg_lt
+        - Validate.col_avg_ge
+        - Validate.col_avg_le
+        - Validate.col_avg_eq
+        - Validate.col_sd_gt
+        - Validate.col_sd_lt
+        - Validate.col_sd_ge
+        - Validate.col_sd_le
+        - Validate.col_sd_eq
+
+    - title: Column Selection
+      desc: >
+        Use the `col()` function along with column selection helpers to flexibly select columns
+        for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting
+        multiple target columns.
+      contents:
+        - col
+        - starts_with
+        - ends_with
+        - contains
+        - matches
+        - everything
+        - first_n
+        - last_n
+        - expr_col
+
+    - title: Segment Groups
+      desc: >
+        Combine multiple values into a single segment using `seg_*()` helper functions.
+      contents:
+        - seg_group
+
+    - title: Interrogation and Reporting
+      desc: >
+        The validation plan is executed when `interrogate()` is called. After interrogation,
+        view validation reports, extract metrics, or split data based on results.
+      contents:
+        - Validate.interrogate
+        - Validate.set_tbl
+        - Validate.get_tabular_report
+        - Validate.get_step_report
+        - Validate.get_json_report
+        - Validate.get_sundered_data
+        - Validate.get_data_extracts
+        - Validate.all_passed
+        - Validate.assert_passing
+        - Validate.assert_below_threshold
+        - Validate.above_threshold
+        - Validate.n
+        - Validate.n_passed
+        - Validate.n_failed
+        - Validate.f_passed
+        - Validate.f_failed
+        - Validate.warning
+        - Validate.error
+        - Validate.critical
+
+    - title: Inspection and Assistance
+      desc: >
+        Functions for getting to grips with a new data table. Use DataScan for a quick
+        overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries,
+        and `missing_vals_tbl()` for missing value analysis.
+      contents:
+        - DataScan
+        - preview
+        - col_summary_tbl
+        - missing_vals_tbl
+        - load_dataset
+        - get_data_path
+        - connect_to_table
+        - print_database_tables
+
+    - title: Table Pre-checks
+      desc: >
+        Helper functions for use with the `active=` parameter of validation methods. These
+        inspect the target table before a step runs and conditionally skip the step when
+        preconditions are not met.
+      contents:
+        - has_columns
+        - has_rows
+
+    - title: YAML
+      desc: >
+        Functions for using YAML to orchestrate validation workflows.
+      contents:
+        - yaml_interrogate
+        - validate_yaml
+        - yaml_to_python
+
+    - title: Utility Functions
+      desc: >
+        Functions for accessing metadata about the target data and managing configuration.
+      contents:
+        - get_column_count
+        - get_row_count
+        - get_action_metadata
+        - get_validation_summary
+        - write_file
+        - read_file
+        - ref
+
+    - title: Test Data Generation
+      desc: >
+        Generate synthetic test data based on schema definitions. Use `generate_dataset()`
+        to create data from a Schema object.
+      contents:
+        - generate_dataset
+        - int_field
+        - float_field
+        - string_field
+        - bool_field
+        - date_field
+        - datetime_field
+        - time_field
+        - duration_field
+        - profile_fields
+
+    - title: Prebuilt Actions
+      desc: >
+        Prebuilt action functions for common notification patterns.
+      contents:
+        - send_slack_notification

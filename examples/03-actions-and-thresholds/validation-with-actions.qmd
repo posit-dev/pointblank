@@ -1,0 +1,113 @@
+---
+title: "Step-Level Actions"
+description: "Configure actions to trigger when validation thresholds are exceeded, such as logging warnings or errors."
+image: "img/validation_with_actions.png"
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+def log_warning():
+    """Custom action to log validation warnings"""
+    metadata = pb.get_action_metadata()
+    print(f"⚠️  WARNING: Validation step '{metadata['step']}' exceeded threshold!")
+
+def log_error():
+    """Custom action to log validation errors"""
+    metadata = pb.get_action_metadata()
+    print(f"❌  ERROR: Critical validation failure in step '{metadata['step']}'!")
+    print(f"    This requires immediate attention.")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="nycflights", tbl_type="polars"),
+        label="Validation with actions"
+    )
+    .col_vals_between(
+        columns="distance",
+        left=100, right=2000,
+        thresholds=pb.Thresholds(warning=0.1),  # Allow 10% failures before warning
+        actions=pb.Actions(warning=log_warning),
+        brief="Column 'distance' range check."
+    )
+    .col_vals_gt(
+        columns="air_time",
+        value=25,
+        na_pass=True,
+        thresholds=pb.Thresholds(error=200),  # Allow only 200 failures before error
+        actions=pb.Actions(error=log_error),
+        brief="Column 'origin' check for minimum value."
+    )
+    .col_vals_not_null(
+        columns="carrier",
+        thresholds=(1, 0.05),  # No tolerance for null values
+        actions=pb.Actions(warning=log_warning, error=log_error),
+        brief="Column 'carrier' completeness check."
+    )
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+def log_warning():
+    """Custom action to log validation warnings"""
+    metadata = pb.get_action_metadata()
+    print(f"⚠️  WARNING: Validation step '{metadata['step']}' exceeded threshold!")
+
+def log_error():
+    """Custom action to log validation errors"""
+    metadata = pb.get_action_metadata()
+    print(f"❌  ERROR: Critical validation failure in step '{metadata['step']}'!")
+    print(f"    This requires immediate attention.")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="nycflights", tbl_type="polars"),
+        label="Validation with actions"
+    )
+    .col_vals_between(
+        columns="distance",
+        left=100, right=2000,
+        thresholds=pb.Thresholds(warning=0.1),  # Allow 10% failures before warning
+        actions=pb.Actions(warning=log_warning),
+        brief="Column 'distance' range check."
+    )
+    .col_vals_gt(
+        columns="air_time",
+        value=25,
+        na_pass=True,
+        thresholds=pb.Thresholds(error=200),  # Allow only 200 failures before error
+        actions=pb.Actions(error=log_error),
+        brief="Column 'origin' check for minimum value."
+    )
+    .col_vals_not_null(
+        columns="carrier",
+        thresholds=(1, 0.05),  # No tolerance for null values
+        actions=pb.Actions(warning=log_warning, error=log_error),
+        brief="Column 'carrier' completeness check."
+    )
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="nycflights", tbl_type="polars"))
+```
+
+</details>

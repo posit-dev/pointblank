@@ -1,0 +1,985 @@
+---
+title: Validation Methods
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Pointblank provides a comprehensive suite of validation methods to verify different aspects of your
+data. Each method creates a validation step that becomes part of your validation plan.
+
+These validation methods cover everything from checking column values against thresholds to
+validating the table structure and detecting duplicates. Combined into validation steps, they form
+the foundation of your data quality workflow.
+
+Pointblank provides [over 40 validation methods](https://posit-dev.github.io/pointblank/reference/#validation-steps)
+to handle diverse data quality requirements. These are grouped into five main categories:
+
+1. Column Value Validations
+2. Row-based Validations
+3. Table Structure Validations
+4. AI-Powered Validations
+5. Aggregate Validations
+
+Within each of these categories, we'll walk through several examples showing how each validation
+method creates steps in your validation plan.
+
+And we'll use the `small_table` dataset for all of our examples. Here's a preview of it:
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="small_table"), n_head=20, n_tail=20)
+```
+
+## Validation Methods to Validation Steps
+
+In Pointblank, validation *methods* become validation *steps* when you add them to a validation
+plan. Each method creates a distinct step that performs a specific check on your data.
+
+Here's a simple example showing how three validation methods create three validation steps:
+
+```{python}
+import pointblank as pb
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+
+    # Step 1: Check that values in column `a` are greater than 2 ---
+    .col_vals_gt(columns="a", value=2, brief="Values in 'a' must exceed 2.")
+
+    # Step 2: Check that column 'date' exists in the table ---
+    .col_exists(columns="date", brief="Column 'date' must exist.")
+
+    # Step 3: Check that the table has exactly 13 rows ---
+    .row_count_match(count=13, brief="Table should have exactly 13 rows.")
+    .interrogate()
+)
+```
+
+Each validation method produces one step in the validation report above. When combined, these steps
+form a complete validation plan that systematically checks different aspects of your data quality.
+
+## Common Arguments
+
+Most validation methods in Pointblank share a set of common arguments that provide consistency and
+flexibility across different validation types:
+
+- `columns=`: specifies which column(s) to validate (used in column-based validations)
+- `pre=`: allows data transformation before validation
+- `segments=`: enables validation across different data subsets
+- `thresholds=`: sets acceptable failure thresholds
+- `actions=`: defines actions to take when validations fail
+- `brief=`: provides a description of what the validation is checking
+- `active=`: determines if the validation step should be executed (default is `True`)
+- `na_pass=`: controls how missing values are handled (only for column value validation methods)
+
+For column validation methods, the `na_pass=` parameter determines whether missing values
+(Null/None/NA) should pass validation (this parameter is covered in a later section).
+
+These arguments follow a consistent pattern across validation methods, so you don't need to memorize
+different parameter sets for each function. This systematic approach makes Pointblank more intuitive
+to work with as you build increasingly complex validation plans.
+
+We'll cover most of these common arguments in their own dedicated sections later in the
+**User Guide**, as some of them represent a deeper topic worthy of focused attention.
+
+## 1. Column Value Validations
+
+These methods check individual values within columns against specific criteria:
+
+- **Comparison checks** ([`Validate.col_vals_gt()`](`Validate.col_vals_gt`), [`Validate.col_vals_lt()`](`Validate.col_vals_lt`), etc.) for comparing
+values to thresholds or other columns
+
+- **Range checks** ([`Validate.col_vals_between()`](`Validate.col_vals_between`), [`Validate.col_vals_outside()`](`Validate.col_vals_outside`)) for verifying
+that values fall within or outside specific ranges
+
+- **Set membership checks** ([`Validate.col_vals_in_set()`](`Validate.col_vals_in_set`), [`Validate.col_vals_not_in_set()`](`Validate.col_vals_not_in_set`)) for
+validating values against predefined sets
+
+- **Null value checks** ([`Validate.col_vals_null()`](`Validate.col_vals_null`), [`Validate.col_vals_not_null()`](`Validate.col_vals_not_null`)) for testing
+presence or absence of null values
+
+- **Pattern matching checks** ([`Validate.col_vals_regex()`](`Validate.col_vals_regex`), [`Validate.col_vals_within_spec()`](`Validate.col_vals_within_spec`))
+for validating text patterns with regular expressions or against standard specifications
+
+- **Trending value checks** ([`Validate.col_vals_increasing()`](`Validate.col_vals_increasing`), [`Validate.col_vals_decreasing()`](`Validate.col_vals_decreasing`))
+for verifying that values increase or decrease as you move down the rows
+
+- **Custom expression checks** ([`Validate.col_vals_expr()`](`Validate.col_vals_expr`)) for complex validations using custom
+expressions
+
+Now let's look at some key examples from select categories of column value validations.
+
+### Comparison Checks
+
+Let's start with a simple example of how [`Validate.col_vals_gt()`](`Validate.col_vals_gt`) might be used to check if the
+values in a column are greater than a specified value.
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_gt(columns="a", value=5)
+    .interrogate()
+)
+```
+
+If you're checking data in a column that contains Null/`None`/`NA` values and you'd like to
+disregard those values (i.e., let them pass validation), you can use `na_pass=True`. The following
+example checks values in column `c` of `small_table`, which contains two `None` values:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_le(columns="c", value=10, na_pass=True)
+    .interrogate()
+)
+```
+
+In the above validation table, we see that all test units passed. If we didn't use `na_pass=True`
+there would be 2 failing test units, one for each `None` value in the `c` column.
+
+It's possible to check against column values against values in an adjacent column. To do this,
+supply the `value=` argument with the column name within the `col()` helper function. Here's an
+example of that:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_lt(columns="a", value=pb.col("c"))
+    .interrogate()
+)
+```
+
+This validation checks that values in column `a` are less than values in column `c`.
+
+### Checking of Missing Values
+
+A very common thing to validate is that there are no Null/NA/missing values in a column. The
+[`Validate.col_vals_not_null()`](`Validate.col_vals_not_null`) method checks for the presence of missing values:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_not_null(columns="a")
+    .interrogate()
+)
+```
+
+Column `a` has no missing values and the above validation proves this.
+
+### Checking Percentage of Missing Values
+
+While [`Validate.col_vals_not_null()`](`Validate.col_vals_not_null`) ensures there are no missing values at all, sometimes you
+need to validate that missing values match a specific percentage. The [`Validate.col_pct_null()`](`Validate.col_pct_null`)
+method checks whether the percentage of missing values in a column matches an expected value:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_pct_null(columns="c", p=0.15, tol=0.05)  # Expect ~15% missing values (±5%)
+    .interrogate()
+)
+```
+
+This validation checks that approximately 15% of values in column `c` are missing, allowing a
+tolerance of ±5% (so the acceptable range is 10-20%). The `tol=` parameter can accept various
+formats including absolute counts or percentage ranges:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_pct_null(columns="c", p=0.15, tol=(0.05, 0.10))  # Asymmetric tolerance: -5%/+10%
+    .interrogate()
+)
+```
+
+### Checking Strings with Regexes
+
+A regular expression (regex) validation via the [`Validate.col_vals_regex()`](`Validate.col_vals_regex`) validation method
+checks if values in a column match a specified pattern. Here's an example with two validation steps,
+each checking text values in a column:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")
+    .col_vals_regex(columns="f", pattern=r"high|low|mid")
+    .interrogate()
+)
+```
+
+### Checking Strings Against Specifications
+
+The [`Validate.col_vals_within_spec()`](`Validate.col_vals_within_spec`) method validates column values against common data
+specifications like email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, and
+IBANs. This is particularly useful when you need to validate that text data conforms to standard
+formats:
+
+```{python}
+import polars as pl
+
+# Create a sample table with various data types
+sample_data = pl.DataFrame({
+    "isbn": ["978-0-306-40615-7", "0-306-40615-2", "invalid"],
+    "email": ["test@example.com", "user@domain.co.uk", "not-an-email"],
+    "zip": ["12345", "90210", "invalid"]
+})
+
+(
+    pb.Validate(data=sample_data)
+    .col_vals_within_spec(columns="isbn", spec="isbn")
+    .col_vals_within_spec(columns="email", spec="email")
+    .col_vals_within_spec(columns="zip", spec="postal_code[US]")
+    .interrogate()
+)
+```
+
+### Checking for Trending Values
+
+The [`Validate.col_vals_increasing()`](`Validate.col_vals_increasing`) and [`Validate.col_vals_decreasing()`](`Validate.col_vals_decreasing`) validation methods
+check whether column values are increasing or decreasing as you move down the rows. These are useful
+for validating time series data, sequential identifiers, or any data where you expect monotonic
+trends:
+
+```{python}
+import polars as pl
+
+# Create a sample table with increasing and decreasing values
+trend_data = pl.DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "temperature": [20, 22, 25, 28, 30],
+    "countdown": [100, 80, 60, 40, 20]
+})
+
+(
+    pb.Validate(data=trend_data)
+    .col_vals_increasing(columns="id")
+    .col_vals_increasing(columns="temperature")
+    .col_vals_decreasing(columns="countdown")
+    .interrogate()
+)
+```
+
+The `allow_stationary=` parameter lets you control whether consecutive identical values should pass
+validation. By default, stationary values (e.g., `[1, 2, 2, 3]`) will fail the increasing check,
+but setting `allow_stationary=True` will allow them to pass.
+
+### Handling Missing Values with `na_pass=`
+
+When validating columns containing Null/None/NA values, you can control how these missing values are
+treated with the `na_pass=` parameter:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_le(columns="c", value=10, na_pass=True)
+    .interrogate()
+)
+```
+
+In the above example, column `c` contains two `None` values, but all test units pass because we set
+`na_pass=True`. Without this setting, those two values would fail the validation.
+
+In summary, `na_pass=` works like this:
+
+- `na_pass=True`: missing values pass validation regardless of the condition being tested
+- `na_pass=False` (the default): missing values fail validation
+
+## 2. Row-based Validations
+
+Row-based validations focus on examining properties that span across entire rows rather than
+individual columns. These are essential for detecting issues that can't be found by looking at
+columns in isolation:
+
+- [`Validate.rows_distinct()`](`Validate.rows_distinct`): ensures no duplicate rows exist in the table
+- [`Validate.rows_complete()`](`Validate.rows_complete`): verifies that no rows contain any missing values
+
+These row-level validations are particularly valuable for ensuring data integrity and completeness
+at the record level, which is crucial for many analytical and operational data applications.
+
+### Checking Row Distinctness
+
+Here's an example where we check for duplicate rows with [`Validate.rows_distinct()`](`Validate.rows_distinct`):
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .rows_distinct()
+    .interrogate()
+)
+```
+
+We can also adapt the [`Validate.rows_distinct()`](`Validate.rows_distinct`) check to use a single column or a subset of
+columns. To do that, we need to use the `columns_subset=` parameter. Here's an example of that:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .rows_distinct(columns_subset="b")
+    .interrogate()
+)
+```
+
+### Checking Row Completeness
+
+Another important validation is checking for complete rows: rows that have no missing values across
+all columns or a specified subset of columns. The [`Validate.rows_complete()`](`Validate.rows_complete`) validation method
+performs this check.
+
+Here's an example checking if all rows in the table are complete (have no missing values in any
+column):
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .rows_complete()
+    .interrogate()
+)
+```
+
+As the report indicates, there are some incomplete rows in the table.
+
+## 3. Table Structure Validations
+
+Table structure validations ensure that the overall architecture of your data meets expectations.
+These structural checks form a foundation for more detailed data quality assessments:
+
+- [`Validate.col_exists()`](`Validate.col_exists`): verifies a column exists in the table
+- [`Validate.col_schema_match()`](`Validate.col_schema_match`): ensures table matches a defined schema
+- [`Validate.col_count_match()`](`Validate.col_count_match`): confirms the table has the expected number of columns
+- [`Validate.row_count_match()`](`Validate.row_count_match`): verifies the table has the expected number of rows
+- [`Validate.tbl_match()`](`Validate.tbl_match`): validates that the target table matches a comparison table
+- [`Validate.data_freshness()`](`Validate.data_freshness`): checks that data is recent and not stale
+
+These structural validations provide essential checks on the fundamental organization of your data
+tables, ensuring they have the expected dimensions and components needed for reliable data analysis.
+
+### Checking Column Presence
+
+If you need to check for the presence of individual columns, the `Validate.col_exists()` validation
+method is useful. In this example, we check whether the `date` column is present in the table:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_exists(columns="date")
+    .interrogate()
+)
+```
+
+That column is present, so the single test unit of this validation step is a passing one.
+
+### Checking the Table Schema
+
+For deeper checks of table structure, a schema validation can be performed with the
+[`Validate.col_schema_match()`](`Validate.col_schema_match`) validation method, where the goal is to check whether the structure
+of a table matches an expected schema. To define an expected table schema, we need to use the
+`Schema` class. Here is a simple example that (1) prepares a schema consisting of column names, (2)
+uses that `schema` object in a [`Validate.col_schema_match()`](`Validate.col_schema_match`) validation step:
+
+```{python}
+schema = pb.Schema(columns=["date_time", "date", "a", "b", "c", "d", "e", "f"])
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_schema_match(schema=schema)
+    .interrogate()
+)
+```
+
+The [`Validate.col_schema_match()`](`Validate.col_schema_match`) validation step will only have a single test unit (signifying
+pass or fail). We can see in the above validation report that the column schema validation passed.
+
+More often, a schema will be defined using column names and column types. We can do that by using a
+list of tuples in the `columns=` parameter of `Schema`. Here's an example of that approach in
+action:
+
+```{python}
+schema = pb.Schema(
+    columns=[
+        ("date_time", "Datetime(time_unit='us', time_zone=None)"),
+        ("date", "Date"),
+        ("a", "Int64"),
+        ("b", "String"),
+        ("c", "Int64"),
+        ("d", "Float64"),
+        ("e", "Boolean"),
+        ("f", "String"),
+    ]
+)
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_schema_match(schema=schema)
+    .interrogate()
+)
+```
+
+The [`Validate.col_schema_match()`](`Validate.col_schema_match`) validation method has several boolean parameters for making the
+checks less stringent:
+
+- `complete=`: requires exact column matching (all expected columns must exist, no extra columns
+allowed)
+- `in_order=`: enforces that columns appear in the same order as defined in the schema
+- `case_sensitive_colnames=`: column names must match with exact letter case
+- `case_sensitive_dtypes=`: data type strings must match with exact letter case
+
+These parameters all default to `True`, providing strict schema validation. Setting any to `False`
+relaxes the validation requirements, making the checks more flexible when exact matching isn't
+necessary or practical for your use case.
+
+### Comparing Tables with `tbl_match()`
+
+The [`Validate.tbl_match()`](`Validate.tbl_match`) validation method provides a comprehensive way to verify that two
+tables are identical. It performs a progressive series of checks, from least to most stringent:
+
+1. Column count match
+2. Row count match
+3. Schema match (loose - case-insensitive, any order)
+4. Schema match (order - columns in correct order)
+5. Schema match (exact - case-sensitive, correct order)
+6. Data match (cell-by-cell comparison)
+
+This progressive approach helps identify exactly where tables differ. Here's an example comparing
+the `small_table` dataset with itself:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .tbl_match(tbl_compare=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .interrogate()
+)
+```
+
+This validation method is especially useful for:
+
+- Verifying that data transformations preserve expected properties
+- Comparing production data against a golden dataset
+- Ensuring data consistency across different environments
+- Validating that imported data matches source data
+
+### Checking Counts of Row and Columns
+
+Row and column count validations check the number of rows and columns in a table.
+
+Using [`Validate.row_count_match()`](`Validate.row_count_match`) checks whether the number of rows in a table matches a
+specified count.
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .row_count_match(count=13)
+    .interrogate()
+)
+```
+
+The [`Validate.col_count_match()`](`Validate.col_count_match`) validation method checks if the number of columns in a table
+matches a specified count.
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_count_match(count=8)
+    .interrogate()
+)
+```
+
+Expectations on column and row counts can be useful in certain situations and they align nicely with
+schema checks.
+
+### Validating Data Freshness
+
+Late or missing data is one of the most common (and costly) data quality issues in production
+systems. When data pipelines fail silently or experience delays, downstream analytics and ML models
+can produce stale or misleading results. The [`Validate.data_freshness()`](`Validate.data_freshness`) validation method helps
+catch these issues early by verifying that your data contains recent records.
+
+Data freshness validation works by checking a datetime column against a maximum allowed age. If the
+most recent timestamp in that column is older than the specified threshold, the validation fails.
+This simple check can prevent major downstream problems caused by stale data.
+
+Here's an example that validates data is no older than 2 days:
+
+```{python}
+import polars as pl
+from datetime import datetime, timedelta
+
+# Simulate a data feed that should be updated daily
+recent_data = pl.DataFrame({
+    "event": ["login", "purchase", "logout", "signup"],
+    "event_time": [
+        datetime.now() - timedelta(hours=1),
+        datetime.now() - timedelta(hours=6),
+        datetime.now() - timedelta(hours=12),
+        datetime.now() - timedelta(hours=18),
+    ],
+    "user_id": [101, 102, 103, 104]
+})
+
+(
+    pb.Validate(data=recent_data)
+    .data_freshness(column="event_time", max_age="2d")
+    .interrogate()
+)
+```
+
+The `max_age=` parameter accepts a flexible string format: `"30m"` for 30 minutes, `"6h"` for 6
+hours, `"2d"` for 2 days, or `"1w"` for 1 week. You can also combine units: `"1d 12h"` for 1.5 days.
+
+When validation succeeds, the report includes details about the data's age in the footer. When it
+fails, you'll see exactly how old the most recent data is and what threshold was exceeded. This
+context helps quickly diagnose whether you're dealing with a minor delay or a major pipeline
+failure.
+
+Data freshness validation is particularly valuable for:
+
+- monitoring ETL pipelines to catch failures before they cascade to reports and dashboards
+- validating data feeds to ensure third-party data sources are delivering as expected
+- including freshness checks in automated data quality tests as part of continuous integration
+- building alerting systems that trigger notifications when critical data becomes stale
+
+You might wonder why not just use [`Validate.col_vals_gt()`](`Validate.col_vals_gt`) with a datetime threshold. While that
+approach works, [`Validate.data_freshness()`](`Validate.data_freshness`) offers several advantages: the method name clearly
+communicates your intent, the `max_age=` string format (e.g., `"2d"`) is more readable than datetime
+arithmetic, it auto-generates meaningful validation briefs, the report footer shows helpful context
+about actual data age and thresholds, and timezone mismatches between your data and comparison time
+are handled gracefully with informative warnings.
+
+::: {.callout-note}
+When comparing timezone-aware and timezone-naive datetimes, Pointblank will include a warning in the
+validation report. For consistent results, ensure your data and comparison times use compatible
+timezone settings.
+:::
+
+## 4. AI-Powered Validations
+
+AI-powered validations use Large Language Models (LLMs) to validate data based on natural language
+criteria. This opens up new possibilities for complex validation rules that are difficult to express
+with traditional programmatic methods.
+
+### Validating with Natural Language Prompts
+
+The [`Validate.prompt()`](`Validate.prompt`) validation method allows you to describe validation criteria in plain
+language. The LLM interprets your prompt and evaluates each row, producing pass/fail results just
+like other Pointblank validation methods.
+
+This is particularly useful for:
+
+- Semantic checks (e.g., "descriptions should mention a product name")
+- Context-dependent validation (e.g., "prices should be reasonable for the product category")
+- Subjective quality assessments (e.g., "comments should be professional and constructive")
+- Complex rules that would require extensive regex patterns or custom functions
+
+Here's a simple example that validates whether text descriptions contain specific information:
+
+```{python}
+#| eval: false
+import polars as pl
+
+# Create sample data with product descriptions
+products = pl.DataFrame({
+    "product": ["Widget A", "Gadget B", "Tool C"],
+    "description": [
+        "High-quality widget made in USA",
+        "Innovative gadget with warranty",
+        "Professional tool"
+    ],
+    "price": [29.99, 49.99, 19.99]
+})
+
+# Validate that descriptions mention quality or features
+(
+    pb.Validate(data=products)
+    .prompt(
+        prompt="Each description should mention either quality, features, or warranty",
+        columns_subset=["description"],
+        model="anthropic:claude-sonnet-4-5"
+    )
+    .interrogate()
+)
+```
+
+The `columns_subset=` parameter lets you specify which columns to include in the validation,
+improving performance and reducing API costs by only sending relevant data to the LLM.
+
+**Note:** To use [`Validate.prompt()`](`Validate.prompt`), you need to have the appropriate API credentials configured
+for your chosen LLM provider (Anthropic, OpenAI, Ollama, or AWS Bedrock).
+
+## 5. Aggregate Validations
+
+Aggregate validations operate on column-level statistics rather than individual row values. These
+methods compute an aggregate value (such as sum, average, or standard deviation) from a column and
+compare it against an expected value. Unlike row-level validations where each row is a test unit,
+aggregate validations treat the entire column as a single test unit that either passes or fails.
+
+Pointblank provides three families of aggregate validation methods:
+
+- **Sum validations** ([`Validate.col_sum_eq()`](`Validate.col_sum_eq`), [`Validate.col_sum_gt()`](`Validate.col_sum_gt`), [`Validate.col_sum_lt()`](`Validate.col_sum_lt`),
+  [`Validate.col_sum_ge()`](`Validate.col_sum_ge`), [`Validate.col_sum_le()`](`Validate.col_sum_le`)) for validating the sum of column values
+
+- **Average validations** ([`Validate.col_avg_eq()`](`Validate.col_avg_eq`), [`Validate.col_avg_gt()`](`Validate.col_avg_gt`), [`Validate.col_avg_lt()`](`Validate.col_avg_lt`),
+  [`Validate.col_avg_ge()`](`Validate.col_avg_ge`), [`Validate.col_avg_le()`](`Validate.col_avg_le`)) for validating the mean of column values
+
+- **Standard deviation validations** ([`Validate.col_sd_eq()`](`Validate.col_sd_eq`), [`Validate.col_sd_gt()`](`Validate.col_sd_gt`),
+  [`Validate.col_sd_lt()`](`Validate.col_sd_lt`), [`Validate.col_sd_ge()`](`Validate.col_sd_ge`), [`Validate.col_sd_le()`](`Validate.col_sd_le`)) for validating the
+  standard deviation of column values
+
+Each family supports the five comparison operators: equal to (`_eq`), greater than (`_gt`), less
+than (`_lt`), greater than or equal to (`_ge`), and less than or equal to (`_le`).
+
+### Validating Column Sums
+
+Here's an example validating that the sum of column `a` equals 55:
+
+```{python}
+import polars as pl
+
+agg_data = pl.DataFrame({
+    "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "b": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+})
+
+(
+    pb.Validate(data=agg_data)
+    .col_sum_eq(columns="a", value=55)
+    .col_sum_gt(columns="b", value=500)
+    .interrogate()
+)
+```
+
+### Validating Column Averages
+
+Average validations are useful for ensuring that typical values remain within expected bounds:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_avg_eq(columns="a", value=5.5)
+    .col_avg_ge(columns="b", value=50)
+    .interrogate()
+)
+```
+
+### Validating Standard Deviations
+
+Standard deviation validations help ensure data variability is within expected ranges:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_sd_gt(columns="a", value=2)
+    .col_sd_lt(columns="b", value=35)
+    .interrogate()
+)
+```
+
+### Using Tolerance for Fuzzy Comparisons
+
+Floating-point arithmetic can introduce small precision errors, making exact equality comparisons
+unreliable. The `tol=` parameter allows for fuzzy comparisons by specifying an acceptable tolerance:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_avg_eq(columns="a", value=5.5, tol=0.01)  # Pass if average is within ±0.01 of 5.5
+    .col_sum_eq(columns="b", value=550, tol=1)    # Pass if sum is within ±1 of 550
+    .interrogate()
+)
+```
+
+For equality comparisons, the tolerance creates a range `[value - tol, value + tol]` within which
+the aggregate is considered valid.
+
+### Comparing Against Reference Data
+
+Aggregate validations shine when comparing current data against a baseline or reference dataset.
+This is invaluable for detecting drift in data properties over time:
+
+```{python}
+# Current data
+current_data = pl.DataFrame({"revenue": [100, 200, 150, 175, 125]})
+
+# Historical baseline
+baseline_data = pl.DataFrame({"revenue": [95, 205, 145, 180, 130]})
+
+(
+    pb.Validate(data=current_data, reference=baseline_data)
+    .col_sum_eq(columns="revenue", tol=50)   # Compare sums with tolerance
+    .col_avg_eq(columns="revenue", tol=5)    # Compare averages with tolerance
+    .interrogate()
+)
+```
+
+When `value=None` (the default) and reference data is set, aggregate methods automatically compare
+against the same column in the reference data.
+
+## 6. Custom Validations with `specially()`
+
+While Pointblank provides over 40 built-in validation methods, there are times when you need to
+implement custom validation logic that goes beyond these standard checks. The [`Validate.specially()`](`Validate.specially`)
+method gives you complete flexibility to create bespoke validations for domain-specific business
+rules, complex multi-column checks, or cross-dataset referential integrity constraints.
+
+### Basic Custom Validations
+
+The `specially()` method accepts a callable function that performs your custom validation logic. The
+function should return boolean values indicating whether each test unit passes:
+
+```{python}
+import polars as pl
+
+simple_tbl = pl.DataFrame({
+    "a": [5, 7, 1, 3, 9, 4],
+    "b": [6, 3, 0, 5, 8, 2]
+})
+
+# Custom validation: sum of two columns must be positive
+def validate_sum_positive(data):
+    return data.select(pl.col("a") + pl.col("b") > 0)
+
+(
+    pb.Validate(data=simple_tbl)
+    .specially(
+        expr=validate_sum_positive,
+        brief="Sum of columns 'a' and 'b' must be positive"
+    )
+    .interrogate()
+)
+```
+
+This validation passes because all rows have a positive sum for columns `a` and `b`. The
+`specially()` method provides the flexibility to implement any validation logic you can express in
+Python, making it a powerful tool for custom data quality checks.
+
+### Cross-Dataset Referential Integrity
+
+One powerful use case for `specially()` is validating relationships between multiple datasets. This
+is particularly valuable for checking foreign key constraints, conditional existence rules, and
+cardinality relationships that span multiple tables.
+
+#### Foreign Key Validation
+
+Verify that all keys in one dataset exist in another:
+
+```{python}
+# Create related datasets: Orders and OrderDetails
+orders = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5],
+    "customer_id": ["A", "B", "A", "C", "B"],
+    "status": ["completed", "pending", "completed", "cancelled", "completed"]
+})
+
+order_details = pl.DataFrame({
+    "detail_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
+    "order_id": [1, 1, 1, 2, 3, 3, 4, 5, 5],
+    "product_id": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
+    "quantity": [2, 1, 3, 1, 2, 1, 1, 2, 1]
+})
+
+# Validate foreign key constraint
+def check_foreign_key(df):
+    """Check if all order_ids in order_details exist in orders table"""
+    valid_order_ids = orders.select("order_id")
+    # Semi join returns only rows with matching keys
+    return df.join(valid_order_ids, on="order_id", how="semi").height == df.height
+
+(
+    pb.Validate(data=order_details, tbl_name="order_details")
+    .specially(
+        expr=check_foreign_key,
+        brief="All order_ids must exist in orders table"
+    )
+    .interrogate()
+)
+```
+
+This validation ensures referential integrity by confirming that every `order_id` in the
+`order_details` table has a corresponding record in the `orders` table. The use of a semi-join makes
+this check efficient, as it only verifies the existence of matching keys without returning full
+joined data.
+
+#### Conditional Existence Checks
+
+Implement "if X then Y must exist" logic across datasets:
+
+```{python}
+def check_completed_orders_have_details(df):
+    """Completed orders must have at least one detail record"""
+    completed_orders = df.filter(pl.col("status") == "completed")
+    order_ids_with_details = order_details.select("order_id").unique()
+
+    # Check each completed order has matching details
+    return completed_orders.join(
+        order_ids_with_details,
+        on="order_id",
+        how="left"
+    ).with_columns(
+        pl.col("order_id").is_not_null().alias("has_details")
+    ).select("has_details")
+
+(
+    pb.Validate(data=orders, tbl_name="orders")
+    .specially(
+        expr=check_completed_orders_have_details,
+        brief="Completed orders must have detail records"
+    )
+    .interrogate()
+)
+```
+
+This validation implements conditional business logic: only orders with a `completed` status are
+required to have detail records. This pattern is common in real-world scenarios where certain
+records trigger mandatory relationships while others don't. The validation returns a boolean for
+each completed order, allowing you to see exactly which records pass or fail.
+
+#### Cardinality Constraints
+
+Validate that relationships between datasets follow specific cardinality rules:
+
+```{python}
+def check_quantity_ratio(df):
+    """Each order should have exactly 3x quantity units in details"""
+    order_counts = orders.group_by("order_id").agg(pl.lit(1).alias("order_count"))
+
+    detail_quantities = order_details.group_by("order_id").agg(
+        pl.col("quantity").sum().alias("total_quantity")
+    )
+
+    joined = order_counts.join(detail_quantities, on="order_id", how="left")
+
+    return joined.with_columns(
+        (pl.col("total_quantity") == pl.col("order_count") * 3).alias("valid_ratio")
+    ).select("valid_ratio")
+
+
+(
+    pb.Validate(data=orders, tbl_name="orders")
+    .specially(
+        expr=check_quantity_ratio,
+        brief="Each order should have 3x quantity units in details",
+        thresholds=(0.4, 0.7),  # Allow some flexibility
+    )
+    .interrogate()
+)
+```
+
+Cardinality constraints like this validate that the relationship between datasets follows expected
+patterns. In this example, we expect each order to have a specific quantity ratio in the detail
+records. Note the use of `thresholds=` to allow some flexibility (not every order needs to meet this
+requirement perfectly, but too many violations would indicate a data quality issue).
+
+#### Composite Keys with Business Logic
+
+Validate complex relationships involving multiple columns and conditional logic:
+
+```{python}
+# More complex scenario with composite keys
+employees = pl.DataFrame({
+    "dept_id": ["D1", "D1", "D2", "D2", "D3"],
+    "emp_id": ["E001", "E002", "E003", "E004", "E005"],
+    "emp_name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+    "is_manager": [True, False, True, False, False]
+})
+
+projects = pl.DataFrame({
+    "project_id": ["P1", "P2", "P3", "P4"],
+    "dept_id": ["D1", "D2", "D1", "D3"],
+    "manager_emp_id": ["E001", "E003", "E001", "E005"]
+})
+
+def check_project_manager_validity(df):
+    """Project managers must be valid managers in their department"""
+    validation_result = df.join(
+        employees,
+        left_on=["dept_id", "manager_emp_id"],
+        right_on=["dept_id", "emp_id"],
+        how="left"
+    ).with_columns(
+        # Manager must exist in dept AND have manager status
+        ((pl.col("emp_name").is_not_null()) & (pl.col("is_manager") == True)).alias("valid_manager")
+    ).select("valid_manager")
+
+    return validation_result
+
+(
+    pb.Validate(data=projects, tbl_name="projects")
+    .specially(
+        expr=check_project_manager_validity,
+        brief="Project managers must be valid managers in their department"
+    )
+    .interrogate()
+)
+```
+
+This example demonstrates validation using composite keys (both `dept_id` and `emp_id`) combined
+with conditional business logic (checking the `is_manager` flag). Such validations are common in
+enterprise systems where relationships must satisfy multiple constraints simultaneously. The
+validation reveals that one project (`P4`) fails because employee `E005` is not a manager, even
+though they exist in the same department.
+
+### Reusable Validation Factories
+
+For validations you'll use repeatedly, create factory functions that generate customized validators:
+
+```{python}
+def make_foreign_key_validator(reference_table, key_columns):
+    """Factory function to create reusable foreign key validators"""
+    def validate_fk(df):
+        if isinstance(key_columns, str):
+            keys = [key_columns]
+        else:
+            keys = key_columns
+
+        ref_keys = reference_table.select(keys).unique()
+        matched = df.join(ref_keys, on=keys, how="semi")
+        return matched.height == df.height
+
+    return validate_fk
+
+# Use the factory across multiple validations
+(
+    pb.Validate(data=order_details, tbl_name="order_details")
+    .specially(
+        expr=make_foreign_key_validator(orders, "order_id"),
+        brief="FK constraint: order_id → orders"
+    )
+    .interrogate()
+)
+```
+
+Factory functions like `make_foreign_key_validator()` make your validation code more maintainable
+and reusable. Once defined, you can use the same factory to validate different foreign key
+relationships across your entire data pipeline, ensuring consistency in how these constraints are
+checked. This pattern is particularly valuable in production environments where you validate
+multiple related tables.
+
+### When to Use `specially()`
+
+The `specially()` method is ideal for:
+
+- cross-dataset validations: foreign keys, referential integrity, conditional existence
+- complex business rules: multi-column checks, conditional logic, domain-specific constraints
+- custom statistical tests: validations requiring calculations not covered by built-in methods
+- SQL-style checks: converting complex SQL queries into validation steps
+- prototype validations: testing new validation patterns before implementing them as dedicated methods
+
+By combining `specially()` with Pointblank's built-in validation methods, you can create
+comprehensive data quality checks that address both standard and highly specific validation
+requirements.
+
+## Conclusion
+
+In this article, we've explored the various types of validation methods that Pointblank offers for
+ensuring data quality. These methods provide a framework for validating column values, checking row
+properties, verifying table structures, using AI for complex semantic validations, and validating
+aggregate statistics across columns. By combining these validation methods into comprehensive plans,
+you can systematically test your data against business rules and quality expectations. And this all
+helps to ensure your data remains reliable and trustworthy.
