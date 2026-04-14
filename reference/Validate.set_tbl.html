@@ -1083,7 +1083,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>We will first create two similar tables for our future validation plans.</p>
-<div id="5593eae5" class="cell" data-execution_count="2">
+<div id="ffdc8b08" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1101,7 +1101,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 </div>
 <p>Create a validation plan with the first table.</p>
-<div id="35721ef3" class="cell" data-execution_count="3">
+<div id="1127ad5c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_table_1 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>table_1,</span>
@@ -1113,7 +1113,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Now apply the same validation plan to the second table.</p>
-<div id="6f2f6d4a" class="cell" data-execution_count="4">
+<div id="43e3d177" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_table_2 <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    validation_table_1</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .set_tbl(</span>
@@ -1124,7 +1124,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Here is the interrogation of the first table:</p>
-<div id="0d5f8750" class="cell" data-execution_count="5">
+<div id="0ba781ed" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation_table_1.interrogate()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1309,7 +1309,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 </div>
 </div>
 <p>And the second table:</p>
-<div id="01947060" class="cell" data-execution_count="6">
+<div id="26653bcc" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_table_2.interrogate()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

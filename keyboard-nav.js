@@ -5,6 +5,8 @@
  * - `/` or `s` to focus search
  * - `[` / `]` for previous/next page navigation
  * - `q` to navigate to homepage
+ * - `u` to navigate to User Guide (when available)
+ * - `r` to navigate to API Reference (when available)
  * - `m` or `n` to show/hide floating menu overlay (sidebar nav or navbar links)
  * - `d` to toggle dark mode
  * - `c` to copy page as Markdown (when available)
@@ -106,6 +108,33 @@
         }
         // Fallback: navigate to site root
         window.location.href = './';
+    }
+
+    /**
+     * Find a navbar link whose href contains the given path segment.
+     */
+    function findNavbarLink(pathSegment) {
+        var links = document.querySelectorAll(
+            '#navbarCollapse > .navbar-nav.me-auto > .nav-item > .nav-link'
+        );
+        for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            if (href.indexOf(pathSegment) !== -1) return links[i];
+        }
+        return null;
+    }
+
+    function hasUserGuide() { return !!findNavbarLink('user-guide/'); }
+    function hasReference() { return !!findNavbarLink('reference/'); }
+
+    function navigateUserGuide() {
+        var link = findNavbarLink('user-guide/');
+        if (link) window.location.href = link.getAttribute('href');
+    }
+
+    function navigateReference() {
+        var link = findNavbarLink('reference/');
+        if (link) window.location.href = link.getAttribute('href');
     }
 
     // ── Show Menu Overlay ──────────────────────────────────────────────
@@ -377,10 +406,11 @@
             titleFallback: 'Navigation',
             shortcuts: [
                 { keys: ['s', '/'], descKey: 'kb_focus_search', descFallback: 'Focus search' },
-                { keys: ['['], descKey: 'kb_prev_page', descFallback: 'Previous page' },
-                { keys: [']'], descKey: 'kb_next_page', descFallback: 'Next page' },
+                { keys: ['[', ']'], descKey: 'kb_prev_next_page', descFallback: 'Previous / next page', separator: ' / ' },
                 { keys: ['m', 'n'], descKey: 'kb_show_menu', descFallback: 'Show menu' },
                 { keys: ['q'], descKey: 'kb_home', descFallback: 'Go to homepage' },
+                { keys: ['u'], descKey: 'kb_user_guide', descFallback: 'User Guide', visible: hasUserGuide },
+                { keys: ['r'], descKey: 'kb_api_reference', descFallback: 'API Reference', visible: hasReference },
             ]
         },
         {
@@ -435,11 +465,16 @@
             html += '<dl>';
             for (var s = 0; s < group.shortcuts.length; s++) {
                 var sc = group.shortcuts[s];
+                if (sc.visible && !sc.visible()) continue;
                 html += '<div class="gd-keyboard-row">';
                 html += '<dt>';
                 for (var k = 0; k < sc.keys.length; k++) {
-                    if (k > 0) html += ' <span class="gd-keyboard-or">' +
-                        escapeHtml(_gdT('kb_or', 'or')) + '</span> ';
+                    if (k > 0) {
+                        var sep = sc.separator != null ? sc.separator :
+                            ' <span class="gd-keyboard-or">' +
+                            escapeHtml(_gdT('kb_or', 'or')) + '</span> ';
+                        html += sep;
+                    }
                     html += '<kbd>' + escapeHtml(sc.keys[k]) + '</kbd>';
                 }
                 html += '</dt>';
@@ -570,6 +605,20 @@
             case 'q':
                 e.preventDefault();
                 navigateHome();
+                break;
+
+            case 'u':
+                if (hasUserGuide()) {
+                    e.preventDefault();
+                    navigateUserGuide();
+                }
+                break;
+
+            case 'r':
+                if (hasReference()) {
+                    e.preventDefault();
+                    navigateReference();
+                }
                 break;
 
             case 'd':
