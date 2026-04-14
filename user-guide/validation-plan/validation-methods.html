@@ -535,7 +535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <p>Within each of these categories, we’ll walk through several examples showing how each validation method creates steps in your validation plan.</p>
 <p>And we’ll use the <code>small_table</code> dataset for all of our examples. Here’s a preview of it:</p>
-<div id="8bae676f" class="cell" data-execution_count="2">
+<div id="65a71968" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -777,7 +777,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Validation Methods to Validation Steps</h1>
 <p>In Pointblank, validation <em>methods</em> become validation <em>steps</em> when you add them to a validation plan. Each method creates a distinct step that performs a specific check on your data.</p>
 <p>Here’s a simple example showing how three validation methods create three validation steps:</p>
-<div id="aa44584f" class="cell" data-execution_count="3">
+<div id="9bf97f1f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1061,7 +1061,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="comparison-checks" class="level2">
 <h2 class="anchored" data-anchor-id="comparison-checks">Comparison Checks</h2>
 <p>Let’s start with a simple example of how <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>Validate.col_vals_gt()</code></a> might be used to check if the values in a column are greater than a specified value.</p>
-<div id="83d97ae4" class="cell" data-execution_count="4">
+<div id="d245c66d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
@@ -1210,7 +1210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>If you’re checking data in a column that contains Null/<code>None</code>/<code>NA</code> values and you’d like to disregard those values (i.e., let them pass validation), you can use <code>na_pass=True</code>. The following example checks values in column <code>c</code> of <code>small_table</code>, which contains two <code>None</code> values:</p>
-<div id="405d159e" class="cell" data-execution_count="5">
+<div id="865b348c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
@@ -1360,7 +1360,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>In the above validation table, we see that all test units passed. If we didn’t use <code>na_pass=True</code> there would be 2 failing test units, one for each <code>None</code> value in the <code>c</code> column.</p>
 <p>It’s possible to check against column values against values in an adjacent column. To do this, supply the <code>value=</code> argument with the column name within the <a href="../../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> helper function. Here’s an example of that:</p>
-<div id="1af2f2e9" class="cell" data-execution_count="6">
+<div id="bddd606b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>
@@ -1513,7 +1513,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-of-missing-values" class="level2">
 <h2 class="anchored" data-anchor-id="checking-of-missing-values">Checking of Missing Values</h2>
 <p>A very common thing to validate is that there are no Null/NA/missing values in a column. The <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>Validate.col_vals_not_null()</code></a> method checks for the presence of missing values:</p>
-<div id="8fb6c8b7" class="cell" data-execution_count="7">
+<div id="d97f574f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"a"</span>)</span>
@@ -1668,7 +1668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-percentage-of-missing-values" class="level2">
 <h2 class="anchored" data-anchor-id="checking-percentage-of-missing-values">Checking Percentage of Missing Values</h2>
 <p>While <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>Validate.col_vals_not_null()</code></a> ensures there are no missing values at all, sometimes you need to validate that missing values match a specific percentage. The <a href="../../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link"><code>Validate.col_pct_null()</code></a> method checks whether the percentage of missing values in a column matches an expected value:</p>
-<div id="24207e01" class="cell" data-execution_count="8">
+<div id="620e7744" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"c"</span>, p<span class="op">=</span><span class="fl">0.15</span>, tol<span class="op">=</span><span class="fl">0.05</span>)  <span class="co"># Expect ~15% missing values (±5%)</span></span>
@@ -1820,7 +1820,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This validation checks that approximately 15% of values in column <code>c</code> are missing, allowing a tolerance of ±5% (so the acceptable range is 10-20%). The <code>tol=</code> parameter can accept various formats including absolute counts or percentage ranges:</p>
-<div id="32bda803" class="cell" data-execution_count="9">
+<div id="f8dbef15" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"c"</span>, p<span class="op">=</span><span class="fl">0.15</span>, tol<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.10</span>))  <span class="co"># Asymmetric tolerance: -5%/+10%</span></span>
@@ -1975,7 +1975,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-strings-with-regexes" class="level2">
 <h2 class="anchored" data-anchor-id="checking-strings-with-regexes">Checking Strings with Regexes</h2>
 <p>A regular expression (regex) validation via the <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>Validate.col_vals_regex()</code></a> validation method checks if values in a column match a specified pattern. Here’s an example with two validation steps, each checking text values in a column:</p>
-<div id="257d3cc0" class="cell" data-execution_count="10">
+<div id="4be5aa31" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="dv">^\d</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="dv">\d</span><span class="op">{3}</span><span class="dv">$</span><span class="vs">"</span>)</span>
@@ -2175,7 +2175,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-strings-against-specifications" class="level2">
 <h2 class="anchored" data-anchor-id="checking-strings-against-specifications">Checking Strings Against Specifications</h2>
 <p>The <a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>Validate.col_vals_within_spec()</code></a> method validates column values against common data specifications like email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, and IBANs. This is particularly useful when you need to validate that text data conforms to standard formats:</p>
-<div id="717ea198" class="cell" data-execution_count="11">
+<div id="3665df74" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table with various data types</span></span>
@@ -2426,7 +2426,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-for-trending-values" class="level2">
 <h2 class="anchored" data-anchor-id="checking-for-trending-values">Checking for Trending Values</h2>
 <p>The <a href="../../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>Validate.col_vals_increasing()</code></a> and <a href="../../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>Validate.col_vals_decreasing()</code></a> validation methods check whether column values are increasing or decreasing as you move down the rows. These are useful for validating time series data, sequential identifiers, or any data where you expect monotonic trends:</p>
-<div id="c6fb98be" class="cell" data-execution_count="12">
+<div id="00ca7c14" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table with increasing and decreasing values</span></span>
@@ -2678,7 +2678,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="handling-missing-values-with-na_pass" class="level2">
 <h2 class="anchored" data-anchor-id="handling-missing-values-with-na_pass">Handling Missing Values with <code>na_pass=</code></h2>
 <p>When validating columns containing Null/None/NA values, you can control how these missing values are treated with the <code>na_pass=</code> parameter:</p>
-<div id="443331e6" class="cell" data-execution_count="13">
+<div id="f05128b2" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
@@ -2845,7 +2845,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-row-distinctness" class="level2">
 <h2 class="anchored" data-anchor-id="checking-row-distinctness">Checking Row Distinctness</h2>
 <p>Here’s an example where we check for duplicate rows with <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>Validate.rows_distinct()</code></a>:</p>
-<div id="8a8445d2" class="cell" data-execution_count="14">
+<div id="6ffec09c" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    .rows_distinct()</span>
@@ -2998,7 +2998,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>We can also adapt the <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>Validate.rows_distinct()</code></a> check to use a single column or a subset of columns. To do that, we need to use the <code>columns_subset=</code> parameter. Here’s an example of that:</p>
-<div id="009c1c67" class="cell" data-execution_count="15">
+<div id="a6cc49f9" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    .rows_distinct(columns_subset<span class="op">=</span><span class="st">"b"</span>)</span>
@@ -3155,7 +3155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="checking-row-completeness">Checking Row Completeness</h2>
 <p>Another important validation is checking for complete rows: rows that have no missing values across all columns or a specified subset of columns. The <a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link"><code>Validate.rows_complete()</code></a> validation method performs this check.</p>
 <p>Here’s an example checking if all rows in the table are complete (have no missing values in any column):</p>
-<div id="018b8474" class="cell" data-execution_count="16">
+<div id="e7e3406b" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    .rows_complete()</span>
@@ -3324,7 +3324,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-column-presence" class="level2">
 <h2 class="anchored" data-anchor-id="checking-column-presence">Checking Column Presence</h2>
 <p>If you need to check for the presence of individual columns, the <a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">Validate.col_exists()</a> validation method is useful. In this example, we check whether the <code>date</code> column is present in the table:</p>
-<div id="d05bb507" class="cell" data-execution_count="17">
+<div id="1d458921" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span><span class="st">"date"</span>)</span>
@@ -3478,7 +3478,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-table-schema" class="level2">
 <h2 class="anchored" data-anchor-id="checking-the-table-schema">Checking the Table Schema</h2>
 <p>For deeper checks of table structure, a schema validation can be performed with the <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a> validation method, where the goal is to check whether the structure of a table matches an expected schema. To define an expected table schema, we need to use the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> class. Here is a simple example that (1) prepares a schema consisting of column names, (2) uses that <code>schema</code> object in a <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a> validation step:</p>
-<div id="4293c902" class="cell" data-execution_count="18">
+<div id="5fcd4a73" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>[<span class="st">"date_time"</span>, <span class="st">"date"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"e"</span>, <span class="st">"f"</span>])</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -3826,7 +3826,7 @@ tr { background-color: transparent; }
 </div>
 <p>The <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a> validation step will only have a single test unit (signifying pass or fail). We can see in the above validation report that the column schema validation passed.</p>
 <p>More often, a schema will be defined using column names and column types. We can do that by using a list of tuples in the <code>columns=</code> parameter of <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a>. Here’s an example of that approach in action:</p>
-<div id="918e24c6" class="cell" data-execution_count="19">
+<div id="0c667769" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"date_time"</span>, <span class="st">"Datetime(time_unit='us', time_zone=None)"</span>),</span>
@@ -4204,7 +4204,7 @@ tr { background-color: transparent; }
 <li>Data match (cell-by-cell comparison)</li>
 </ol>
 <p>This progressive approach helps identify exactly where tables differ. Here’s an example comparing the <code>small_table</code> dataset with itself:</p>
-<div id="e752141c" class="cell" data-execution_count="20">
+<div id="7eff5a82" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -4373,7 +4373,7 @@ tr { background-color: transparent; }
 <h2 class="anchored" data-anchor-id="checking-counts-of-row-and-columns">Checking Counts of Row and Columns</h2>
 <p>Row and column count validations check the number of rows and columns in a table.</p>
 <p>Using <a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link"><code>Validate.row_count_match()</code></a> checks whether the number of rows in a table matches a specified count.</p>
-<div id="04055134" class="cell" data-execution_count="21">
+<div id="43bad12a" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    .row_count_match(count<span class="op">=</span><span class="dv">13</span>)</span>
@@ -4527,7 +4527,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The <a href="../../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link"><code>Validate.col_count_match()</code></a> validation method checks if the number of columns in a table matches a specified count.</p>
-<div id="4f89441f" class="cell" data-execution_count="22">
+<div id="835923c7" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .col_count_match(count<span class="op">=</span><span class="dv">8</span>)</span>
@@ -4687,7 +4687,7 @@ tr { background-color: transparent; }
 <p>Late or missing data is one of the most common (and costly) data quality issues in production systems. When data pipelines fail silently or experience delays, downstream analytics and ML models can produce stale or misleading results. The <a href="../../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link"><code>Validate.data_freshness()</code></a> validation method helps catch these issues early by verifying that your data contains recent records.</p>
 <p>Data freshness validation works by checking a datetime column against a maximum allowed age. If the most recent timestamp in that column is older than the specified threshold, the validation fails. This simple check can prevent major downstream problems caused by stale data.</p>
 <p>Here’s an example that validates data is no older than 2 days:</p>
-<div id="746d957b" class="cell" data-execution_count="23">
+<div id="5dd4d460" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4850,7 +4850,7 @@ tr { background-color: transparent; }
   <tr>
     <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-04-13 23:46:19</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p></td>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-04-14 01:16:47</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p></td>
   </tr>
 
 </tfoot>
@@ -4900,7 +4900,7 @@ Note
 <li>Complex rules that would require extensive regex patterns or custom functions</li>
 </ul>
 <p>Here’s a simple example that validates whether text descriptions contain specific information:</p>
-<div id="513732cf" class="cell" data-execution_count="24">
+<div id="d45241fb" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data with product descriptions</span></span>
@@ -4942,7 +4942,7 @@ Note
 <section id="validating-column-sums" class="level2">
 <h2 class="anchored" data-anchor-id="validating-column-sums">Validating Column Sums</h2>
 <p>Here’s an example validating that the sum of column <code>a</code> equals 55:</p>
-<div id="46d4c45c" class="cell" data-execution_count="25">
+<div id="36ac4a95" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>agg_data <span class="op">=</span> pl.DataFrame({</span>
@@ -5153,7 +5153,7 @@ Note
 <section id="validating-column-averages" class="level2">
 <h2 class="anchored" data-anchor-id="validating-column-averages">Validating Column Averages</h2>
 <p>Average validations are useful for ensuring that typical values remain within expected bounds:</p>
-<div id="08346ba2" class="cell" data-execution_count="26">
+<div id="58d01ec6" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>agg_data)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">5.5</span>)</span>
@@ -5357,7 +5357,7 @@ Note
 <section id="validating-standard-deviations" class="level2">
 <h2 class="anchored" data-anchor-id="validating-standard-deviations">Validating Standard Deviations</h2>
 <p>Standard deviation validations help ensure data variability is within expected ranges:</p>
-<div id="0a6b576d" class="cell" data-execution_count="27">
+<div id="f50bda5b" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>agg_data)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    .col_sd_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">2</span>)</span>
@@ -5559,7 +5559,7 @@ Note
 <section id="using-tolerance-for-fuzzy-comparisons" class="level2">
 <h2 class="anchored" data-anchor-id="using-tolerance-for-fuzzy-comparisons">Using Tolerance for Fuzzy Comparisons</h2>
 <p>Floating-point arithmetic can introduce small precision errors, making exact equality comparisons unreliable. The <code>tol=</code> parameter allows for fuzzy comparisons by specifying an acceptable tolerance:</p>
-<div id="9cda8803" class="cell" data-execution_count="28">
+<div id="9e8a6938" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>agg_data)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">5.5</span>, tol<span class="op">=</span><span class="fl">0.01</span>)  <span class="co"># Pass if average is within ±0.01 of 5.5</span></span>
@@ -5764,7 +5764,7 @@ Note
 <section id="comparing-against-reference-data" class="level2">
 <h2 class="anchored" data-anchor-id="comparing-against-reference-data">Comparing Against Reference Data</h2>
 <p>Aggregate validations shine when comparing current data against a baseline or reference dataset. This is invaluable for detecting drift in data properties over time:</p>
-<div id="393ac3bc" class="cell" data-execution_count="29">
+<div id="58c050a1" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Current data</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>current_data <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">150</span>, <span class="dv">175</span>, <span class="dv">125</span>]})</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5979,7 +5979,7 @@ Note
 <section id="basic-custom-validations" class="level2">
 <h2 class="anchored" data-anchor-id="basic-custom-validations">Basic Custom Validations</h2>
 <p>The <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> method accepts a callable function that performs your custom validation logic. The function should return boolean values indicating whether each test unit passes:</p>
-<div id="57fc0e88" class="cell" data-execution_count="30">
+<div id="ca1259a4" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>simple_tbl <span class="op">=</span> pl.DataFrame({</span>
@@ -6152,7 +6152,7 @@ Note
 <section id="foreign-key-validation" class="level3">
 <h3 class="anchored" data-anchor-id="foreign-key-validation">Foreign Key Validation</h3>
 <p>Verify that all keys in one dataset exist in another:</p>
-<div id="b7ff479a" class="cell" data-execution_count="31">
+<div id="1bc38b92" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create related datasets: Orders and OrderDetails</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
@@ -6332,7 +6332,7 @@ Note
 <section id="conditional-existence-checks" class="level3">
 <h3 class="anchored" data-anchor-id="conditional-existence-checks">Conditional Existence Checks</h3>
 <p>Implement “if X then Y must exist” logic across datasets:</p>
-<div id="b62e5097" class="cell" data-execution_count="32">
+<div id="51155602" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_completed_orders_have_details(df):</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Completed orders must have at least one detail record"""</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    completed_orders <span class="op">=</span> df.<span class="bu">filter</span>(pl.col(<span class="st">"status"</span>) <span class="op">==</span> <span class="st">"completed"</span>)</span>
@@ -6505,7 +6505,7 @@ Note
 <section id="cardinality-constraints" class="level3">
 <h3 class="anchored" data-anchor-id="cardinality-constraints">Cardinality Constraints</h3>
 <p>Validate that relationships between datasets follow specific cardinality rules:</p>
-<div id="8bb8db99" class="cell" data-execution_count="33">
+<div id="f2351195" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_quantity_ratio(df):</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Each order should have exactly 3x quantity units in details"""</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    order_counts <span class="op">=</span> orders.group_by(<span class="st">"order_id"</span>).agg(pl.lit(<span class="dv">1</span>).alias(<span class="st">"order_count"</span>))</span>
@@ -6688,7 +6688,7 @@ Note
 <section id="composite-keys-with-business-logic" class="level3">
 <h3 class="anchored" data-anchor-id="composite-keys-with-business-logic">Composite Keys with Business Logic</h3>
 <p>Validate complex relationships involving multiple columns and conditional logic:</p>
-<div id="21507b10" class="cell" data-execution_count="34">
+<div id="97b23008" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># More complex scenario with composite keys</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>employees <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dept_id"</span>: [<span class="st">"D1"</span>, <span class="st">"D1"</span>, <span class="st">"D2"</span>, <span class="st">"D2"</span>, <span class="st">"D3"</span>],</span>
@@ -6876,7 +6876,7 @@ Note
 <section id="reusable-validation-factories" class="level2">
 <h2 class="anchored" data-anchor-id="reusable-validation-factories">Reusable Validation Factories</h2>
 <p>For validations you’ll use repeatedly, create factory functions that generate customized validators:</p>
-<div id="e7282e68" class="cell" data-execution_count="35">
+<div id="07d78efd" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_foreign_key_validator(reference_table, key_columns):</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Factory function to create reusable foreign key validators"""</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate_fk(df):</span>
