@@ -78,7 +78,7 @@ except ImportError:
 
 ## If we specifically disable tests in pytest set the availability to False
 if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
-    PYSPARKAVAILABLE = False
+    PYSPARK_AVAILABLE = False
 SQLITE_AVAILABLE = True
 if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
     SQLITE_AVAILABLE = False
@@ -13899,47 +13899,45 @@ def test_get_step_report_schema_checks(schema) -> None:
         assert isinstance(validation.get_step_report(i=1), GT.GT)
 
 
-def test_get_dataframe_wrong_tbl_type_messaging():
+def test_get_dataframe_report_wrong_tbl_type_messaging():
     tbl = pl.DataFrame({"name": ["Monica", "Erica", "Rita", "Tina"], "mambo_no": [2, 3, 4, 5]})
 
     validation = Validate(data=tbl).col_vals_gt(columns="mambo_no", value=5).interrogate()
 
     with pytest.raises(ValueError, match="The DataFrame type `polar` is not valid. Choose one of"):
-        validation.get_dataframe("polar")
+        validation.get_dataframe_report("polar")
 
 
 @pytest.mark.parametrize(
     "library, tbl_type", [("Polars", "polars"), ("Pandas", "pandas"), ("Ibis", "duckdb")]
 )
-def test_get_dataframe_missing_libraries(library, tbl_type):
-
+def test_get_dataframe_report_missing_libraries(library, tbl_type):
     validation = Validate(data="small_table")
 
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = False  # library not present
 
         with pytest.raises(ImportError, match=f"The {library} library is not installed"):
-            validation.get_dataframe(tbl_type)
+            validation.get_dataframe_report(tbl_type)
 
 
-def test_get_dataframe_returns_polars_df():
+def test_get_dataframe_report_returns_polars_df():
     validation = Validate(data="small_table")
-    df_polars = validation.get_dataframe("polars")
+    df_polars = validation.get_dataframe_report("polars")
     assert isinstance(df_polars, pl.DataFrame)
 
 
-def test_get_dataframe_returns_pandas_df():
+def test_get_dataframe_report_returns_pandas_df():
     validation = Validate(data="small_table")
-    df_pandas = validation.get_dataframe("pandas")
+    df_pandas = validation.get_dataframe_report("pandas")
     assert isinstance(df_pandas, pd.DataFrame)
 
 
-def test_get_dataframe_returns_ibis_memtable():
+def test_get_dataframe_report_returns_ibis_memtable():
     validation = Validate(data="small_table")
-    df_ibis = validation.get_dataframe("duckdb")
+    df_ibis = validation.get_dataframe_report("duckdb")
     assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
-# TODO: MEGHAN - test col names, brief coalescing, values to dict check, test inactive steps output, empty validation check
 
 def get_schema_info(
     data_tbl,
@@ -19359,7 +19357,6 @@ def test_col_vals_ge_timezone_datetime_duckdb() -> None:
 
     finally:
         conn.close()
-        os.unlink(temp_db_path)
 
 
 @pytest.mark.xfail(reason="Mixed timezone comparisons may not work correctly yet")
