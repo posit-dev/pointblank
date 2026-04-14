@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 
 [tool.setuptools.packages.find]
-include = ["pointblank"]
+include = ["pointblank", "pointblank.*"]
 
 [project]
 name = "pointblank"
@@ -59,6 +59,10 @@ generate = [
     "shiny>=1.3.0",
 ]
 mcp = ["mcp[cli]>=1.10.1", "fastmcp>=2.11.3", "pytest-asyncio>=1.0.0"]
+otel = [
+    "opentelemetry-api>=1.22.0",
+    "opentelemetry-sdk>=1.22.0",
+]
 
 excel = ["openpyxl>=3.0.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
@@ -131,6 +135,9 @@ pb = "pointblank.cli:cli"
 minversion = "6.0"
 addopts = "-ra --cov=pointblank"
 testpaths = ["tests"]
+markers = [
+    "otel: OpenTelemetry integration tests",
+]
 
 [tool.ruff]
 line-length = 100
