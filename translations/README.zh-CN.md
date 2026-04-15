@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # 示例数据集
 
 # 使用 DraftValidation 生成验证计划
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 输出是基于您的数据的具有智能建议的完整验证计划：
