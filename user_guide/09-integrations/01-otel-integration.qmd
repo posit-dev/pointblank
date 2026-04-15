@@ -169,6 +169,7 @@ are perfect for exploration: they capture every metric, span, and log record in 
 can print them without running a collector.
 
 ```{python}
+#| eval: false
 import polars as pl
 import pointblank as pb
 from pointblank.integrations.otel import OTelExporter
@@ -204,6 +205,7 @@ negative amount, a zero amount, and a missing customer name), validate it, and t
 results.
 
 ```{python}
+#| eval: false
 df = pl.DataFrame(
     {
         "order_id": [101, 102, 103, 104, 105],
@@ -232,6 +234,7 @@ The report shows two steps with failures. Now we create an `OTelExporter` with a
 enabled and export the validation results.
 
 ```{python}
+#| eval: false
 otel = OTelExporter(
     meter_provider=meter_provider,
     tracer_provider=tracer_provider,
@@ -253,6 +256,7 @@ The metric reader holds all counters, gauges, and histograms that were recorded.
 through them to see every instrument and its current value.
 
 ```{python}
+#| eval: false
 metrics_data = metric_reader.get_metrics_data()
 
 for resource_metrics in metrics_data.resource_metrics:
@@ -272,6 +276,7 @@ that would appear in Prometheus, Datadog, or any OTel-compatible metrics backend
 Each `interrogate()` call produces a root span with one child per validation step:
 
 ```{python}
+#| eval: false
 spans = span_exporter.get_finished_spans()
 
 for span in spans:
@@ -294,6 +299,7 @@ Log records are emitted for each validation step that exceeds a threshold. The s
 record corresponds to the highest threshold level breached by that step.
 
 ```{python}
+#| eval: false
 logs = log_exporter.get_finished_logs()
 
 for log in logs:
@@ -309,6 +315,7 @@ Elasticsearch, or CloudWatch) where you can search and alert on them.
 
 ```{python}
 #| echo: false
+#| eval: false
 meter_provider.shutdown()
 tracer_provider.shutdown()
 logger_provider.shutdown()
