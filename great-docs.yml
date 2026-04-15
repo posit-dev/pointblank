@@ -269,3 +269,13 @@ reference:
         Prebuilt action functions for common notification patterns.
       contents:
         - send_slack_notification
+        - emit_otel
+
+    - title: Integrations
+      desc: >
+        Classes for integrating Pointblank with external observability and monitoring
+        systems. Use `OTelExporter` to export validation results as OpenTelemetry
+        metrics, traces, and logs.
+      contents:
+        - name: integrations.otel.OTelExporter
+          members: true
