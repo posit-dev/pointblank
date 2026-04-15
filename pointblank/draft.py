@@ -37,7 +37,7 @@ class DraftValidation:
         The data to be used for drafting a validation plan.
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     api_key
         The API key to be used for the model.
@@ -103,7 +103,7 @@ class DraftValidation:
     # Disable SSL verification for networks with self-signed certificates
     pb.DraftValidation(
         data=data,
-        model="anthropic:claude-sonnet-4-5",
+        model="anthropic:claude-opus-4-6",
         verify_ssl=False
     )
     ```
@@ -140,7 +140,7 @@ class DraftValidation:
     Let's look at how the `DraftValidation` class can be used to draft a validation plan for a
     table. The table to be used is `"nycflights"`, which is available here via the
     [`load_dataset()`](`pointblank.load_dataset`) function. The model to be used is
-    `"anthropic:claude-sonnet-4-5"` (which performs very well compared to other LLMs). The
+    `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The
     example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
     ```python
@@ -150,7 +150,7 @@ class DraftValidation:
     data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
     # Draft a validation plan for the "nycflights" table
-    pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+    pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
     ```
 
     The output will be a drafted validation plan for the `"nycflights"` table and this will appear

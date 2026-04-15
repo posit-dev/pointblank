@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # مجموعة بيانات عينة
 
 # استخدم DraftValidation لإنشاء خطة تحقق
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 الناتج هو خطة تحقق كاملة مع اقتراحات ذكية مبنية على بياناتك:

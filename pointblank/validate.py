@@ -10928,7 +10928,7 @@ class Validate:
             so try to include only the columns necessary for the validation.
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
-            `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+            `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
             `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific
             model to be used from the provider (for `"azure-openai"`, the value after the colon is
             the Azure *deployment id*). Model names are subject to change so consult the provider's

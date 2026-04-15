@@ -601,7 +601,7 @@ products = pl.DataFrame({
     .prompt(
         prompt="Each description should mention either quality, features, or warranty",
         columns_subset=["description"],
-        model="anthropic:claude-sonnet-4-5"
+        model="anthropic:claude-opus-4-6"
     )
     .interrogate()
 )

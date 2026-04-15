@@ -1,15 +1,6 @@
 import inspect
 import re
 from pathlib import Path
-from typing import Optional
-from urllib.parse import urljoin
-
-try:
-    import requests
-
-    SCRAPING_AVAILABLE = True
-except ImportError:
-    SCRAPING_AVAILABLE = False
 
 
 def get_api_details(module, exported_list) -> str:
@@ -335,7 +326,7 @@ table information, and timing details."""
 def _get_examples_text() -> str:
     """
     Get the examples for the Pointblank library. These examples are extracted from the Quarto
-    documents in the `docs/demos` directory.
+    documents in the `examples` directory.
 
     Returns
     -------
@@ -349,65 +340,44 @@ def _get_examples_text() -> str:
         f"{sep_line}\nThis is a set of examples for the Pointblank library.\n{sep_line}\n\n"
     )
 
-    # A large set of examples is available in the docs/demos directory, and each of the
-    # subdirectories contains a different example (in the form of a Quarto document)
+    # Examples are organized in the examples/ directory under category subdirectories,
+    # each containing Quarto documents with title and description in YAML front matter
 
-    example_dirs = [
-        "01-starter",
-        "02-advanced",
-        "03-data-extracts",
-        "04-sundered-data",
-        "05-step-report-column-check",
-        "06-step-report-schema-check",
-        "apply-checks-to-several-columns",
-        "check-row-column-counts",
-        "checks-for-missing",
-        "col-vals-custom-expr",
-        "column-selector-functions",
-        "comparisons-across-columns",
-        "expect-no-duplicate-rows",
-        "expect-no-duplicate-values",
-        "expect-text-pattern",
-        "failure-thresholds",
-        "mutate-table-in-step",
-        "numeric-comparisons",
-        "schema-check",
-        "set-membership",
-        "using-parquet-data",
-    ]
+    examples_dir = Path("examples")
 
-    for example_dir in example_dirs:
-        link = f"https://posit-dev.github.io/pointblank/demos/{example_dir}/"
+    # Collect all .qmd files from category subdirectories, sorted for deterministic order
+    example_files = sorted(examples_dir.glob("*/*.qmd"))
 
-        # Read in the index.qmd file for each example
-        with open(f"docs/demos/{example_dir}/index.qmd", "r") as f:
-            example_text = f.read()
+    for example_file in example_files:
+        # Build the link URL from the file path (e.g., examples/01-getting-started/starter.html)
+        link = (
+            f"https://posit-dev.github.io/pointblank/"
+            f"{example_file.parent.name}/{example_file.stem}.html"
+        )
 
-            # Remove the first eight lines of the example text (contains the YAML front matter)
-            example_text = "\n".join(example_text.split("\n")[8:])
+        example_text = example_file.read_text()
 
-            # Extract the title of the example (the line beginning with `###`)
-            title_match = re.search(r"### (.*)", example_text)
-            assert title_match is not None
-            title = title_match.group(1)
+        # Extract title and description from YAML front matter
+        title_match = re.search(r'^title:\s*"(.+?)"', example_text, re.MULTILINE)
+        desc_match = re.search(r'^description:\s*"(.+?)"', example_text, re.MULTILINE)
 
-            # The next line with text is the short description of the example
-            desc_match = re.search(r"(.*)\.", example_text)
-            assert desc_match is not None
-            desc = desc_match.group(1)
+        if not title_match or not desc_match:
+            continue
 
-            # Get all of the Python code blocks in the example
-            # these can be identified as starting with ```python and ending with ```
-            code_blocks = re.findall(r"```python\n(.*?)```", example_text, re.DOTALL)
+        title = title_match.group(1)
+        desc = desc_match.group(1)
 
-            # Wrap each code block with a leading ```python and trailing ```
-            code_blocks = [f"```python\n{code}```" for code in code_blocks]
+        # Get the plain ```python code blocks (not ```{python} executable blocks)
+        code_blocks = re.findall(r"```python\n(.*?)```", example_text, re.DOTALL)
 
-            # Collapse all code blocks into a single string
-            code_text = "\n\n".join(code_blocks)
+        # Wrap each code block with a leading ```python and trailing ```
+        code_blocks = [f"```python\n{code}```" for code in code_blocks]
 
-            # Add the example title, description, and code to the examples text
-            examples_text += f"### {title} ({link})\n\n{desc}\n\n{code_text}\n\n"
+        # Collapse all code blocks into a single string
+        code_text = "\n\n".join(code_blocks)
+
+        # Add the example title, description, and code to the examples text
+        examples_text += f"### {title} ({link})\n\n{desc}\n\n{code_text}\n\n"
 
     return examples_text
 
@@ -426,295 +396,3 @@ def _get_api_and_examples_text() -> str:
     examples_text = _get_examples_text()
 
     return f"{api_text}\n\n{examples_text}"
-
-
-def scrape_examples_index(base_url: str = "https://posit-dev.github.io/pointblank/") -> list[dict]:
-    """
-    Parse the examples index page from local .qmd file to extract demo titles and descriptions.
-
-    Parameters
-    ----------
-    base_url : str
-        The base URL of the Pointblank documentation site.
-
-    Returns
-    -------
-    list[dict]
-        A list of dictionaries with 'title', 'description', and 'url' keys.
-    """
-    examples = []
-
-    # Read from local file
-    qmd_path = Path(__file__).parent.parent / "docs" / "demos" / "index.qmd"
-
-    if not qmd_path.exists():
-        # Fallback to web scraping if local file doesn't exist
-        if not SCRAPING_AVAILABLE:
-            raise ImportError(
-                "requests is required for web scraping. Install it with: pip install requests"
-            )
-        demos_url = urljoin(base_url, "demos/")
-        response = requests.get(demos_url)
-        response.raise_for_status()
-        content = response.text
-    else:
-        with open(qmd_path, "r") as f:
-            content = f.read()
-
-    # Pattern to match the example structure in the .qmd file:
-    # [Title](./path/index.qmd)
-    # ... potentially an image ...
-    # <p ...>Description</p>
-
-    # First, get the grid-based examples with images
-    grid_pattern = r"\[([^\]]+)\]\(\./([^)]+)/index\.qmd\).*?<p[^>]*>(.*?)</p>"
-    matches = re.findall(grid_pattern, content, re.DOTALL)
-
-    for title, path, description in matches:
-        url = urljoin(base_url, f"demos/{path}/")
-        # Clean up description
-        desc_clean = re.sub(r"<[^>]+>", "", description).strip()
-        examples.append({"title": title.strip(), "description": desc_clean, "url": url})
-
-    # Also get the list-style examples (after the <hr>)
-    list_pattern = r"\[([^\]]+)\]\(\./([^)]+)/index\.qmd\)<br>\s*([^\n]+)"
-    list_matches = re.findall(list_pattern, content)
-
-    for title, path, description in list_matches:
-        url = urljoin(base_url, f"demos/{path}/")
-        examples.append({"title": title.strip(), "description": description.strip(), "url": url})
-
-    return examples
-
-
-def scrape_api_reference_index(
-    base_url: str = "https://posit-dev.github.io/pointblank/",
-) -> list[dict]:
-    """
-    Parse the API reference index page from local .qmd file to extract function/class names and descriptions.
-
-    Parameters
-    ----------
-    base_url : str
-        The base URL of the Pointblank documentation site.
-
-    Returns
-    -------
-    list[dict]
-        A list of dictionaries with 'title', 'description', and 'url' keys.
-    """
-    api_items = []
-
-    # Read from local file
-    qmd_path = Path(__file__).parent.parent / "docs" / "reference" / "index.qmd"
-
-    if not qmd_path.exists():
-        # Fallback to web scraping if local file doesn't exist
-        if not SCRAPING_AVAILABLE:
-            raise ImportError(
-                "requests is required for web scraping. Install it with: pip install requests"
-            )
-        reference_url = urljoin(base_url, "reference/")
-        response = requests.get(reference_url)
-        response.raise_for_status()
-        content = response.text
-    else:
-        with open(qmd_path, "r") as f:
-            content = f.read()
-
-    # Pattern to match the API reference structure in the .qmd file:
-    # | [Function](path.qmd#anchor) | Description |
-
-    table_row_pattern = r"\| \[([^\]]+)\]\(([^)]+)\) \| ([^\|]+) \|"
-    matches = re.findall(table_row_pattern, content)
-
-    for title, path, description in matches:
-        # Extract just the filename without the anchor and change .qmd to .html
-        file_path = path.split("#")[0]
-        if file_path.endswith(".qmd"):
-            file_path = file_path[:-4] + ".html"
-        url = urljoin(base_url, f"reference/{file_path}")
-
-        api_items.append({"title": title.strip(), "description": description.strip(), "url": url})
-
-    return api_items
-
-
-def generate_llms_txt(
-    base_url: str = "https://posit-dev.github.io/pointblank/",
-    include_user_guide: bool = True,
-) -> str:
-    """
-    Generate the llms.txt content for the Pointblank project.
-
-    Parameters
-    ----------
-    base_url : str
-        The base URL of the Pointblank documentation site.
-    include_user_guide : bool
-        Whether to include user guide pages in the output.
-
-    Returns
-    -------
-    str
-        The llms.txt formatted content.
-    """
-    if not SCRAPING_AVAILABLE:
-        raise ImportError(
-            "requests is required for web scraping. Install it with: pip install requests"
-        )
-
-    lines = ["# Pointblank", "", "## Docs", ""]
-
-    # Add examples section
-    try:
-        examples = scrape_examples_index(base_url)
-        if examples:
-            lines.append("### Examples")
-            lines.append("")
-            for ex in examples:
-                desc = f": {ex['description']}" if ex["description"] else ""
-                lines.append(f"- [{ex['title']}]({ex['url']}){desc}")
-            lines.append("")
-    except Exception as e:
-        print(f"Warning: Failed to scrape examples index: {e}")
-
-    # Add API reference section
-    try:
-        api_items = scrape_api_reference_index(base_url)
-        if api_items:
-            lines.append("### API Reference")
-            lines.append("")
-            for item in api_items:
-                desc = f": {item['description']}" if item["description"] else ""
-                lines.append(f"- [{item['title']}]({item['url']}){desc}")
-            lines.append("")
-    except Exception as e:
-        print(f"Warning: Failed to scrape API reference: {e}")
-
-    # If user guide is requested, scrape it too
-    if include_user_guide:
-        try:
-            user_guide_items = scrape_user_guide_index(base_url)
-            if user_guide_items:
-                lines.append("### User Guide")
-                lines.append("")
-                for item in user_guide_items:
-                    desc = f": {item['description']}" if item["description"] else ""
-                    lines.append(f"- [{item['title']}]({item['url']}){desc}")
-        except Exception as e:
-            print(f"Warning: Failed to scrape user guide: {e}")
-
-    return "\n".join(lines)
-
-
-def scrape_user_guide_index(
-    base_url: str = "https://posit-dev.github.io/pointblank/",
-) -> list[dict]:
-    """
-    Get the user guide pages from local directory listing.
-
-    Parameters
-    ----------
-    base_url : str
-        The base URL of the Pointblank documentation site.
-
-    Returns
-    -------
-    list[dict]
-        A list of dictionaries with 'title', 'description', and 'url' keys.
-    """
-    guide_items = []
-
-    # Read from local directory
-    user_guide_dir = Path(__file__).parent.parent / "docs" / "user-guide"
-
-    if not user_guide_dir.exists():
-        return guide_items
-
-    # Get all .qmd files (excluding index.qmd)
-    qmd_files = sorted([f for f in user_guide_dir.glob("*.qmd") if f.name != "index.qmd"])
-
-    for qmd_file in qmd_files:
-        # Read the file to extract title
-        with open(qmd_file, "r") as f:
-            content = f.read()
-
-        # Try to extract title from YAML frontmatter
-        title_match = re.search(r'^title:\s*["\']?([^"\'\n]+)["\']?', content, re.MULTILINE)
-        if title_match:
-            title = title_match.group(1).strip()
-        else:
-            # Fallback to filename
-            title = qmd_file.stem.replace("-", " ").title()
-
-        # Try to extract first paragraph as description (optional)
-        # Skip code blocks and look for first real content
-        description = ""
-
-        url = urljoin(base_url, f"user-guide/{qmd_file.stem}.html")
-
-        guide_items.append({"title": title, "description": description, "url": url})
-
-    return guide_items
-
-
-def generate_llms_full_txt(output_path: Optional[str] = None) -> str:
-    """
-    Generate the llms-full.txt content using the existing api-docs.txt file or by generating
-    the API and examples text.
-
-    Parameters
-    ----------
-    output_path : str, optional
-        Path to save the generated content. If None, content is returned but not saved.
-
-    Returns
-    -------
-    str
-        The llms-full.txt formatted content.
-    """
-    # Try to use existing api-docs.txt first
-    api_docs_path = Path(__file__).parent / "data" / "api-docs.txt"
-
-    if api_docs_path.exists():
-        with open(api_docs_path, "r") as f:
-            content = f.read()
-    else:
-        # Generate the content
-        content = _get_api_and_examples_text()
-
-    if output_path:
-        with open(output_path, "w") as f:
-            f.write(content)
-
-    return content
-
-
-def main() -> None:
-    """
-    Main function to generate both llms.txt and llms-full.txt files.
-    """
-    # Generate llms.txt
-    print("Generating llms.txt...")
-    try:
-        llms_content = generate_llms_txt()
-        llms_path = Path(__file__).parent.parent / "docs" / "llms.txt"
-        with open(llms_path, "w") as f:
-            f.write(llms_content)
-        print(f"✓ Generated {llms_path}")
-    except Exception as e:
-        print(f"✗ Failed to generate llms.txt: {e}")
-
-    # Generate llms-full.txt
-    print("\nGenerating llms-full.txt...")
-    try:
-        llms_full_path = Path(__file__).parent.parent / "docs" / "llms-full.txt"
-        generate_llms_full_txt(str(llms_full_path))
-        print(f"✓ Generated {llms_full_path}")
-    except Exception as e:
-        print(f"✗ Failed to generate llms-full.txt: {e}")
-
-
-if __name__ == "__main__":
-    main()
