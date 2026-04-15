@@ -511,7 +511,7 @@ def string_length_calculator(column_name):
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">1</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-IDEwLDEzIEwxMCw1MSBDMTAsNTIuNjUyMzQ0IDExLjM0NzY1Niw1NCAxMyw1NCBMNTEsNTQgQzUyLjY1MjM0NCw1NCA1NCw1Mi42NTIzNDQgNTQsNTEgTDU0LDEzIEM1NCwxMS4zNDc2NTYgNTIuNjUyMzQ0LDEwIDUxLDEwIFogTTM4LjcwNzAzMSw0NS4yOTI5NjkgTDM3LjI5Mjk2OSw0Ni43MDcwMzEgTDIyLjU4NTkzOCwzMiBMMzcuMjkyOTY5LDE3LjI5Mjk2OSBMMzguNzA3MDMxLDE4LjcwNzAzMSBMMjUuNDE0MDYzLDMyIEwzOC43MDcwMzEsNDUuMjkyOTY5IFoiIGlkPSJsZXNzX3RoYW4iIGZpbGw9IiMwMDAwMDAiIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
+<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Ym94PSIwIDAgNjcgNjciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgc3R5bGU9ImJhY2tncm91bmQ6ICNGRkZGRkY7Ij4KICAgIDx0aXRsZT5jb2xfdmFsc19sdDwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJjb2xfdmFsc19sdCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS41MDAwMDAsIDEuNTAwMDAwKSIgZmlsbC1ydWxlPSJub256ZXJvIj4KICAgICAgICAgICAgPHBhdGggZD0iTTU1LDAgQzU3LjQ4NTI4MTMsMCA1OS43MzUyODEzLDEuMDA3MzU5MzEgNjEuMzYzOTYxLDIuNjM2MDM4OTcgQzYyLjk5MjY0MDcsNC4yNjQ3MTg2MyA2NCw2LjUxNDcxODYzIDY0LDkgTDY0LDkgTDY0LDY0IEw5LDY0IEM2LjUxNDcxODYyLDY0IDQuMjY0NzE4NjIsNjIuOTkyNjQwNyAyLjYzNjAzODk3LDYxLjM2Mzk2MSBDMS4wMDczNTkzMSw1OS43MzUyODE0IDAsNTcuNDg1MjgxNCAwLDU1IEwwLDU1IEwwLDkgQzAsNi41MTQ3MTg2MyAxLjAwNzM1OTMxLDQuMjY0NzE4NjMgMi42MzYwMzg5NywyLjYzNjAzODk3IEM0LjI2NDcxODYyLDEuMDA3MzU5MzEgNi41MTQ3MTg2MiwwIDksMCBMOSwwIEw1NSwwIFoiIGlkPSJyZWN0YW5nbGUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSIjRkZGRkZGIiAvPgogICAgICAgICAgICA8cGF0aCBkPSJNNTEsMTAgTDEzLDEwIEMxMS4zNDc2NTYsMTAgMTAsMTEuMzQ3NjU2IDEwLDEzIEwxMCw1MSBDMTAsNTIuNjUyMzQ0IDExLjM0NzY1Niw1NCAxMyw1NCBMNTEsNTQgQzUyLjY1MjM0NCw1NCA1NCw1Mi42NTIzNDQgNTQsNTEgTDU0LDEzIEM1NCwxMS4zNDc2NTYgNTIuNjUyMzQ0LDEwIDUxLDEwIFogTTM4LjcwNzAzMSw0NS4yOTI5NjkgTDM3LjI5Mjk2OSw0Ni43MDcwMzEgTDIyLjU4NTkzOCwzMiBMMzcuMjkyOTY5LDE3LjI5Mjk2OSBMMzguNzA3MDMxLDE4LjcwNzAzMSBMMjUuNDE0MDYzLDMyIEwzOC43MDcwMzEsNDUuMjkyOTY5IFoiIGlkPSJsZXNzX3RoYW4iIGZpbGw9IiMwMDAwMDAiIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
 
 col_vals_lt()
 
@@ -680,9 +680,9 @@ shape: (3, 2)
 | f      | n   |
 |--------|-----|
 | str    | u32 |
+| "low"  | 5   |
 | "high" | 6   |
 | "mid"  | 2   |
-| "low"  | 5   |
 
 
 Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:

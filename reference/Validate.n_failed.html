@@ -985,6 +985,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1072,7 +1092,7 @@ A dictionary of the number of failing test units for each validation step or a s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps and, as it turns out, all of them will have failing test units. After interrogation, the <a href="Validate.n_failed.html#pointblank.Validate.n_failed" class="gdls-link gdls-code">n_failed()</a> method is used to determine the number of failing test units for each validation step.</p>
-<div id="54b03c7f" class="cell" data-execution_count="1">
+<div id="3880d886" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1099,7 +1119,7 @@ A dictionary of the number of failing test units for each validation step or a s
 </div>
 <p>The returned dictionary shows that all validation steps had failing test units.</p>
 <p>If we wanted to check the number of failing test units for a single validation step, we can provide the step number. Also, we could forego the dictionary and get a scalar value by setting <code>scalar=True</code> (ensuring that <code>i=</code> is a scalar).</p>
-<div id="a5e8e23e" class="cell" data-execution_count="2">
+<div id="f18860e4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.n_failed(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{1: 1}</code></pre>

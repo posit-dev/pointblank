@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1125,7 +1145,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples here, we’ll use the built in dataset <code>"small_table"</code>. The table can be obtained by calling <code>load_dataset("small_table")</code>.</p>
-<div id="016a9e0a" class="cell" data-execution_count="2">
+<div id="29f893b7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -1335,7 +1355,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Let’s validate that the number of rows in the table matches a fixed value. In this case, we will use the value <code>13</code> as the expected row count.</p>
-<div id="a1063e45" class="cell" data-execution_count="3">
+<div id="0173374d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>small_table)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .row_count_match(count<span class="op">=</span><span class="dv">13</span>)</span>
@@ -1491,7 +1511,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>The validation table shows that the expectation value of <code>13</code> matches the actual count of rows in the target table. So, the single test unit passed.</p>
 <p>Let’s modify our example to show the different ways we can allow some tolerance to our validation by using the <code>tol</code> argument.</p>
-<div id="829618b9" class="cell" data-execution_count="4">
+<div id="b8bb791d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>smaller_small_table <span class="op">=</span> small_table.sample(n <span class="op">=</span> <span class="dv">12</span>) <span class="co"># within the lower bound</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>smaller_small_table)</span>

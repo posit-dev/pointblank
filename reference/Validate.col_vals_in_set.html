@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1140,7 +1160,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with two numeric columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="446ddf95" class="cell" data-execution_count="2">
+<div id="fe1de5ee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1261,7 +1281,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all in the set of <code>[2, 3, 4, 5, 6]</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="cff7e55c" class="cell" data-execution_count="3">
+<div id="ea3eba35" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"a"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</span>
@@ -1412,7 +1432,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>. All test units passed, and there are no failing test units.</p>
 <p>Now, let’s use that same set of values for a validation on column <code>b</code>.</p>
-<div id="9f15c0a0" class="cell" data-execution_count="4">
+<div id="45380831" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"b"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</span>
@@ -1564,7 +1584,7 @@ segments=["region", "date"]</code></pre>
 <p>The validation table reports two failing test units. The specific failing cases are for the column <code>b</code> values of <code>8</code> and <code>1</code>, which are not in the set of <code>[2, 3, 4, 5, 6]</code>.</p>
 <p><strong>Using Python Enums</strong></p>
 <p>The <a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> method also supports Python Enum classes and instances, which can make validations more readable and maintainable:</p>
-<div id="38d16109" class="cell" data-execution_count="5">
+<div id="d87a3693" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> enum <span class="im">import</span> Enum</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Color(Enum):</span>
@@ -1729,7 +1749,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>This validation will fail for the <code>"yellow"</code> value since it’s not in the <code>Color</code> enum.</p>
 <p>You can also use specific Enum instances or mix them with regular values:</p>
-<div id="9a366e5e" class="cell" data-execution_count="6">
+<div id="9b8d9f53" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate using specific Enum instances</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_colors)</span>

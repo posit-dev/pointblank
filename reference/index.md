@@ -416,3 +416,16 @@ Prebuilt action functions for common notification patterns.
 
 [send_slack_notification()](send_slack_notification.md#pointblank.send_slack_notification)  
 Create a Slack notification function using a webhook URL.
+
+[emit_otel()](emit_otel.md#pointblank.emit_otel)  
+Create an OTel export action for use in `FinalActions`.
+
+
+## Integrations
+
+
+Classes for integrating Pointblank with external observability and monitoring systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.
+
+
+[integrations.otel.OTelExporter](integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter)  
+Export Pointblank validation results as OpenTelemetry signals.

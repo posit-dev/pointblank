@@ -194,6 +194,14 @@ Generate synthetic test data based on schema definitions. Use [generate_dataset(
 Prebuilt action functions for common notification patterns.
 
 - [send_slack_notification](reference/send_slack_notification.html#pointblank.send_slack_notification): Create a Slack notification function using a webhook URL
+- [emit_otel](reference/emit_otel.html#pointblank.emit_otel): Create an OTel export action for use in [FinalActions](reference/FinalActions.html#pointblank.FinalActions)
+
+
+## Integrations
+
+Classes for integrating Pointblank with external observability and monitoring systems. Use [OTelExporter](reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter) to export validation results as OpenTelemetry metrics, traces, and logs.
+
+- [integrations.otel.OTelExporter](reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter)
 
 
 # Resources

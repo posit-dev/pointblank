@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1084,7 +1104,7 @@ If any of the provided column names is not a string or list of strings.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Using <a href="has_columns.html#pointblank.has_columns" class="gdls-link gdls-code">has_columns()</a> with the <code>active=</code> parameter to conditionally run a validation step:</p>
-<div id="42cf4947" class="cell" data-execution_count="2">
+<div id="632aca7c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1290,7 +1310,7 @@ If any of the provided column names is not a string or list of strings.
 </div>
 <p>The first step ran because column <code>a</code> exists. The second step was skipped because column <code>z</code> is missing, and the report note explains which column was not found.</p>
 <p>When checking for multiple columns, the step is only active when <em>all</em> columns are present:</p>
-<div id="0e696e91" class="cell" data-execution_count="3">
+<div id="b82b2b4f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>, <span class="st">"b"</span>))</span>
@@ -1491,7 +1511,7 @@ If any of the provided column names is not a string or list of strings.
 </div>
 <p>The first step is active because both <code>a</code> and <code>b</code> exist. The second step is skipped because <code>x</code> and <code>y</code> are missing.</p>
 <p>Column names can also be provided as a list:</p>
-<div id="e14622a7" class="cell" data-execution_count="4">
+<div id="bdd06cbb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns([<span class="st">"a"</span>, <span class="st">"b"</span>]))</span>

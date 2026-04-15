@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1067,7 +1087,7 @@ A reference column marker that indicates the value should be computed from the r
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Suppose we have two DataFrames: a current data table and a reference (historical) table. We want to validate that the sum of a column in the current data matches the sum of the same column in the reference data.</p>
-<div id="19eee66a" class="cell" data-execution_count="2">
+<div id="f8fcfdff" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1231,7 +1251,7 @@ A reference column marker that indicates the value should be computed from the r
 </div>
 </div>
 <p>You can also compare different columns or use tolerance:</p>
-<div id="2a0dc70f" class="cell" data-execution_count="3">
+<div id="06ddffa1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>current_data <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="dv">105</span>, <span class="dv">205</span>, <span class="dv">305</span>]})</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>reference_data <span class="op">=</span> pl.DataFrame({<span class="st">"sales"</span>: [<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">300</span>]})</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

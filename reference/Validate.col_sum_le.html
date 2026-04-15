@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1136,7 +1156,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples, we’ll use a simple Polars DataFrame with numeric columns. The table is shown below:</p>
-<div id="70b51cea" class="cell" data-execution_count="2">
+<div id="aad964c8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1252,7 +1272,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Let’s validate that the sum of column <code>a</code> is at most <code>15</code>:</p>
-<div id="c9f7737b" class="cell" data-execution_count="3">
+<div id="efb7f0df" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_le(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">15</span>)</span>
@@ -1408,7 +1428,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>The validation result shows whether the sum comparison passed or failed. Since this is an aggregation-based validation, there is exactly one test unit per column.</p>
 <p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="8df5c236" class="cell" data-execution_count="4">
+<div id="ad238aeb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_le(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">15</span>)</span>
@@ -1609,7 +1629,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Using tolerance for flexible comparisons:</p>
-<div id="33555e89" class="cell" data-execution_count="5">
+<div id="afa52b58" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_le(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">15</span>, tol<span class="op">=</span><span class="fl">1.0</span>)</span>

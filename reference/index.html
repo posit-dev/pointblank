@@ -938,6 +938,26 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -962,6 +982,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#utility-functions" id="toc-utility-functions" class="nav-link" data-scroll-target="#utility-functions">Utility Functions</a></li>
   <li><a href="#test-data-generation" id="toc-test-data-generation" class="nav-link" data-scroll-target="#test-data-generation">Test Data Generation</a></li>
   <li><a href="#prebuilt-actions" id="toc-prebuilt-actions" class="nav-link" data-scroll-target="#prebuilt-actions">Prebuilt Actions</a></li>
+  <li><a href="#integrations" id="toc-integrations" class="nav-link" data-scroll-target="#integrations">Integrations</a></li>
   </ul>
 </nav>
     </div>
@@ -1524,6 +1545,22 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="doc-function doc-label doc-label-function">send_slack_notification()</a></dt>
 <dd>
 <p>Create a Slack notification function using a webhook URL.</p>
+</dd>
+<dt><a href="../reference/emit_otel.html#pointblank.emit_otel" class="doc-function doc-label doc-label-function">emit_otel()</a></dt>
+<dd>
+<p>Create an OTel export action for use in <code>FinalActions</code>.</p>
+</dd>
+</dl>
+</section>
+<section id="integrations" class="level2 doc-group">
+<h2 class="doc-group">Integrations</h2>
+<div class="doc-description">
+<p>Classes for integrating Pointblank with external observability and monitoring systems. Use <code>OTelExporter</code> to export validation results as OpenTelemetry metrics, traces, and logs.</p>
+</div>
+<dl>
+<dt><a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="doc-class doc-label doc-label-class">integrations.otel.OTelExporter</a></dt>
+<dd>
+<p>Export Pointblank validation results as OpenTelemetry signals.</p>
 </dd>
 </dl>
 

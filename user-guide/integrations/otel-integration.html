@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>OpenTelemetry Integration – Pointblank | Pointblank</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/mcp-server/mcp-quick-start.html" rel="prev">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5864d2c5cf85e8c6f619c1992905b265.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="../../theme-init.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html">
+  <meta name="description" content="OpenTelemetry (OTel) is the industry-standard framework for vendor-neutral observability. Pointblank can export validation results (pass/fail counts,...">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OpenTelemetry Integration – Pointblank | Pointblank">
+  <meta property="og:description" content="OpenTelemetry (OTel) is the industry-standard framework for vendor-neutral observability. Pointblank can export validation results (pass/fail counts,...">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OpenTelemetry Integration – Pointblank | Pointblank">
+  <meta name="twitter:description" content="OpenTelemetry (OTel) is the industry-standard framework for vendor-neutral observability. Pointblank can export validation results (pass/fail counts,...">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.23.0</code><br>Released 2026-04-01">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class=""></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/index.html"> 
+<span class="menu-text">API Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+    </span>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs">OpenTelemetry Integration</h1>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Getting Started</span></a>
+</div>
+      <ul id="quarto-sidebar-section-1" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/quickstart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quickstart</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validation Plan</span></a>
+</div>
+      <ul id="quarto-sidebar-section-2" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Methods</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/column-selection-patterns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Selection Patterns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/preprocessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preprocessing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/segmentation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Segmentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/briefs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Briefs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Advanced Validation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-3" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Expression-Based Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/schema-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Schema Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/assertions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assertions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/draft-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Draft Validation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">YAML</span></a>
+</div>
+      <ul id="quarto-sidebar-section-4" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Validation Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Post Interrogation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-5" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/validation-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/step-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/sundering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sundering Validated Data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Data Inspection</span></a>
+</div>
+      <ul id="quarto-sidebar-section-6" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previewing Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/col-summary-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Summaries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/missing-vals-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing Values Reporting</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Test Data Generation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-7" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/test-data-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Test Data Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">The Pointblank CLI</span></a>
+</div>
+      <ul id="quarto-sidebar-section-8" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Inspection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CLI Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">MCP Server</span></a>
+</div>
+      <ul id="quarto-sidebar-section-9" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP Quick Start</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-10" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">OpenTelemetry Integration</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#what-gets-exported" id="toc-what-gets-exported" class="nav-link" data-scroll-target="#what-gets-exported">What Gets Exported</a>
+  <ul class="collapse">
+  <li><a href="#metric-instruments" id="toc-metric-instruments" class="nav-link" data-scroll-target="#metric-instruments">Metric Instruments</a></li>
+  </ul></li>
+  <li><a href="#two-usage-patterns" id="toc-two-usage-patterns" class="nav-link" data-scroll-target="#two-usage-patterns">Two Usage Patterns</a>
+  <ul class="collapse">
+  <li><a href="#pattern-a-explicit-export" id="toc-pattern-a-explicit-export" class="nav-link" data-scroll-target="#pattern-a-explicit-export">Pattern A: Explicit Export</a></li>
+  <li><a href="#pattern-b-finalactions-automatic" id="toc-pattern-b-finalactions-automatic" class="nav-link" data-scroll-target="#pattern-b-finalactions-automatic">Pattern B: FinalActions (Automatic)</a></li>
+  </ul></li>
+  <li><a href="#working-example-with-console-output" id="toc-working-example-with-console-output" class="nav-link" data-scroll-target="#working-example-with-console-output">Working Example with Console Output</a>
+  <ul class="collapse">
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#run-validation-and-export" id="toc-run-validation-and-export" class="nav-link" data-scroll-target="#run-validation-and-export">Run Validation and Export</a></li>
+  <li><a href="#inspect-the-emitted-metrics" id="toc-inspect-the-emitted-metrics" class="nav-link" data-scroll-target="#inspect-the-emitted-metrics">Inspect the Emitted Metrics</a></li>
+  <li><a href="#inspect-the-trace-spans" id="toc-inspect-the-trace-spans" class="nav-link" data-scroll-target="#inspect-the-trace-spans">Inspect the Trace Spans</a></li>
+  <li><a href="#inspect-the-log-records" id="toc-inspect-the-log-records" class="nav-link" data-scroll-target="#inspect-the-log-records">Inspect the Log Records</a></li>
+  </ul></li>
+  <li><a href="#configuration-reference" id="toc-configuration-reference" class="nav-link" data-scroll-target="#configuration-reference">Configuration Reference</a>
+  <ul class="collapse">
+  <li><a href="#otelexporter-parameters" id="toc-otelexporter-parameters" class="nav-link" data-scroll-target="#otelexporter-parameters"><code>OTelExporter</code> Parameters</a></li>
+  <li><a href="#log-level-filtering" id="toc-log-level-filtering" class="nav-link" data-scroll-target="#log-level-filtering">Log Level Filtering</a></li>
+  </ul></li>
+  <li><a href="#bringing-your-own-provider" id="toc-bringing-your-own-provider" class="nav-link" data-scroll-target="#bringing-your-own-provider">Bringing Your Own Provider</a></li>
+  <li><a href="#pipeline-integration" id="toc-pipeline-integration" class="nav-link" data-scroll-target="#pipeline-integration">Pipeline Integration</a></li>
+  <li><a href="#example-promql-queries" id="toc-example-promql-queries" class="nav-link" data-scroll-target="#example-promql-queries">Example PromQL Queries</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">OpenTelemetry Integration</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>OpenTelemetry (OTel) is the industry-standard framework for vendor-neutral observability. Pointblank can export validation results (pass/fail counts, durations, threshold breaches) as OTel signals so they appear alongside your application metrics in Grafana, Datadog, New Relic, or any OTel-compatible backend.</p>
+<p>Instead of building separate integrations for each monitoring tool, one OTel export covers all of them. And when Pointblank runs inside an Airflow, Prefect, or Dagster task that already uses OTel instrumentation, validation spans appear inside the pipeline’s distributed trace automatically.</p>
+<section id="installation" class="level1">
+<h1>Installation</h1>
+<p>The OTel integration is an optional dependency. Install it with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">otel</span><span class="pp">]</span></span></code></pre></div>
+<p>This adds <code>opentelemetry-api</code> and <code>opentelemetry-sdk</code>. For sending data to a collector you’ll also need an exporter package, most commonly:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install opentelemetry-exporter-otlp-proto-grpc</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install opentelemetry-exporter-otlp-proto-http</span></code></pre></div>
+<p>With these packages installed, Pointblank can push signals to any OTel-compatible backend. The following section describes exactly what gets sent.</p>
+</section>
+<section id="what-gets-exported" class="level1">
+<h1>What Gets Exported</h1>
+<p>Pointblank maps its validation outputs onto three OTel signal types:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Signal</th>
+<th>What’s Exported</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Metrics</strong></td>
+<td>Pass/fail counters, pass rate gauge, step duration histogram, threshold breach counts</td>
+<td>Dashboards, alerting, SLA tracking</td>
+</tr>
+<tr class="even">
+<td><strong>Traces</strong></td>
+<td>A root span per <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> call with child spans per validation step</td>
+<td>Pipeline traceability, performance analysis</td>
+</tr>
+<tr class="odd">
+<td><strong>Logs</strong></td>
+<td>Structured log records for threshold breaches</td>
+<td>Incident investigation, audit trails</td>
+</tr>
+</tbody>
+</table>
+<p>Each signal type captures a different dimension of the validation run. Metrics provide aggregate counts and rates suitable for dashboards, traces capture timing and parent-child relationships for debugging, and logs produce structured records for incident review.</p>
+<section id="metric-instruments" class="level2">
+<h2 class="anchored" data-anchor-id="metric-instruments">Metric Instruments</h2>
+<p>The metrics signal is the most detailed. Twelve instruments cover step-level and aggregate statistics, all sharing a configurable name prefix (default: <code>pb.validation</code>).</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Metric Name</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>{prefix}.steps.total</code></td>
+<td>Counter</td>
+<td>Total validation steps executed</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.steps.passed</code></td>
+<td>Counter</td>
+<td>Steps where all test units passed</td>
+</tr>
+<tr class="odd">
+<td><code>{prefix}.steps.failed</code></td>
+<td>Counter</td>
+<td>Steps with at least one failure</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.test_units.total</code></td>
+<td>Counter</td>
+<td>Total test units evaluated</td>
+</tr>
+<tr class="odd">
+<td><code>{prefix}.test_units.passed</code></td>
+<td>Counter</td>
+<td>Test units that passed</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.test_units.failed</code></td>
+<td>Counter</td>
+<td>Test units that failed</td>
+</tr>
+<tr class="odd">
+<td><code>{prefix}.pass_rate</code></td>
+<td>Gauge</td>
+<td>Overall pass fraction (0–1)</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.step.duration</code></td>
+<td>Histogram</td>
+<td>Per-step processing duration (seconds)</td>
+</tr>
+<tr class="odd">
+<td><code>{prefix}.duration</code></td>
+<td>Gauge</td>
+<td>Total interrogation wall-clock time (seconds)</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.threshold.warning</code></td>
+<td>Counter</td>
+<td>Steps exceeding warning threshold</td>
+</tr>
+<tr class="odd">
+<td><code>{prefix}.threshold.error</code></td>
+<td>Counter</td>
+<td>Steps exceeding error threshold</td>
+</tr>
+<tr class="even">
+<td><code>{prefix}.threshold.critical</code></td>
+<td>Counter</td>
+<td>Steps exceeding critical threshold</td>
+</tr>
+</tbody>
+</table>
+<p>Every metric carries attributes derived from the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (<code>pb.tbl_name</code>, <code>pb.label</code>, <code>pb.owner</code>, <code>pb.version</code>) plus any <code>extra_attributes</code> you provide. Per-step metrics also include <code>pb.step.i</code>, <code>pb.step.assertion_type</code>, and <code>pb.step.column</code>.</p>
+<p>Together these instruments give you enough information to build dashboards, set alerts, and track data quality SLAs across every table Pointblank validates.</p>
+</section>
+</section>
+<section id="two-usage-patterns" class="level1">
+<h1>Two Usage Patterns</h1>
+<p>Pointblank offers two ways to export OTel signals, matching how different teams prefer to work.</p>
+<section id="pattern-a-explicit-export" class="level2">
+<h2 class="anchored" data-anchor-id="pattern-a-explicit-export">Pattern A: Explicit Export</h2>
+<p>Import <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a>, run your validation, then call <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link gdls-code">export()</a>. This gives you full control over when and how signals are emitted.</p>
+<div id="00d32930" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>df, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>otel <span class="op">=</span> OTelExporter(enable_metrics<span class="op">=</span><span class="va">True</span>, enable_tracing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>otel.export(validation)</span></code></pre></div>
+</div>
+<p>Because the export happens after <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a>, you can inspect the validation results first and decide whether to export at all. This pattern works well for ad-hoc analysis or when you want to conditionally emit signals based on the outcome.</p>
+</section>
+<section id="pattern-b-finalactions-automatic" class="level2">
+<h2 class="anchored" data-anchor-id="pattern-b-finalactions-automatic">Pattern B: FinalActions (Automatic)</h2>
+<p>Use <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> inside <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> so metrics are emitted automatically at the end of every <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> call (no extra code needed after the validation).</p>
+<div id="5e4cf3c0" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>df,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            pb.emit_otel(enable_metrics<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()  <span class="co"># metrics emitted here automatically</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>You can combine <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> with other final actions like <a href="../../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a>:</p>
+<div id="5fd105e2" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>df,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            pb.emit_otel(enable_metrics<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            pb.send_slack_notification(webhook_url<span class="op">=</span>os.environ[<span class="st">"SLACK_WEBHOOK"</span>]),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>Both patterns produce identical OTel output. Choose explicit export when you want manual control, and <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> when you want every validation run to emit signals automatically.</p>
+</section>
+</section>
+<section id="working-example-with-console-output" class="level1">
+<h1>Working Example with Console Output</h1>
+<p>Let’s walk through a complete example using in-memory providers so you can see exactly what gets emitted (no external collector needed).</p>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>Before exporting any signals we need OTel providers to receive them. The SDK’s in-memory providers are perfect for exploration: they capture every metric, span, and log record in Python lists so we can print them without running a collector.</p>
+<div id="6d0f5858" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace <span class="im">import</span> TracerProvider</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export <span class="im">import</span> SimpleSpanProcessor</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export.in_memory_span_exporter <span class="im">import</span> InMemorySpanExporter</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs <span class="im">import</span> LoggerProvider</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs.export <span class="im">import</span> InMemoryLogRecordExporter, SimpleLogRecordProcessor</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># In-memory providers capture signals without a collector</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>metric_reader <span class="op">=</span> InMemoryMetricReader()</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>meter_provider <span class="op">=</span> MeterProvider(metric_readers<span class="op">=</span>[metric_reader])</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>span_exporter <span class="op">=</span> InMemorySpanExporter()</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>tracer_provider <span class="op">=</span> TracerProvider()</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>log_exporter <span class="op">=</span> InMemoryLogRecordExporter()</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>logger_provider <span class="op">=</span> LoggerProvider()</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>logger_provider.add_log_record_processor(SimpleLogRecordProcessor(log_exporter))</span></code></pre></div>
+</div>
+<p>Each provider is paired with an in-memory reader or exporter that we’ll query later to see what was captured.</p>
+</section>
+<section id="run-validation-and-export" class="level2">
+<h2 class="anchored" data-anchor-id="run-validation-and-export">Run Validation and Export</h2>
+<p>With the providers ready, we’ll create a small DataFrame with some intentional quality issues (a negative amount, a zero amount, and a missing customer name), validate it, and then export the results.</p>
+<div id="22659ac6" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>, <span class="dv">105</span>],</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">29.99</span>, <span class="fl">150.00</span>, <span class="op">-</span><span class="fl">5.00</span>, <span class="fl">75.50</span>, <span class="fl">0.00</span>],</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="va">None</span>, <span class="st">"Dana"</span>, <span class="st">"Eve"</span>],</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>df,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Daily orders check"</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        owner<span class="op">=</span><span class="st">"data-platform-team"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>),</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+</div>
+<p>The report shows two steps with failures. Now we create an <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> with all three signal types enabled and export the validation results.</p>
+<div id="f6a387b0" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>otel <span class="op">=</span> OTelExporter(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    meter_provider<span class="op">=</span>meter_provider,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    tracer_provider<span class="op">=</span>tracer_provider,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    logger_provider<span class="op">=</span>logger_provider,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    enable_metrics<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    enable_tracing<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    enable_logging<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    extra_attributes<span class="op">=</span>{<span class="st">"env"</span>: <span class="st">"production"</span>, <span class="st">"pipeline"</span>: <span class="st">"daily-orders"</span>},</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>otel.export(validation)</span></code></pre></div>
+</div>
+<p>The <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link gdls-code">export()</a> call is instantaneous as the in-memory providers simply store the data. In production, this is where the SDK would batch and send signals to your collector.</p>
+</section>
+<section id="inspect-the-emitted-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-emitted-metrics">Inspect the Emitted Metrics</h2>
+<p>The metric reader holds all counters, gauges, and histograms that were recorded. We can iterate through them to see every instrument and its current value.</p>
+<div id="70486025" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>metrics_data <span class="op">=</span> metric_reader.get_metrics_data()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> resource_metrics <span class="kw">in</span> metrics_data.resource_metrics:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> scope_metrics <span class="kw">in</span> resource_metrics.scope_metrics:</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> metric <span class="kw">in</span> <span class="bu">sorted</span>(scope_metrics.metrics, key<span class="op">=</span><span class="kw">lambda</span> m: m.name):</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> dp <span class="kw">in</span> metric.data.data_points:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                val <span class="op">=</span> <span class="bu">getattr</span>(dp, <span class="st">"value"</span>, <span class="va">None</span>) <span class="kw">or</span> <span class="bu">getattr</span>(dp, <span class="st">"count"</span>, <span class="st">"N/A"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>metric<span class="sc">.</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>val<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+</div>
+<p>You’ll see counters like <code>pb.validation.steps.total</code> and <code>pb.validation.test_units.failed</code>, the <code>pb.validation.pass_rate</code> gauge, and a histogram of step durations. These are the same instruments that would appear in Prometheus, Datadog, or any OTel-compatible metrics backend.</p>
+</section>
+<section id="inspect-the-trace-spans" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-trace-spans">Inspect the Trace Spans</h2>
+<p>Each <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> call produces a root span with one child per validation step:</p>
+<div id="9c8fc253" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>spans <span class="op">=</span> span_exporter.get_finished_spans()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> span <span class="kw">in</span> spans:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    parent <span class="op">=</span> <span class="st">"(root)"</span> <span class="cf">if</span> span.parent <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> <span class="st">"(child)"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Span: </span><span class="sc">{</span>span<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>parent<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k, v <span class="kw">in</span> <span class="bu">sorted</span>(span.attributes.items()):</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>v<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> event <span class="kw">in</span> span.events:</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  EVENT: </span><span class="sc">{</span>event<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> -&gt; </span><span class="sc">{</span><span class="bu">dict</span>(event.attributes)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div>
+</div>
+<p>The root span (<code>pb.validate</code>) carries table-level attributes and timing, while each child span (<code>pb.validate.step</code>) carries per-step details. Steps that breach a threshold also include an event recording the severity level.</p>
+</section>
+<section id="inspect-the-log-records" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-log-records">Inspect the Log Records</h2>
+<p>Log records are emitted for each validation step that exceeds a threshold. The severity of the log record corresponds to the highest threshold level breached by that step.</p>
+<div id="abe83a42" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>logs <span class="op">=</span> log_exporter.get_finished_logs()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> log <span class="kw">in</span> logs:</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    rec <span class="op">=</span> log.log_record</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[</span><span class="sc">{</span>rec<span class="sc">.</span>severity_text<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>rec<span class="sc">.</span>body<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  attributes: </span><span class="sc">{</span><span class="bu">dict</span>(rec.attributes)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div>
+</div>
+<p>Each log record includes the step index, assertion type, column name, and the threshold level that was breached. In a production setup these records would flow to your log aggregator (e.g., Loki, Elasticsearch, or CloudWatch) where you can search and alert on them.</p>
+<p>That completes the end-to-end walkthrough. The same three signal types (metrics, traces, logs) work identically whether you use in-memory providers for development or OTLP exporters in production.</p>
+</section>
+</section>
+<section id="configuration-reference" class="level1">
+<h1>Configuration Reference</h1>
+<p>Both <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> and the <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> factory accept the same set of parameters. This section documents every option and how the log-level filter works.</p>
+<section id="otelexporter-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="otelexporter-parameters"><a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> Parameters</h2>
+<p>The table below lists all constructor parameters for <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>meter_name</code></td>
+<td><code>"pointblank"</code></td>
+<td>Name for the OTel Meter</td>
+</tr>
+<tr class="even">
+<td><code>meter_version</code></td>
+<td>Package version</td>
+<td>Version string for the Meter</td>
+</tr>
+<tr class="odd">
+<td><code>enable_metrics</code></td>
+<td><code>True</code></td>
+<td>Emit metric counters, gauges, and histograms</td>
+</tr>
+<tr class="even">
+<td><code>enable_tracing</code></td>
+<td><code>False</code></td>
+<td>Emit trace spans</td>
+</tr>
+<tr class="odd">
+<td><code>enable_logging</code></td>
+<td><code>False</code></td>
+<td>Emit log records for threshold breaches</td>
+</tr>
+<tr class="even">
+<td><code>meter_provider</code></td>
+<td>Global default</td>
+<td>Custom <code>MeterProvider</code> instance</td>
+</tr>
+<tr class="odd">
+<td><code>tracer_provider</code></td>
+<td>Global default</td>
+<td>Custom <code>TracerProvider</code> instance</td>
+</tr>
+<tr class="even">
+<td><code>logger_provider</code></td>
+<td><code>None</code></td>
+<td>Custom <code>LoggerProvider</code> (required for logging)</td>
+</tr>
+<tr class="odd">
+<td><code>metric_prefix</code></td>
+<td><code>"pb.validation"</code></td>
+<td>Prefix for all metric instrument names</td>
+</tr>
+<tr class="even">
+<td><code>log_level</code></td>
+<td><code>"warning"</code></td>
+<td>Minimum threshold severity for log emission</td>
+</tr>
+<tr class="odd">
+<td><code>extra_attributes</code></td>
+<td><code>None</code></td>
+<td>Additional key-value pairs on all signals</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> factory function accepts the same parameters and returns a callable suitable for use in <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>.</p>
+</section>
+<section id="log-level-filtering" class="level2">
+<h2 class="anchored" data-anchor-id="log-level-filtering">Log Level Filtering</h2>
+<p>Not every threshold breach warrants a log record. The <code>log_level=</code> parameter controls which breaches produce log records, letting you filter out lower-severity noise.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><code>log_level</code> value</th>
+<th style="text-align: center;">warning breaches</th>
+<th style="text-align: center;">error breaches</th>
+<th style="text-align: center;">critical breaches</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>"warning"</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="even">
+<td><code>"error"</code></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="odd">
+<td><code>"critical"</code></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+</tr>
+</tbody>
+</table>
+<p>For most production deployments, <code>"warning"</code> (the default) is a good starting point. Switch to <code>"error"</code> or <code>"critical"</code> if your log volume is too high or you only want to be notified about serious issues.</p>
+</section>
+</section>
+<section id="bringing-your-own-provider" class="level1">
+<h1>Bringing Your Own Provider</h1>
+<p>The in-memory providers used in the walkthrough above are great during development, but in production you’ll point the SDK at an actual collector. Here’s how to configure a <code>MeterProvider</code> with the OTLP gRPC exporter.</p>
+<div id="c8abaa1f" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> PeriodicExportingMetricReader</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.exporter.otlp.proto.grpc.metric_exporter <span class="im">import</span> OTLPMetricExporter</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>reader <span class="op">=</span> PeriodicExportingMetricReader(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    OTLPMetricExporter(endpoint<span class="op">=</span><span class="st">"http://otel-collector:4317"</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>provider <span class="op">=</span> MeterProvider(metric_readers<span class="op">=</span>[reader])</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>otel <span class="op">=</span> OTelExporter(meter_provider<span class="op">=</span>provider)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>otel.export(validation)</span></code></pre></div>
+</div>
+<p>If you set the standard <code>OTEL_EXPORTER_OTLP_ENDPOINT</code> environment variable and use the global provider (the default when <code>meter_provider=None</code>), no provider configuration is needed at all.</p>
+<p>The same approach works for <code>TracerProvider</code> and <code>LoggerProvider</code>. Pass your custom providers to <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> and they’ll be used instead of the global defaults.</p>
+</section>
+<section id="pipeline-integration" class="level1">
+<h1>Pipeline Integration</h1>
+<p>Pointblank’s OTel integration becomes especially powerful inside orchestrated data pipelines. When Pointblank runs inside an Airflow, Prefect, or Dagster task that has OTel auto-instrumentation, trace context propagation happens automatically. The <code>pb.validate</code> span attaches as a child of the current task span, giving you a unified view of pipeline and validation performance.</p>
+<pre><code>Span: airflow.task (root)
+└── Span: pb.validate
+    ├── Span: pb.validate.step  (`col_vals_not_null` on 'order_id')
+    ├── Span: pb.validate.step  (`col_vals_gt` on 'amount')
+    └── Span: pb.validate.step  (`col_vals_in_set` on 'status')</code></pre>
+<p>This means validation timing and failures appear in your existing pipeline traces without any additional configuration. If a validation step is slow or failing, you can trace it back to the exact pipeline run and task that triggered it.</p>
+</section>
+<section id="example-promql-queries" class="level1">
+<h1>Example PromQL Queries</h1>
+<p>Once metrics are flowing into a Prometheus-compatible backend, you can query them with PromQL. Below are a few starter queries that cover common data-quality monitoring scenarios.</p>
+<pre class="promql"><code># Pass rate for a specific table
+pb_validation_pass_rate{pb_tbl_name="orders"}
+
+# Alert on any critical threshold breach in the last hour
+increase(pb_validation_threshold_critical_total[1h]) &gt; 0
+
+# Failed test units by table (24h window)
+sum by (pb_tbl_name) (increase(pb_validation_test_units_failed_total[24h]))
+
+# p95 validation step duration
+histogram_quantile(0.95, rate(pb_validation_step_duration_bucket[5m]))</code></pre>
+<p>These queries use Prometheus naming conventions (dots replaced with underscores, <code>_total</code> suffix on counters). Adjust the metric names if you’ve changed the <code>metric_prefix=</code> parameter.</p>
+<p>With metrics, traces, and logs all flowing through OpenTelemetry, you have a complete observability picture for your data validation workflows. Whether you’re running ad-hoc checks in a notebook or validating tables in a production pipeline, the same instrumentation gives you dashboards, alerts, and audit trails with no additional tooling.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="pagination-link" aria-label="MCP Quick Start">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">MCP Quick Start</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong> and <strong>Rich&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+</div>
+</footer>
+<script src="../../github-widget.js"></script>
+<script src="../../copy-page.js"></script>
+<script src="../../sidebar-wrap.js"></script>
+<script src="../../sidebar-filter.js"></script>
+<script src="../../dark-mode-toggle.js"></script>
+<script src="../../back-to-top.js"></script>
+<script src="../../keyboard-nav.js"></script>
+<script src="../../copy-code.js"></script>
+<script src="../../mermaid-renderer.js"></script>
+<script src="../../reference-switcher.js"></script>
+<script src="../../tooltips.js"></script>
+<script src="../../responsive-tables.js"></script>
+<script src="video-embed.js"></script>
+<script src="../../navbar-widgets.js"></script>
+
+
+
+
+</body></html>

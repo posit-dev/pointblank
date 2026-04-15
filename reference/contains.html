@@ -988,6 +988,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1115,7 +1135,7 @@ A <code>Contains</code> object, which can be used to select columns that contain
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Suppose we have a table with columns <code>name</code>, <code>2021_pay_total</code>, <code>2022_pay_total</code>, and <code>person_id</code> and we’d like to validate that the values in columns having <code>"pay"</code> in the name are greater than <code>10</code>. We can use the <a href="contains.html#pointblank.contains" class="gdls-link gdls-code">contains()</a> column selector function to specify the column names that contain <code>"pay"</code> as the columns to validate.</p>
-<div id="c89ea8c5" class="cell" data-execution_count="2">
+<div id="6cbfcb6b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1319,7 +1339,7 @@ A <code>Contains</code> object, which can be used to select columns that contain
 </div>
 <p>From the results of the validation table we get two validation steps, one for <code>2021_pay_total</code> and one for <code>2022_pay_total</code>. The values in both columns were all greater than <code>10</code>.</p>
 <p>We can also use the <a href="contains.html#pointblank.contains" class="gdls-link gdls-code">contains()</a> function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain <code>"pay"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="8c8ee7a0" class="cell" data-execution_count="3">
+<div id="dcc073ee" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>

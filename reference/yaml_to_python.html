@@ -985,6 +985,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">send_slack_notification()</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">emit_otel()</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-class">integrations.otel.OTelExporter</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1076,7 +1096,7 @@ If the YAML is invalid, malformed, or contains unknown validation methods.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Convert a basic YAML configuration to Python code:</p>
-<div id="84a2b21c" class="cell" data-execution_count="2">
+<div id="ba558739" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a YAML validation workflow</span></span>
@@ -1112,7 +1132,7 @@ import pointblank as pb
 </div>
 <p>The generated Python code shows exactly how to replicate the YAML workflow programmatically. This is particularly useful when transitioning from YAML-based workflows to code-based workflows, or when generating documentation that shows both YAML and Python approaches.</p>
 <p>For more complex workflows with thresholds and metadata:</p>
-<div id="47a96425" class="cell" data-execution_count="3">
+<div id="64a0e6a9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -1154,7 +1174,7 @@ import pointblank as pb
 </div>
 <p>The generated code includes all configuration parameters, thresholds, and maintains the exact same validation logic as the original YAML workflow.</p>
 <p>Governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>) and <code>reference</code> are also rendered in the generated Python code:</p>
-<div id="e6a1f558" class="cell" data-execution_count="4">
+<div id="4a0bda12" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Sales Pipeline</span></span>
