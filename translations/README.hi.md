@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # एक नमूना डेटासेट
 
 # वैलिडेशन योजना गेनरेट करने के लिए DraftValidation का उपयोग करें
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 आउटपुट आपके डेटा के आधार पर बुद्धिमान सुझावों के साथ एक पूर्ण वैलिडेशन योजना है:

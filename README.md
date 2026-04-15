@@ -60,7 +60,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # A sample dataset
 
 # Use DraftValidation to generate a validation plan
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 The output is a complete validation plan with intelligent suggestions based on your data:

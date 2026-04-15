@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # 예제 데이터셋
 
 # DraftValidation을 사용하여 검증 계획 생성
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 결과는 데이터에 기반한 지능적 제안이 포함된 완전한 검증 계획입니다:

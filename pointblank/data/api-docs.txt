@@ -827,7 +827,7 @@ Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: '
     retrieve metadata about the step where the action is executed.
     
 
-FinalActions(*args)
+FinalActions(*args) -> 'None'
 
     Define actions to be taken after validation is complete.
 
@@ -928,7 +928,7 @@ FinalActions(*args)
     used to retrieve the summary of the validation results.
     
 
-Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs)
+Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs) -> 'None'
 Definition of a schema object.
 
     The schema object defines the structure of a table. Once it is defined, the object can be used
@@ -1202,7 +1202,7 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
         The data to be used for drafting a validation plan.
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     api_key
         The API key to be used for the model.
@@ -1268,7 +1268,7 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     # Disable SSL verification for networks with self-signed certificates
     pb.DraftValidation(
         data=data,
-        model="anthropic:claude-sonnet-4-5",
+        model="anthropic:claude-opus-4-6",
         verify_ssl=False
     )
     ```
@@ -1305,7 +1305,7 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     Let's look at how the `DraftValidation` class can be used to draft a validation plan for a
     table. The table to be used is `"nycflights"`, which is available here via the
     [`load_dataset()`](`pointblank.load_dataset`) function. The model to be used is
-    `"anthropic:claude-sonnet-4-5"` (which performs very well compared to other LLMs). The
+    `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The
     example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
     ```python
@@ -1315,7 +1315,7 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
     # Draft a validation plan for the "nycflights" table
-    pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+    pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
     ```
 
     The output will be a drafted validation plan for the `"nycflights"` table and this will appear
@@ -9971,7 +9971,7 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             so try to include only the columns necessary for the validation.
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
-            `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+            `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
             `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from
             the provider. Model names are subject to change so consult the provider's documentation
             for the most up-to-date model names.
@@ -12353,7 +12353,7 @@ get_json_report(self, use_fields: 'list[str] | None' = None, exclude_fields: 'li
         failed validation
         
 
-get_sundered_data(self, type='pass') -> 'Any'
+get_sundered_data(self, type: 'str' = 'pass') -> 'Any'
 
         Get the data that passed or failed the validation steps.
 
@@ -14096,7 +14096,7 @@ assistant(model: 'str', data: 'Any' = None, tbl_name: 'str | None' = None, api_k
     ----------
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
@@ -15962,6 +15962,9 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
       integer columns named `age` are automatically constrained to working-age range (22--65).
     - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
       format used by the specified country.
+    - **Locale preset** (`"locale_code"`): returns a locale identifier (e.g., `"en_US"`,
+      `"de_DE"`) derived from the country. Multilingual countries randomly select among their
+      official locale codes (e.g., `"CH"` yields `"de_CH"`, `"fr_CH"`, or `"it_CH"`).
 
     When multiple columns in the same schema use related presets, the generated data is
     automatically coherent across those columns within each row. Person-related presets will share
@@ -16423,8 +16426,9 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
     for region-specific formatting (e.g., address formats, phone number patterns).
 
     **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
-    or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
-    `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
+    or suffix), `"first_name"`, `"last_name"`, `"gender"` (person's gender, coherent with
+    name), `"email"` (realistic email address), `"phone_number"`, `"address"` (full street
+    address), `"city"`, `"state"`, `"country"`,
     `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
     3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
 
@@ -16434,7 +16438,8 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
 
     **Text:** `"text"` (paragraph of text), `"sentence"`, `"paragraph"`, `"word"`
 
-    **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
+    **Financial:** `"credit_card_number"`, `"credit_card_provider"` (Visa, Mastercard,
+    American Express, or Discover), `"iban"`, `"currency_code"`
 
     **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
     40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
@@ -16449,7 +16454,9 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
     (up to 10 years back), `"time"`
 
     **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
-    `"user_agent"` (browser user agent string with country-specific browser weighting)
+    `"user_agent"` (browser user agent string with country-specific browser weighting),
+    `"locale_code"` (locale identifier like `"en_US"`, `"de_DE"`; multilingual countries
+    return a random official locale)
 
     Coherent Data Generation
     ------------------------
@@ -16457,10 +16464,13 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
     coherent across those columns within each row. Specifically:
 
     - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
-      `"email"`, `"user_name"`): the email and username will be derived from the person's name.
+      `"gender"`, `"email"`, `"user_name"`): the email and username will be derived from the
+      person's name, and `"gender"` will match the person's first name.
     - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
       `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
       correspond to the same location within the address.
+    - **Credit card presets** (`"credit_card_number"`, `"credit_card_provider"`): the card
+      number prefix and provider name will be consistent (e.g., "Visa" with a "4"-prefixed number).
 
     This coherence is automatic and requires no additional configuration.
 
@@ -17434,31 +17444,9 @@ send_slack_notification(webhook_url: 'str | None' = None, step_msg: 'str | None'
 This is a set of examples for the Pointblank library.
 ----------------------------------------------------------------------
 
-### Starter Validation (https://posit-dev.github.io/pointblank/demos/01-starter/)
+### Advanced Validation (https://posit-dev.github.io/pointblank/01-getting-started/advanced-validation.html)
 
-A validation with the basics
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate( # Use pb.Validate to start
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
-        tbl_name="small_table",
-        label="A starter validation"
-    )
-    .col_vals_gt(columns="d", value=1000)       # STEP 1 |
-    .col_vals_le(columns="c", value=5)          # STEP 2 | <-- Build up a validation plan
-    .col_exists(columns=["date", "date_time"])  # STEP 3 |
-    .interrogate()  # This will execute all validation steps and collect intel
-)
-
-validation
-```
-
-### Advanced Validation (https://posit-dev.github.io/pointblank/demos/02-advanced/)
-
-A validation with a comprehensive set of rules
+A validation with a comprehensive set of rules.
 
 ```python
 import pointblank as pb
@@ -17496,9 +17484,31 @@ validation = (
 validation
 ```
 
-### Data Extracts (https://posit-dev.github.io/pointblank/demos/03-data-extracts/)
+### Starter Validation (https://posit-dev.github.io/pointblank/01-getting-started/starter-validation.html)
 
-Pulling out data extracts that highlight rows with validation failures
+A validation with the basics.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate( # Use pb.Validate to start
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        tbl_name="small_table",
+        label="A starter validation"
+    )
+    .col_vals_gt(columns="d", value=1000)       # STEP 1 |
+    .col_vals_le(columns="c", value=5)          # STEP 2 | <-- Build up a validation plan
+    .col_exists(columns=["date", "date_time"])  # STEP 3 |
+    .interrogate()  # This will execute all validation steps and collect intel
+)
+
+validation
+```
+
+### Data Extracts (https://posit-dev.github.io/pointblank/02-results-and-reporting/data-extracts.html)
+
+Pulling out data extracts that highlight rows with validation failures.
 
 ```python
 import pointblank as pb
@@ -17519,35 +17529,9 @@ validation = (
 pb.preview(validation.get_data_extracts(i=2, frame=True), n_head=20, n_tail=20)
 ```
 
-### Sundered Data (https://posit-dev.github.io/pointblank/demos/04-sundered-data/)
+### Step Reports for Column Data Checks (https://posit-dev.github.io/pointblank/02-results-and-reporting/step-report-column-check.html)
 
-Splitting your data into 'pass' and 'fail' subsets
-
-```python
-import pointblank as pb
-import polars as pl
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="pandas"),
-        tbl_name="small_table",
-        label="Sundering Data"
-    )
-    .col_vals_gt(columns="d", value=1000)
-    .col_vals_le(columns="c", value=5)
-    .interrogate()
-)
-
-validation
-```
-
-```python
-pb.preview(validation.get_sundered_data(type="pass"))
-```
-
-### Step Report: Column Data Checks (https://posit-dev.github.io/pointblank/demos/05-step-report-column-check/)
-
-A step report for column checks shows what went wrong
+A step report for column checks shows what went wrong.
 
 ```python
 import pointblank as pb
@@ -17574,9 +17558,9 @@ validation.get_step_report(i=1)
 validation.get_step_report(i=2)
 ```
 
-### Step Report: Schema Check (https://posit-dev.github.io/pointblank/demos/06-step-report-schema-check/)
+### Step Report for a Schema Check (https://posit-dev.github.io/pointblank/02-results-and-reporting/step-report-schema-check.html)
 
-When a schema doesn't match, a step report gives you the details
+When a schema doesn't match, a step report gives you the details.
 
 ```python
 import pointblank as pb
@@ -17613,9 +17597,165 @@ validation
 validation.get_step_report(i=1)
 ```
 
-### Apply Validation Rules to Multiple Columns (https://posit-dev.github.io/pointblank/demos/apply-checks-to-several-columns/)
+### Sundered Data (https://posit-dev.github.io/pointblank/02-results-and-reporting/sundered-data.html)
 
-Create multiple validation steps by using a list of column names with `columns=`
+Splitting your data into 'pass' and 'fail' subsets.
+
+```python
+import pointblank as pb
+import polars as pl
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="pandas"),
+        tbl_name="small_table",
+        label="Sundering Data"
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_le(columns="c", value=5)
+    .interrogate()
+)
+
+validation
+```
+
+```python
+pb.preview(validation.get_sundered_data(type="pass"))
+```
+
+### Set Failure Threshold Levels (https://posit-dev.github.io/pointblank/03-actions-and-thresholds/failure-thresholds.html)
+
+Set threshold levels to better gauge adverse data quality.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(  # setting relative threshold defaults for all steps
+            warning=0.05,          # 5% failing test units: warning threshold (gray)
+            error=0.10,            # 10% failed test units: error threshold (yellow)
+            critical=0.15          # 15% failed test units: critical threshold (red)
+        ),
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(
+        columns="session_duration",
+        value=4,
+        thresholds=(5, 10, 20)     # setting absolute thresholds for *this* step (W, E, C)
+    )
+    .col_exists(columns="end_day")
+    .interrogate()
+)
+
+validation
+```
+
+### Step-Level Actions (https://posit-dev.github.io/pointblank/03-actions-and-thresholds/validation-with-actions.html)
+
+Configure actions to trigger when validation thresholds are exceeded, such as logging warnings or errors.
+
+```python
+import pointblank as pb
+
+def log_warning():
+    """Custom action to log validation warnings"""
+    metadata = pb.get_action_metadata()
+    print(f"⚠️  WARNING: Validation step '{metadata['step']}' exceeded threshold!")
+
+def log_error():
+    """Custom action to log validation errors"""
+    metadata = pb.get_action_metadata()
+    print(f"❌  ERROR: Critical validation failure in step '{metadata['step']}'!")
+    print(f"    This requires immediate attention.")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="nycflights", tbl_type="polars"),
+        label="Validation with actions"
+    )
+    .col_vals_between(
+        columns="distance",
+        left=100, right=2000,
+        thresholds=pb.Thresholds(warning=0.1),  # Allow 10% failures before warning
+        actions=pb.Actions(warning=log_warning),
+        brief="Column 'distance' range check."
+    )
+    .col_vals_gt(
+        columns="air_time",
+        value=25,
+        na_pass=True,
+        thresholds=pb.Thresholds(error=200),  # Allow only 200 failures before error
+        actions=pb.Actions(error=log_error),
+        brief="Column 'origin' check for minimum value."
+    )
+    .col_vals_not_null(
+        columns="carrier",
+        thresholds=(1, 0.05),  # No tolerance for null values
+        actions=pb.Actions(warning=log_warning, error=log_error),
+        brief="Column 'carrier' completeness check."
+    )
+    .interrogate()
+)
+
+validation
+```
+
+### Final Actions (https://posit-dev.github.io/pointblank/03-actions-and-thresholds/validation-with-final-actions.html)
+
+Execute actions after validation completes, such as sending alerts or generating summary reports.
+
+```python
+import pointblank as pb
+
+def send_alert():
+    """Check validation summary and send alert if critical failures found"""
+    summary = pb.get_validation_summary()
+    if summary and summary.get("highest_severity") == "critical":
+        print(f"🚨 ALERT: Critical validation failures found!")
+        print(f"   Failed steps: {summary['n_failing_steps']}")
+    elif summary and summary.get("highest_severity") == "error":
+        print(f"⚠️  WARNING: Error-level validation failures detected.")
+    else:
+        print("✅ All validation checks passed successfully!")
+
+def generate_summary_report():
+    """Generate a summary report of validation results"""
+    summary = pb.get_validation_summary()
+    if summary:
+        print("\n--- Validation Summary Report ---")
+        print(f"Total validation steps: {summary['n_steps']}")
+        print(f"Passed steps: {summary['n_passing_steps']}")
+        print(f"Failed steps: {summary['n_failing_steps']}")
+        print(f"Highest severity: {summary['highest_severity']}")
+        print("--- End of Report ---")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars"),
+        label="Validation with final actions",
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        final_actions=pb.FinalActions(
+            "Validation workflow completed.",  # String message
+            send_alert,                        # Alert function
+            generate_summary_report            # Report function
+        )
+    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(columns="session_duration", value=15)
+    .interrogate()
+)
+
+validation
+```
+
+### Apply Validation Rules to Multiple Columns (https://posit-dev.github.io/pointblank/04-column-value-checks/apply-checks-to-several-columns.html)
+
+Create multiple validation steps by using a list of column names with columns=.
 
 ```python
 import pointblank as pb
@@ -17632,9 +17772,264 @@ validation = (
 validation
 ```
 
-### Verifying Row and Column Counts (https://posit-dev.github.io/pointblank/demos/check-row-column-counts/)
+### Checks for Missing Values (https://posit-dev.github.io/pointblank/04-column-value-checks/checks-for-missing.html)
 
-Check the dimensions of the table with the `*_count_match()` validation methods
+Perform validations that check whether missing/NA/Null values are present.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_not_null(columns="a")                  # expect no Null values
+    .col_vals_not_null(columns="b")                  # "" ""
+    .col_vals_not_null(columns="c")                  # "" ""
+    .col_vals_not_null(columns="d")                  # "" ""
+    .col_vals_null(columns="a")                      # expect all values to be Null
+    .interrogate()
+)
+
+validation
+```
+
+### Custom Expression for Checking Column Values (https://posit-dev.github.io/pointblank/04-column-value-checks/col-vals-custom-expr.html)
+
+A column expression can be used to check column values. Just use col_vals_expr() for this.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="pandas")
+    )
+    .col_vals_expr(expr=lambda df: (df["d"] % 1 != 0) & (df["a"] < 10))  # Pandas column expr
+    .interrogate()
+)
+
+validation
+```
+
+### Comparison Checks Across Columns (https://posit-dev.github.io/pointblank/04-column-value-checks/comparisons-across-columns.html)
+
+Perform comparisons of values in columns to values in other columns.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_lt(columns="a", value=pb.col("c"))     # values in 'a' > values in 'c'
+    .col_vals_between(
+        columns="d",                                 # values in 'd' are between values
+        left=pb.col("c"),                            # in 'c' and the fixed value of 12,000;
+        right=12000,                                 # any missing values encountered result
+        na_pass=True                                 # in a passing test unit
+    )
+    .interrogate()
+)
+
+validation
+```
+
+### Custom Validation with specially() (https://posit-dev.github.io/pointblank/04-column-value-checks/custom-validation-specially.html)
+
+Create bespoke validations using specially() to implement domain-specific business rules.
+
+```python
+import pointblank as pb
+import polars as pl
+
+def within_std_deviations(df, column, n_std=2):
+    """Check if all values are within n standard deviations of the mean"""
+    mean_val = df[column].mean()
+    std_val = df[column].std()
+
+    lower_bound = mean_val - (n_std * std_val)
+    upper_bound = mean_val + (n_std * std_val)
+
+    # Add a boolean column and return the modified DataFrame
+    return df.with_columns(
+        pl.col(column).is_between(lower_bound, upper_bound, closed="both").alias("validation_result")
+    )
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars")
+    )
+    .specially(
+        expr=lambda df: within_std_deviations(df, column="session_duration", n_std=2),
+        brief="All values in column 'a' should be within 2 std devs of mean"
+    )
+    .specially(
+        expr=lambda df: within_std_deviations(df, column="session_duration", n_std=3),
+        brief="All values in column 'c' should be within 3 std devs of mean"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+### Expect No Duplicate Rows (https://posit-dev.github.io/pointblank/04-column-value-checks/expect-no-duplicate-rows.html)
+
+We can check for duplicate rows in the table with rows_distinct().
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .rows_distinct()    # expect no duplicate rows
+    .interrogate()
+)
+
+validation
+```
+
+### Checking for Duplicate Values (https://posit-dev.github.io/pointblank/04-column-value-checks/expect-no-duplicate-values.html)
+
+To check for duplicate values down a column, use rows_distinct() with a columns_subset= value.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .rows_distinct(columns_subset="b")   # expect no duplicate values in 'b'
+    .interrogate()
+)
+
+validation
+```
+
+### Expectations with a Text Pattern (https://posit-dev.github.io/pointblank/04-column-value-checks/expect-text-pattern.html)
+
+With col_vals_regex(), check for conformance to a regular expression.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")  # check pattern in 'b'
+    .col_vals_regex(columns="f", pattern=r"high|low|mid")         # check pattern in 'f'
+    .interrogate()
+)
+
+validation
+```
+
+### Numeric Comparisons (https://posit-dev.github.io/pointblank/04-column-value-checks/numeric-comparisons.html)
+
+Perform comparisons of values in columns to fixed values.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_gt(columns="d", value=1000)            # values in 'd' > 1000
+    .col_vals_lt(columns="d", value=10000)           # values in 'd' < 10000
+    .col_vals_ge(columns="a", value=1)               # values in 'a' >= 1
+    .col_vals_le(columns="c", value=5)               # values in 'c' <= 5
+    .col_vals_ne(columns="a", value=7)               # values in 'a' not equal to 7
+    .col_vals_between(columns="c", left=0, right=15) # 0 <= 'c' values <= 15
+    .interrogate()
+)
+
+validation
+```
+
+### Set Membership (https://posit-dev.github.io/pointblank/04-column-value-checks/set-membership.html)
+
+Perform validations that check whether values are part of a set (or not part of one).
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    )
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])    # part of this set
+    .col_vals_not_in_set(columns="f", set=["zero", "infinity"])  # not part of this set
+    .interrogate()
+)
+
+validation
+```
+
+### Validating Data Freshness (https://posit-dev.github.io/pointblank/05-advanced-topics/check-for-freshness.html)
+
+Use date-based validations to ensure your data is current and recent.
+
+```python
+import pointblank as pb
+import polars as pl
+from datetime import date, datetime, timedelta
+
+# Create sample data with mixed freshness levels
+freshness_data = pl.DataFrame({
+    "data_timestamp": [
+        datetime(2023, 12, 28, 10, 30),  # 3 days ago from Dec 31
+        datetime(2023, 12, 29, 14, 15),  # 2 days ago
+        datetime(2023, 12, 30, 9, 45),   # 1 day ago
+        datetime(2023, 12, 31, 16, 20),  # Today
+    ],
+    "sensor_id": ["TEMP_01", "TEMP_02", "TEMP_01", "TEMP_03"],
+    "reading": [22.5, 21.8, 23.1, 22.9],
+    "quality_score": [0.95, 0.88, 0.92, 0.97]
+})
+
+# Assuming today is 2023-12-31, check for data freshness
+current_date = date(2023, 12, 31)
+freshness_cutoff = current_date - timedelta(days=2)  # Data should be within 2 days
+
+validation = (
+    pb.Validate(freshness_data)
+    .specially(
+        expr=lambda df: df.filter(
+            pl.col("data_timestamp").dt.date() >= freshness_cutoff
+        ).height > 0,
+        brief=f"Recent data available (within 2 days of {current_date})"
+    )
+    .col_vals_ge(
+        columns="data_timestamp",
+        value=current_date - timedelta(days=7),  # Within last week
+        brief="All data points are from the last week"
+    )
+    .specially(
+        expr=lambda df: (
+            df.select(pl.col("data_timestamp").max()).item().date() >= current_date
+        ),
+        brief="Most recent data is from today"
+    )
+    .col_vals_not_null(
+        columns="data_timestamp",
+        brief="No missing timestamps"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+### Verifying Row and Column Counts (https://posit-dev.github.io/pointblank/05-advanced-topics/check-row-column-counts.html)
+
+Check the dimensions of the table with the *_count_match() validation methods.
 
 ```python
 import pointblank as pb
@@ -17657,49 +18052,15 @@ validation = (
 validation
 ```
 
-### Checks for Missing Values (https://posit-dev.github.io/pointblank/demos/checks-for-missing/)
+### CLI Interactive Demos (https://posit-dev.github.io/pointblank/05-advanced-topics/cli-interactive.html)
 
-Perform validations that check whether missing/NA/Null values are present
+These CLI demos showcase practical data quality workflows that you can use!
 
-```python
-import pointblank as pb
 
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
-    )
-    .col_vals_not_null(columns="a")                  # expect no Null values
-    .col_vals_not_null(columns="b")                  # "" ""
-    .col_vals_not_null(columns="c")                  # "" ""
-    .col_vals_not_null(columns="d")                  # "" ""
-    .col_vals_null(columns="a")                      # expect all values to be Null
-    .interrogate()
-)
 
-validation
-```
+### Column Selector Functions: Easily Pick Columns (https://posit-dev.github.io/pointblank/05-advanced-topics/column-selector-functions.html)
 
-### Custom Expression for Checking Column Values (https://posit-dev.github.io/pointblank/demos/col-vals-custom-expr/)
-
-A column expression can be used to check column values. Just use `col_vals_expr()` for this
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="pandas")
-    )
-    .col_vals_expr(expr=lambda df: (df["d"] % 1 != 0) & (df["a"] < 10))  # Pandas column expr
-    .interrogate()
-)
-
-validation
-```
-
-### Column Selector Functions: Easily Pick Columns (https://posit-dev.github.io/pointblank/demos/column-selector-functions/)
-
-Use column selector functions in the `columns=` argument to conveniently choose columns
+Use column selector functions in the columns= argument to conveniently choose columns.
 
 ```python
 import pointblank as pb
@@ -17730,119 +18091,79 @@ validation = (
 validation
 ```
 
-### Comparison Checks Across Columns (https://posit-dev.github.io/pointblank/demos/comparisons-across-columns/)
+### Date and Datetime Validations (https://posit-dev.github.io/pointblank/05-advanced-topics/datetime-validations.html)
 
-Perform comparisons of values in columns to values in other columns
+Comprehensive examples of date, datetime, and timezone-aware datetime comparisons.
 
 ```python
 import pointblank as pb
+import polars as pl
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
+
+# Create sample data with various temporal data types
+temporal_data = pl.DataFrame({
+    "order_date": [
+        date(2023, 1, 15),
+        date(2023, 6, 10),
+        date(2023, 12, 5),
+        date(2024, 3, 20)
+    ],
+    "created_at": [
+        datetime(2023, 1, 15, 9, 30, 0),
+        datetime(2023, 6, 10, 14, 45, 30),
+        datetime(2023, 12, 5, 8, 15, 0),
+        datetime(2024, 3, 20, 17, 22, 45)
+    ],
+    "event_time_tz": [
+        datetime(2023, 1, 15, 9, 0, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 6, 10, 12, 30, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 12, 5, 15, 45, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2024, 3, 20, 18, 15, tzinfo=ZoneInfo("America/New_York"))
+    ],
+    "order_id": [1001, 1002, 1003, 1004],
+    "amount": [150.0, 275.5, 89.99, 420.00]
+})
 
 validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    pb.Validate(temporal_data)
+    .col_vals_ge(
+        columns="order_date",
+        value=date(2023, 1, 1),
+        brief="Orders are from 2023 or later"
     )
-    .col_vals_lt(columns="a", value=pb.col("c"))     # values in 'a' > values in 'c'
     .col_vals_between(
-        columns="d",                                 # values in 'd' are between values
-        left=pb.col("c"),                            # in 'c' and the fixed value of 12,000;
-        right=12000,                                 # any missing values encountered result
-        na_pass=True                                 # in a passing test unit
+        columns="created_at",
+        left=datetime(2023, 1, 1, 0, 0, 0),
+        right=datetime(2024, 12, 31, 23, 59, 59),
+        brief="Creation timestamps within expected range"
     )
-    .interrogate()
-)
-
-validation
-```
-
-### Expect No Duplicate Rows (https://posit-dev.github.io/pointblank/demos/expect-no-duplicate-rows/)
-
-We can check for duplicate rows in the table with `rows_distinct()`
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
+    .col_vals_ge(
+        columns="event_time_tz",
+        value=datetime(2023, 1, 1, 8, 0, tzinfo=ZoneInfo("America/New_York")),
+        brief="Timezone-aware events after 8 AM Eastern"
     )
-    .rows_distinct()    # expect no duplicate rows
-    .interrogate()
-)
-
-validation
-```
-
-### Checking for Duplicate Values (https://posit-dev.github.io/pointblank/demos/expect-no-duplicate-values/)
-
-To check for duplicate values down a column, use `rows_distinct()` with a `columns_subset=` value
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
-    )
-    .rows_distinct(columns_subset="b")   # expect no duplicate values in 'b'
-    .interrogate()
-)
-
-validation
-```
-
-### Expectations with a Text Pattern (https://posit-dev.github.io/pointblank/demos/expect-text-pattern/)
-
-With the `col_vals_regex()`, check for conformance to a regular expression
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
-    )
-    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")  # check pattern in 'b'
-    .col_vals_regex(columns="f", pattern=r"high|low|mid")         # check pattern in 'f'
-    .interrogate()
-)
-
-validation
-```
-
-### Set Failure Threshold Levels (https://posit-dev.github.io/pointblank/demos/failure-thresholds/)
-
-Set threshold levels to better gauge adverse data quality
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(  # setting relative threshold defaults for all steps
-            warning=0.05,          # 5% failing test units: warning threshold (gray)
-            error=0.10,            # 10% failed test units: error threshold (yellow)
-            critical=0.15          # 15% failed test units: critical threshold (red)
+    .col_schema_match(
+        pb.Schema(
+            columns=[
+                ("order_date", "Date"),
+                ("created_at", "Datetime(time_unit='us', time_zone=None)"),
+                ("event_time_tz", "Datetime(time_unit='us', time_zone='America/New_York')"),
+                ("order_id", "Int64"),
+                ("amount", "Float64")
+            ]
         ),
+        brief="Schema includes proper date/datetime types"
     )
-    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(
-        columns="session_duration",
-        value=4,
-        thresholds=(5, 10, 20)     # setting absolute thresholds for *this* step (W, E, C)
-    )
-    .col_exists(columns="end_day")
     .interrogate()
 )
 
 validation
 ```
 
-### Mutate the Table in a Validation Step (https://posit-dev.github.io/pointblank/demos/mutate-table-in-step/)
+### Mutate the Table in a Validation Step (https://posit-dev.github.io/pointblank/05-advanced-topics/mutate-table-in-step.html)
 
-For far more specialized validations, modify the table with the `pre=` argument before checking it
+For far more specialized validations, modify the table with the pre= argument before checking it.
 
 ```python
 import pointblank as pb
@@ -17881,32 +18202,9 @@ validation = (
 validation
 ```
 
-### Numeric Comparisons (https://posit-dev.github.io/pointblank/demos/numeric-comparisons/)
+### Check the Schema of a Table (https://posit-dev.github.io/pointblank/05-advanced-topics/schema-check.html)
 
-Perform comparisons of values in columns to fixed values
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
-    )
-    .col_vals_gt(columns="d", value=1000)            # values in 'd' > 1000
-    .col_vals_lt(columns="d", value=10000)           # values in 'd' < 10000
-    .col_vals_ge(columns="a", value=1)               # values in 'a' >= 1
-    .col_vals_le(columns="c", value=5)               # values in 'c' <= 5
-    .col_vals_ne(columns="a", value=7)               # values in 'a' not equal to 7
-    .col_vals_between(columns="c", left=0, right=15) # 0 <= 'c' values <= 15
-    .interrogate()
-)
-
-validation
-```
-
-### Check the Schema of a Table (https://posit-dev.github.io/pointblank/demos/schema-check/)
-
-The schema of a table can be flexibly defined with `Schema` and verified with `col_schema_match()`
+The schema of a table can be flexibly defined with Schema and verified with col_schema_match().
 
 ```python
 import pointblank as pb
@@ -17939,28 +18237,9 @@ validation = (
 validation
 ```
 
-### Set Membership (https://posit-dev.github.io/pointblank/demos/set-membership/)
+### Using Parquet Data (https://posit-dev.github.io/pointblank/05-advanced-topics/using-parquet-data.html)
 
-Perform validations that check whether values are part of a set (or *not* part of one)
-
-```python
-import pointblank as pb
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="small_table", tbl_type="polars")
-    )
-    .col_vals_in_set(columns="f", set=["low", "mid", "high"])    # part of this set
-    .col_vals_not_in_set(columns="f", set=["zero", "infinity"])  # not part of this set
-    .interrogate()
-)
-
-validation
-```
-
-### Using Parquet Data (https://posit-dev.github.io/pointblank/demos/using-parquet-data/)
-
-A Parquet dataset can be used for data validation, thanks to Ibis
+A Parquet dataset can be used for data validation, thanks to Ibis.
 
 ```python
 import pointblank as pb

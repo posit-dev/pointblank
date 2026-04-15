@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # サンプルデータセット
 
 # DraftValidation を使用して検証プランを生成
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 出力は、データに基づいた知的な提案を含む完全な検証プランです：
