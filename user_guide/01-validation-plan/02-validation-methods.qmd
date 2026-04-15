@@ -611,7 +611,13 @@ The `columns_subset=` parameter lets you specify which columns to include in the
 improving performance and reducing API costs by only sending relevant data to the LLM.
 
 **Note:** To use [`Validate.prompt()`](`Validate.prompt`), you need to have the appropriate API credentials configured
-for your chosen LLM provider (Anthropic, OpenAI, Ollama, or AWS Bedrock).
+for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, or Azure OpenAI).
+
+For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the
+name you assigned when deploying the model in your Azure OpenAI resource. In addition to
+`AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g.,
+`https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your
+environment.
 
 ## 5. Aggregate Validations
 
