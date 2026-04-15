@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # Ein Beispieldatensatz
 
 # Verwenden Sie DraftValidation, um einen Validierungsplan zu generieren
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 Die Ausgabe ist ein vollständiger Validierungsplan mit intelligenten Vorschlägen basierend auf Ihren Daten:
