@@ -2,13 +2,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from opentelemetry.sdk.metrics.export import (
-    Gauge,
-    Histogram,
-    InMemoryMetricReader,
-    MetricsData,
-    Sum,
-)
+try:
+    from opentelemetry.sdk.metrics.export import (
+        Gauge,
+        Histogram,
+        InMemoryMetricReader,
+        MetricsData,
+        Sum,
+    )
+except ModuleNotFoundError:  # pragma: no cover
+    # When the otel extra is not installed, allow the module to be imported
+    # without error. Callers (test_otel_*.py) already use
+    # pytest.importorskip("opentelemetry.sdk") so tests will be skipped.
+    pass
 
 
 def get_metrics_by_name(reader: InMemoryMetricReader) -> dict[str, Any]:
