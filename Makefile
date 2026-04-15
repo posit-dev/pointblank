@@ -110,10 +110,10 @@ docs-pdf: ## Build PDF version of User Guide (HTML to PDF preserving graphics)
 	uv run python scripts/create_toc_pdf.py docs/user-guide.pdf
 	@echo "PDF available at docs/user-guide.pdf"
 
-docs-llms: ## Generate llms.txt and llms-full.txt files for LLM consumption
-	@uv run python scripts/generate_llms_txt.py
+docs-api-text: ## Regenerate api-docs.txt for DraftValidation/assistant
+	@uv run python scripts/generate_api_docs.py
 
-docs-full: docs-build docs-llms ## Build docs and generate llms.txt files
+docs-full: docs-build ## Build docs
 
 install: dist ## install the package to the active Python's site-packages
 	python3 -m pip install --force-reinstall dist/pointblank*.whl
