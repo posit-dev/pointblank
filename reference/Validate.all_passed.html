@@ -663,6 +663,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dataframe_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dataframe_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.get_sundered_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_sundered_data()</span></span></a>
   </div>
@@ -1046,7 +1052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <a href="Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed()</a> method is used to determine if all validation steps passed perfectly.</p>
-<div id="72da1286" class="cell" data-execution_count="1">
+<div id="0dd6b692" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

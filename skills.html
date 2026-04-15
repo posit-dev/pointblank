@@ -356,92 +356,93 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_tabular_report`</span></span>
 <span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_step_report`</span></span>
 <span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_json_report`</span></span>
-<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_sundered_data`</span></span>
-<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_data_extracts`</span></span>
-<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.all_passed`</span></span>
-<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_passing`</span></span>
-<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_below_threshold`</span></span>
-<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.above_threshold`</span></span>
-<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n`</span></span>
-<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_passed`</span></span>
-<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_failed`</span></span>
-<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_passed`</span></span>
-<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_failed`</span></span>
-<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.warning`</span></span>
-<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.error`</span></span>
-<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.critical`</span></span>
-<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspection and Assistance</span></span>
-<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use DataScan for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
-<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_dataframe_report`</span></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_sundered_data`</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_data_extracts`</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.all_passed`</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_passing`</span></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_below_threshold`</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.above_threshold`</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n`</span></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_passed`</span></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_failed`</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_passed`</span></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_failed`</span></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.warning`</span></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.error`</span></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.critical`</span></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspection and Assistance</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use DataScan for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
 <span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DataScan`</span>: Get a summary of a dataset</span>
-<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`preview`</span>: Display a table preview that shows some rows from the top, some from the bottom</span>
-<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`col_summary_tbl`</span>: Generate a column-level summary table of a dataset</span>
-<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`missing_vals_tbl`</span>: Display a table that shows the missing values in the input table</span>
-<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_dataset`</span>: Load a dataset hosted in the library as specified table type</span>
-<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_data_path`</span>: Get the file path to a dataset included with the Pointblank package</span>
-<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`connect_to_table`</span>: Connect to a database table using a connection string</span>
-<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`print_database_tables`</span>: List all tables in a database from a connection string</span>
-<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="fu">### Table Pre-checks</span></span>
-<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>Helper functions for use with the <span class="in">`active=`</span> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</span>
-<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DataScan`</span>: Get a summary of a dataset</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`preview`</span>: Display a table preview that shows some rows from the top, some from the bottom</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`col_summary_tbl`</span>: Generate a column-level summary table of a dataset</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`missing_vals_tbl`</span>: Display a table that shows the missing values in the input table</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_dataset`</span>: Load a dataset hosted in the library as specified table type</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_data_path`</span>: Get the file path to a dataset included with the Pointblank package</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`connect_to_table`</span>: Connect to a database table using a connection string</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`print_database_tables`</span>: List all tables in a database from a connection string</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="fu">### Table Pre-checks</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>Helper functions for use with the <span class="in">`active=`</span> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</span>
 <span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_columns`</span>: Check whether one or more columns exist in a table</span>
-<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_rows`</span>: Check whether a table has a certain number of rows</span>
-<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### YAML</span></span>
-<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>Functions for using YAML to orchestrate validation workflows.</span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_columns`</span>: Check whether one or more columns exist in a table</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_rows`</span>: Check whether a table has a certain number of rows</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="fu">### YAML</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>Functions for using YAML to orchestrate validation workflows.</span>
 <span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_interrogate`</span>: Execute a YAML-based validation workflow</span>
-<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_yaml`</span>: Validate YAML configuration against the expected structure</span>
-<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_to_python`</span>: Convert YAML validation configuration to equivalent Python code</span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### Utility Functions</span></span>
-<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>Functions for accessing metadata about the target data and managing configuration.</span>
-<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_interrogate`</span>: Execute a YAML-based validation workflow</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_yaml`</span>: Validate YAML configuration against the expected structure</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_to_python`</span>: Convert YAML validation configuration to equivalent Python code</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="fu">### Utility Functions</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>Functions for accessing metadata about the target data and managing configuration.</span>
 <span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_column_count`</span>: Get the number of columns in a table</span>
-<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_row_count`</span>: Get the number of rows in a table</span>
-<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_action_metadata`</span>: Access step-level metadata when authoring custom actions</span>
-<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_validation_summary`</span>: Access validation summary information when authoring final actions</span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`write_file`</span>: Write a Validate object to disk as a serialized file</span>
-<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`read_file`</span>: Read a Validate object from disk that was previously saved with <span class="in">`write_file()`</span></span>
-<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ref`</span>: Reference a column from the reference data for aggregate comparisons</span>
-<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">### Test Data Generation</span></span>
-<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>Generate synthetic test data based on schema definitions. Use <span class="in">`generate_dataset()`</span> to create data from a Schema object.</span>
-<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_column_count`</span>: Get the number of columns in a table</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_row_count`</span>: Get the number of rows in a table</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_action_metadata`</span>: Access step-level metadata when authoring custom actions</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_validation_summary`</span>: Access validation summary information when authoring final actions</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`write_file`</span>: Write a Validate object to disk as a serialized file</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`read_file`</span>: Read a Validate object from disk that was previously saved with <span class="in">`write_file()`</span></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ref`</span>: Reference a column from the reference data for aggregate comparisons</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="fu">### Test Data Generation</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>Generate synthetic test data based on schema definitions. Use <span class="in">`generate_dataset()`</span> to create data from a Schema object.</span>
 <span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`generate_dataset`</span>: Generate synthetic test data from a schema</span>
-<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`int_field`</span>: Create an integer column specification for use in a schema</span>
-<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`float_field`</span>: Create a floating-point column specification for use in a schema</span>
-<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`string_field`</span>: Create a string column specification for use in a schema</span>
-<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`bool_field`</span>: Create a boolean column specification for use in a schema</span>
-<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`date_field`</span>: Create a date column specification for use in a schema</span>
-<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`datetime_field`</span>: Create a datetime column specification for use in a schema</span>
-<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`time_field`</span>: Create a time column specification for use in a schema</span>
-<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duration_field`</span>: Create a duration column specification for use in a schema</span>
-<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`profile_fields`</span>: Create a dict of string field specifications representing a person profile</span>
-<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prebuilt Actions</span></span>
-<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>Prebuilt action functions for common notification patterns.</span>
-<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`generate_dataset`</span>: Generate synthetic test data from a schema</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`int_field`</span>: Create an integer column specification for use in a schema</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`float_field`</span>: Create a floating-point column specification for use in a schema</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`string_field`</span>: Create a string column specification for use in a schema</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`bool_field`</span>: Create a boolean column specification for use in a schema</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`date_field`</span>: Create a date column specification for use in a schema</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`datetime_field`</span>: Create a datetime column specification for use in a schema</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`time_field`</span>: Create a time column specification for use in a schema</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duration_field`</span>: Create a duration column specification for use in a schema</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`profile_fields`</span>: Create a dict of string field specifications representing a person profile</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prebuilt Actions</span></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>Prebuilt action functions for common notification patterns.</span>
 <span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`send_slack_notification`</span>: Create a Slack notification function using a webhook URL</span>
-<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
-<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
-<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`send_slack_notification`</span>: Create a Slack notification function using a webhook URL</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
 </pre>
 
 

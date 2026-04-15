@@ -666,6 +666,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dataframe_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dataframe_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.get_sundered_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_sundered_data()</span></span></a>
   </div>
@@ -1100,7 +1106,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>The <code>min_date=</code> and <code>max_date=</code> parameters accept <code>datetime</code> objects for precise range definitions:</p>
-<div id="fdf93cc0" class="cell" data-execution_count="1">
+<div id="860e4f5b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1248,7 +1254,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 </div>
 </div>
 <p>For a quick setup, ISO format strings work just as well:</p>
-<div id="3172c6a6" class="cell" data-execution_count="2">
+<div id="eaef9c76" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    event_time<span class="op">=</span>pb.datetime_field(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        min_date<span class="op">=</span><span class="st">"2024-03-01T08:00:00"</span>,</span>
@@ -1377,7 +1383,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 </div>
 </div>
 <p>Optional timestamps can be simulated with <code>nullable=True</code>, and datetime fields work nicely alongside other field types:</p>
-<div id="0f42b4b9" class="cell" data-execution_count="3">
+<div id="2b882dac" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    order_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1000</span>, max_val<span class="op">=</span><span class="dv">9999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    placed_at<span class="op">=</span>pb.datetime_field(</span>

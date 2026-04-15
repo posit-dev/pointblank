@@ -237,6 +237,9 @@ Get a detailed report for a single validation step.
 [Validate.get_json_report()](Validate.get_json_report.md#pointblank.Validate.get_json_report)  
 Get a report of the validation results as a JSON-formatted string.
 
+[Validate.get_dataframe_report()](Validate.get_dataframe_report.md#pointblank.Validate.get_dataframe_report)  
+Get a report of the validation results as a DataFrame.
+
 [Validate.get_sundered_data()](Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data)  
 Get the data that passed or failed the validation steps.
 

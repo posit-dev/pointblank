@@ -112,6 +112,7 @@ The validation plan is executed when [interrogate()](reference/Validate.interrog
 - [Validate.get_tabular_report](reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report)
 - [Validate.get_step_report](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report)
 - [Validate.get_json_report](reference/Validate.get_json_report.html#pointblank.Validate.get_json_report)
+- [Validate.get_dataframe_report](reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report)
 - [Validate.get_sundered_data](reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data)
 - [Validate.get_data_extracts](reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts)
 - [Validate.all_passed](reference/Validate.all_passed.html#pointblank.Validate.all_passed)
