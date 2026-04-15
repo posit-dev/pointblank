@@ -1085,7 +1085,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-sonnet-4-5"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">api_key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1140,7 +1140,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Disable SSL verification for networks with self-signed certificates</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-5"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-6"</span>,</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    verify_ssl<span class="op">=</span><span class="va">False</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="callout callout-style-default callout-warning callout-titled">
@@ -1172,14 +1172,14 @@ Warning
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
-<p>Let’s look at how the <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-sonnet-4-5"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<p>Let’s look at how the <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-opus-4-6"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Draft a validation plan for the "nycflights" table</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-5"</span>)</span></code></pre></div>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-6"</span>)</span></code></pre></div>
 <p>The output will be a drafted validation plan for the <code>"nycflights"</code> table and this will appear in the console.</p>
 <pre class="plaintext"><code>```python
 import pointblank as pb

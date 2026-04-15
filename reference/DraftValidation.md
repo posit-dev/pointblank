@@ -25,7 +25,7 @@ By using a large language model (LLM) to draft a validation plan, you can quickl
 The data to be used for drafting a validation plan.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`.
 
 `api_key: str | None = None`  
 The API key to be used for the model.
@@ -83,7 +83,7 @@ data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 # Disable SSL verification for networks with self-signed certificates
 pb.DraftValidation(
     data=data,
-    model="anthropic:claude-sonnet-4-5",
+    model="anthropic:claude-opus-4-6",
     verify_ssl=False
 )
 ```
@@ -110,7 +110,7 @@ The Amazon Bedrock is a special case since it is a self-hosted model and securit
 
 ## Examples
 
-Let's look at how the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is `"anthropic:claude-sonnet-4-5"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
+Let's look at how the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
 ``` python
 import pointblank as pb
@@ -119,7 +119,7 @@ import pointblank as pb
 data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
 # Draft a validation plan for the "nycflights" table
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 The output will be a drafted validation plan for the `"nycflights"` table and this will appear in the console.

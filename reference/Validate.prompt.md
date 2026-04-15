@@ -42,7 +42,7 @@ A natural language description of the validation criteria. This prompt should cl
 A single column or list of columns to include in the validation. If `None`, all columns will be included. Specifying fewer columns can improve performance and reduce API costs so try to include only the columns necessary for the validation.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
 
 `batch_size: int = ``1000`  
 Number of rows to process in each batch. Larger batches are more efficient but may hit API limits. Default is `1000`.
