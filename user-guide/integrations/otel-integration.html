@@ -640,7 +640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pattern-a-explicit-export" class="level2">
 <h2 class="anchored" data-anchor-id="pattern-a-explicit-export">Pattern A: Explicit Export</h2>
 <p>Import <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a>, run your validation, then call <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link gdls-code">export()</a>. This gives you full control over when and how signals are emitted.</p>
-<div id="d8db883b" class="cell" data-execution_count="2">
+<div id="00e27c4f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -658,7 +658,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pattern-b-finalactions-automatic" class="level2">
 <h2 class="anchored" data-anchor-id="pattern-b-finalactions-automatic">Pattern B: FinalActions (Automatic)</h2>
 <p>Use <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> inside <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> so metrics are emitted automatically at the end of every <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> call (no extra code needed after the validation).</p>
-<div id="61c7a551" class="cell" data-execution_count="3">
+<div id="8765cc14" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>You can combine <a href="../../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> with other final actions like <a href="../../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a>:</p>
-<div id="f338c635" class="cell" data-execution_count="4">
+<div id="5fa6fdb3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -700,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>Before exporting any signals we need OTel providers to receive them. The SDK’s in-memory providers are perfect for exploration: they capture every metric, span, and log record in Python lists so we can print them without running a collector.</p>
-<div id="fda35fde" class="cell" data-execution_count="5">
+<div id="183e67ab" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
@@ -730,7 +730,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="run-validation-and-export" class="level2">
 <h2 class="anchored" data-anchor-id="run-validation-and-export">Run Validation and Export</h2>
 <p>With the providers ready, we’ll create a small DataFrame with some intentional quality issues (a negative amount, a zero amount, and a missing customer name), validate it, and then export the results.</p>
-<div id="5234d607" class="cell" data-execution_count="6">
+<div id="8e288f7d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>, <span class="dv">105</span>],</span>
@@ -755,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
 </div>
 <p>The report shows two steps with failures. Now we create an <a href="../../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> with all three signal types enabled and export the validation results.</p>
-<div id="4e8dbff7" class="cell" data-execution_count="7">
+<div id="90870e43" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>otel <span class="op">=</span> OTelExporter(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    meter_provider<span class="op">=</span>meter_provider,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    tracer_provider<span class="op">=</span>tracer_provider,</span>
@@ -772,7 +772,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="inspect-the-emitted-metrics" class="level2">
 <h2 class="anchored" data-anchor-id="inspect-the-emitted-metrics">Inspect the Emitted Metrics</h2>
 <p>The metric reader holds all counters, gauges, and histograms that were recorded. We can iterate through them to see every instrument and its current value.</p>
-<div id="42687887" class="cell" data-execution_count="8">
+<div id="112a2de6" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>metrics_data <span class="op">=</span> metric_reader.get_metrics_data()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> resource_metrics <span class="kw">in</span> metrics_data.resource_metrics:</span>
@@ -787,7 +787,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="inspect-the-trace-spans" class="level2">
 <h2 class="anchored" data-anchor-id="inspect-the-trace-spans">Inspect the Trace Spans</h2>
 <p>Each <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> call produces a root span with one child per validation step:</p>
-<div id="60090c27" class="cell" data-execution_count="9">
+<div id="77d86042" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>spans <span class="op">=</span> span_exporter.get_finished_spans()</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> span <span class="kw">in</span> spans:</span>
@@ -804,7 +804,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="inspect-the-log-records" class="level2">
 <h2 class="anchored" data-anchor-id="inspect-the-log-records">Inspect the Log Records</h2>
 <p>Log records are emitted for each validation step that exceeds a threshold. The severity of the log record corresponds to the highest threshold level breached by that step.</p>
-<div id="ebd31424" class="cell" data-execution_count="10">
+<div id="532c5024" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>logs <span class="op">=</span> log_exporter.get_finished_logs()</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> log <span class="kw">in</span> logs:</span>
@@ -930,7 +930,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="bringing-your-own-provider" class="level1">
 <h1>Bringing Your Own Provider</h1>
 <p>The in-memory providers used in the walkthrough above are great during development, but in production you’ll point the SDK at an actual collector. Here’s how to configure a <code>MeterProvider</code> with the OTLP gRPC exporter.</p>
-<div id="4f28f9e9" class="cell" data-execution_count="12">
+<div id="2fd779c3" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> PeriodicExportingMetricReader</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.exporter.otlp.proto.grpc.metric_exporter <span class="im">import</span> OTLPMetricExporter</span>

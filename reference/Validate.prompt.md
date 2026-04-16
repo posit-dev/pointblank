@@ -42,7 +42,7 @@ A natural language description of the validation criteria. This prompt should cl
 A single column or list of columns to include in the validation. If `None`, all columns will be included. Specifying fewer columns can improve performance and reduce API costs so try to include only the columns necessary for the validation.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific model to be used from the provider (for `"azure-openai"`, the value after the colon is the Azure *deployment id*). Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
 
 `batch_size: int = ``1000`  
 Number of rows to process in each batch. Larger batches are more efficient but may hit API limits. Default is `1000`.
@@ -84,8 +84,9 @@ The `model=` argument should be constructed using the provider and model name se
 - `"openai"` (OpenAI)
 - `"ollama"` (Ollama)
 - `"bedrock"` (Amazon Bedrock)
+- `"azure-openai"` (Azure OpenAI)
 
-The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
+The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id.
 
 
 ## Notes On Authentication
@@ -109,6 +110,7 @@ There's no need to have the `python-dotenv` package installed when using `.env` 
 - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
 - **Ollama**: no API key required, just ensure Ollama is running locally
 - **Bedrock**: configure AWS credentials through standard AWS methods
+- **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
 
 
 ## Ai Validation Process
