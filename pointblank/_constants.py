@@ -141,6 +141,7 @@ MODEL_PROVIDERS = [
     "anthropic",
     "ollama",
     "bedrock",
+    "azure-openai",
 ]
 
 TABLE_TYPE_STYLES = {

@@ -172,6 +172,41 @@ EXAMPLE OUTPUT FORMAT:
             kwargs={"http_client": http_client},
         )
 
+    elif provider == "azure-openai":  # pragma: no cover
+        try:
+            import openai  # noqa
+        except ImportError:
+            raise ImportError(
+                "The `openai` package is required to use AI validation with "
+                "`azure-openai`. Please install it using `pip install openai`."
+            )
+
+        import os
+
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("OPENAI_API_VERSION")
+        if not endpoint:
+            raise ValueError(
+                "AZURE_OPENAI_ENDPOINT environment variable must be set to use "
+                "the 'azure-openai' provider."
+            )
+        if not api_version:
+            raise ValueError(
+                "OPENAI_API_VERSION environment variable must be set to use "
+                "the 'azure-openai' provider (e.g. '2024-06-01')."
+            )
+
+        from chatlas import ChatAzureOpenAI
+
+        chat = ChatAzureOpenAI(
+            endpoint=endpoint,
+            deployment_id=model_name,
+            api_version=api_version,
+            api_key=api_key,
+            system_prompt=system_prompt,
+            kwargs={"http_client": http_client},
+        )
+
     else:
         raise ValueError(f"Unsupported provider: {provider}")
 

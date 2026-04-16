@@ -410,6 +410,7 @@ def test_prompt_inactive():
         ("openai", "gpt-4o-mini"),
         ("ollama", "llama2"),
         ("bedrock", "anthropic.claude-3-sonnet-20240229-v1:0"),
+        ("azure-openai", "my-gpt4-deployment"),
     ],
 )
 def test_prompt_with_different_providers(provider, model):
