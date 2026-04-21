@@ -258,9 +258,9 @@ class DraftValidation:
             )
 
         # Read the API/examples text from a file
-        with files("pointblank.data").joinpath("api-docs.txt").open(
-            encoding="utf-8"
-        ) as f:  # pragma: no cover
+        with (
+            files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f
+        ):  # pragma: no cover
             api_and_examples_text = f.read()
 
         # Get the model name from the `model` value
