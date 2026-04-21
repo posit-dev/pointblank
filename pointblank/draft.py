@@ -22,9 +22,9 @@ class DraftValidation:
     starting point for validating a table. This can be useful when you have a new table and you
     want to get a sense of how to validate it (and adjustments could always be made later). The
     `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-    using an LLM from either the `"anthropic"`, `"openai"`, `"ollama"` or `"bedrock"` provider. You
-    can install all requirements for the class through an optional 'generate' install of Pointblank
-    via `pip install pointblank[generate]`.
+    using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"`
+    provider. You can install all requirements for the class through an optional 'generate' install
+    of Pointblank via `pip install pointblank[generate]`.
 
     :::{.callout-warning}
     The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -38,7 +38,8 @@ class DraftValidation:
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, and `"bedrock"`.
+        `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the
+        colon is the Azure *deployment id*, not an OpenAI model id.
     api_key
         The API key to be used for the model.
     verify_ssl
@@ -61,9 +62,15 @@ class DraftValidation:
     - `"openai"` (OpenAI)
     - `"ollama"` (Ollama)
     - `"bedrock"` (Amazon Bedrock)
+    - `"azure-openai"` (Azure OpenAI)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
+    For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you
+    assigned when deploying the model in your Azure OpenAI resource). It also requires the
+    environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+    `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
+    be set.
 
     Notes on Authentication
     -----------------------
@@ -251,7 +258,9 @@ class DraftValidation:
             )
 
         # Read the API/examples text from a file
-        with files("pointblank.data").joinpath("api-docs.txt").open() as f:  # pragma: no cover
+        with files("pointblank.data").joinpath("api-docs.txt").open(
+            encoding="utf-8"
+        ) as f:  # pragma: no cover
             api_and_examples_text = f.read()
 
         # Get the model name from the `model` value
@@ -385,6 +394,41 @@ class DraftValidation:
 
             chat = ChatBedrockAnthropic(  # pragma: no cover
                 model=model_name,
+                system_prompt="You are a terse assistant and a Python expert.",
+                kwargs={"http_client": http_client},
+            )
+
+        if provider == "azure-openai":  # pragma: no cover
+            try:
+                import openai  # noqa
+            except ImportError:  # pragma: no cover
+                raise ImportError(  # pragma: no cover
+                    "The `openai` package is required to use the `DraftValidation` class with "
+                    "the `azure-openai` provider. Please install it using `pip install openai`."
+                )
+
+            import os
+
+            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+            api_version = os.getenv("OPENAI_API_VERSION")
+            if not endpoint:
+                raise ValueError(
+                    "AZURE_OPENAI_ENDPOINT environment variable must be set to use "
+                    "the 'azure-openai' provider."
+                )
+            if not api_version:
+                raise ValueError(
+                    "OPENAI_API_VERSION environment variable must be set to use "
+                    "the 'azure-openai' provider (e.g. '2024-06-01')."
+                )
+
+            from chatlas import ChatAzureOpenAI  # pragma: no cover
+
+            chat = ChatAzureOpenAI(  # pragma: no cover
+                endpoint=endpoint,
+                deployment_id=model_name,
+                api_version=api_version,
+                api_key=self.api_key,
                 system_prompt="You are a terse assistant and a Python expert.",
                 kwargs={"http_client": http_client},
             )
