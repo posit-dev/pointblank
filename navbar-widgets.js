@@ -79,6 +79,12 @@
             if (ghLi && !ghLi.hasChildNodes()) ghLi.remove();
         }
 
+        // 4b. Version selector — #gd-version-selector
+        var vsWidget = document.getElementById('gd-version-selector');
+        if (vsWidget) {
+            moveToWrapper(wrapper, vsWidget);
+        }
+
         // 5. Search button
         var search = document.getElementById('quarto-search');
         if (search) moveToWrapper(wrapper, search);
@@ -121,6 +127,14 @@
         if (navbarCollapse) {
             var observer = new MutationObserver(scheduleCollect);
             observer.observe(navbarCollapse, { childList: true, subtree: true });
+        }
+
+        // Also watch container-fluid for widgets appended outside navbarCollapse
+        // (e.g. version selector)
+        var containerFluid = document.querySelector('.navbar .container-fluid');
+        if (containerFluid) {
+            var cfObserver = new MutationObserver(scheduleCollect);
+            cfObserver.observe(containerFluid, { childList: true });
         }
 
         window.addEventListener('load', scheduleCollect, { once: true });

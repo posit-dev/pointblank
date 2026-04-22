@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5864d2c5cf85e8c6f619c1992905b265.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c3c1eaddac709e2bc8d02962e1cdecd2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -207,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">DraftValidation</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1054,13 +1054,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L16-L398" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L16-L442" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">DraftValidation</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
+<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, or <code>"azure-openai"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1085,7 +1085,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, and <code>"azure-openai"</code>. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em>, not an OpenAI model id.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">api_key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1117,8 +1117,9 @@ The drafted validation plan.
 <li><code>"openai"</code> (OpenAI)</li>
 <li><code>"ollama"</code> (Ollama)</li>
 <li><code>"bedrock"</code> (Amazon Bedrock)</li>
+<li><code>"azure-openai"</code> (Azure OpenAI)</li>
 </ul>
-<p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names.</p>
+<p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables <code>AZURE_OPENAI_API_KEY</code>, <code>AZURE_OPENAI_ENDPOINT</code> (e.g., <code>https://&lt;resource&gt;.openai.azure.com</code>), and <code>OPENAI_API_VERSION</code> (e.g., <code>"2024-06-01"</code>) to be set.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-notes-on-authentication">
 <h2 class="doc-notes-on-authentication">Notes On Authentication</h2>

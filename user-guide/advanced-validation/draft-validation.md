@@ -41,6 +41,7 @@ The [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidat
 - **OpenAI** (GPT models)
 - **Ollama** (local LLMs)
 - **Amazon Bedrock** (AWS-hosted models)
+- **Azure OpenAI** (OpenAI models deployed on Azure)
 
 Each provider has different capabilities and performance characteristics, but all can be used to generate validation plans through a consistent interface.
 
@@ -163,6 +164,11 @@ You can also store API keys in a `.env` file in your project's root directory:
     ANTHROPIC_API_KEY=your_anthropic_api_key_here
     OPENAI_API_KEY=your_openai_api_key_here
 
+    # For Azure OpenAI, three variables are required:
+    AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+    AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+    OPENAI_API_VERSION=2025-03-01-preview
+
 If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`), [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation) will automatically find and use them:
 
 ``` python
@@ -271,6 +277,10 @@ pb.DraftValidation(data=data, model="ollama:llama3:latest")
 
 # Using Amazon Bedrock
 pb.DraftValidation(data=data, model="bedrock:anthropic.claude-3-sonnet-20240229-v1:0")
+
+# Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;
+# requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)
+pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 ```
 
 

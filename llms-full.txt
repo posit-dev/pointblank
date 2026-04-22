@@ -1200,9 +1200,9 @@ By using a large language model (LLM) to draft a validation plan, you can quickl
 starting point for validating a table. This can be useful when you have a new table and you
 want to get a sense of how to validate it (and adjustments could always be made later). The
 `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-using an LLM from either the `"anthropic"`, `"openai"`, `"ollama"` or `"bedrock"` provider. You
-can install all requirements for the class through an optional 'generate' install of Pointblank
-via `pip install pointblank[generate]`.
+using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"`
+provider. You can install all requirements for the class through an optional 'generate' install
+of Pointblank via `pip install pointblank[generate]`.
 
 :::{.callout-warning}
 The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -1216,7 +1216,8 @@ data
 model
     The model to be used. This should be in the form of `provider:model` (e.g.,
     `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-    `"ollama"`, and `"bedrock"`.
+    `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the
+    colon is the Azure *deployment id*, not an OpenAI model id.
 api_key
     The API key to be used for the model.
 verify_ssl
@@ -1239,9 +1240,15 @@ colon (`provider:model`). The provider text can any of:
 - `"openai"` (OpenAI)
 - `"ollama"` (Ollama)
 - `"bedrock"` (Amazon Bedrock)
+- `"azure-openai"` (Azure OpenAI)
 
 The model name should be the specific model to be used from the provider. Model names are
 subject to change so consult the provider's documentation for the most up-to-date model names.
+For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you
+assigned when deploying the model in your Azure OpenAI resource). It also requires the
+environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+`https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
+be set.
 
 Notes on Authentication
 -----------------------
@@ -23836,6 +23843,7 @@ The `DraftValidation` class supports multiple LLM providers:
 - **OpenAI** (GPT models)
 - **Ollama** (local LLMs)
 - **Amazon Bedrock** (AWS-hosted models)
+- **Azure OpenAI** (OpenAI models deployed on Azure)
 
 Each provider has different capabilities and performance characteristics, but all can be used to
 generate validation plans through a consistent interface.
@@ -23958,6 +23966,11 @@ You can also store API keys in a `.env` file in your project's root directory:
 # Contents of .env file
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
+
+# For Azure OpenAI, three variables are required:
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+OPENAI_API_VERSION=2025-03-01-preview
 ```
 
 If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`),
@@ -24067,6 +24080,10 @@ pb.DraftValidation(data=data, model="ollama:llama3:latest")
 
 # Using Amazon Bedrock
 pb.DraftValidation(data=data, model="bedrock:anthropic.claude-3-sonnet-20240229-v1:0")
+
+# Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;
+# requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)
+pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 ```
 
 ### Model Performance and Privacy

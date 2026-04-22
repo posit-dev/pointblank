@@ -11,7 +11,7 @@ DraftValidation()
 ```
 
 
-By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from either the `"anthropic"`, `"openai"`, `"ollama"` or `"bedrock"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]`.
+By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]`.
 
 > **Warning: Warning**
 >
@@ -25,7 +25,7 @@ By using a large language model (LLM) to draft a validation plan, you can quickl
 The data to be used for drafting a validation plan.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, and `"bedrock"`.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the colon is the Azure *deployment id*, not an OpenAI model id.
 
 `api_key: str | None = None`  
 The API key to be used for the model.
@@ -49,8 +49,9 @@ The `model=` argument should be constructed using the provider and model name se
 - `"openai"` (OpenAI)
 - `"ollama"` (Ollama)
 - `"bedrock"` (Amazon Bedrock)
+- `"azure-openai"` (Azure OpenAI)
 
-The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
+The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to be set.
 
 
 ## Notes On Authentication
