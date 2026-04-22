@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-c3c1eaddac709e2bc8d02962e1cdecd2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-b4fcbc11625077f9c0d1a790597d7014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,7 +77,6 @@ ul.task-list li input[type="checkbox"] {
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
-  <link rel="canonical" href="https://posit-dev.github.io/pointblank/changelog.html">
   <meta name="description" content="This changelog is generated automatically from GitHub Releases.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Changelog – Pointblank | Pointblank">
@@ -96,7 +95,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.23.0</code><br>Released 2026-04-01">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.24.0</code><br>Released 2026-04-22">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -150,77 +149,83 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#v0.23.0" id="toc-v0.23.0" class="nav-link active" data-scroll-target="#v0.23.0">v0.23.0</a>
+  <li><a href="#v0.24.0" id="toc-v0.24.0" class="nav-link active" data-scroll-target="#v0.24.0">v0.24.0</a>
+  <ul class="collapse">
+  <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New Features</a></li>
+  <li><a href="#docs" id="toc-docs" class="nav-link" data-scroll-target="#docs">Docs</a></li>
+  <li><a href="#new-contributors" id="toc-new-contributors" class="nav-link" data-scroll-target="#new-contributors">New Contributors</a></li>
+  </ul></li>
+  <li><a href="#v0.23.0" id="toc-v0.23.0" class="nav-link" data-scroll-target="#v0.23.0">v0.23.0</a>
   <ul class="collapse">
   <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
   <li><a href="#fixes" id="toc-fixes" class="nav-link" data-scroll-target="#fixes">Fixes:</a></li>
   </ul></li>
   <li><a href="#v0.22.0" id="toc-v0.22.0" class="nav-link" data-scroll-target="#v0.22.0">v0.22.0</a>
   <ul class="collapse">
-  <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New Features</a></li>
+  <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New Features</a></li>
   <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug Fixes</a></li>
-  <li><a href="#docs" id="toc-docs" class="nav-link" data-scroll-target="#docs">Docs</a></li>
+  <li><a href="#docs-1" id="toc-docs-1" class="nav-link" data-scroll-target="#docs-1">Docs</a></li>
   </ul></li>
   <li><a href="#v0.21.0" id="toc-v0.21.0" class="nav-link" data-scroll-target="#v0.21.0">v0.21.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New Features</a></li>
-  <li><a href="#docs-1" id="toc-docs-1" class="nav-link" data-scroll-target="#docs-1">Docs</a></li>
+  <li><a href="#new-features-2" id="toc-new-features-2" class="nav-link" data-scroll-target="#new-features-2">New Features</a></li>
+  <li><a href="#docs-2" id="toc-docs-2" class="nav-link" data-scroll-target="#docs-2">Docs</a></li>
   </ul></li>
   <li><a href="#v0.20.0" id="toc-v0.20.0" class="nav-link" data-scroll-target="#v0.20.0">v0.20.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-2" id="toc-new-features-2" class="nav-link" data-scroll-target="#new-features-2">New Features</a></li>
+  <li><a href="#new-features-3" id="toc-new-features-3" class="nav-link" data-scroll-target="#new-features-3">New Features</a></li>
   </ul></li>
   <li><a href="#v0.19.0" id="toc-v0.19.0" class="nav-link" data-scroll-target="#v0.19.0">v0.19.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-3" id="toc-new-features-3" class="nav-link" data-scroll-target="#new-features-3">New Features</a></li>
+  <li><a href="#new-features-4" id="toc-new-features-4" class="nav-link" data-scroll-target="#new-features-4">New Features</a></li>
   <li><a href="#fixes-1" id="toc-fixes-1" class="nav-link" data-scroll-target="#fixes-1">Fixes</a></li>
   </ul></li>
   <li><a href="#v0.18.0" id="toc-v0.18.0" class="nav-link" data-scroll-target="#v0.18.0">v0.18.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-4" id="toc-new-features-4" class="nav-link" data-scroll-target="#new-features-4">New Features</a></li>
+  <li><a href="#new-features-5" id="toc-new-features-5" class="nav-link" data-scroll-target="#new-features-5">New Features</a></li>
   <li><a href="#fixes-2" id="toc-fixes-2" class="nav-link" data-scroll-target="#fixes-2">Fixes</a></li>
-  <li><a href="#docs-2" id="toc-docs-2" class="nav-link" data-scroll-target="#docs-2">Docs</a></li>
+  <li><a href="#docs-3" id="toc-docs-3" class="nav-link" data-scroll-target="#docs-3">Docs</a></li>
   </ul></li>
   <li><a href="#v0.17.0" id="toc-v0.17.0" class="nav-link" data-scroll-target="#v0.17.0">v0.17.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-5" id="toc-new-features-5" class="nav-link" data-scroll-target="#new-features-5">New Features</a></li>
+  <li><a href="#new-features-6" id="toc-new-features-6" class="nav-link" data-scroll-target="#new-features-6">New Features</a></li>
   <li><a href="#fixes-3" id="toc-fixes-3" class="nav-link" data-scroll-target="#fixes-3">Fixes</a></li>
-  <li><a href="#new-contributors" id="toc-new-contributors" class="nav-link" data-scroll-target="#new-contributors">New Contributors</a></li>
+  <li><a href="#new-contributors-1" id="toc-new-contributors-1" class="nav-link" data-scroll-target="#new-contributors-1">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.16.0" id="toc-v0.16.0" class="nav-link" data-scroll-target="#v0.16.0">v0.16.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-6" id="toc-new-features-6" class="nav-link" data-scroll-target="#new-features-6">New Features</a></li>
+  <li><a href="#new-features-7" id="toc-new-features-7" class="nav-link" data-scroll-target="#new-features-7">New Features</a></li>
   <li><a href="#fixes-4" id="toc-fixes-4" class="nav-link" data-scroll-target="#fixes-4">Fixes</a></li>
-  <li><a href="#docs-3" id="toc-docs-3" class="nav-link" data-scroll-target="#docs-3">Docs</a></li>
-  <li><a href="#new-contributors-1" id="toc-new-contributors-1" class="nav-link" data-scroll-target="#new-contributors-1">New Contributors</a></li>
+  <li><a href="#docs-4" id="toc-docs-4" class="nav-link" data-scroll-target="#docs-4">Docs</a></li>
+  <li><a href="#new-contributors-2" id="toc-new-contributors-2" class="nav-link" data-scroll-target="#new-contributors-2">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.15.0" id="toc-v0.15.0" class="nav-link" data-scroll-target="#v0.15.0">v0.15.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-7" id="toc-new-features-7" class="nav-link" data-scroll-target="#new-features-7">New Features</a></li>
+  <li><a href="#new-features-8" id="toc-new-features-8" class="nav-link" data-scroll-target="#new-features-8">New Features</a></li>
   <li><a href="#fixes-5" id="toc-fixes-5" class="nav-link" data-scroll-target="#fixes-5">Fixes</a></li>
-  <li><a href="#docs-4" id="toc-docs-4" class="nav-link" data-scroll-target="#docs-4">Docs</a></li>
+  <li><a href="#docs-5" id="toc-docs-5" class="nav-link" data-scroll-target="#docs-5">Docs</a></li>
   </ul></li>
   <li><a href="#v0.14.0" id="toc-v0.14.0" class="nav-link" data-scroll-target="#v0.14.0">v0.14.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-8" id="toc-new-features-8" class="nav-link" data-scroll-target="#new-features-8">New Features</a></li>
-  <li><a href="#docs-5" id="toc-docs-5" class="nav-link" data-scroll-target="#docs-5">Docs</a></li>
+  <li><a href="#new-features-9" id="toc-new-features-9" class="nav-link" data-scroll-target="#new-features-9">New Features</a></li>
+  <li><a href="#docs-6" id="toc-docs-6" class="nav-link" data-scroll-target="#docs-6">Docs</a></li>
   <li><a href="#fixes-6" id="toc-fixes-6" class="nav-link" data-scroll-target="#fixes-6">Fixes</a></li>
   <li><a href="#chores" id="toc-chores" class="nav-link" data-scroll-target="#chores">Chores</a></li>
   </ul></li>
   <li><a href="#v0.13.4" id="toc-v0.13.4" class="nav-link" data-scroll-target="#v0.13.4">v0.13.4</a>
   <ul class="collapse">
-  <li><a href="#new-features-9" id="toc-new-features-9" class="nav-link" data-scroll-target="#new-features-9">New Features</a></li>
+  <li><a href="#new-features-10" id="toc-new-features-10" class="nav-link" data-scroll-target="#new-features-10">New Features</a></li>
   <li><a href="#fixes-7" id="toc-fixes-7" class="nav-link" data-scroll-target="#fixes-7">Fixes</a></li>
   </ul></li>
   <li><a href="#v0.13.3" id="toc-v0.13.3" class="nav-link" data-scroll-target="#v0.13.3">v0.13.3</a>
   <ul class="collapse">
-  <li><a href="#new-features-10" id="toc-new-features-10" class="nav-link" data-scroll-target="#new-features-10">New Features</a></li>
+  <li><a href="#new-features-11" id="toc-new-features-11" class="nav-link" data-scroll-target="#new-features-11">New Features</a></li>
   <li><a href="#fixes-8" id="toc-fixes-8" class="nav-link" data-scroll-target="#fixes-8">Fixes</a></li>
-  <li><a href="#new-contributors-2" id="toc-new-contributors-2" class="nav-link" data-scroll-target="#new-contributors-2">New Contributors</a></li>
+  <li><a href="#new-contributors-3" id="toc-new-contributors-3" class="nav-link" data-scroll-target="#new-contributors-3">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.13.2" id="toc-v0.13.2" class="nav-link" data-scroll-target="#v0.13.2">v0.13.2</a>
   <ul class="collapse">
-  <li><a href="#new-features-11" id="toc-new-features-11" class="nav-link" data-scroll-target="#new-features-11">New Features</a></li>
+  <li><a href="#new-features-12" id="toc-new-features-12" class="nav-link" data-scroll-target="#new-features-12">New Features</a></li>
   <li><a href="#fixes-9" id="toc-fixes-9" class="nav-link" data-scroll-target="#fixes-9">Fixes</a></li>
   <li><a href="#chores-1" id="toc-chores-1" class="nav-link" data-scroll-target="#chores-1">Chores</a></li>
   </ul></li>
@@ -230,37 +235,37 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#v0.13.0" id="toc-v0.13.0" class="nav-link" data-scroll-target="#v0.13.0">v0.13.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-12" id="toc-new-features-12" class="nav-link" data-scroll-target="#new-features-12">New Features</a></li>
-  <li><a href="#docs-6" id="toc-docs-6" class="nav-link" data-scroll-target="#docs-6">Docs</a></li>
+  <li><a href="#new-features-13" id="toc-new-features-13" class="nav-link" data-scroll-target="#new-features-13">New Features</a></li>
+  <li><a href="#docs-7" id="toc-docs-7" class="nav-link" data-scroll-target="#docs-7">Docs</a></li>
   <li><a href="#chores-2" id="toc-chores-2" class="nav-link" data-scroll-target="#chores-2">Chores</a></li>
-  <li><a href="#new-contributors-3" id="toc-new-contributors-3" class="nav-link" data-scroll-target="#new-contributors-3">New Contributors</a></li>
+  <li><a href="#new-contributors-4" id="toc-new-contributors-4" class="nav-link" data-scroll-target="#new-contributors-4">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.12.2" id="toc-v0.12.2" class="nav-link" data-scroll-target="#v0.12.2">v0.12.2</a>
   <ul class="collapse">
-  <li><a href="#new-features-13" id="toc-new-features-13" class="nav-link" data-scroll-target="#new-features-13">New Features</a></li>
+  <li><a href="#new-features-14" id="toc-new-features-14" class="nav-link" data-scroll-target="#new-features-14">New Features</a></li>
   </ul></li>
   <li><a href="#v0.12.1" id="toc-v0.12.1" class="nav-link" data-scroll-target="#v0.12.1">v0.12.1</a>
   <ul class="collapse">
-  <li><a href="#new-features-14" id="toc-new-features-14" class="nav-link" data-scroll-target="#new-features-14">New Features</a></li>
+  <li><a href="#new-features-15" id="toc-new-features-15" class="nav-link" data-scroll-target="#new-features-15">New Features</a></li>
   </ul></li>
   <li><a href="#v0.12.0" id="toc-v0.12.0" class="nav-link" data-scroll-target="#v0.12.0">v0.12.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-15" id="toc-new-features-15" class="nav-link" data-scroll-target="#new-features-15">New Features</a></li>
+  <li><a href="#new-features-16" id="toc-new-features-16" class="nav-link" data-scroll-target="#new-features-16">New Features</a></li>
   </ul></li>
   <li><a href="#v0.11.6" id="toc-v0.11.6" class="nav-link" data-scroll-target="#v0.11.6">v0.11.6</a>
   <ul class="collapse">
-  <li><a href="#docs-7" id="toc-docs-7" class="nav-link" data-scroll-target="#docs-7">Docs</a></li>
+  <li><a href="#docs-8" id="toc-docs-8" class="nav-link" data-scroll-target="#docs-8">Docs</a></li>
   <li><a href="#fixes-11" id="toc-fixes-11" class="nav-link" data-scroll-target="#fixes-11">Fixes</a></li>
-  <li><a href="#new-contributors-4" id="toc-new-contributors-4" class="nav-link" data-scroll-target="#new-contributors-4">New Contributors</a></li>
+  <li><a href="#new-contributors-5" id="toc-new-contributors-5" class="nav-link" data-scroll-target="#new-contributors-5">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.11.5" id="toc-v0.11.5" class="nav-link" data-scroll-target="#v0.11.5">v0.11.5</a></li>
   <li><a href="#v0.11.4" id="toc-v0.11.4" class="nav-link" data-scroll-target="#v0.11.4">v0.11.4</a>
   <ul class="collapse">
-  <li><a href="#new-features-16" id="toc-new-features-16" class="nav-link" data-scroll-target="#new-features-16">New Features</a></li>
+  <li><a href="#new-features-17" id="toc-new-features-17" class="nav-link" data-scroll-target="#new-features-17">New Features</a></li>
   </ul></li>
   <li><a href="#v0.11.3" id="toc-v0.11.3" class="nav-link" data-scroll-target="#v0.11.3">v0.11.3</a>
   <ul class="collapse">
-  <li><a href="#new-features-17" id="toc-new-features-17" class="nav-link" data-scroll-target="#new-features-17">New Features</a></li>
+  <li><a href="#new-features-18" id="toc-new-features-18" class="nav-link" data-scroll-target="#new-features-18">New Features</a></li>
   </ul></li>
   <li><a href="#v0.11.2" id="toc-v0.11.2" class="nav-link" data-scroll-target="#v0.11.2">v0.11.2</a>
   <ul class="collapse">
@@ -269,20 +274,20 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#v0.11.1" id="toc-v0.11.1" class="nav-link" data-scroll-target="#v0.11.1">v0.11.1</a>
   <ul class="collapse">
-  <li><a href="#new-features-18" id="toc-new-features-18" class="nav-link" data-scroll-target="#new-features-18">New Features</a></li>
+  <li><a href="#new-features-19" id="toc-new-features-19" class="nav-link" data-scroll-target="#new-features-19">New Features</a></li>
   <li><a href="#fixes-13" id="toc-fixes-13" class="nav-link" data-scroll-target="#fixes-13">Fixes</a></li>
   <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
   </ul></li>
   <li><a href="#v0.11.0" id="toc-v0.11.0" class="nav-link" data-scroll-target="#v0.11.0">v0.11.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-19" id="toc-new-features-19" class="nav-link" data-scroll-target="#new-features-19">New Features</a></li>
+  <li><a href="#new-features-20" id="toc-new-features-20" class="nav-link" data-scroll-target="#new-features-20">New Features</a></li>
   </ul></li>
   <li><a href="#v0.10.0" id="toc-v0.10.0" class="nav-link" data-scroll-target="#v0.10.0">v0.10.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-20" id="toc-new-features-20" class="nav-link" data-scroll-target="#new-features-20">New Features</a></li>
+  <li><a href="#new-features-21" id="toc-new-features-21" class="nav-link" data-scroll-target="#new-features-21">New Features</a></li>
   <li><a href="#fixes-14" id="toc-fixes-14" class="nav-link" data-scroll-target="#fixes-14">Fixes</a></li>
   <li><a href="#documentation-2" id="toc-documentation-2" class="nav-link" data-scroll-target="#documentation-2">Documentation</a></li>
-  <li><a href="#new-contributors-5" id="toc-new-contributors-5" class="nav-link" data-scroll-target="#new-contributors-5">New Contributors</a></li>
+  <li><a href="#new-contributors-6" id="toc-new-contributors-6" class="nav-link" data-scroll-target="#new-contributors-6">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.9.6" id="toc-v0.9.6" class="nav-link" data-scroll-target="#v0.9.6">v0.9.6</a>
   <ul class="collapse">
@@ -302,31 +307,31 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#v0.9.1" id="toc-v0.9.1" class="nav-link" data-scroll-target="#v0.9.1">v0.9.1</a>
   <ul class="collapse">
-  <li><a href="#new-features-21" id="toc-new-features-21" class="nav-link" data-scroll-target="#new-features-21">New Features</a></li>
+  <li><a href="#new-features-22" id="toc-new-features-22" class="nav-link" data-scroll-target="#new-features-22">New Features</a></li>
   </ul></li>
   <li><a href="#v0.9.0" id="toc-v0.9.0" class="nav-link" data-scroll-target="#v0.9.0">v0.9.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-22" id="toc-new-features-22" class="nav-link" data-scroll-target="#new-features-22">New Features</a></li>
+  <li><a href="#new-features-23" id="toc-new-features-23" class="nav-link" data-scroll-target="#new-features-23">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.7" id="toc-v0.8.7" class="nav-link" data-scroll-target="#v0.8.7">v0.8.7</a>
   <ul class="collapse">
-  <li><a href="#new-features-23" id="toc-new-features-23" class="nav-link" data-scroll-target="#new-features-23">New Features</a></li>
+  <li><a href="#new-features-24" id="toc-new-features-24" class="nav-link" data-scroll-target="#new-features-24">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.6" id="toc-v0.8.6" class="nav-link" data-scroll-target="#v0.8.6">v0.8.6</a>
   <ul class="collapse">
-  <li><a href="#new-features-24" id="toc-new-features-24" class="nav-link" data-scroll-target="#new-features-24">New Features</a></li>
+  <li><a href="#new-features-25" id="toc-new-features-25" class="nav-link" data-scroll-target="#new-features-25">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.5" id="toc-v0.8.5" class="nav-link" data-scroll-target="#v0.8.5">v0.8.5</a>
   <ul class="collapse">
-  <li><a href="#new-features-25" id="toc-new-features-25" class="nav-link" data-scroll-target="#new-features-25">New Features</a></li>
+  <li><a href="#new-features-26" id="toc-new-features-26" class="nav-link" data-scroll-target="#new-features-26">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.4" id="toc-v0.8.4" class="nav-link" data-scroll-target="#v0.8.4">v0.8.4</a>
   <ul class="collapse">
-  <li><a href="#new-features-26" id="toc-new-features-26" class="nav-link" data-scroll-target="#new-features-26">New Features</a></li>
+  <li><a href="#new-features-27" id="toc-new-features-27" class="nav-link" data-scroll-target="#new-features-27">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.3" id="toc-v0.8.3" class="nav-link" data-scroll-target="#v0.8.3">v0.8.3</a>
   <ul class="collapse">
-  <li><a href="#new-features-27" id="toc-new-features-27" class="nav-link" data-scroll-target="#new-features-27">New Features</a></li>
+  <li><a href="#new-features-28" id="toc-new-features-28" class="nav-link" data-scroll-target="#new-features-28">New Features</a></li>
   </ul></li>
   <li><a href="#v0.8.2" id="toc-v0.8.2" class="nav-link" data-scroll-target="#v0.8.2">v0.8.2</a>
   <ul class="collapse">
@@ -338,22 +343,22 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#v0.8.0" id="toc-v0.8.0" class="nav-link" data-scroll-target="#v0.8.0">v0.8.0</a>
   <ul class="collapse">
-  <li><a href="#new-features-28" id="toc-new-features-28" class="nav-link" data-scroll-target="#new-features-28">New Features</a></li>
+  <li><a href="#new-features-29" id="toc-new-features-29" class="nav-link" data-scroll-target="#new-features-29">New Features</a></li>
   <li><a href="#fixes-and-documentation" id="toc-fixes-and-documentation" class="nav-link" data-scroll-target="#fixes-and-documentation">Fixes and Documentation</a></li>
   </ul></li>
   <li><a href="#v0.7.3" id="toc-v0.7.3" class="nav-link" data-scroll-target="#v0.7.3">v0.7.3</a>
   <ul class="collapse">
-  <li><a href="#new-features-29" id="toc-new-features-29" class="nav-link" data-scroll-target="#new-features-29">New Features</a></li>
+  <li><a href="#new-features-30" id="toc-new-features-30" class="nav-link" data-scroll-target="#new-features-30">New Features</a></li>
   </ul></li>
   <li><a href="#v0.7.2" id="toc-v0.7.2" class="nav-link" data-scroll-target="#v0.7.2">v0.7.2</a>
   <ul class="collapse">
   <li><a href="#new-features-and-fixes-3" id="toc-new-features-and-fixes-3" class="nav-link" data-scroll-target="#new-features-and-fixes-3">New Features and Fixes</a></li>
-  <li><a href="#new-contributors-6" id="toc-new-contributors-6" class="nav-link" data-scroll-target="#new-contributors-6">New Contributors</a></li>
+  <li><a href="#new-contributors-7" id="toc-new-contributors-7" class="nav-link" data-scroll-target="#new-contributors-7">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.7.1" id="toc-v0.7.1" class="nav-link" data-scroll-target="#v0.7.1">v0.7.1</a>
   <ul class="collapse">
   <li><a href="#new-features-and-fixes-4" id="toc-new-features-and-fixes-4" class="nav-link" data-scroll-target="#new-features-and-fixes-4">New Features and Fixes</a></li>
-  <li><a href="#new-contributors-7" id="toc-new-contributors-7" class="nav-link" data-scroll-target="#new-contributors-7">New Contributors</a></li>
+  <li><a href="#new-contributors-8" id="toc-new-contributors-8" class="nav-link" data-scroll-target="#new-contributors-8">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.7.0" id="toc-v0.7.0" class="nav-link" data-scroll-target="#v0.7.0">v0.7.0</a>
   <ul class="collapse">
@@ -362,7 +367,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#v0.6.3" id="toc-v0.6.3" class="nav-link" data-scroll-target="#v0.6.3">v0.6.3</a>
   <ul class="collapse">
   <li><a href="#new-features-and-fixes-6" id="toc-new-features-and-fixes-6" class="nav-link" data-scroll-target="#new-features-and-fixes-6">New Features and Fixes</a></li>
-  <li><a href="#new-contributors-8" id="toc-new-contributors-8" class="nav-link" data-scroll-target="#new-contributors-8">New Contributors</a></li>
+  <li><a href="#new-contributors-9" id="toc-new-contributors-9" class="nav-link" data-scroll-target="#new-contributors-9">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.6.2" id="toc-v0.6.2" class="nav-link" data-scroll-target="#v0.6.2">v0.6.2</a>
   <ul class="collapse">
@@ -371,26 +376,21 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#v0.6.1" id="toc-v0.6.1" class="nav-link" data-scroll-target="#v0.6.1">v0.6.1</a>
   <ul class="collapse">
   <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
-  <li><a href="#new-features-30" id="toc-new-features-30" class="nav-link" data-scroll-target="#new-features-30">New Features</a></li>
+  <li><a href="#new-features-31" id="toc-new-features-31" class="nav-link" data-scroll-target="#new-features-31">New Features</a></li>
   <li><a href="#fixes-15" id="toc-fixes-15" class="nav-link" data-scroll-target="#fixes-15">Fixes</a></li>
-  <li><a href="#new-contributors-9" id="toc-new-contributors-9" class="nav-link" data-scroll-target="#new-contributors-9">New Contributors</a></li>
+  <li><a href="#new-contributors-10" id="toc-new-contributors-10" class="nav-link" data-scroll-target="#new-contributors-10">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.6.0" id="toc-v0.6.0" class="nav-link" data-scroll-target="#v0.6.0">v0.6.0</a>
   <ul class="collapse">
   <li><a href="#features-1" id="toc-features-1" class="nav-link" data-scroll-target="#features-1">Features</a></li>
   <li><a href="#fixes-and-documentation-1" id="toc-fixes-and-documentation-1" class="nav-link" data-scroll-target="#fixes-and-documentation-1">Fixes and Documentation</a></li>
-  <li><a href="#new-contributors-10" id="toc-new-contributors-10" class="nav-link" data-scroll-target="#new-contributors-10">New Contributors</a></li>
+  <li><a href="#new-contributors-11" id="toc-new-contributors-11" class="nav-link" data-scroll-target="#new-contributors-11">New Contributors</a></li>
   </ul></li>
   <li><a href="#v0.5.0" id="toc-v0.5.0" class="nav-link" data-scroll-target="#v0.5.0">v0.5.0</a>
   <ul class="collapse">
   <li><a href="#features-2" id="toc-features-2" class="nav-link" data-scroll-target="#features-2">Features</a></li>
   <li><a href="#fixes-and-documentation-2" id="toc-fixes-and-documentation-2" class="nav-link" data-scroll-target="#fixes-and-documentation-2">Fixes and Documentation</a></li>
-  <li><a href="#new-contributors-11" id="toc-new-contributors-11" class="nav-link" data-scroll-target="#new-contributors-11">New Contributors</a></li>
-  </ul></li>
-  <li><a href="#v0.4.0" id="toc-v0.4.0" class="nav-link" data-scroll-target="#v0.4.0">v0.4.0</a>
-  <ul class="collapse">
-  <li><a href="#features-3" id="toc-features-3" class="nav-link" data-scroll-target="#features-3">Features</a></li>
-  <li><a href="#fixes-and-documentation-3" id="toc-fixes-and-documentation-3" class="nav-link" data-scroll-target="#fixes-and-documentation-3">Fixes and Documentation</a></li>
+  <li><a href="#new-contributors-12" id="toc-new-contributors-12" class="nav-link" data-scroll-target="#new-contributors-12">New Contributors</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -418,6 +418,33 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>This changelog is generated automatically from <a href="https://github.com/posit-dev/pointblank/releases">GitHub Releases</a>.</p>
+<section id="v0.24.0" class="level1 changelog-version">
+<h1 class="changelog-version">v0.24.0</h1>
+<p><em>2026-04-22</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.24.0">GitHub</a></p>
+<section id="new-features" class="level2">
+<h2 class="anchored" data-anchor-id="new-features">New Features</h2>
+<ul>
+<li>Added the <a href="reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report" class="gdls-link gdls-code">get_dataframe_report()</a> method to <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). (<a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/341">#341</a>)</li>
+<li>Added OpenTelemetry (OTel) integration for exporting validation results as metrics, traces, and logs. Available as an optional dependency via the <code>otel</code> extra. (<a href="https://github.com/posit-dev/pointblank/issues/383">#383</a>)</li>
+<li>Added Azure OpenAI as a model provider for both <a href="reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">Validate.prompt()</a> and <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a>. (<a href="https://github.com/howardbaik"><span class="citation" data-cites="howardbaik">@howardbaik</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/385">#385</a>, <a href="https://github.com/posit-dev/pointblank/issues/387">#387</a>)</li>
+</ul>
+</section>
+<section id="docs" class="level2">
+<h2 class="anchored" data-anchor-id="docs">Docs</h2>
+<ul>
+<li>Reorganized demos into the new docs structure. (<a href="https://github.com/posit-dev/pointblank/issues/381">#381</a>)</li>
+<li>Added a User Guide page on OpenTelemetry integration. (<a href="https://github.com/posit-dev/pointblank/issues/383">#383</a>)</li>
+<li>Added Azure OpenAI usage and setup instructions to the User Guide. (<a href="https://github.com/posit-dev/pointblank/issues/385">#385</a>, <a href="https://github.com/posit-dev/pointblank/issues/387">#387</a>)</li>
+</ul>
+</section>
+<section id="new-contributors" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors">New Contributors</h2>
+<ul>
+<li><a href="https://github.com/howardbaik"><span class="citation" data-cites="howardbaik">@howardbaik</span></a> made their first contribution in <a href="https://github.com/posit-dev/pointblank/issues/385">#385</a></li>
+</ul>
+<p>Full Changelog: <a href="https://github.com/posit-dev/pointblank/compare/v0.23.0...v0.24.0">v0.23.0…v0.24.0</a></p>
+</section>
+</section>
 <section id="v0.23.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.23.0</h1>
 <p><em>2026-04-01</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.23.0">GitHub</a></p>
@@ -441,8 +468,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.22.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.22.0</h1>
 <p><em>2026-02-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.22.0">GitHub</a></p>
-<section id="new-features" class="level2">
-<h2 class="anchored" data-anchor-id="new-features">New Features</h2>
+<section id="new-features-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-1">New Features</h2>
 <ul>
 <li>Expanded <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> country support with 29 new countries (EC, PA, SA, UA, AM, AZ, BO, CM, DO, GE, GT, HN, IL, JM, JO, KH, KZ, LB, MD, MM, MZ, NP, PY, RS, RW, SV, TZ, UY, UZ), bringing the total to 100 supported countries, along with expanded street lists and normalized industry names across existing countries. (<a href="https://github.com/posit-dev/pointblank/issues/370">#370</a>, <a href="https://github.com/posit-dev/pointblank/issues/371">#371</a>)</li>
 <li>Added <a href="reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> as a composite helper that creates a dictionary of person-profile <code>StringField</code> objects for direct unpacking into a <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema()</a>. Supports three tiers (<code>"minimal"</code>, <code>"standard"</code>, <code>"full"</code>), name splitting, column include/exclude, and a <code>prefix=</code> parameter for namespacing. (<a href="https://github.com/posit-dev/pointblank/issues/367">#367</a>)</li>
@@ -455,8 +482,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> failing on tables with duration (timedelta) columns by casting them to strings before display. (<a href="https://github.com/posit-dev/pointblank/issues/368">#368</a>)</li>
 </ul>
 </section>
-<section id="docs" class="level2">
-<h2 class="anchored" data-anchor-id="docs">Docs</h2>
+<section id="docs-1" class="level2">
+<h2 class="anchored" data-anchor-id="docs-1">Docs</h2>
 <ul>
 <li>Added YAML reference and validation workflow guides covering governance metadata and aggregate methods. (<a href="https://github.com/posit-dev/pointblank/issues/369">#369</a>)</li>
 <li>Updated data generation documentation with <a href="reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> usage and 100-country support. (<a href="https://github.com/posit-dev/pointblank/issues/367">#367</a>, <a href="https://github.com/posit-dev/pointblank/issues/370">#370</a>, <a href="https://github.com/posit-dev/pointblank/issues/371">#371</a>)</li>
@@ -467,15 +494,15 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.21.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.21.0</h1>
 <p><em>2026-02-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.21.0">GitHub</a></p>
-<section id="new-features-1" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-1">New Features</h2>
+<section id="new-features-2" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-2">New Features</h2>
 <ul>
 <li>Significantly enhanced <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> with locale mixing (<code>country=</code> now accepts lists or weighted dicts), frequency-weighted sampling via a 4-tier system, a <code>user_agent</code> preset with country-weighted browser selection, presets for hash digests (<code>md5</code>, <code>sha1</code>, <code>sha256</code>), barcodes (<code>ean8</code>, <code>ean13</code>), date strings (<code>date_between</code>, <code>date_range</code>, <code>future_date</code>, <code>past_date</code>), and ISO 3166-1 country codes (<code>country_code_2</code>, <code>country_code_3</code>), country-specific license plate formats, industry-coherent person-company pairing, a <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture with automatic per-test seeding, and expanded country support (bringing the total to 71). (<a href="https://github.com/posit-dev/pointblank/issues/352">#352</a>, <a href="https://github.com/posit-dev/pointblank/issues/354">#354</a>, <a href="https://github.com/posit-dev/pointblank/issues/355">#355</a>, <a href="https://github.com/posit-dev/pointblank/issues/358">#358</a>, <a href="https://github.com/posit-dev/pointblank/issues/360">#360</a>, <a href="https://github.com/posit-dev/pointblank/issues/361">#361</a>, <a href="https://github.com/posit-dev/pointblank/issues/362">#362</a>, <a href="https://github.com/posit-dev/pointblank/issues/363">#363</a>, <a href="https://github.com/posit-dev/pointblank/issues/364">#364</a>, <a href="https://github.com/posit-dev/pointblank/issues/365">#365</a>, <a href="https://github.com/posit-dev/pointblank/issues/366">#366</a>)</li>
 <li>Added expressions support for the <code>active=</code> parameter to provide for more flexible and dynamic validation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/349">#349</a>)</li>
 </ul>
 </section>
-<section id="docs-1" class="level2">
-<h2 class="anchored" data-anchor-id="docs-1">Docs</h2>
+<section id="docs-2" class="level2">
+<h2 class="anchored" data-anchor-id="docs-2">Docs</h2>
 <ul>
 <li>Added validation report notes output display in documentation examples. (<a href="https://github.com/posit-dev/pointblank/issues/350">#350</a>)</li>
 <li>Improved docstrings for <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> and all <code>*_field()</code> functions. (<a href="https://github.com/posit-dev/pointblank/issues/353">#353</a>)</li>
@@ -488,8 +515,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.20.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.20.0</h1>
 <p><em>2026-02-04</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.20.0">GitHub</a></p>
-<section id="new-features-2" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-2">New Features</h2>
+<section id="new-features-3" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-3">New Features</h2>
 <ul>
 <li>Added the <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> function for creating realistic synthetic test data from <a href="reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> definitions, with a suite of field helper functions (<a href="reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>, <a href="reference/date_field.html#pointblank.date_field" class="gdls-link gdls-code">date_field()</a>, <code>name_field()</code>, etc.) and support for 50 country locales via the <code>country=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/348">#348</a>)</li>
 </ul>
@@ -499,8 +526,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.19.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.19.0</h1>
 <p><em>2026-01-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.19.0">GitHub</a></p>
-<section id="new-features-3" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-3">New Features</h2>
+<section id="new-features-4" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-4">New Features</h2>
 <ul>
 <li>We can now specify <code>owner</code>, <code>consumers</code>, and <code>version</code> metadata for data validations within the <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class. (<a href="https://github.com/posit-dev/pointblank/issues/344">#344</a>)</li>
 <li>The new <a href="reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> validation method has been added for easily checking the freshness of data. (<a href="https://github.com/posit-dev/pointblank/issues/345">#345</a>)</li>
@@ -518,8 +545,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.18.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.18.0</h1>
 <p><em>2026-01-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.18.0">GitHub</a></p>
-<section id="new-features-4" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-4">New Features</h2>
+<section id="new-features-5" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-5">New Features</h2>
 <ul>
 <li>Added several validation methods that work on aggregates of column values (e.g.,<a href="reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>, <a href="reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt" class="gdls-link gdls-code">col_sd_lt()</a>, etc.). (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/332">#332</a>)</li>
 </ul>
@@ -533,8 +560,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Improved the display of aggregation-type methods in the validation report. (<a href="https://github.com/posit-dev/pointblank/issues/342">#342</a>)</li>
 </ul>
 </section>
-<section id="docs-2" class="level2">
-<h2 class="anchored" data-anchor-id="docs-2">Docs</h2>
+<section id="docs-3" class="level2">
+<h2 class="anchored" data-anchor-id="docs-3">Docs</h2>
 <ul>
 <li>Updated the reference API with aggregate check methods. (<a href="https://github.com/posit-dev/pointblank/issues/340">#340</a>)</li>
 </ul>
@@ -544,8 +571,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.17.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.17.0</h1>
 <p><em>2025-12-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.17.0">GitHub</a></p>
-<section id="new-features-5" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-5">New Features</h2>
+<section id="new-features-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-6">New Features</h2>
 <ul>
 <li>All <a href="reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> validation steps are now accompanied by notes that describe the results. (<a href="https://github.com/posit-dev/pointblank/issues/325">#325</a>)</li>
 <li>Notes appear in validation reports notes when columns are not found or none are resolved by use of column selectors. (<a href="https://github.com/posit-dev/pointblank/issues/326">#326</a>)</li>
@@ -561,8 +588,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Removed a duplicate paragraph in the docs. (<a href="https://github.com/posit-dev/pointblank/issues/329">#329</a>, <a href="https://github.com/dpprdan"><span class="citation" data-cites="dpprdan">@dpprdan</span></a>)</li>
 </ul>
 </section>
-<section id="new-contributors" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors">New Contributors</h2>
+<section id="new-contributors-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-1">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/dpprdan"><span class="citation" data-cites="dpprdan">@dpprdan</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/329</li>
 </ul>
@@ -572,8 +599,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.16.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.16.0</h1>
 <p><em>2025-11-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.16.0">GitHub</a></p>
-<section id="new-features-6" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-6">New Features</h2>
+<section id="new-features-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-7">New Features</h2>
 <ul>
 <li>Use of local thresholds settings will now produce notes at the bottom of the validation report table. (<a href="https://github.com/posit-dev/pointblank/issues/318">#318</a>)</li>
 <li>Added the <a href="reference/print_database_tables.html#pointblank.print_database_tables" class="gdls-link gdls-code">print_database_tables()</a> function for printing a list of tables in a database connection. (<a href="https://github.com/posit-dev/pointblank/issues/322">#322</a>, <a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>)</li>
@@ -587,8 +614,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Ensured that Pointblank is compatible with Python 3.14 (<a href="https://github.com/posit-dev/pointblank/issues/320">#320</a>)</li>
 </ul>
 </section>
-<section id="docs-3" class="level2">
-<h2 class="anchored" data-anchor-id="docs-3">Docs</h2>
+<section id="docs-4" class="level2">
+<h2 class="anchored" data-anchor-id="docs-4">Docs</h2>
 <ul>
 <li>Revised project website navigation to put the User Guide front and center. (<a href="https://github.com/posit-dev/pointblank/issues/307">#307</a>, <a href="https://github.com/posit-dev/pointblank/issues/321">#321</a>)</li>
 <li>Modified logo used in website. (<a href="https://github.com/posit-dev/pointblank/issues/308">#308</a>)</li>
@@ -599,8 +626,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed broken contributor info links. (<a href="https://github.com/posit-dev/pointblank/issues/316">#316</a>, <a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>)</li>
 </ul>
 </section>
-<section id="new-contributors-1" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-1">New Contributors</h2>
+<section id="new-contributors-2" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-2">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/316</li>
 </ul>
@@ -610,8 +637,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.15.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.15.0</h1>
 <p><em>2025-10-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.15.0">GitHub</a></p>
-<section id="new-features-7" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-7">New Features</h2>
+<section id="new-features-8" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-8">New Features</h2>
 <ul>
 <li>Several new validation methods were incorporated: <a href="reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a>, <a href="reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link gdls-code">col_vals_increasing()</a>, <a href="reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link gdls-code">col_vals_decreasing()</a>, and <a href="reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/304">#304</a>, <a href="https://github.com/posit-dev/pointblank/issues/305">#305</a>, <a href="https://github.com/posit-dev/pointblank/issues/306">#306</a>)</li>
 <li>The option to ignore SSL verification was added to the <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class via the new <code>verify_ssl=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/302">#302</a>)</li>
@@ -624,8 +651,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Altered the HTML tags of ‘brief’ text in validation reports for better display across different publishing environments. (<a href="https://github.com/posit-dev/pointblank/issues/299">#299</a>)</li>
 </ul>
 </section>
-<section id="docs-4" class="level2">
-<h2 class="anchored" data-anchor-id="docs-4">Docs</h2>
+<section id="docs-5" class="level2">
+<h2 class="anchored" data-anchor-id="docs-5">Docs</h2>
 <ul>
 <li>Added a User Guide page on validation reports. (<a href="https://github.com/posit-dev/pointblank/issues/300">#300</a>)</li>
 </ul>
@@ -635,16 +662,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.14.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.14.0</h1>
 <p><em>2025-10-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.14.0">GitHub</a></p>
-<section id="new-features-8" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-8">New Features</h2>
+<section id="new-features-9" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-9">New Features</h2>
 <ul>
 <li>Added the <code>.prompt()</code> validation method to enable data validation using LLMs, evaluating data in rows against natural language descriptions instead of programmatic rules. (<a href="https://github.com/posit-dev/pointblank/issues/287">#287</a>)</li>
 <li>The new <a href="reference/write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a> and <a href="reference/read_file.html#pointblank.read_file" class="gdls-link gdls-code">read_file()</a> functions allow for writing/reading validation objects to and from disk. (<a href="https://github.com/posit-dev/pointblank/issues/291">#291</a>)</li>
 <li>More translation languages added (<code>"id"</code>, <code>"uk"</code>, <code>"he"</code>, <code>"th"</code>, and <code>"fa"</code>). (<a href="https://github.com/posit-dev/pointblank/issues/293">#293</a>)</li>
 </ul>
 </section>
-<section id="docs-5" class="level2">
-<h2 class="anchored" data-anchor-id="docs-5">Docs</h2>
+<section id="docs-6" class="level2">
+<h2 class="anchored" data-anchor-id="docs-6">Docs</h2>
 <ul>
 <li>Summary fields in the <a href="reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> docs examples were updated. (<a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/284">#284</a>)</li>
 <li>The <a href="reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> function now has published docs on the project website. (<a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/288">#288</a>)</li>
@@ -669,8 +696,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.4</h1>
 <p><em>2025-09-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.4">GitHub</a></p>
-<section id="new-features-9" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-9">New Features</h2>
+<section id="new-features-10" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-10">New Features</h2>
 <ul>
 <li>Add Enum support to <a href="reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> and <a href="reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/280">#280</a>)</li>
 <li>The <a href="reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> validation method now has the <code>inverse=</code> parameter to enable negative regex matching. (<a href="https://github.com/posit-dev/pointblank/issues/282">#282</a>)</li>
@@ -687,8 +714,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.3</h1>
 <p><em>2025-09-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.3">GitHub</a></p>
-<section id="new-features-10" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-10">New Features</h2>
+<section id="new-features-11" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-11">New Features</h2>
 <ul>
 <li>Added the <code>namespaces=</code> parameter to <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> to facilitate authoring of custom actions. (<a href="https://github.com/mark-druffel"><span class="citation" data-cites="mark-druffel">@mark-druffel</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/277">#277</a>)</li>
 </ul>
@@ -699,8 +726,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed error when using <code>brief=</code> with <code>segments=seg_group()</code>. (<a href="https://github.com/posit-dev/pointblank/issues/275">#275</a>)</li>
 </ul>
 </section>
-<section id="new-contributors-2" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-2">New Contributors</h2>
+<section id="new-contributors-3" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-3">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/mark-druffel"><span class="citation" data-cites="mark-druffel">@mark-druffel</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/277</li>
 </ul>
@@ -710,8 +737,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.2" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.2</h1>
 <p><em>2025-09-05</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.2">GitHub</a></p>
-<section id="new-features-11" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-11">New Features</h2>
+<section id="new-features-12" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-12">New Features</h2>
 <ul>
 <li>String-based comparisons are now possible in the <a href="reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> and <a href="reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a> validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/272">#272</a>)</li>
 </ul>
@@ -745,14 +772,14 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.0</h1>
 <p><em>2025-08-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.0">GitHub</a></p>
-<section id="new-features-12" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-12">New Features</h2>
+<section id="new-features-13" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-13">New Features</h2>
 <ul>
 <li>Incorporated a Model Context Protocol (MCP) server implementation. (<a href="https://github.com/posit-dev/pointblank/issues/239">#239</a>, <a href="https://github.com/posit-dev/pointblank/issues/264">#264</a>, <a href="https://github.com/pipaber"><span class="citation" data-cites="pipaber">@pipaber</span></a>)</li>
 </ul>
 </section>
-<section id="docs-6" class="level2">
-<h2 class="anchored" data-anchor-id="docs-6">Docs</h2>
+<section id="docs-7" class="level2">
+<h2 class="anchored" data-anchor-id="docs-7">Docs</h2>
 <ul>
 <li>New installation instructions for adding Pointblank to pixi projects. (<a href="https://github.com/posit-dev/pointblank/issues/263">#263</a>, <a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a>)</li>
 </ul>
@@ -764,8 +791,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Reorganized tests and added new ones. (<a href="https://github.com/posit-dev/pointblank/issues/261">#261</a>)</li>
 </ul>
 </section>
-<section id="new-contributors-3" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-3">New Contributors</h2>
+<section id="new-contributors-4" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-4">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/pipaber"><span class="citation" data-cites="pipaber">@pipaber</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/239</li>
 </ul>
@@ -775,8 +802,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.2" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.2</h1>
 <p><em>2025-08-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.2">GitHub</a></p>
-<section id="new-features-13" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-13">New Features</h2>
+<section id="new-features-14" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-14">New Features</h2>
 <ul>
 <li>Added the <a href="reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method and also the <code>set_tbl=</code> parameter to <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/260">#260</a>)</li>
 </ul>
@@ -786,8 +813,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.1</h1>
 <p><em>2025-08-11</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.1">GitHub</a></p>
-<section id="new-features-14" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-14">New Features</h2>
+<section id="new-features-15" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-15">New Features</h2>
 <ul>
 <li>Pointblank now internally handles all Ibis tables using Narwhals. (<a href="https://github.com/posit-dev/pointblank/issues/257">#257</a>)</li>
 </ul>
@@ -797,8 +824,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.0</h1>
 <p><em>2025-08-07</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.0">GitHub</a></p>
-<section id="new-features-15" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-15">New Features</h2>
+<section id="new-features-16" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-16">New Features</h2>
 <ul>
 <li>The segmentation feature was expanded by way of the new <a href="reference/seg_group.html#pointblank.seg_group" class="gdls-link gdls-code">seg_group()</a> helper function. (<a href="https://github.com/posit-dev/pointblank/issues/243">#243</a>)</li>
 <li>You can now validate Spark DataFrames without using Ibis (we now internally process those using Narwhals). (<a href="https://github.com/posit-dev/pointblank/issues/256">#256</a>)</li>
@@ -809,8 +836,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.6" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.6</h1>
 <p><em>2025-07-29</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.6">GitHub</a></p>
-<section id="docs-7" class="level2">
-<h2 class="anchored" data-anchor-id="docs-7">Docs</h2>
+<section id="docs-8" class="level2">
+<h2 class="anchored" data-anchor-id="docs-8">Docs</h2>
 <ul>
 <li>Enhanced YAML documentation by creating two new articles for the User Guide. (<a href="https://github.com/posit-dev/pointblank/issues/249">#249</a>)</li>
 </ul>
@@ -821,8 +848,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Specify <code>ignore_nulls=True</code> in <code>nw.all_horizontal</code>. (<a href="https://github.com/MarcoGorelli"><span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/251">#251</a>)</li>
 </ul>
 </section>
-<section id="new-contributors-4" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-4">New Contributors</h2>
+<section id="new-contributors-5" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-5">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/MarcoGorelli"><span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/251</li>
 </ul>
@@ -840,8 +867,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.4</h1>
 <p><em>2025-07-23</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.4">GitHub</a></p>
-<section id="new-features-16" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-16">New Features</h2>
+<section id="new-features-17" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-17">New Features</h2>
 <ul>
 <li>It’s now possible to define YAML configuration files for validation workflows and run the YAML validations through <a href="reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> or in the Pointblank CLI via <code>pb run</code> (<a href="https://github.com/posit-dev/pointblank/issues/247">#247</a>, <a href="https://github.com/posit-dev/pointblank/issues/248">#248</a>)</li>
 </ul>
@@ -851,8 +878,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.3</h1>
 <p><em>2025-07-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.3">GitHub</a></p>
-<section id="new-features-17" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-17">New Features</h2>
+<section id="new-features-18" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-18">New Features</h2>
 <ul>
 <li>The CLI has the new <code>pb pl</code> command, allowing you to run Polars at the command line. (<a href="https://github.com/posit-dev/pointblank/issues/246">#246</a>)</li>
 </ul>
@@ -881,8 +908,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.1</h1>
 <p><em>2025-06-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.1">GitHub</a></p>
-<section id="new-features-18" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-18">New Features</h2>
+<section id="new-features-19" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-19">New Features</h2>
 <ul>
 <li>Have consistent input ingestion for all classes/functions with a <code>data=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/223">#223</a>)</li>
 <li>Enable data to be obtained via GitHub URLs. (<a href="https://github.com/posit-dev/pointblank/issues/224">#224</a>)</li>
@@ -913,8 +940,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.0</h1>
 <p><em>2025-06-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.0">GitHub</a></p>
-<section id="new-features-19" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-19">New Features</h2>
+<section id="new-features-20" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-20">New Features</h2>
 <ul>
 <li>The <code>pb</code> CLI utility has been added to enable: (1) quick data quality checks, (2) exploration of data at the command line, and (3) easy integration with shell scripts and automation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/221">#221</a>)</li>
 </ul>
@@ -924,8 +951,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.10.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.10.0</h1>
 <p><em>2025-06-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.10.0">GitHub</a></p>
-<section id="new-features-20" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-20">New Features</h2>
+<section id="new-features-21" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-21">New Features</h2>
 <ul>
 <li>It’s now possible to validate Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/200">#200</a>)</li>
 <li>Paths to CSV and Parquet files can now be used as inputs for <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> and <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/213">#213</a>, <a href="https://github.com/posit-dev/pointblank/issues/214">#214</a>, <a href="https://github.com/posit-dev/pointblank/issues/217">#217</a>)</li>
@@ -953,8 +980,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Improved the interlinking in the User Guide thanks to new functionality in quartodoc. (<a href="https://github.com/posit-dev/pointblank/issues/191">#191</a>, <a href="https://github.com/posit-dev/pointblank/issues/212">#212</a>)</li>
 </ul>
 </section>
-<section id="new-contributors-5" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-5">New Contributors</h2>
+<section id="new-contributors-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-6">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/zilto"><span class="citation" data-cites="zilto">@zilto</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/197</li>
 <li><a href="https://github.com/matt-humphrey"><span class="citation" data-cites="matt-humphrey">@matt-humphrey</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/218</li>
@@ -1014,8 +1041,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.9.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.9.1</h1>
 <p><em>2025-05-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.1">GitHub</a></p>
-<section id="new-features-21" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-21">New Features</h2>
+<section id="new-features-22" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-22">New Features</h2>
 <ul>
 <li>Added the <a href="reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/171</li>
 </ul>
@@ -1025,8 +1052,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.9.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.9.0</h1>
 <p><em>2025-04-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.0">GitHub</a></p>
-<section id="new-features-22" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-22">New Features</h2>
+<section id="new-features-23" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-23">New Features</h2>
 <ul>
 <li>There’s now support for data segmentation within a wide variety of validation methods (with the new <code>segments=</code> argument), by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/170</li>
 <li>Implemented parallelization of tests to decrease the overall duration of tests, by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/165</li>
@@ -1037,8 +1064,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.7" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.7</h1>
 <p><em>2025-04-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.7">GitHub</a></p>
-<section id="new-features-23" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-23">New Features</h2>
+<section id="new-features-24" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-24">New Features</h2>
 <ul>
 <li>Allow <code>None</code> in <a href="reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, https://github.com/posit-dev/pointblank/pull/162</li>
 </ul>
@@ -1048,8 +1075,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.6" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.6</h1>
 <p><em>2025-04-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.6">GitHub</a></p>
-<section id="new-features-24" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-24">New Features</h2>
+<section id="new-features-25" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-25">New Features</h2>
 <ul>
 <li>Added the <a href="reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)</li>
 </ul>
@@ -1059,8 +1086,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.5" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.5</h1>
 <p><em>2025-04-15</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.5">GitHub</a></p>
-<section id="new-features-25" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-25">New Features</h2>
+<section id="new-features-26" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-26">New Features</h2>
 <ul>
 <li>Added step report functionality for <a href="reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> validation steps, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/157</li>
 </ul>
@@ -1070,8 +1097,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.4</h1>
 <p><em>2025-04-12</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.4">GitHub</a></p>
-<section id="new-features-26" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-26">New Features</h2>
+<section id="new-features-27" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-27">New Features</h2>
 <ul>
 <li>All step reports are now translated according to the <code>Validate(lang=)</code> value, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/155</li>
 </ul>
@@ -1081,8 +1108,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.3</h1>
 <p><em>2025-04-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.3">GitHub</a></p>
-<section id="new-features-27" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-27">New Features</h2>
+<section id="new-features-28" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-28">New Features</h2>
 <ul>
 <li>Added Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)</li>
 </ul>
@@ -1116,8 +1143,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.0</h1>
 <p><em>2025-04-03</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.0">GitHub</a></p>
-<section id="new-features-28" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-28">New Features</h2>
+<section id="new-features-29" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-29">New Features</h2>
 <ul>
 <li>Added <code>highest_level=</code> and <code>default=</code> parameters to the <a href="reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> class, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)</li>
 <li>The <code>brief=</code> text now appears in the validation report table, plus we enabled more templating features for <code>brief=</code>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/127</li>
@@ -1140,8 +1167,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.7.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.7.3</h1>
 <p><em>2025-03-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.3">GitHub</a></p>
-<section id="new-features-29" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-29">New Features</h2>
+<section id="new-features-30" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-30">New Features</h2>
 <ul>
 <li>Added the <code>limit=</code> parameter to <a href="reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/115</li>
 <li>The new <code>min_tbl_width=</code> arg in <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> can improve the display of narrow preview tables by default, and, allows for customization, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/117</li>
@@ -1164,8 +1191,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Revised <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> for better operability with the Ibis PySpark backend, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/112</li>
 </ul>
 </section>
-<section id="new-contributors-6" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-6">New Contributors</h2>
+<section id="new-contributors-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-7">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/109</li>
 </ul>
@@ -1182,8 +1209,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Add note about getting a validation report from the REPL by <a href="https://github.com/aborruso"><span class="citation" data-cites="aborruso">@aborruso</span></a> in https://github.com/posit-dev/pointblank/pull/99</li>
 </ul>
 </section>
-<section id="new-contributors-7" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-7">New Contributors</h2>
+<section id="new-contributors-8" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-8">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/aborruso"><span class="citation" data-cites="aborruso">@aborruso</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/99</li>
 <li><a href="https://github.com/albersonmiranda"><span class="citation" data-cites="albersonmiranda">@albersonmiranda</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/103</li>
@@ -1215,8 +1242,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed a display issue concerning value sets within step reports, by <a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> in https://github.com/posit-dev/pointblank/pull/80</li>
 </ul>
 </section>
-<section id="new-contributors-8" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-8">New Contributors</h2>
+<section id="new-contributors-9" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-9">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/80</li>
 </ul>
@@ -1247,8 +1274,8 @@ ul.task-list li input[type="checkbox"] {
 <li>thresholds level names have been renamed to better align with standard log levels by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/69</li>
 </ul>
 </section>
-<section id="new-features-30" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-30">New Features</h2>
+<section id="new-features-31" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-31">New Features</h2>
 <ul>
 <li>Added the ability to execute actions when exceeding threshold levels by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/66</li>
 <li>Added AWS Bedrock support to <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> by <a href="https://github.com/kmasiello"><span class="citation" data-cites="kmasiello">@kmasiello</span></a> in https://github.com/posit-dev/pointblank/pull/67</li>
@@ -1260,8 +1287,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Improved the implementation of <a href="reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/68</li>
 </ul>
 </section>
-<section id="new-contributors-9" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-9">New Contributors</h2>
+<section id="new-contributors-10" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-10">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/kmasiello"><span class="citation" data-cites="kmasiello">@kmasiello</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/67</li>
 </ul>
@@ -1292,8 +1319,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed a typo in the <code>README.md</code> file by <a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a> in https://github.com/posit-dev/pointblank/pull/56</li>
 </ul>
 </section>
-<section id="new-contributors-10" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-10">New Contributors</h2>
+<section id="new-contributors-11" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-11">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/gregorywaynepower"><span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/56</li>
 <li><a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/64</li>
@@ -1320,37 +1347,12 @@ ul.task-list li input[type="checkbox"] {
 <li>Added the Examples page on the project website by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/rich-iannone/pointblank/pull/32, https://github.com/rich-iannone/pointblank/pull/33)</li>
 </ul>
 </section>
-<section id="new-contributors-11" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-11">New Contributors</h2>
+<section id="new-contributors-12" class="level2">
+<h2 class="anchored" data-anchor-id="new-contributors-12">New Contributors</h2>
 <ul>
 <li><a href="https://github.com/malcolmbarrett"><span class="citation" data-cites="malcolmbarrett">@malcolmbarrett</span></a> made their first contribution in https://github.com/rich-iannone/pointblank/pull/41</li>
 </ul>
 <p><strong>Full Changelog</strong>: https://github.com/rich-iannone/pointblank/compare/v0.4.0…v0.5.0</p>
-</section>
-</section>
-<section id="v0.4.0" class="level1 changelog-version">
-<h1 class="changelog-version">v0.4.0</h1>
-<p><em>2025-01-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.4.0">GitHub</a></p>
-<section id="features-3" class="level2">
-<h2 class="anchored" data-anchor-id="features-3">Features</h2>
-<ul>
-<li>Add the <a href="reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a> and <a href="reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match()</a> validation methods by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/rich-iannone/pointblank/pull/24, https://github.com/rich-iannone/pointblank/pull/25)</li>
-<li>Add the <a href="reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> validation method by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/30</li>
-<li>Add the <a href="reference/get_column_count.html#pointblank.get_column_count" class="gdls-link gdls-code">get_column_count()</a> and <a href="reference/get_row_count.html#pointblank.get_row_count" class="gdls-link gdls-code">get_row_count()</a> functions by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/23</li>
-<li>Add the <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> function by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/20</li>
-<li>Incorporate row numbers to preview by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/21</li>
-<li>Add option for info header in <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/22</li>
-</ul>
-</section>
-<section id="fixes-and-documentation-3" class="level2">
-<h2 class="anchored" data-anchor-id="fixes-and-documentation-3">Fixes and Documentation</h2>
-<ul>
-<li>Make corrections to step indexing by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/26</li>
-<li>Improve visual display of <a href="reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> steps in validation report by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/27</li>
-<li>In <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> function, make a copy of the input table by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/29</li>
-<li>Use <a href="reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> with datasets throughout documentation by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/rich-iannone/pointblank/pull/28</li>
-</ul>
-<p><strong>Full Changelog</strong>: https://github.com/rich-iannone/pointblank/compare/v0.3.0…v0.4.0</p>
 
 
 </section>
@@ -1714,6 +1716,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="mermaid-renderer.js"></script>
 <script src="reference-switcher.js"></script>
 <script src="tooltips.js"></script>
+<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
 <script src="responsive-tables.js"></script>
 <script src="video-embed.js"></script>
 <script src="navbar-widgets.js"></script>

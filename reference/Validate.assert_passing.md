@@ -54,7 +54,7 @@ validation.assert_passing()
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    /tmp/ipykernel_10548/2424908189.py in ?()
+    /tmp/ipykernel_10965/2424908189.py in ?()
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 

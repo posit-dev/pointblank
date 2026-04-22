@@ -146,3 +146,51 @@
         init();
     }
 })();
+
+/**
+ * Mobile sidebar toggle → menu overlay redirect.
+ *
+ * On mobile (< 992px) the sidebar toggle button in the Title Bar
+ * (.quarto-btn-toggle) opens the polished menu overlay (same as the
+ * 'm'/'n' keyboard shortcut) instead of Bootstrap's collapse sidebar.
+ * This gives a smooth fade-in/slide, rounded card, backdrop blur, and
+ * auto-scroll to the current page — matching the desktop overlay UX.
+ */
+(function () {
+  "use strict";
+
+  var mql = window.matchMedia("(max-width: 991.98px)");
+
+  function intercept(e) {
+    if (!mql.matches) return;           // desktop — let Bootstrap handle it
+    if (!window.__gdMenu) return;       // keyboard-nav.js not loaded yet
+
+    // Stop Bootstrap collapse and Quarto headroom toggle
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (window.__gdMenu.isOpen()) {
+      window.__gdMenu.hide();
+    } else {
+      window.__gdMenu.show();
+    }
+  }
+
+  function attach() {
+    // The secondary-nav has two clickable elements: the <button> and
+    // the <a> that wraps the title text.  Intercept both.
+    var targets = document.querySelectorAll(
+      ".quarto-secondary-nav .quarto-btn-toggle, " +
+      ".quarto-secondary-nav a[data-bs-toggle='collapse']"
+    );
+    targets.forEach(function (el) {
+      el.addEventListener("click", intercept, /* capture */ true);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attach);
+  } else {
+    attach();
+  }
+})();

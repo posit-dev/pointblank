@@ -3,6 +3,32 @@
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
 
+# v0.24.0
+
+*2026-04-22* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.24.0)
+
+
+## New Features
+
+- Added the [get_dataframe_report()](reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report) method to [Validate](reference/Validate.html#pointblank.Validate) for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). ([<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha), [\#341](https://github.com/posit-dev/pointblank/issues/341))
+- Added OpenTelemetry (OTel) integration for exporting validation results as metrics, traces, and logs. Available as an optional dependency via the `otel` extra. ([\#383](https://github.com/posit-dev/pointblank/issues/383))
+- Added Azure OpenAI as a model provider for both [Validate.prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt) and [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation). ([<span class="citation" cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik), [\#385](https://github.com/posit-dev/pointblank/issues/385), [\#387](https://github.com/posit-dev/pointblank/issues/387))
+
+
+## Docs
+
+- Reorganized demos into the new docs structure. ([\#381](https://github.com/posit-dev/pointblank/issues/381))
+- Added a User Guide page on OpenTelemetry integration. ([\#383](https://github.com/posit-dev/pointblank/issues/383))
+- Added Azure OpenAI usage and setup instructions to the User Guide. ([\#385](https://github.com/posit-dev/pointblank/issues/385), [\#387](https://github.com/posit-dev/pointblank/issues/387))
+
+
+## New Contributors
+
+- [<span class="citation" cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik) made their first contribution in [\#385](https://github.com/posit-dev/pointblank/issues/385)
+
+Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/compare/v0.23.0...v0.24.0)
+
+
 # v0.23.0
 
 *2026-04-01* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.23.0)
@@ -55,7 +81,7 @@ This changelog is generated automatically from [GitHub Releases](https://github.
 
 ## New Features
 
-posit-dev/pointblank/issues/362), [\#363](https://github.com/posit-dev/pointblank/issues/363), [\#364](https://github.com/posit-dev/pointblank/issues/364), [\#365](https://github.com/posit-dev/pointblank/issues/365), [\#366](https://github.com/posit-dev/pointblank/issues/366))
+- Significantly enhanced [generate_dataset()](reference/generate_dataset.html#pointblank.generate_dataset) with locale mixing (`country=` now accepts lists or weighted dicts), frequency-weighted sampling via a 4-tier system, a `user_agent` preset with country-weighted browser selection, presets for hash digests (`md5`, `sha1`, `sha256`), barcodes (`ean8`, `ean13`), date strings (`date_between`, `date_range`, `future_date`, `past_date`), and ISO 3166-1 country codes (`country_code_2`, `country_code_3`), country-specific license plate formats, industry-coherent person-company pairing, a [generate_dataset](reference/generate_dataset.html#pointblank.generate_dataset) pytest fixture with automatic per-test seeding, and expanded country support (bringing the total to 71). ([\#352](https://github.com/posit-dev/pointblank/issues/352), [\#354](https://github.com/posit-dev/pointblank/issues/354), [\#355](https://github.com/posit-dev/pointblank/issues/355), [\#358](https://github.com/posit-dev/pointblank/issues/358), [\#360](https://github.com/posit-dev/pointblank/issues/360), [\#361](https://github.com/posit-dev/pointblank/issues/361), [\#362](https://github.com/posit-dev/pointblank/issues/362), [\#363](https://github.com/posit-dev/pointblank/issues/363), [\#364](https://github.com/posit-dev/pointblank/issues/364), [\#365](https://github.com/posit-dev/pointblank/issues/365), [\#366](https://github.com/posit-dev/pointblank/issues/366))
 - Added expressions support for the `active=` parameter to provide for more flexible and dynamic validation workflows. ([\#349](https://github.com/posit-dev/pointblank/issues/349))
 
 
@@ -916,28 +942,3 @@ posit-dev/pointblank/issues/362), [\#363](https://github.com/posit-dev/pointblan
 - [<span class="citation" cites="malcolmbarrett">@malcolmbarrett</span>](https://github.com/malcolmbarrett) made their first contribution in https://github.com/rich-iannone/pointblank/pull/41
 
 **Full Changelog**: https://github.com/rich-iannone/pointblank/compare/v0.4.0…v0.5.0
-
-
-# v0.4.0
-
-*2025-01-13* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.4.0)
-
-
-## Features
-
-- Add the [row_count_match()](reference/Validate.row_count_match.html#pointblank.Validate.row_count_match) and [col_count_match()](reference/Validate.col_count_match.html#pointblank.Validate.col_count_match) validation methods by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/rich-iannone/pointblank/pull/24, https://github.com/rich-iannone/pointblank/pull/25)
-- Add the [col_vals_expr()](reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr) validation method by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/30
-- Add the [get_column_count()](reference/get_column_count.html#pointblank.get_column_count) and [get_row_count()](reference/get_row_count.html#pointblank.get_row_count) functions by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/23
-- Add the [preview()](reference/preview.html#pointblank.preview) function by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/20
-- Incorporate row numbers to preview by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/21
-- Add option for info header in [preview()](reference/preview.html#pointblank.preview) table by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/22
-
-
-## Fixes and Documentation
-
-- Make corrections to step indexing by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/26
-- Improve visual display of [rows_distinct()](reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct) steps in validation report by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/27
-- In [preview()](reference/preview.html#pointblank.preview) function, make a copy of the input table by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/29
-- Use [preview()](reference/preview.html#pointblank.preview) with datasets throughout documentation by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/28
-
-**Full Changelog**: https://github.com/rich-iannone/pointblank/compare/v0.3.0…v0.4.0
