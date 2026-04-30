@@ -1702,7 +1702,7 @@ class TestGeneratorValidation:
             ]
         )
 
-        df = generate_dataset(schema, n=100, seed=42, country="US")
+        df = generate_dataset(schema, n=100, seed=23, country="US")
 
         # Map prefixes to expected providers
         PREFIX_TO_PROVIDER = {
@@ -1740,7 +1740,7 @@ class TestGeneratorValidation:
 
         # Without credit_card_number, provider should still vary per row
         schema = Schema(columns=[("provider", string_field(preset="credit_card_provider"))])
-        df = generate_dataset(schema, n=50, seed=42, country="US")
+        df = generate_dataset(schema, n=50, seed=23, country="US")
 
         providers = df["provider"].to_list()
 
