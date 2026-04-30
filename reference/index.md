@@ -374,11 +374,14 @@ Reference a column from the reference data for aggregate comparisons.
 ## Test Data Generation
 
 
-Generate synthetic test data based on schema definitions. Use `generate_dataset()` to create data from a Schema object.
+Generate synthetic test data based on schema definitions. Use `generate_dataset()` to create data from a Schema object, or `schema_from_tbl()` to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).
 
 
 [generate_dataset()](generate_dataset.md#pointblank.generate_dataset)  
 Generate synthetic test data from a schema.
+
+[schema_from_tbl()](schema_from_tbl.md#pointblank.schema_from_tbl)  
+Create a Schema from an existing table with inferred Field constraints.
 
 [int_field()](int_field.md#pointblank.int_field)  
 Create an integer column specification for use in a schema.

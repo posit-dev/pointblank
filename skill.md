@@ -175,9 +175,10 @@ Functions for accessing metadata about the target data and managing configuratio
 
 ## Test Data Generation
 
-Generate synthetic test data based on schema definitions. Use [generate_dataset()](reference/generate_dataset.html#pointblank.generate_dataset) to create data from a Schema object.
+Generate synthetic test data based on schema definitions. Use [generate_dataset()](reference/generate_dataset.html#pointblank.generate_dataset) to create data from a Schema object, or [schema_from_tbl()](reference/schema_from_tbl.html#pointblank.schema_from_tbl) to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).
 
 - [generate_dataset](reference/generate_dataset.html#pointblank.generate_dataset): Generate synthetic test data from a schema
+- [schema_from_tbl](reference/schema_from_tbl.html#pointblank.schema_from_tbl): Create a Schema from an existing table with inferred Field constraints
 - [int_field](reference/int_field.html#pointblank.int_field): Create an integer column specification for use in a schema
 - [float_field](reference/float_field.html#pointblank.float_field): Create a floating-point column specification for use in a schema
 - [string_field](reference/string_field.html#pointblank.string_field): Create a string column specification for use in a schema

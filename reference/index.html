@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b4fcbc11625077f9c0d1a790597d7014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -871,6 +871,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/schema_from_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">schema_from_tbl()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/int_field.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">int_field()</span></span></a>
   </div>
@@ -1490,12 +1496,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="test-data-generation" class="level2 doc-group">
 <h2 class="doc-group">Test Data Generation</h2>
 <div class="doc-description">
-<p>Generate synthetic test data based on schema definitions. Use <code>generate_dataset()</code> to create data from a Schema object.</p>
+<p>Generate synthetic test data based on schema definitions. Use <code>generate_dataset()</code> to create data from a Schema object, or <code>schema_from_tbl()</code> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</p>
 </div>
 <dl>
 <dt><a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="doc-function doc-label doc-label-function">generate_dataset()</a></dt>
 <dd>
 <p>Generate synthetic test data from a schema.</p>
+</dd>
+<dt><a href="../reference/schema_from_tbl.html#pointblank.schema_from_tbl" class="doc-function doc-label doc-label-function">schema_from_tbl()</a></dt>
+<dd>
+<p>Create a Schema from an existing table with inferred Field constraints.</p>
 </dd>
 <dt><a href="../reference/int_field.html#pointblank.int_field" class="doc-function doc-label doc-label-function">int_field()</a></dt>
 <dd>
@@ -1915,6 +1925,7 @@ ul.task-list li input[type="checkbox"] {
 </footer>
 <script src="../github-widget.js"></script>
 <script src="../sidebar-wrap.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
