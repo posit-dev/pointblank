@@ -17,14 +17,12 @@ from pointblank.generate.inference import (
     infer_fields_from_table,
     _detect_preset,
     _classify_dtype,
-    _normalize_col_name,
-    _is_id_column,
     _validate_preset_values,
     _validate_numeric_as_latitude,
     _validate_numeric_as_longitude,
     _detect_numeric_role,
 )
-from pointblank.schema import schema_from_df, schema_from_tbl
+from pointblank.schema import schema_from_tbl
 
 
 # ---------------------------------------------------------------------------
@@ -510,22 +508,6 @@ class TestSchemaFromTblFunction:
         field = _get_field(schema, "email")
         assert isinstance(field, StringField)
         assert field.preset is None
-
-
-class TestDeprecatedAliases:
-    def test_schema_from_df_alias(self):
-        """schema_from_df() still works as a deprecated alias."""
-        df = pl.DataFrame({"x": [1, 2, 3]})
-        schema = schema_from_df(df)
-        assert schema.columns is not None
-        assert len(schema.columns) == 1
-
-    def test_from_dataframe_alias(self):
-        """Schema.from_dataframe() still works as a deprecated alias."""
-        df = pl.DataFrame({"x": [1, 2, 3]})
-        schema = Schema.from_dataframe(df)
-        assert schema.columns is not None
-        assert len(schema.columns) == 1
 
 
 # ---------------------------------------------------------------------------

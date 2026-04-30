@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from pointblank.field import Field
 
-__all__ = ["Schema", "generate_dataset", "schema_from_tbl", "schema_from_df", "_check_schema_match"]
+__all__ = ["Schema", "generate_dataset", "schema_from_tbl", "_check_schema_match"]
 
 
 @dataclass
@@ -390,25 +390,6 @@ class Schema:
         instance.tbl = None
         instance.columns = [(name, field_obj) for name, field_obj in field_tuples]
         return instance
-
-    @classmethod
-    def from_dataframe(
-        cls,
-        tbl: Any,
-        *,
-        infer_constraints: bool = True,
-        categorical_threshold: int | float = 20,
-        detect_presets: bool = True,
-        sample_size: int | None = None,
-    ) -> "Schema":
-        """Deprecated alias for `Schema.from_table()`. Use `from_table()` instead."""
-        return cls.from_table(
-            tbl,
-            infer_constraints=infer_constraints,
-            categorical_threshold=categorical_threshold,
-            detect_presets=detect_presets,
-            sample_size=sample_size,
-        )
 
     def _validate_schema_inputs(self) -> None:
         if not isinstance(self.columns, list):
@@ -2009,24 +1990,6 @@ def schema_from_tbl(
     ```
     """
     return Schema.from_table(
-        tbl,
-        infer_constraints=infer_constraints,
-        categorical_threshold=categorical_threshold,
-        detect_presets=detect_presets,
-        sample_size=sample_size,
-    )
-
-
-def schema_from_df(
-    tbl: Any,
-    *,
-    infer_constraints: bool = True,
-    categorical_threshold: int | float = 20,
-    detect_presets: bool = True,
-    sample_size: int | None = None,
-) -> Schema:
-    """Deprecated alias for `schema_from_tbl()`. Use `schema_from_tbl()` instead."""
-    return schema_from_tbl(
         tbl,
         infer_constraints=infer_constraints,
         categorical_threshold=categorical_threshold,
