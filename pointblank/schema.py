@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from pointblank.field import Field
 
-__all__ = ["Schema", "generate_dataset", "_check_schema_match"]
+__all__ = ["Schema", "generate_dataset", "schema_from_tbl", "_check_schema_match"]
 
 
 @dataclass
@@ -313,6 +313,83 @@ class Schema:
         # Get the table type and store as an attribute (only if a table is provided)
         if self.tbl is not None:
             self.tbl_type = _get_tbl_type(self.tbl)
+
+    @classmethod
+    def from_table(
+        cls,
+        tbl: Any,
+        *,
+        infer_constraints: bool = True,
+        categorical_threshold: int | float = 20,
+        detect_presets: bool = True,
+        sample_size: int | None = None,
+    ) -> "Schema":
+        """
+        Create a Schema from an existing table with inferred Field constraints.
+
+        Unlike `Schema(tbl=df)` which only captures column names and dtypes, this method
+        inspects the actual values in the table to infer rich constraints suitable for
+        synthetic data generation via `schema.generate()`.
+
+        Parameters
+        ----------
+        tbl
+            A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+        infer_constraints
+            When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc.
+            When `False`, behave like `Schema(tbl=df)` (dtype only).
+        categorical_threshold
+            If a column has <= this many unique values (int) or this fraction of total rows (float
+            between 0 and 1), treat it as categorical and populate `allowed=`. Default is `20`.
+        detect_presets
+            Attempt to match string columns to known generation presets (e.g., email, url,
+            phone_number) based on column name heuristics and value validation. Default is `True`.
+        sample_size
+            If set, sample this many rows before analysis (useful for very large tables).
+            `None` means use all rows.
+
+        Returns
+        -------
+        Schema
+            A Schema populated with Field objects containing inferred constraints, ready for use
+            with `schema.generate()` or `generate_dataset()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        df = pl.DataFrame({
+            "user_id": [1, 2, 3, 4, 5],
+            "email": ["a@b.com", "c@d.com", "e@f.com", "g@h.com", "i@j.com"],
+            "age": [25, 30, 35, 40, 45],
+            "status": ["active", "active", "pending", "inactive", "active"],
+        })
+
+        schema = pb.Schema.from_table(df)
+
+        # Generate synthetic data matching the original's characteristics
+        synthetic = schema.generate(n=100, seed=23)
+        ```
+        """
+        if not infer_constraints:
+            return cls(tbl=tbl)
+
+        from pointblank.generate.inference import infer_fields_from_table
+
+        field_tuples = infer_fields_from_table(
+            tbl,
+            categorical_threshold=categorical_threshold,
+            detect_presets=detect_presets,
+            sample_size=sample_size,
+        )
+
+        # Build Schema with Field objects as column values
+        instance = cls.__new__(cls)
+        instance.tbl = None
+        instance.columns = [(name, field_obj) for name, field_obj in field_tuples]
+        return instance
 
     def _validate_schema_inputs(self) -> None:
         if not isinstance(self.columns, list):
@@ -1848,4 +1925,74 @@ def generate_dataset(
     """
     return schema.generate(
         n=n, seed=seed, output=output, country=country, shuffle=shuffle, weighted=weighted
+    )
+
+
+def schema_from_tbl(
+    tbl: Any,
+    *,
+    infer_constraints: bool = True,
+    categorical_threshold: int | float = 20,
+    detect_presets: bool = True,
+    sample_size: int | None = None,
+) -> Schema:
+    """
+    Create a Schema from an existing table with inferred Field constraints.
+
+    This is the functional form of `Schema.from_table()`. It inspects the actual values in the
+    table to infer rich constraints (min/max, uniqueness, null rates, allowed values, presets)
+    suitable for synthetic data generation via `schema.generate()` or `generate_dataset()`.
+
+    Parameters
+    ----------
+    tbl
+        A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+    infer_constraints
+        When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc. When
+        `False`, behave like `Schema(tbl=df)` (dtype only).
+    categorical_threshold
+        If a column has <= this many unique values (int) or this fraction of total rows (float
+        between `0` and `1`), treat it as categorical and populate `allowed=`. Default is `20`.
+    detect_presets
+        Attempt to match string columns to known generation presets (e.g., email, url, phone_number)
+        based on column name heuristics and value validation. Default is `True`.
+    sample_size
+        If set, sample this many rows before analysis (useful for very large tables). `None` means
+        use all rows.
+
+    Returns
+    -------
+    Schema
+        A Schema populated with Field objects containing inferred constraints, ready for use with
+        `schema.generate()` or `generate_dataset()`.
+
+    Examples
+    --------
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    df = pl.DataFrame({
+        "user_id": list(range(1, 51)),
+        "email": [f"user{i}@example.com" for i in range(50)],
+        "age": [20 + i % 50 for i in range(50)],
+        "status": ["active", "pending", "inactive"] * 16 + ["active", "pending"],
+    })
+
+    schema = pb.schema_from_tbl(df)
+    print(schema)
+    ```
+
+    Generate synthetic data matching the original's characteristics:
+
+    ```{python}
+    pb.preview(schema.generate(n=10, seed=23))
+    ```
+    """
+    return Schema.from_table(
+        tbl,
+        infer_constraints=infer_constraints,
+        categorical_threshold=categorical_threshold,
+        detect_presets=detect_presets,
+        sample_size=sample_size,
     )

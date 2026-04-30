@@ -250,10 +250,12 @@ reference:
 
     - title: Test Data Generation
       desc: >
-        Generate synthetic test data based on schema definitions. Use `generate_dataset()`
-        to create data from a Schema object.
+        Generate synthetic test data based on schema definitions. Use `generate_dataset()` to create
+        data from a Schema object, or `schema_from_tbl()` to infer a generation-ready schema from an
+        existing table (Polars, Pandas, or Ibis/DuckDB).
       contents:
         - generate_dataset
+        - schema_from_tbl
         - int_field
         - float_field
         - string_field

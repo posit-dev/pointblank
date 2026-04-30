@@ -48,7 +48,7 @@ from pointblank.field import (
 from pointblank.generate.base import GeneratorConfig
 from pointblank.inspect import has_columns, has_rows
 from pointblank.integrations.otel import emit_otel
-from pointblank.schema import Schema, generate_dataset
+from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from pointblank.validate import (
@@ -133,6 +133,7 @@ __all__ = [
     "GeneratorConfig",
     # Data generation - convenience function
     "generate_dataset",
+    "schema_from_tbl",
     # Table inspection functions (for use with `active=`)
     "has_columns",
     "has_rows",
