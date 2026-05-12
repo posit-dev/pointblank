@@ -2821,6 +2821,7 @@ def interrogate_prompt(
         llm_model = ai_config["llm_model"]
         batch_size = ai_config.get("batch_size", 1000)
         max_concurrent = ai_config.get("max_concurrent", 3)
+        attachments = ai_config.get("attachments", [])
 
         # Set up LLM configuration (api_key will be loaded from environment)
         llm_config = _LLMConfig(
@@ -2852,7 +2853,7 @@ def interrogate_prompt(
         prompt_builder = _PromptBuilder(prompt)
 
         # Create AI validation engine
-        engine = _AIValidationEngine(llm_config)
+        engine = _AIValidationEngine(llm_config, attachments=attachments)
 
         # Run AI validation synchronously (chatlas is synchronous)
         batch_results = engine.validate_batches(
