@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pathlib
+import warnings
 
 import pandas as pd
 import pytest
@@ -82,6 +83,19 @@ def test_prepare_attachments_local_png(png_path: pathlib.Path):
     # Should be a chatlas Content image (inline, base64-encoded from disk).
     assert isinstance(result[0], chatlas.types.Content)
     assert "Image" in type(result[0]).__name__
+
+
+def test_prepare_attachments_local_image_no_resize_warning(png_path: pathlib.Path):
+    """Auto-coerced local images must not surface chatlas's MissingResizeWarning."""
+    pytest.importorskip("chatlas")
+    with warnings.catch_warnings(record=True) as captured:
+        warnings.simplefilter("always")
+        _prepare_attachments([str(png_path)])
+    assert not any(
+        "MissingResizeWarning" in type(w.category).__name__
+        or "resize" in str(w.message).lower()
+        for w in captured
+    ), [str(w.message) for w in captured]
 
 
 def test_prepare_attachments_local_pdf_via_pathlib(pdf_path: pathlib.Path):

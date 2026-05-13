@@ -11122,6 +11122,11 @@ class Validate:
 
         Supported extensions: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.pdf`.
 
+        Note: local image paths auto-coerced through `attachments=` use `resize="low"` (chatlas's
+        default downscale to 512x512) to keep token costs predictable. For higher fidelity,
+        pre-build the content yourself with `chatlas.content_image_file(path, resize="high")`
+        (or `"none"`) and pass that object inside `attachments=`.
+
         **Cost / batching note**: attachments are re-sent on *every* batch (one batch = one LLM API
         call). For a table that requires N batches, each attachment's input tokens are billed N
         times. To control costs:

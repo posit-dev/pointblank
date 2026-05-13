@@ -266,8 +266,16 @@ def _prepare_attachments(attachments: Optional[List[Any]]) -> List[Any]:
                 )
             is_url = path_str.startswith(("http://", "https://"))
             if ext in _IMAGE_EXTS:
+                # content_image_file emits MissingResizeWarning when no resize
+                # is given; pass "low" explicitly (its implicit default) to
+                # suppress it. content_image_url has no resize parameter.
+                # Users wanting higher fidelity should pre-build the Content
+                # with their preferred resize and pass it in directly (the
+                # pass-through branch below handles that).
                 prepared.append(
-                    content_image_url(path_str) if is_url else content_image_file(path_str)
+                    content_image_url(path_str)
+                    if is_url
+                    else content_image_file(path_str, resize="low")
                 )
             else:
                 prepared.append(content_pdf_url(path_str) if is_url else content_pdf_file(path_str))
