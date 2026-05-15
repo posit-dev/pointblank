@@ -3,12 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import pathlib
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import narwhals as nw
 
 from pointblank._constants import MODEL_PROVIDERS
+
+_IMAGE_EXTS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".webp"})
+_PDF_EXTS = frozenset({".pdf"})
+_SUPPORTED_ATTACHMENT_EXTS = _IMAGE_EXTS | _PDF_EXTS
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +98,9 @@ EXAMPLE OUTPUT FORMAT:
   {"index": 0, "result": true},
   {"index": 1, "result": false},
   {"index": 2, "result": true}
-]"""
+]
+
+If reference attachments (images or PDFs) are provided alongside the data, use them as context when evaluating each row."""
 
     # Create httpx client with SSL verification settings
     try:
@@ -211,6 +218,71 @@ EXAMPLE OUTPUT FORMAT:
         raise ValueError(f"Unsupported provider: {provider}")
 
     return chat
+
+
+def _prepare_attachments(attachments: Optional[List[Any]]) -> List[Any]:
+    """
+    Coerce a heterogeneous list of attachment specs into chatlas Content objects.
+
+    Accepts:
+    - ``str`` or ``pathlib.Path``: auto-converted to ``content_image_*`` or ``content_pdf_*``
+      based on extension. URLs (``http://``/``https://``) use the URL variants.
+    - Pre-built chatlas ``Content`` objects: passed through untouched.
+
+    Raises ``ValueError`` for unsupported extensions and ``ImportError`` if chatlas
+    is not installed.
+    """
+    if not attachments:
+        return []
+
+    if not isinstance(attachments, (list, tuple)):
+        raise TypeError(f"attachments must be a list or tuple, got {type(attachments).__name__}")
+
+    try:
+        from chatlas import (
+            content_image_file,
+            content_image_url,
+            content_pdf_file,
+            content_pdf_url,
+        )
+    except ImportError:  # pragma: no cover
+        raise ImportError(
+            "The `chatlas` package is required for attachments support. "
+            "Please install it using `pip install chatlas`."
+        )
+
+    prepared: List[Any] = []
+    for item in attachments:
+        # If it's a string or path-like, coerce based on extension. Otherwise
+        # assume it's an already-built chatlas Content object and pass through.
+        if isinstance(item, (str, pathlib.PurePath)):
+            path_str = str(item)
+            # Strip query string before checking extension for URLs.
+            ext = pathlib.PurePosixPath(path_str.split("?", 1)[0]).suffix.lower()
+            if ext not in _SUPPORTED_ATTACHMENT_EXTS:
+                raise ValueError(
+                    f"Unsupported attachment extension {ext!r} for {path_str!r}. "
+                    f"Supported extensions: {sorted(_SUPPORTED_ATTACHMENT_EXTS)}"
+                )
+            is_url = path_str.startswith(("http://", "https://"))
+            if ext in _IMAGE_EXTS:
+                # content_image_file emits MissingResizeWarning when no resize
+                # is given; pass "low" explicitly (its implicit default) to
+                # suppress it. content_image_url has no resize parameter.
+                # Users wanting higher fidelity should pre-build the Content
+                # with their preferred resize and pass it in directly (the
+                # pass-through branch below handles that).
+                prepared.append(
+                    content_image_url(path_str)
+                    if is_url
+                    else content_image_file(path_str, resize="low")
+                )
+            else:
+                prepared.append(content_pdf_url(path_str) if is_url else content_pdf_file(path_str))
+        else:
+            prepared.append(item)
+
+    return prepared
 
 
 # ============================================================================
@@ -767,7 +839,11 @@ class _ValidationResponseParser:
 class _AIValidationEngine:
     """Main engine for AI-powered validation using chatlas."""
 
-    def __init__(self, llm_config: _LLMConfig):
+    def __init__(
+        self,
+        llm_config: _LLMConfig,
+        attachments: Optional[List[Any]] = None,
+    ):
         """
         Initialize the AI validation engine.
 
@@ -775,8 +851,12 @@ class _AIValidationEngine:
         ----------
         llm_config
             Configuration for the LLM provider.
+        attachments
+            Optional list of chatlas ``Content`` objects sent as global context
+            alongside every batch's text prompt.
         """
         self.llm_config = llm_config
+        self.attachments: List[Any] = list(attachments) if attachments else []
         self.chat = _create_chat_instance(
             provider=llm_config.provider,
             model_name=llm_config.model,
@@ -823,8 +903,9 @@ class _AIValidationEngine:
                 logger.debug(prompt)
                 logger.debug("--- PROMPT END ---")
 
-                # Get response from LLM using chatlas (synchronous)
-                response = str(self.chat.chat(prompt, stream=False, echo="none"))
+                # Get response from LLM using chatlas (synchronous). Attachments
+                # ride along as global context content blocks for every batch.
+                response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
                 # Debug: Log the raw LLM response
                 logger.debug(f"📥 LLM Response for batch {batch['batch_id']}:")
@@ -890,8 +971,9 @@ class _AIValidationEngine:
             # Build the prompt for this batch
             prompt = prompt_builder.build_prompt(batch["data"])
 
-            # Get response from LLM using chatlas (synchronous)
-            response = str(self.chat.chat(prompt, stream=False, echo="none"))
+            # Get response from LLM using chatlas (synchronous). Attachments
+            # ride along as global context content blocks for every batch.
+            response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
             # Parse the response
             parser = _ValidationResponseParser(total_rows=1000)  # This will be set properly

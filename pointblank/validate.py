@@ -10881,6 +10881,7 @@ class Validate:
         prompt: str,
         model: str,
         columns_subset: str | list[str] | None = None,
+        attachments: list | None = None,
         batch_size: int = 1000,
         max_concurrent: int = 3,
         pre: Callable | None = None,
@@ -10926,6 +10927,15 @@ class Validate:
             A single column or list of columns to include in the validation. If `None`, all columns
             will be included. Specifying fewer columns can improve performance and reduce API costs
             so try to include only the columns necessary for the validation.
+        attachments
+            An optional list of reference files (images or PDFs) to attach as global context for
+            every batch. Each item can be a local file path, a URL (`http://` / `https://`), a
+            `pathlib.Path`, or a pre-built chatlas `Content` object. Supported extensions are
+            `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and `.pdf`. The attachments apply to the whole
+            validation step, not per-row, so they are well-suited for things like brand guides,
+            schema diagrams, or sample documents the LLM should consult when scoring each row.
+            **Cost note**: attachments are re-sent on every batch — see the *Multi-modal
+            attachments* section below for cost-management tips.
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
             `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
@@ -11094,6 +11104,39 @@ class Validate:
         - "Describe the quality of each row" (asks for description, not validation)
         - "How would you improve this data?" (asks for suggestions, not pass/fail)
 
+        Multi-modal Attachments
+        -----------------------
+        Use `attachments=` to give the LLM a reference image or PDF that applies to every row. The
+        attachment is sent as global context, while each row's values are still serialized as JSON
+        and validated against your `prompt=`. Useful patterns:
+
+        - validating descriptions against a brand-style image: `attachments=["brand_guide.pdf"]`
+        - cross-referencing rows with a schema diagram: `attachments=["schema.png"]`
+        - matching free-text fields to a sample document: `attachments=["sample_invoice.pdf"]`
+
+        Accepted values per list item:
+
+        - local path strings or `pathlib.Path` objects (e.g., `"docs/diagram.png"`)
+        - URLs (e.g., `"https://example.com/diagram.png"`)
+        - pre-built chatlas `Content` objects (e.g., `chatlas.content_image_plot()`)
+
+        Supported extensions: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.pdf`.
+
+        Note: local image paths auto-coerced through `attachments=` use `resize="low"` (chatlas's
+        default downscale to 512x512) to keep token costs predictable. For higher fidelity,
+        pre-build the content yourself with `chatlas.content_image_file(path, resize="high")`
+        (or `"none"`) and pass that object inside `attachments=`.
+
+        **Cost / batching note**: attachments are re-sent on *every* batch (one batch = one LLM API
+        call). For a table that requires N batches, each attachment's input tokens are billed N
+        times. To control costs:
+
+        - keep attachments small (downscale images, crop PDFs to the relevant page)
+        - use `columns_subset=` aggressively to maximize row-signature memoization (fewer unique
+          rows means fewer batches)
+        - raise `batch_size=` when the combined system prompt, attachment, and row JSON fit
+          comfortably under the model's context window
+
         Performance Considerations
         --------------------------
         AI validation is significantly slower than traditional validation methods due to API calls
@@ -11215,6 +11258,28 @@ class Validate:
         which exceeds all threshold levels. The validation will trigger the specified error action
         since the failure rate (40%) is above the error threshold (20%). The AI can recognize
         various phone number formats and determine whether they include area codes.
+
+        **Multi-modal example with `attachments=`:**
+
+        Suppose you have a table of product descriptions and a brand-style PDF that describes the
+        approved tone and vocabulary. Pass the PDF as a global attachment so the LLM can compare
+        each description against it.
+
+        ```python
+        validation = (
+            pb.Validate(data=products)
+            .prompt(
+                prompt="Each product description must match the tone and vocabulary in the brand guide.",
+                columns_subset=["description"],
+                attachments=["docs/brand_guide.pdf"],
+                model="anthropic:claude-opus-4-6",
+            )
+            .interrogate()
+        )
+        ```
+
+        The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each
+        description with the same reference document in view.
         """
 
         assertion_type = _get_fn_name()
@@ -11241,6 +11306,13 @@ class Validate:
         if not isinstance(max_concurrent, int) or max_concurrent < 1:
             raise ValueError("max_concurrent must be a positive integer")
 
+        # Coerce `attachments=` into a list of chatlas Content objects. Fails fast
+        # on unsupported extensions so users see the error at step definition time,
+        # not deep inside interrogation.
+        from pointblank._utils_ai import _prepare_attachments
+
+        prepared_attachments = _prepare_attachments(attachments)
+
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_active_input(param=active, param_name="active")
@@ -11264,6 +11336,7 @@ class Validate:
             "llm_model": model_name,
             "batch_size": batch_size,
             "max_concurrent": max_concurrent,
+            "attachments": prepared_attachments,
         }
 
         val_info = _ValidationInfo(

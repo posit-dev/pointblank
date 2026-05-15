@@ -419,6 +419,7 @@ class Validate:
         prompt: str,
         model: str,
         columns_subset: str | list[str] | None = None,
+        attachments: list | None = None,
         batch_size: int = 1000,
         max_concurrent: int = 3,
         pre: Callable | None = None,
