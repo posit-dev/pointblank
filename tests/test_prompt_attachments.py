@@ -92,8 +92,7 @@ def test_prepare_attachments_local_image_no_resize_warning(png_path: pathlib.Pat
         warnings.simplefilter("always")
         _prepare_attachments([str(png_path)])
     assert not any(
-        "MissingResizeWarning" in type(w.category).__name__
-        or "resize" in str(w.message).lower()
+        "MissingResizeWarning" in type(w.category).__name__ or "resize" in str(w.message).lower()
         for w in captured
     ), [str(w.message) for w in captured]
 
