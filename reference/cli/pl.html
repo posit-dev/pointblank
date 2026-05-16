@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -43,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-03d05489a1b0cbe063b91ebd7d2b46f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
-  <meta name="description" content="Find out if your data is what you think it is.">
+  <meta name="description" content="Execute Polars expressions and display results.">
   <script type="application/ld+json">
 [
   {
@@ -107,15 +142,15 @@ ul.task-list li input[type="checkbox"] {
 </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="pb pl – Pointblank | Pointblank">
-  <meta property="og:description" content="Find out if your data is what you think it is.">
+  <meta property="og:description" content="Execute Polars expressions and display results.">
   <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/cli/pl.html">
   <meta property="og:site_name" content="Pointblank">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="pb pl – Pointblank | Pointblank">
-  <meta name="twitter:description" content="Find out if your data is what you think it is.">
+  <meta name="twitter:description" content="Execute Polars expressions and display results.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -171,7 +206,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">pb pl</span></h1>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">great-docs pl</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -186,67 +221,67 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/info.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb info</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb info</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/preview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb preview</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb preview</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/scan.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb scan</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb scan</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/missing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb missing</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb missing</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/validate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb validate</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb validate</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/datasets.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb datasets</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb datasets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/requirements.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb requirements</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb requirements</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/make_template.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb make-template</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb make-template</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/run.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb run</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb run</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/pl.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">pb pl</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb pl</span></span></a>
   </div>
 </li>
     </ul>
@@ -254,15 +289,23 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#arguments" id="toc-arguments" class="nav-link active" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#options" id="toc-options" class="nav-link" data-scroll-target="#options">Options</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title cli-title">pb pl</h1>
+<h1 class="title cli-title"><span class="doc-object-name doc-function doc-label doc-label-cli">pb pl</span></h1>
 </div>
 
 
@@ -279,6 +322,19 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="doc-subject">
+<p>Execute Polars expressions and display results.</p>
+</div>
+<div class="doc-signature doc-Kind.FUNCTION">
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">POLARS_EXPRESSION</span><span class="pp">]</span></span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Execute Polars DataFrame operations from the command line and display the results using Pointblank’s visualization tools.</p>
+<p>POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame. The <code>pl</code> module is automatically imported and available.</p>
+</div>
+<details class="gd-details">
+<summary class="gd-details-summary"><span class="gd-details-chevron" aria-hidden="true"></span><span class="gd-details-title">Full --help output</span></summary>
+<div class="gd-details-body">
 <div class="cli-manpage">
 <pre><code>Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
 
@@ -341,8 +397,101 @@ Options:
   --pipe-format [parquet|csv]     Format for piped output (default: parquet)
   --help                          Show this message and exit.</code></pre>
 </div>
+</div>
+</details>
+<section id="arguments" class="level1 doc-parameters">
+<h1 class="doc-parameters">Arguments</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">POLARS_EXPRESSION</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">TEXT</span></code></dt>
+<dd>
+Optional.
+</dd>
+</dl>
+</div>
+</section>
+<section id="options" class="level1 doc-parameters">
+<h1 class="doc-parameters">Options</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">-e, –edit</span></code></dt>
+<dd>
+Open editor for multi-line input
+</dd>
+<dt><code><span class="doc-parameter-name">-f, –file</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">PATH</span></code></dt>
+<dd>
+Read query from file
+</dd>
+<dt><code><span class="doc-parameter-name">–editor</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">TEXT</span></code></dt>
+<dd>
+Editor to use for <code>--edit</code> mode (overrides $EDITOR and auto-detection)
+</dd>
+<dt><code><span class="doc-parameter-name">-o, –output-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">preview</span></code></dt>
+<dd>
+Output format for the result
+</dd>
+<dt><code><span class="doc-parameter-name">–preview-head</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">INTEGER</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">5</span></code></dt>
+<dd>
+Number of head rows for preview
+</dd>
+<dt><code><span class="doc-parameter-name">–preview-tail</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">INTEGER</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">5</span></code></dt>
+<dd>
+Number of tail rows for preview
+</dd>
+<dt><code><span class="doc-parameter-name">–output-html</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">PATH</span></code></dt>
+<dd>
+Save HTML output to file
+</dd>
+<dt><code><span class="doc-parameter-name">–pipe</span></code></dt>
+<dd>
+Output data in a format suitable for piping to other pb commands
+</dd>
+<dt><code><span class="doc-parameter-name">–pipe-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">parquet</span></code></dt>
+<dd>
+Format for piped output (default: parquet)
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level1 doc-examples">
+<h1 class="doc-examples">Examples</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct expression</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv')"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv').select(['name', 'age'])"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv').filter(pl.col('age') &gt; 25)"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Multi-line with editor (supports multiple statements)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Multi-statement code example in editor:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># csv = pl.read_csv('data.csv')</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># result = csv.select(['name', 'age']).filter(pl.col('age') &gt; 25)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Multi-line with a specific editor</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--editor</span> nano</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--editor</span> code</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--editor</span> micro</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># From file</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--file</span> query.py</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="ex">Piping</span> to other pb commands</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv').head(20)"</span> <span class="at">--pipe</span> <span class="kw">|</span> <span class="ex">pb</span> validate <span class="at">--check</span> rows-distinct</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--pipe</span> <span class="kw">|</span> <span class="ex">pb</span> preview <span class="at">--head</span> 10</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--pipe</span> <span class="kw">|</span> <span class="ex">pb</span> scan <span class="at">--output-html</span> report.html</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="at">--edit</span> <span class="at">--pipe</span> <span class="kw">|</span> <span class="ex">pb</span> missing <span class="at">--output-html</span> missing_report.html</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ex">Use</span> <span class="at">--output-format</span> to change how results are displayed:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv')"</span> <span class="at">--output-format</span> scan</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv')"</span> <span class="at">--output-format</span> missing</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> pl <span class="st">"pl.read_csv('data.csv')"</span> <span class="at">--output-format</span> info</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ex">Note:</span> For multi-statement code, assign your final result to a variable like <span class="st">'result'</span>, <span class="st">'df'</span>,</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">'data'</span><span class="ex">,</span> or ensure it<span class="st">'s the last expression.</span></span></code></pre></div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -698,8 +847,10 @@ Options:
 <script src="../../sidebar-filter.js"></script>
 <script src="../../dark-mode-toggle.js"></script>
 <script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>
 <script src="../../tooltips.js"></script>

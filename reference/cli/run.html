@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -43,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-03d05489a1b0cbe063b91ebd7d2b46f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
-  <meta name="description" content="Find out if your data is what you think it is.">
+  <meta name="description" content="Run a Pointblank validation script or YAML configuration.">
   <script type="application/ld+json">
 [
   {
@@ -107,15 +142,15 @@ ul.task-list li input[type="checkbox"] {
 </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="pb run – Pointblank | Pointblank">
-  <meta property="og:description" content="Find out if your data is what you think it is.">
+  <meta property="og:description" content="Run a Pointblank validation script or YAML configuration.">
   <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/cli/run.html">
   <meta property="og:site_name" content="Pointblank">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="pb run – Pointblank | Pointblank">
-  <meta name="twitter:description" content="Find out if your data is what you think it is.">
+  <meta name="twitter:description" content="Run a Pointblank validation script or YAML configuration.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -171,7 +206,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">pb run</span></h1>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">great-docs run</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -186,67 +221,67 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/info.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb info</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb info</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/preview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb preview</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb preview</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/scan.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb scan</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb scan</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/missing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb missing</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb missing</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/validate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb validate</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb validate</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/datasets.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb datasets</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb datasets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/requirements.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb requirements</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb requirements</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/make_template.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb make-template</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb make-template</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/run.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">pb run</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb run</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/pl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb pl</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb pl</span></span></a>
   </div>
 </li>
     </ul>
@@ -254,15 +289,23 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#arguments" id="toc-arguments" class="nav-link active" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#options" id="toc-options" class="nav-link" data-scroll-target="#options">Options</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title cli-title">pb run</h1>
+<h1 class="title cli-title"><span class="doc-object-name doc-function doc-label doc-label-cli">pb run</span></h1>
 </div>
 
 
@@ -279,6 +322,33 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="doc-subject">
+<p>Run a Pointblank validation script or YAML configuration.</p>
+</div>
+<div class="doc-signature doc-Kind.FUNCTION">
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">VALIDATION_FILE</span><span class="pp">]</span></span></code></pre></div>
+</div>
+<div class="doc-text">
+<ul>
+<li>VALIDATION_FILE can be:</li>
+<li>A Python file (.py) that defines validation logic</li>
+<li>A YAML configuration file (.yaml, .yml) that defines validation steps</li>
+</ul>
+<p>Python scripts should load their own data and create validation objects. YAML configurations define data sources and validation steps declaratively.</p>
+<p>If <code>--data</code> is provided, it will automatically replace the data source in your validation objects (Python scripts) or override the <code>tbl</code> field (YAML configs).</p>
+<p>To get started quickly, use <code>pb make-template</code> to create templates.</p>
+<p>DATA can be:</p>
+<ul>
+<li>CSV file path (e.g., data.csv)</li>
+<li>Parquet file path or pattern (e.g., data.parquet, data/*.parquet)</li>
+<li>GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)</li>
+<li>Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)</li>
+<li>Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)</li>
+</ul>
+</div>
+<details class="gd-details">
+<summary class="gd-details-summary"><span class="gd-details-chevron" aria-hidden="true"></span><span class="gd-details-title">Full --help output</span></summary>
+<div class="gd-details-body">
 <div class="cli-manpage">
 <pre><code>Usage: pb run [OPTIONS] [VALIDATION_FILE]
 
@@ -330,8 +400,67 @@ Options:
                                   reaches this threshold level
   --help                          Show this message and exit.</code></pre>
 </div>
+</div>
+</details>
+<section id="arguments" class="level1 doc-parameters">
+<h1 class="doc-parameters">Arguments</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">VALIDATION_FILE</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">PATH</span></code></dt>
+<dd>
+Optional.
+</dd>
+</dl>
+</div>
+</section>
+<section id="options" class="level1 doc-parameters">
+<h1 class="doc-parameters">Options</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">–data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">TEXT</span></code></dt>
+<dd>
+Data source to replace in validation objects (Python scripts and YAML configs)
+</dd>
+<dt><code><span class="doc-parameter-name">–output-html</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">PATH</span></code></dt>
+<dd>
+Save HTML validation report to file
+</dd>
+<dt><code><span class="doc-parameter-name">–output-json</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">PATH</span></code></dt>
+<dd>
+Save JSON validation summary to file
+</dd>
+<dt><code><span class="doc-parameter-name">–show-extract</span></code></dt>
+<dd>
+Show extract of failing rows if validation fails
+</dd>
+<dt><code><span class="doc-parameter-name">–write-extract</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">TEXT</span></code></dt>
+<dd>
+Save failing rows to folders (one CSV per step). Provide base name for folder.
+</dd>
+<dt><code><span class="doc-parameter-name">–limit</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">INTEGER</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">500</span></code></dt>
+<dd>
+Maximum number of failing rows to save to CSV (default: 500)
+</dd>
+<dt><code><span class="doc-parameter-name">–fail-on</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span></code></dt>
+<dd>
+Exit with non-zero code when validation reaches this threshold level
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level1 doc-examples">
+<h1 class="doc-examples">Examples</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> make-template my_validation.py  <span class="co"># Create a Python template</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py <span class="at">--data</span> data.csv</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml <span class="at">--data</span> small_table <span class="at">--output-html</span> report.html</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py <span class="at">--show-extract</span> <span class="at">--fail-on</span> error</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml <span class="at">--write-extract</span> extracts_folder <span class="at">--fail-on</span> critical</span></code></pre></div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -687,8 +816,10 @@ Options:
 <script src="../../sidebar-filter.js"></script>
 <script src="../../dark-mode-toggle.js"></script>
 <script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>
 <script src="../../tooltips.js"></script>

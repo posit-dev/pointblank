@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-03d05489a1b0cbe063b91ebd7d2b46f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1028,6 +1028,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#notes-on-authentication" id="toc-notes-on-authentication" class="nav-link" data-scroll-target="#notes-on-authentication">Notes On Authentication</a></li>
   <li><a href="#ai-validation-process" id="toc-ai-validation-process" class="nav-link" data-scroll-target="#ai-validation-process">Ai Validation Process</a></li>
   <li><a href="#prompt-design-tips" id="toc-prompt-design-tips" class="nav-link" data-scroll-target="#prompt-design-tips">Prompt Design Tips</a></li>
+  <li><a href="#multi-modal-attachments" id="toc-multi-modal-attachments" class="nav-link" data-scroll-target="#multi-modal-attachments">Multi-Modal Attachments</a></li>
   <li><a href="#performance-considerations" id="toc-performance-considerations" class="nav-link" data-scroll-target="#performance-considerations">Performance Considerations</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
@@ -1060,22 +1061,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10879-L11283" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10879-L11356" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">prompt</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">prompt</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">model</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">columns_subset</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">batch_size</span><span class="op">=</span><span class="dv">1000</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_concurrent</span><span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">segments</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">attachments</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">batch_size</span><span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_concurrent</span><span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">segments</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <a href="Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Similar to other Pointblank validation methods, this generates binary test results (pass/fail) that integrate seamlessly with the standard reporting framework.</p>
@@ -1094,6 +1096,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dt><code><span class="doc-parameter-name">columns_subset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
 <p>A single column or list of columns to include in the validation. If <code>None</code>, all columns will be included. Specifying fewer columns can improve performance and reduce API costs so try to include only the columns necessary for the validation.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">attachments</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>An optional list of reference files (images or PDFs) to attach as global context for every batch. Each item can be a local file path, a URL (<code>http://</code> / <code>https://</code>), a <code>pathlib.Path</code>, or a pre-built chatlas <code>Content</code> object. Supported extensions are <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.gif</code>, <code>.webp</code>, and <code>.pdf</code>. The attachments apply to the whole validation step, not per-row, so they are well-suited for things like brand guides, schema diagrams, or sample documents the LLM should consult when scoring each row. <strong>Cost note</strong>: attachments are re-sent on every batch — see the <em>Multi-modal attachments</em> section below for cost-management tips.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
@@ -1226,6 +1232,32 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>“How would you improve this data?” (asks for suggestions, not pass/fail)</li>
 </ul>
 </section>
+<section id="multi-modal-attachments" class="level2 doc-multi-modal-attachments">
+<h2 class="doc-multi-modal-attachments">Multi-Modal Attachments</h2>
+<p>Use <code>attachments=</code> to give the LLM a reference image or PDF that applies to every row. The attachment is sent as global context, while each row’s values are still serialized as JSON and validated against your <code>prompt=</code>. Useful patterns:</p>
+<ul>
+<li>validating descriptions against a brand-style image: <code>attachments=["brand_guide.pdf"]</code></li>
+<li>cross-referencing rows with a schema diagram: <code>attachments=["schema.png"]</code></li>
+<li>matching free-text fields to a sample document: <code>attachments=["sample_invoice.pdf"]</code></li>
+</ul>
+<p>Accepted values per list item:</p>
+<ul>
+<li>local path strings or <code>pathlib.Path</code> objects (e.g., <code>"docs/diagram.png"</code>)</li>
+<li>URLs (e.g., <code>"https://example.com/diagram.png"</code>)</li>
+<li>pre-built chatlas <code>Content</code> objects (e.g., <code>chatlas.content_image_plot()</code>)</li>
+</ul>
+<p>Supported extensions: <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.gif</code>, <code>.webp</code>, <code>.pdf</code>.</p>
+<section id="notes" class="level2 doc-section doc-section-notes">
+<h2 class="doc-section doc-section-notes">Notes</h2>
+<p>local image paths auto-coerced through <code>attachments=</code> use <code>resize="low"</code> (chatlas’s default downscale to 512x512) to keep token costs predictable. For higher fidelity, pre-build the content yourself with <code>chatlas.content_image_file(path, resize="high")</code> (or <code>"none"</code>) and pass that object inside <code>attachments=</code>.</p>
+</section>
+<p><strong>Cost / batching note</strong>: attachments are re-sent on <em>every</em> batch (one batch = one LLM API call). For a table that requires N batches, each attachment’s input tokens are billed N times. To control costs:</p>
+<ul>
+<li>keep attachments small (downscale images, crop PDFs to the relevant page)</li>
+<li>use <code>columns_subset=</code> aggressively to maximize row-signature memoization (fewer unique rows means fewer batches)</li>
+<li>raise <code>batch_size=</code> when the combined system prompt, attachment, and row JSON fit comfortably under the model’s context window</li>
+</ul>
+</section>
 <section id="performance-considerations" class="level2 doc-performance-considerations">
 <h2 class="doc-performance-considerations">Performance Considerations</h2>
 <p>AI validation is significantly slower than traditional validation methods due to API calls to LLM providers. However, performance varies dramatically based on data characteristics:</p>
@@ -1308,6 +1340,19 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>This validation will identify that 2 out of 5 phone numbers (40%) are missing area codes, which exceeds all threshold levels. The validation will trigger the specified error action since the failure rate (40%) is above the error threshold (20%). The AI can recognize various phone number formats and determine whether they include area codes.</p>
+<p><strong>Multi-modal example with <code>attachments=</code>:</strong></p>
+<p>Suppose you have a table of product descriptions and a brand-style PDF that describes the approved tone and vocabulary. Pass the PDF as a global attachment so the LLM can compare each description against it.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>products)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .prompt(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        prompt<span class="op">=</span><span class="st">"Each product description must match the tone and vocabulary in the brand guide."</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        columns_subset<span class="op">=</span>[<span class="st">"description"</span>],</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        attachments<span class="op">=</span>[<span class="st">"docs/brand_guide.pdf"</span>],</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-6"</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each description with the same reference document in view.</p>
 
 
 </section>
@@ -1668,8 +1713,10 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>
 <script src="../tooltips.js"></script>

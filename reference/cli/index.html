@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -43,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-03d05489a1b0cbe063b91ebd7d2b46f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
-  <meta name="description" content="Find out if your data is what you think it is.">
+  <meta name="description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
   <script type="application/ld+json">
 [
   {
@@ -107,15 +142,15 @@ ul.task-list li input[type="checkbox"] {
 </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="pb – Pointblank | Pointblank">
-  <meta property="og:description" content="Find out if your data is what you think it is.">
+  <meta property="og:description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
   <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/cli/">
   <meta property="og:site_name" content="Pointblank">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="pb – Pointblank | Pointblank">
-  <meta name="twitter:description" content="Find out if your data is what you think it is.">
+  <meta name="twitter:description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -186,67 +221,67 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">pb</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/info.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb info</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb info</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/preview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb preview</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb preview</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/scan.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb scan</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb scan</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/missing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb missing</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb missing</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/validate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb validate</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb validate</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/datasets.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb datasets</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb datasets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/requirements.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb requirements</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb requirements</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/make_template.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb make-template</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb make-template</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/run.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb run</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb run</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../reference/cli/pl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">pb pl</span></a>
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli">pb pl</span></span></a>
   </div>
 </li>
     </ul>
@@ -254,15 +289,22 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#options" id="toc-options" class="nav-link active" data-scroll-target="#options">Options</a></li>
+  <li><a href="#commands" id="toc-commands" class="nav-link" data-scroll-target="#commands">Commands</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title cli-title">pb</h1>
+<h1 class="title cli-title"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></h1>
 </div>
 
 
@@ -279,6 +321,21 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="doc-subject">
+<p>Pointblank CLI: Data validation and quality tools for data engineers.</p>
+</div>
+<div class="doc-signature doc-Kind.FUNCTION">
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span> COMMAND <span class="pp">[</span><span class="ss">ARGS</span><span class="pp">]</span>...</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Use this CLI to validate data quality, explore datasets, and generate comprehensive reports for CSV, Parquet, and database sources. Suitable for data pipelines, ETL validation, and exploratory data analysis from the command line.</p>
+<p>Quick Examples:</p>
+<p>pb preview data.csv Preview your data pb scan data.csv Generate data profile pb validate data.csv Run basic validation</p>
+<p>Use pb COMMAND –help for detailed help on any command.</p>
+</div>
+<details class="gd-details">
+<summary class="gd-details-summary"><span class="gd-details-chevron" aria-hidden="true"></span><span class="gd-details-title">Full --help output</span></summary>
+<div class="gd-details-body">
 <div class="cli-manpage">
 <pre><code>Usage: pb [OPTIONS] COMMAND [ARGS]...
 
@@ -313,8 +370,68 @@ Commands:
   datasets       List available built-in datasets.
   requirements   Check installed dependencies and their availability.</code></pre>
 </div>
+</div>
+</details>
+<section id="options" class="level1 doc-parameters">
+<h1 class="doc-parameters">Options</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">-v, –version</span></code></dt>
+<dd>
+Show the version and exit.
+</dd>
+</dl>
+</div>
+</section>
+<section id="commands" class="level1 doc-parameters">
+<h1 class="doc-parameters">Commands</h1>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">info</span></code></dt>
+<dd>
+<a href="../../reference/cli/info.html">Display information about a data source.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">preview</span></code></dt>
+<dd>
+<a href="../../reference/cli/preview.html">Preview a data table showing head and tail rows.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">scan</span></code></dt>
+<dd>
+<a href="../../reference/cli/scan.html">Generate a data scan profile report.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">missing</span></code></dt>
+<dd>
+<a href="../../reference/cli/missing.html">Generate a missing values report for a data table.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">validate</span></code></dt>
+<dd>
+<a href="../../reference/cli/validate.html">Perform single or multiple data validations.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">datasets</span></code></dt>
+<dd>
+<a href="../../reference/cli/datasets.html">List available built-in datasets.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">requirements</span></code></dt>
+<dd>
+<a href="../../reference/cli/requirements.html">Check installed dependencies and their availability.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">make-template</span></code></dt>
+<dd>
+<a href="../../reference/cli/make_template.html">Create a validation script or YAML configuration template.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">run</span></code></dt>
+<dd>
+<a href="../../reference/cli/run.html">Run a Pointblank validation script or YAML configuration.</a>
+</dd>
+<dt><code><span class="doc-parameter-name">pl</span></code></dt>
+<dd>
+<a href="../../reference/cli/pl.html">Execute Polars expressions and display results.</a>
+</dd>
+</dl>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -670,8 +787,10 @@ Commands:
 <script src="../../sidebar-filter.js"></script>
 <script src="../../dark-mode-toggle.js"></script>
 <script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>
 <script src="../../tooltips.js"></script>

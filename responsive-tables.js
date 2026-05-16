@@ -148,6 +148,11 @@
 
   function applyScaleToFit(container, minScaleObj) {
     // minScaleObj: parsed result from parseMinScale(), or null.
+    // Per-container data-min-scale overrides the page/global threshold.
+    var containerMinScale = parseMinScale(container.getAttribute("data-min-scale"));
+    if (containerMinScale) {
+      minScaleObj = containerMinScale;
+    }
     // Find the content to scale — first child element that has measurable width
     var inner = container.querySelector(".cell-output-display, .cell-output, table, .gt_table");
     if (!inner) {

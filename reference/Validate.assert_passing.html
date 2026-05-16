@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3504a55d3d295cf6131458524f726dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-03d05489a1b0cbe063b91ebd7d2b46f7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1054,7 +1054,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14637-L14702" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14710-L14775" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">assert_passing</span>()</span></code></pre></div>
@@ -1077,7 +1077,7 @@ If any validation step has failing test units.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). The <a href="Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method is used to assert that all validation steps passed perfectly, automatically performing the interrogation if needed.</p>
-<div id="5af300e9" class="cell" data-execution_count="1">
+<div id="7e72f5ef" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1109,12 +1109,12 @@ If any validation step has failing test units.
 <span class="ansi-green-fg">     19</span> <span style="font-style:italic;color:rgb(95,135,135)"># No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly</span>
 <span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">20</span> validation.assert_passing()
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/work/pointblank/pointblank/pointblank/validate.py:14702</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg">  14698</span>             ]
-<span class="ansi-green-fg">  14699</span>             msg = "The following assertions failed:\n" + "\n".join(
-<span class="ansi-green-fg">  14700</span>                 [<span class="ansi-yellow-fg">f"- Step {i + 1}: {autobrief}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(0,135,0)">in</span> failed_steps]
-<span class="ansi-green-fg">  14701</span>             )
-<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">14702</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/work/pointblank/pointblank/pointblank/validate.py:14775</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg">  14771</span>             ]
+<span class="ansi-green-fg">  14772</span>             msg = "The following assertions failed:\n" + "\n".join(
+<span class="ansi-green-fg">  14773</span>                 [<span class="ansi-yellow-fg">f"- Step {i + 1}: {autobrief}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(0,135,0)">in</span> failed_steps]
+<span class="ansi-green-fg">  14774</span>             )
+<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">14775</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
 
 <span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
 - Step 2: Expect that values in `b` should be &lt; `9`.</pre>
@@ -1481,8 +1481,10 @@ If any validation step has failing test units.
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>
 <script src="../tooltips.js"></script>
