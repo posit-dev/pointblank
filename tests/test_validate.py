@@ -5228,7 +5228,56 @@ def test_rows_distinct(request, tbl_fixture) -> None:
     )
 
 
-def test_conjointly_polars_native() -> None:
+@pytest.mark.parametrize(
+    "tbl_type",
+    ["polars", "pandas"],
+)
+def test_rows_distinct_with_nulls(tbl_type) -> None:
+    """Test that rows_distinct correctly handles rows containing null values (GH#397)."""
+    if tbl_type == "polars":
+        import polars as pl
+
+        df = pl.DataFrame(
+            {"id": ["A", "B", "C"], "name": ["Alice", "Bob", "Charlie"], "score": [100, None, 100]}
+        )
+    else:
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {"id": ["A", "B", "C"], "name": ["Alice", "Bob", "Charlie"], "score": [100, None, 100]}
+        )
+
+    # All 3 rows are distinct — null should not cause exclusion
+    v = Validate(df).rows_distinct().interrogate()
+    assert v.n_passed(i=1, scalar=True) == 3
+    assert v.n_failed(i=1, scalar=True) == 0
+
+    # Column subset without nulls
+    v2 = Validate(df).rows_distinct(columns_subset=["id"]).interrogate()
+    assert v2.n_passed(i=1, scalar=True) == 3
+    assert v2.n_failed(i=1, scalar=True) == 0
+
+    # Actual duplicates with nulls should still be detected
+    if tbl_type == "polars":
+        df_dup = pl.DataFrame(
+            {
+                "id": ["A", "A", "C"],
+                "name": ["Alice", "Alice", "Charlie"],
+                "score": [None, None, 100],
+            }
+        )
+    else:
+        df_dup = pd.DataFrame(
+            {
+                "id": ["A", "A", "C"],
+                "name": ["Alice", "Alice", "Charlie"],
+                "score": [None, None, 100],
+            }
+        )
+
+    v3 = Validate(df_dup).rows_distinct().interrogate()
+    assert v3.n_passed(i=1, scalar=True) == 1
+    assert v3.n_failed(i=1, scalar=True) == 2
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     validation = (
