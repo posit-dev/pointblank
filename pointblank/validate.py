@@ -13696,15 +13696,11 @@ class Validate:
                 )
 
             # ------------------------------------------------
-            # Determine table type and `collect()` if needed
+            # Determine table type
             # ------------------------------------------------
 
             if tbl_type not in IBIS_BACKENDS:
                 tbl_type = "local"
-
-            # If the table is a lazy frame, we need to collect it
-            if _is_lazy_frame(data_tbl_step):
-                data_tbl_step = data_tbl_step.collect()
 
             # ------------------------------------------------
             # Set the number of test units
