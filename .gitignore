@@ -131,6 +131,10 @@ datasets/
 /*.csv
 .ruff_cache
 
+/*.md
+!README.md
+!ROADMAP.md
+
 # Benchmark results and reports
 benchmark/results/
 benchmark/reports/
