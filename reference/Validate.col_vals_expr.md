@@ -54,6 +54,11 @@ A boolean value or callable that determines whether the validation step should b
 The [Validate](Validate.md#pointblank.Validate) object with the added validation step.
 
 
+## Notes
+
+This validation method is not supported for PySpark DataFrames. The internal implementation uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
+
+
 ## Preprocessing
 
 The `pre=` argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.

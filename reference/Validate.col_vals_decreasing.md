@@ -66,6 +66,11 @@ A boolean value or callable that determines whether the validation step should b
 The [Validate](Validate.md#pointblank.Validate) object with the added validation step.
 
 
+## Notes
+
+This validation method is not supported for PySpark DataFrames. PySpark DataFrames are represented as LazyFrames in Narwhals, which do not support order-dependent operations like `shift()`. Calling this method on a PySpark DataFrame will raise an `InvalidOperationError` during interrogation.
+
+
 ## Examples
 
 For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The table is shown below:
