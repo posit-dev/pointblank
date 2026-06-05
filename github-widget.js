@@ -15,7 +15,7 @@
         owner: null,
         repo: null,
         cacheKey: 'great-docs-github-stats',
-        cacheDuration: 5 * 60 * 1000 // 5 minutes
+        cacheDuration: 4 * 60 * 60 * 1000 // 4 hours
     };
 
     /**
@@ -36,8 +36,17 @@
         // Create the widget structure
         createWidgetStructure(widget);
 
-        // Fetch and display stats
-        fetchGitHubStats();
+        // Use build-time embedded stats if available, otherwise try API
+        const embeddedStars = widget.dataset.stars;
+        const embeddedForks = widget.dataset.forks;
+        if (embeddedStars !== undefined && embeddedForks !== undefined) {
+            updateStatsDisplay({
+                stars: parseInt(embeddedStars, 10),
+                forks: parseInt(embeddedForks, 10)
+            });
+        } else {
+            fetchGitHubStats();
+        }
 
         // Setup dropdown behavior
         setupDropdown(widget);
@@ -126,11 +135,19 @@
             return;
         }
 
+        // Get stale cache (expired but still usable as fallback)
+        const staleCache = getFromCache(cacheKey, true);
+
         try {
             // Fetch repo stats
             const repoResponse = await fetch(
                 `https://api.github.com/repos/${config.owner}/${config.repo}`,
-                { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+                {
+                    headers: {
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
+                }
             );
 
             if (!repoResponse.ok) {
@@ -142,30 +159,9 @@
             const stats = {
                 stars: repoData.stargazers_count,
                 forks: repoData.forks_count,
-                openIssues: repoData.open_issues_count, // This includes PRs
+                openIssues: repoData.open_issues_count,
                 timestamp: Date.now()
             };
-
-            // Try to get separate issue and PR counts (optional, may hit rate limits)
-            try {
-                const [issuesResponse, prsResponse] = await Promise.all([
-                    fetch(`https://api.github.com/search/issues?q=repo:${config.owner}/${config.repo}+type:issue+state:open`, {
-                        headers: { 'Accept': 'application/vnd.github.v3+json' }
-                    }),
-                    fetch(`https://api.github.com/search/issues?q=repo:${config.owner}/${config.repo}+type:pr+state:open`, {
-                        headers: { 'Accept': 'application/vnd.github.v3+json' }
-                    })
-                ]);
-
-                if (issuesResponse.ok && prsResponse.ok) {
-                    const issuesData = await issuesResponse.json();
-                    const prsData = await prsResponse.json();
-                    stats.issues = issuesData.total_count;
-                    stats.prs = prsData.total_count;
-                }
-            } catch (e) {
-                // Silently fail - we'll just not show separate counts
-            }
 
             // Cache the results
             saveToCache(cacheKey, stats);
@@ -175,8 +171,12 @@
 
         } catch (error) {
             console.warn('GitHub widget: Failed to fetch stats', error);
-            // Show fallback
-            updateStatsDisplay({ stars: '?', forks: '?' });
+            // Use stale cache if available, otherwise show fallback
+            if (staleCache) {
+                updateStatsDisplay(staleCache);
+            } else {
+                updateStatsDisplay({ stars: '?', forks: '?' });
+            }
         }
     }
 
@@ -230,16 +230,15 @@
     }
 
     /**
-     * Get cached data if not expired
+     * Get cached data if not expired (or any cached data if allowStale is true)
      */
-    function getFromCache(key) {
+    function getFromCache(key, allowStale) {
         try {
             const data = localStorage.getItem(key);
             if (!data) return null;
 
             const parsed = JSON.parse(data);
-            if (Date.now() - parsed.timestamp > config.cacheDuration) {
-                localStorage.removeItem(key);
+            if (!allowStale && Date.now() - parsed.timestamp > config.cacheDuration) {
                 return null;
             }
             return parsed;

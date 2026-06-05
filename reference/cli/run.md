@@ -92,25 +92,25 @@ Optional.
 # Options
 
 
-`-data: TEXT`  
+`--data: TEXT`  
 Data source to replace in validation objects (Python scripts and YAML configs)
 
-`-output-html: PATH`  
+`--output-html: PATH`  
 Save HTML validation report to file
 
-`-output-json: PATH`  
+`--output-json: PATH`  
 Save JSON validation summary to file
 
-`-show-extract`  
+`--show-extract`  
 Show extract of failing rows if validation fails
 
-`-write-extract: TEXT`  
+`--write-extract: TEXT`  
 Save failing rows to folders (one CSV per step). Provide base name for folder.
 
-`-limit: INTEGER = 500`  
+`--limit: INTEGER = 500`  
 Maximum number of failing rows to save to CSV (default: 500)
 
-`-fail-on: CHOICE`  
+`--fail-on: CHOICE`  
 Exit with non-zero code when validation reaches this threshold level
 
 

@@ -89,31 +89,31 @@ Optional.
 # Options
 
 
-`-e, -edit`  
+`-e, --edit`  
 Open editor for multi-line input
 
-`-f, -file: PATH`  
+`-f, --file: PATH`  
 Read query from file
 
-`-editor: TEXT`  
+`--editor: TEXT`  
 Editor to use for `--edit` mode (overrides \$EDITOR and auto-detection)
 
-`-o, -output-format: CHOICE = preview`  
+`-o, --output-format: CHOICE = preview`  
 Output format for the result
 
-`-preview-head: INTEGER = 5`  
+`--preview-head: INTEGER = 5`  
 Number of head rows for preview
 
-`-preview-tail: INTEGER = 5`  
+`--preview-tail: INTEGER = 5`  
 Number of tail rows for preview
 
-`-output-html: PATH`  
+`--output-html: PATH`  
 Save HTML output to file
 
-`-pipe`  
+`--pipe`  
 Output data in a format suitable for piping to other pb commands
 
-`-pipe-format: CHOICE = parquet`  
+`--pipe-format: CHOICE = parquet`  
 Format for piped output (default: parquet)
 
 

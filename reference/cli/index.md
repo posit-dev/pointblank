@@ -58,7 +58,7 @@ Use pb COMMAND -help for detailed help on any command.
 # Options
 
 
-`-v, -version`  
+`-v, --version`  
 Show the version and exit.
 
 

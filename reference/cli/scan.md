@@ -65,8 +65,8 @@ Optional.
 # Options
 
 
-`-output-html: PATH`  
+`--output-html: PATH`  
 Save HTML scan report to file
 
-`-c, -columns: TEXT`  
+`-c, --columns: TEXT`  
 Comma-separated list of columns to scan

@@ -267,6 +267,33 @@
     }
 
     /**
+     * Detect whether the current page is MCP Reference.
+     */
+    function isMcpReferencePage() {
+        return window.location.pathname.indexOf('/reference/mcp/') !== -1;
+    }
+
+    /**
+     * Get enabled reference sections from body data attribute.
+     */
+    function getRefSections() {
+        var attr = document.body.getAttribute('data-gd-ref-sections');
+        if (attr) return attr.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+        // Fallback detection
+        var sections = ['api'];
+        if (document.querySelector('.reference-switcher-container') ||
+            document.querySelector('a[href*="/reference/cli/"]') ||
+            isCliReferencePage()) {
+            sections.push('cli');
+        }
+        if (document.querySelector('a[href*="/reference/mcp/"]') ||
+            isMcpReferencePage()) {
+            sections.push('mcp');
+        }
+        return sections;
+    }
+
+    /**
      * Check if CLI Reference docs exist (switcher should show both tabs).
      */
     function hasCliReference() {
@@ -279,20 +306,32 @@
     }
 
     /**
-     * Build the reference switcher HTML (API / CLI tabs).
+     * Build the reference switcher HTML for the keyboard nav overlay.
+     * Uses segmented buttons for 2 sections, dropdown for 3+.
      */
     function buildRefSwitcherHtml() {
-        if (!hasCliReference()) return '';
-        var isCli = isCliReferencePage();
-        var apiLabel = _gdT('api', 'API');
-        var cliLabel = _gdT('cli', 'CLI');
+        var sections = getRefSections();
+        if (sections.length < 2) return '';
+
+        var currentRef = 'api';
+        if (isMcpReferencePage()) currentRef = 'mcp';
+        else if (isCliReferencePage()) currentRef = 'cli';
+
+        var sectionMeta = {
+            api: { label: _gdT('api', 'Python API'), svg: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>' },
+            cli: { label: _gdT('cli', 'CLI'), svg: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>' },
+            mcp: { label: _gdT('mcp', 'MCP Server'), svg: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>' }
+        };
+
         var html = '<div class="gd-menu-ref-switcher">';
-        html += '<button class="gd-menu-ref-switcher-btn' + (isCli ? '' : ' active') + '" data-ref="api">';
-        html += '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
-        html += '<span>' + escapeHtml(apiLabel) + '</span></button>';
-        html += '<button class="gd-menu-ref-switcher-btn' + (isCli ? ' active' : '') + '" data-ref="cli">';
-        html += '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>';
-        html += '<span>' + escapeHtml(cliLabel) + '</span></button>';
+        for (var i = 0; i < sections.length; i++) {
+            var id = sections[i];
+            var meta = sectionMeta[id] || { label: id, svg: '' };
+            var active = id === currentRef ? ' active' : '';
+            html += '<button class="gd-menu-ref-switcher-btn' + active + '" data-ref="' + id + '">';
+            html += meta.svg;
+            html += '<span>' + escapeHtml(meta.label) + '</span></button>';
+        }
         html += '</div>';
         return html;
     }
@@ -430,10 +469,11 @@
             var item = items[i];
             if (item.section && item.section !== currentSection) {
                 currentSection = item.section;
+                // Section text comes from innerHTML (already HTML-safe), so
+                // insert directly without escaping to avoid double-encoding
+                // entities like &amp; → &amp;amp;
                 html += '<li class="gd-menu-section" aria-hidden="true">' +
-                        (typeof currentSection === 'string' && currentSection.indexOf('<') !== -1
-                            ? currentSection
-                            : escapeHtml(currentSection)) + '</li>';
+                        currentSection + '</li>';
             }
             var activeClass = item.active ? ' gd-menu-item-active' : '';
             var label = item.html || escapeHtml(item.text);
@@ -465,51 +505,58 @@
         var cache = {}; // cache fetched items by ref type
 
         // Pre-populate current section's items from what's already rendered
-        var currentType = isCliReferencePage() ? 'cli' : 'api';
-        // (No need to cache — the overlay already shows these)
+        var currentType = 'api';
+        if (isMcpReferencePage()) currentType = 'mcp';
+        else if (isCliReferencePage()) currentType = 'cli';
 
-        buttons.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var refType = btn.getAttribute('data-ref');
+        var refPaths = {
+            api: basePath + '/reference/index.html',
+            cli: basePath + '/reference/cli/index.html',
+            mcp: basePath + '/reference/mcp/index.html'
+        };
 
-                // Update active state on buttons
-                buttons.forEach(function(b) { b.classList.remove('active'); });
-                btn.classList.add('active');
+        for (var i = 0; i < buttons.length; i++) {
+            (function(btn) {
+                btn.addEventListener('click', function() {
+                    var refType = btn.getAttribute('data-ref');
 
-                // If switching to the section we're already on, re-render from sidebar
-                if (refType === currentType) {
-                    var items = getSidebarItems();
-                    renderItemsInOverlay(overlay, items);
-                    return;
-                }
+                    // Update active state on buttons
+                    for (var b = 0; b < buttons.length; b++) { buttons[b].classList.remove('active'); }
+                    btn.classList.add('active');
 
-                // If cached, render immediately
-                if (cache[refType]) {
-                    renderItemsInOverlay(overlay, cache[refType]);
-                    return;
-                }
+                    // If switching to the section we're already on, re-render from sidebar
+                    if (refType === currentType) {
+                        var items = getSidebarItems();
+                        renderItemsInOverlay(overlay, items);
+                        return;
+                    }
 
-                // Fetch the other section's index page and parse its sidebar
-                var url = refType === 'cli'
-                    ? basePath + '/reference/cli/index.html'
-                    : basePath + '/reference/index.html';
+                    // If cached, render immediately
+                    if (cache[refType]) {
+                        renderItemsInOverlay(overlay, cache[refType]);
+                        return;
+                    }
 
-                fetch(url)
-                    .then(function(res) { return res.text(); })
-                    .then(function(htmlStr) {
-                        var items = parseSidebarItemsFromHtml(htmlStr, url);
-                        cache[refType] = items;
-                        // Only render if this tab is still active
-                        if (btn.classList.contains('active')) {
-                            renderItemsInOverlay(overlay, items);
-                        }
-                    })
-                    .catch(function() {
-                        // On error, fall back to navigation
-                        window.location.href = url;
-                    });
-            });
-        });
+                    // Fetch the target section's index page and parse its sidebar
+                    var url = refPaths[refType] || basePath + '/reference/index.html';
+
+                    fetch(url)
+                        .then(function(res) { return res.text(); })
+                        .then(function(htmlStr) {
+                            var items = parseSidebarItemsFromHtml(htmlStr, url);
+                            cache[refType] = items;
+                            // Only render if this tab is still active
+                            if (btn.classList.contains('active')) {
+                                renderItemsInOverlay(overlay, items);
+                            }
+                        })
+                        .catch(function() {
+                            // On error, fall back to navigation
+                            window.location.href = url;
+                        });
+                });
+            })(buttons[i]);
+        }
     }
 
     /**

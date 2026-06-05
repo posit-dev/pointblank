@@ -50,5 +50,5 @@ Optional.
 # Options
 
 
-`-output-html: PATH`  
+`--output-html: PATH`  
 Save HTML output to file

@@ -133,31 +133,31 @@ Optional.
 # Options
 
 
-`-list-checks`  
+`--list-checks`  
 List available validation checks and exit
 
-`-check: CHOICE`  
+`--check: CHOICE`  
 Type of validation check to perform. Can be used multiple times for multiple checks.
 
-`-column: TEXT`  
+`--column: TEXT`  
 Column name or integer position as \#N (1-based index) for validation.
 
-`-set: TEXT`  
+`--set: TEXT`  
 Comma-separated allowed values for col-vals-in-set checks.
 
-`-value: FLOAT`  
+`--value: FLOAT`  
 Numeric value for comparison checks.
 
-`-show-extract`  
+`--show-extract`  
 Show extract of failing rows if validation fails
 
-`-write-extract: TEXT`  
+`--write-extract: TEXT`  
 Save failing rows to folder. Provide base name for folder.
 
-`-limit: INTEGER = 500`  
+`--limit: INTEGER = 500`  
 Maximum number of failing rows to save to CSV (default: 500)
 
-`-exit-code`  
+`--exit-code`  
 Exit with non-zero code if validation fails
 
 

@@ -86,38 +86,38 @@ Optional.
 # Options
 
 
-`-columns: TEXT`  
+`--columns: TEXT`  
 Comma-separated list of columns to display
 
-`-col-range: TEXT`  
+`--col-range: TEXT`  
 Column range like `1:10` or `5:` or `:15` (1-based indexing)
 
-`-col-first: INTEGER`  
+`--col-first: INTEGER`  
 Show first N columns
 
-`-col-last: INTEGER`  
+`--col-last: INTEGER`  
 Show last N columns
 
-`-head: INTEGER = 5`  
+`--head: INTEGER = 5`  
 Number of rows from the top (default: 5)
 
-`-tail: INTEGER = 5`  
+`--tail: INTEGER = 5`  
 Number of rows from the bottom (default: 5)
 
-`-limit: INTEGER = 50`  
+`--limit: INTEGER = 50`  
 Maximum total rows to display (default: 50)
 
-`-no-row-numbers`  
+`--no-row-numbers`  
 Hide row numbers
 
-`-max-col-width: INTEGER = 250`  
+`--max-col-width: INTEGER = 250`  
 Maximum column width in pixels (default: 250)
 
-`-min-table-width: INTEGER = 500`  
+`--min-table-width: INTEGER = 500`  
 Minimum table width in pixels (default: 500)
 
-`-no-header`  
+`--no-header`  
 Hide table header
 
-`-output-html: PATH`  
+`--output-html: PATH`  
 Save HTML output to file
