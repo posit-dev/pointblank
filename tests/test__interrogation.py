@@ -266,44 +266,25 @@ def test_pyspark_nested_exception_print():
 
 
 def test_check_column_has_nulls_attribute_error():
-    """Test AttributeError handling in null checking."""
+    """Test that _column_has_null_values returns False when select raises an exception."""
 
-    # Create a mock table without null_count method
+    # Create a mock table that raises when select() is called
     mock_table = Mock()
-    del mock_table.select().null_count  # Remove null_count method
-
-    # Mock the select().collect() scenario for LazyFrames
-    mock_collected = Mock()
-    mock_collected.null_count.return_value = {"test_col": [1]}
-    mock_table.select.return_value.collect.return_value = mock_collected
+    mock_table.select.side_effect = Exception("Unsupported operation")
 
     result = _column_has_null_values(mock_table, "test_col")
-    assert result is True
+    assert result is False
 
 
 def test_check_column_has_nulls_nested_exceptions():
     """Test nested exception handling in null checking."""
 
-    # Create a mock that raises AttributeError for null_count
+    # Create a mock table that raises when select() is called
     mock_table = Mock()
+    mock_table.select.side_effect = Exception("Select failed")
 
-    # Make standard null_count() method fail
-    mock_select_result = Mock()
-    del mock_select_result.null_count  # Remove null_count method to trigger AttributeError
-    mock_table.select.return_value = mock_select_result
-
-    # Make collect() also fail
-    mock_select_result.collect.side_effect = Exception("Collect failed")
-
-    # Mock Narwhals scenario that also fails
-    with patch("pointblank._interrogation.nw") as mock_nw:
-        mock_nw.col.return_value.is_null.return_value.sum.return_value.alias.return_value = (
-            "null_expr"
-        )
-        mock_table.select.side_effect = [mock_select_result, Exception("Select failed")]
-
-        result = _column_has_null_values(mock_table, "test_col")
-        assert result is False  # Last resort returns False
+    result = _column_has_null_values(mock_table, "test_col")
+    assert result is False  # Last resort returns False
 
 
 def test_modify_datetime_column_isinstance_check():
