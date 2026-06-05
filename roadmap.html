@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index – Pointblank | Pointblank</title>
+<title>Roadmap – Pointblank | Pointblank</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,26 +26,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../favicon.ico" rel="icon">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-96b938f4df28e178fdc9f17501a8d28b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-96b938f4df28e178fdc9f17501a8d28b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -73,93 +71,35 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
-<script src="../theme-init.js"></script>
+<script src="theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-  <meta name="description" content="Find out if your data is what you think it is.">
+  <meta name="description" content="High-priority features that build on existing infrastructure.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="index – Pointblank | Pointblank">
-  <meta property="og:description" content="Find out if your data is what you think it is.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/blog/">
+  <meta property="og:title" content="Roadmap – Pointblank | Pointblank">
+  <meta property="og:description" content="High-priority features that build on existing infrastructure.">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/roadmap.html">
   <meta property="og:site_name" content="Pointblank">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="index – Pointblank | Pointblank">
-  <meta name="twitter:description" content="Find out if your data is what you think it is.">
+  <meta name="twitter:title" content="Roadmap – Pointblank | Pointblank">
+  <meta name="twitter:description" content="High-priority features that build on existing infrastructure.">
 </head>
 
-<body class="nav-fixed gd-blog-index fullcontent quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.24.0</code><br>Released 2026-04-22">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.24.0</code><br>Released 2026-04-22">
+    <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class=""></div>
@@ -169,23 +109,23 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="./user-guide/index.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../reference/index.html"> 
+    <a class="nav-link" href="./reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../changelog.html"> 
+    <a class="nav-link" href="./changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../examples/index.html"> 
+    <a class="nav-link" href="./examples/index.html"> 
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../blog/index.html" aria-current="page"> 
+    <a class="nav-link" href="./blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
 </ul>
@@ -206,133 +146,292 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
-<!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
-
-
-
-
-<p><img src="./pointblank_blog_logo.png" class="img-fluid"></p>
-
-
-
-
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-    <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-      <option value="" disabled="" selected="" hidden="">Order By</option>
-      <option value="index" data-direction="asc">Default</option>
-      <option value="listing-date-sort" data-direction="asc">
-        Date - Oldest
-      </option>
-      <option value="listing-date-sort" data-direction="desc">
-        Date - Newest
-      </option>
-      <option value="listing-title-sort" data-direction="asc">
-        Title
-      </option>
-      <option value="listing-author" data-direction="asc">
-        Author
-      </option>
-    </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#planned-near-term" id="toc-planned-near-term" class="nav-link active" data-scroll-target="#planned-near-term">Planned — Near Term</a>
+  <ul class="collapse">
+  <li><a href="#schema-export" id="toc-schema-export" class="nav-link" data-scroll-target="#schema-export">Schema Export</a></li>
+  <li><a href="#validation-registry" id="toc-validation-registry" class="nav-link" data-scroll-target="#validation-registry">Validation Registry</a></li>
+  <li><a href="#rich-notification-ecosystem" id="toc-rich-notification-ecosystem" class="nav-link" data-scroll-target="#rich-notification-ecosystem">Rich Notification Ecosystem</a></li>
+  <li><a href="#semantic-validation-enhancements" id="toc-semantic-validation-enhancements" class="nav-link" data-scroll-target="#semantic-validation-enhancements">Semantic Validation Enhancements</a></li>
+  <li><a href="#test-data-generation-enhancements" id="toc-test-data-generation-enhancements" class="nav-link" data-scroll-target="#test-data-generation-enhancements">Test Data Generation Enhancements</a></li>
+  </ul></li>
+  <li><a href="#planned-medium-term" id="toc-planned-medium-term" class="nav-link" data-scroll-target="#planned-medium-term">Planned — Medium Term</a>
+  <ul class="collapse">
+  <li><a href="#intelligent-validation-recommendations" id="toc-intelligent-validation-recommendations" class="nav-link" data-scroll-target="#intelligent-validation-recommendations">Intelligent Validation Recommendations</a></li>
+  <li><a href="#ai-powered-data-documentation" id="toc-ai-powered-data-documentation" class="nav-link" data-scroll-target="#ai-powered-data-documentation">AI-Powered Data Documentation</a></li>
+  <li><a href="#natural-language-validation-queries" id="toc-natural-language-validation-queries" class="nav-link" data-scroll-target="#natural-language-validation-queries">Natural Language Validation Queries</a></li>
+  <li><a href="#pipeline-integration-framework" id="toc-pipeline-integration-framework" class="nav-link" data-scroll-target="#pipeline-integration-framework">Pipeline Integration Framework</a></li>
+  <li><a href="#data-observability-dashboard" id="toc-data-observability-dashboard" class="nav-link" data-scroll-target="#data-observability-dashboard">Data Observability Dashboard</a></li>
+  <li><a href="#data-profiling-drift-detection" id="toc-data-profiling-drift-detection" class="nav-link" data-scroll-target="#data-profiling-drift-detection">Data Profiling &amp; Drift Detection</a></li>
+  </ul></li>
+  <li><a href="#planned-long-term" id="toc-planned-long-term" class="nav-link" data-scroll-target="#planned-long-term">Planned — Long Term</a>
+  <ul class="collapse">
+  <li><a href="#multi-table-cross-dataset-validation" id="toc-multi-table-cross-dataset-validation" class="nav-link" data-scroll-target="#multi-table-cross-dataset-validation">Multi-Table &amp; Cross-Dataset Validation</a></li>
+  <li><a href="#vs-code-extension" id="toc-vs-code-extension" class="nav-link" data-scroll-target="#vs-code-extension">VS Code Extension</a></li>
+  <li><a href="#jupyternotebook-magic-commands" id="toc-jupyternotebook-magic-commands" class="nav-link" data-scroll-target="#jupyternotebook-magic-commands">Jupyter/Notebook Magic Commands</a></li>
+  <li><a href="#schema-inference-serialization" id="toc-schema-inference-serialization" class="nav-link" data-scroll-target="#schema-inference-serialization">Schema Inference &amp; Serialization</a></li>
+  <li><a href="#type-hints-static-analysis" id="toc-type-hints-static-analysis" class="nav-link" data-scroll-target="#type-hints-static-analysis">Type Hints &amp; Static Analysis</a></li>
+  <li><a href="#plugin-architecture" id="toc-plugin-architecture" class="nav-link" data-scroll-target="#plugin-architecture">Plugin Architecture</a></li>
+  <li><a href="#backend-expansion" id="toc-backend-expansion" class="nav-link" data-scroll-target="#backend-expansion">Backend Expansion</a></li>
+  <li><a href="#benchmarking-performance" id="toc-benchmarking-performance" class="nav-link" data-scroll-target="#benchmarking-performance">Benchmarking &amp; Performance</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Roadmap</h1>
 </div>
-<table class="quarto-listing-table table">
-<thead>
-<tr>
 
-<th>
-<a class="sort" data-sort="listing-date-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Date</a>
-</th>
 
-<th>
-<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Title</a>
-</th>
 
-<th>
-<a class="sort" data-sort="listing-author" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Author</a>
-</th>
+<div class="quarto-title-meta">
 
-</tr>
-</thead>
-<tbody class="list">
+    
+  
+    
+  </div>
+  
 
-<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1780663951115" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4706" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 4, 2025</span>
-</td>
-<td>
-<a href="../blog/validation-libs-2025/index.html" class="title listing-title">Data Validation Libraries for Polars (2025 Edition)</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
 
-</tr>
+</header>
 
-<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1780663947389" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 3, 2025</span>
-</td>
-<td>
-<a href="../blog/lets-workshop-together/index.html" class="title listing-title">C’mon C’mon: Let’s Do a Pointblank Workshop!</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
 
-</tr>
+<section id="planned-near-term" class="level1">
+<h1>Planned — Near Term</h1>
+<p>High-priority features that build on existing infrastructure.</p>
+<section id="schema-export" class="level2">
+<h2 class="anchored" data-anchor-id="schema-export">Schema Export</h2>
+<p>Export validation rules and schemas to standard interchange formats.</p>
+<ul>
+<li><code>.to_json_schema()</code> method on <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for JSON Schema output</li>
+<li><code>.to_documentation()</code> for auto-generated data documentation (Markdown, HTML)</li>
+<li>Round-trip compatibility with YAML validation configs</li>
+</ul>
+</section>
+<section id="validation-registry" class="level2">
+<h2 class="anchored" data-anchor-id="validation-registry">Validation Registry</h2>
+<p>Organizational catalog for sharing and discovering validation definitions.</p>
+<ul>
+<li><code>pb.ValidationRegistry</code> for storing and retrieving validations</li>
+<li>Named validation lookup across teams</li>
+<li>Version tracking for validation definitions</li>
+<li>Integration with YAML-based validation configs</li>
+</ul>
+</section>
+<section id="rich-notification-ecosystem" class="level2">
+<h2 class="anchored" data-anchor-id="rich-notification-ecosystem">Rich Notification Ecosystem</h2>
+<p>Expand alerting beyond Slack to additional platforms.</p>
+<ul>
+<li><code>send_email()</code> — SMTP email notifications</li>
+<li><code>send_pagerduty()</code> — PagerDuty incident creation</li>
+<li><code>send_discord()</code> — Discord webhooks</li>
+<li><code>send_to_datadog()</code> — Datadog events/metrics</li>
+<li><code>send_to_opsgenie()</code> — Opsgenie alerts</li>
+<li><code>trigger_webhook()</code> — Generic webhook support</li>
+</ul>
+</section>
+<section id="semantic-validation-enhancements" class="level2">
+<h2 class="anchored" data-anchor-id="semantic-validation-enhancements">Semantic Validation Enhancements</h2>
+<p>Improve the existing <code>.prompt()</code> LLM-based validation method.</p>
+<ul>
+<li>Batch processing optimization for LLM calls</li>
+<li>Confidence scores for semantic validations</li>
+<li>Advanced caching and cost optimization</li>
+<li>Fallback strategies for rate limits</li>
+<li>Custom prompt templates</li>
+</ul>
+</section>
+<section id="test-data-generation-enhancements" class="level2">
+<h2 class="anchored" data-anchor-id="test-data-generation-enhancements">Test Data Generation Enhancements</h2>
+<p>Extend the existing <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> capabilities.</p>
+<ul>
+<li>Schema interoperability: use a <a href="reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> schema to generate test data</li>
+<li>Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)</li>
+<li>Edge case generation (nulls, boundaries, Unicode, etc.)</li>
+<li>Hypothesis integration for property-based testing</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="planned-medium-term" class="level1">
+<h1>Planned — Medium Term</h1>
+<p>Features that expand Pointblank’s scope into new domains.</p>
+<section id="intelligent-validation-recommendations" class="level2">
+<h2 class="anchored" data-anchor-id="intelligent-validation-recommendations">Intelligent Validation Recommendations</h2>
+<p>AI-powered suggestions for improving existing validations.</p>
+<ul>
+<li>Post-hoc validation improvement suggestions via <code>.suggest_improvements()</code></li>
+<li>Automatic detection of uncovered columns</li>
+<li>Correlation-based rule suggestions</li>
+<li>Anomaly-based threshold recommendations</li>
+</ul>
+</section>
+<section id="ai-powered-data-documentation" class="level2">
+<h2 class="anchored" data-anchor-id="ai-powered-data-documentation">AI-Powered Data Documentation</h2>
+<p>Auto-generate data dictionaries and documentation from data and validations.</p>
+<ul>
+<li><code>pb.document()</code> function for AI-generated documentation</li>
+<li>Multiple output formats (Markdown, HTML, PDF, Quarto)</li>
+<li>Integration with validation results for quality context</li>
+<li>Customizable documentation templates</li>
+<li>Incremental documentation updates</li>
+</ul>
+</section>
+<section id="natural-language-validation-queries" class="level2">
+<h2 class="anchored" data-anchor-id="natural-language-validation-queries">Natural Language Validation Queries</h2>
+<p>Define validations using plain English descriptions.</p>
+<ul>
+<li><code>.from_prompt()</code> method for NL-to-validation conversion</li>
+<li>Interactive clarification for ambiguous requests</li>
+<li>Learning from corrections to improve suggestions</li>
+<li>Support for domain-specific terminology</li>
+</ul>
+</section>
+<section id="pipeline-integration-framework" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline-integration-framework">Pipeline Integration Framework</h2>
+<p>First-class integration with data orchestration tools.</p>
+<ul>
+<li>Apache Airflow operators</li>
+<li>Prefect tasks and flows</li>
+<li>Dagster asset checks</li>
+<li>dbt test adapter</li>
+<li>Luigi tasks</li>
+<li>Kedro hooks</li>
+</ul>
+</section>
+<section id="data-observability-dashboard" class="level2">
+<h2 class="anchored" data-anchor-id="data-observability-dashboard">Data Observability Dashboard</h2>
+<p>Local web dashboard for monitoring data quality over time.</p>
+<ul>
+<li>Historical validation tracking in DuckDB/SQLite</li>
+<li>Trend visualization for data quality metrics</li>
+<li>Anomaly detection on validation metrics over time</li>
+<li>Alerting rules based on metric trends</li>
+<li>Exportable quality scorecards</li>
+</ul>
+</section>
+<section id="data-profiling-drift-detection" class="level2">
+<h2 class="anchored" data-anchor-id="data-profiling-drift-detection">Data Profiling &amp; Drift Detection</h2>
+<p>Expand <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection.</p>
+<ul>
+<li><code>pb.DataProfile</code> class for comprehensive profiling</li>
+<li>Profile persistence and comparison</li>
+<li>Statistical drift detection (KS test, PSI, etc.)</li>
+<li>Schema drift detection</li>
+<li>Distribution visualization</li>
+<li>Automatic validation generation from drift</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="planned-long-term" class="level1">
+<h1>Planned — Long Term</h1>
+<p>Larger efforts for future milestones.</p>
+<section id="multi-table-cross-dataset-validation" class="level2">
+<h2 class="anchored" data-anchor-id="multi-table-cross-dataset-validation">Multi-Table &amp; Cross-Dataset Validation</h2>
+<p>Validate relationships across tables and datasets.</p>
+<ul>
+<li><code>pb.ValidateRelationships</code> for multi-table validation</li>
+<li>Foreign key validation</li>
+<li>Referential integrity checks</li>
+<li>Cross-table aggregate validations</li>
+<li>Entity resolution checks</li>
+<li>Join quality validation</li>
+</ul>
+</section>
+<section id="vs-code-extension" class="level2">
+<h2 class="anchored" data-anchor-id="vs-code-extension">VS Code Extension</h2>
+<p>Bring Pointblank directly into the IDE.</p>
+<ul>
+<li>Inline validation preview while writing code</li>
+<li>Validation report viewer in VS Code</li>
+<li>YAML validation schema with autocomplete</li>
+<li>Quick fix suggestions for validation errors</li>
+<li>Data preview with quality indicators</li>
+</ul>
+</section>
+<section id="jupyternotebook-magic-commands" class="level2">
+<h2 class="anchored" data-anchor-id="jupyternotebook-magic-commands">Jupyter/Notebook Magic Commands</h2>
+<p>Delightful notebook validation experience.</p>
+<ul>
+<li><code>%%pb_validate</code> cell magic</li>
+<li><code>%pb_check</code> line magic for quick assertions</li>
+<li><code>%pb_build</code> interactive validation builder widget</li>
+<li><code>%pb_report</code> inline report rendering</li>
+<li>Automatic validation suggestions in notebooks</li>
+</ul>
+</section>
+<section id="schema-inference-serialization" class="level2">
+<h2 class="anchored" data-anchor-id="schema-inference-serialization">Schema Inference &amp; Serialization</h2>
+<p>Seamlessly move between data, schemas, and validations.</p>
+<ul>
+<li><code>Schema.from_data()</code> with configurable inference</li>
+<li>Export Schema to JSON Schema, Avro, SQL DDL, Pydantic</li>
+<li>Import Schema from Pydantic, SQL, Avro, JSON Schema</li>
+<li><code>.with_rules_from_schema()</code> to auto-generate validation steps</li>
+<li>Schema diff and merge operations</li>
+<li>Schema evolution tracking</li>
+</ul>
+</section>
+<section id="type-hints-static-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="type-hints-static-analysis">Type Hints &amp; Static Analysis</h2>
+<p>Enable static type checking for validated data.</p>
+<ul>
+<li><code>pb.ValidatedFrame</code> wrapper with schema tracking</li>
+<li>Schema-aware type stubs for IDE support</li>
+<li>MyPy/Pyright plugin for static validation hints</li>
+<li>Integration with Polars/Pandas type systems</li>
+<li>Autocomplete for validated column names</li>
+</ul>
+</section>
+<section id="plugin-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="plugin-architecture">Plugin Architecture</h2>
+<p>Allow third-party extensions to hook into the validation pipeline.</p>
+<ul>
+<li><code>@pb.register_validation</code> decorator for custom validations</li>
+<li><code>@pb.register_action</code> for custom notification actions</li>
+<li>Plugin discovery and loading system</li>
+<li>Plugin marketplace/registry</li>
+<li>Plugin testing utilities</li>
+</ul>
+</section>
+<section id="backend-expansion" class="level2">
+<h2 class="anchored" data-anchor-id="backend-expansion">Backend Expansion</h2>
+<p>Certify additional database and data lake backends.</p>
+<ul>
+<li>Snowflake (full certification)</li>
+<li>BigQuery (full certification)</li>
+<li>Databricks (full certification)</li>
+<li>Delta Lake</li>
+<li>Apache Iceberg</li>
+<li>Redshift</li>
+<li>ClickHouse</li>
+</ul>
+</section>
+<section id="benchmarking-performance" class="level2">
+<h2 class="anchored" data-anchor-id="benchmarking-performance">Benchmarking &amp; Performance</h2>
+<p>Establish Pointblank as the fastest Python validation library.</p>
+<ul>
+<li>Comprehensive benchmark suite</li>
+<li>Performance comparison with competitors</li>
+<li>Optimization for large datasets (streaming validation)</li>
+<li>Lazy evaluation optimization</li>
+<li>Parallel validation execution</li>
+</ul>
 
-<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1780663951116" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 20, 2025</span>
-</td>
-<td>
-<a href="../blog/overhauled-user-guide/index.html" class="title listing-title">Overhauling Pointblank’s User Guide</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone and Michael Chow</span>
-</td>
 
-</tr>
+</section>
+</section>
 
-<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1780663951116" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 2, 2025</span>
-</td>
-<td>
-<a href="../blog/all-about-actions/index.html" class="title listing-title">Level Up Your Data Validation with <code>Actions</code> and <code>FinalActions</code></a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1780663951116" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 4, 2025</span>
-</td>
-<td>
-<a href="../blog/intro-pointblank/index.html" class="title listing-title">Introducing Pointblank</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-</tbody>
-</table>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -679,25 +778,25 @@ window.Quarto = {
 </div>
 </div>
 </footer>
-<script src="../github-widget.js"></script>
-<script src="../copy-page.js"></script>
-<script src="../sidebar-wrap.js"></script>
+<script src="github-widget.js"></script>
+<script src="copy-page.js"></script>
+<script src="sidebar-wrap.js"></script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
-<script src="../sidebar-filter.js"></script>
-<script src="../dark-mode-toggle.js"></script>
-<script src="../back-to-top.js"></script>
+<script src="sidebar-filter.js"></script>
+<script src="dark-mode-toggle.js"></script>
+<script src="back-to-top.js"></script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
-<script src="../keyboard-nav.js"></script>
-<script src="../copy-code.js"></script>
-<script src="../details.js"></script>
-<script src="../mermaid-renderer.js"></script>
-<script src="../reference-switcher.js"></script>
-<script src="../tooltips.js"></script>
+<script src="keyboard-nav.js"></script>
+<script src="copy-code.js"></script>
+<script src="details.js"></script>
+<script src="mermaid-renderer.js"></script>
+<script src="reference-switcher.js"></script>
+<script src="tooltips.js"></script>
 <script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
-<script src="../responsive-tables.js"></script>
+<script src="responsive-tables.js"></script>
 <script src="video-embed.js"></script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
-<script src="../navbar-widgets.js"></script>
+<script src="navbar-widgets.js"></script>
 
 
 
