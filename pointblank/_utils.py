@@ -355,9 +355,9 @@ def _count_true_values_in_column(
     # Filter the table based on the column and whether we want to count True or False values
     tbl_filtered = tbl_nw.filter(nw.col(column) if not inverse else ~nw.col(column))
 
-    # Always collect table if it is a LazyFrame; this is required to get the row count
+    # For LazyFrames, use aggregation to get the count without materializing all filtered rows
     if is_narwhals_lazyframe(tbl_filtered):
-        tbl_filtered = tbl_filtered.collect()
+        return int(tbl_filtered.select(nw.len()).collect().item())
 
     return len(tbl_filtered)
 
@@ -386,14 +386,13 @@ def _count_null_values_in_column(
     # already a Narwhals DataFrame)
     tbl_nw = nw.from_native(tbl)
 
-    # Filter the table to get rows where the specified column is Null
-    tbl_filtered = tbl_nw.filter(nw.col(column).is_null())
+    # Use aggregation to count null values without materializing the full frame
+    # Cast to Int32 before sum to support PySpark which can't sum booleans
+    result = tbl_nw.select(nw.col(column).is_null().cast(nw.Int32).sum())
 
-    # Always collect table if it is a LazyFrame; this is required to get the row count
-    if is_narwhals_lazyframe(tbl_filtered):
-        tbl_filtered = tbl_filtered.collect()
-
-    return len(tbl_filtered)
+    if is_narwhals_lazyframe(result):
+        return int(result.collect().item())
+    return int(result.item())
 
 
 def _is_numeric_dtype(dtype: str) -> bool:

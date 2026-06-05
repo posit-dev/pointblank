@@ -8323,6 +8323,13 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
+
         Examples
         --------
         ```{python}
@@ -8515,6 +8522,13 @@ class Validate:
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
 
         Examples
         --------
@@ -9744,6 +9758,12 @@ class Validate:
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. The internal implementation
+        uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this
+        method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
 
         Preprocessing
         -------------
@@ -13696,15 +13716,11 @@ class Validate:
                 )
 
             # ------------------------------------------------
-            # Determine table type and `collect()` if needed
+            # Determine table type
             # ------------------------------------------------
 
             if tbl_type not in IBIS_BACKENDS:
                 tbl_type = "local"
-
-            # If the table is a lazy frame, we need to collect it
-            if _is_lazy_frame(data_tbl_step):
-                data_tbl_step = data_tbl_step.collect()
 
             # ------------------------------------------------
             # Set the number of test units

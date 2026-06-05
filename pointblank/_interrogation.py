@@ -27,6 +27,7 @@ from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
     _get_tbl_type,
+    _is_lazy_frame,
 )
 from pointblank.column import Column
 
@@ -154,6 +155,11 @@ class ConjointlyValidation:
             self.tbl_type = _get_tbl_type(data=data_tbl)
         else:
             self.tbl_type = tbl_type
+
+        # Conjointly validation requires eager frames (uses .to_series())
+        # Collect lazy frames here since this validation inherently needs materialized data
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
 
     def get_test_results(self):
         """Evaluate all expressions and combine them conjointly."""
@@ -403,6 +409,10 @@ class SpeciallyValidation:
         else:
             self.tbl_type = tbl_type
 
+        # User-defined specially() functions expect eager frames for backwards compatibility
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
+
     def get_test_results(self) -> Any | list[bool]:
         """Evaluate the expression get either a list of booleans or a results table."""
 
@@ -513,9 +523,9 @@ class NumberOfTestUnits:
                 df=self.df, column=self.column, allowed_types=None, check_exists=False
             )
 
-            # Handle LazyFrames which don't have len()
+            # Use lazy-compatible row count (avoids collecting the entire frame)
             if is_narwhals_lazyframe(dfn):
-                dfn = dfn.collect()
+                return dfn.select(nw.len()).collect().item()
 
             assert is_narwhals_dataframe(dfn)
             return len(dfn)
@@ -538,21 +548,15 @@ def _get_compare_expr_nw(compare: Any) -> Any:
 
 def _column_has_null_values(table: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> bool:
     try:
-        # Try the standard null_count() method (DataFrame)
-        null_count = (table.select(column).null_count())[column][0]  # type: ignore[union-attr]
-    except AttributeError:
-        # For LazyFrames, collect first then get null count
-        try:
-            collected = table.select(column).collect()  # type: ignore[union-attr]
-            null_count = (collected.null_count())[column][0]
-        except Exception:
-            # Fallback: check if any values are null
-            try:
-                result = table.select(nw.col(column).is_null().sum().alias("null_count")).collect()  # type: ignore[union-attr]
-                null_count = result["null_count"][0]
-            except Exception:
-                # Last resort: return False (assume no nulls)
-                return False
+        # Use lazy-compatible aggregation to count nulls
+        # Cast to Int32 before sum to support PySpark which can't sum booleans
+        result = table.select(nw.col(column).is_null().cast(nw.Int32).sum().alias("null_count"))
+        if is_narwhals_lazyframe(result):
+            result = result.collect()
+        null_count = result["null_count"][0]
+    except Exception:
+        # Last resort: return False (assume no nulls)
+        return False
 
     return null_count is not None and null_count > 0
 
@@ -730,24 +734,23 @@ def col_pct_null(
 ) -> bool:
     """Check if the percentage of null vales are within p given the absolute bounds."""
     nw_frame = nw.from_native(data_tbl)
-    # Handle LazyFrames by collecting them first
+
+    # Use lazy-compatible aggregation to get total rows and null count
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
     if is_narwhals_lazyframe(nw_frame):
-        nw_frame = nw_frame.collect()
-
-    assert is_narwhals_dataframe(nw_frame)
-
-    # We cast as int because it could come back as an arbitary type. For example if the backend
-    # is numpy-like, we might get a scalar from `item()`. `int()` expects a certain signature though
-    # and `object` does not satisfy so we have to go with the type ignore.
-    total_rows: object = nw_frame.select(nw.len()).item()
-    total_rows: int = int(total_rows)
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_null=nw.col(column).is_null().cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_null: int = int(stats["n_null"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_null = int(nw_frame.select(nw.col(column).is_null().cast(nw.Int32).sum()).item())
 
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
-
-    # Count null values (see above comment on typing shenanigans)
-    n_null: object = nw_frame.select(nw.col(column).is_null().sum()).item()
-    n_null: int = int(n_null)
 
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
@@ -2793,6 +2796,11 @@ def interrogate_prompt(
 
     logger = logging.getLogger(__name__)
 
+    # AI validation inherently needs materialized data (sends rows to LLM)
+    # Collect lazy frames here since this cannot operate lazily
+    if _is_lazy_frame(tbl):
+        tbl = tbl.collect()
+
     # Convert to narwhals early for consistent row counting
     nw_tbl = nw.from_native(tbl)
     # Get row count - for LazyFrame we need to use select/collect
@@ -3005,12 +3013,6 @@ def data_freshness(
 
     nw_frame = nw.from_native(data_tbl)
 
-    # Handle LazyFrames by collecting them first
-    if is_narwhals_lazyframe(nw_frame):
-        nw_frame = nw_frame.collect()
-
-    assert is_narwhals_dataframe(nw_frame)
-
     result = {
         "passed": False,
         "max_datetime": None,
@@ -3021,10 +3023,11 @@ def data_freshness(
         "column_empty": False,
     }
 
-    # Get the maximum datetime value from the column
+    # Get the maximum datetime value from the column using lazy-compatible aggregation
     try:
-        # Use narwhals to get max value
         max_val_result = nw_frame.select(nw.col(column).max())
+        if is_narwhals_lazyframe(max_val_result):
+            max_val_result = max_val_result.collect()
         max_datetime_raw = max_val_result.item()
 
         if max_datetime_raw is None:
