@@ -39,6 +39,39 @@ cli:
   module: pointblank.cli
   name: cli
 
+# MCP Server Documentation
+mcp:
+  enabled: true
+  module: pointblank.mcp
+  server_var: mcp
+  name: Pointblank MCP Server
+  categories:
+    "Data Management":
+      - load_dataframe
+      - list_loaded_dataframes
+      - list_available_backends
+      - delete_dataframe
+    "Data Analysis":
+      - profile_dataframe
+    "Validation":
+      - create_validator
+      - add_validation_step
+      - apply_validation_template
+      - interrogate_validator
+      - get_validation_step_output
+      - list_active_validators
+      - delete_validator
+    "Table Visualization":
+      - preview_table
+      - missing_values_table
+      - column_summary_table
+    "AI & Assistant":
+      - validation_assistant
+      - draft_validation_plan
+    "Reference & Management":
+      - get_pointblank_api_reference
+      - server_health_check
+
 # Changelog
 changelog:
   enabled: true
