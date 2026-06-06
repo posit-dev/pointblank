@@ -71,21 +71,11 @@ def _create_fastmcp_instance():
     """Create FastMCP instance with backwards compatibility for dependencies parameter."""
     try:
         import fastmcp
+        from packaging.version import Version
 
         version_str = getattr(fastmcp, "__version__", "0.0.0")
-        version_parts = version_str.split(".")
-        if len(version_parts) >= 3:
-            major, minor, patch = (
-                int(version_parts[0]),
-                int(version_parts[1]),
-                int(version_parts[2]),
-            )
-            if (
-                (major > 2)
-                or (major == 2 and minor > 11)
-                or (major == 2 and minor == 11 and patch >= 4)
-            ):
-                return FastMCP("PointblankMCP", lifespan=app_lifespan)
+        if Version(version_str) >= Version("2.11.4"):
+            return FastMCP("PointblankMCP", lifespan=app_lifespan)
 
         return FastMCP(
             "PointblankMCP", lifespan=app_lifespan, dependencies=["pointblank", "openpyxl"]
@@ -299,44 +289,8 @@ async def delete_dataframe(
 
 
 @mcp.tool(
-    name="analyze_data_quality",
-    description="Analyze data quality using Pointblank's DataScan class.",
-    tags={"Data Analysis"},
-)
-async def analyze_data_quality(
-    ctx: Context,
-    df_id: Annotated[str, "ID of the DataFrame to analyze."],
-) -> Dict[str, Any]:
-    """Analyze data quality using Pointblank's built-in DataScan functionality."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
-    df_id = validate_resource_id(df_id, "DataFrame")
-
-    if df_id not in app_ctx.loaded_dataframes:
-        raise ValueError(f"DataFrame ID '{df_id}' not found.")
-
-    df = app_ctx.loaded_dataframes[df_id]
-
-    await ctx.report_progress(20, 100, "Starting data quality analysis...")
-
-    scanner = pb.DataScan(data=df)
-
-    await ctx.report_progress(60, 100, "Running DataScan analysis...")
-
-    profile_json = scanner.to_json()
-
-    await ctx.report_progress(80, 100, "Processing results...")
-
-    profile_results = json.loads(profile_json)
-    cleaned_results = clean_for_json_serialization(profile_results)
-
-    await ctx.report_progress(100, 100, "Data quality analysis complete!")
-
-    return {"status": "success", "df_id": df_id, "analysis": cleaned_results}
-
-
-@mcp.tool(
     name="profile_dataframe",
-    description="Generate comprehensive data profiling insights for a loaded DataFrame.",
+    description="Profile a loaded DataFrame using Pointblank's DataScan, returning column-level statistics.",
     tags={"Data Analysis"},
 )
 async def profile_dataframe(
@@ -344,9 +298,9 @@ async def profile_dataframe(
     df_id: Annotated[str, "ID of the DataFrame to profile."],
     sample_size: Annotated[
         int, "Maximum number of rows to sample for profiling (0 = all rows)."
-    ] = 10000,
+    ] = 0,
 ) -> Dict[str, Any]:
-    """Generates comprehensive data profiling insights using Pointblank's DataScan class."""
+    """Run Pointblank DataScan on a loaded DataFrame and return column-level statistics."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     df_id = validate_resource_id(df_id, "DataFrame")
 
@@ -377,7 +331,7 @@ async def profile_dataframe(
     cleaned_results = clean_for_json_serialization(profile_results)
 
     await ctx.report_progress(100, 100, "Data profiling complete!")
-    return cleaned_results
+    return {"status": "success", "df_id": df_id, "profile": cleaned_results}
 
 
 # =============================================================================
