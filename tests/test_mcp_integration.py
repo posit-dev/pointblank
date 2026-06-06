@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from fastmcp import Client
 
-from pointblank_mcp_server.pointblank_server import mcp
+from pointblank.mcp.server import mcp
 
 
 @pytest.fixture(scope="module")

@@ -1,6 +1,6 @@
 # MCP Pointblank Server Documentation
 
-This document provides documentation for the `pointblank_server.py` script located in the `pointblank_mcp_server` folder. This server leverages the FastMCP framework to expose data validation functionalities of the Pointblank library, allowing for robust data quality checks through a structured interface.
+This document provides documentation for the `server.py` script located in the `pointblank/mcp` package. This server leverages the FastMCP framework to expose data validation functionalities of the Pointblank library, allowing for robust data quality checks through a structured interface.
 
 ## Overview
 
