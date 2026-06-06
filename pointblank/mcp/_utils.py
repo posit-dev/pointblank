@@ -456,7 +456,6 @@ SUPPORTED_VALIDATION_TYPES = [
     "col_exists",
     "rows_distinct",
     "rows_complete",
-    "prompt",
     "row_count_match",
     "conjointly",
     "col_schema_match",

@@ -774,85 +774,70 @@ async def preview_table(
     show_row_numbers: bool = True,
 ) -> str:
     """Display a preview of the DataFrame showing rows from top and bottom."""
-    try:
-        app_ctx: AppContext = ctx.request_context.lifespan_context
-        dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
-        if dataframe_id not in app_ctx.loaded_dataframes:
-            return f"Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+    if dataframe_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame '{dataframe_id}' not found. Load a DataFrame first.")
 
-        data = app_ctx.loaded_dataframes[dataframe_id]
+    data = app_ctx.loaded_dataframes[dataframe_id]
 
-        gt_table = pb.preview(
-            data, n_head=n_head, n_tail=n_tail, limit=limit, show_row_numbers=show_row_numbers
-        )
+    gt_table = pb.preview(
+        data, n_head=n_head, n_tail=n_tail, limit=limit, show_row_numbers=show_row_numbers
+    )
 
-        html_output = gt_table.as_raw_html()
-        browser_msg = save_html_and_open(
-            html_output,
-            title=f"DataFrame Preview: {dataframe_id}",
-            filename_prefix=f"pointblank_preview_{dataframe_id}",
-        )
+    html_output = gt_table.as_raw_html()
+    browser_msg = save_html_and_open(
+        html_output,
+        title=f"DataFrame Preview: {dataframe_id}",
+        filename_prefix=f"pointblank_preview_{dataframe_id}",
+    )
 
-        return f"Table preview generated successfully!\n\n{browser_msg}\n\nShowing {n_head} head + {n_tail} tail rows from {data.shape[0]:,} total rows with {data.shape[1]} columns."
-
-    except Exception as e:
-        logger.error(f"Error creating table preview: {e}")
-        return f"Error creating preview: {str(e)}"
+    return f"Table preview generated successfully!\n\n{browser_msg}\n\nShowing {n_head} head + {n_tail} tail rows from {data.shape[0]:,} total rows with {data.shape[1]} columns."
 
 
 @mcp.tool()
 async def missing_values_table(ctx: Context, dataframe_id: str) -> str:
     """Generate a table showing missing values analysis for the DataFrame."""
-    try:
-        app_ctx: AppContext = ctx.request_context.lifespan_context
-        dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
-        if dataframe_id not in app_ctx.loaded_dataframes:
-            return f"Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+    if dataframe_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame '{dataframe_id}' not found. Load a DataFrame first.")
 
-        data = app_ctx.loaded_dataframes[dataframe_id]
+    data = app_ctx.loaded_dataframes[dataframe_id]
 
-        gt_table = pb.missing_vals_tbl(data)
-        html_output = gt_table.as_raw_html()
-        browser_msg = save_html_and_open(
-            html_output,
-            title=f"Missing Values Analysis: {dataframe_id}",
-            filename_prefix=f"pointblank_missing_values_{dataframe_id}",
-        )
+    gt_table = pb.missing_vals_tbl(data)
+    html_output = gt_table.as_raw_html()
+    browser_msg = save_html_and_open(
+        html_output,
+        title=f"Missing Values Analysis: {dataframe_id}",
+        filename_prefix=f"pointblank_missing_values_{dataframe_id}",
+    )
 
-        return f"Missing values analysis generated!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows x {data.shape[1]} columns"
-
-    except Exception as e:
-        logger.error(f"Error creating missing values table: {e}")
-        return f"Error creating missing values analysis: {str(e)}"
+    return f"Missing values analysis generated!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows x {data.shape[1]} columns"
 
 
 @mcp.tool()
 async def column_summary_table(ctx: Context, dataframe_id: str, table_name: str = None) -> str:
     """Generate a comprehensive column-level summary of the DataFrame."""
-    try:
-        app_ctx: AppContext = ctx.request_context.lifespan_context
-        dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
-        if dataframe_id not in app_ctx.loaded_dataframes:
-            return f"Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+    if dataframe_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame '{dataframe_id}' not found. Load a DataFrame first.")
 
-        data = app_ctx.loaded_dataframes[dataframe_id]
+    data = app_ctx.loaded_dataframes[dataframe_id]
 
-        gt_table = pb.col_summary_tbl(data, tbl_name=table_name if table_name else dataframe_id)
-        html_output = gt_table.as_raw_html()
-        browser_msg = save_html_and_open(
-            html_output,
-            title=f"Column Summary: {dataframe_id}",
-            filename_prefix=f"pointblank_column_summary_{dataframe_id}",
-        )
+    gt_table = pb.col_summary_tbl(data, tbl_name=table_name if table_name else dataframe_id)
+    html_output = gt_table.as_raw_html()
+    browser_msg = save_html_and_open(
+        html_output,
+        title=f"Column Summary: {dataframe_id}",
+        filename_prefix=f"pointblank_column_summary_{dataframe_id}",
+    )
 
-        return f"Column summary table generated!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows x {data.shape[1]} columns"
-
-    except Exception as e:
-        logger.error(f"Error creating column summary table: {e}")
-        return f"Error creating column summary: {str(e)}"
+    return f"Column summary table generated!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows x {data.shape[1]} columns"
 
 
 # =============================================================================
@@ -934,7 +919,7 @@ def validation_assistant(
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
-        return f"Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+        raise ValueError(f"DataFrame '{dataframe_id}' not found. Load a DataFrame first.")
 
     data = app_ctx.loaded_dataframes[dataframe_id]
     rows, cols = data.shape
