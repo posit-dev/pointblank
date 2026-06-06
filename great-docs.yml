@@ -43,7 +43,7 @@ cli:
 mcp:
   enabled: true
   module: pointblank.mcp
-  server_var: mcp
+  server_var: _server
   name: Pointblank MCP Server
   categories:
     "Data Management":
