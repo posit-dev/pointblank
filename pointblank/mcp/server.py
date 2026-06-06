@@ -2,6 +2,7 @@ import json
 import logging
 import math
 import os
+import platform
 import sys
 import uuid
 import webbrowser
@@ -523,50 +524,23 @@ def _generate_validation_report_html(validator: pb.Validate, validator_id: str) 
     Uses Pointblank's built-in get_tabular_report() and as_raw_html() methods.
     Returns the file path.
     """
-    try:
-        # Generate timestamped filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"pointblank_validation_report_{validator_id}_{timestamp}.html"
-        file_path = Path.cwd() / filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"pointblank_validation_report_{validator_id}_{timestamp}.html"
+    file_path = Path.cwd() / filename
 
-        # Skip file generation during testing
-        if TESTING_MODE:
-            logger.debug(f"Skipping HTML file generation during testing: {filename}")
-            return str(file_path.resolve())  # Return path but don't create file
-
-        # Get the validation report as a GT table
-        gt_report = validator.get_tabular_report()
-
-        # Get the raw HTML from the GT table
-        html_content = gt_report.as_raw_html()
-
-        # Fix encoding issues with corrupted em dash characters
-        # Use byte sequences to avoid encoding issues in the source code
-        corrupted_sequences = [
-            b"\xe2\x80\x94".decode("utf-8"),  # The â€" corruption pattern
-            "\u2014",  # Unicode em dash
-            "—",  # Literal em dash
-        ]
-
-        # Replace all problematic sequences with HTML entity
-        for seq in corrupted_sequences:
-            html_content = html_content.replace(seq, "&mdash;")
-
-        # Ensure proper UTF-8 content
-        if isinstance(html_content, bytes):
-            html_content = html_content.decode("utf-8", errors="replace")
-
-        # Save HTML file with explicit UTF-8 encoding
-        with open(file_path, "w", encoding="utf-8", newline="") as f:
-            f.write(html_content)
-
-        logger.info(f"Validation report HTML saved to: {file_path}")
+    # Skip file generation during testing
+    if TESTING_MODE:
+        logger.debug(f"Skipping HTML file generation during testing: {filename}")
         return str(file_path.resolve())
 
-    except Exception as e:
-        logger.error(f"Error generating validation HTML report using get_tabular_report(): {e}")
-        # If get_tabular_report() fails, we still need a fallback
-        raise RuntimeError(f"Could not generate validation report HTML: {e}")
+    gt_report = validator.get_tabular_report()
+    html_content = gt_report.as_raw_html()
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    logger.info(f"Validation report HTML saved to: {file_path}")
+    return str(file_path.resolve())
 
 
 @dataclass
@@ -914,16 +888,13 @@ def clean_for_json_serialization(obj: Any) -> Any:
 
 
 @mcp.tool(
-    name="profile_dataframe_original",
+    name="profile_dataframe",
     description="Generate comprehensive data profiling insights for a loaded DataFrame.",
     tags={"Data Analysis"},
 )
 async def profile_dataframe(
     ctx: Context,
     df_id: Annotated[str, "ID of the DataFrame to profile."],
-    include_correlations: Annotated[
-        bool, "Whether to include correlation analysis for numeric columns."
-    ] = True,
     sample_size: Annotated[
         int, "Maximum number of rows to sample for profiling (0 = all rows)."
     ] = 10000,
@@ -1308,9 +1279,6 @@ async def server_health_check(ctx: Context) -> Dict[str, Any]:
             dataframe_details.append({"df_id": df_id, "error": str(e), "backend": "unknown"})
 
     # Get system information
-    import platform
-    import sys
-
     health_info = {
         "timestamp": current_time,
         "server_status": "healthy",
