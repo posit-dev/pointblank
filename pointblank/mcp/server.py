@@ -48,16 +48,120 @@ except ImportError:
     pl = None
     HAS_POLARS = False
 
+
 # Configure logging
+def _get_log_path() -> Path:
+    """Get a writable log file path, falling back to temp directory."""
+    candidates = [
+        Path.home() / ".pointblank" / "mcp_server.log",
+        Path("/tmp") / "pointblank_mcp_server.log",
+    ]
+    for p in candidates:
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            return p
+        except OSError:
+            continue
+    # Last resort: no file logging
+    return None
+
+
+_log_path = _get_log_path()
+_log_handlers: list = [logging.StreamHandler()]
+if _log_path:
+    _log_handlers.append(logging.FileHandler(str(_log_path)))
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("pointblank_mcp_server.log"), logging.StreamHandler()],
+    handlers=_log_handlers,
 )
 logger = logging.getLogger(__name__)
 logger.info(f"MCP Server starting at {datetime.now()}")
 logger.info(f"Available DataFrame backends: pandas={HAS_PANDAS}, polars={HAS_POLARS}")
 logger.info("Core Pointblank visualization features available")
+
+# Maximum file size for loading (500 MB)
+_MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024
+
+# Allowed file extensions for data loading
+_ALLOWED_DATA_EXTENSIONS = {".csv", ".xls", ".xlsx", ".parquet", ".json", ".jsonl"}
+
+
+def _validate_input_path(input_path: str) -> Path:
+    """
+    Validate and resolve an input file path, preventing path traversal attacks.
+
+    Ensures the path:
+    - Is resolved to an absolute path
+    - Does not contain traversal sequences
+    - Has an allowed file extension
+    - Does not exceed the maximum file size
+    """
+    p = Path(input_path).resolve()
+
+    # Block obvious traversal patterns in the raw input
+    if ".." in Path(input_path).parts:
+        raise ValueError("Path traversal ('..') is not allowed in file paths.")
+
+    # Validate extension
+    if p.suffix.lower() not in _ALLOWED_DATA_EXTENSIONS:
+        raise ValueError(
+            f"File type '{p.suffix}' is not allowed. "
+            f"Supported: {', '.join(sorted(_ALLOWED_DATA_EXTENSIONS))}"
+        )
+
+    # Check existence
+    if not p.exists():
+        raise FileNotFoundError(f"Input file not found: {p}")
+
+    if not p.is_file():
+        raise ValueError(f"Path is not a regular file: {p}")
+
+    # Check file size
+    file_size = p.stat().st_size
+    if file_size > _MAX_FILE_SIZE_BYTES:
+        raise ValueError(
+            f"File size ({file_size / 1024 / 1024:.1f} MB) exceeds the "
+            f"{_MAX_FILE_SIZE_BYTES / 1024 / 1024:.0f} MB limit."
+        )
+
+    return p
+
+
+def _validate_output_path(output_path: str, allowed_extensions: set[str]) -> Path:
+    """
+    Validate an output file path, preventing writes to dangerous locations.
+
+    Ensures the path:
+    - Is resolved to an absolute path
+    - Does not contain traversal sequences
+    - Has an allowed file extension
+    - Parent directory exists or can be created
+    """
+    p = Path(output_path).resolve()
+
+    # Block traversal
+    if ".." in Path(output_path).parts:
+        raise ValueError("Path traversal ('..') is not allowed in file paths.")
+
+    # Validate extension
+    if p.suffix.lower() not in allowed_extensions:
+        raise ValueError(
+            f"File type '{p.suffix}' is not allowed. "
+            f"Supported: {', '.join(sorted(allowed_extensions))}"
+        )
+
+    # Don't allow writing into system directories
+    _blocked_prefixes = ("/etc", "/usr", "/bin", "/sbin", "/var", "/sys", "/proc")
+    for prefix in _blocked_prefixes:
+        if str(p).startswith(prefix):
+            raise ValueError(f"Writing to system directory '{prefix}' is not allowed.")
+
+    # Ensure parent directory exists
+    p.parent.mkdir(parents=True, exist_ok=True)
+
+    return p
 
 
 # Type alias for DataFrame: can be Pandas or Polars or other
@@ -178,11 +282,59 @@ def _open_browser_conditionally(url: str) -> None:
         logger.debug(f"Browser opening suppressed in testing mode for: {url}")
 
 
+def _save_html_and_open(html_content: str, title: str, filename_prefix: str) -> str:
+    """
+    Wrap HTML content in a styled document, save to a file, and open in browser.
+
+    Returns a user-facing message about the result.
+    """
+    full_html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>{title}</title>
+    <meta charset="utf-8">
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }}
+        .table-container {{
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }}
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        {html_content}
+    </div>
+</body>
+</html>
+"""
+    html_filename = f"{filename_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    html_path = Path.cwd() / html_filename
+
+    if TESTING_MODE:
+        return (
+            f"HTML generated (file creation skipped during testing)\n\nFile location: {html_path}"
+        )
+
+    try:
+        with open(html_path, "w", encoding="utf-8") as f:
+            f.write(full_html)
+        _open_browser_conditionally(f"file://{html_path}")
+        return f"HTML saved and opened in default browser!\n\nFile location: {html_path}"
+    except Exception as e:
+        return f"Error saving HTML file: {str(e)}"
+
+
 def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
     """Load DataFrame from file using specified backend or auto-detect."""
-    p_path = Path(input_path)
-    if not p_path.exists():
-        raise FileNotFoundError(f"Input file '{input_path}' not found.")
+    p_path = _validate_input_path(input_path)
 
     # Auto-detect backend
     if backend == "auto":
@@ -762,34 +914,6 @@ def clean_for_json_serialization(obj: Any) -> Any:
 
 
 @mcp.tool(
-    name="test_simple_dataframe_access",
-    description="Simple test to check if DataFrame access causes serialization issues.",
-    tags={"Debug"},
-)
-async def test_simple_dataframe_access(
-    ctx: Context,
-    df_id: Annotated[str, "ID of the DataFrame to test."],
-) -> Dict[str, Any]:
-    """
-    Simple test function to check DataFrame access.
-    """
-    app_ctx: AppContext = ctx.request_context.lifespan_context
-
-    if df_id not in app_ctx.loaded_dataframes:
-        raise ValueError(f"DataFrame ID '{df_id}' not found.")
-
-    df = app_ctx.loaded_dataframes[df_id]
-
-    # Return minimal info without accessing df.shape or any other potentially problematic attributes
-    return {
-        "status": "success",
-        "df_id": df_id,
-        "columns": list(df.columns),
-        "column_count": len(df.columns),
-    }
-
-
-@mcp.tool(
     name="profile_dataframe_original",
     description="Generate comprehensive data profiling insights for a loaded DataFrame.",
     tags={"Data Analysis"},
@@ -849,300 +973,6 @@ async def profile_dataframe(
         error_msg = f"Error during data profiling: {str(e)}"
         await ctx.report_progress(100, 100, error_msg)
         raise ValueError(error_msg)
-
-
-def _profile_column(df: Any, column: str) -> Dict[str, Any]:
-    """Profile a single column and return statistics."""
-    try:
-        col_data = df[column]
-
-        # Basic info
-        profile = {
-            "dtype": str(col_data.dtype),
-            "non_null_count": int(col_data.count()) if hasattr(col_data, "count") else "N/A",
-            "null_count": int(col_data.isnull().sum()) if hasattr(col_data, "isnull") else "N/A",
-            "unique_count": int(col_data.nunique()) if hasattr(col_data, "nunique") else "N/A",
-        }
-
-        # Add null percentage
-        if isinstance(profile["null_count"], int) and len(col_data) > 0:
-            profile["null_percentage"] = round(profile["null_count"] / len(col_data) * 100, 2)
-
-        # Type-specific analysis
-        if hasattr(col_data, "dtype"):
-            if "int" in str(col_data.dtype) or "float" in str(col_data.dtype):
-                # Numeric column
-                profile.update(
-                    {
-                        "min": float(col_data.min()) if hasattr(col_data, "min") else None,
-                        "max": float(col_data.max()) if hasattr(col_data, "max") else None,
-                        "mean": float(col_data.mean()) if hasattr(col_data, "mean") else None,
-                        "std": float(col_data.std()) if hasattr(col_data, "std") else None,
-                        "quartiles": [
-                            float(col_data.quantile(0.25))
-                            if hasattr(col_data, "quantile")
-                            else None,
-                            float(col_data.quantile(0.5))
-                            if hasattr(col_data, "quantile")
-                            else None,
-                            float(col_data.quantile(0.75))
-                            if hasattr(col_data, "quantile")
-                            else None,
-                        ]
-                        if hasattr(col_data, "quantile")
-                        else None,
-                    }
-                )
-            elif "object" in str(col_data.dtype) or "string" in str(col_data.dtype):
-                # String column
-                if hasattr(col_data, "str"):
-                    try:
-                        profile.update(
-                            {
-                                "avg_length": float(col_data.str.len().mean())
-                                if hasattr(col_data.str, "len")
-                                else None,
-                                "min_length": int(col_data.str.len().min())
-                                if hasattr(col_data.str, "len")
-                                else None,
-                                "max_length": int(col_data.str.len().max())
-                                if hasattr(col_data.str, "len")
-                                else None,
-                            }
-                        )
-                    except Exception:
-                        pass
-
-                # Most common values
-                try:
-                    if hasattr(col_data, "value_counts"):
-                        top_values = col_data.value_counts().head(5)
-                        if hasattr(top_values, "to_dict"):
-                            profile["top_values"] = top_values.to_dict()
-                        else:
-                            profile["top_values"] = dict(top_values)
-                except Exception:
-                    pass
-
-        return profile
-    except Exception as e:
-        return {"error": str(e)}
-
-
-def _generate_validation_suggestions(column: str, profile: Dict[str, Any]) -> list:
-    """Generate suggested validation rules based on column profile."""
-    suggestions = []
-
-    try:
-        # Null checks
-        if profile.get("null_count", 0) == 0:
-            suggestions.append(
-                {
-                    "validation_type": "col_vals_not_null",
-                    "params": {"columns": column},
-                    "reason": "Column has no null values",
-                }
-            )
-        elif profile.get("null_percentage", 0) > 20:
-            suggestions.append(
-                {
-                    "validation_type": "col_vals_null",
-                    "params": {"columns": column},
-                    "reason": f"High null percentage ({profile.get('null_percentage', 0)}%)",
-                }
-            )
-
-        # Numeric validations
-        if profile.get("min") is not None and profile.get("max") is not None:
-            min_val = profile["min"]
-            max_val = profile["max"]
-
-            # Range validation
-            suggestions.append(
-                {
-                    "validation_type": "col_vals_between",
-                    "params": {"columns": column, "left": min_val, "right": max_val},
-                    "reason": f"Values range from {min_val} to {max_val}",
-                }
-            )
-
-            # Positive values check
-            if min_val >= 0:
-                suggestions.append(
-                    {
-                        "validation_type": "col_vals_ge",
-                        "params": {"columns": column, "value": 0},
-                        "reason": "All values are non-negative",
-                    }
-                )
-
-        # String validations
-        if "top_values" in profile and len(profile["top_values"]) <= 10:
-            # With a limited set of values suggest `in_set` validation
-            values_list = list(profile["top_values"].keys())
-            suggestions.append(
-                {
-                    "validation_type": "col_vals_in_set",
-                    "params": {"columns": column, "set_": values_list},
-                    "reason": f"Column has limited distinct values: {values_list[:3]}...",
-                }
-            )
-
-        # Length validations for strings
-        if profile.get("min_length") is not None and profile.get("max_length") is not None:
-            min_len = profile["min_length"]
-            max_len = profile["max_length"]
-            if min_len > 0:
-                suggestions.append(
-                    {
-                        "validation_type": "col_vals_expr",
-                        "params": {"columns": column, "expr": f"_.str.len() >= {min_len}"},
-                        "reason": f"Minimum string length is {min_len}",
-                    }
-                )
-
-    except Exception:
-        pass
-
-    return suggestions
-
-
-def _detect_data_quality_issues(df: Any, column_profiles: Dict[str, Any]) -> list:
-    """Detect potential data quality issues."""
-    issues = []
-
-    try:
-        total_rows = df.shape[0]
-
-        for col, profile in column_profiles.items():
-            if "error" in profile:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "analysis_error",
-                        "severity": "warning",
-                        "description": f"Could not analyze column: {profile['error']}",
-                    }
-                )
-                continue
-
-            # High null percentage
-            null_pct = profile.get("null_percentage", 0)
-            if null_pct > 50:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "high_null_rate",
-                        "severity": "critical",
-                        "description": f"Column has {null_pct}% null values",
-                    }
-                )
-            elif null_pct > 20:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "moderate_null_rate",
-                        "severity": "warning",
-                        "description": f"Column has {null_pct}% null values",
-                    }
-                )
-
-            # Low cardinality (potential categorical)
-            unique_count = profile.get("unique_count")
-            if unique_count is not None and unique_count < 10 and total_rows > 100:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "low_cardinality",
-                        "severity": "info",
-                        "description": f"Column has only {unique_count} unique values (potential categorical)",
-                    }
-                )
-
-            # High cardinality (potential identifier)
-            if unique_count is not None and unique_count > total_rows * 0.9:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "high_cardinality",
-                        "severity": "info",
-                        "description": f"Column has {unique_count}/{total_rows} unique values (potential identifier)",
-                    }
-                )
-
-            # Constant column
-            if unique_count == 1:
-                issues.append(
-                    {
-                        "column": col,
-                        "issue_type": "constant_column",
-                        "severity": "warning",
-                        "description": "Column has only one unique value",
-                    }
-                )
-
-    except Exception as e:
-        issues.append(
-            {
-                "column": "general",
-                "issue_type": "analysis_error",
-                "severity": "error",
-                "description": f"Error during data quality analysis: {str(e)}",
-            }
-        )
-
-    return issues
-
-
-def _compute_correlations(df: Any) -> Dict[str, Any]:
-    """Compute correlation matrix for numeric columns."""
-    try:
-        # Get numeric columns
-        if hasattr(df, "select_dtypes"):  # Pandas
-            numeric_df = df.select_dtypes(include=["number"])
-        else:  # Polars: basic approach
-            numeric_cols = [
-                col
-                for col in df.columns
-                if "int" in str(df[col].dtype) or "float" in str(df[col].dtype)
-            ]
-            numeric_df = df.select(numeric_cols) if numeric_cols else None
-
-        if numeric_df is None or numeric_df.shape[1] < 2:
-            return {"message": "Not enough numeric columns for correlation analysis"}
-
-        # Compute correlation matrix
-        if hasattr(numeric_df, "corr"):  # Pandas
-            corr_matrix = numeric_df.corr()
-
-            # Find strong correlations
-            strong_correlations = []
-            for i in range(len(corr_matrix.columns)):
-                for j in range(i + 1, len(corr_matrix.columns)):
-                    col1 = corr_matrix.columns[i]
-                    col2 = corr_matrix.columns[j]
-                    corr_value = corr_matrix.iloc[i, j]
-
-                    if abs(corr_value) > 0.7:  # Strong correlation threshold
-                        strong_correlations.append(
-                            {
-                                "column1": col1,
-                                "column2": col2,
-                                "correlation": round(float(corr_value), 3),
-                                "strength": "strong" if abs(corr_value) > 0.8 else "moderate",
-                            }
-                        )
-
-            return {
-                "correlation_matrix": corr_matrix.round(3).to_dict(),
-                "strong_correlations": strong_correlations,
-                "numeric_columns": list(numeric_df.columns),
-            }
-        else:
-            return {"message": "Correlation analysis not available for this DataFrame type"}
-
-    except Exception as e:
-        return {"error": str(e)}
 
 
 @mcp.tool(
@@ -1844,9 +1674,7 @@ async def get_validation_step_output(
         raise ValueError(f"Validator ID '{validator_id}' not found.")
     validator = app_ctx.active_validators[validator_id]
 
-    p_output_path = Path(output_path)
-    if p_output_path.suffix.lower() != ".csv":
-        raise ValueError(f"Unsupported file format '{p_output_path.suffix}'. Please use '.csv'.")
+    p_output_path = _validate_output_path(output_path, {".csv"})
 
     if step_index is not None and step_index < 0:
         raise ValueError("The 'step_index' cannot be a negative number.")
@@ -1857,7 +1685,6 @@ async def get_validation_step_output(
                 f"Validator '{validator_id}' has not been interrogated. Interrogating now."
             )
 
-        p_output_path.parent.mkdir(parents=True, exist_ok=True)
         message = ""
         data_extract_df = None
 
@@ -2156,7 +1983,6 @@ async def preview_table(
     table view with column types and a sample of the data.
     """
     try:
-        # Get the DataFrame
         app_ctx: AppContext = ctx.request_context.lifespan_context
 
         if dataframe_id not in app_ctx.loaded_dataframes:
@@ -2164,72 +1990,16 @@ async def preview_table(
 
         data = app_ctx.loaded_dataframes[dataframe_id]
 
-        # Use Pointblank's preview function
-        import pointblank as pb
-
         gt_table = pb.preview(
             data, n_head=n_head, n_tail=n_tail, limit=limit, show_row_numbers=show_row_numbers
         )
 
-        # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
-
-        # Save HTML to file for viewing
-
-        # Create a complete HTML document with nice styling
-        full_html = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>DataFrame Preview: {dataframe_id}</title>
-    <meta charset="utf-8">
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-        }}
-        .table-container {{
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }}
-    </style>
-</head>
-<body>
-    <div class="table-container">
-        {html_output}
-    </div>
-</body>
-</html>
-"""
-
-        # Save HTML to file for viewing
-        try:
-            # Save to a user-friendly location
-            html_filename = (
-                f"pointblank_preview_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-            )
-            html_path = Path.cwd() / html_filename
-
-            # Skip file generation during testing
-            if TESTING_MODE:
-                browser_msg = f"HTML preview generated (file creation skipped during testing)\n\nFile location: {html_path}"
-            else:
-                with open(html_path, "w", encoding="utf-8") as f:
-                    f.write(full_html)
-
-                # Open in default browser
-                try:
-                    _open_browser_conditionally(f"file://{html_path}")
-                    browser_msg = f"HTML preview saved and opened in default browser!\n\nFile location: {html_path}"
-                except Exception as browser_error:
-                    browser_msg = f"HTML preview saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
-
-        except Exception as e:
-            browser_msg = f"Error saving HTML file: {str(e)}"
+        browser_msg = _save_html_and_open(
+            html_output,
+            title=f"DataFrame Preview: {dataframe_id}",
+            filename_prefix=f"pointblank_preview_{dataframe_id}",
+        )
 
         return f"✅ Table preview generated successfully!\n\n{browser_msg}\n\nShowing {n_head} head + {n_tail} tail rows from {data.shape[0]:,} total rows with {data.shape[1]} columns."
 
@@ -2250,7 +2020,6 @@ async def missing_values_table(
     missing value patterns and statistics.
     """
     try:
-        # Get the DataFrame
         app_ctx: AppContext = ctx.request_context.lifespan_context
 
         if dataframe_id not in app_ctx.loaded_dataframes:
@@ -2258,68 +2027,13 @@ async def missing_values_table(
 
         data = app_ctx.loaded_dataframes[dataframe_id]
 
-        # Use Pointblank's missing_vals_tbl function
-        import pointblank as pb
-
         gt_table = pb.missing_vals_tbl(data)
-
-        # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
-
-        # Save HTML to file for viewing
-
-        # Create a complete HTML document with nice styling
-        full_html = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Missing Values Analysis: {dataframe_id}</title>
-    <meta charset="utf-8">
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-        }}
-        .table-container {{
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }}
-    </style>
-</head>
-<body>
-    <div class="table-container">
-        {html_output}
-    </div>
-</body>
-</html>
-"""
-
-        # Save HTML to file for viewing
-        try:
-            # Save to a user-friendly location
-            html_filename = f"pointblank_missing_values_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-            html_path = Path.cwd() / html_filename
-
-            # Skip file generation during testing
-            if TESTING_MODE:
-                browser_msg = f"HTML missing values analysis generated (file creation skipped during testing)\n\nFile location: {html_path}"
-            else:
-                with open(html_path, "w", encoding="utf-8") as f:
-                    f.write(full_html)
-
-                # Open in default browser
-                try:
-                    _open_browser_conditionally(f"file://{html_path}")
-                    browser_msg = f"HTML missing values analysis saved and opened in default browser!\n\nFile location: {html_path}"
-                except Exception as browser_error:
-                    browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
-
-        except Exception as e:
-            browser_msg = f"Error saving HTML file: {str(e)}"
+        browser_msg = _save_html_and_open(
+            html_output,
+            title=f"Missing Values Analysis: {dataframe_id}",
+            filename_prefix=f"pointblank_missing_values_{dataframe_id}",
+        )
 
         return f"✅ Missing values analysis generated successfully!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows × {data.shape[1]} columns"
 
@@ -2341,7 +2055,6 @@ async def column_summary_table(
     statistics including data types, missing values, and descriptive statistics.
     """
     try:
-        # Get the DataFrame
         app_ctx: AppContext = ctx.request_context.lifespan_context
 
         if dataframe_id not in app_ctx.loaded_dataframes:
@@ -2349,68 +2062,13 @@ async def column_summary_table(
 
         data = app_ctx.loaded_dataframes[dataframe_id]
 
-        # Use Pointblank's col_summary_tbl function
-        import pointblank as pb
-
         gt_table = pb.col_summary_tbl(data, tbl_name=table_name if table_name else dataframe_id)
-
-        # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
-
-        # Save HTML to file for viewing
-
-        # Create a complete HTML document with nice styling
-        full_html = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Column Summary: {dataframe_id}</title>
-    <meta charset="utf-8">
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-        }}
-        .table-container {{
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }}
-    </style>
-</head>
-<body>
-    <div class="table-container">
-        {html_output}
-    </div>
-</body>
-</html>
-"""
-
-        # Save HTML to file for viewing
-        try:
-            # Save to a user-friendly location
-            html_filename = f"pointblank_column_summary_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-            html_path = Path.cwd() / html_filename
-
-            # Skip file generation during testing
-            if TESTING_MODE:
-                browser_msg = f"HTML column summary generated (file creation skipped during testing)\n\nFile location: {html_path}"
-            else:
-                with open(html_path, "w", encoding="utf-8") as f:
-                    f.write(full_html)
-
-                # Open in default browser
-                try:
-                    _open_browser_conditionally(f"file://{html_path}")
-                    browser_msg = f"HTML column summary saved and opened in default browser!\n\nFile location: {html_path}"
-                except Exception as browser_error:
-                    browser_msg = f"HTML summary saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
-
-        except Exception as e:
-            browser_msg = f"Error saving HTML file: {str(e)}"
+        browser_msg = _save_html_and_open(
+            html_output,
+            title=f"Column Summary: {dataframe_id}",
+            filename_prefix=f"pointblank_column_summary_{dataframe_id}",
+        )
 
         return f"✅ Column summary table generated successfully!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows × {data.shape[1]} columns"
 
@@ -2912,85 +2570,3 @@ async def get_pointblank_api_reference(
 
     else:
         return f"❌ Unknown category '{category}'. Use: validation_methods, data_types, thresholds, common_patterns, or all"
-
-
-def _format_validation_plan_summary(validator_steps: list) -> str:
-    """
-    Format validation steps into a readable summary with code block.
-    """
-    plan_summary = "## **🎯 Netflix Dataset Validation Plan**\n\n"
-
-    # Group by category
-    integrity_checks = []
-    business_logic = []
-
-    step_descriptions = {
-        "col_vals_not_null": "Ensures no missing values",
-        "rows_distinct": "Checks for duplicate entries",
-        "col_vals_in_set": "Validates against allowed values",
-        "col_vals_between": "Validates numeric ranges",
-        "col_vals_ge": "Ensures values are non-negative",
-        "col_vals_regex": "Validates format patterns",
-    }
-
-    for i, step in enumerate(validator_steps, 1):
-        step_type = step.get("validation_type", "unknown")
-        columns = step.get("params", {}).get("columns", "table")
-        description = step_descriptions.get(step_type, f"Validates {step_type}")
-
-        if step_type in ["col_vals_not_null", "rows_distinct", "col_exists"]:
-            integrity_checks.append(
-                f"{i}. **{columns.title() if isinstance(columns, str) else 'Data'} Check** - {description}"
-            )
-        else:
-            business_logic.append(
-                f"{i}. **{columns.title() if isinstance(columns, str) else 'Value'} Validation** - {description}"
-            )
-
-    # Add categories
-    if integrity_checks:
-        plan_summary += "### **Data Integrity Checks:**\n"
-        for check in integrity_checks:
-            plan_summary += f"- {check}\n"
-        plan_summary += "\n"
-
-    if business_logic:
-        plan_summary += "### **Business Logic Validations:**\n"
-        for validation in business_logic:
-            plan_summary += f"- {validation}\n"
-        plan_summary += "\n"
-
-    # Add code block
-    plan_summary += """<details>
-<summary><strong>📋 View Pointblank Code</strong></summary>
-
-```python
-import pointblank as pb
-
-# Create validator
-validator = (
-    pb.Validate(data=df, tbl_name="Netflix Movies and TV Shows")
-    .col_vals_not_null(columns="show_id")
-    .rows_distinct()
-    .col_vals_not_null(columns="title")
-    .col_vals_in_set(columns="type", set=["Movie", "TV Show"])
-    .col_vals_between(columns="release_year", left=1900, right=2025)
-    .col_vals_between(columns="rating", left=0, right=10)
-    .col_vals_ge(columns="vote_count", value=0)
-    .col_vals_between(columns="vote_average", left=0, right=10)
-    .col_vals_ge(columns="budget", value=0)
-    .col_vals_ge(columns="revenue", value=0)
-)
-
-# Run validation
-results = validator.interrogate()
-```
-</details>
-
-"""
-
-    return plan_summary
-
-
-if __name__ == "__main__":
-    mcp.run(transport="stdio")
