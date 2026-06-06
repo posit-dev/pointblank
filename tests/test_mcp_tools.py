@@ -244,29 +244,6 @@ async def test_validation_assistant_not_found(mcp_server):
 
 
 @pytest.mark.asyncio
-async def test_analyze_data_quality(mcp_server, temp_csv_file):
-    """Test analyze_data_quality returns scan results."""
-    async with Client(mcp_server) as client:
-        load_result = await client.call_tool("load_dataframe", {"input_path": temp_csv_file})
-        df_id = load_result.data.df_id
-
-        result = await client.call_tool("analyze_data_quality", {"df_id": df_id})
-        assert not result.is_error
-        data = result.data
-        assert data["status"] == "success"
-        assert data["df_id"] == df_id
-        assert "analysis" in data
-
-
-@pytest.mark.asyncio
-async def test_analyze_data_quality_not_found(mcp_server):
-    """Test analyze_data_quality raises for missing DataFrame."""
-    async with Client(mcp_server) as client:
-        with pytest.raises(ToolError):
-            await client.call_tool("analyze_data_quality", {"df_id": "nonexistent_df"})
-
-
-@pytest.mark.asyncio
 async def test_profile_dataframe(mcp_server, temp_csv_file):
     """Test profile_dataframe returns profiling results."""
     async with Client(mcp_server) as client:
@@ -276,8 +253,17 @@ async def test_profile_dataframe(mcp_server, temp_csv_file):
         result = await client.call_tool("profile_dataframe", {"df_id": df_id, "sample_size": 0})
         assert not result.is_error
         data = result.data
-        # DataScan JSON output should be a dict or list
-        assert data is not None
+        assert data["status"] == "success"
+        assert data["df_id"] == df_id
+        assert "profile" in data
+
+
+@pytest.mark.asyncio
+async def test_profile_dataframe_not_found(mcp_server):
+    """Test profile_dataframe raises for missing DataFrame."""
+    async with Client(mcp_server) as client:
+        with pytest.raises(ToolError):
+            await client.call_tool("profile_dataframe", {"df_id": "nonexistent_df"})
 
 
 @pytest.mark.asyncio
@@ -289,6 +275,8 @@ async def test_profile_dataframe_with_sampling(mcp_server, temp_csv_file):
 
         result = await client.call_tool("profile_dataframe", {"df_id": df_id, "sample_size": 3})
         assert not result.is_error
+        data = result.data
+        assert data["status"] == "success"
 
 
 # =============================================================================
