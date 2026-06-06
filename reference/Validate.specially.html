@@ -112,7 +112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
 <script src="../theme-init.js"></script>
-<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli');});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="439" data-forks="27"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="438" data-forks="27"></div>
     </span>
   </li>  
 </ul>
@@ -1162,7 +1162,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="simple-validation-with-direct-table-access" class="level3">
 <h4 class="anchored" data-anchor-id="simple-validation-with-direct-table-access">Simple validation with direct table access</h4>
 <p>This example shows the most straightforward use case where we create a function that directly checks if the sum of two columns is positive.</p>
-<div id="bd482bc6" class="cell" data-execution_count="2">
+<div id="39225762" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1329,7 +1329,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="advanced-validation-with-closure-variables-for-parameters" class="level3">
 <h4 class="anchored" data-anchor-id="advanced-validation-with-closure-variables-for-parameters">Advanced validation with closure variables for parameters</h4>
 <p>When you need to make your validation configurable, you can use the function factory pattern (also known as closures) to create parameterized validations:</p>
-<div id="8a6111fb" class="cell" data-execution_count="3">
+<div id="a4c78f6c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a parameterized validation function using closures</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_column_ratio_validator(col1, col2, min_ratio):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate_column_ratio(data):</span>
@@ -1492,7 +1492,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="validation-function-returning-a-list-of-booleans" class="level3">
 <h4 class="anchored" data-anchor-id="validation-function-returning-a-list-of-booleans">Validation function returning a list of booleans</h4>
 <p>This example demonstrates how to create a validation function that returns a list of boolean values, where each element represents a separate test unit:</p>
-<div id="7e0c05d3" class="cell" data-execution_count="4">
+<div id="801deb58" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
@@ -1693,7 +1693,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="table-level-validation-returning-a-single-boolean" class="level3">
 <h4 class="anchored" data-anchor-id="table-level-validation-returning-a-single-boolean">Table-level validation returning a single boolean</h4>
 <p>Sometimes you need to validate properties of the entire table rather than row-by-row. In these cases, your function can return a single boolean value:</p>
-<div id="0f500d7f" class="cell" data-execution_count="5">
+<div id="07c528b3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_table_properties(data):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if table has at least one row with column 'a' &gt; 10</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    has_large_values <span class="op">=</span> data.<span class="bu">filter</span>(pl.col(<span class="st">"a"</span>) <span class="op">&gt;</span> <span class="dv">10</span>).height <span class="op">&gt;</span> <span class="dv">0</span></span>
@@ -1858,7 +1858,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="environment-validation-that-doesnt-use-the-data-table" class="level3">
 <h4 class="anchored" data-anchor-id="environment-validation-that-doesnt-use-the-data-table">Environment validation that doesn’t use the data table</h4>
 <p>The <a href="Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> validation method can even be used to validate aspects of your environment that are completely independent of the data:</p>
-<div id="bc7f9773" class="cell" data-execution_count="6">
+<div id="ae06e320" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_pointblank_version():</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> importlib.metadata</span>

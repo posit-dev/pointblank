@@ -112,7 +112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
 <script src="../theme-init.js"></script>
-<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli');});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="439" data-forks="27"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="438" data-forks="27"></div>
     </span>
   </li>  
 </ul>
@@ -1134,7 +1134,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Create a validation, interrogate, and get the results as a Polars DataFrame:</p>
-<div id="85f45cf3" class="cell" data-execution_count="1">
+<div id="1f7a6e95" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1247,7 +1247,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 </div>
 </div>
 <p>Get the results as a Pandas DataFrame instead:</p>
-<div id="2ffb0c4a" class="cell" data-execution_count="2">
+<div id="964d3400" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_dataframe_report(tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>

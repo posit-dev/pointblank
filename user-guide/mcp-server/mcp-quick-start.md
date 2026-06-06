@@ -24,7 +24,7 @@ pip install pointblank[mcp]
   "servers": {
     "pointblank": {
       "command": "python",
-      "args": ["-m", "pointblank_mcp_server.pointblank_server"]
+      "args": ["-m", "pointblank.mcp"]
     }
   }
 }

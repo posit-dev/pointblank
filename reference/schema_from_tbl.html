@@ -112,7 +112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
 <script src="../theme-init.js"></script>
-<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli');});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="439" data-forks="27"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="438" data-forks="27"></div>
     </span>
   </li>  
 </ul>
@@ -1115,7 +1115,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
-<div id="15a227b1" class="cell" data-execution_count="1">
+<div id="0d77be69" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1137,7 +1137,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </div>
 </div>
 <p>Generate synthetic data matching the original’s characteristics:</p>
-<div id="7a32656b" class="cell" data-execution_count="2">
+<div id="6629ec3b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(schema.generate(n<span class="op">=</span><span class="dv">10</span>, seed<span class="op">=</span><span class="dv">23</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
