@@ -14635,15 +14635,28 @@ class Validate:
                         column_names_subset = ["_row_num_"] + column
                         validation_extract_nw = validation_extract_nw.select(column_names_subset)
 
+                    # Use cast-to-string + fill_null before grouping to avoid issues with
+                    # null values in over() on pandas backends (nulls don't group properly
+                    # in window functions on pandas). We add temporary filled columns for
+                    # grouping only. Casting to string first avoids type mismatch errors
+                    # on backends like PySpark where fill_null requires matching types.
+                    fill_cols = [
+                        nw.col(c)
+                        .cast(nw.String)
+                        .fill_null(value="__pb_null__")
+                        .alias(f"__pb_filled_{c}__")
+                        for c in column_names
+                    ]
+                    filled_names = [f"__pb_filled_{c}__" for c in column_names]
+
                     validation_extract_nw = (
-                        validation_extract_nw.with_columns(
-                            group_min_row=nw.min("_row_num_").over(*column_names)
-                        )
+                        validation_extract_nw.with_columns(*fill_cols)
+                        .with_columns(group_min_row=nw.min("_row_num_").over(*filled_names))
                         # First sort by the columns to group duplicates and by row numbers
                         # within groups; this type of sorting will preserve the original order in a
                         # single operation
-                        .sort(by=["group_min_row"] + column_names + ["_row_num_"])
-                        .drop("group_min_row")
+                        .sort(by=["group_min_row"] + filled_names + ["_row_num_"])
+                        .drop("group_min_row", *filled_names)
                     )
 
                 # Ensure that the extract is collected and set to its native format

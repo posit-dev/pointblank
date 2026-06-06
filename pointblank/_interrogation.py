@@ -2752,20 +2752,18 @@ def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | N
 
     # Get the column subset to use for the test
     if columns_subset is None:
-        columns_subset = tbl.columns
+        columns_subset = tbl.collect_schema().names() if is_narwhals_lazyframe(tbl) else tbl.columns
 
-    # Create a count of duplicates using group_by approach
-    # Group by the columns of interest and count occurrences
-    # Handle DataFrame and LazyFrame separately for proper type narrowing
+    # Check for duplicate rows using null-safe approaches
+    # The previous group_by + join approach failed because NULL != NULL in join semantics,
+    # causing rows with nulls to be excluded from both PASS and FAIL counts.
     if is_narwhals_dataframe(tbl):
-        count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
-        result = tbl.join(count_tbl, on=columns_subset, how="left")
-        result = result.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
+        # For DataFrames, is_duplicated() correctly treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=~tbl.select(columns_subset).is_duplicated())
         return result.to_native()
     elif is_narwhals_lazyframe(tbl):
-        count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
-        result = tbl.join(count_tbl, on=columns_subset, how="left")
-        result = result.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
+        # For LazyFrames, use a window function which treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=nw.len().over(columns_subset) == 1)
         return result.to_native()
     else:
         msg = f"Expected DataFrame or LazyFrame, got {type(tbl)}"

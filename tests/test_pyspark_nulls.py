@@ -213,9 +213,8 @@ class TestRowsDistinctNulls:
 
         # Rows: (1,a), (2,b), (1,a), (None,c), (None,c)
         # Duplicates: (1,a) appears twice, (None,c) appears twice
-        # rows_distinct counts only the *extra* occurrences as failures
-        # (i.e., n-1 for each group of n duplicates)
-        assert v.n_failed(i=1, scalar=True) == 2
+        # All rows in a duplicate group are non-distinct (fail)
+        assert v.n_failed(i=1, scalar=True) == 4
 
     def test_rows_distinct_subset_with_nulls(self, tbl_duplicates_nulls):
         """rows_distinct with column subset containing NULLs."""
@@ -223,8 +222,8 @@ class TestRowsDistinctNulls:
 
         # id values: 1, 2, 1, None, None
         # Duplicates by id: 1 appears twice, None appears twice
-        # Only extra occurrences count as failures
-        assert v.n_failed(i=1, scalar=True) == 2
+        # All rows in a duplicate group are non-distinct (fail)
+        assert v.n_failed(i=1, scalar=True) == 4
 
 
 # ---------------------------------------------------------------------------
