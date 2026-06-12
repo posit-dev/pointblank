@@ -625,3 +625,119 @@ class TestHelperFunctions:
         assert thresholds.critical is None
 
 
+# ─── Edge Cases ──────────────────────────────────────────────────────────────────
+
+
+class TestContractEdgeCases:
+    """Edge cases and boundary conditions."""
+
+    def test_contract_with_many_steps(self, simple_df):
+        """Contract with many different step types."""
+        contract = Contract(
+            name="many_steps",
+            steps=[
+                Step("col_exists", columns="id"),
+                Step("col_exists", columns="name"),
+                Step("col_vals_not_null", columns=["id"]),
+                Step("col_vals_gt", columns="id", value=0),
+                Step("col_vals_lt", columns="amount", value=1000),
+                Step("col_vals_between", columns="amount", left=0, right=500),
+                Step("col_vals_in_set", columns="status", set=["active", "inactive"]),
+                Step("rows_distinct", columns_subset=["id"]),
+            ],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_contract_schema_only(self, simple_df):
+        """Contract with only schema, no steps."""
+        contract = Contract(
+            name="schema_only",
+            schema=pb.Schema(id="Int64", name="String", amount="Float64", status="String"),
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_contract_steps_only(self, simple_df):
+        """Contract with only steps, no schema."""
+        contract = Contract(
+            name="steps_only",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_contract_empty_no_schema_no_steps(self, simple_df):
+        """Contract with no schema and no steps."""
+        contract = Contract(name="empty")
+        # Should still be able to create a validate object
+        validation = contract.to_validate(simple_df)
+        assert validation is not None
+
+    def test_contract_consumers_single_string(self):
+        contract = Contract(name="test", consumers="analytics-team")
+        assert contract.consumers == "analytics-team"
+
+    def test_contract_consumers_list(self):
+        contract = Contract(name="test", consumers=["ml-team", "bi-team"])
+        assert contract.consumers == ["ml-team", "bi-team"]
+
+    def test_step_with_na_pass(self, simple_df):
+        """Step with na_pass parameter."""
+        contract = Contract(
+            name="na_pass_test",
+            steps=[Step("col_vals_gt", columns="amount", value=0, na_pass=True)],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_yaml_round_trip_complex(self, tmp_path):
+        """Full YAML round-trip with complex contract."""
+        contract = Contract(
+            name="complex_contract",
+            direction="target",
+            schema=pb.Schema(
+                order_id="String",
+                amount="Float64",
+                currency="String",
+                status="String",
+            ),
+            steps=[
+                Step("col_vals_not_null", columns=["order_id", "amount"]),
+                Step("col_vals_gt", columns="amount", value=0),
+                Step("col_vals_in_set", columns="currency", set=["USD", "EUR", "GBP"]),
+                Step("col_vals_in_set", columns="status", set=["pending", "shipped", "delivered"]),
+                Step("rows_distinct", columns=["order_id"]),
+            ],
+            version="2.1.0",
+            owner="data-platform",
+            consumers=["analytics", "ml"],
+            description="Clean order data contract",
+            thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+            on_violation="raise",
+        )
+
+        path = str(tmp_path / "complex.yaml")
+        contract.to_yaml(path)
+        loaded = Contract.from_yaml(path)
+
+        assert loaded.name == contract.name
+        assert loaded.direction == contract.direction
+        assert loaded.version == contract.version
+        assert loaded.owner == contract.owner
+        assert loaded.consumers == contract.consumers
+        assert loaded.on_violation == contract.on_violation
+        assert loaded.steps == contract.steps
+        assert loaded.thresholds.warning == 0.01
+        assert loaded.thresholds.error == 0.05
+        assert loaded.thresholds.critical == 0.10
+
+    def test_contract_with_thresholds_validates(self, simple_df):
+        """Contract with thresholds passes them to Validate."""
+        contract = Contract(
+            name="thresh_test",
+            steps=[Step("col_vals_gt", columns="amount", value=50)],
+            thresholds=pb.Thresholds(warning=0.5, error=0.8),
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
