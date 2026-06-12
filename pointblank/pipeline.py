@@ -373,3 +373,45 @@ class Pipeline:
 
         return validation
 
+    def _handle_violation(self, contract: Contract, validation: Validate) -> None:
+        """Handle a contract violation based on the contract's on_violation setting.
+
+        Parameters
+        ----------
+        contract
+            The contract that was validated.
+        validation
+            The interrogated Validate object.
+
+        Raises
+        ------
+        RuntimeError
+            If on_violation="raise" and the validation has failures.
+        """
+        # Check if there are any failures
+        has_failures = not validation.all_passed()
+
+        if not has_failures:
+            return
+
+        if contract.on_violation == "raise":
+            raise RuntimeError(
+                f"Contract '{contract.name}' ({contract.direction}) violated: "
+                f"validation has failing steps."
+            )
+        elif contract.on_violation == "warn":
+            warnings.warn(
+                f"Contract '{contract.name}' ({contract.direction}) violated: "
+                f"validation has failing steps.",
+                UserWarning,
+                stacklevel=3,
+            )
+        elif contract.on_violation == "log":
+            import logging
+
+            logger = logging.getLogger("pointblank.contract")
+            logger.warning(
+                f"Contract '{contract.name}' ({contract.direction}) violated: "
+                f"validation has failing steps."
+            )
+
