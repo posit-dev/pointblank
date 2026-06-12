@@ -485,3 +485,26 @@ class Contract:
         return ", ".join(parts) + ")"
 
 
+# ─── Helper functions for serialization ─────────────────────────────────────────
+
+
+def _schema_to_dict(schema: Schema) -> dict[str, Any]:
+    """Convert a Schema object to a dictionary representation."""
+    result = {}
+    if schema.columns is not None:
+        for col_name, col_dtype in schema.columns:
+            if col_dtype is not None:
+                result[col_name] = str(col_dtype)
+            else:
+                result[col_name] = None
+    return result
+
+
+def _dict_to_schema(data: dict[str, Any]) -> Schema:
+    """Convert a dictionary to a Schema object."""
+    from pointblank.schema import Schema
+
+    # Build kwargs for Schema: column_name=dtype_string
+    return Schema(**{col_name: dtype for col_name, dtype in data.items() if dtype is not None})
+
+
