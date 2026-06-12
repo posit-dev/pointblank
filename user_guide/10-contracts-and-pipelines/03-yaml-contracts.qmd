@@ -40,3 +40,117 @@ The YAML approach doesn't replace the Python API but, rather, it complements it.
 stable, well-defined contracts that change infrequently, and Python for exploratory validation or
 complex logic that benefits from programmatic construction.
 
+## Contract YAML Format
+
+Every contract YAML file uses a `contract:` top-level key as its root element. Inside this key you
+define all the metadata, schema, and validation steps that make up your contract. The structure is
+designed to be self-documenting so someone reading the file should immediately understand what data
+this contract governs, who owns it, and what rules are enforced.
+
+Here's a complete example showing all the available fields:
+
+```yaml
+contract:
+  name: customer_records
+  direction: source
+  version: "1.2.0"
+  owner: data-platform-team
+  consumers:
+    - analytics-team
+    - ml-team
+  description: "Raw customer data from the CRM system"
+  on_violation: warn
+
+  schema:
+    customer_id: String
+    email: String
+    name: String
+    signup_date: String
+    plan: String
+
+  steps:
+    - col_vals_not_null:
+        columns:
+          - customer_id
+          - email
+    - col_vals_regex:
+        columns: email
+        pattern: "^[^@]+@[^@]+\\.[^@]+$"
+    - rows_distinct:
+        columns_subset:
+          - customer_id
+    - col_vals_in_set:
+        columns: plan
+        set:
+          - free
+          - pro
+          - enterprise
+
+  thresholds:
+    warning: 0.01
+    error: 0.05
+    critical: 0.10
+```
+
+### Structure Reference
+
+The table below summarizes every key available inside the `contract:` block. Only `name` is
+required and everything else has sensible defaults or can be omitted if not applicable to your use
+case.
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `name` | Yes | Human-readable identifier for this contract |
+| `direction` | No | `"source"` (default) or `"target"`: indicates where in a pipeline this contract applies |
+| `version` | No | Semantic version string (e.g., `"1.2.0"`) for tracking contract evolution over time |
+| `owner` | No | Team or individual responsible for maintaining this contract |
+| `consumers` | No | List of teams or systems that depend on data conforming to this contract |
+| `description` | No | Longer prose describing the contract's purpose and context |
+| `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
+| `schema` | No | Column name → data type mapping; triggers a `col_schema_match()` check |
+| `steps` | No | Ordered list of validation steps to execute |
+| `thresholds` | No | Threshold levels (`warning`, `error`, `critical`) as fractions or absolute counts |
+
+### Step Syntax in YAML
+
+Steps are the heart of a contract. They define the actual validation rules that will be checked
+against your data. In YAML, each step is a list item whose key is the name of a Pointblank
+validation method (like `col_vals_gt` or `rows_distinct`), and whose value is a dictionary of the
+arguments to pass to that method.
+
+This mapping is direct: the YAML step `col_vals_gt: {columns: amount, value: 0}` is exactly
+equivalent to calling `.col_vals_gt(columns="amount", value=0)` in Python. Here are examples
+covering the most common patterns:
+
+```yaml
+steps:
+  # Step with keyword arguments
+  - col_vals_gt:
+      columns: amount
+      value: 0
+
+  # Step with a list of columns
+  - col_vals_not_null:
+      columns:
+        - id
+        - name
+        - email
+
+  # Step with multiple arguments
+  - col_vals_between:
+      columns: age
+      left: 0
+      right: 150
+
+  # Step with a set/list of values
+  - col_vals_in_set:
+      columns: status
+      set:
+        - active
+        - inactive
+        - suspended
+
+  # Step with no arguments
+  - rows_complete: {}
+```
+
