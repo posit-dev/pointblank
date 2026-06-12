@@ -24,3 +24,44 @@ Pointblank's `Contract` class combines three things into a single, portable unit
 Contracts can be serialized to YAML, version-controlled, and shared across teams. They can serve as
 the single source of truth for data quality expectations at a given boundary.
 
+## Creating Your First Contract
+
+The simplest contract just names a set of validation steps:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define a contract for customer data
+customer_contract = pb.Contract(
+    name="customer_records",
+    steps=[
+        pb.Step("col_vals_not_null", columns=["customer_id", "email"]),
+        pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$"),
+        pb.Step("rows_distinct", columns_subset=["customer_id"]),
+    ],
+)
+```
+
+This contract essentially says: "Any data calling itself `customer_records` must have non-null IDs
+and emails, valid email formats, and unique customer IDs."
+
+Now validate some data against it:
+
+```{python}
+customers = pl.DataFrame(
+    {
+        "customer_id": ["C001", "C002", "C003", "C004"],
+        "email": ["alice@example.com", "bob@corp.io", "charlie@mail.org", "dave@startup.co"],
+        "name": ["Alice", "Bob", "Charlie", "Dave"],
+        "signup_date": ["2024-01-15", "2024-02-20", "2024-03-10", "2024-04-05"],
+    }
+)
+
+customer_contract.validate(customers)
+```
+
+The `.validate()` method compiles the contract into a `Validate` object, runs all the checks, and
+returns the interrogated result. You get the same rich validation report you're used to but the
+contract itself is a reusable, declarative artifact.
+
