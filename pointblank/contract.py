@@ -15,6 +15,18 @@ __all__ = ["Step", "Contract"]
 
 @dataclass
 class Step:
+    """A single validation step in a Contract, defined declaratively.
+
+    This is the declarative equivalent of calling a validation method on Validate.
+    Steps are stored as data and compiled into Validate method calls at enforcement time.
+
+    Parameters
+    ----------
+    method
+        The validation method name (e.g., "col_vals_gt", "rows_distinct").
+    **kwargs
+        All parameters that would be passed to the corresponding Validate method.
+
 
     method: str
     kwargs: dict[str, Any] = field(default_factory=dict)
