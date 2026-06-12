@@ -258,3 +258,25 @@ sales_contract = pb.Contract(
 print(f"Total steps: {len(sales_contract.steps)}")
 ```
 
+## Example: Validating with Failures
+
+Let's see what happens when data doesn't meet the contract:
+
+```{python}
+# Data with quality issues
+bad_orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-001", "ORD-004", None],   # duplicates + null
+        "customer_id": ["C001", None, "C001", "C003", "C002"],            # null
+        "amount": [29.99, -5.00, 9.99, 0.0, 220.00],                      # negative + zero
+        "quantity": [1, 3, 1, 0, 5],                                      # zero (should be >= 1)
+        "status": ["shipped", "pending", "invalid", "pending", "shipped"],# invalid value
+    }
+)
+
+order_contract.validate(bad_orders)
+```
+
+The validation report clearly shows which steps failed and how many test units were affected. This
+makes it easy to diagnose data quality issues and communicate them to data producers.
+
