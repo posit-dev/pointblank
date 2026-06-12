@@ -132,6 +132,22 @@ reference:
         - name: DraftValidation
           members: false
 
+    - title: Contracts and Pipelines
+      desc: >
+        Use `Contract` and `Step` to define declarative data quality contracts that specify what
+        valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data
+        transformation (source and target), producing a `PipelineResult` with full introspection
+        into what passed and what failed.
+      contents:
+        - name: Contract
+          members: true
+        - name: Step
+          members: true
+        - name: Pipeline
+          members: true
+        - name: PipelineResult
+          members: true
+
     - title: Validation Steps
       desc: >
         Validation steps are sequential validations on the target data. Call Validate's
