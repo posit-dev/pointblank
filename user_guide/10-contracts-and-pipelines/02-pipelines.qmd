@@ -53,3 +53,70 @@ that matter most: the entry point and the exit point of your transformation. By 
 This dual-boundary model makes it possible to distinguish between "the data I received was bad" and
 "my code introduced a bug". This is a distinction that a single-point validation cannot make.
 
+## Creating a Pipeline
+
+A Pipeline needs at least one contract (source, target, or both). In practice, most pipelines define
+both contracts because that gives you full boundary coverage. However, there are legitimate cases
+for single-boundary pipelines (covered later in this guide).
+
+The example below demonstrates a real-world pattern: a transaction processing pipeline that receives
+raw financial data in one format (amounts in cents, all fields as raw strings) and produces clean,
+normalized output (amounts in decimal dollars, validated types). Notice how the source and target
+contracts encode fundamentally different expectations about the data's shape and values (this is
+intentional). The source contract reflects what your upstream system actually produces, while the
+target contract reflects what downstream consumers need.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define the source contract (what raw data must look like)
+source_contract = pb.Contract(
+    name="raw_transactions",
+    direction="source",
+    schema=pb.Schema(
+        txn_id="String",
+        amount_cents="Int64",
+        currency="String",
+        timestamp="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["txn_id", "amount_cents", "currency"]),
+        pb.Step("col_vals_ge", columns="amount_cents", value=0),
+        pb.Step("col_vals_in_set", columns="currency", set=["USD", "EUR", "GBP", "JPY"]),
+        pb.Step("rows_distinct", columns_subset=["txn_id"]),
+    ],
+    version="1.0.0",
+    owner="ingestion-team",
+)
+
+# Define the target contract (what clean data must look like)
+target_contract = pb.Contract(
+    name="clean_transactions",
+    direction="target",
+    schema=pb.Schema(
+        txn_id="String",
+        currency="String",
+        timestamp="String",
+        amount="Float64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["txn_id", "amount", "currency", "timestamp"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_between", columns="amount", left=0.01, right=100_000.0),
+        pb.Step("rows_distinct", columns_subset=["txn_id"]),
+    ],
+    version="1.0.0",
+    consumers=["analytics-team", "fraud-team"],
+)
+
+# Create the pipeline
+pipeline = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    label="Transaction Processing Pipeline",
+)
+
+print(pipeline)
+```
+
