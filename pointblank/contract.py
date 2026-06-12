@@ -27,6 +27,21 @@ class Step:
     **kwargs
         All parameters that would be passed to the corresponding Validate method.
 
+    Examples
+    --------
+    ```python
+    import pointblank as pb
+
+    # A step that checks column values are greater than 0
+    step = pb.Step("col_vals_gt", columns="amount", value=0)
+
+    # A step that checks rows are distinct by a key column
+    step = pb.Step("rows_distinct", columns=["order_id"])
+
+    # A step that checks a regex pattern
+    step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\\.[^@]+$")
+    ```
+    """
 
     method: str
     kwargs: dict[str, Any] = field(default_factory=dict)
