@@ -264,3 +264,47 @@ class TestPipelineValidateSource:
         assert "violated" in caplog.text
 
 
+# ─── Pipeline.validate_target() Tests ────────────────────────────────────────────
+
+
+class TestPipelineValidateTarget:
+    """Tests for Pipeline.validate_target()."""
+
+    def test_validate_target_passing(self, raw_data, target_contract, transform_fn):
+        pipeline = Pipeline(target=target_contract)
+        clean_data = transform_fn(raw_data)
+        result = pipeline.validate_target(clean_data)
+        assert result.all_passed()
+
+    def test_validate_target_failing(self, target_contract):
+        # Data that fails target contract (missing values)
+        bad_data = pl.DataFrame(
+            {
+                "id": [1, 2, None],
+                "amount": [100.0, -5.0, 50.0],
+                "currency": ["USD", "EUR", None],
+            }
+        )
+        pipeline = Pipeline(target=target_contract)
+        result = pipeline.validate_target(bad_data)
+        assert not result.all_passed()
+
+    def test_validate_target_no_target_raises(self, raw_data, source_contract):
+        pipeline = Pipeline(source=source_contract)
+        with pytest.raises(ValueError, match="No target contract"):
+            pipeline.validate_target(raw_data)
+
+    def test_validate_target_on_violation_raise(self, target_contract):
+        target_contract.on_violation = "raise"
+        pipeline = Pipeline(target=target_contract)
+        bad_data = pl.DataFrame(
+            {
+                "id": [1, None],
+                "amount": [100.0, -5.0],
+                "currency": ["USD", None],
+            }
+        )
+        with pytest.raises(RuntimeError, match="violated"):
+            pipeline.validate_target(bad_data)
+
+
