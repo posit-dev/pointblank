@@ -479,3 +479,91 @@ class TestPipelineThresholdOverride:
         assert result.all_passed()
 
 
+# ─── Pipeline YAML Tests ─────────────────────────────────────────────────────────
+
+
+class TestPipelineYAML:
+    """Tests for Pipeline YAML serialization/deserialization."""
+
+    def test_to_yaml_basic(self, basic_pipeline):
+        yaml_str = basic_pipeline.to_yaml()
+        assert "pipeline:" in yaml_str
+        assert "source:" in yaml_str
+        assert "target:" in yaml_str
+
+    def test_to_yaml_file(self, basic_pipeline, tmp_path):
+        path = str(tmp_path / "pipeline.yaml")
+        basic_pipeline.to_yaml(path)
+        assert Path(path).exists()
+
+    def test_from_yaml(self, basic_pipeline, tmp_path):
+        path = str(tmp_path / "pipeline.yaml")
+        basic_pipeline.to_yaml(path)
+        loaded = Pipeline.from_yaml(path)
+        assert loaded.source.name == basic_pipeline.source.name
+        assert loaded.target.name == basic_pipeline.target.name
+
+    def test_from_yaml_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            Pipeline.from_yaml("/nonexistent/pipeline.yaml")
+
+    def test_from_yaml_empty(self, tmp_path):
+        path = str(tmp_path / "empty.yaml")
+        Path(path).write_text("")
+        with pytest.raises(ValueError, match="empty"):
+            Pipeline.from_yaml(path)
+
+    def test_to_dict_with_label_and_thresholds(self, source_contract, target_contract):
+        pipeline = Pipeline(
+            source=source_contract,
+            target=target_contract,
+            label="Test Pipeline",
+            thresholds=pb.Thresholds(warning=0.01, error=0.05),
+        )
+        d = pipeline.to_dict()
+        assert d["pipeline"]["label"] == "Test Pipeline"
+        assert d["pipeline"]["thresholds"]["warning"] == 0.01
+        assert d["source"]["name"] == "raw_orders"
+        assert d["target"]["name"] == "clean_orders"
+
+    def test_to_dict_short_circuit_false(self, source_contract):
+        pipeline = Pipeline(source=source_contract, short_circuit=False)
+        d = pipeline.to_dict()
+        assert d["pipeline"]["short_circuit"] is False
+
+    def test_to_dict_short_circuit_true_omitted(self, source_contract):
+        pipeline = Pipeline(source=source_contract, short_circuit=True)
+        d = pipeline.to_dict()
+        assert "short_circuit" not in d["pipeline"]
+
+    def test_round_trip_yaml(self, tmp_path, source_contract, target_contract):
+        """Full YAML round trip."""
+        pipeline = Pipeline(
+            source=source_contract,
+            target=target_contract,
+            label="Round Trip Test",
+            thresholds=pb.Thresholds(warning=0.01),
+            short_circuit=False,
+        )
+        path = str(tmp_path / "round_trip.yaml")
+        pipeline.to_yaml(path)
+        loaded = Pipeline.from_yaml(path)
+
+        assert loaded.label == "Round Trip Test"
+        assert loaded.thresholds.warning == 0.01
+        assert loaded.short_circuit is False
+        assert loaded.source.name == "raw_orders"
+        assert loaded.target.name == "clean_orders"
+
+    def test_from_dict_defaults_direction(self):
+        """Pipeline.from_dict should default source/target direction."""
+        d = {
+            "pipeline": {},
+            "source": {"name": "src", "steps": []},
+            "target": {"name": "tgt", "steps": []},
+        }
+        pipeline = Pipeline.from_dict(d)
+        assert pipeline.source.direction == "source"
+        assert pipeline.target.direction == "target"
+
+
