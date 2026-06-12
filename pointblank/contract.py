@@ -135,3 +135,24 @@ _VALID_VALIDATION_METHODS = frozenset(
 )
 
 
+@dataclass
+class Contract:
+    """A declarative boundary contract for pipeline data.
+
+    A Contract defines what data must look like at a specific point in a pipeline.
+    It combines a Schema (structural expectations) with validation Steps (semantic
+    expectations) and metadata (ownership, versioning, directionality).
+
+    """
+
+    name: str
+    direction: Literal["source", "target"] = "source"
+    schema: Schema | None = None
+    steps: list[Step] = field(default_factory=list)
+    version: str | None = None
+    owner: str | None = None
+    consumers: str | list[str] | None = None
+    description: str | None = None
+    thresholds: Thresholds | None = None
+    on_violation: Literal["warn", "raise", "log"] = "warn"
+
