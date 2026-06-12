@@ -566,3 +566,23 @@ class TestContractSerialization:
         assert len(loaded.steps) == 1
 
 
+class TestContractRepr:
+    """Tests for Contract __repr__."""
+
+    def test_repr_minimal(self):
+        contract = Contract(name="test")
+        r = repr(contract)
+        assert "Contract(" in r
+        assert "name='test'" in r
+
+    def test_repr_with_version(self):
+        contract = Contract(name="test", version="1.0.0")
+        r = repr(contract)
+        assert "version='1.0.0'" in r
+
+    def test_repr_with_schema(self, basic_schema):
+        contract = Contract(name="test", schema=basic_schema)
+        r = repr(contract)
+        assert "schema=<defined>" in r
+
+
