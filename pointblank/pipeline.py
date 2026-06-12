@@ -325,3 +325,51 @@ class Pipeline:
 
         return result
 
+    def _build_validation(self, contract: Contract, data: IntoDataFrame) -> Validate:
+        """Build a Validate object from a contract, applying pipeline-level overrides.
+
+        Parameters
+        ----------
+        contract
+            The contract to build from.
+        data
+            The data to validate.
+
+        Returns
+        -------
+        Validate
+            A Validate object (not yet interrogated).
+        """
+        from pointblank.validate import Validate
+
+        # Determine thresholds: pipeline-level overrides contract-level
+        thresholds = self.thresholds if self.thresholds is not None else contract.thresholds
+
+        validation = Validate(
+            data=data,
+            tbl_name=contract.name,
+            label=(self.label or f"Pipeline: {contract.name}") + f" [{contract.direction}]",
+            thresholds=thresholds,
+            actions=self.actions,
+            final_actions=self.final_actions,
+            owner=contract.owner,
+            consumers=contract.consumers,
+            version=contract.version,
+        )
+
+        # Add schema validation if defined
+        if contract.schema is not None:
+            validation = validation.col_schema_match(schema=contract.schema)
+
+        # Add all steps
+        for step in contract.steps:
+            method = getattr(validation, step.method, None)
+            if method is None:
+                raise AttributeError(
+                    f"Validate object has no method '{step.method}'. "
+                    f"This may indicate a version mismatch."
+                )
+            validation = method(**step.kwargs)
+
+        return validation
+
