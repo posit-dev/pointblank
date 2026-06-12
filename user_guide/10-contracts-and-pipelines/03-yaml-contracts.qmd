@@ -154,3 +154,60 @@ steps:
   - rows_complete: {}
 ```
 
+## Writing and Loading Contracts
+
+Pointblank supports a complete round-trip workflow: define contracts in Python, save them to YAML
+for version control and sharing, then load them back in any environment. This section walks through
+each step of that workflow.
+
+### Saving to YAML
+
+The `.to_yaml()` method serializes a `Contract` object to a YAML string. You can optionally pass a
+file path to write directly to disk. The resulting YAML is clean, readable, and contains all the
+information needed to reconstruct the contract exactly.
+
+```{python}
+import pointblank as pb
+from pathlib import Path
+
+# Create a contract in Python
+contract = pb.Contract(
+    name="product_catalog",
+    direction="source",
+    version="1.0.0",
+    owner="catalog-team",
+    schema=pb.Schema(
+        product_id="String",
+        name="String",
+        price="Float64",
+        category="String",
+        in_stock="Boolean",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["product_id", "name", "price"]),
+        pb.Step("col_vals_gt", columns="price", value=0),
+        pb.Step("col_vals_in_set", columns="category", set=["electronics", "clothing", "food", "home"]),
+        pb.Step("rows_distinct", columns_subset=["product_id"]),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05),
+)
+
+# Save to YAML
+yaml_output = contract.to_yaml("product_contract.yaml")
+print(yaml_output)
+```
+
+### Loading from YAML
+
+The `Contract.from_yaml()` class method reads a YAML file and reconstructs the full `Contract`
+object, including schema, steps, thresholds, and all metadata. The loaded contract is identical in
+behavior to one created directly in Python (there's no functional difference).
+
+```{python}
+# Load the contract back
+loaded_contract = pb.Contract.from_yaml("product_contract.yaml")
+print(loaded_contract)
+print(f"Steps: {len(loaded_contract.steps)}")
+print(f"Version: {loaded_contract.version}")
+```
+
