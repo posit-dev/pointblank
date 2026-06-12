@@ -23,6 +23,7 @@ from pointblank.column import (
     ref,
     starts_with,
 )
+from pointblank.contract import Contract, Step
 from pointblank.datascan import DataScan, col_summary_tbl
 from pointblank.draft import DraftValidation
 from pointblank.field import (
@@ -48,6 +49,7 @@ from pointblank.field import (
 from pointblank.generate.base import GeneratorConfig
 from pointblank.inspect import has_columns, has_rows
 from pointblank.integrations.otel import emit_otel
+from pointblank.pipeline import Pipeline, PipelineResult
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
