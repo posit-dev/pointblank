@@ -295,3 +295,59 @@ class Contract:
 
         return validation
 
+    def validate(self, data: IntoDataFrame) -> Validate:
+        """Compile and interrogate this Contract against the provided data.
+
+        This is a convenience method that calls `to_validate(data).interrogate()`.
+
+        Parameters
+        ----------
+        data
+            The data table to validate against this contract.
+
+        Returns
+        -------
+        Validate
+            An interrogated Validate object with results.
+        """
+        return self.to_validate(data).interrogate()
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the Contract to a dictionary for YAML/JSON export.
+
+        Returns
+        -------
+        dict
+            A dictionary representation of this contract.
+        """
+        result: dict[str, Any] = {"name": self.name}
+
+        if self.direction != "source":
+            result["direction"] = self.direction
+
+        if self.version is not None:
+            result["version"] = self.version
+
+        if self.owner is not None:
+            result["owner"] = self.owner
+
+        if self.consumers is not None:
+            result["consumers"] = self.consumers
+
+        if self.description is not None:
+            result["description"] = self.description
+
+        if self.on_violation != "warn":
+            result["on_violation"] = self.on_violation
+
+        if self.schema is not None:
+            result["schema"] = _schema_to_dict(self.schema)
+
+        if self.steps:
+            result["steps"] = [step.to_dict() for step in self.steps]
+
+        if self.thresholds is not None:
+            result["thresholds"] = _thresholds_to_dict(self.thresholds)
+
+        return result
+
