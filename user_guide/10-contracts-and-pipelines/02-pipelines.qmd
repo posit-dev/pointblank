@@ -120,3 +120,88 @@ pipeline = pb.Pipeline(
 print(pipeline)
 ```
 
+## Running the Pipeline
+
+The `Pipeline.run()` method executes the full boundary enforcement workflow in a single call. This
+is the primary way to use a pipeline: you hand it your input data and a transform function, and it
+handles the validation orchestration for you. The method follows a strict three-step sequence:
+
+1. Validate source data against the source contract
+2. Execute your transform function (only if source validation passes)
+3. Validate the output against the target contract
+
+This ordering is deliberate. By validating the source *before* running the transform, you avoid
+wasting compute on data that was already invalid. And by validating the target *after* the
+transform, you confirm that your code produced output matching your guarantees.
+
+```{python}
+# Sample raw transaction data
+raw_transactions = pl.DataFrame(
+    {
+        "txn_id": ["TXN-001", "TXN-002", "TXN-003", "TXN-004", "TXN-005"],
+        "amount_cents": [4999, 12500, 750, 89900, 3200],
+        "currency": ["USD", "EUR", "GBP", "USD", "JPY"],
+        "timestamp": [
+            "2024-06-01T10:30:00",
+            "2024-06-01T11:45:00",
+            "2024-06-01T12:00:00",
+            "2024-06-01T14:20:00",
+            "2024-06-01T15:55:00",
+        ],
+    }
+)
+
+# Your transformation logic
+def process_transactions(df: pl.DataFrame) -> pl.DataFrame:
+    """Convert cents to dollars and clean up the data."""
+    return df.with_columns(
+        (pl.col("amount_cents") / 100).alias("amount")
+    ).drop("amount_cents")
+
+# Run the full pipeline
+result = pipeline.run(data=raw_transactions, transform=process_transactions)
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target passed: {result.target_passed}")
+print(f"Overall passed: {result.passed}")
+```
+
+The `result` is a `PipelineResult` object containing:
+
+- `result.source_validation`: the interrogated Validate object for the source check
+- `result.target_validation`: the interrogated Validate object for the target check
+- `result.transform_output`: the data returned by your transform function
+- `result.passed`: `True` only if **both** boundaries pass
+
+The `PipelineResult` is designed to give you full introspection. You can access the raw validation
+objects (which are standard Pointblank `Validate` instances), inspect the transformed data directly,
+or simply check the boolean `passed` property for a quick go/no-go decision. Holding onto the result
+object also gives you the ability to generate reports or log details after the fact.
+
+## Inspecting Results
+
+Because `PipelineResult` holds full `Validate` objects, you have access to Pointblank's rich
+reporting capabilities. Each validation result can render its standard HTML report table, which
+shows exactly which steps passed, which failed, and by how much. This is especially valuable during
+development when you need to understand *why* a boundary check failed, not just *that* it failed.
+
+You can access individual validation results to see the standard Pointblank report:
+
+```{python}
+# View the source boundary validation
+result.source_validation
+```
+
+```{python}
+# View the target boundary validation
+result.target_validation
+```
+
+You can also get a text summary of the full pipeline run. The `get_report()` method produces a
+human-readable summary that includes both the source and target validation results, making it
+suitable for logging or printing in CI/CD output:
+
+```{python}
+print(result.get_report())
+```
+
