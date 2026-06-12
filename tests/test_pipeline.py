@@ -86,3 +86,67 @@ def basic_pipeline(source_contract, target_contract):
     return Pipeline(source=source_contract, target=target_contract)
 
 
+# ─── PipelineResult Tests ────────────────────────────────────────────────────────
+
+
+class TestPipelineResult:
+    """Tests for the PipelineResult class."""
+
+    def test_empty_result(self):
+        result = PipelineResult()
+        assert result.source_validation is None
+        assert result.target_validation is None
+        assert result.transform_output is None
+        # No validations means passed
+        assert result.source_passed is True
+        assert result.target_passed is True
+        assert result.passed is True
+
+    def test_repr(self):
+        result = PipelineResult()
+        r = repr(result)
+        assert "PipelineResult" in r
+        assert "passed=True" in r
+
+    def test_get_report_empty(self):
+        result = PipelineResult()
+        report = result.get_report()
+        assert "Pipeline Boundary Validation Results" in report
+        assert "Overall: PASSED" in report
+
+    def test_result_with_source_only(self, raw_data, source_contract):
+        """Result with only source validation."""
+        pipeline = Pipeline(source=source_contract)
+        validation = pipeline.validate_source(raw_data)
+
+        result = PipelineResult(source_validation=validation)
+        assert result.source_passed is True
+        assert result.target_passed is True  # No target = passes
+        assert result.passed is True
+
+    def test_result_with_failing_source(self, raw_data_with_issues):
+        """Result with failing source validation."""
+        contract = Contract(
+            name="strict_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id", "amount_cents"])],
+        )
+        pipeline = Pipeline(source=contract)
+        validation = pipeline.validate_source(raw_data_with_issues)
+
+        result = PipelineResult(source_validation=validation)
+        assert result.source_passed is False
+        assert result.passed is False
+
+    def test_get_report_full(self, raw_data, source_contract, target_contract, transform_fn):
+        pipeline = Pipeline(source=source_contract, target=target_contract)
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+
+        report = result.get_report()
+        assert "Source Boundary: PASSED" in report
+        assert "Target Boundary: PASSED" in report
+        assert "Overall: PASSED" in report
+        assert "Steps:" in report
+        assert "Test units passed:" in report
+
+
