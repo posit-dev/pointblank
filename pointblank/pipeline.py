@@ -123,3 +123,205 @@ def _append_validation_summary(lines: list[str], validation: Validate) -> None:
         lines.append("  (unable to retrieve summary)")
 
 
+@dataclass
+class Pipeline:
+    """Binds source and target contracts into a pipeline boundary enforcement unit.
+
+    A Pipeline enforces data quality at both the ingestion point ("boundary in") and
+    the output point ("boundary out") of a data transformation. It validates that data
+    entering a pipeline meets source contract requirements, and that data leaving meets
+    target contract requirements.
+
+    Parameters
+    ----------
+    source
+        The source (inbound) Contract.
+    target
+        The target (outbound) Contract, or None if only validating inbound data.
+    thresholds
+        Global thresholds applied to both boundary validations (overrides contract-level
+        thresholds).
+    actions
+        Actions triggered on threshold exceedance at either boundary.
+    final_actions
+        Actions triggered after both validations complete.
+    label
+        A label for this pipeline (used in reports).
+    short_circuit
+        If True (default), skip the transform and target validation when source validation
+        fails critically. Set to False to always run both validations.
+
+    Examples
+    --------
+    ```python
+    import pointblank as pb
+
+    source_contract = pb.Contract(
+        name="raw_data",
+        direction="source",
+        steps=[pb.Step("col_vals_not_null", columns=["id"])],
+    )
+
+    target_contract = pb.Contract(
+        name="clean_data",
+        direction="target",
+        steps=[pb.Step("col_vals_not_null", columns=pb.everything())],
+    )
+
+    pipeline = pb.Pipeline(
+        source=source_contract,
+        target=target_contract,
+    )
+
+    # Validate source data
+    source_result = pipeline.validate_source(raw_data)
+
+    # Validate target data
+    target_result = pipeline.validate_target(clean_data)
+
+    # Or do it all in one shot
+    result = pipeline.run(data=raw_data, transform=my_transform)
+    ```
+    """
+
+    source: Contract | None = None
+    target: Contract | None = None
+    thresholds: Thresholds | None = None
+    actions: Actions | None = None
+    final_actions: FinalActions | None = None
+    label: str | None = None
+    short_circuit: bool = True
+
+    def __post_init__(self) -> None:
+        from pointblank.contract import Contract
+
+        if self.source is not None and not isinstance(self.source, Contract):
+            raise TypeError(
+                f"Pipeline 'source' must be a Contract object, got {type(self.source).__name__}."
+            )
+        if self.target is not None and not isinstance(self.target, Contract):
+            raise TypeError(
+                f"Pipeline 'target' must be a Contract object, got {type(self.target).__name__}."
+            )
+        if self.source is None and self.target is None:
+            raise ValueError("Pipeline must have at least one of 'source' or 'target' contracts.")
+
+    def validate_source(self, data: IntoDataFrame) -> Validate:
+        """Validate data against the source (inbound) contract.
+
+        Parameters
+        ----------
+        data
+            The incoming data to validate.
+
+        Returns
+        -------
+        Validate
+            An interrogated Validate object with results.
+
+        Raises
+        ------
+        ValueError
+            If no source contract is defined.
+        RuntimeError
+            If on_violation="raise" and validation fails.
+        """
+        if self.source is None:
+            raise ValueError("No source contract defined for this pipeline.")
+
+        validation = self._build_validation(self.source, data)
+        validation = validation.interrogate()
+
+        self._handle_violation(self.source, validation)
+
+        return validation
+
+    def validate_target(self, data: IntoDataFrame) -> Validate:
+        """Validate data against the target (outbound) contract.
+
+        Parameters
+        ----------
+        data
+            The outgoing data to validate.
+
+        Returns
+        -------
+        Validate
+            An interrogated Validate object with results.
+
+        Raises
+        ------
+        ValueError
+            If no target contract is defined.
+        RuntimeError
+            If on_violation="raise" and validation fails.
+        """
+        if self.target is None:
+            raise ValueError("No target contract defined for this pipeline.")
+
+        validation = self._build_validation(self.target, data)
+        validation = validation.interrogate()
+
+        self._handle_violation(self.target, validation)
+
+        return validation
+
+    def run(
+        self,
+        data: IntoDataFrame,
+        transform: Callable[[Any], Any],
+    ) -> PipelineResult:
+        """Run the full pipeline: validate source, transform, validate target.
+
+        Parameters
+        ----------
+        data
+            The input data for the pipeline.
+        transform
+            A callable that transforms the source data into target data.
+            Must accept the data and return transformed data.
+
+        Returns
+        -------
+        PipelineResult
+            A result object containing both validations and the transform output.
+        """
+        result = PipelineResult()
+
+        # Step 1: Validate source if a source contract is defined
+        if self.source is not None:
+            source_validation = self._build_validation(self.source, data)
+            source_validation = source_validation.interrogate()
+            result.source_validation = source_validation
+
+            # Handle violation for source
+            try:
+                self._handle_violation(self.source, source_validation)
+            except RuntimeError:
+                if self.short_circuit:
+                    # Source failed critically and short_circuit is True
+                    return result
+                # If not short_circuit, continue despite source failure
+
+            # Check if source passed; if not and short_circuit is True, skip transform
+            if self.short_circuit and not result.source_passed:
+                return result
+
+        # Step 2: Run the transform
+        transformed_data = transform(data)
+        result.transform_output = transformed_data
+
+        # Step 3: Validate target if a target contract is defined
+        if self.target is not None:
+            target_validation = self._build_validation(self.target, transformed_data)
+            target_validation = target_validation.interrogate()
+            result.target_validation = target_validation
+
+            # Handle violation for target
+            try:
+                self._handle_violation(self.target, target_validation)
+            except RuntimeError:
+                pass  # Already stored in result
+
+        return result
+
