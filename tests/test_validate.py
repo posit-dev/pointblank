@@ -28,6 +28,19 @@ def multiply_column_by_20(df):
     return df.with_columns(nw.col("a") * 20)
 
 
+def _strip_report_nondeterminism(html_str: str) -> str:
+    """Strip non-deterministic content (timestamps, durations, footers) from report HTML."""
+    # Remove tfoot-based sourcenotes (great_tables < 0.22)
+    html_str = re.sub(r'<tfoot class="gt_sourcenotes">.*?</tfoot>', "", html_str, flags=re.DOTALL)
+    # Remove tr-based sourcenotes (great_tables >= 0.22)
+    html_str = re.sub(r'<tr class="gt_sourcenotes">.*?</tr>', "", html_str, flags=re.DOTALL)
+    # Replace timestamps (e.g., "2026-06-12 12:35:50 UTC")
+    html_str = re.sub(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC", "TIMESTAMP", html_str)
+    # Replace durations (e.g., "< 1 s" or "2.5 s")
+    html_str = re.sub(r"(?:<|&lt;)\s*\d+\s*s|\d+\.?\d*\s*s", "DURATION", html_str)
+    return html_str
+
+
 # StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
 try:
     from enum import StrEnum
@@ -8904,11 +8917,8 @@ def test_validation_with_selector_helper_functions_no_match_snap(
 
     html_str = v.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "selector_helper_functions_no_match.html")
@@ -9411,11 +9421,8 @@ def test_comprehensive_validation_report_html_snap(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "comprehensive_validation_report.html")
@@ -9453,11 +9460,8 @@ def test_validation_report_segments_html(snapshot, tbl_type) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_segments.html")
@@ -9484,11 +9488,8 @@ def test_validation_report_segments_with_pre_html(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_segments_with_pre.html")
@@ -9512,11 +9513,8 @@ def test_validation_report_briefs_html(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_with_briefs.html")
@@ -9541,11 +9539,8 @@ def test_validation_report_briefs_global_local_html(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
@@ -9582,11 +9577,8 @@ def test_no_interrogation_validation_report_html_snap(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "no_interrogation_validation_report.html")
@@ -9601,8 +9593,11 @@ def test_no_steps_validation_report_html_snap(snapshot) -> None:
 
     html_str = validation.get_tabular_report().as_raw_html()
 
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
+
     # Use the snapshot fixture to create and save the snapshot
-    snapshot.assert_match(html_str, "no_steps_validation_report.html")
+    snapshot.assert_match(edited_report_html_str, "no_steps_validation_report.html")
 
 
 def test_no_steps_validation_report_html_with_interrogate() -> None:

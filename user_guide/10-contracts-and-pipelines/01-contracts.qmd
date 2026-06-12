@@ -1,0 +1,287 @@
+---
+title: Data Contracts
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+A **data contract** is a declarative specification of what data should look like at a particular
+point in your system. Rather than writing imperative validation code every time you need to check
+data, contracts let you define *expectations as data* and then enforce them anywhere.
+
+Pointblank's `Contract` class combines three things into a single, portable unit:
+
+1. **Schema**: what columns exist and what types they are
+2. **Validation steps**: semantic rules the data must satisfy
+3. **Metadata**: who owns it, what version it is, and what to do on failure
+
+Contracts can be serialized to YAML, version-controlled, and shared across teams. They can serve as
+the single source of truth for data quality expectations at a given boundary.
+
+## Creating Your First Contract
+
+The simplest contract just names a set of validation steps:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define a contract for customer data
+customer_contract = pb.Contract(
+    name="customer_records",
+    steps=[
+        pb.Step("col_vals_not_null", columns=["customer_id", "email"]),
+        pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$"),
+        pb.Step("rows_distinct", columns_subset=["customer_id"]),
+    ],
+)
+```
+
+This contract essentially says: "Any data calling itself `customer_records` must have non-null IDs
+and emails, valid email formats, and unique customer IDs."
+
+Now validate some data against it:
+
+```{python}
+customers = pl.DataFrame(
+    {
+        "customer_id": ["C001", "C002", "C003", "C004"],
+        "email": ["alice@example.com", "bob@corp.io", "charlie@mail.org", "dave@startup.co"],
+        "name": ["Alice", "Bob", "Charlie", "Dave"],
+        "signup_date": ["2024-01-15", "2024-02-20", "2024-03-10", "2024-04-05"],
+    }
+)
+
+customer_contract.validate(customers)
+```
+
+The `.validate()` method compiles the contract into a `Validate` object, runs all the checks, and
+returns the interrogated result. You get the same rich validation report you're used to but the
+contract itself is a reusable, declarative artifact.
+
+## Adding a Schema
+
+Contracts can include a `Schema` to enforce structural expectations (column names and data types):
+
+```{python}
+order_contract = pb.Contract(
+    name="order_data",
+    direction="source",
+    schema=pb.Schema(
+        order_id="String",
+        customer_id="String",
+        amount="Float64",
+        quantity="Int64",
+        status="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "customer_id", "amount"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_ge", columns="quantity", value=1),
+        pb.Step("col_vals_in_set", columns="status", set=["pending", "shipped", "delivered"]),
+        pb.Step("rows_distinct", columns_subset=["order_id"]),
+    ],
+    version="1.0.0",
+    owner="data-platform-team",
+)
+```
+
+When a schema is defined, the contract automatically adds a `col_schema_match()` step before all
+other validation steps. This means the schema check runs first, and if the table doesn't have the
+right columns and types, you'll know immediately.
+
+```{python}
+orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-003", "ORD-004", "ORD-005"],
+        "customer_id": ["C001", "C002", "C001", "C003", "C002"],
+        "amount": [29.99, 149.50, 9.99, 75.00, 220.00],
+        "quantity": [1, 3, 1, 2, 5],
+        "status": ["shipped", "pending", "delivered", "pending", "shipped"],
+    }
+)
+
+order_contract.validate(orders)
+```
+
+## The `Step` Class
+
+Each validation rule in a contract is represented by a `Step`, which is a declarative description of
+a single validation method call. Steps store the method name and its arguments as plain data:
+
+```{python}
+# These are equivalent ways to express a validation rule:
+step1 = pb.Step("col_vals_gt", columns="revenue", value=0)
+step2 = pb.Step("col_vals_between", columns="age", left=0, right=150)
+step3 = pb.Step("col_vals_in_set", columns="country", set=["US", "UK", "CA", "AU"])
+step4 = pb.Step("col_vals_regex", columns="phone", pattern=r"^\+?[0-9\-\(\) ]+$")
+
+# Steps are data so you can inspect them
+print(step1)
+print(step1.method)
+print(step1.kwargs)
+```
+
+Because steps are data (not function calls), they serialize cleanly to YAML/JSON and can be
+reconstructed anywhere. The `method` field corresponds directly to a validation method on the
+`Validate` class, and the `kwargs` are passed through verbatim.
+
+### Available Methods
+
+Any validation method from the `Validate` class can be used in a Step. Here are the most common
+ones for contract definitions:
+
+| Method | Purpose |
+|--------|---------|
+| `col_vals_gt()`, `col_vals_lt()`, `col_vals_ge()`, `col_vals_le()` | Numeric bounds |
+| `col_vals_between()`, `col_vals_outside()` | Range checks |
+| `col_vals_eq()`, `col_vals_ne()` | Equality checks |
+| `col_vals_in_set()`, `col_vals_not_in_set()` | Categorical membership |
+| `col_vals_not_null()`, `col_vals_null()` | Null checks |
+| `col_vals_regex()` | Pattern matching |
+| `col_exists()` | Column presence |
+| `rows_distinct()` | Uniqueness (use `columns_subset=`) |
+| `rows_complete()` | No nulls in any column |
+| `row_count_match()` | Expected row count |
+| `col_count_match()` | Expected column count |
+
+## Contract Metadata
+
+Contracts support rich metadata that makes them self-documenting and suitable for team workflows:
+
+```{python}
+production_contract = pb.Contract(
+    name="clean_sales_report",
+    direction="target",              # "source" or "target" boundary
+    version="2.1.0",                 # Semantic versioning for evolution
+    owner="data-platform-team",      # Who maintains this contract
+    consumers=["analytics-team", "ml-team"],  # Who depends on it
+    description="Validated, deduplicated sales data ready for downstream consumption.",
+    on_violation="warn",             # "warn", "raise", or "log"
+    schema=pb.Schema(
+        sale_id="String",
+        revenue="Float64",
+        region="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["sale_id", "revenue", "region"]),
+        pb.Step("col_vals_gt", columns="revenue", value=0),
+        pb.Step("rows_distinct", columns_subset=["sale_id"]),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+)
+
+print(production_contract)
+```
+
+### Direction
+
+The `direction` parameter is metadata that signals where in a pipeline this contract applies:
+
+- `"source"`: for inbound/raw data arriving from upstream
+- `"target"`: for outbound data leaving your transform
+
+Direction doesn't change validation behavior, but it's used in pipeline reports and helps teams
+understand the contract's role in the system.
+
+### Violation Handling
+
+The `on_violation` parameter controls what happens when validation fails (used by the `Pipeline`
+class, covered in the next guide page):
+
+- `"warn"` (default): issue a Python `UserWarning`
+- `"raise"`: raise a `RuntimeError` (halts execution)
+- `"log"`: log via the `pointblank.contract` logger
+
+## Using `to_validate()` for Custom Workflows
+
+If you need more control, `to_validate()` gives you back an un-interrogated `Validate` object that
+you can extend with additional checks:
+
+```{python}
+# Start from the contract, then add ad-hoc checks
+validation = (
+    order_contract
+    .to_validate(orders)
+    .col_vals_lt(columns="amount", value=500)  # Additional check not in the contract
+    .interrogate()
+)
+
+validation
+```
+
+This is useful when a contract captures your *baseline* expectations, but a specific workflow needs
+extra checks on top.
+
+## Contract Equality and Composition
+
+Steps support equality comparison, making it easy to verify contracts:
+
+```{python}
+# Steps are equal if they have the same method and kwargs
+s1 = pb.Step("col_vals_gt", columns="x", value=0)
+s2 = pb.Step("col_vals_gt", columns="x", value=0)
+s3 = pb.Step("col_vals_gt", columns="x", value=10)
+
+print(f"s1 == s2: {s1 == s2}")
+print(f"s1 == s3: {s1 == s3}")
+```
+
+You can compose contracts by combining steps from multiple sources:
+
+```{python}
+# Common checks shared across all tables
+common_steps = [
+    pb.Step("col_vals_not_null", columns=["id"]),
+    pb.Step("rows_distinct", columns_subset=["id"]),
+]
+
+# Table-specific checks
+sales_steps = [
+    pb.Step("col_vals_gt", columns="revenue", value=0),
+    pb.Step("col_vals_in_set", columns="region", set=["NA", "EU", "APAC"]),
+]
+
+# Compose them
+sales_contract = pb.Contract(
+    name="sales_data",
+    steps=common_steps + sales_steps,
+    version="1.0.0",
+)
+
+print(f"Total steps: {len(sales_contract.steps)}")
+```
+
+## Example: Validating with Failures
+
+Let's see what happens when data doesn't meet the contract:
+
+```{python}
+# Data with quality issues
+bad_orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-001", "ORD-004", None],   # duplicates + null
+        "customer_id": ["C001", None, "C001", "C003", "C002"],            # null
+        "amount": [29.99, -5.00, 9.99, 0.0, 220.00],                      # negative + zero
+        "quantity": [1, 3, 1, 0, 5],                                      # zero (should be >= 1)
+        "status": ["shipped", "pending", "invalid", "pending", "shipped"],# invalid value
+    }
+)
+
+order_contract.validate(bad_orders)
+```
+
+The validation report clearly shows which steps failed and how many test units were affected. This
+makes it easy to diagnose data quality issues and communicate them to data producers.
+
+## What's Next
+
+Now that you understand contracts, the next guide page covers **Pipelines**. They combine a source
+contract, a transform, and a target contract into a complete boundary enforcement workflow. This
+lets you validate data at both the *input* and *output* of your data transformations.
