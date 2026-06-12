@@ -211,3 +211,137 @@ print(f"Steps: {len(loaded_contract.steps)}")
 print(f"Version: {loaded_contract.version}")
 ```
 
+### Validating with a Loaded Contract
+
+Once loaded, a contract works exactly like one defined in Python. Call `.validate(data)` to compile
+it into a `Validate` object, execute all checks, and get the standard Pointblank validation report.
+This is the core value proposition of YAML contracts: define once, validate anywhere.
+
+```{python}
+import polars as pl
+
+products = pl.DataFrame(
+    {
+        "product_id": ["P001", "P002", "P003", "P004", "P005"],
+        "name": ["Laptop", "T-Shirt", "Coffee Beans", "Desk Lamp", "Headphones"],
+        "price": [999.99, 29.99, 12.50, 45.00, 79.99],
+        "category": ["electronics", "clothing", "food", "home", "electronics"],
+        "in_stock": [True, True, False, True, True],
+    }
+)
+
+loaded_contract.validate(products)
+```
+
+## Pipeline YAML Format
+
+While individual contracts validate data at a single point, **pipelines** enforce quality at both
+the input and output boundaries of a transformation. A pipeline YAML file packages the source
+contract, target contract, and pipeline-level settings (like global thresholds and short-circuit
+behavior) into a single, self-contained document.
+
+This is especially powerful for team workflows: a data engineer defines the pipeline specification
+in YAML, commits it to version control, and any downstream system can load and execute it without
+knowing anything about the implementation details.
+
+Let's build a pipeline in Python and export it to see what the YAML looks like:
+
+```{python}
+# Create a pipeline and export to YAML
+source = pb.Contract(
+    name="raw_events",
+    direction="source",
+    version="1.0.0",
+    schema=pb.Schema(
+        event_id="String",
+        user_id="String",
+        event_type="String",
+        value_cents="Int64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["event_id", "user_id", "event_type"]),
+        pb.Step("col_vals_ge", columns="value_cents", value=0),
+        pb.Step("col_vals_in_set", columns="event_type", set=["click", "purchase", "view", "signup"]),
+        pb.Step("rows_distinct", columns_subset=["event_id"]),
+    ],
+)
+
+target = pb.Contract(
+    name="enriched_events",
+    direction="target",
+    version="1.0.0",
+    schema=pb.Schema(
+        event_id="String",
+        user_id="String",
+        event_type="String",
+        value="Float64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["event_id", "user_id", "event_type", "value"]),
+        pb.Step("col_vals_gt", columns="value", value=0),
+        pb.Step("rows_distinct", columns_subset=["event_id"]),
+    ],
+)
+
+pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    label="Event Processing Pipeline",
+    thresholds=pb.Thresholds(warning=0.02, error=0.10),
+)
+
+pipeline_yaml = pipeline.to_yaml("event_pipeline.yaml")
+print(pipeline_yaml)
+```
+
+### Pipeline YAML Structure
+
+The generated YAML has three top-level sections that correspond to the three components of boundary
+enforcement: the `pipeline:` section for global settings, the `source:` section for the inbound
+contract, and the `target:` section for the outbound contract. Each section can be understood
+independently, which makes reviewing changes straightforward.
+
+Here's the annotated structure:
+
+```yaml
+# Pipeline metadata and global settings
+pipeline:
+  label: "Event Processing Pipeline"
+  thresholds:
+    warning: 0.02
+    error: 0.10
+  # short_circuit: true   (default, omitted when true)
+
+# Source contract (inbound boundary)
+source:
+  name: raw_events
+  version: "1.0.0"
+  schema:
+    event_id: String
+    user_id: String
+    event_type: String
+    value_cents: Int64
+  steps:
+    - col_vals_not_null:
+        columns: [event_id, user_id, event_type]
+    - col_vals_ge:
+        columns: value_cents
+        value: 0
+
+# Target contract (outbound boundary)
+target:
+  name: enriched_events
+  version: "1.0.0"
+  schema:
+    event_id: String
+    user_id: String
+    event_type: String
+    value: Float64
+  steps:
+    - col_vals_not_null:
+        columns: [event_id, user_id, event_type, value]
+    - col_vals_gt:
+        columns: value
+        value: 0
+```
+
