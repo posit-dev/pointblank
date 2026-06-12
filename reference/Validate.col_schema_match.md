@@ -253,9 +253,10 @@ col_schema_match()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3">--</td>
 <td class="gt_row gt_center" style="height: 40px">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(schema_check)</span> <span style="color:#4CA64C;">✓</span> Schema validation <strong>passed</strong>.</p>
 Schema Comparison
@@ -309,16 +310,18 @@ Schema Comparison
 <td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">Float64</td>
 <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote">
+
 Supplied Column Schema:
 
 <code style="color: #303030; font-family: monospace; font-size: 8px;">[('a', 'String'), ('b', 'Int64'), ('c', 'Float64')]</code>
 </div></td>
 </tr>
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote"> 
+
 Schema Match Settings
 
 COMPLETE

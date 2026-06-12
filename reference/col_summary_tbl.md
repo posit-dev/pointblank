@@ -293,8 +293,8 @@ String
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">4</td>
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">1</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote">String columns statistics regard the string's length.</td>
 </tr>
 </tfoot>
@@ -312,7 +312,7 @@ pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
 
 
-    /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:818: UserWarning: PyArrow Table support is currently experimental.
+    /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:825: UserWarning: PyArrow Table support is currently experimental.
       warnings.warn("PyArrow Table support is currently experimental.")
 
 
@@ -739,8 +739,8 @@ Int64
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">59</td>
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">36</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote">String columns statistics regard the string's length.</td>
 </tr>
 </tfoot>

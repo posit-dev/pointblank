@@ -504,9 +504,10 @@ float ≠ float64
 <td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">str</td>
 <td class="gt_row gt_left"><span style="color: #CF142B;">✗</span></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote">
+
 Supplied Column Schema:
 
 <code style="color: #303030; font-family: monospace; font-size: 8px;">[('date_time', 'timestamp'), ('dates', 'date'), ('a', 'int64'), ('b',), ('c',), ('d', 'float64'), ('e', ['bool', 'boolean']), ('f', 'str')]</code>

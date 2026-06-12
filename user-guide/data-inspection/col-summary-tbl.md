@@ -230,8 +230,8 @@ String
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">4</td>
 <td class="gt_row gt_center" style="text-align: right; font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;">1</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote">String columns statistics regard the string's length.</td>
 </tr>
 </tfoot>

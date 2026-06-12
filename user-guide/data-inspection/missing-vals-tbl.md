@@ -281,9 +281,9 @@ pb.missing_vals_tbl(nycflights)
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="11" class="gt_sourcenote"><div style="display: flex; align-items: center; padding-bottom: 10px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="11" class="gt_sourcenote">
 
 
 <span style="font-size: 10px;">NO MISSING VALUES</span><span style="font-size: 10px;">     PROPORTION MISSING:  </span>
@@ -470,9 +470,9 @@ pb.missing_vals_tbl(small_table)
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="11" class="gt_sourcenote"><div style="display: flex; align-items: center; padding-bottom: 10px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="11" class="gt_sourcenote">
 
 
 <span style="font-size: 10px;">NO MISSING VALUES</span><span style="font-size: 10px;">     PROPORTION MISSING:  </span>
@@ -689,9 +689,9 @@ pb.missing_vals_tbl(game_revenue)
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 <td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5; border-left: 1px solid #F0F0F0; border-right: 1px solid #F0F0F0; height: 20px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black; font-family: IBM Plex Mono; font-size: 12px; background-color: lightblue"></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="11" class="gt_sourcenote"><div style="display: flex; align-items: center; padding-bottom: 10px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="11" class="gt_sourcenote">
 
 
 <span style="font-size: 10px;">NO MISSING VALUES</span><span style="font-size: 10px;">     PROPORTION MISSING:  </span>

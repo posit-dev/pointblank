@@ -179,9 +179,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3">--</td>
 <td class="gt_row gt_center" style="height: 40px">CSV</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(local_thresholds)</span> Step-specific thresholds set with <span style="font-family: monospace;"><span style="color: #AAAAAA; font-weight: bold;">W</span>:5</span>.</p></td>
 </tr>

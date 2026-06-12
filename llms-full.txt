@@ -19017,6 +19017,10 @@ We'd love to hear from you! Connect with us:
 
 
 
+### Contracts & Pipelines
+
+
+
 ### Quickstart
 
 ```{python}
@@ -31102,4 +31106,1475 @@ With metrics, traces, and logs all flowing through OpenTelemetry, you have a com
 picture for your data validation workflows. Whether you're running ad-hoc checks in a notebook or
 validating tables in a production pipeline, the same instrumentation gives you dashboards, alerts,
 and audit trails with no additional tooling.
+
+
+### Data Contracts
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+A **data contract** is a declarative specification of what data should look like at a particular
+point in your system. Rather than writing imperative validation code every time you need to check
+data, contracts let you define *expectations as data* and then enforce them anywhere.
+
+Pointblank's `Contract` class combines three things into a single, portable unit:
+
+1. **Schema**: what columns exist and what types they are
+2. **Validation steps**: semantic rules the data must satisfy
+3. **Metadata**: who owns it, what version it is, and what to do on failure
+
+Contracts can be serialized to YAML, version-controlled, and shared across teams. They can serve as
+the single source of truth for data quality expectations at a given boundary.
+
+## Creating Your First Contract
+
+The simplest contract just names a set of validation steps:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define a contract for customer data
+customer_contract = pb.Contract(
+    name="customer_records",
+    steps=[
+        pb.Step("col_vals_not_null", columns=["customer_id", "email"]),
+        pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$"),
+        pb.Step("rows_distinct", columns_subset=["customer_id"]),
+    ],
+)
+```
+
+This contract essentially says: "Any data calling itself `customer_records` must have non-null IDs
+and emails, valid email formats, and unique customer IDs."
+
+Now validate some data against it:
+
+```{python}
+customers = pl.DataFrame(
+    {
+        "customer_id": ["C001", "C002", "C003", "C004"],
+        "email": ["alice@example.com", "bob@corp.io", "charlie@mail.org", "dave@startup.co"],
+        "name": ["Alice", "Bob", "Charlie", "Dave"],
+        "signup_date": ["2024-01-15", "2024-02-20", "2024-03-10", "2024-04-05"],
+    }
+)
+
+customer_contract.validate(customers)
+```
+
+The `.validate()` method compiles the contract into a `Validate` object, runs all the checks, and
+returns the interrogated result. You get the same rich validation report you're used to but the
+contract itself is a reusable, declarative artifact.
+
+## Adding a Schema
+
+Contracts can include a `Schema` to enforce structural expectations (column names and data types):
+
+```{python}
+order_contract = pb.Contract(
+    name="order_data",
+    direction="source",
+    schema=pb.Schema(
+        order_id="String",
+        customer_id="String",
+        amount="Float64",
+        quantity="Int64",
+        status="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "customer_id", "amount"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_ge", columns="quantity", value=1),
+        pb.Step("col_vals_in_set", columns="status", set=["pending", "shipped", "delivered"]),
+        pb.Step("rows_distinct", columns_subset=["order_id"]),
+    ],
+    version="1.0.0",
+    owner="data-platform-team",
+)
+```
+
+When a schema is defined, the contract automatically adds a `col_schema_match()` step before all
+other validation steps. This means the schema check runs first, and if the table doesn't have the
+right columns and types, you'll know immediately.
+
+```{python}
+orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-003", "ORD-004", "ORD-005"],
+        "customer_id": ["C001", "C002", "C001", "C003", "C002"],
+        "amount": [29.99, 149.50, 9.99, 75.00, 220.00],
+        "quantity": [1, 3, 1, 2, 5],
+        "status": ["shipped", "pending", "delivered", "pending", "shipped"],
+    }
+)
+
+order_contract.validate(orders)
+```
+
+## The `Step` Class
+
+Each validation rule in a contract is represented by a `Step`, which is a declarative description of
+a single validation method call. Steps store the method name and its arguments as plain data:
+
+```{python}
+# These are equivalent ways to express a validation rule:
+step1 = pb.Step("col_vals_gt", columns="revenue", value=0)
+step2 = pb.Step("col_vals_between", columns="age", left=0, right=150)
+step3 = pb.Step("col_vals_in_set", columns="country", set=["US", "UK", "CA", "AU"])
+step4 = pb.Step("col_vals_regex", columns="phone", pattern=r"^\+?[0-9\-\(\) ]+$")
+
+# Steps are data so you can inspect them
+print(step1)
+print(step1.method)
+print(step1.kwargs)
+```
+
+Because steps are data (not function calls), they serialize cleanly to YAML/JSON and can be
+reconstructed anywhere. The `method` field corresponds directly to a validation method on the
+`Validate` class, and the `kwargs` are passed through verbatim.
+
+### Available Methods
+
+Any validation method from the `Validate` class can be used in a Step. Here are the most common
+ones for contract definitions:
+
+| Method | Purpose |
+|--------|---------|
+| `col_vals_gt()`, `col_vals_lt()`, `col_vals_ge()`, `col_vals_le()` | Numeric bounds |
+| `col_vals_between()`, `col_vals_outside()` | Range checks |
+| `col_vals_eq()`, `col_vals_ne()` | Equality checks |
+| `col_vals_in_set()`, `col_vals_not_in_set()` | Categorical membership |
+| `col_vals_not_null()`, `col_vals_null()` | Null checks |
+| `col_vals_regex()` | Pattern matching |
+| `col_exists()` | Column presence |
+| `rows_distinct()` | Uniqueness (use `columns_subset=`) |
+| `rows_complete()` | No nulls in any column |
+| `row_count_match()` | Expected row count |
+| `col_count_match()` | Expected column count |
+
+## Contract Metadata
+
+Contracts support rich metadata that makes them self-documenting and suitable for team workflows:
+
+```{python}
+production_contract = pb.Contract(
+    name="clean_sales_report",
+    direction="target",              # "source" or "target" boundary
+    version="2.1.0",                 # Semantic versioning for evolution
+    owner="data-platform-team",      # Who maintains this contract
+    consumers=["analytics-team", "ml-team"],  # Who depends on it
+    description="Validated, deduplicated sales data ready for downstream consumption.",
+    on_violation="warn",             # "warn", "raise", or "log"
+    schema=pb.Schema(
+        sale_id="String",
+        revenue="Float64",
+        region="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["sale_id", "revenue", "region"]),
+        pb.Step("col_vals_gt", columns="revenue", value=0),
+        pb.Step("rows_distinct", columns_subset=["sale_id"]),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+)
+
+print(production_contract)
+```
+
+### Direction
+
+The `direction` parameter is metadata that signals where in a pipeline this contract applies:
+
+- `"source"`: for inbound/raw data arriving from upstream
+- `"target"`: for outbound data leaving your transform
+
+Direction doesn't change validation behavior, but it's used in pipeline reports and helps teams
+understand the contract's role in the system.
+
+### Violation Handling
+
+The `on_violation` parameter controls what happens when validation fails (used by the `Pipeline`
+class, covered in the next guide page):
+
+- `"warn"` (default): issue a Python `UserWarning`
+- `"raise"`: raise a `RuntimeError` (halts execution)
+- `"log"`: log via the `pointblank.contract` logger
+
+## Using `to_validate()` for Custom Workflows
+
+If you need more control, `to_validate()` gives you back an un-interrogated `Validate` object that
+you can extend with additional checks:
+
+```{python}
+# Start from the contract, then add ad-hoc checks
+validation = (
+    order_contract
+    .to_validate(orders)
+    .col_vals_lt(columns="amount", value=500)  # Additional check not in the contract
+    .interrogate()
+)
+
+validation
+```
+
+This is useful when a contract captures your *baseline* expectations, but a specific workflow needs
+extra checks on top.
+
+## Contract Equality and Composition
+
+Steps support equality comparison, making it easy to verify contracts:
+
+```{python}
+# Steps are equal if they have the same method and kwargs
+s1 = pb.Step("col_vals_gt", columns="x", value=0)
+s2 = pb.Step("col_vals_gt", columns="x", value=0)
+s3 = pb.Step("col_vals_gt", columns="x", value=10)
+
+print(f"s1 == s2: {s1 == s2}")
+print(f"s1 == s3: {s1 == s3}")
+```
+
+You can compose contracts by combining steps from multiple sources:
+
+```{python}
+# Common checks shared across all tables
+common_steps = [
+    pb.Step("col_vals_not_null", columns=["id"]),
+    pb.Step("rows_distinct", columns_subset=["id"]),
+]
+
+# Table-specific checks
+sales_steps = [
+    pb.Step("col_vals_gt", columns="revenue", value=0),
+    pb.Step("col_vals_in_set", columns="region", set=["NA", "EU", "APAC"]),
+]
+
+# Compose them
+sales_contract = pb.Contract(
+    name="sales_data",
+    steps=common_steps + sales_steps,
+    version="1.0.0",
+)
+
+print(f"Total steps: {len(sales_contract.steps)}")
+```
+
+## Example: Validating with Failures
+
+Let's see what happens when data doesn't meet the contract:
+
+```{python}
+# Data with quality issues
+bad_orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-001", "ORD-004", None],   # duplicates + null
+        "customer_id": ["C001", None, "C001", "C003", "C002"],            # null
+        "amount": [29.99, -5.00, 9.99, 0.0, 220.00],                      # negative + zero
+        "quantity": [1, 3, 1, 0, 5],                                      # zero (should be >= 1)
+        "status": ["shipped", "pending", "invalid", "pending", "shipped"],# invalid value
+    }
+)
+
+order_contract.validate(bad_orders)
+```
+
+The validation report clearly shows which steps failed and how many test units were affected. This
+makes it easy to diagnose data quality issues and communicate them to data producers.
+
+## What's Next
+
+Now that you understand contracts, the next guide page covers **Pipelines**. They combine a source
+contract, a transform, and a target contract into a complete boundary enforcement workflow. This
+lets you validate data at both the *input* and *output* of your data transformations.
+
+
+### Pipeline Boundary Enforcement
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+A **pipeline** in Pointblank represents the enforcement of data quality at both boundaries of a data
+transformation: the input ("source") and the output ("target"). The `Pipeline` class binds a source
+contract and a target contract together, providing a unified way to validate data as it flows
+through your system.
+
+This approach embodies a key principle: **Pointblank enforces boundaries, it doesn't orchestrate the
+transform.** You write the transformation logic; Pointblank guards the edges. This deliberate
+separation of concerns means you can use any DataFrame library, any transformation approach, and any
+orchestration tool you prefer. Pointblank's only job is to verify that data entering your transform
+meets expectations and that data leaving your transform satisfies guarantees you've made to
+downstream consumers.
+
+Think of it like type-checking for data in motion: the source contract is your function's input type
+signature, and the target contract is the return type. The pipeline ties them together.
+
+## Why Boundary Enforcement?
+
+Data pipelines rarely fail in obvious ways. More often, quality degrades silently: an upstream team
+adds a column and reorders the schema, a third-party API starts returning nulls in a field that was
+always populated, or a subtle join bug duplicates rows without raising any exception. These failures
+propagate downstream and compound, making root-cause analysis painful.
+
+Even with a perfectly correct transformation, data quality can degrade if:
+
+- Upstream data changes shape, types, or semantics without notice
+- A transform introduces bugs (null propagation, incorrect joins, off-by-one errors)
+- Schema drift occurs silently over time
+- External data sources degrade in quality between scheduled runs
+
+Boundary enforcement addresses these problems by placing validation checkpoints at the two places
+that matter most: the entry point and the exit point of your transformation. By validating at
+**both** boundaries, you can:
+
+1. **Catch upstream issues early**: before they enter your transform and corrupt derived tables
+2. **Detect transform bugs**: by verifying output against a separate contract defined independently
+3. **Short-circuit expensive processing**: fail fast when source data is invalid, saving compute
+4. **Generate compliance evidence**: produce audit-ready reports showing data quality at each stage
+5. **Assign accountability**: source contracts belong to producers, target contracts to consumers
+
+This dual-boundary model makes it possible to distinguish between "the data I received was bad" and
+"my code introduced a bug". This is a distinction that a single-point validation cannot make.
+
+## Creating a Pipeline
+
+A Pipeline needs at least one contract (source, target, or both). In practice, most pipelines define
+both contracts because that gives you full boundary coverage. However, there are legitimate cases
+for single-boundary pipelines (covered later in this guide).
+
+The example below demonstrates a real-world pattern: a transaction processing pipeline that receives
+raw financial data in one format (amounts in cents, all fields as raw strings) and produces clean,
+normalized output (amounts in decimal dollars, validated types). Notice how the source and target
+contracts encode fundamentally different expectations about the data's shape and values (this is
+intentional). The source contract reflects what your upstream system actually produces, while the
+target contract reflects what downstream consumers need.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define the source contract (what raw data must look like)
+source_contract = pb.Contract(
+    name="raw_transactions",
+    direction="source",
+    schema=pb.Schema(
+        txn_id="String",
+        amount_cents="Int64",
+        currency="String",
+        timestamp="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["txn_id", "amount_cents", "currency"]),
+        pb.Step("col_vals_ge", columns="amount_cents", value=0),
+        pb.Step("col_vals_in_set", columns="currency", set=["USD", "EUR", "GBP", "JPY"]),
+        pb.Step("rows_distinct", columns_subset=["txn_id"]),
+    ],
+    version="1.0.0",
+    owner="ingestion-team",
+)
+
+# Define the target contract (what clean data must look like)
+target_contract = pb.Contract(
+    name="clean_transactions",
+    direction="target",
+    schema=pb.Schema(
+        txn_id="String",
+        currency="String",
+        timestamp="String",
+        amount="Float64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["txn_id", "amount", "currency", "timestamp"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_between", columns="amount", left=0.01, right=100_000.0),
+        pb.Step("rows_distinct", columns_subset=["txn_id"]),
+    ],
+    version="1.0.0",
+    consumers=["analytics-team", "fraud-team"],
+)
+
+# Create the pipeline
+pipeline = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    label="Transaction Processing Pipeline",
+)
+
+print(pipeline)
+```
+
+## Running the Pipeline
+
+The `Pipeline.run()` method executes the full boundary enforcement workflow in a single call. This
+is the primary way to use a pipeline: you hand it your input data and a transform function, and it
+handles the validation orchestration for you. The method follows a strict three-step sequence:
+
+1. Validate source data against the source contract
+2. Execute your transform function (only if source validation passes)
+3. Validate the output against the target contract
+
+This ordering is deliberate. By validating the source *before* running the transform, you avoid
+wasting compute on data that was already invalid. And by validating the target *after* the
+transform, you confirm that your code produced output matching your guarantees.
+
+```{python}
+# Sample raw transaction data
+raw_transactions = pl.DataFrame(
+    {
+        "txn_id": ["TXN-001", "TXN-002", "TXN-003", "TXN-004", "TXN-005"],
+        "amount_cents": [4999, 12500, 750, 89900, 3200],
+        "currency": ["USD", "EUR", "GBP", "USD", "JPY"],
+        "timestamp": [
+            "2024-06-01T10:30:00",
+            "2024-06-01T11:45:00",
+            "2024-06-01T12:00:00",
+            "2024-06-01T14:20:00",
+            "2024-06-01T15:55:00",
+        ],
+    }
+)
+
+# Your transformation logic
+def process_transactions(df: pl.DataFrame) -> pl.DataFrame:
+    """Convert cents to dollars and clean up the data."""
+    return df.with_columns(
+        (pl.col("amount_cents") / 100).alias("amount")
+    ).drop("amount_cents")
+
+# Run the full pipeline
+result = pipeline.run(data=raw_transactions, transform=process_transactions)
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target passed: {result.target_passed}")
+print(f"Overall passed: {result.passed}")
+```
+
+The `result` is a `PipelineResult` object containing:
+
+- `result.source_validation`: the interrogated Validate object for the source check
+- `result.target_validation`: the interrogated Validate object for the target check
+- `result.transform_output`: the data returned by your transform function
+- `result.passed`: `True` only if **both** boundaries pass
+
+The `PipelineResult` is designed to give you full introspection. You can access the raw validation
+objects (which are standard Pointblank `Validate` instances), inspect the transformed data directly,
+or simply check the boolean `passed` property for a quick go/no-go decision. Holding onto the result
+object also gives you the ability to generate reports or log details after the fact.
+
+## Inspecting Results
+
+Because `PipelineResult` holds full `Validate` objects, you have access to Pointblank's rich
+reporting capabilities. Each validation result can render its standard HTML report table, which
+shows exactly which steps passed, which failed, and by how much. This is especially valuable during
+development when you need to understand *why* a boundary check failed, not just *that* it failed.
+
+You can access individual validation results to see the standard Pointblank report:
+
+```{python}
+# View the source boundary validation
+result.source_validation
+```
+
+```{python}
+# View the target boundary validation
+result.target_validation
+```
+
+You can also get a text summary of the full pipeline run. The `get_report()` method produces a
+human-readable summary that includes both the source and target validation results, making it
+suitable for logging or printing in CI/CD output:
+
+```{python}
+print(result.get_report())
+```
+
+## Validating Boundaries Independently
+
+You don't have to use `run()`. You can validate each boundary separately when you need more
+control over the workflow. The `validate_source()` and `validate_target()` methods each return
+a standard `Validate` object (not a `PipelineResult`), giving you direct access to the
+interrogation results.
+
+This pattern is particularly useful when:
+
+- Your transform has side effects (writing to a database, calling an API) that you don't want
+triggered during validation testing
+- You need to inspect or modify intermediate data between the two validation steps
+- You're building a custom orchestration layer that needs finer-grained control
+- You want to run just one boundary check in a unit test
+
+```{python}
+# Validate just the source
+source_result = pipeline.validate_source(raw_transactions)
+print(f"Source all passed: {source_result.all_passed()}")
+```
+
+```{python}
+# Run your transform manually
+clean_data = process_transactions(raw_transactions)
+
+# Then validate the target
+target_result = pipeline.validate_target(clean_data)
+print(f"Target all passed: {target_result.all_passed()}")
+```
+
+This is useful when your transform is complex, has side effects, or when you want to inspect
+intermediate results before proceeding. Notice that these methods return `Validate` objects
+directly, so you call `.all_passed()` on them rather than checking `.passed` as you would on a
+`PipelineResult`.
+
+## Short-Circuiting on Source Failure
+
+By default, `Pipeline.run()` uses **short-circuit** behavior: if the source validation fails, the
+transform is never executed and the target is never validated. This is a safety mechanism that
+prevents invalid data from flowing into your transformation logic, where it could cause unexpected
+exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to
+a production database.
+
+Short-circuiting also saves compute resources. If your transform is expensive (large joins, ML
+inference, API calls), there's no reason to run it on data you already know is invalid. The pipeline
+fails fast and reports exactly why.
+
+In the example below, the source data contains a null `txn_id` and a negative `amount_cents`, both
+of which violate the source contract. Because short-circuiting is enabled (the default), the
+transform function is never called and the target validation is skipped entirely:
+
+```{python}
+# Data with problems (null txn_id, negative amount)
+bad_raw_data = pl.DataFrame(
+    {
+        "txn_id": ["TXN-001", None, "TXN-003", "TXN-004", "TXN-005"],
+        "amount_cents": [4999, -100, 750, 89900, 3200],
+        "currency": ["USD", "EUR", "GBP", "USD", "JPY"],
+        "timestamp": [
+            "2024-06-01T10:30:00",
+            "2024-06-01T11:45:00",
+            "2024-06-01T12:00:00",
+            "2024-06-01T14:20:00",
+            "2024-06-01T15:55:00",
+        ],
+    }
+)
+
+# Source contract uses on_violation="warn" (default)
+import warnings
+
+with warnings.catch_warnings(record=True):
+    warnings.simplefilter("always")
+    result = pipeline.run(data=bad_raw_data, transform=process_transactions)
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target validation: {result.target_validation}")  # None, was skipped
+print(f"Transform output: {result.transform_output}")  # None, was skipped
+```
+
+To disable short-circuiting and always run both validations, set `short_circuit=False`. This is
+useful when you want to collect validation reports from *both* boundaries regardless of whether the
+source passed (for example, during development when you want to see the full picture of all data
+quality issues at once):
+
+```{python}
+pipeline_no_shortcircuit = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    short_circuit=False,
+)
+
+with warnings.catch_warnings(record=True):
+    warnings.simplefilter("always")
+    result = pipeline_no_shortcircuit.run(
+        data=bad_raw_data, transform=process_transactions
+    )
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target validated: {result.target_validation is not None}")
+```
+
+## Violation Handling
+
+When a contract's validation fails, the pipeline needs to *do something* about it. The
+`on_violation` parameter on each `Contract` controls this behavior. There are three modes, each
+suited to different stages of your development and deployment lifecycle:
+
+- **`"warn"`** (default): Issues a Python `UserWarning`. The pipeline continues, and the failure
+is recorded in the result. Ideal for development and monitoring.
+- **`"raise"`**: Raises a `RuntimeError` immediately. The pipeline halts. Ideal for production
+gates where invalid data must never proceed.
+- **`"log"`**: Writes a warning-level message to the `pointblank.contract` logger. The pipeline
+continues silently. Ideal for background monitoring and observability integrations.
+
+Each contract in a pipeline can use a different violation mode. For example, you might use `"warn"`
+on the source contract (so you can still inspect the data) and `"raise"` on the target contract (to
+guarantee output quality).
+
+### Warning Mode (Default)
+
+The warning mode is non-blocking: your pipeline completes, but Python's warning system records that
+a violation occurred. You can capture these warnings programmatically using the standard `warnings`
+module:
+
+```{python}
+warn_contract = pb.Contract(
+    name="soft_check",
+    steps=[pb.Step("col_vals_not_null", columns=["txn_id"])],
+    on_violation="warn",  # Issues a UserWarning
+)
+
+pipeline = pb.Pipeline(source=warn_contract)
+
+with warnings.catch_warnings(record=True) as w:
+    warnings.simplefilter("always")
+    pipeline.validate_source(bad_raw_data)
+    if w:
+        print(f"Warning raised: {w[0].message}")
+```
+
+### Raise Mode
+
+Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest
+mode and the right choice for production pipelines where bad data must never reach downstream
+systems. When a validation fails with this mode, a `RuntimeError` is raised with a message
+identifying which contract failed, giving you a clear stack trace for debugging:
+
+```python
+strict_contract = pb.Contract(
+    name="strict_check",
+    steps=[pb.Step("col_vals_not_null", columns=["txn_id"])],
+    on_violation="raise",  # Raises RuntimeError
+)
+
+pipeline = pb.Pipeline(source=strict_contract)
+
+# This will raise RuntimeError:
+# pipeline.validate_source(bad_raw_data)
+```
+
+### Log Mode
+
+Use `on_violation="log"` for background monitoring without interrupting the pipeline. This mode
+integrates with Python's standard `logging` module, writing violation messages to the
+`pointblank.contract` logger at the WARNING level. This is ideal for production systems with
+structured logging and alerting infrastructure where you want visibility into data quality without
+blocking data flow:
+
+```python
+import logging
+logging.basicConfig(level=logging.WARNING)
+
+log_contract = pb.Contract(
+    name="monitored_check",
+    steps=[pb.Step("col_vals_not_null", columns=["txn_id"])],
+    on_violation="log",  # Logs via pointblank.contract logger
+)
+```
+
+## Pipeline-Level Thresholds
+
+You can set thresholds at the pipeline level to override contract-level thresholds. This is a
+powerful mechanism for reusing the same contracts across different environments with different
+tolerance levels. A contract defines *what* to check; the pipeline's thresholds define *how strict*
+those checks should be in a given context.
+
+For example, during development you might tolerate up to 10% of rows failing a given check (so you
+can work with imperfect sample data), while in production you might require less than 1% failure.
+Rather than maintaining separate contracts for each environment, you define the contracts once and
+let the pipeline's thresholds control the sensitivity:
+
+```{python}
+# Relaxed thresholds for development
+dev_pipeline = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.50),
+    label="Development Pipeline",
+)
+
+# Strict thresholds for production
+prod_pipeline = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+    label="Production Pipeline",
+)
+```
+
+## Source-Only and Target-Only Pipelines
+
+You don't always need both boundaries. In many real-world systems, you'll encounter situations where
+only one boundary is relevant. The `Pipeline` class supports this naturally: simply omit the
+contract you don't need, and the pipeline will only validate the boundary you've defined.
+
+Common patterns:
+
+### Source-Only (Ingestion Guard)
+
+Validate incoming data without a specific output contract. This pattern is common at the edges of
+your system where you receive data from external sources (APIs, file uploads, partner feeds) and
+want to reject or flag invalid input before it enters your data lake or warehouse:
+
+```{python}
+ingestion_pipeline = pb.Pipeline(source=source_contract)
+
+result = ingestion_pipeline.run(
+    data=raw_transactions,
+    transform=lambda df: df,  # Pass-through
+)
+print(f"Ingestion valid: {result.passed}")
+```
+
+### Target-Only (Output Guard)
+
+Validate data before it leaves your system. This pattern is useful for data exports, API responses,
+or any point where you're publishing data to external consumers. You've already transformed the data
+and simply want to confirm it meets the contract you've promised:
+
+```{python}
+export_pipeline = pb.Pipeline(target=target_contract)
+
+clean_data = process_transactions(raw_transactions)
+result = export_pipeline.run(
+    data=clean_data,
+    transform=lambda df: df,  # Already transformed
+)
+print(f"Export valid: {result.passed}")
+```
+
+## Detecting Transform Bugs
+
+One of the most powerful applications of boundary enforcement is catching bugs in your
+transformation logic. When you validate at both boundaries, you can distinguish between "the input
+data was bad" (source failure) and "my code introduced a problem" (source passes, target fails).
+This distinction is invaluable during debugging and code review.
+
+Here's an example where a buggy transform introduces data quality issues. The source data is
+perfectly valid, but the transformation logic has a conditional branch that inadvertently nulls out
+small transaction amounts. Without boundary enforcement, this bug might go undetected until a
+downstream consumer reports missing data (potentially days or weeks later):
+
+```{python}
+def buggy_transform(df: pl.DataFrame) -> pl.DataFrame:
+    """A transform with a bug (introduces nulls for certain records)."""
+    return df.with_columns(
+        pl.when(pl.col("amount_cents") < 1000)
+        .then(None)  # Bug! Small amounts become null
+        .otherwise(pl.col("amount_cents") / 100)
+        .alias("amount")
+    ).drop("amount_cents")
+
+# The source data is fine...
+result_source = pipeline.validate_source(raw_transactions)
+print(f"Source passes: {result_source.all_passed()}")
+
+# ...but the buggy transform breaks the target contract
+with warnings.catch_warnings(record=True):
+    warnings.simplefilter("always")
+    result = pipeline.run(data=raw_transactions, transform=buggy_transform)
+
+print(f"\nAfter buggy transform:")
+print(f"  Source passed: {result.source_passed}")
+print(f"  Target passed: {result.target_passed}")
+print(f"  Overall passed: {result.passed}")
+```
+
+```{python}
+# The target validation shows exactly what went wrong
+result.target_validation
+```
+
+The target validation report above pinpoints the failure: the `col_vals_not_null` step on the
+`amount` column fails because the buggy transform introduced nulls. This makes the root cause
+obvious and you can see exactly which contract step failed and trace it back to the transformation
+logic. Without the target contract, this bug would silently produce a table with missing values.
+
+## Working with Pandas
+
+Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface
+is identical: you pass a Pandas DataFrame to `run()` or `validate_source()`, and Pointblank handles
+the rest. This means your contracts are portable across DataFrame backends and you can define a
+contract once and use it to validate both Polars and Pandas data without modification.
+
+Here's the same transaction-processing workflow using Pandas DataFrames:
+
+```{python}
+import pandas as pd
+
+# Pandas DataFrame
+raw_pd = pd.DataFrame(
+    {
+        "txn_id": ["TXN-001", "TXN-002", "TXN-003"],
+        "amount_cents": [4999, 12500, 750],
+        "currency": ["USD", "EUR", "GBP"],
+        "timestamp": ["2024-06-01T10:30:00", "2024-06-01T11:45:00", "2024-06-01T12:00:00"],
+    }
+)
+
+# Pandas transform
+def pandas_transform(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["amount"] = df["amount_cents"] / 100
+    df = df.drop(columns=["amount_cents"])
+    return df
+
+# Same pipeline works with Pandas
+source_only = pb.Pipeline(
+    source=pb.Contract(
+        name="pandas_source",
+        steps=[
+            pb.Step("col_vals_not_null", columns=["txn_id", "amount_cents"]),
+            pb.Step("col_vals_ge", columns="amount_cents", value=0),
+        ],
+    ),
+    target=pb.Contract(
+        name="pandas_target",
+        steps=[
+            pb.Step("col_vals_not_null", columns=["txn_id", "amount"]),
+            pb.Step("col_vals_gt", columns="amount", value=0),
+        ],
+    ),
+)
+
+result = source_only.run(data=raw_pd, transform=pandas_transform)
+print(f"Pandas pipeline passed: {result.passed}")
+```
+
+## Multiple Pipeline Runs
+
+Pipelines are stateless and can be run multiple times with different data. Each call to `run()`
+produces an independent `PipelineResult` with no side effects on the pipeline object itself. This
+makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same
+validation logic applies to many batches of data.
+
+The example below demonstrates running a single pipeline against multiple data batches (a common
+pattern in batch-processing systems where data arrives in chunks):
+
+```{python}
+# Same pipeline, different data batches
+batches = [
+    pl.DataFrame({
+        "txn_id": [f"BATCH1-{i}" for i in range(3)],
+        "amount_cents": [1000, 2000, 3000],
+        "currency": ["USD", "USD", "EUR"],
+        "timestamp": ["2024-06-01T10:00:00"] * 3,
+    }),
+    pl.DataFrame({
+        "txn_id": [f"BATCH2-{i}" for i in range(3)],
+        "amount_cents": [500, 1500, 4500],
+        "currency": ["GBP", "JPY", "USD"],
+        "timestamp": ["2024-06-02T10:00:00"] * 3,
+    }),
+]
+
+for i, batch in enumerate(batches):
+    result = pipeline.run(data=batch, transform=process_transactions)
+    print(f"Batch {i + 1}: {'PASSED' if result.passed else 'FAILED'}")
+```
+
+## What's Next
+
+You now have a solid understanding of how `Pipeline` enforces data quality at both boundaries of
+a transformation. You've seen how to run full pipelines, inspect results, validate boundaries
+independently, handle violations, tune thresholds per environment, and detect transform bugs
+through dual-boundary validation.
+
+The next guide page covers **YAML Contracts**: how to serialize contracts and pipelines to YAML
+files for version control, team collaboration, and configuration-driven validation workflows. YAML
+serialization is especially powerful in production environments where contracts should be managed as
+configuration rather than code, enabling non-developers to review and modify data quality rules.
+
+
+### YAML Contracts & Pipelines
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Contracts and pipelines are designed to be **data, not code**. They serialize cleanly to YAML,
+making them ideal for version control, team collaboration, and configuration-driven workflows. This
+guide covers how to write, load, and use YAML-based contracts and pipelines.
+
+When you define a contract in Python, it lives inside your application code. That's fine for quick
+validation tasks, but in production data platforms you often want the *specification* of what data
+should look like to live separately from the *code* that processes it. YAML contracts give you
+exactly that separation with a human-readable, machine-parseable definition of data expectations
+that anyone on your team can read, review, and modify.
+
+## Why YAML?
+
+YAML contracts offer several advantages over defining contracts purely in Python:
+
+- **Version-controllable**: track contract changes alongside your code in Git, with clear diffs
+  when expectations evolve
+- **Language-agnostic**: contracts can be understood (and even authored) by non-Python team members
+  such as data analysts, product managers, or compliance officers
+- **Separates concerns**: validation rules live apart from transform logic, meaning you can update
+  expectations without touching application code
+- **CI/CD friendly**: load and enforce contracts in automated pipelines and gate deployments on
+  contract compliance
+- **Reviewable**: pull requests that change data contracts are easy to review because the YAML
+  format highlights exactly what changed in a readable way
+
+The YAML approach doesn't replace the Python API but, rather, it complements it. Use YAML for
+stable, well-defined contracts that change infrequently, and Python for exploratory validation or
+complex logic that benefits from programmatic construction.
+
+## Contract YAML Format
+
+Every contract YAML file uses a `contract:` top-level key as its root element. Inside this key you
+define all the metadata, schema, and validation steps that make up your contract. The structure is
+designed to be self-documenting so someone reading the file should immediately understand what data
+this contract governs, who owns it, and what rules are enforced.
+
+Here's a complete example showing all the available fields:
+
+```yaml
+contract:
+  name: customer_records
+  direction: source
+  version: "1.2.0"
+  owner: data-platform-team
+  consumers:
+    - analytics-team
+    - ml-team
+  description: "Raw customer data from the CRM system"
+  on_violation: warn
+
+  schema:
+    customer_id: String
+    email: String
+    name: String
+    signup_date: String
+    plan: String
+
+  steps:
+    - col_vals_not_null:
+        columns:
+          - customer_id
+          - email
+    - col_vals_regex:
+        columns: email
+        pattern: "^[^@]+@[^@]+\\.[^@]+$"
+    - rows_distinct:
+        columns_subset:
+          - customer_id
+    - col_vals_in_set:
+        columns: plan
+        set:
+          - free
+          - pro
+          - enterprise
+
+  thresholds:
+    warning: 0.01
+    error: 0.05
+    critical: 0.10
+```
+
+### Structure Reference
+
+The table below summarizes every key available inside the `contract:` block. Only `name` is
+required and everything else has sensible defaults or can be omitted if not applicable to your use
+case.
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `name` | Yes | Human-readable identifier for this contract |
+| `direction` | No | `"source"` (default) or `"target"`: indicates where in a pipeline this contract applies |
+| `version` | No | Semantic version string (e.g., `"1.2.0"`) for tracking contract evolution over time |
+| `owner` | No | Team or individual responsible for maintaining this contract |
+| `consumers` | No | List of teams or systems that depend on data conforming to this contract |
+| `description` | No | Longer prose describing the contract's purpose and context |
+| `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
+| `schema` | No | Column name → data type mapping; triggers a `col_schema_match()` check |
+| `steps` | No | Ordered list of validation steps to execute |
+| `thresholds` | No | Threshold levels (`warning`, `error`, `critical`) as fractions or absolute counts |
+
+### Step Syntax in YAML
+
+Steps are the heart of a contract. They define the actual validation rules that will be checked
+against your data. In YAML, each step is a list item whose key is the name of a Pointblank
+validation method (like `col_vals_gt` or `rows_distinct`), and whose value is a dictionary of the
+arguments to pass to that method.
+
+This mapping is direct: the YAML step `col_vals_gt: {columns: amount, value: 0}` is exactly
+equivalent to calling `.col_vals_gt(columns="amount", value=0)` in Python. Here are examples
+covering the most common patterns:
+
+```yaml
+steps:
+  # Step with keyword arguments
+  - col_vals_gt:
+      columns: amount
+      value: 0
+
+  # Step with a list of columns
+  - col_vals_not_null:
+      columns:
+        - id
+        - name
+        - email
+
+  # Step with multiple arguments
+  - col_vals_between:
+      columns: age
+      left: 0
+      right: 150
+
+  # Step with a set/list of values
+  - col_vals_in_set:
+      columns: status
+      set:
+        - active
+        - inactive
+        - suspended
+
+  # Step with no arguments
+  - rows_complete: {}
+```
+
+## Writing and Loading Contracts
+
+Pointblank supports a complete round-trip workflow: define contracts in Python, save them to YAML
+for version control and sharing, then load them back in any environment. This section walks through
+each step of that workflow.
+
+### Saving to YAML
+
+The `.to_yaml()` method serializes a `Contract` object to a YAML string. You can optionally pass a
+file path to write directly to disk. The resulting YAML is clean, readable, and contains all the
+information needed to reconstruct the contract exactly.
+
+```{python}
+import pointblank as pb
+from pathlib import Path
+
+# Create a contract in Python
+contract = pb.Contract(
+    name="product_catalog",
+    direction="source",
+    version="1.0.0",
+    owner="catalog-team",
+    schema=pb.Schema(
+        product_id="String",
+        name="String",
+        price="Float64",
+        category="String",
+        in_stock="Boolean",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["product_id", "name", "price"]),
+        pb.Step("col_vals_gt", columns="price", value=0),
+        pb.Step("col_vals_in_set", columns="category", set=["electronics", "clothing", "food", "home"]),
+        pb.Step("rows_distinct", columns_subset=["product_id"]),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05),
+)
+
+# Save to YAML
+yaml_output = contract.to_yaml("product_contract.yaml")
+print(yaml_output)
+```
+
+### Loading from YAML
+
+The `Contract.from_yaml()` class method reads a YAML file and reconstructs the full `Contract`
+object, including schema, steps, thresholds, and all metadata. The loaded contract is identical in
+behavior to one created directly in Python (there's no functional difference).
+
+```{python}
+# Load the contract back
+loaded_contract = pb.Contract.from_yaml("product_contract.yaml")
+print(loaded_contract)
+print(f"Steps: {len(loaded_contract.steps)}")
+print(f"Version: {loaded_contract.version}")
+```
+
+### Validating with a Loaded Contract
+
+Once loaded, a contract works exactly like one defined in Python. Call `.validate(data)` to compile
+it into a `Validate` object, execute all checks, and get the standard Pointblank validation report.
+This is the core value proposition of YAML contracts: define once, validate anywhere.
+
+```{python}
+import polars as pl
+
+products = pl.DataFrame(
+    {
+        "product_id": ["P001", "P002", "P003", "P004", "P005"],
+        "name": ["Laptop", "T-Shirt", "Coffee Beans", "Desk Lamp", "Headphones"],
+        "price": [999.99, 29.99, 12.50, 45.00, 79.99],
+        "category": ["electronics", "clothing", "food", "home", "electronics"],
+        "in_stock": [True, True, False, True, True],
+    }
+)
+
+loaded_contract.validate(products)
+```
+
+## Pipeline YAML Format
+
+While individual contracts validate data at a single point, **pipelines** enforce quality at both
+the input and output boundaries of a transformation. A pipeline YAML file packages the source
+contract, target contract, and pipeline-level settings (like global thresholds and short-circuit
+behavior) into a single, self-contained document.
+
+This is especially powerful for team workflows: a data engineer defines the pipeline specification
+in YAML, commits it to version control, and any downstream system can load and execute it without
+knowing anything about the implementation details.
+
+Let's build a pipeline in Python and export it to see what the YAML looks like:
+
+```{python}
+# Create a pipeline and export to YAML
+source = pb.Contract(
+    name="raw_events",
+    direction="source",
+    version="1.0.0",
+    schema=pb.Schema(
+        event_id="String",
+        user_id="String",
+        event_type="String",
+        value_cents="Int64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["event_id", "user_id", "event_type"]),
+        pb.Step("col_vals_ge", columns="value_cents", value=0),
+        pb.Step("col_vals_in_set", columns="event_type", set=["click", "purchase", "view", "signup"]),
+        pb.Step("rows_distinct", columns_subset=["event_id"]),
+    ],
+)
+
+target = pb.Contract(
+    name="enriched_events",
+    direction="target",
+    version="1.0.0",
+    schema=pb.Schema(
+        event_id="String",
+        user_id="String",
+        event_type="String",
+        value="Float64",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["event_id", "user_id", "event_type", "value"]),
+        pb.Step("col_vals_gt", columns="value", value=0),
+        pb.Step("rows_distinct", columns_subset=["event_id"]),
+    ],
+)
+
+pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    label="Event Processing Pipeline",
+    thresholds=pb.Thresholds(warning=0.02, error=0.10),
+)
+
+pipeline_yaml = pipeline.to_yaml("event_pipeline.yaml")
+print(pipeline_yaml)
+```
+
+### Pipeline YAML Structure
+
+The generated YAML has three top-level sections that correspond to the three components of boundary
+enforcement: the `pipeline:` section for global settings, the `source:` section for the inbound
+contract, and the `target:` section for the outbound contract. Each section can be understood
+independently, which makes reviewing changes straightforward.
+
+Here's the annotated structure:
+
+```yaml
+# Pipeline metadata and global settings
+pipeline:
+  label: "Event Processing Pipeline"
+  thresholds:
+    warning: 0.02
+    error: 0.10
+  # short_circuit: true   (default, omitted when true)
+
+# Source contract (inbound boundary)
+source:
+  name: raw_events
+  version: "1.0.0"
+  schema:
+    event_id: String
+    user_id: String
+    event_type: String
+    value_cents: Int64
+  steps:
+    - col_vals_not_null:
+        columns: [event_id, user_id, event_type]
+    - col_vals_ge:
+        columns: value_cents
+        value: 0
+
+# Target contract (outbound boundary)
+target:
+  name: enriched_events
+  version: "1.0.0"
+  schema:
+    event_id: String
+    user_id: String
+    event_type: String
+    value: Float64
+  steps:
+    - col_vals_not_null:
+        columns: [event_id, user_id, event_type, value]
+    - col_vals_gt:
+        columns: value
+        value: 0
+```
+
+### Loading and Running a Pipeline from YAML
+
+Loading a pipeline from YAML works the same way as loading a contract: call the `from_yaml()` class
+method with the file path. The returned `Pipeline` object is fully functional and ready to validate
+data or run a complete boundary enforcement workflow.
+
+```{python}
+# Load the pipeline from YAML
+loaded_pipeline = pb.Pipeline.from_yaml("event_pipeline.yaml")
+print(loaded_pipeline)
+```
+
+With the pipeline loaded, you provide data and a transform function just as you would with a
+pipeline defined in Python. The YAML only stores the *contract specifications* whereas the transform
+logic always lives in your Python code (since transforms are arbitrary functions that can't be
+meaningfully serialized to YAML).
+
+```{python}
+# Create test data and run the pipeline
+events = pl.DataFrame(
+    {
+        "event_id": ["EVT-001", "EVT-002", "EVT-003", "EVT-004"],
+        "user_id": ["U100", "U200", "U100", "U300"],
+        "event_type": ["purchase", "click", "view", "signup"],
+        "value_cents": [2500, 0, 0, 0],
+    }
+)
+
+def enrich_events(df: pl.DataFrame) -> pl.DataFrame:
+    """Convert cents to dollars, defaulting zero to a minimum value."""
+    return df.with_columns(
+        pl.when(pl.col("value_cents") > 0)
+        .then(pl.col("value_cents") / 100)
+        .otherwise(0.01)  # Minimum trackable value
+        .alias("value")
+    ).drop("value_cents")
+
+result = loaded_pipeline.run(data=events, transform=enrich_events)
+print(f"Pipeline passed: {result.passed}")
+```
+
+```{python}
+result.target_validation
+```
+
+## Practical Patterns
+
+The following patterns illustrate common ways teams use YAML contracts and pipelines in real-world
+data platforms. These aren't exhaustive: they're starting points that you can adapt to your own
+workflow.
+
+### Pattern 1: Environment-Specific Pipelines
+
+A common need is to apply different tolerance levels in different environments. In development, you
+might accept 20% failure rates while iterating on a transform. In production, anything above 1% is
+a critical issue. YAML contracts make this easy: store the same validation logic in a shared
+contract, but load different pipeline configurations that set environment-appropriate thresholds.
+
+```{python}
+# Same contracts, different thresholds
+dev_pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    thresholds=pb.Thresholds(warning=0.20, error=0.50),  # Lenient for dev
+    label="DEV: Event Pipeline",
+)
+
+prod_pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),  # Strict
+    label="PROD: Event Pipeline",
+)
+
+# In practice, you'd select based on an env var:
+# import os
+# pipeline = pb.Pipeline.from_yaml(f"contracts/{os.environ['ENV']}_pipeline.yaml")
+```
+
+### Pattern 2: Contract Library
+
+As your data platform grows, you'll accumulate many contracts. A recommended practice is to organize
+them into a directory structure that mirrors your data architecture. This creates a discoverable,
+browsable "library" of data quality expectations that serves as living documentation of your
+system's data contracts.
+
+Here's a typical layout:
+
+```
+contracts/
+├── sources/
+│   ├── raw_events.yaml
+│   ├── raw_transactions.yaml
+│   └── raw_customers.yaml
+├── targets/
+│   ├── clean_events.yaml
+│   ├── clean_transactions.yaml
+│   └── clean_customers.yaml
+└── pipelines/
+    ├── event_pipeline.yaml
+    └── transaction_pipeline.yaml
+```
+
+```python
+# Load any contract from the library
+events_source = pb.Contract.from_yaml("contracts/sources/raw_events.yaml")
+events_target = pb.Contract.from_yaml("contracts/targets/clean_events.yaml")
+
+# Build pipeline dynamically
+pipeline = pb.Pipeline(source=events_source, target=events_target)
+```
+
+### Pattern 3: CI/CD Integration
+
+YAML contracts integrate naturally into CI/CD pipelines. Because contracts are plain files, you can
+load them in test suites, gate deployments on contract compliance, and fail builds when data quality
+regresses. This turns data quality from a manual spot-check into an automated, enforceable
+standard.
+
+Here's what a pytest-based contract test might look like:
+
+```python
+# In your test suite or CI script:
+import pointblank as pb
+
+def test_pipeline_contract():
+    pipeline = pb.Pipeline.from_yaml("contracts/pipelines/event_pipeline.yaml")
+    test_data = load_test_fixture("events_sample.parquet")
+
+    result = pipeline.run(data=test_data, transform=my_transform)
+    assert result.passed, result.get_report()
+```
+
+### Pattern 4: Composing Steps from Multiple Sources
+
+Sometimes you want to define a set of "base" validation rules that apply to all tables (like "every
+table must have a non-null `id` column that's unique"), and then layer on table-specific rules.
+YAML makes this easy because you can parse step definitions from YAML fragments and combine them
+programmatically.
+
+This pattern is especially useful when you have organization-wide data quality standards that every
+contract should inherit.
+
+```{python}
+# Base steps that apply to all tables
+base_steps_yaml = """
+- col_vals_not_null:
+    columns: [id]
+- rows_distinct:
+    columns_subset: [id]
+"""
+
+import yaml
+base_steps = [pb.Step.from_dict(s) for s in yaml.safe_load(base_steps_yaml)]
+
+# Compose with table-specific steps
+full_contract = pb.Contract(
+    name="composed_contract",
+    steps=base_steps + [
+        pb.Step("col_vals_gt", columns="score", value=0),
+        pb.Step("col_vals_le", columns="score", value=100),
+    ],
+)
+
+print(f"Total steps: {len(full_contract.steps)}")
+for step in full_contract.steps:
+    print(f"  - {step}")
+```
+
+## Round-Trip Fidelity
+
+A critical property of Pointblank's YAML serialization is **round-trip fidelity**: when you save a
+contract to YAML and load it back, you get an identical object. No information is lost, no defaults
+are silently changed, and no steps are reordered. This guarantee means you can confidently use YAML
+as your source of truth without worrying about subtle differences between the YAML representation
+and the in-memory object.
+
+Let's verify this with a fully-specified contract:
+
+```{python}
+# Original contract
+original = pb.Contract(
+    name="fidelity_test",
+    direction="target",
+    version="3.0.0",
+    owner="qa-team",
+    consumers=["reporting", "dashboards"],
+    on_violation="raise",
+    schema=pb.Schema(x="Int64", y="Float64", z="String"),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["x", "y", "z"]),
+        pb.Step("col_vals_between", columns="y", left=-1.0, right=1.0),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+)
+
+# Round-trip through YAML
+original.to_yaml("fidelity_test.yaml")
+restored = pb.Contract.from_yaml("fidelity_test.yaml")
+
+# Verify fidelity
+print(f"Name matches: {original.name == restored.name}")
+print(f"Direction matches: {original.direction == restored.direction}")
+print(f"Version matches: {original.version == restored.version}")
+print(f"Owner matches: {original.owner == restored.owner}")
+print(f"Steps match: {original.steps == restored.steps}")
+print(f"Thresholds match: {original.thresholds.warning == restored.thresholds.warning}")
+```
+
+## Cleanup
+
+The examples in this guide created several YAML files on disk to demonstrate the serialization
+workflow. The following hidden cell removes them so they don't clutter your working directory. In
+your own projects, these files would live in version control and persist across sessions. You'd
+never need to clean them up like this.
+
+```{python}
+#| echo: false
+import os
+for f in ["product_contract.yaml", "event_pipeline.yaml", "fidelity_test.yaml",
+           "basic_validation.yaml"]:
+    if os.path.exists(f):
+        os.remove(f)
+```
+
+## Conclusion
+
+The table below summarizes the key operations and how they map between the Python API and YAML:
+
+| Operation | Python API | YAML |
+|-----------|-----------|------|
+| Define contract | `pb.Contract(...)` | `contract:` block |
+| Define pipeline | `pb.Pipeline(...)` | `pipeline:` + `source:` + `target:` |
+| Save | `.to_yaml("path.yaml")` | --- |
+| Load contract | `pb.Contract.from_yaml("path.yaml")` | --- |
+| Load pipeline | `pb.Pipeline.from_yaml("path.yaml")` | --- |
+| Validate | `.validate(data)` | Load → validate in Python |
+| Run pipeline | `.run(data, transform)` | Load → run in Python |
+
+YAML contracts and pipelines give you the best of both worlds: declarative, reviewable
+specifications that integrate seamlessly with Pointblank's Python execution engine. The separation
+of *what* (YAML contracts) from *how* (Python transforms) creates a clean architecture where data
+quality expectations can evolve independently from processing logic: reviewed by different people,
+on different timelines, with clear accountability at each boundary.
 

@@ -119,9 +119,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2">--</td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #F2F2F2">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(active_check)</span> Step skipped -- Row count check failed: table is empty.</p></td>
 </tr>
@@ -187,9 +188,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2">--</td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #F2F2F2">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(active_check)</span> Step skipped -- Row count check failed: expected at least <code>100</code> row(s), found <code>3</code>.</p></td>
 </tr>
@@ -303,9 +305,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2">--</td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #F2F2F2">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(active_check)</span> Step skipped -- Row count check failed: expected exactly <code>100</code> row(s), found <code>3</code>.</p></td>
 </tr>

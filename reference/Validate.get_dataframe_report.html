@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-96b938f4df28e178fdc9f17501a8d28b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-3bf6dc44f1d1c4f1986ae0ab89442a35.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="438" data-forks="27"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -1134,7 +1134,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Create a validation, interrogate, and get the results as a Polars DataFrame:</p>
-<div id="1f7a6e95" class="cell" data-execution_count="1">
+<div id="4003fdea" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1156,173 +1156,84 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (2, 18)</small>
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">active</th>
-<th data-quarto-table-cell-role="th">step_number</th>
-<th data-quarto-table-cell-role="th">step_description</th>
-<th data-quarto-table-cell-role="th">columns</th>
-<th data-quarto-table-cell-role="th">values</th>
-<th data-quarto-table-cell-role="th">step_evaluated</th>
-<th data-quarto-table-cell-role="th">units</th>
-<th data-quarto-table-cell-role="th">all_units_passed</th>
-<th data-quarto-table-cell-role="th">pass_n</th>
-<th data-quarto-table-cell-role="th">pass_pct</th>
-<th data-quarto-table-cell-role="th">failed_n</th>
-<th data-quarto-table-cell-role="th">failed_pct</th>
-<th data-quarto-table-cell-role="th">warning</th>
-<th data-quarto-table-cell-role="th">error</th>
-<th data-quarto-table-cell-role="th">critical</th>
-<th data-quarto-table-cell-role="th">brief</th>
-<th data-quarto-table-cell-role="th">preprocessed</th>
-<th data-quarto-table-cell-role="th">segmented</th>
-</tr>
-<tr class="even">
-<td>bool</td>
-<td>i64</td>
-<td>str</td>
-<td>str</td>
-<td>object</td>
-<td>bool</td>
-<td>i64</td>
-<td>bool</td>
-<td>i64</td>
-<td>f64</td>
-<td>i64</td>
-<td>f64</td>
-<td>bool</td>
-<td>bool</td>
-<td>bool</td>
-<td>str</td>
-<td>bool</td>
-<td>bool</td>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>true</td>
-<td>1</td>
-<td>"col_vals_gt"</td>
-<td>"d"</td>
-<td>100</td>
-<td>null</td>
-<td>13</td>
-<td>true</td>
-<td>13</td>
-<td>1.0</td>
-<td>0</td>
-<td>0.0</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>"Expect that values in `d` shou…</td>
-<td>false</td>
-<td>false</td>
-</tr>
-<tr class="even">
-<td>true</td>
-<td>2</td>
-<td>"col_vals_regex"</td>
-<td>"b"</td>
-<td>[0-9]-[a-z]{3}-[0-9]{3}</td>
-<td>null</td>
-<td>13</td>
-<td>true</td>
-<td>13</td>
-<td>1.0</td>
-<td>0</td>
-<td>0.0</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>"Expect that values in `b` shou…</td>
-<td>false</td>
-<td>false</td>
-</tr>
-</tbody>
-</table>
-</div>
+<small>shape: (2, 18)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>active</th><th>step_number</th><th>step_description</th><th>columns</th><th>values</th><th>step_evaluated</th><th>units</th><th>all_units_passed</th><th>pass_n</th><th>pass_pct</th><th>failed_n</th><th>failed_pct</th><th>warning</th><th>error</th><th>critical</th><th>brief</th><th>preprocessed</th><th>segmented</th></tr><tr><td>bool</td><td>i64</td><td>str</td><td>str</td><td>object</td><td>bool</td><td>i64</td><td>bool</td><td>i64</td><td>f64</td><td>i64</td><td>f64</td><td>bool</td><td>bool</td><td>bool</td><td>str</td><td>bool</td><td>bool</td></tr></thead><tbody><tr><td>true</td><td>1</td><td>"col_vals_gt"</td><td>"d"</td><td>100</td><td>null</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `d` shou…</td><td>false</td><td>false</td></tr><tr><td>true</td><td>2</td><td>"col_vals_regex"</td><td>"b"</td><td>[0-9]-[a-z]{3}-[0-9]{3}</td><td>null</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `b` shou…</td><td>false</td><td>false</td></tr></tbody></table></div>
 </div>
 </div>
 <p>Get the results as a Pandas DataFrame instead:</p>
-<div id="964d3400" class="cell" data-execution_count="2">
+<div id="1be1b111" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_dataframe_report(tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">active</th>
-<th data-quarto-table-cell-role="th">step_number</th>
-<th data-quarto-table-cell-role="th">step_description</th>
-<th data-quarto-table-cell-role="th">columns</th>
-<th data-quarto-table-cell-role="th">values</th>
-<th data-quarto-table-cell-role="th">step_evaluated</th>
-<th data-quarto-table-cell-role="th">units</th>
-<th data-quarto-table-cell-role="th">all_units_passed</th>
-<th data-quarto-table-cell-role="th">pass_n</th>
-<th data-quarto-table-cell-role="th">pass_pct</th>
-<th data-quarto-table-cell-role="th">failed_n</th>
-<th data-quarto-table-cell-role="th">failed_pct</th>
-<th data-quarto-table-cell-role="th">warning</th>
-<th data-quarto-table-cell-role="th">error</th>
-<th data-quarto-table-cell-role="th">critical</th>
-<th data-quarto-table-cell-role="th">brief</th>
-<th data-quarto-table-cell-role="th">preprocessed</th>
-<th data-quarto-table-cell-role="th">segmented</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">0</th>
-<td>True</td>
-<td>1</td>
-<td>col_vals_gt</td>
-<td>d</td>
-<td>100</td>
-<td>None</td>
-<td>13</td>
-<td>True</td>
-<td>13</td>
-<td>1.0</td>
-<td>0</td>
-<td>0.0</td>
-<td>None</td>
-<td>None</td>
-<td>None</td>
-<td>Expect that values in `d` should be &gt; `100`.</td>
-<td>False</td>
-<td>False</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">1</th>
-<td>True</td>
-<td>2</td>
-<td>col_vals_regex</td>
-<td>b</td>
-<td>[0-9]-[a-z]{3}-[0-9]{3}</td>
-<td>None</td>
-<td>13</td>
-<td>True</td>
-<td>13</td>
-<td>1.0</td>
-<td>0</td>
-<td>0.0</td>
-<td>None</td>
-<td>None</td>
-<td>None</td>
-<td>Expect that values in `b` should match the reg...</td>
-<td>False</td>
-<td>False</td>
-</tr>
-</tbody>
+<table class="dataframe table table-sm table-striped small">
+  <thead>
+    <tr>
+      <th></th>
+      <th>active</th>
+      <th>step_number</th>
+      <th>step_description</th>
+      <th>columns</th>
+      <th>values</th>
+      <th>step_evaluated</th>
+      <th>units</th>
+      <th>all_units_passed</th>
+      <th>pass_n</th>
+      <th>pass_pct</th>
+      <th>failed_n</th>
+      <th>failed_pct</th>
+      <th>warning</th>
+      <th>error</th>
+      <th>critical</th>
+      <th>brief</th>
+      <th>preprocessed</th>
+      <th>segmented</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>True</td>
+      <td>1</td>
+      <td>col_vals_gt</td>
+      <td>d</td>
+      <td>100</td>
+      <td>None</td>
+      <td>13</td>
+      <td>True</td>
+      <td>13</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>Expect that values in `d` should be &gt; `100`.</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>True</td>
+      <td>2</td>
+      <td>col_vals_regex</td>
+      <td>b</td>
+      <td>[0-9]-[a-z]{3}-[0-9]{3}</td>
+      <td>None</td>
+      <td>13</td>
+      <td>True</td>
+      <td>13</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>Expect that values in `b` should match the reg...</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
 </table>
-
 </div>
 </div>
 </div>

@@ -55,14 +55,16 @@ col_schema_match()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3">--</td>
 <td class="gt_row gt_center" style="height: 40px">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;">
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-06 21:47:08 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-06 21:47:08 UTC</span>
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-12 16:52:56 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-12 16:52:56 UTC</span>
 </div></td>
 </tr>
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(schema_check)</span> <span style="color:#FF3300;">✗</span> Schema validation <strong>failed</strong>: 1 unmatched column(s), 2 dtype mismatch(es).</p>
 Schema Comparison
@@ -166,16 +168,18 @@ Schema Comparison
 <td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">str</td>
 <td class="gt_row gt_left"><span style="color: #CF142B;">✗</span></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote">
+
 Supplied Column Schema:
 
 <code style="color: #303030; font-family: monospace; font-size: 8px;">[('date_time', 'timestamp'), ('dates', 'date'), ('a', 'int64'), ('b',), ('c',), ('d', 'float64'), ('e', ['bool', 'boolean']), ('f', 'str')]</code>
 </div></td>
 </tr>
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote"> 
+
 Schema Match Settings
 
 COMPLETE
@@ -318,9 +322,10 @@ float ≠ float64
 <td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">str</td>
 <td class="gt_row gt_left"><span style="color: #CF142B;">✗</span></td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="8" class="gt_sourcenote"><div style="padding-bottom: 2px;">
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="8" class="gt_sourcenote">
+
 Supplied Column Schema:
 
 <code style="color: #303030; font-family: monospace; font-size: 8px;">[('date_time', 'timestamp'), ('dates', 'date'), ('a', 'int64'), ('b',), ('c',), ('d', 'float64'), ('e', ['bool', 'boolean']), ('f', 'str')]</code>

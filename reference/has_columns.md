@@ -128,9 +128,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2">--</td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #F2F2F2">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(active_check)</span> Step skipped -- Column check failed: missing column(s) <code>z</code>.</p></td>
 </tr>
@@ -220,9 +221,10 @@ col_vals_gt()
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2">--</td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #F2F2F2">--</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes">
-<tr>
-<td colspan="14" class="gt_sourcenote" style="text-align: left;"><hr />
+</tbody><tfoot>
+<tr class="gt_sourcenotes">
+<td colspan="14" class="gt_sourcenote" style="text-align: left;">
+<hr />
 <strong>Notes</strong>
 <p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(active_check)</span> Step skipped -- Column check failed: missing column(s) <code>x</code>, <code>y</code>.</p></td>
 </tr>
