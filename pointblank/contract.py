@@ -508,3 +508,15 @@ def _dict_to_schema(data: dict[str, Any]) -> Schema:
     return Schema(**{col_name: dtype for col_name, dtype in data.items() if dtype is not None})
 
 
+def _thresholds_to_dict(thresholds: Thresholds) -> dict[str, Any]:
+    """Convert a Thresholds object to a dictionary."""
+    result = {}
+    if thresholds.warning is not None:
+        result["warning"] = thresholds.warning
+    if thresholds.error is not None:
+        result["error"] = thresholds.error
+    if thresholds.critical is not None:
+        result["critical"] = thresholds.critical
+    return result
+
+
