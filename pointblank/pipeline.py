@@ -526,3 +526,43 @@ class Pipeline:
 
         return cls.from_dict(data)
 
+    def to_yaml(self, path: str | None = None) -> str:
+        """Serialize this Pipeline to YAML.
+
+        Parameters
+        ----------
+        path
+            Optional file path. If provided, the YAML is written to this file.
+            If None, the YAML string is returned.
+
+        Returns
+        -------
+        str
+            The YAML representation of this pipeline.
+        """
+        import yaml
+
+        data = self.to_dict()
+        yaml_str = yaml.dump(data, default_flow_style=False, sort_keys=False)
+
+        if path is not None:
+            from pathlib import Path
+
+            yaml_path = Path(path)
+            yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(yaml_path, "w") as f:
+                f.write(yaml_str)
+
+        return yaml_str
+
+    def __repr__(self) -> str:
+        parts = ["Pipeline("]
+        if self.label:
+            parts.append(f"  label={self.label!r},")
+        if self.source:
+            parts.append(f"  source={self.source.name!r},")
+        if self.target:
+            parts.append(f"  target={self.target.name!r},")
+        parts.append(f"  short_circuit={self.short_circuit}")
+        parts.append(")")
+        return "\n".join(parts)
