@@ -415,3 +415,34 @@ class Pipeline:
                 f"validation has failing steps."
             )
 
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the Pipeline to a dictionary for YAML/JSON export.
+
+        Returns
+        -------
+        dict
+            A dictionary representation of this pipeline.
+        """
+        from pointblank.contract import _thresholds_to_dict
+
+        result: dict[str, Any] = {}
+
+        if self.label is not None:
+            result["label"] = self.label
+
+        if self.thresholds is not None:
+            result["thresholds"] = _thresholds_to_dict(self.thresholds)
+
+        if self.short_circuit is not True:
+            result["short_circuit"] = self.short_circuit
+
+        pipeline_dict: dict[str, Any] = {"pipeline": result}
+
+        if self.source is not None:
+            pipeline_dict["source"] = self.source.to_dict()
+
+        if self.target is not None:
+            pipeline_dict["target"] = self.target.to_dict()
+
+        return pipeline_dict
+
