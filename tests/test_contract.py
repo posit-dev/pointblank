@@ -586,3 +586,42 @@ class TestContractRepr:
         assert "schema=<defined>" in r
 
 
+# ─── Helper Function Tests ───────────────────────────────────────────────────────
+
+
+class TestHelperFunctions:
+    """Tests for _schema_to_dict, _dict_to_schema, etc."""
+
+    def test_schema_to_dict(self):
+        schema = pb.Schema(id="Int64", name="String")
+        d = _schema_to_dict(schema)
+        assert d == {"id": "Int64", "name": "String"}
+
+    def test_dict_to_schema(self):
+        d = {"id": "Int64", "name": "String", "amount": "Float64"}
+        schema = _dict_to_schema(d)
+        assert schema is not None
+        # Verify the schema has the right columns
+        col_names = [col_name for col_name, _ in schema.columns]
+        assert "id" in col_names
+        assert "name" in col_names
+        assert "amount" in col_names
+
+    def test_thresholds_to_dict(self):
+        thresholds = pb.Thresholds(warning=0.01, error=0.05, critical=0.10)
+        d = _thresholds_to_dict(thresholds)
+        assert d == {"warning": 0.01, "error": 0.05, "critical": 0.10}
+
+    def test_thresholds_to_dict_partial(self):
+        thresholds = pb.Thresholds(warning=0.01)
+        d = _thresholds_to_dict(thresholds)
+        assert d == {"warning": 0.01}
+
+    def test_dict_to_thresholds(self):
+        d = {"warning": 0.01, "error": 0.05}
+        thresholds = _dict_to_thresholds(d)
+        assert thresholds.warning == 0.01
+        assert thresholds.error == 0.05
+        assert thresholds.critical is None
+
+
