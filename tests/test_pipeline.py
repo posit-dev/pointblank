@@ -308,3 +308,142 @@ class TestPipelineValidateTarget:
             pipeline.validate_target(bad_data)
 
 
+# ─── Pipeline.run() Tests ────────────────────────────────────────────────────────
+
+
+class TestPipelineRun:
+    """Tests for Pipeline.run()."""
+
+    def test_run_all_pass(self, raw_data, basic_pipeline, transform_fn):
+        result = basic_pipeline.run(data=raw_data, transform=transform_fn)
+        assert result.source_passed is True
+        assert result.target_passed is True
+        assert result.passed is True
+        assert result.transform_output is not None
+        assert result.source_validation is not None
+        assert result.target_validation is not None
+
+    def test_run_source_fails_short_circuit(self, raw_data_with_issues, target_contract):
+        """When source fails and short_circuit=True, transform and target are skipped."""
+        source = Contract(
+            name="strict_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id", "amount_cents"])],
+            on_violation="warn",  # Don't raise, just warn
+        )
+        pipeline = Pipeline(source=source, target=target_contract, short_circuit=True)
+
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            result = pipeline.run(
+                data=raw_data_with_issues,
+                transform=lambda df: df,  # Shouldn't be called
+            )
+
+        assert result.source_passed is False
+        assert result.target_validation is None  # Skipped
+        assert result.transform_output is None  # Skipped
+        assert result.passed is False
+
+    def test_run_source_fails_no_short_circuit(self, raw_data_with_issues):
+        """When short_circuit=False, target is still validated even if source fails."""
+        source = Contract(
+            name="lenient_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="warn",
+        )
+        target = Contract(
+            name="lenient_target",
+            direction="target",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="warn",
+        )
+        pipeline = Pipeline(source=source, target=target, short_circuit=False)
+
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            result = pipeline.run(
+                data=raw_data_with_issues,
+                transform=lambda df: df,
+            )
+
+        assert result.source_passed is False
+        assert result.target_validation is not None  # NOT skipped
+        assert result.transform_output is not None
+
+    def test_run_target_fails(self, raw_data, source_contract, transform_fn):
+        """Target fails but source passes."""
+        # Target contract that's impossible to satisfy
+        target = Contract(
+            name="impossible_target",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="amount", value=999999)],
+            on_violation="warn",
+        )
+        pipeline = Pipeline(source=source_contract, target=target)
+
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            result = pipeline.run(data=raw_data, transform=transform_fn)
+
+        assert result.source_passed is True
+        assert result.target_passed is False
+        assert result.passed is False
+        assert result.transform_output is not None
+
+    def test_run_source_only_pipeline(self, raw_data):
+        source = Contract(
+            name="source_only",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+        )
+        pipeline = Pipeline(source=source)
+        result = pipeline.run(data=raw_data, transform=lambda df: df)
+        assert result.source_passed is True
+        assert result.target_validation is None
+        assert result.passed is True
+
+    def test_run_target_only_pipeline(self, raw_data, transform_fn):
+        target = Contract(
+            name="target_only",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="amount", value=0)],
+        )
+        pipeline = Pipeline(target=target)
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+        assert result.source_validation is None
+        assert result.target_passed is True
+        assert result.passed is True
+
+    def test_run_transform_receives_original_data(self, raw_data, source_contract):
+        """Verify the transform gets the original data."""
+        received_data = []
+
+        def capture_transform(df):
+            received_data.append(df)
+            return df
+
+        pipeline = Pipeline(source=source_contract)
+        pipeline.run(data=raw_data, transform=capture_transform)
+
+        assert len(received_data) == 1
+        assert received_data[0].equals(raw_data)
+
+    def test_run_with_on_violation_raise_source(self, raw_data_with_issues, target_contract):
+        """on_violation=raise in source with short_circuit should abort."""
+        source = Contract(
+            name="strict_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=source, target=target_contract, short_circuit=True)
+
+        # When short_circuit=True and on_violation=raise, the pipeline should
+        # catch the error and short circuit
+        result = pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+        assert result.source_passed is False
+        assert result.target_validation is None
+
+
