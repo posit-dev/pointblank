@@ -447,3 +447,35 @@ class TestPipelineRun:
         assert result.target_validation is None
 
 
+# ─── Pipeline Threshold Override Tests ───────────────────────────────────────────
+
+
+class TestPipelineThresholdOverride:
+    """Tests for pipeline-level threshold overriding contract-level thresholds."""
+
+    def test_pipeline_thresholds_override_contract(self, raw_data):
+        contract = Contract(
+            name="with_thresh",
+            direction="source",
+            steps=[Step("col_vals_gt", columns="amount_cents", value=0)],
+            thresholds=pb.Thresholds(warning=0.001),  # Contract threshold
+        )
+        pipeline = Pipeline(
+            source=contract,
+            thresholds=pb.Thresholds(warning=0.5),  # Pipeline overrides
+        )
+        result = pipeline.validate_source(raw_data)
+        assert result.all_passed()
+
+    def test_contract_thresholds_used_when_no_pipeline_override(self, raw_data):
+        contract = Contract(
+            name="with_thresh",
+            direction="source",
+            steps=[Step("col_vals_gt", columns="amount_cents", value=0)],
+            thresholds=pb.Thresholds(warning=0.001),
+        )
+        pipeline = Pipeline(source=contract)  # No pipeline thresholds
+        result = pipeline.validate_source(raw_data)
+        assert result.all_passed()
+
+
