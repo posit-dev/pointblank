@@ -457,3 +457,135 @@ events_target = pb.Contract.from_yaml("contracts/targets/clean_events.yaml")
 pipeline = pb.Pipeline(source=events_source, target=events_target)
 ```
 
+### Pattern 3: CI/CD Integration
+
+YAML contracts integrate naturally into CI/CD pipelines. Because contracts are plain files, you can
+load them in test suites, gate deployments on contract compliance, and fail builds when data quality
+regresses. This turns data quality from a manual spot-check into an automated, enforceable
+standard.
+
+Here's what a pytest-based contract test might look like:
+
+```python
+# In your test suite or CI script:
+import pointblank as pb
+
+def test_pipeline_contract():
+    pipeline = pb.Pipeline.from_yaml("contracts/pipelines/event_pipeline.yaml")
+    test_data = load_test_fixture("events_sample.parquet")
+
+    result = pipeline.run(data=test_data, transform=my_transform)
+    assert result.passed, result.get_report()
+```
+
+### Pattern 4: Composing Steps from Multiple Sources
+
+Sometimes you want to define a set of "base" validation rules that apply to all tables (like "every
+table must have a non-null `id` column that's unique"), and then layer on table-specific rules.
+YAML makes this easy because you can parse step definitions from YAML fragments and combine them
+programmatically.
+
+This pattern is especially useful when you have organization-wide data quality standards that every
+contract should inherit.
+
+```{python}
+# Base steps that apply to all tables
+base_steps_yaml = """
+- col_vals_not_null:
+    columns: [id]
+- rows_distinct:
+    columns_subset: [id]
+"""
+
+import yaml
+base_steps = [pb.Step.from_dict(s) for s in yaml.safe_load(base_steps_yaml)]
+
+# Compose with table-specific steps
+full_contract = pb.Contract(
+    name="composed_contract",
+    steps=base_steps + [
+        pb.Step("col_vals_gt", columns="score", value=0),
+        pb.Step("col_vals_le", columns="score", value=100),
+    ],
+)
+
+print(f"Total steps: {len(full_contract.steps)}")
+for step in full_contract.steps:
+    print(f"  - {step}")
+```
+
+## Round-Trip Fidelity
+
+A critical property of Pointblank's YAML serialization is **round-trip fidelity**: when you save a
+contract to YAML and load it back, you get an identical object. No information is lost, no defaults
+are silently changed, and no steps are reordered. This guarantee means you can confidently use YAML
+as your source of truth without worrying about subtle differences between the YAML representation
+and the in-memory object.
+
+Let's verify this with a fully-specified contract:
+
+```{python}
+# Original contract
+original = pb.Contract(
+    name="fidelity_test",
+    direction="target",
+    version="3.0.0",
+    owner="qa-team",
+    consumers=["reporting", "dashboards"],
+    on_violation="raise",
+    schema=pb.Schema(x="Int64", y="Float64", z="String"),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["x", "y", "z"]),
+        pb.Step("col_vals_between", columns="y", left=-1.0, right=1.0),
+    ],
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+)
+
+# Round-trip through YAML
+original.to_yaml("fidelity_test.yaml")
+restored = pb.Contract.from_yaml("fidelity_test.yaml")
+
+# Verify fidelity
+print(f"Name matches: {original.name == restored.name}")
+print(f"Direction matches: {original.direction == restored.direction}")
+print(f"Version matches: {original.version == restored.version}")
+print(f"Owner matches: {original.owner == restored.owner}")
+print(f"Steps match: {original.steps == restored.steps}")
+print(f"Thresholds match: {original.thresholds.warning == restored.thresholds.warning}")
+```
+
+## Cleanup
+
+The examples in this guide created several YAML files on disk to demonstrate the serialization
+workflow. The following hidden cell removes them so they don't clutter your working directory. In
+your own projects, these files would live in version control and persist across sessions. You'd
+never need to clean them up like this.
+
+```{python}
+#| echo: false
+import os
+for f in ["product_contract.yaml", "event_pipeline.yaml", "fidelity_test.yaml",
+           "basic_validation.yaml"]:
+    if os.path.exists(f):
+        os.remove(f)
+```
+
+## Conclusion
+
+The table below summarizes the key operations and how they map between the Python API and YAML:
+
+| Operation | Python API | YAML |
+|-----------|-----------|------|
+| Define contract | `pb.Contract(...)` | `contract:` block |
+| Define pipeline | `pb.Pipeline(...)` | `pipeline:` + `source:` + `target:` |
+| Save | `.to_yaml("path.yaml")` | --- |
+| Load contract | `pb.Contract.from_yaml("path.yaml")` | --- |
+| Load pipeline | `pb.Pipeline.from_yaml("path.yaml")` | --- |
+| Validate | `.validate(data)` | Load → validate in Python |
+| Run pipeline | `.run(data, transform)` | Load → run in Python |
+
+YAML contracts and pipelines give you the best of both worlds: declarative, reviewable
+specifications that integrate seamlessly with Pointblank's Python execution engine. The separation
+of *what* (YAML contracts) from *how* (Python transforms) creates a clean architecture where data
+quality expectations can evolve independently from processing logic: reviewed by different people,
+on different timelines, with clear accountability at each boundary.
