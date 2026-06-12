@@ -240,3 +240,87 @@ intermediate results before proceeding. Notice that these methods return `Valida
 directly, so you call `.all_passed()` on them rather than checking `.passed` as you would on a
 `PipelineResult`.
 
+## Short-Circuiting on Source Failure
+
+By default, `Pipeline.run()` uses **short-circuit** behavior: if the source validation fails, the
+transform is never executed and the target is never validated. This is a safety mechanism that
+prevents invalid data from flowing into your transformation logic, where it could cause unexpected
+exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to
+a production database.
+
+Short-circuiting also saves compute resources. If your transform is expensive (large joins, ML
+inference, API calls), there's no reason to run it on data you already know is invalid. The pipeline
+fails fast and reports exactly why.
+
+In the example below, the source data contains a null `txn_id` and a negative `amount_cents`, both
+of which violate the source contract. Because short-circuiting is enabled (the default), the
+transform function is never called and the target validation is skipped entirely:
+
+```{python}
+# Data with problems (null txn_id, negative amount)
+bad_raw_data = pl.DataFrame(
+    {
+        "txn_id": ["TXN-001", None, "TXN-003", "TXN-004", "TXN-005"],
+        "amount_cents": [4999, -100, 750, 89900, 3200],
+        "currency": ["USD", "EUR", "GBP", "USD", "JPY"],
+        "timestamp": [
+            "2024-06-01T10:30:00",
+            "2024-06-01T11:45:00",
+            "2024-06-01T12:00:00",
+            "2024-06-01T14:20:00",
+            "2024-06-01T15:55:00",
+        ],
+    }
+)
+
+# Source contract uses on_violation="warn" (default)
+import warnings
+
+with warnings.catch_warnings(record=True):
+    warnings.simplefilter("always")
+    result = pipeline.run(data=bad_raw_data, transform=process_transactions)
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target validation: {result.target_validation}")  # None, was skipped
+print(f"Transform output: {result.transform_output}")  # None, was skipped
+```
+
+To disable short-circuiting and always run both validations, set `short_circuit=False`. This is
+useful when you want to collect validation reports from *both* boundaries regardless of whether the
+source passed (for example, during development when you want to see the full picture of all data
+quality issues at once):
+
+```{python}
+pipeline_no_shortcircuit = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+    short_circuit=False,
+)
+
+with warnings.catch_warnings(record=True):
+    warnings.simplefilter("always")
+    result = pipeline_no_shortcircuit.run(
+        data=bad_raw_data, transform=process_transactions
+    )
+
+print(f"Source passed: {result.source_passed}")
+print(f"Target validated: {result.target_validation is not None}")
+```
+
+## Violation Handling
+
+When a contract's validation fails, the pipeline needs to *do something* about it. The
+`on_violation` parameter on each `Contract` controls this behavior. There are three modes, each
+suited to different stages of your development and deployment lifecycle:
+
+- **`"warn"`** (default): Issues a Python `UserWarning`. The pipeline continues, and the failure
+is recorded in the result. Ideal for development and monitoring.
+- **`"raise"`**: Raises a `RuntimeError` immediately. The pipeline halts. Ideal for production
+gates where invalid data must never proceed.
+- **`"log"`**: Writes a warning-level message to the `pointblank.contract` logger. The pipeline
+continues silently. Ideal for background monitoring and observability integrations.
+
+Each contract in a pipeline can use a different violation mode. For example, you might use `"warn"`
+on the source contract (so you can still inspect the data) and `"raise"` on the target contract (to
+guarantee output quality).
+
