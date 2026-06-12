@@ -435,3 +435,134 @@ class TestContractOnViolation:
         assert contract.on_violation == "log"
 
 
+class TestContractSerialization:
+    """Tests for Contract serialization (to_dict, from_dict, YAML)."""
+
+    def test_to_dict_minimal(self):
+        contract = Contract(name="minimal")
+        d = contract.to_dict()
+        assert d == {"name": "minimal"}
+
+    def test_to_dict_full(self, basic_contract):
+        d = basic_contract.to_dict()
+        assert d["name"] == "test_contract"
+        assert d["version"] == "1.0.0"
+        assert d["owner"] == "test-team"
+        assert "schema" in d
+        assert "steps" in d
+        assert len(d["steps"]) == 2
+
+    def test_to_dict_target_direction(self):
+        contract = Contract(name="out", direction="target")
+        d = contract.to_dict()
+        assert d["direction"] == "target"
+
+    def test_to_dict_source_direction_omitted(self):
+        contract = Contract(name="in", direction="source")
+        d = contract.to_dict()
+        assert "direction" not in d  # source is default, omitted
+
+    def test_from_dict_minimal(self):
+        d = {"name": "minimal"}
+        contract = Contract.from_dict(d)
+        assert contract.name == "minimal"
+        assert contract.direction == "source"
+        assert contract.steps == []
+
+    def test_from_dict_full(self):
+        d = {
+            "name": "full_contract",
+            "direction": "target",
+            "version": "2.0.0",
+            "owner": "data-team",
+            "consumers": ["ml", "bi"],
+            "description": "Test contract",
+            "on_violation": "raise",
+            "schema": {"id": "Int64", "name": "String"},
+            "steps": [
+                {"col_vals_not_null": {"columns": ["id"]}},
+                {"col_vals_gt": {"columns": "id", "value": 0}},
+            ],
+            "thresholds": {"warning": 0.01, "error": 0.05},
+        }
+        contract = Contract.from_dict(d)
+        assert contract.name == "full_contract"
+        assert contract.direction == "target"
+        assert contract.version == "2.0.0"
+        assert contract.owner == "data-team"
+        assert contract.consumers == ["ml", "bi"]
+        assert contract.description == "Test contract"
+        assert contract.on_violation == "raise"
+        assert contract.schema is not None
+        assert len(contract.steps) == 2
+        assert contract.thresholds.warning == 0.01
+        assert contract.thresholds.error == 0.05
+
+    def test_from_dict_no_name_raises(self):
+        with pytest.raises(ValueError, match="must include a 'name' key"):
+            Contract.from_dict({})
+
+    def test_from_dict_steps_not_list_raises(self):
+        with pytest.raises(TypeError, match="must be a list"):
+            Contract.from_dict({"name": "bad", "steps": "not_a_list"})
+
+    def test_round_trip_dict(self, basic_contract):
+        """to_dict -> from_dict should be lossless."""
+        d = basic_contract.to_dict()
+        loaded = Contract.from_dict(d)
+        assert loaded.name == basic_contract.name
+        assert loaded.version == basic_contract.version
+        assert loaded.owner == basic_contract.owner
+        assert loaded.steps == basic_contract.steps
+
+    def test_to_yaml_string(self, basic_contract):
+        yaml_str = basic_contract.to_yaml()
+        assert "contract:" in yaml_str
+        assert "name: test_contract" in yaml_str
+        assert "col_vals_not_null:" in yaml_str
+
+    def test_to_yaml_file(self, basic_contract, tmp_path):
+        path = str(tmp_path / "contract.yaml")
+        basic_contract.to_yaml(path)
+        assert Path(path).exists()
+
+        # Verify file content
+        with open(path) as f:
+            content = yaml.safe_load(f)
+        assert content["contract"]["name"] == "test_contract"
+
+    def test_from_yaml(self, basic_contract, tmp_path):
+        path = str(tmp_path / "contract.yaml")
+        basic_contract.to_yaml(path)
+
+        loaded = Contract.from_yaml(path)
+        assert loaded.name == basic_contract.name
+        assert loaded.steps == basic_contract.steps
+
+    def test_from_yaml_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            Contract.from_yaml("/nonexistent/path.yaml")
+
+    def test_from_yaml_empty_file(self, tmp_path):
+        path = str(tmp_path / "empty.yaml")
+        Path(path).write_text("")
+        with pytest.raises(ValueError, match="empty"):
+            Contract.from_yaml(path)
+
+    def test_from_yaml_with_contract_key(self, tmp_path):
+        """YAML files with a top-level 'contract' key should work."""
+        content = {
+            "contract": {
+                "name": "yaml_test",
+                "steps": [{"col_vals_not_null": {"columns": ["id"]}}],
+            }
+        }
+        path = str(tmp_path / "contract.yaml")
+        with open(path, "w") as f:
+            yaml.dump(content, f)
+
+        loaded = Contract.from_yaml(path)
+        assert loaded.name == "yaml_test"
+        assert len(loaded.steps) == 1
+
+
