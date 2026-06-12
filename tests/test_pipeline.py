@@ -150,3 +150,54 @@ class TestPipelineResult:
         assert "Test units passed:" in report
 
 
+# ─── Pipeline Creation Tests ─────────────────────────────────────────────────────
+
+
+class TestPipelineCreation:
+    """Tests for Pipeline instantiation."""
+
+    def test_basic_creation(self, source_contract, target_contract):
+        pipeline = Pipeline(source=source_contract, target=target_contract)
+        assert pipeline.source is source_contract
+        assert pipeline.target is target_contract
+        assert pipeline.short_circuit is True
+
+    def test_source_only(self, source_contract):
+        pipeline = Pipeline(source=source_contract)
+        assert pipeline.source is source_contract
+        assert pipeline.target is None
+
+    def test_target_only(self, target_contract):
+        pipeline = Pipeline(target=target_contract)
+        assert pipeline.source is None
+        assert pipeline.target is target_contract
+
+    def test_no_contracts_raises(self):
+        with pytest.raises(ValueError, match="at least one"):
+            Pipeline(source=None, target=None)
+
+    def test_invalid_source_type(self):
+        with pytest.raises(TypeError, match="must be a Contract"):
+            Pipeline(source="not_a_contract")  # type: ignore
+
+    def test_invalid_target_type(self):
+        with pytest.raises(TypeError, match="must be a Contract"):
+            Pipeline(target=42)  # type: ignore
+
+    def test_with_thresholds(self, source_contract):
+        pipeline = Pipeline(
+            source=source_contract,
+            thresholds=pb.Thresholds(warning=0.01, error=0.05),
+        )
+        assert pipeline.thresholds.warning == 0.01
+        assert pipeline.thresholds.error == 0.05
+
+    def test_with_label(self, source_contract):
+        pipeline = Pipeline(source=source_contract, label="My Pipeline")
+        assert pipeline.label == "My Pipeline"
+
+    def test_short_circuit_false(self, source_contract, target_contract):
+        pipeline = Pipeline(source=source_contract, target=target_contract, short_circuit=False)
+        assert pipeline.short_circuit is False
+
+
