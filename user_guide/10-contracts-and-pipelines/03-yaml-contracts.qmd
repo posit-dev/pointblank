@@ -345,3 +345,115 @@ target:
         value: 0
 ```
 
+### Loading and Running a Pipeline from YAML
+
+Loading a pipeline from YAML works the same way as loading a contract: call the `from_yaml()` class
+method with the file path. The returned `Pipeline` object is fully functional and ready to validate
+data or run a complete boundary enforcement workflow.
+
+```{python}
+# Load the pipeline from YAML
+loaded_pipeline = pb.Pipeline.from_yaml("event_pipeline.yaml")
+print(loaded_pipeline)
+```
+
+With the pipeline loaded, you provide data and a transform function just as you would with a
+pipeline defined in Python. The YAML only stores the *contract specifications* whereas the transform
+logic always lives in your Python code (since transforms are arbitrary functions that can't be
+meaningfully serialized to YAML).
+
+```{python}
+# Create test data and run the pipeline
+events = pl.DataFrame(
+    {
+        "event_id": ["EVT-001", "EVT-002", "EVT-003", "EVT-004"],
+        "user_id": ["U100", "U200", "U100", "U300"],
+        "event_type": ["purchase", "click", "view", "signup"],
+        "value_cents": [2500, 0, 0, 0],
+    }
+)
+
+def enrich_events(df: pl.DataFrame) -> pl.DataFrame:
+    """Convert cents to dollars, defaulting zero to a minimum value."""
+    return df.with_columns(
+        pl.when(pl.col("value_cents") > 0)
+        .then(pl.col("value_cents") / 100)
+        .otherwise(0.01)  # Minimum trackable value
+        .alias("value")
+    ).drop("value_cents")
+
+result = loaded_pipeline.run(data=events, transform=enrich_events)
+print(f"Pipeline passed: {result.passed}")
+```
+
+```{python}
+result.target_validation
+```
+
+## Practical Patterns
+
+The following patterns illustrate common ways teams use YAML contracts and pipelines in real-world
+data platforms. These aren't exhaustive: they're starting points that you can adapt to your own
+workflow.
+
+### Pattern 1: Environment-Specific Pipelines
+
+A common need is to apply different tolerance levels in different environments. In development, you
+might accept 20% failure rates while iterating on a transform. In production, anything above 1% is
+a critical issue. YAML contracts make this easy: store the same validation logic in a shared
+contract, but load different pipeline configurations that set environment-appropriate thresholds.
+
+```{python}
+# Same contracts, different thresholds
+dev_pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    thresholds=pb.Thresholds(warning=0.20, error=0.50),  # Lenient for dev
+    label="DEV: Event Pipeline",
+)
+
+prod_pipeline = pb.Pipeline(
+    source=source,
+    target=target,
+    thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),  # Strict
+    label="PROD: Event Pipeline",
+)
+
+# In practice, you'd select based on an env var:
+# import os
+# pipeline = pb.Pipeline.from_yaml(f"contracts/{os.environ['ENV']}_pipeline.yaml")
+```
+
+### Pattern 2: Contract Library
+
+As your data platform grows, you'll accumulate many contracts. A recommended practice is to organize
+them into a directory structure that mirrors your data architecture. This creates a discoverable,
+browsable "library" of data quality expectations that serves as living documentation of your
+system's data contracts.
+
+Here's a typical layout:
+
+```
+contracts/
+├── sources/
+│   ├── raw_events.yaml
+│   ├── raw_transactions.yaml
+│   └── raw_customers.yaml
+├── targets/
+│   ├── clean_events.yaml
+│   ├── clean_transactions.yaml
+│   └── clean_customers.yaml
+└── pipelines/
+    ├── event_pipeline.yaml
+    └── transaction_pipeline.yaml
+```
+
+```python
+# Load any contract from the library
+events_source = pb.Contract.from_yaml("contracts/sources/raw_events.yaml")
+events_target = pb.Contract.from_yaml("contracts/targets/clean_events.yaml")
+
+# Build pipeline dynamically
+pipeline = pb.Pipeline(source=events_source, target=events_target)
+```
+
