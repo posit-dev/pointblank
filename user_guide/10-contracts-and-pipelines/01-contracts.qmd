@@ -280,3 +280,8 @@ order_contract.validate(bad_orders)
 The validation report clearly shows which steps failed and how many test units were affected. This
 makes it easy to diagnose data quality issues and communicate them to data producers.
 
+## What's Next
+
+Now that you understand contracts, the next guide page covers **Pipelines**. They combine a source
+contract, a transform, and a target contract into a complete boundary enforcement workflow. This
+lets you validate data at both the *input* and *output* of your data transformations.
