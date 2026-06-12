@@ -445,3 +445,43 @@ class Contract:
 
         return cls.from_dict(data)
 
+    def to_yaml(self, path: str | None = None) -> str:
+        """Serialize this Contract to YAML.
+
+        Parameters
+        ----------
+        path
+            Optional file path. If provided, the YAML is written to this file.
+            If None, the YAML string is returned.
+
+        Returns
+        -------
+        str
+            The YAML representation of this contract.
+        """
+        import yaml
+
+        data = {"contract": self.to_dict()}
+        yaml_str = yaml.dump(data, default_flow_style=False, sort_keys=False)
+
+        if path is not None:
+            from pathlib import Path
+
+            yaml_path = Path(path)
+            yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(yaml_path, "w") as f:
+                f.write(yaml_str)
+
+        return yaml_str
+
+    def __repr__(self) -> str:
+        parts = [f"Contract(name={self.name!r}"]
+        parts.append(f"direction={self.direction!r}")
+        if self.version:
+            parts.append(f"version={self.version!r}")
+        if self.schema:
+            parts.append("schema=<defined>")
+        parts.append(f"steps={len(self.steps)}")
+        return ", ".join(parts) + ")"
+
+
