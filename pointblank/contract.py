@@ -103,3 +103,35 @@ class Step:
         return cls(method, **kwargs)
 
 
+# Valid validation method names from the Validate class
+_VALID_VALIDATION_METHODS = frozenset(
+    {
+        "col_vals_gt",
+        "col_vals_lt",
+        "col_vals_eq",
+        "col_vals_ne",
+        "col_vals_ge",
+        "col_vals_le",
+        "col_vals_between",
+        "col_vals_outside",
+        "col_vals_in_set",
+        "col_vals_not_in_set",
+        "col_vals_increasing",
+        "col_vals_decreasing",
+        "col_vals_null",
+        "col_vals_not_null",
+        "col_vals_regex",
+        "col_vals_within_spec",
+        "col_vals_expr",
+        "col_exists",
+        "col_pct_null",
+        "col_schema_match",
+        "col_count_match",
+        "rows_distinct",
+        "rows_complete",
+        "row_count_match",
+        "conjointly",
+    }
+)
+
+
