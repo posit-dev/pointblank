@@ -567,3 +567,181 @@ class TestPipelineYAML:
         assert pipeline.target.direction == "target"
 
 
+# ─── Pipeline repr Tests ─────────────────────────────────────────────────────────
+
+
+class TestPipelineRepr:
+    """Tests for Pipeline __repr__."""
+
+    def test_repr_basic(self, basic_pipeline):
+        r = repr(basic_pipeline)
+        assert "Pipeline(" in r
+        assert "raw_orders" in r
+        assert "clean_orders" in r
+
+    def test_repr_with_label(self, source_contract):
+        pipeline = Pipeline(source=source_contract, label="My Pipeline")
+        r = repr(pipeline)
+        assert "My Pipeline" in r
+
+
+# ─── Integration Tests ───────────────────────────────────────────────────────────
+
+
+class TestPipelineIntegration:
+    """Integration tests that test the full pipeline lifecycle."""
+
+    def test_full_pipeline_with_schema(self):
+        """Full pipeline with schema + steps at both boundaries."""
+        raw = pl.DataFrame(
+            {
+                "order_id": ["A001", "A002", "A003"],
+                "amount_cents": [1500, 2500, 900],
+                "currency": ["USD", "EUR", "USD"],
+            }
+        )
+
+        source = Contract(
+            name="raw_orders",
+            direction="source",
+            schema=pb.Schema(order_id="String", amount_cents="Int64", currency="String"),
+            steps=[
+                Step("col_vals_not_null", columns=["order_id", "amount_cents"]),
+                Step("col_vals_ge", columns="amount_cents", value=0),
+                Step("col_vals_in_set", columns="currency", set=["USD", "EUR", "GBP"]),
+            ],
+        )
+
+        target = Contract(
+            name="clean_orders",
+            direction="target",
+            schema=pb.Schema(order_id="String", currency="String", amount="Float64"),
+            steps=[
+                Step("col_vals_not_null", columns=["order_id", "amount"]),
+                Step("col_vals_gt", columns="amount", value=0),
+                Step("rows_distinct", columns_subset=["order_id"]),
+            ],
+        )
+
+        def transform(df):
+            return df.with_columns((pl.col("amount_cents") / 100).alias("amount")).drop(
+                "amount_cents"
+            )
+
+        pipeline = Pipeline(source=source, target=target)
+        result = pipeline.run(data=raw, transform=transform)
+
+        assert result.passed is True
+        assert result.source_passed is True
+        assert result.target_passed is True
+        assert "amount" in result.transform_output.columns
+        assert "amount_cents" not in result.transform_output.columns
+
+    def test_pipeline_detects_transform_bug(self):
+        """Pipeline catches when a transform introduces data quality issues."""
+        raw = pl.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "value": [100, 200, 300],
+            }
+        )
+
+        source = Contract(
+            name="input",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id", "value"])],
+        )
+
+        target = Contract(
+            name="output",
+            direction="target",
+            steps=[
+                Step("col_vals_not_null", columns=["id", "value", "computed"]),
+                Step("col_vals_gt", columns="computed", value=0),
+            ],
+            on_violation="warn",
+        )
+
+        def buggy_transform(df):
+            # Bug: introduces a null in 'computed' column
+            return df.with_columns(
+                pl.when(pl.col("id") == 2)
+                .then(None)
+                .otherwise(pl.col("value") * 2)
+                .alias("computed")
+            )
+
+        pipeline = Pipeline(source=source, target=target)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            result = pipeline.run(data=raw, transform=buggy_transform)
+
+        assert result.source_passed is True
+        assert result.target_passed is False
+        assert result.passed is False
+
+    def test_pipeline_from_yaml_and_run(self, tmp_path):
+        """Load pipeline from YAML and run it."""
+        yaml_content = {
+            "pipeline": {"label": "YAML Pipeline"},
+            "source": {
+                "name": "yaml_source",
+                "steps": [{"col_vals_not_null": {"columns": ["x", "y"]}}],
+            },
+            "target": {
+                "name": "yaml_target",
+                "steps": [{"col_vals_gt": {"columns": "z", "value": 0}}],
+            },
+        }
+        path = str(tmp_path / "pipeline.yaml")
+        with open(path, "w") as f:
+            yaml.dump(yaml_content, f)
+
+        pipeline = Pipeline.from_yaml(path)
+        data = pl.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+
+        def transform(df):
+            return df.with_columns((pl.col("x") + pl.col("y")).alias("z"))
+
+        result = pipeline.run(data=data, transform=transform)
+        assert result.passed is True
+
+    def test_pipeline_idempotent_multiple_runs(self, raw_data, basic_pipeline, transform_fn):
+        """Running the same pipeline multiple times should give same results."""
+        result1 = basic_pipeline.run(data=raw_data, transform=transform_fn)
+        result2 = basic_pipeline.run(data=raw_data, transform=transform_fn)
+        assert result1.passed == result2.passed
+        assert result1.source_passed == result2.source_passed
+        assert result1.target_passed == result2.target_passed
+
+    def test_pipeline_with_pandas(self):
+        """Pipeline works with Pandas DataFrames."""
+        import pandas as pd
+
+        raw = pd.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "value": [100.0, 200.0, 300.0],
+            }
+        )
+
+        source = Contract(
+            name="pandas_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id", "value"])],
+        )
+
+        target = Contract(
+            name="pandas_target",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="doubled", value=0)],
+        )
+
+        def transform(df):
+            df = df.copy()
+            df["doubled"] = df["value"] * 2
+            return df
+
+        pipeline = Pipeline(source=source, target=target)
+        result = pipeline.run(data=raw, transform=transform)
+        assert result.passed is True
