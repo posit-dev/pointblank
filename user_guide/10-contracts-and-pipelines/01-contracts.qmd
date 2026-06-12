@@ -1,0 +1,26 @@
+---
+title: Data Contracts
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+A **data contract** is a declarative specification of what data should look like at a particular
+point in your system. Rather than writing imperative validation code every time you need to check
+data, contracts let you define *expectations as data* and then enforce them anywhere.
+
+Pointblank's `Contract` class combines three things into a single, portable unit:
+
+1. **Schema**: what columns exist and what types they are
+2. **Validation steps**: semantic rules the data must satisfy
+3. **Metadata**: who owns it, what version it is, and what to do on failure
+
+Contracts can be serialized to YAML, version-controlled, and shared across teams. They can serve as
+the single source of truth for data quality expectations at a given boundary.
+
