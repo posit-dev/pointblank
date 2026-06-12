@@ -179,3 +179,87 @@ class TestStep:
         assert "rows_complete" in _VALID_VALIDATION_METHODS
 
 
+# ─── Contract Tests ──────────────────────────────────────────────────────────────
+
+
+class TestContractCreation:
+    """Tests for Contract instantiation and validation."""
+
+    def test_basic_creation(self, basic_schema):
+        contract = Contract(
+            name="test",
+            direction="source",
+            schema=basic_schema,
+            steps=[Step("col_vals_not_null", columns=["id"])],
+        )
+        assert contract.name == "test"
+        assert contract.direction == "source"
+        assert contract.schema is not None
+        assert len(contract.steps) == 1
+
+    def test_minimal_creation(self):
+        """Contract with just a name is valid."""
+        contract = Contract(name="minimal")
+        assert contract.name == "minimal"
+        assert contract.direction == "source"
+        assert contract.schema is None
+        assert contract.steps == []
+
+    def test_target_direction(self):
+        contract = Contract(name="output", direction="target")
+        assert contract.direction == "target"
+
+    def test_invalid_direction(self):
+        with pytest.raises(ValueError, match="must be 'source' or 'target'"):
+            Contract(name="bad", direction="invalid")
+
+    def test_invalid_on_violation(self):
+        with pytest.raises(ValueError, match="must be 'warn', 'raise', or 'log'"):
+            Contract(name="bad", on_violation="explode")
+
+    def test_empty_name_raises(self):
+        with pytest.raises(ValueError, match="non-empty string"):
+            Contract(name="")
+
+    def test_non_string_name_raises(self):
+        with pytest.raises(ValueError, match="non-empty string"):
+            Contract(name=123)  # type: ignore
+
+    def test_steps_not_list_raises(self):
+        with pytest.raises(TypeError, match="must be a list"):
+            Contract(name="test", steps="not_a_list")  # type: ignore
+
+    def test_steps_non_step_item_raises(self):
+        with pytest.raises(TypeError, match="must be Step objects"):
+            Contract(name="test", steps=[Step("col_vals_gt", columns="a", value=1), "bad"])
+
+    def test_invalid_method_in_step_raises(self):
+        with pytest.raises(ValueError, match="Unknown validation method"):
+            Contract(name="test", steps=[Step("nonexistent_method")])
+
+    def test_all_metadata_fields(self):
+        contract = Contract(
+            name="full",
+            direction="target",
+            version="2.1.0",
+            owner="analytics-team",
+            consumers=["ml-team", "bi-team"],
+            description="A fully specified contract",
+            on_violation="raise",
+        )
+        assert contract.version == "2.1.0"
+        assert contract.owner == "analytics-team"
+        assert contract.consumers == ["ml-team", "bi-team"]
+        assert contract.description == "A fully specified contract"
+        assert contract.on_violation == "raise"
+
+    def test_thresholds(self):
+        contract = Contract(
+            name="with_thresh",
+            thresholds=pb.Thresholds(warning=0.01, error=0.05, critical=0.10),
+        )
+        assert contract.thresholds.warning == 0.01
+        assert contract.thresholds.error == 0.05
+        assert contract.thresholds.critical == 0.10
+
+
