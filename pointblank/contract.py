@@ -411,3 +411,37 @@ class Contract:
             on_violation=on_violation,
         )
 
+    @classmethod
+    def from_yaml(cls, path: str) -> Contract:
+        """Load a Contract from a YAML file.
+
+        Parameters
+        ----------
+        path
+            Path to the YAML file.
+
+        Returns
+        -------
+        Contract
+            A new Contract instance.
+        """
+        from pathlib import Path
+
+        import yaml
+
+        yaml_path = Path(path)
+        if not yaml_path.exists():
+            raise FileNotFoundError(f"YAML file not found: {path}")
+
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+
+        if data is None:
+            raise ValueError(f"YAML file is empty: {path}")
+
+        # If the YAML has a top-level 'contract' key, use that
+        if "contract" in data:
+            data = data["contract"]
+
+        return cls.from_dict(data)
+
