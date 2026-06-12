@@ -202,3 +202,36 @@ class Contract:
     thresholds: Thresholds | None = None
     on_violation: Literal["warn", "raise", "log"] = "warn"
 
+    def __post_init__(self) -> None:
+        # Validate direction
+        if self.direction not in ("source", "target"):
+            raise ValueError(
+                f"Contract direction must be 'source' or 'target', got '{self.direction}'."
+            )
+
+        # Validate on_violation
+        if self.on_violation not in ("warn", "raise", "log"):
+            raise ValueError(
+                f"Contract on_violation must be 'warn', 'raise', or 'log', "
+                f"got '{self.on_violation}'."
+            )
+
+        # Validate name
+        if not self.name or not isinstance(self.name, str):
+            raise ValueError("Contract name must be a non-empty string.")
+
+        # Validate steps
+        if not isinstance(self.steps, list):
+            raise TypeError("Contract steps must be a list of Step objects.")
+        for i, step in enumerate(self.steps):
+            if not isinstance(step, Step):
+                raise TypeError(
+                    f"All items in steps must be Step objects, got {type(step).__name__} "
+                    f"at index {i}."
+                )
+            if step.method not in _VALID_VALIDATION_METHODS:
+                raise ValueError(
+                    f"Unknown validation method '{step.method}' in step at index {i}. "
+                    f"Valid methods are: {sorted(_VALID_VALIDATION_METHODS)}"
+                )
+
