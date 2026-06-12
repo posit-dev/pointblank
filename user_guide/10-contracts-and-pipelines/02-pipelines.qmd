@@ -1,0 +1,55 @@
+---
+title: Pipeline Boundary Enforcement
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+A **pipeline** in Pointblank represents the enforcement of data quality at both boundaries of a data
+transformation: the input ("source") and the output ("target"). The `Pipeline` class binds a source
+contract and a target contract together, providing a unified way to validate data as it flows
+through your system.
+
+This approach embodies a key principle: **Pointblank enforces boundaries, it doesn't orchestrate the
+transform.** You write the transformation logic; Pointblank guards the edges. This deliberate
+separation of concerns means you can use any DataFrame library, any transformation approach, and any
+orchestration tool you prefer. Pointblank's only job is to verify that data entering your transform
+meets expectations and that data leaving your transform satisfies guarantees you've made to
+downstream consumers.
+
+Think of it like type-checking for data in motion: the source contract is your function's input type
+signature, and the target contract is the return type. The pipeline ties them together.
+
+## Why Boundary Enforcement?
+
+Data pipelines rarely fail in obvious ways. More often, quality degrades silently: an upstream team
+adds a column and reorders the schema, a third-party API starts returning nulls in a field that was
+always populated, or a subtle join bug duplicates rows without raising any exception. These failures
+propagate downstream and compound, making root-cause analysis painful.
+
+Even with a perfectly correct transformation, data quality can degrade if:
+
+- Upstream data changes shape, types, or semantics without notice
+- A transform introduces bugs (null propagation, incorrect joins, off-by-one errors)
+- Schema drift occurs silently over time
+- External data sources degrade in quality between scheduled runs
+
+Boundary enforcement addresses these problems by placing validation checkpoints at the two places
+that matter most: the entry point and the exit point of your transformation. By validating at
+**both** boundaries, you can:
+
+1. **Catch upstream issues early**: before they enter your transform and corrupt derived tables
+2. **Detect transform bugs**: by verifying output against a separate contract defined independently
+3. **Short-circuit expensive processing**: fail fast when source data is invalid, saving compute
+4. **Generate compliance evidence**: produce audit-ready reports showing data quality at each stage
+5. **Assign accountability**: source contracts belong to producers, target contracts to consumers
+
+This dual-boundary model makes it possible to distinguish between "the data I received was bad" and
+"my code introduced a bug". This is a distinction that a single-point validation cannot make.
+
