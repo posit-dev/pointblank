@@ -351,3 +351,63 @@ class Contract:
 
         return result
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Contract:
+        """Construct a Contract from a dictionary (e.g., parsed from YAML).
+
+        Parameters
+        ----------
+        data
+            A dictionary representation of a contract.
+
+        Returns
+        -------
+        Contract
+            A new Contract instance.
+        """
+
+        name = data.get("name")
+        if not name:
+            raise ValueError("Contract dictionary must include a 'name' key.")
+
+        direction = data.get("direction", "source")
+        version = data.get("version")
+        owner = data.get("owner")
+        consumers = data.get("consumers")
+        description = data.get("description")
+        on_violation = data.get("on_violation", "warn")
+
+        # Parse schema
+        schema = None
+        schema_data = data.get("schema")
+        if schema_data is not None:
+            schema = _dict_to_schema(schema_data)
+
+        # Parse steps
+        steps = []
+        steps_data = data.get("steps")
+        if steps_data is not None:
+            if not isinstance(steps_data, list):
+                raise TypeError("Contract 'steps' must be a list.")
+            for step_data in steps_data:
+                steps.append(Step.from_dict(step_data))
+
+        # Parse thresholds
+        thresholds = None
+        thresholds_data = data.get("thresholds")
+        if thresholds_data is not None:
+            thresholds = _dict_to_thresholds(thresholds_data)
+
+        return cls(
+            name=name,
+            direction=direction,
+            schema=schema,
+            steps=steps,
+            version=version,
+            owner=owner,
+            consumers=consumers,
+            description=description,
+            thresholds=thresholds,
+            on_violation=on_violation,
+        )
+
