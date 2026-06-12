@@ -65,3 +65,30 @@ The `.validate()` method compiles the contract into a `Validate` object, runs al
 returns the interrogated result. You get the same rich validation report you're used to but the
 contract itself is a reusable, declarative artifact.
 
+## Adding a Schema
+
+Contracts can include a `Schema` to enforce structural expectations (column names and data types):
+
+```{python}
+order_contract = pb.Contract(
+    name="order_data",
+    direction="source",
+    schema=pb.Schema(
+        order_id="String",
+        customer_id="String",
+        amount="Float64",
+        quantity="Int64",
+        status="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "customer_id", "amount"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_ge", columns="quantity", value=1),
+        pb.Step("col_vals_in_set", columns="status", set=["pending", "shipped", "delivered"]),
+        pb.Step("rows_distinct", columns_subset=["order_id"]),
+    ],
+    version="1.0.0",
+    owner="data-platform-team",
+)
+```
+
