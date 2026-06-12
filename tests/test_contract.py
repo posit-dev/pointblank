@@ -52,3 +52,19 @@ def basic_schema():
     return pb.Schema(id="Int64", name="String", amount="Float64", status="String")
 
 
+@pytest.fixture
+def basic_contract(basic_schema):
+    """A basic contract with schema and steps."""
+    return Contract(
+        name="test_contract",
+        direction="source",
+        schema=basic_schema,
+        steps=[
+            Step("col_vals_not_null", columns=["id", "name"]),
+            Step("col_vals_gt", columns="amount", value=0),
+        ],
+        version="1.0.0",
+        owner="test-team",
+    )
+
+
