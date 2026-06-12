@@ -143,6 +143,52 @@ class Contract:
     It combines a Schema (structural expectations) with validation Steps (semantic
     expectations) and metadata (ownership, versioning, directionality).
 
+    Parameters
+    ----------
+    name
+        A human-readable name for this contract (e.g., "raw_clickstream_feed").
+    direction
+        Either "source" (inbound data) or "target" (outbound data product).
+        This is metadata for reporting and does not change validation behavior.
+    schema
+        A Schema object defining expected column names and types.
+    steps
+        A list of Step objects defining validation rules beyond schema checks.
+    version
+        Semantic version string for tracking contract evolution.
+    owner
+        Who is responsible for maintaining this contract.
+    consumers
+        Who depends on data conforming to this contract.
+    description
+        Optional longer description of the contract's purpose.
+    thresholds
+        Default thresholds for this contract's validations.
+    on_violation
+        What to do when the contract is violated: "warn", "raise", or "log".
+        Default is "warn".
+
+    Examples
+    --------
+    ```python
+    import pointblank as pb
+
+    source_contract = pb.Contract(
+        name="raw_sales_feed",
+        direction="source",
+        schema=pb.Schema(
+            order_id="String",
+            amount_cents="Int64",
+            currency="String",
+        ),
+        steps=[
+            pb.Step("col_vals_not_null", columns=["order_id", "amount_cents"]),
+            pb.Step("rows_distinct", columns=["order_id"]),
+        ],
+        version="1.0.0",
+        owner="data-platform-team",
+    )
+    ```
     """
 
     name: str
