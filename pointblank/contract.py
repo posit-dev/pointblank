@@ -520,3 +520,12 @@ def _thresholds_to_dict(thresholds: Thresholds) -> dict[str, Any]:
     return result
 
 
+def _dict_to_thresholds(data: dict[str, Any]) -> Thresholds:
+    """Convert a dictionary to a Thresholds object."""
+    from pointblank.thresholds import Thresholds
+
+    return Thresholds(
+        warning=data.get("warning"),
+        error=data.get("error"),
+        critical=data.get("critical"),
+    )
