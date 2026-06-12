@@ -3,6 +3,31 @@
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
 
+# v0.25.0
+
+*2026-06-12* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.25.0)
+
+Pointblank `v0.25.0` introduces powerful new capabilities for data pipeline governance and synthetic data generation. This release adds boundary enforcement through contracts and pipelines, letting you validate data at both the source and target of a transformation. Rich schema inference automatically detects constraints from existing tables (including ranges, categorical values, and semantic presets) enabling realistic synthetic data generation. The [prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt) validation method now accepts multi-modal attachments (images and PDFs), giving the LLM visual context when evaluating data quality.
+
+
+### New Features
+
+- **Rich schema inference** -- `Schema.from_table()` and [schema_from_tbl()](reference/schema_from_tbl.html#pointblank.schema_from_tbl) automatically extract comprehensive constraints from any supported table, including numeric ranges, categorical values, nullability, date bounds, and 25+ semantic presets (email, address, UUID, etc.) to power realistic synthetic data generation. ([\#391](https://github.com/posit-dev/pointblank/issues/391))
+
+- **Multi-modal attachments in [prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt)** -- The [prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt) validation method now accepts an `attachments=` parameter for images and PDFs (local files or URLs), providing visual context to the LLM for richer data validation against brand guides, schema diagrams, or reference documents. ([\#393](https://github.com/posit-dev/pointblank/issues/393))
+
+- **Boundary enforcement with contracts and pipelines** -- New [Contract](reference/Contract.html#pointblank.Contract) and [Pipeline](reference/Pipeline.html#pointblank.Pipeline) classes enable dual-boundary validation at the source and target of data transformations. Contracts define schema expectations and validation steps with ownership metadata, while pipelines orchestrate the full validate-transform-validate workflow with short-circuit optimization. ([\#401](https://github.com/posit-dev/pointblank/issues/401))
+
+
+### Bug Fixes
+
+- Lazy frames are no longer prematurely collected during interrogation, preserving the performance benefits of deferred evaluation with Polars LazyFrames. ([\#398](https://github.com/posit-dev/pointblank/issues/398))
+
+- [rows_distinct()](reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct) now correctly handles rows containing null values instead of dropping them from validation results. ([\#399](https://github.com/posit-dev/pointblank/issues/399))
+
+- The MCP server now starts reliably across different versions of the `fastmcp` library by using version-aware instantiation with fallback strategies. ([\#400](https://github.com/posit-dev/pointblank/issues/400))
+
+
 # v0.24.0
 
 *2026-04-22* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.24.0)
@@ -916,29 +941,3 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) made their first contribution in https://github.com/posit-dev/pointblank/pull/64
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.5.0…v0.6.0](https://github.com/posit-dev/pointblank/compare/v0.5.0...v0.6.0)
-
-
-# v0.5.0
-
-*2025-01-30* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.5.0)
-
-
-## Features
-
-- Incorporate the use of Narwhals selectors to select multiple columns for validation by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/45
-- View a report for a single validation step with the new [get_step_report()](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report) method by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/rich-iannone/pointblank/pull/31, https://github.com/rich-iannone/pointblank/pull/42, https://github.com/rich-iannone/pointblank/pull/43, https://github.com/rich-iannone/pointblank/pull/44, https://github.com/rich-iannone/pointblank/pull/47, https://github.com/rich-iannone/pointblank/pull/48)
-
-
-## Fixes and Documentation
-
-- When collecting target table schema, avoid conversion to Narwhals (use native DF schemas) by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/40
-- Corrected installation instructions in the contributing guide by [<span class="citation" cites="malcolmbarrett">@malcolmbarrett</span>](https://github.com/malcolmbarrett) in https://github.com/rich-iannone/pointblank/pull/41
-- Fix issues with `n_failing()` correctness (when Null values present) by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/rich-iannone/pointblank/pull/46
-- Added the Examples page on the project website by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/rich-iannone/pointblank/pull/32, https://github.com/rich-iannone/pointblank/pull/33)
-
-
-## New Contributors
-
-- [<span class="citation" cites="malcolmbarrett">@malcolmbarrett</span>](https://github.com/malcolmbarrett) made their first contribution in https://github.com/rich-iannone/pointblank/pull/41
-
-**Full Changelog**: https://github.com/rich-iannone/pointblank/compare/v0.4.0…v0.5.0

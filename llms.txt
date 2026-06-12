@@ -17,6 +17,15 @@
 - [Schema](reference/Schema.html): Definition of a schema object
 - [DraftValidation](reference/DraftValidation.html): Draft a validation plan for a given table using an LLM
 
+#### Contracts and Pipelines
+> Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+
+
+- [Contract](reference/Contract.html): A declarative boundary contract for pipeline data
+- [Step](reference/Step.html): A single validation step in a Contract, defined declaratively
+- [Pipeline](reference/Pipeline.html): Binds source and target contracts into a pipeline boundary enforcement unit
+- [PipelineResult](reference/PipelineResult.html): Result of a pipeline boundary validation run
+
 #### Validation Steps
 > Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
 

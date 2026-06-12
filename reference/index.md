@@ -26,6 +26,25 @@ Definition of a schema object.
 Draft a validation plan for a given table using an LLM.
 
 
+## Contracts and Pipelines
+
+
+Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+
+
+[Contract](Contract.md#pointblank.Contract)  
+A declarative boundary contract for pipeline data.
+
+[Step](Step.md#pointblank.Step)  
+A single validation step in a Contract, defined declaratively.
+
+[Pipeline](Pipeline.md#pointblank.Pipeline)  
+Binds source and target contracts into a pipeline boundary enforcement unit.
+
+[PipelineResult](PipelineResult.md#pointblank.PipelineResult)  
+Result of a pipeline boundary validation run.
+
+
 ## Validation Steps
 
 

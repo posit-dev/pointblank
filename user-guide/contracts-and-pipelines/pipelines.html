@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.24.0</code><br>Released 2026-04-22">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.25.0</code><br>Released 2026-06-12">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -541,7 +541,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>A <strong>pipeline</strong> in Pointblank represents the enforcement of data quality at both boundaries of a data transformation: the input (“source”) and the output (“target”). The <code>Pipeline</code> class binds a source contract and a target contract together, providing a unified way to validate data as it flows through your system.</p>
+<p>A <strong>pipeline</strong> in Pointblank represents the enforcement of data quality at both boundaries of a data transformation: the input (“source”) and the output (“target”). The <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> class binds a source contract and a target contract together, providing a unified way to validate data as it flows through your system.</p>
 <p>This approach embodies a key principle: <strong>Pointblank enforces boundaries, it doesn’t orchestrate the transform.</strong> You write the transformation logic; Pointblank guards the edges. This deliberate separation of concerns means you can use any DataFrame library, any transformation approach, and any orchestration tool you prefer. Pointblank’s only job is to verify that data entering your transform meets expectations and that data leaving your transform satisfies guarantees you’ve made to downstream consumers.</p>
 <p>Think of it like type-checking for data in motion: the source contract is your function’s input type signature, and the target contract is the return type. The pipeline ties them together.</p>
 <section id="why-boundary-enforcement" class="level1">
@@ -568,7 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Creating a Pipeline</h1>
 <p>A Pipeline needs at least one contract (source, target, or both). In practice, most pipelines define both contracts because that gives you full boundary coverage. However, there are legitimate cases for single-boundary pipelines (covered later in this guide).</p>
 <p>The example below demonstrates a real-world pattern: a transaction processing pipeline that receives raw financial data in one format (amounts in cents, all fields as raw strings) and produces clean, normalized output (amounts in decimal dollars, validated types). Notice how the source and target contracts encode fundamentally different expectations about the data’s shape and values (this is intentional). The source contract reflects what your upstream system actually produces, while the target contract reflects what downstream consumers need.</p>
-<div id="6376431d" class="cell" data-execution_count="2">
+<div id="b5c976ee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -632,14 +632,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="running-the-pipeline" class="level1">
 <h1>Running the Pipeline</h1>
-<p>The <code>Pipeline.run()</code> method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:</p>
+<p>The <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">Pipeline.run()</a> method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:</p>
 <ol type="1">
 <li>Validate source data against the source contract</li>
 <li>Execute your transform function (only if source validation passes)</li>
 <li>Validate the output against the target contract</li>
 </ol>
 <p>This ordering is deliberate. By validating the source <em>before</em> running the transform, you avoid wasting compute on data that was already invalid. And by validating the target <em>after</em> the transform, you confirm that your code produced output matching your guarantees.</p>
-<div id="b34a5572" class="cell" data-execution_count="3">
+<div id="2982ddf6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample raw transaction data</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>raw_transactions <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -675,20 +675,20 @@ Target passed: True
 Overall passed: True</code></pre>
 </div>
 </div>
-<p>The <code>result</code> is a <code>PipelineResult</code> object containing:</p>
+<p>The <code>result</code> is a <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> object containing:</p>
 <ul>
 <li><code>result.source_validation</code>: the interrogated Validate object for the source check</li>
 <li><code>result.target_validation</code>: the interrogated Validate object for the target check</li>
 <li><code>result.transform_output</code>: the data returned by your transform function</li>
 <li><code>result.passed</code>: <code>True</code> only if <strong>both</strong> boundaries pass</li>
 </ul>
-<p>The <code>PipelineResult</code> is designed to give you full introspection. You can access the raw validation objects (which are standard Pointblank <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> instances), inspect the transformed data directly, or simply check the boolean <code>passed</code> property for a quick go/no-go decision. Holding onto the result object also gives you the ability to generate reports or log details after the fact.</p>
+<p>The <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> is designed to give you full introspection. You can access the raw validation objects (which are standard Pointblank <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> instances), inspect the transformed data directly, or simply check the boolean <a href="../../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link gdls-code">passed</a> property for a quick go/no-go decision. Holding onto the result object also gives you the ability to generate reports or log details after the fact.</p>
 </section>
 <section id="inspecting-results" class="level1">
 <h1>Inspecting Results</h1>
-<p>Because <code>PipelineResult</code> holds full <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects, you have access to Pointblank’s rich reporting capabilities. Each validation result can render its standard HTML report table, which shows exactly which steps passed, which failed, and by how much. This is especially valuable during development when you need to understand <em>why</em> a boundary check failed, not just <em>that</em> it failed.</p>
+<p>Because <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> holds full <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects, you have access to Pointblank’s rich reporting capabilities. Each validation result can render its standard HTML report table, which shows exactly which steps passed, which failed, and by how much. This is especially valuable during development when you need to understand <em>why</em> a boundary check failed, not just <em>that</em> it failed.</p>
 <p>You can access individual validation results to see the standard Pointblank report:</p>
-<div id="170637e7" class="cell" data-execution_count="4">
+<div id="4b979003" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the source boundary validation</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>result.source_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -1250,7 +1250,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 </div>
-<div id="d220ce44" class="cell" data-execution_count="5">
+<div id="3307074c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the target boundary validation</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -1855,8 +1855,8 @@ tr { background-color: transparent; }
 </div>
 </div>
 </div>
-<p>You can also get a text summary of the full pipeline run. The <code>get_report()</code> method produces a human-readable summary that includes both the source and target validation results, making it suitable for logging or printing in CI/CD output:</p>
-<div id="b25231aa" class="cell" data-execution_count="6">
+<p>You can also get a text summary of the full pipeline run. The <a href="../../reference/PipelineResult.html#pointblank.PipelineResult.get_report" class="gdls-link gdls-code">get_report()</a> method produces a human-readable summary that includes both the source and target validation results, making it suitable for logging or printing in CI/CD output:</p>
+<div id="ea3aa4bb" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.get_report())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pipeline Boundary Validation Results
@@ -1880,7 +1880,7 @@ Overall: PASSED</code></pre>
 </section>
 <section id="validating-boundaries-independently" class="level1">
 <h1>Validating Boundaries Independently</h1>
-<p>You don’t have to use <code>run()</code>. You can validate each boundary separately when you need more control over the workflow. The <code>validate_source()</code> and <code>validate_target()</code> methods each return a standard <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (not a <code>PipelineResult</code>), giving you direct access to the interrogation results.</p>
+<p>You don’t have to use <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a>. You can validate each boundary separately when you need more control over the workflow. The <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a> and <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link gdls-code">validate_target()</a> methods each return a standard <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (not a <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>), giving you direct access to the interrogation results.</p>
 <p>This pattern is particularly useful when:</p>
 <ul>
 <li>Your transform has side effects (writing to a database, calling an API) that you don’t want triggered during validation testing</li>
@@ -1888,7 +1888,7 @@ Overall: PASSED</code></pre>
 <li>You’re building a custom orchestration layer that needs finer-grained control</li>
 <li>You want to run just one boundary check in a unit test</li>
 </ul>
-<div id="733e989d" class="cell" data-execution_count="7">
+<div id="87081656" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate just the source</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>source_result <span class="op">=</span> pipeline.validate_source(raw_transactions)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Source all passed: </span><span class="sc">{</span>source_result<span class="sc">.</span>all_passed()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
@@ -1896,7 +1896,7 @@ Overall: PASSED</code></pre>
 <pre><code>Source all passed: True</code></pre>
 </div>
 </div>
-<div id="bd9ed2b5" class="cell" data-execution_count="8">
+<div id="6c0c74b2" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run your transform manually</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>clean_data <span class="op">=</span> process_transactions(raw_transactions)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1907,14 +1907,14 @@ Overall: PASSED</code></pre>
 <pre><code>Target all passed: True</code></pre>
 </div>
 </div>
-<p>This is useful when your transform is complex, has side effects, or when you want to inspect intermediate results before proceeding. Notice that these methods return <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects directly, so you call <code>.all_passed()</code> on them rather than checking <code>.passed</code> as you would on a <code>PipelineResult</code>.</p>
+<p>This is useful when your transform is complex, has side effects, or when you want to inspect intermediate results before proceeding. Notice that these methods return <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects directly, so you call <code>.all_passed()</code> on them rather than checking <code>.passed</code> as you would on a <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>.</p>
 </section>
 <section id="short-circuiting-on-source-failure" class="level1">
 <h1>Short-Circuiting on Source Failure</h1>
-<p>By default, <code>Pipeline.run()</code> uses <strong>short-circuit</strong> behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.</p>
+<p>By default, <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">Pipeline.run()</a> uses <strong>short-circuit</strong> behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.</p>
 <p>Short-circuiting also saves compute resources. If your transform is expensive (large joins, ML inference, API calls), there’s no reason to run it on data you already know is invalid. The pipeline fails fast and reports exactly why.</p>
 <p>In the example below, the source data contains a null <code>txn_id</code> and a negative <code>amount_cents</code>, both of which violate the source contract. Because short-circuiting is enabled (the default), the transform function is never called and the target validation is skipped entirely:</p>
-<div id="6ca71d4c" class="cell" data-execution_count="9">
+<div id="d21a9db5" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with problems (null txn_id, negative amount)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>bad_raw_data <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1948,7 +1948,7 @@ Transform output: None</code></pre>
 </div>
 </div>
 <p>To disable short-circuiting and always run both validations, set <code>short_circuit=False</code>. This is useful when you want to collect validation reports from <em>both</em> boundaries regardless of whether the source passed (for example, during development when you want to see the full picture of all data quality issues at once):</p>
-<div id="e7856cb9" class="cell" data-execution_count="10">
+<div id="bc0d50f0" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pipeline_no_shortcircuit <span class="op">=</span> pb.Pipeline(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span>source_contract,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    target<span class="op">=</span>target_contract,</span>
@@ -1971,7 +1971,7 @@ Target validated: True</code></pre>
 </section>
 <section id="violation-handling" class="level1">
 <h1>Violation Handling</h1>
-<p>When a contract’s validation fails, the pipeline needs to <em>do something</em> about it. The <code>on_violation</code> parameter on each <code>Contract</code> controls this behavior. There are three modes, each suited to different stages of your development and deployment lifecycle:</p>
+<p>When a contract’s validation fails, the pipeline needs to <em>do something</em> about it. The <a href="../../reference/Contract.html#pointblank.Contract.on_violation" class="gdls-link gdls-code">on_violation</a> parameter on each <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> controls this behavior. There are three modes, each suited to different stages of your development and deployment lifecycle:</p>
 <ul>
 <li><strong><code>"warn"</code></strong> (default): Issues a Python <code>UserWarning</code>. The pipeline continues, and the failure is recorded in the result. Ideal for development and monitoring.</li>
 <li><strong><code>"raise"</code></strong>: Raises a <code>RuntimeError</code> immediately. The pipeline halts. Ideal for production gates where invalid data must never proceed.</li>
@@ -1981,7 +1981,7 @@ Target validated: True</code></pre>
 <section id="warning-mode-default" class="level2">
 <h2 class="anchored" data-anchor-id="warning-mode-default">Warning Mode (Default)</h2>
 <p>The warning mode is non-blocking: your pipeline completes, but Python’s warning system records that a violation occurred. You can capture these warnings programmatically using the standard <code>warnings</code> module:</p>
-<div id="18f72f64" class="cell" data-execution_count="11">
+<div id="3d1ef22b" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>warn_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"soft_check"</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span>[pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span>[<span class="st">"txn_id"</span>])],</span>
@@ -2031,7 +2031,7 @@ Target validated: True</code></pre>
 <h1>Pipeline-Level Thresholds</h1>
 <p>You can set thresholds at the pipeline level to override contract-level thresholds. This is a powerful mechanism for reusing the same contracts across different environments with different tolerance levels. A contract defines <em>what</em> to check; the pipeline’s thresholds define <em>how strict</em> those checks should be in a given context.</p>
 <p>For example, during development you might tolerate up to 10% of rows failing a given check (so you can work with imperfect sample data), while in production you might require less than 1% failure. Rather than maintaining separate contracts for each environment, you define the contracts once and let the pipeline’s thresholds control the sensitivity:</p>
-<div id="74905e0f" class="cell" data-execution_count="12">
+<div id="708f6391" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Relaxed thresholds for development</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dev_pipeline <span class="op">=</span> pb.Pipeline(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span>source_contract,</span>
@@ -2051,12 +2051,12 @@ Target validated: True</code></pre>
 </section>
 <section id="source-only-and-target-only-pipelines" class="level1">
 <h1>Source-Only and Target-Only Pipelines</h1>
-<p>You don’t always need both boundaries. In many real-world systems, you’ll encounter situations where only one boundary is relevant. The <code>Pipeline</code> class supports this naturally: simply omit the contract you don’t need, and the pipeline will only validate the boundary you’ve defined.</p>
+<p>You don’t always need both boundaries. In many real-world systems, you’ll encounter situations where only one boundary is relevant. The <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> class supports this naturally: simply omit the contract you don’t need, and the pipeline will only validate the boundary you’ve defined.</p>
 <p>Common patterns:</p>
 <section id="source-only-ingestion-guard" class="level2">
 <h2 class="anchored" data-anchor-id="source-only-ingestion-guard">Source-Only (Ingestion Guard)</h2>
 <p>Validate incoming data without a specific output contract. This pattern is common at the edges of your system where you receive data from external sources (APIs, file uploads, partner feeds) and want to reject or flag invalid input before it enters your data lake or warehouse:</p>
-<div id="f9c4f9b1" class="cell" data-execution_count="13">
+<div id="c6754d63" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ingestion_pipeline <span class="op">=</span> pb.Pipeline(source<span class="op">=</span>source_contract)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> ingestion_pipeline.run(</span>
@@ -2072,7 +2072,7 @@ Target validated: True</code></pre>
 <section id="target-only-output-guard" class="level2">
 <h2 class="anchored" data-anchor-id="target-only-output-guard">Target-Only (Output Guard)</h2>
 <p>Validate data before it leaves your system. This pattern is useful for data exports, API responses, or any point where you’re publishing data to external consumers. You’ve already transformed the data and simply want to confirm it meets the contract you’ve promised:</p>
-<div id="1451c87e" class="cell" data-execution_count="14">
+<div id="d21ed4cc" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>export_pipeline <span class="op">=</span> pb.Pipeline(target<span class="op">=</span>target_contract)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>clean_data <span class="op">=</span> process_transactions(raw_transactions)</span>
@@ -2091,7 +2091,7 @@ Target validated: True</code></pre>
 <h1>Detecting Transform Bugs</h1>
 <p>One of the most powerful applications of boundary enforcement is catching bugs in your transformation logic. When you validate at both boundaries, you can distinguish between “the input data was bad” (source failure) and “my code introduced a problem” (source passes, target fails). This distinction is invaluable during debugging and code review.</p>
 <p>Here’s an example where a buggy transform introduces data quality issues. The source data is perfectly valid, but the transformation logic has a conditional branch that inadvertently nulls out small transaction amounts. Without boundary enforcement, this bug might go undetected until a downstream consumer reports missing data (potentially days or weeks later):</p>
-<div id="bc7f5243" class="cell" data-execution_count="15">
+<div id="83af9b64" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> buggy_transform(df: pl.DataFrame) <span class="op">-&gt;</span> pl.DataFrame:</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""A transform with a bug (introduces nulls for certain records)."""</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.with_columns(</span>
@@ -2123,7 +2123,7 @@ After buggy transform:
   Overall passed: True</code></pre>
 </div>
 </div>
-<div id="842a62de" class="cell" data-execution_count="16">
+<div id="4c30898a" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The target validation shows exactly what went wrong</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 </div>
@@ -2131,9 +2131,9 @@ After buggy transform:
 </section>
 <section id="working-with-pandas" class="level1">
 <h1>Working with Pandas</h1>
-<p>Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to <code>run()</code> or <code>validate_source()</code>, and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.</p>
+<p>Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> or <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a>, and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.</p>
 <p>Here’s the same transaction-processing workflow using Pandas DataFrames:</p>
-<div id="ca98da8c" class="cell" data-execution_count="17">
+<div id="6ab76269" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Pandas DataFrame</span></span>
@@ -2180,9 +2180,9 @@ After buggy transform:
 </section>
 <section id="multiple-pipeline-runs" class="level1">
 <h1>Multiple Pipeline Runs</h1>
-<p>Pipelines are stateless and can be run multiple times with different data. Each call to <code>run()</code> produces an independent <code>PipelineResult</code> with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.</p>
+<p>Pipelines are stateless and can be run multiple times with different data. Each call to <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> produces an independent <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.</p>
 <p>The example below demonstrates running a single pipeline against multiple data batches (a common pattern in batch-processing systems where data arrives in chunks):</p>
-<div id="a078f8b8" class="cell" data-execution_count="18">
+<div id="bf61036f" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same pipeline, different data batches</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>batches <span class="op">=</span> [</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    pl.DataFrame({</span>
@@ -2210,7 +2210,7 @@ Batch 2: PASSED</code></pre>
 </section>
 <section id="whats-next" class="level1">
 <h1>What’s Next</h1>
-<p>You now have a solid understanding of how <code>Pipeline</code> enforces data quality at both boundaries of a transformation. You’ve seen how to run full pipelines, inspect results, validate boundaries independently, handle violations, tune thresholds per environment, and detect transform bugs through dual-boundary validation.</p>
+<p>You now have a solid understanding of how <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> enforces data quality at both boundaries of a transformation. You’ve seen how to run full pipelines, inspect results, validate boundaries independently, handle violations, tune thresholds per environment, and detect transform bugs through dual-boundary validation.</p>
 <p>The next guide page covers <strong>YAML Contracts</strong>: how to serialize contracts and pipelines to YAML files for version control, team collaboration, and configuration-driven validation workflows. YAML serialization is especially powerful in production environments where contracts should be managed as configuration rather than code, enabling non-developers to review and modify data quality rules.</p>
 
 
@@ -2571,7 +2571,7 @@ Batch 2: PASSED</code></pre>
 <footer class="footer">
   <div class="nav-footer">
 <div class="nav-footer-center">
-<p>Developed by <strong>Richard&nbsp;Iannone</strong> and <strong>Rich&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+<p>Developed by <strong>Richard&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
 </div>
 </div>
 </footer>

@@ -1407,6 +1407,179 @@ Note that the output does not know how the data was obtained, so it uses the pla
 be replaced with the actual data variable.
 
 
+## Contracts and Pipelines
+
+Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+
+
+
+Contract(name: 'str', direction: "Literal['source', 'target']" = 'source', schema: 'Schema | None' = None, steps: 'list[Step]' = <factory>, version: 'str | None' = None, owner: 'str | None' = None, consumers: 'str | list[str] | None' = None, description: 'str | None' = None, thresholds: 'Thresholds | None' = None, on_violation: "Literal['warn', 'raise', 'log']" = 'warn') -> None
+
+A declarative boundary contract for pipeline data.
+
+A Contract defines what data must look like at a specific point in a pipeline.
+It combines a Schema (structural expectations) with validation Steps (semantic
+expectations) and metadata (ownership, versioning, directionality).
+
+Parameters
+----------
+name
+    A human-readable name for this contract (e.g., "raw_clickstream_feed").
+direction
+    Either "source" (inbound data) or "target" (outbound data product).
+    This is metadata for reporting and does not change validation behavior.
+schema
+    A Schema object defining expected column names and types.
+steps
+    A list of Step objects defining validation rules beyond schema checks.
+version
+    Semantic version string for tracking contract evolution.
+owner
+    Who is responsible for maintaining this contract.
+consumers
+    Who depends on data conforming to this contract.
+description
+    Optional longer description of the contract's purpose.
+thresholds
+    Default thresholds for this contract's validations.
+on_violation
+    What to do when the contract is violated: "warn", "raise", or "log".
+    Default is "warn".
+
+Examples
+--------
+```python
+import pointblank as pb
+
+source_contract = pb.Contract(
+    name="raw_sales_feed",
+    direction="source",
+    schema=pb.Schema(
+        order_id="String",
+        amount_cents="Int64",
+        currency="String",
+    ),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "amount_cents"]),
+        pb.Step("rows_distinct", columns=["order_id"]),
+    ],
+    version="1.0.0",
+    owner="data-platform-team",
+)
+```
+
+Step(method: 'str', **kwargs: 'Any') -> 'None'
+
+A single validation step in a Contract, defined declaratively.
+
+This is the declarative equivalent of calling a validation method on Validate.
+Steps are stored as data and compiled into Validate method calls at enforcement time.
+
+Parameters
+----------
+method
+    The validation method name (e.g., "col_vals_gt", "rows_distinct").
+**kwargs
+    All parameters that would be passed to the corresponding Validate method.
+
+Examples
+--------
+```python
+import pointblank as pb
+
+# A step that checks column values are greater than 0
+step = pb.Step("col_vals_gt", columns="amount", value=0)
+
+# A step that checks rows are distinct by a key column
+step = pb.Step("rows_distinct", columns=["order_id"])
+
+# A step that checks a regex pattern
+step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")
+```
+
+Pipeline(source: 'Contract | None' = None, target: 'Contract | None' = None, thresholds: 'Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, label: 'str | None' = None, short_circuit: 'bool' = True) -> None
+
+Binds source and target contracts into a pipeline boundary enforcement unit.
+
+A Pipeline enforces data quality at both the ingestion point ("boundary in") and
+the output point ("boundary out") of a data transformation. It validates that data
+entering a pipeline meets source contract requirements, and that data leaving meets
+target contract requirements.
+
+Parameters
+----------
+source
+    The source (inbound) Contract.
+target
+    The target (outbound) Contract, or None if only validating inbound data.
+thresholds
+    Global thresholds applied to both boundary validations (overrides contract-level
+    thresholds).
+actions
+    Actions triggered on threshold exceedance at either boundary.
+final_actions
+    Actions triggered after both validations complete.
+label
+    A label for this pipeline (used in reports).
+short_circuit
+    If True (default), skip the transform and target validation when source validation
+    fails critically. Set to False to always run both validations.
+
+Examples
+--------
+```python
+import pointblank as pb
+
+source_contract = pb.Contract(
+    name="raw_data",
+    direction="source",
+    steps=[pb.Step("col_vals_not_null", columns=["id"])],
+)
+
+target_contract = pb.Contract(
+    name="clean_data",
+    direction="target",
+    steps=[pb.Step("col_vals_not_null", columns=pb.everything())],
+)
+
+pipeline = pb.Pipeline(
+    source=source_contract,
+    target=target_contract,
+)
+
+# Validate source data
+source_result = pipeline.validate_source(raw_data)
+
+# Validate target data
+target_result = pipeline.validate_target(clean_data)
+
+# Or do it all in one shot
+result = pipeline.run(data=raw_data, transform=my_transform)
+```
+
+PipelineResult(source_validation: 'Validate | None' = None, target_validation: 'Validate | None' = None, transform_output: 'Any' = None, _source_passed: 'bool | None' = None, _target_passed: 'bool | None' = None) -> None
+
+Result of a pipeline boundary validation run.
+
+Contains the validation results for both source and target boundaries,
+plus metadata about the run.
+
+Attributes
+----------
+source_validation
+    The Validate object for the source boundary (or None if no source contract).
+target_validation
+    The Validate object for the target boundary (or None if no target contract).
+transform_output
+    The transformed data (only available when using `Pipeline.run()`).
+passed
+    True only if BOTH boundary validations pass (no critical failures).
+source_passed
+    True if the source boundary validation passes.
+target_passed
+    True if the target boundary validation passes.
+
+
 ## Validation Steps
 
 Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
