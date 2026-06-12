@@ -73,3 +73,33 @@ class Step:
             return {self.method: dict(self.kwargs)}
         return {self.method: {}}
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Step:
+        """Construct a Step from a dictionary (e.g., parsed from YAML).
+
+        Parameters
+        ----------
+        data
+            A dictionary with a single key (the method name) mapping to its kwargs dict.
+
+        Returns
+        -------
+        Step
+            A new Step instance.
+        """
+        if len(data) != 1:
+            raise ValueError(
+                f"Step dictionary must have exactly one key (the method name), got {len(data)} keys."
+            )
+        method = next(iter(data))
+        kwargs = data[method]
+        if kwargs is None:
+            kwargs = {}
+        if not isinstance(kwargs, dict):
+            raise TypeError(
+                f"Step kwargs must be a dictionary, got {type(kwargs).__name__} for method "
+                f"'{method}'."
+            )
+        return cls(method, **kwargs)
+
+
