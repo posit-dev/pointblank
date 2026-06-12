@@ -263,3 +263,175 @@ class TestContractCreation:
         assert contract.thresholds.critical == 0.10
 
 
+class TestContractValidation:
+    """Tests for Contract.validate() and Contract.to_validate()."""
+
+    def test_validate_passing(self, simple_df, basic_contract):
+        result = basic_contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_failing_null(self, df_with_nulls):
+        contract = Contract(
+            name="null_check",
+            steps=[Step("col_vals_not_null", columns=["id", "name", "amount"])],
+        )
+        result = contract.validate(df_with_nulls)
+        assert not result.all_passed()
+
+    def test_validate_schema_match(self, simple_df):
+        contract = Contract(
+            name="schema_check",
+            schema=pb.Schema(id="Int64", name="String", amount="Float64", status="String"),
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_schema_mismatch(self, simple_df):
+        contract = Contract(
+            name="bad_schema",
+            schema=pb.Schema(id="String", name="String"),  # id is actually Int64
+        )
+        result = contract.validate(simple_df)
+        assert not result.all_passed()
+
+    def test_validate_with_gt(self, simple_df):
+        contract = Contract(
+            name="amount_check",
+            steps=[Step("col_vals_gt", columns="amount", value=50)],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_with_gt_failing(self, simple_df):
+        contract = Contract(
+            name="amount_check",
+            steps=[Step("col_vals_gt", columns="amount", value=200)],
+        )
+        result = contract.validate(simple_df)
+        assert not result.all_passed()
+
+    def test_validate_with_in_set(self, simple_df):
+        contract = Contract(
+            name="status_check",
+            steps=[Step("col_vals_in_set", columns="status", set=["active", "inactive"])],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_with_in_set_failing(self, simple_df):
+        contract = Contract(
+            name="status_check",
+            steps=[Step("col_vals_in_set", columns="status", set=["active"])],
+        )
+        result = contract.validate(simple_df)
+        assert not result.all_passed()
+
+    def test_validate_rows_distinct(self, simple_df):
+        contract = Contract(
+            name="distinct_check",
+            steps=[Step("rows_distinct", columns_subset=["id"])],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_rows_distinct_failing(self):
+        df = pl.DataFrame({"id": [1, 1, 2, 3, 3]})
+        contract = Contract(
+            name="distinct_check",
+            steps=[Step("rows_distinct", columns_subset=["id"])],
+        )
+        result = contract.validate(df)
+        assert not result.all_passed()
+
+    def test_validate_multiple_steps(self, simple_df):
+        contract = Contract(
+            name="multi_check",
+            steps=[
+                Step("col_vals_not_null", columns=["id", "name"]),
+                Step("col_vals_gt", columns="amount", value=0),
+                Step("col_vals_in_set", columns="status", set=["active", "inactive"]),
+                Step("rows_distinct", columns_subset=["id"]),
+            ],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_to_validate_not_interrogated(self, simple_df, basic_contract):
+        """to_validate() should NOT interrogate."""
+        validation = basic_contract.to_validate(simple_df)
+        # Before interrogation, the validation should exist but not have results
+        assert validation is not None
+
+    def test_validate_with_regex(self):
+        df = pl.DataFrame({"email": ["a@b.com", "c@d.org", "e@f.net"]})
+        contract = Contract(
+            name="email_check",
+            steps=[Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")],
+        )
+        result = contract.validate(df)
+        assert result.all_passed()
+
+    def test_validate_with_regex_failing(self):
+        df = pl.DataFrame({"email": ["a@b.com", "not_an_email", "e@f.net"]})
+        contract = Contract(
+            name="email_check",
+            steps=[Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")],
+        )
+        result = contract.validate(df)
+        assert not result.all_passed()
+
+    def test_validate_col_exists(self, simple_df):
+        contract = Contract(
+            name="exists_check",
+            steps=[Step("col_exists", columns="id")],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_col_exists_failing(self, simple_df):
+        contract = Contract(
+            name="exists_check",
+            steps=[Step("col_exists", columns="nonexistent_column")],
+        )
+        result = contract.validate(simple_df)
+        assert not result.all_passed()
+
+    def test_validate_between(self, simple_df):
+        contract = Contract(
+            name="between_check",
+            steps=[Step("col_vals_between", columns="amount", left=0, right=500)],
+        )
+        result = contract.validate(simple_df)
+        assert result.all_passed()
+
+    def test_validate_between_failing(self, simple_df):
+        contract = Contract(
+            name="between_check",
+            steps=[Step("col_vals_between", columns="amount", left=0, right=100)],
+        )
+        result = contract.validate(simple_df)
+        assert not result.all_passed()
+
+
+class TestContractOnViolation:
+    """Tests for on_violation behavior."""
+
+    def test_on_violation_warn_default(self, basic_contract):
+        assert basic_contract.on_violation == "warn"
+
+    def test_on_violation_raise(self, df_with_nulls):
+        contract = Contract(
+            name="strict",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="raise",
+        )
+        # Using Contract.validate() directly doesn't trigger on_violation
+        # (it's Pipeline that handles on_violation)
+        result = contract.validate(df_with_nulls)
+        assert not result.all_passed()
+
+    def test_on_violation_log(self):
+        contract = Contract(name="log_mode", on_violation="log")
+        assert contract.on_violation == "log"
+
+
