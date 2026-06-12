@@ -235,3 +235,63 @@ class Contract:
                     f"Valid methods are: {sorted(_VALID_VALIDATION_METHODS)}"
                 )
 
+    def to_validate(self, data: IntoDataFrame) -> Validate:
+        """Compile this Contract into a Validate object ready for interrogation.
+
+        This creates a Validate object with all schema checks and validation steps
+        from this contract applied. The resulting Validate object has NOT been
+        interrogated yet — call `.interrogate()` on it to execute the validation.
+
+        Parameters
+        ----------
+        data
+            The data table to validate against this contract.
+
+        Returns
+        -------
+        Validate
+            A Validate object with all contract checks applied (not yet interrogated).
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        contract = pb.Contract(
+            name="my_data",
+            schema=pb.Schema(id="Int64", name="String"),
+            steps=[pb.Step("col_vals_not_null", columns=["id"])],
+        )
+
+        # Create and interrogate
+        validation = contract.to_validate(my_data).interrogate()
+        ```
+        """
+        from pointblank.validate import Validate
+
+        validation = Validate(
+            data=data,
+            tbl_name=self.name,
+            label=f"Contract: {self.name}" + (f" v{self.version}" if self.version else ""),
+            thresholds=self.thresholds,
+            owner=self.owner,
+            consumers=self.consumers,
+            version=self.version,
+        )
+
+        # Add schema validation if a schema is defined
+        if self.schema is not None:
+            validation = validation.col_schema_match(schema=self.schema)
+
+        # Add each step as a validation method call
+        for step in self.steps:
+            method = getattr(validation, step.method, None)
+            if method is None:
+                raise AttributeError(
+                    f"Validate object has no method '{step.method}'. "
+                    f"This may indicate a version mismatch."
+                )
+            validation = method(**step.kwargs)
+
+        return validation
+
