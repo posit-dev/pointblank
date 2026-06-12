@@ -205,3 +205,38 @@ suitable for logging or printing in CI/CD output:
 print(result.get_report())
 ```
 
+## Validating Boundaries Independently
+
+You don't have to use `run()`. You can validate each boundary separately when you need more
+control over the workflow. The `validate_source()` and `validate_target()` methods each return
+a standard `Validate` object (not a `PipelineResult`), giving you direct access to the
+interrogation results.
+
+This pattern is particularly useful when:
+
+- Your transform has side effects (writing to a database, calling an API) that you don't want
+triggered during validation testing
+- You need to inspect or modify intermediate data between the two validation steps
+- You're building a custom orchestration layer that needs finer-grained control
+- You want to run just one boundary check in a unit test
+
+```{python}
+# Validate just the source
+source_result = pipeline.validate_source(raw_transactions)
+print(f"Source all passed: {source_result.all_passed()}")
+```
+
+```{python}
+# Run your transform manually
+clean_data = process_transactions(raw_transactions)
+
+# Then validate the target
+target_result = pipeline.validate_target(clean_data)
+print(f"Target all passed: {target_result.all_passed()}")
+```
+
+This is useful when your transform is complex, has side effects, or when you want to inspect
+intermediate results before proceeding. Notice that these methods return `Validate` objects
+directly, so you call `.all_passed()` on them rather than checking `.passed` as you would on a
+`PipelineResult`.
+
