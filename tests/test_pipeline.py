@@ -201,3 +201,66 @@ class TestPipelineCreation:
         assert pipeline.short_circuit is False
 
 
+# ─── Pipeline.validate_source() Tests ────────────────────────────────────────────
+
+
+class TestPipelineValidateSource:
+    """Tests for Pipeline.validate_source()."""
+
+    def test_validate_source_passing(self, raw_data, basic_pipeline):
+        result = basic_pipeline.validate_source(raw_data)
+        assert result.all_passed()
+
+    def test_validate_source_failing(self, raw_data_with_issues):
+        contract = Contract(
+            name="strict",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id", "amount_cents"])],
+        )
+        pipeline = Pipeline(source=contract)
+        result = pipeline.validate_source(raw_data_with_issues)
+        assert not result.all_passed()
+
+    def test_validate_source_no_source_raises(self, raw_data, target_contract):
+        pipeline = Pipeline(target=target_contract)
+        with pytest.raises(ValueError, match="No source contract"):
+            pipeline.validate_source(raw_data)
+
+    def test_validate_source_on_violation_warn(self, raw_data_with_issues):
+        contract = Contract(
+            name="warn_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="warn",
+        )
+        pipeline = Pipeline(source=contract)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            pipeline.validate_source(raw_data_with_issues)
+            assert len(w) == 1
+            assert "violated" in str(w[0].message)
+
+    def test_validate_source_on_violation_raise(self, raw_data_with_issues):
+        contract = Contract(
+            name="strict_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=contract)
+        with pytest.raises(RuntimeError, match="violated"):
+            pipeline.validate_source(raw_data_with_issues)
+
+    def test_validate_source_on_violation_log(self, raw_data_with_issues, caplog):
+        contract = Contract(
+            name="log_source",
+            direction="source",
+            steps=[Step("col_vals_not_null", columns=["id"])],
+            on_violation="log",
+        )
+        pipeline = Pipeline(source=contract)
+        with caplog.at_level(logging.WARNING, logger="pointblank.contract"):
+            pipeline.validate_source(raw_data_with_issues)
+        assert "violated" in caplog.text
+
+
