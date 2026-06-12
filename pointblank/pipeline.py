@@ -446,3 +446,83 @@ class Pipeline:
 
         return pipeline_dict
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Pipeline:
+        """Construct a Pipeline from a dictionary (e.g., parsed from YAML).
+
+        Parameters
+        ----------
+        data
+            A dictionary representation of a pipeline.
+
+        Returns
+        -------
+        Pipeline
+            A new Pipeline instance.
+        """
+        from pointblank.contract import Contract, _dict_to_thresholds
+
+        pipeline_meta = data.get("pipeline", {})
+        label = pipeline_meta.get("label")
+        short_circuit = pipeline_meta.get("short_circuit", True)
+
+        # Parse thresholds
+        thresholds = None
+        thresholds_data = pipeline_meta.get("thresholds")
+        if thresholds_data is not None:
+            thresholds = _dict_to_thresholds(thresholds_data)
+
+        # Parse source contract
+        source = None
+        source_data = data.get("source")
+        if source_data is not None:
+            if "direction" not in source_data:
+                source_data["direction"] = "source"
+            source = Contract.from_dict(source_data)
+
+        # Parse target contract
+        target = None
+        target_data = data.get("target")
+        if target_data is not None:
+            if "direction" not in target_data:
+                target_data["direction"] = "target"
+            target = Contract.from_dict(target_data)
+
+        return cls(
+            source=source,
+            target=target,
+            thresholds=thresholds,
+            label=label,
+            short_circuit=short_circuit,
+        )
+
+    @classmethod
+    def from_yaml(cls, path: str) -> Pipeline:
+        """Load a Pipeline from a YAML file.
+
+        Parameters
+        ----------
+        path
+            Path to the YAML file.
+
+        Returns
+        -------
+        Pipeline
+            A new Pipeline instance.
+        """
+        from pathlib import Path
+
+        import yaml
+
+        yaml_path = Path(path)
+        if not yaml_path.exists():
+            raise FileNotFoundError(f"YAML file not found: {path}")
+
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+
+        if data is None:
+            raise ValueError(f"YAML file is empty: {path}")
+
+        return cls.from_dict(data)
+
