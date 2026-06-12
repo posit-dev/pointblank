@@ -1,0 +1,42 @@
+---
+title: YAML Contracts & Pipelines
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Contracts and pipelines are designed to be **data, not code**. They serialize cleanly to YAML,
+making them ideal for version control, team collaboration, and configuration-driven workflows. This
+guide covers how to write, load, and use YAML-based contracts and pipelines.
+
+When you define a contract in Python, it lives inside your application code. That's fine for quick
+validation tasks, but in production data platforms you often want the *specification* of what data
+should look like to live separately from the *code* that processes it. YAML contracts give you
+exactly that separation with a human-readable, machine-parseable definition of data expectations
+that anyone on your team can read, review, and modify.
+
+## Why YAML?
+
+YAML contracts offer several advantages over defining contracts purely in Python:
+
+- **Version-controllable**: track contract changes alongside your code in Git, with clear diffs
+  when expectations evolve
+- **Language-agnostic**: contracts can be understood (and even authored) by non-Python team members
+  such as data analysts, product managers, or compliance officers
+- **Separates concerns**: validation rules live apart from transform logic, meaning you can update
+  expectations without touching application code
+- **CI/CD friendly**: load and enforce contracts in automated pipelines and gate deployments on
+  contract compliance
+- **Reviewable**: pull requests that change data contracts are easy to review because the YAML
+  format highlights exactly what changed in a readable way
+
+The YAML approach doesn't replace the Python API but, rather, it complements it. Use YAML for
+stable, well-defined contracts that change infrequently, and Python for exploratory validation or
+complex logic that benefits from programmatic construction.
+
