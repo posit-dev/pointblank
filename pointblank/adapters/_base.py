@@ -142,3 +142,41 @@ class ContractImport:
         contract_kwargs.update(kwargs)
         return Contract(**contract_kwargs)
 
+class ContractAdapter:
+    """Base class for contract import/export adapters.
+
+    Subclass this to add support for a new external format.
+
+    Attributes
+    ----------
+    format_name
+        Short identifier for this format (e.g., `"json_schema"`).
+    file_extensions
+        File extensions associated with this format (e.g., `[".json"]`).
+    supports_import
+        Whether this adapter supports importing from the format.
+    supports_export
+        Whether this adapter supports exporting to the format.
+    """
+
+    format_name: str = ""
+    file_extensions: list[str] = []
+    supports_import: bool = True
+    supports_export: bool = True
+
+    @staticmethod
+    def detect(source: Any) -> bool:
+        """Return True if this adapter can handle the given source.
+
+        Parameters
+        ----------
+        source
+            A file path string, dict, or Python object to inspect.
+
+        Returns
+        -------
+        bool
+            True if this adapter can handle the source.
+        """
+        raise NotImplementedError
+
