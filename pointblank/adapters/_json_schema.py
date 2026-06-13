@@ -131,3 +131,172 @@ class JSONSchemaAdapter(ContractAdapter):
 
         return schema_doc
 
+    def _parse_schema(
+        self, schema_doc: dict[str, Any], source_path: str | None = None
+    ) -> ContractImport:
+        """Parse a JSON Schema dict into a ContractImport."""
+        columns: list[tuple[str, str | None]] = []
+        constraints: list[MappedConstraint] = []
+        warnings: list[str] = []
+        metadata: dict[str, Any] = {}
+
+        # Extract metadata
+        if "title" in schema_doc:
+            metadata["title"] = schema_doc["title"]
+        if "description" in schema_doc:
+            metadata["description"] = schema_doc["description"]
+
+        # Detect schema version
+        source_version = schema_doc.get("$schema")
+
+        # Extract properties (the main column definitions)
+        properties = schema_doc.get("properties", {})
+        required_fields = set(schema_doc.get("required", []))
+
+        total_constraints = 0
+
+        for prop_name, prop_schema in properties.items():
+            # Determine dtype from type
+            prop_type = prop_schema.get("type")
+            dtype = None
+            if isinstance(prop_type, str):
+                dtype = _JSON_SCHEMA_TYPE_MAP.get(prop_type)
+            elif isinstance(prop_type, list):
+                # Union type like ["string", "null"] — use the non-null type
+                non_null = [t for t in prop_type if t != "null"]
+                if non_null:
+                    dtype = _JSON_SCHEMA_TYPE_MAP.get(non_null[0])
+
+            columns.append((prop_name, dtype))
+
+            # Required fields -> col_vals_not_null
+            if prop_name in required_fields:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_not_null",
+                        kwargs={"columns": prop_name},
+                        source_description=f"required field: {prop_name}",
+                    )
+                )
+
+            # minimum -> col_vals_ge
+            if "minimum" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_ge",
+                        kwargs={"columns": prop_name, "value": prop_schema["minimum"]},
+                        source_description=f"minimum: {prop_schema['minimum']}",
+                    )
+                )
+
+            # maximum -> col_vals_le
+            if "maximum" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_le",
+                        kwargs={"columns": prop_name, "value": prop_schema["maximum"]},
+                        source_description=f"maximum: {prop_schema['maximum']}",
+                    )
+                )
+
+            # exclusiveMinimum -> col_vals_gt
+            if "exclusiveMinimum" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_gt",
+                        kwargs={
+                            "columns": prop_name,
+                            "value": prop_schema["exclusiveMinimum"],
+                        },
+                        source_description=f"exclusiveMinimum: {prop_schema['exclusiveMinimum']}",
+                    )
+                )
+
+            # exclusiveMaximum -> col_vals_lt
+            if "exclusiveMaximum" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_lt",
+                        kwargs={
+                            "columns": prop_name,
+                            "value": prop_schema["exclusiveMaximum"],
+                        },
+                        source_description=f"exclusiveMaximum: {prop_schema['exclusiveMaximum']}",
+                    )
+                )
+
+            # enum -> col_vals_in_set
+            if "enum" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_in_set",
+                        kwargs={"columns": prop_name, "set": prop_schema["enum"]},
+                        source_description=f"enum: {prop_schema['enum']}",
+                    )
+                )
+
+            # pattern -> col_vals_regex
+            if "pattern" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_regex",
+                        kwargs={"columns": prop_name, "pattern": prop_schema["pattern"]},
+                        source_description=f"pattern: {prop_schema['pattern']}",
+                    )
+                )
+
+            # format -> col_vals_within_spec (where applicable)
+            if "format" in prop_schema:
+                fmt = prop_schema["format"]
+                spec = _JSON_SCHEMA_FORMAT_MAP.get(fmt)
+                if spec:
+                    total_constraints += 1
+                    constraints.append(
+                        MappedConstraint(
+                            method="col_vals_within_spec",
+                            kwargs={"columns": prop_name, "spec": spec},
+                            source_description=f"format: {fmt}",
+                        )
+                    )
+                else:
+                    total_constraints += 1
+                    warnings.append(
+                        f"Column '{prop_name}': JSON Schema format '{fmt}' has no "
+                        f"Pointblank equivalent — skipped."
+                    )
+
+            # const -> col_vals_eq
+            if "const" in prop_schema:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_eq",
+                        kwargs={"columns": prop_name, "value": prop_schema["const"]},
+                        source_description=f"const: {prop_schema['const']}",
+                    )
+                )
+
+        # Calculate coverage
+        coverage = 1.0
+        if total_constraints > 0:
+            mapped_count = total_constraints - len(warnings)
+            coverage = mapped_count / total_constraints
+
+        return ContractImport(
+            source_format="json_schema",
+            source_path=source_path,
+            source_version=source_version,
+            columns=columns,
+            constraints=constraints,
+            metadata=metadata,
+            warnings=warnings,
+            coverage=coverage,
+        )
+
