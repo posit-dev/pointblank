@@ -15,7 +15,7 @@ _JSON_SCHEMA_TYPE_MAP: dict[str, str] = {
     "boolean": "Boolean",
 }
 
-# Mapping from JSON Schema "format" to col_vals_within_spec specs
+# Mapping from JSON Schema "format" to `col_vals_within_spec()` specs
 _JSON_SCHEMA_FORMAT_MAP: dict[str, str] = {
     "email": "email",
     "uri": "url",
