@@ -142,6 +142,93 @@ class ContractImport:
         contract_kwargs.update(kwargs)
         return Contract(**contract_kwargs)
 
+    def to_python(self) -> str:
+        """Generate Python code string for the validation workflow.
+
+        Returns
+        -------
+        str
+            Python source code that recreates the validation.
+        """
+        lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate(data=data)"]
+
+        # Schema step
+        schema_cols = {name: dtype for name, dtype in self.columns if dtype is not None}
+        if schema_cols:
+            schema_args = ", ".join(f'{name}="{dtype}"' for name, dtype in schema_cols.items())
+            lines.append(f"    .col_schema_match(schema=pb.Schema({schema_args}))")
+
+        # Constraint steps
+        for constraint in self.constraints:
+            kwargs_str = ", ".join(f"{k}={v!r}" for k, v in constraint.kwargs.items())
+            lines.append(f"    .{constraint.method}({kwargs_str})")
+
+        lines.append(")")
+        lines.append("")
+        lines.append("validation.interrogate()")
+        return "\n".join(lines)
+
+    def to_yaml(self) -> str:
+        """Generate Pointblank YAML configuration string.
+
+        Returns
+        -------
+        str
+            YAML representation of the validation.
+        """
+        import yaml
+
+        steps_list = []
+
+        # Schema step
+        schema_cols = {name: dtype for name, dtype in self.columns if dtype is not None}
+        if schema_cols:
+            steps_list.append({"col_schema_match": {"schema": schema_cols}})
+
+        # Constraint steps
+        for constraint in self.constraints:
+            steps_list.append({constraint.method: dict(constraint.kwargs)})
+
+        doc = {"validation": {"steps": steps_list}}
+        return yaml.dump(doc, default_flow_style=False, sort_keys=False)
+
+    def summary(self) -> str:
+        """Return a human-readable summary of what was imported.
+
+        Returns
+        -------
+        str
+            A formatted summary string.
+        """
+        lines = [
+            "Contract Import Summary",
+            f"  Format: {self.source_format}",
+        ]
+        if self.source_path:
+            lines.append(f"  Source: {self.source_path}")
+        if self.source_version:
+            lines.append(f"  Format version: {self.source_version}")
+
+        lines.append(f"  Columns detected: {len(self.columns)}")
+        lines.append(f"  Constraints mapped: {len(self.constraints)}")
+        lines.append(f"  Coverage: {self.coverage:.0%}")
+
+        if self.warnings:
+            lines.append(f"  Warnings ({len(self.warnings)}):")
+            for w in self.warnings:
+                lines.append(f"    - {w}")
+
+        return "\n".join(lines)
+
+    def __repr__(self) -> str:
+        return (
+            f"ContractImport(format={self.source_format!r}, "
+            f"columns={len(self.columns)}, "
+            f"constraints={len(self.constraints)}, "
+            f"coverage={self.coverage:.0%})"
+        )
+
+
 class ContractAdapter:
     """Base class for contract import/export adapters.
 
