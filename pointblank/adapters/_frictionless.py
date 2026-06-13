@@ -458,3 +458,20 @@ def _apply_step_to_fields(
             constraints["pattern"] = kwargs.get("pattern")
 
 
+def _extract_validate_step_kwargs_from_info(step_info: Any) -> dict[str, Any]:
+    """Extract kwargs from a _ValidationInfo object."""
+    kwargs: dict[str, Any] = {}
+    if hasattr(step_info, "column") and step_info.column:
+        kwargs["columns"] = step_info.column
+    if hasattr(step_info, "values") and step_info.values is not None:
+        val = step_info.values
+        if isinstance(val, (list, tuple)):
+            kwargs["set"] = list(val)
+        else:
+            kwargs["value"] = val
+    if hasattr(step_info, "val_info") and step_info.val_info:
+        val_info = step_info.val_info
+        if isinstance(val_info, dict):
+            if "pattern" in val_info:
+                kwargs["pattern"] = val_info["pattern"]
+    return kwargs
