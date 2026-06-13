@@ -336,3 +336,34 @@ class JSONSchemaAdapter(ContractAdapter):
 
         return schema_doc
 
+    def _export_from_validate(self, validation: Any) -> dict[str, Any]:
+        """Export a Validate object to JSON Schema.
+
+        This is a best-effort export. It scans the validation steps and maps them back to JSON
+        Schema constraints where possible.
+        """
+        schema_doc: dict[str, Any] = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+        }
+
+        if hasattr(validation, "_tbl_name") and validation._tbl_name:
+            schema_doc["title"] = validation._tbl_name
+
+        properties: dict[str, Any] = {}
+        required: list[str] = []
+
+        # Walk through validation steps
+        for step in validation.validation_info:
+            method = step.assertion_type
+            kwargs = _extract_step_kwargs_from_info(step)
+            _apply_step_to_properties(method, kwargs, properties, required)
+
+        if properties:
+            schema_doc["properties"] = properties
+        if required:
+            schema_doc["required"] = required
+
+        return schema_doc
+
+
