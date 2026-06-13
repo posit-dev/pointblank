@@ -414,3 +414,47 @@ def _pb_dtype_to_frictionless_type(dtype: str) -> str | None:
     return None
 
 
+def _apply_step_to_fields(
+    method: str,
+    kwargs: dict[str, Any],
+    field_map: dict[str, dict[str, Any]],
+    fields: list[dict[str, Any]],
+) -> None:
+    """Apply a validation step to Frictionless field definitions."""
+    columns = kwargs.get("columns", kwargs.get("column", kwargs.get("columns_subset")))
+    if columns is None:
+        return
+
+    if isinstance(columns, str):
+        col_list = [columns]
+    elif isinstance(columns, list):
+        col_list = columns
+    else:
+        return
+
+    for col in col_list:
+        if col not in field_map:
+            field_def: dict[str, Any] = {"name": col}
+            fields.append(field_def)
+            field_map[col] = field_def
+
+        field_def = field_map[col]
+        if "constraints" not in field_def:
+            field_def["constraints"] = {}
+
+        constraints = field_def["constraints"]
+
+        if method == "col_vals_not_null":
+            constraints["required"] = True
+        elif method == "rows_distinct":
+            constraints["unique"] = True
+        elif method == "col_vals_ge":
+            constraints["minimum"] = kwargs.get("value")
+        elif method == "col_vals_le":
+            constraints["maximum"] = kwargs.get("value")
+        elif method == "col_vals_in_set":
+            constraints["enum"] = kwargs.get("set")
+        elif method == "col_vals_regex":
+            constraints["pattern"] = kwargs.get("pattern")
+
+
