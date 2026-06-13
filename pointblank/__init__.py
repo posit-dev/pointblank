@@ -10,6 +10,14 @@ except PackageNotFoundError:  # pragma: no cover
 
 # Import objects from the module
 from pointblank.actions import send_slack_notification
+from pointblank.adapters import (
+    ContractAdapter,
+    ContractImport,
+    export_contract,
+    import_contract,
+    list_adapters,
+    register_adapter,
+)
 from pointblank.assistant import assistant
 from pointblank.column import (
     col,
