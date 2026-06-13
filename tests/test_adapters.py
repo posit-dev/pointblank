@@ -171,3 +171,95 @@ class TestRegistry:
         del _ADAPTER_REGISTRY["test_custom"]
 
 
+class TestContractImport:
+    def test_to_validate(self, simple_df):
+        result = ContractImport(
+            source_format="test",
+            columns=[("age", "Int64"), ("name", "String")],
+            constraints=[
+                MappedConstraint(
+                    method="col_vals_ge",
+                    kwargs={"columns": "age", "value": 0},
+                ),
+                MappedConstraint(
+                    method="col_vals_not_null",
+                    kwargs={"columns": "name"},
+                ),
+            ],
+        )
+        validation = result.to_validate(data=simple_df)
+        # Should have schema check + 2 constraint steps
+        assert len(validation.validation_info) == 3
+
+    def test_to_contract(self):
+        result = ContractImport(
+            source_format="test",
+            columns=[("age", "Int64")],
+            constraints=[
+                MappedConstraint(
+                    method="col_vals_ge",
+                    kwargs={"columns": "age", "value": 0},
+                ),
+            ],
+            metadata={"description": "Test contract"},
+        )
+        contract = result.to_contract(name="my_contract")
+        assert contract.name == "my_contract"
+        assert contract.description == "Test contract"
+        assert contract.schema is not None
+        assert len(contract.steps) == 1
+        assert contract.steps[0].method == "col_vals_ge"
+
+    def test_to_python(self):
+        result = ContractImport(
+            source_format="test",
+            columns=[("age", "Int64")],
+            constraints=[
+                MappedConstraint(method="col_vals_ge", kwargs={"columns": "age", "value": 0}),
+            ],
+        )
+        code = result.to_python()
+        assert "import pointblank as pb" in code
+        assert "pb.Validate(data=data)" in code
+        assert ".col_vals_ge(" in code
+        assert "pb.Schema(" in code
+
+    def test_to_yaml(self):
+        result = ContractImport(
+            source_format="test",
+            columns=[("age", "Int64")],
+            constraints=[
+                MappedConstraint(method="col_vals_ge", kwargs={"columns": "age", "value": 0}),
+            ],
+        )
+        yaml_str = result.to_yaml()
+        assert "col_schema_match" in yaml_str
+        assert "col_vals_ge" in yaml_str
+
+    def test_summary(self):
+        result = ContractImport(
+            source_format="json_schema",
+            source_path="/path/to/file.json",
+            columns=[("a", "Int64"), ("b", "String")],
+            constraints=[MappedConstraint(method="col_vals_ge", kwargs={})],
+            warnings=["Some warning"],
+            coverage=0.8,
+        )
+        summary = result.summary()
+        assert "json_schema" in summary
+        assert "Columns detected: 2" in summary
+        assert "Constraints mapped: 1" in summary
+        assert "80%" in summary
+        assert "Some warning" in summary
+
+    def test_repr(self):
+        result = ContractImport(
+            source_format="json_schema",
+            columns=[("a", "Int64")],
+            constraints=[MappedConstraint(method="col_vals_ge", kwargs={})],
+            coverage=1.0,
+        )
+        assert "json_schema" in repr(result)
+        assert "columns=1" in repr(result)
+
+
