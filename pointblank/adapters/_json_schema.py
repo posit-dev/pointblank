@@ -56,3 +56,36 @@ class JSONSchemaAdapter(ContractAdapter):
 
         return False
 
+    def import_contract(self, source: Any, **kwargs: Any) -> ContractImport:
+        """Import a JSON Schema document into a ContractImport.
+
+        Parameters
+        ----------
+        source
+            A file path (str) to a .json file, or a dict with the schema content.
+        **kwargs
+            Not currently used.
+
+        Returns
+        -------
+        ContractImport
+            The import result.
+        """
+        source_path = None
+
+        if isinstance(source, str):
+            source_path = source
+            path = Path(source)
+            if not path.exists():
+                raise FileNotFoundError(f"JSON Schema file not found: {source}")
+            with open(path) as f:
+                schema_doc = json.load(f)
+        elif isinstance(source, dict):
+            schema_doc = source
+        else:
+            raise TypeError(
+                f"JSON Schema source must be a file path (str) or dict, got {type(source).__name__}"
+            )
+
+        return self._parse_schema(schema_doc, source_path=source_path)
+
