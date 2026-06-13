@@ -151,3 +151,51 @@ class FrictionlessAdapter(ContractAdapter):
 
         return table_schema
 
+    def _extract_table_schema(self, doc: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+        """Extract the Table Schema from a Data Package or standalone schema."""
+        # If it's already a Table Schema (has "fields")
+        if "fields" in doc and isinstance(doc["fields"], list):
+            return doc
+
+        # If it's a Data Package (has "resources")
+        if "resources" in doc:
+            resources = doc["resources"]
+            if not resources:
+                raise ValueError("Data Package has no resources.")
+
+            resource_key = kwargs.get("resource")
+
+            if resource_key is None:
+                # Use first resource
+                resource = resources[0]
+            elif isinstance(resource_key, int):
+                if resource_key >= len(resources):
+                    raise IndexError(
+                        f"Resource index {resource_key} out of range "
+                        f"(package has {len(resources)} resources)."
+                    )
+                resource = resources[resource_key]
+            elif isinstance(resource_key, str):
+                # Find by name
+                resource = None
+                for r in resources:
+                    if r.get("name") == resource_key:
+                        resource = r
+                        break
+                if resource is None:
+                    available = [r.get("name", f"<index {i}>") for i, r in enumerate(resources)]
+                    raise ValueError(f"Resource '{resource_key}' not found. Available: {available}")
+            else:
+                raise TypeError(f"resource must be str or int, got {type(resource_key).__name__}")
+
+            schema = resource.get("schema", {})
+            if "fields" not in schema:
+                raise ValueError(
+                    f"Resource has no 'schema.fields'. Got keys: {list(schema.keys())}"
+                )
+            return schema
+
+        raise ValueError(
+            "Document is neither a Table Schema (no 'fields') nor a Data Package (no 'resources')."
+        )
+
