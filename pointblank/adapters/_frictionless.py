@@ -373,3 +373,22 @@ class FrictionlessAdapter(ContractAdapter):
         table_schema: dict[str, Any] = {"fields": fields}
         return table_schema
 
+    def _export_from_validate(self, validation: Any) -> dict[str, Any]:
+        """Export a Validate to Frictionless Table Schema (best-effort)."""
+        fields: list[dict[str, Any]] = []
+        field_map: dict[str, dict[str, Any]] = {}
+
+        for step in validation.validation_info:
+            method = step.assertion_type
+            col = step.column
+            if col and col not in field_map:
+                field_def: dict[str, Any] = {"name": col}
+                fields.append(field_def)
+                field_map[col] = field_def
+
+            kwargs = _extract_validate_step_kwargs_from_info(step)
+            _apply_step_to_fields(method, kwargs, field_map, fields)
+
+        return {"fields": fields}
+
+
