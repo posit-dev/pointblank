@@ -103,3 +103,42 @@ class ContractImport:
 
         return validation
 
+    def to_contract(self, name: str = "imported_contract", **kwargs: Any) -> Contract:
+        """Build a Contract object from the imported data.
+
+        Parameters
+        ----------
+        name
+            Name for the created `Contract`.
+        **kwargs
+            Additional keyword arguments passed to the `Contract` constructor.
+
+        Returns
+        -------
+        Contract
+            A Contract object with schema and steps derived from the import.
+        """
+        from pointblank.contract import Contract, Step
+        from pointblank.schema import Schema
+
+        # Build schema from columns
+        schema = None
+        schema_cols = {col_name: dtype for col_name, dtype in self.columns if dtype is not None}
+        if schema_cols:
+            schema = Schema(**schema_cols)
+
+        # Build steps from constraints
+        steps = [Step(c.method, **c.kwargs) for c in self.constraints]
+
+        contract_kwargs: dict[str, Any] = {
+            "name": name,
+            "schema": schema,
+            "steps": steps,
+        }
+        # Merge in any metadata as description
+        if "description" in self.metadata and "description" not in kwargs:
+            contract_kwargs["description"] = self.metadata["description"]
+
+        contract_kwargs.update(kwargs)
+        return Contract(**contract_kwargs)
+
