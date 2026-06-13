@@ -430,3 +430,27 @@ def _apply_step_to_properties(
             properties[col]["const"] = kwargs.get("value")
 
 
+def _extract_step_kwargs_from_info(step_info: Any) -> dict[str, Any]:
+    """Extract kwargs-like dict from a `_ValidationInfo` object."""
+    kwargs: dict[str, Any] = {}
+
+    if hasattr(step_info, "column") and step_info.column:
+        kwargs["columns"] = step_info.column
+
+    if hasattr(step_info, "values") and step_info.values is not None:
+        val = step_info.values
+        if isinstance(val, (list, tuple)):
+            kwargs["set"] = list(val)
+        else:
+            kwargs["value"] = val
+
+    # Check val_info for pattern/spec
+    if hasattr(step_info, "val_info") and step_info.val_info:
+        val_info = step_info.val_info
+        if isinstance(val_info, dict):
+            if "pattern" in val_info:
+                kwargs["pattern"] = val_info["pattern"]
+            if "spec" in val_info:
+                kwargs["spec"] = val_info["spec"]
+
+    return kwargs
