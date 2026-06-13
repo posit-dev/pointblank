@@ -381,3 +381,52 @@ def _pb_dtype_to_json_type(dtype: str) -> str | None:
     return None
 
 
+def _apply_step_to_properties(
+    method: str,
+    kwargs: dict[str, Any],
+    properties: dict[str, Any],
+    required: list[str],
+) -> None:
+    """Apply a validation step's information to the JSON Schema properties dict."""
+    columns = kwargs.get("columns", kwargs.get("column", kwargs.get("columns_subset")))
+    if columns is None:
+        return
+
+    # Normalize to list
+    if isinstance(columns, str):
+        col_list = [columns]
+    elif isinstance(columns, list):
+        col_list = columns
+    else:
+        return
+
+    for col in col_list:
+        if col not in properties:
+            properties[col] = {}
+
+        if method == "col_vals_not_null":
+            if col not in required:
+                required.append(col)
+        elif method == "col_vals_ge":
+            properties[col]["minimum"] = kwargs.get("value")
+        elif method == "col_vals_le":
+            properties[col]["maximum"] = kwargs.get("value")
+        elif method == "col_vals_gt":
+            properties[col]["exclusiveMinimum"] = kwargs.get("value")
+        elif method == "col_vals_lt":
+            properties[col]["exclusiveMaximum"] = kwargs.get("value")
+        elif method == "col_vals_in_set":
+            properties[col]["enum"] = kwargs.get("set")
+        elif method == "col_vals_regex":
+            properties[col]["pattern"] = kwargs.get("pattern")
+        elif method == "col_vals_within_spec":
+            spec = kwargs.get("spec", "")
+            # Reverse map
+            for json_fmt, pb_spec in _JSON_SCHEMA_FORMAT_MAP.items():
+                if pb_spec == spec:
+                    properties[col]["format"] = json_fmt
+                    break
+        elif method == "col_vals_eq":
+            properties[col]["const"] = kwargs.get("value")
+
+
