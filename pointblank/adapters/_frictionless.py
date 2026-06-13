@@ -108,3 +108,46 @@ class FrictionlessAdapter(ContractAdapter):
 
         return self._parse_table_schema(table_schema, source_path=source_path)
 
+    def export_contract(
+        self,
+        validation_or_contract: Any,
+        destination: str | None = None,
+        **kwargs: Any,
+    ) -> str | dict[str, Any]:
+        """Export a Validate or Contract to Frictionless Table Schema format.
+
+        Parameters
+        ----------
+        validation_or_contract
+            A `Validate` or `Contract` object.
+        destination
+            Optional file path to write the Table Schema JSON.
+        **kwargs
+            Not currently used.
+
+        Returns
+        -------
+        dict
+            The Frictionless Table Schema as a dict.
+        """
+        from pointblank.contract import Contract
+        from pointblank.validate import Validate
+
+        if isinstance(validation_or_contract, Contract):
+            table_schema = self._export_from_contract(validation_or_contract)
+        elif isinstance(validation_or_contract, Validate):
+            table_schema = self._export_from_validate(validation_or_contract)
+        else:
+            raise TypeError(
+                f"Expected a Validate or Contract object, "
+                f"got {type(validation_or_contract).__name__}"
+            )
+
+        if destination is not None:
+            path = Path(destination)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "w") as f:
+                json.dump(table_schema, f, indent=2)
+
+        return table_schema
+
