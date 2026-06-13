@@ -78,3 +78,27 @@ def get_adapter(format_name: str) -> ContractAdapter:
     return _ADAPTER_REGISTRY[format_name]
 
 
+def list_adapters() -> dict[str, dict[str, Any]]:
+    """List all registered adapters with their capabilities.
+
+    Returns
+    -------
+    dict
+        A dictionary mapping format names to adapter info dicts with keys:
+
+        - "class": the adapter class name
+        - "file_extensions": associated file extensions
+        - "supports_import": whether import is supported
+        - "supports_export": whether export is supported
+    """
+    result = {}
+    for name, adapter in sorted(_ADAPTER_REGISTRY.items()):
+        result[name] = {
+            "class": type(adapter).__name__,
+            "file_extensions": adapter.file_extensions,
+            "supports_import": adapter.supports_import,
+            "supports_export": adapter.supports_export,
+        }
+    return result
+
+
