@@ -263,3 +263,116 @@ class TestContractImport:
         assert "columns=1" in repr(result)
 
 
+class TestJSONSchemaImport:
+    def test_import_from_dict(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+
+        assert result.source_format == "json_schema"
+        assert len(result.columns) == 5
+        assert result.metadata.get("title") == "User Profile"
+        assert result.metadata.get("description") == "Schema for user profile data"
+
+        # Check column dtypes
+        col_map = dict(result.columns)
+        assert col_map["age"] == "Int64"
+        assert col_map["email"] == "String"
+        assert col_map["status"] == "String"
+        assert col_map["score"] == "Float64"
+
+    def test_import_constraints_minimum_maximum(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        # age has minimum=0, maximum=150
+        assert ("col_vals_ge", {"columns": "age", "value": 0}) in methods
+        assert ("col_vals_le", {"columns": "age", "value": 150}) in methods
+
+    def test_import_constraints_exclusive(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        # score has exclusiveMinimum=0, exclusiveMaximum=100
+        assert ("col_vals_gt", {"columns": "score", "value": 0}) in methods
+        assert ("col_vals_lt", {"columns": "score", "value": 100}) in methods
+
+    def test_import_constraints_enum(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert (
+            "col_vals_in_set",
+            {"columns": "status", "set": ["active", "inactive", "pending"]},
+        ) in methods
+
+    def test_import_constraints_required(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("col_vals_not_null", {"columns": "age"}) in methods
+        assert ("col_vals_not_null", {"columns": "email"}) in methods
+
+    def test_import_constraints_pattern(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("col_vals_regex", {"columns": "name", "pattern": "^[A-Za-z ]+$"}) in methods
+
+    def test_import_constraints_format_email(self, json_schema_dict):
+        result = import_contract(json_schema_dict, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("col_vals_within_spec", {"columns": "email", "spec": "email"}) in methods
+
+    def test_import_from_file(self, json_schema_dict):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".schema.json", delete=False) as f:
+            json.dump(json_schema_dict, f)
+            f.flush()
+            result = import_contract(f.name, format="json_schema")
+
+        assert result.source_format == "json_schema"
+        assert result.source_path == f.name
+        assert len(result.columns) == 5
+
+    def test_import_file_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            import_contract("/nonexistent/file.schema.json", format="json_schema")
+
+    def test_import_invalid_type(self):
+        with pytest.raises(TypeError, match="must be a file path"):
+            import_contract(12345, format="json_schema")
+
+    def test_to_validate_end_to_end(self, json_schema_dict, simple_df):
+        result = import_contract(json_schema_dict, format="json_schema")
+        validation = result.to_validate(data=simple_df)
+        validation.interrogate()
+        # Should complete without error
+
+    def test_auto_detect_json_schema(self, json_schema_dict):
+        """Auto-detection works for JSON Schema dicts."""
+        result = import_contract(json_schema_dict)  # no format specified
+        assert result.source_format == "json_schema"
+
+    def test_const_constraint(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "version": {"type": "string", "const": "v2"},
+            },
+        }
+        result = import_contract(schema, format="json_schema")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_eq", {"columns": "version", "value": "v2"}) in methods
+
+    def test_nullable_union_type(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "nickname": {"type": ["string", "null"]},
+            },
+        }
+        result = import_contract(schema, format="json_schema")
+        col_map = dict(result.columns)
+        assert col_map["nickname"] == "String"
+
+
