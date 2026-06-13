@@ -68,3 +68,43 @@ class FrictionlessAdapter(ContractAdapter):
 
         return False
 
+    def import_contract(self, source: Any, **kwargs: Any) -> ContractImport:
+        """Import a Frictionless Table Schema or Data Package.
+
+        Parameters
+        ----------
+        source
+            A file path (str) to a JSON file, or a dict with the schema content.
+        resource
+            For Data Packages with multiple resources, the name or index of the resource to import.
+            Defaults to the first resource.
+        **kwargs
+            Additional options (e.g., `resource="my_table"`).
+
+        Returns
+        -------
+        ContractImport
+            The import result.
+        """
+        source_path = None
+
+        if isinstance(source, str):
+            source_path = source
+            path = Path(source)
+            if not path.exists():
+                raise FileNotFoundError(f"Frictionless schema file not found: {source}")
+            with open(path) as f:
+                doc = json.load(f)
+        elif isinstance(source, dict):
+            doc = source
+        else:
+            raise TypeError(
+                f"Frictionless source must be a file path (str) or dict, "
+                f"got {type(source).__name__}"
+            )
+
+        # If it's a Data Package, extract the Table Schema from a resource
+        table_schema = self._extract_table_schema(doc, **kwargs)
+
+        return self._parse_table_schema(table_schema, source_path=source_path)
+
