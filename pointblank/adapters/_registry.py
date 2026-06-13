@@ -102,3 +102,35 @@ def list_adapters() -> dict[str, dict[str, Any]]:
     return result
 
 
+def _detect_format(source: Any) -> str | None:
+    """Attempt to auto-detect the format of a source.
+
+    Tries each registered adapter's `detect()` method.
+
+    Parameters
+    ----------
+    source
+        The source to detect (file path, dict, or object).
+
+    Returns
+    -------
+    str | None
+        The format name if detected, else `None`.
+    """
+    # First try extension-based detection for file paths
+    if isinstance(source, str):
+        source_lower = source.lower()
+        for name, adapter in _ADAPTER_REGISTRY.items():
+            for ext in adapter.file_extensions:
+                if source_lower.endswith(ext):
+                    return name
+
+    # Then try content-based detection
+    for name, adapter in _ADAPTER_REGISTRY.items():
+        try:
+            if adapter.detect(source):
+                return name
+        except (NotImplementedError, Exception):
+            continue
+
+    return None
