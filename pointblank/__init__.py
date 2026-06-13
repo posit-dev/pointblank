@@ -155,4 +155,11 @@ __all__ = [
     "yaml_interrogate",
     "validate_yaml",
     "yaml_to_python",
+    # Contract import/export
+    "ContractAdapter",
+    "ContractImport",
+    "import_contract",
+    "export_contract",
+    "list_adapters",
+    "register_adapter",
 ]
