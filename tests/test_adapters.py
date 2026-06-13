@@ -119,3 +119,55 @@ def frictionless_datapackage_dict(frictionless_schema_dict):
     }
 
 
+class TestRegistry:
+    def test_builtin_adapters_registered(self):
+        """Built-in adapters should be registered on import."""
+        adapters = list_adapters()
+        assert "json_schema" in adapters
+        assert "frictionless" in adapters
+
+    def test_get_adapter_json_schema(self):
+        adapter = get_adapter("json_schema")
+        assert adapter.format_name == "json_schema"
+        assert adapter.supports_import is True
+        assert adapter.supports_export is True
+
+    def test_get_adapter_frictionless(self):
+        adapter = get_adapter("frictionless")
+        assert adapter.format_name == "frictionless"
+
+    def test_get_adapter_unknown_raises(self):
+        with pytest.raises(ValueError, match="No adapter registered"):
+            get_adapter("nonexistent_format")
+
+    def test_list_adapters_info(self):
+        adapters = list_adapters()
+        for name, info in adapters.items():
+            assert "class" in info
+            assert "file_extensions" in info
+            assert "supports_import" in info
+            assert "supports_export" in info
+
+    def test_register_custom_adapter(self):
+        """Custom adapters can be registered via decorator."""
+
+        @register_adapter("test_custom")
+        class TestCustomAdapter(ContractAdapter):
+            format_name = "test_custom"
+            file_extensions = [".custom"]
+
+            @staticmethod
+            def detect(source):
+                return False
+
+            def import_contract(self, source, **kwargs):
+                return ContractImport(source_format="test_custom")
+
+        assert "test_custom" in list_adapters()
+        adapter = get_adapter("test_custom")
+        assert adapter.format_name == "test_custom"
+
+        # Cleanup
+        del _ADAPTER_REGISTRY["test_custom"]
+
+
