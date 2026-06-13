@@ -199,3 +199,155 @@ class FrictionlessAdapter(ContractAdapter):
             "Document is neither a Table Schema (no 'fields') nor a Data Package (no 'resources')."
         )
 
+    def _parse_table_schema(
+        self, table_schema: dict[str, Any], source_path: str | None = None
+    ) -> ContractImport:
+        """Parse a Frictionless Table Schema dict into a ContractImport."""
+        columns: list[tuple[str, str | None]] = []
+        constraints: list[MappedConstraint] = []
+        warnings: list[str] = []
+        metadata: dict[str, Any] = {}
+
+        fields = table_schema.get("fields", [])
+        primary_key = table_schema.get("primaryKey", [])
+        if isinstance(primary_key, str):
+            primary_key = [primary_key]
+
+        # Metadata
+        if "description" in table_schema:
+            metadata["description"] = table_schema["description"]
+
+        total_constraints = 0
+
+        for field_def in fields:
+            field_name = field_def.get("name", "")
+            field_type = field_def.get("type", "any")
+            dtype = _FRICTIONLESS_TYPE_MAP.get(field_type)
+
+            columns.append((field_name, dtype))
+
+            # Constraints
+            field_constraints = field_def.get("constraints", {})
+
+            # required
+            if field_constraints.get("required", False):
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_not_null",
+                        kwargs={"columns": field_name},
+                        source_description=f"constraints.required: {field_name}",
+                    )
+                )
+
+            # unique
+            if field_constraints.get("unique", False):
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="rows_distinct",
+                        kwargs={"columns_subset": field_name},
+                        source_description=f"constraints.unique: {field_name}",
+                    )
+                )
+
+            # minimum
+            if "minimum" in field_constraints:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_ge",
+                        kwargs={"columns": field_name, "value": field_constraints["minimum"]},
+                        source_description=f"constraints.minimum: {field_constraints['minimum']}",
+                    )
+                )
+
+            # maximum
+            if "maximum" in field_constraints:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_le",
+                        kwargs={"columns": field_name, "value": field_constraints["maximum"]},
+                        source_description=f"constraints.maximum: {field_constraints['maximum']}",
+                    )
+                )
+
+            # enum
+            if "enum" in field_constraints:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_in_set",
+                        kwargs={"columns": field_name, "set": field_constraints["enum"]},
+                        source_description=f"constraints.enum: {field_constraints['enum']}",
+                    )
+                )
+
+            # pattern
+            if "pattern" in field_constraints:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_regex",
+                        kwargs={"columns": field_name, "pattern": field_constraints["pattern"]},
+                        source_description=f"constraints.pattern: {field_constraints['pattern']}",
+                    )
+                )
+
+        # Primary key -> not_null + distinct
+        if primary_key:
+            for pk_col in primary_key:
+                total_constraints += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_not_null",
+                        kwargs={"columns": pk_col},
+                        source_description=f"primaryKey: {pk_col} (not null)",
+                    )
+                )
+            total_constraints += 1
+            if len(primary_key) == 1:
+                constraints.append(
+                    MappedConstraint(
+                        method="rows_distinct",
+                        kwargs={"columns_subset": primary_key[0]},
+                        source_description=f"primaryKey: {primary_key[0]} (unique)",
+                    )
+                )
+            else:
+                constraints.append(
+                    MappedConstraint(
+                        method="rows_distinct",
+                        kwargs={"columns_subset": primary_key},
+                        source_description=f"primaryKey: {primary_key} (composite unique)",
+                    )
+                )
+
+        # Foreign keys -> warnings (cross-table not supported yet)
+        foreign_keys = table_schema.get("foreignKeys", [])
+        for fk in foreign_keys:
+            total_constraints += 1
+            warnings.append(
+                f"Foreign key constraint skipped (cross-table validation not supported): "
+                f"{fk.get('fields', '?')} → {fk.get('reference', {}).get('resource', '?')}."
+                f"{fk.get('reference', {}).get('fields', '?')}"
+            )
+
+        # Calculate coverage
+        coverage = 1.0
+        if total_constraints > 0:
+            mapped_count = total_constraints - len(warnings)
+            coverage = mapped_count / total_constraints
+
+        return ContractImport(
+            source_format="frictionless",
+            source_path=source_path,
+            source_version=None,
+            columns=columns,
+            constraints=constraints,
+            metadata=metadata,
+            warnings=warnings,
+            coverage=coverage,
+        )
+
