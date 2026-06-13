@@ -12,7 +12,7 @@ pb.config(report_incl_footer_timings=False)
 ```
 
 Contracts and pipelines are designed to be **data, not code**. They serialize cleanly to YAML,
-making them ideal for version control, team collaboration, and configuration-driven workflows. This
+making them useful for version control, team collaboration, and configuration-driven workflows. This
 guide covers how to write, load, and use YAML-based contracts and pipelines.
 
 When you define a contract in Python, it lives inside your application code. That's fine for quick
@@ -107,7 +107,7 @@ case.
 | `consumers` | No | List of teams or systems that depend on data conforming to this contract |
 | `description` | No | Longer prose describing the contract's purpose and context |
 | `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
-| `schema` | No | Column name → data type mapping; triggers a `col_schema_match()` check |
+| `schema` | No | Column name -> data type mapping; triggers a `col_schema_match()` check |
 | `steps` | No | Ordered list of validation steps to execute |
 | `thresholds` | No | Threshold levels (`warning`, `error`, `critical`) as fractions or absolute counts |
 
@@ -581,8 +581,8 @@ The table below summarizes the key operations and how they map between the Pytho
 | Save | `.to_yaml("path.yaml")` | --- |
 | Load contract | `pb.Contract.from_yaml("path.yaml")` | --- |
 | Load pipeline | `pb.Pipeline.from_yaml("path.yaml")` | --- |
-| Validate | `.validate(data)` | Load → validate in Python |
-| Run pipeline | `.run(data, transform)` | Load → run in Python |
+| Validate | `.validate(data)` | Load -> validate in Python |
+| Run pipeline | `.run(data, transform)` | Load -> run in Python |
 
 YAML contracts and pipelines give you the best of both worlds: declarative, reviewable
 specifications that integrate seamlessly with Pointblank's Python execution engine. The separation

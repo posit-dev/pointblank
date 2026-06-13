@@ -148,6 +148,22 @@ reference:
         - name: PipelineResult
           members: true
 
+    - title: Contract Import/Export
+      desc: >
+        Import external schema definitions (JSON Schema, Frictionless Table Schema, and more)
+        into Pointblank validation workflows, or export Pointblank contracts to those formats.
+        Use `import_contract()` as the entry point, `export_contract()` for the reverse, and
+        `register_adapter()` to add support for custom formats.
+      contents:
+        - import_contract
+        - export_contract
+        - list_adapters
+        - register_adapter
+        - name: ContractImport
+          members: true
+        - name: ContractAdapter
+          members: true
+
     - title: Validation Steps
       desc: >
         Validation steps are sequential validations on the target data. Call Validate's
