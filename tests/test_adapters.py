@@ -540,3 +540,125 @@ class TestFrictionlessImport:
         assert result.source_format == "frictionless"
 
 
+class TestFrictionlessExport:
+    def test_export_from_contract(self):
+        contract = pb.Contract(
+            name="test_export",
+            schema=pb.Schema(id="Int64", name="String", age="Int64"),
+            steps=[
+                pb.Step("col_vals_not_null", columns="id"),
+                pb.Step("rows_distinct", columns="id"),
+                pb.Step("col_vals_ge", columns="age", value=0),
+            ],
+        )
+        result = export_contract(contract, format="frictionless")
+
+        assert "fields" in result
+        fields = result["fields"]
+        assert len(fields) == 3
+
+        # Check field types
+        field_map = {f["name"]: f for f in fields}
+        assert field_map["id"]["type"] == "integer"
+        assert field_map["name"]["type"] == "string"
+        assert field_map["id"]["constraints"]["required"] is True
+        assert field_map["id"]["constraints"]["unique"] is True
+        assert field_map["age"]["constraints"]["minimum"] == 0
+
+    def test_export_to_file(self):
+        contract = pb.Contract(
+            name="test",
+            schema=pb.Schema(x="Int64"),
+            steps=[],
+        )
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            export_contract(contract, f.name, format="frictionless")
+
+        with open(f.name) as fh:
+            data = json.load(fh)
+        assert "fields" in data
+
+
+class TestImportContractAPI:
+    def test_format_required_or_detectable(self):
+        """Should raise if format can't be detected."""
+        with pytest.raises(ValueError, match="Could not auto-detect"):
+            import_contract({"random": "data"})
+
+    def test_unsupported_format_raises(self):
+        with pytest.raises(ValueError, match="No adapter registered"):
+            import_contract("file.txt", format="made_up_format")
+
+
+class TestExportContractAPI:
+    def test_unsupported_format_raises(self):
+        with pytest.raises(ValueError, match="No adapter registered"):
+            export_contract(pb.Contract(name="x"), format="made_up_format")
+
+
+class TestRoundTrip:
+    def test_json_schema_roundtrip(self):
+        """Import JSON Schema -> export -> re-import should produce equivalent constraints."""
+        original_schema = {
+            "type": "object",
+            "properties": {
+                "age": {"type": "integer", "minimum": 0, "maximum": 150},
+                "status": {"type": "string", "enum": ["active", "inactive"]},
+            },
+            "required": ["age"],
+        }
+
+        # Import
+        imported = import_contract(original_schema, format="json_schema")
+
+        # Create a contract from it
+        contract = imported.to_contract(name="roundtrip_test")
+
+        # Export back to JSON Schema
+        exported = export_contract(contract, format="json_schema")
+
+        # Re-import
+        reimported = import_contract(exported, format="json_schema")
+
+        # Verify same constraints exist (use frozenset for list values)
+        def _hashable_kwargs(kwargs):
+            items = []
+            for k, v in sorted(kwargs.items()):
+                items.append((k, tuple(v) if isinstance(v, list) else v))
+            return tuple(items)
+
+        original_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in imported.constraints}
+        roundtrip_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in reimported.constraints}
+        assert original_methods == roundtrip_methods
+
+    def test_frictionless_roundtrip(self):
+        """Import Frictionless -> export -> re-import should produce equivalent constraints."""
+        original_schema = {
+            "fields": [
+                {
+                    "name": "age",
+                    "type": "integer",
+                    "constraints": {"required": True, "minimum": 0},
+                },
+                {
+                    "name": "status",
+                    "type": "string",
+                    "constraints": {"enum": ["active", "inactive"]},
+                },
+            ],
+        }
+
+        imported = import_contract(original_schema, format="frictionless")
+        contract = imported.to_contract(name="roundtrip_test")
+        exported = export_contract(contract, format="frictionless")
+        reimported = import_contract(exported, format="frictionless")
+
+        def _hashable_kwargs(kwargs):
+            items = []
+            for k, v in sorted(kwargs.items()):
+                items.append((k, tuple(v) if isinstance(v, list) else v))
+            return tuple(items)
+
+        original_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in imported.constraints}
+        roundtrip_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in reimported.constraints}
+        assert original_methods == roundtrip_methods
