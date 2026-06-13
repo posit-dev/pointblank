@@ -52,3 +52,29 @@ def register_adapter(format_name: str | None = None):
     return decorator
 
 
+def get_adapter(format_name: str) -> ContractAdapter:
+    """Get a registered adapter by format name.
+
+    Parameters
+    ----------
+    format_name
+        The format identifier (e.g., `"json_schema"`, `"frictionless"`).
+
+    Returns
+    -------
+    ContractAdapter
+        The registered adapter instance.
+
+    Raises
+    ------
+    ValueError
+        If no adapter is registered for the given format.
+    """
+    if format_name not in _ADAPTER_REGISTRY:
+        available = ", ".join(sorted(_ADAPTER_REGISTRY.keys())) or "(none)"
+        raise ValueError(
+            f"No adapter registered for format '{format_name}'. Available adapters: {available}"
+        )
+    return _ADAPTER_REGISTRY[format_name]
+
+
