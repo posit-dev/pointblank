@@ -351,3 +351,25 @@ class FrictionlessAdapter(ContractAdapter):
             coverage=coverage,
         )
 
+    def _export_from_contract(self, contract: Any) -> dict[str, Any]:
+        """Export a Contract to Frictionless Table Schema."""
+        fields: list[dict[str, Any]] = []
+
+        # Build fields from schema
+        if contract.schema is not None and contract.schema.columns is not None:
+            for col_name, col_dtype in contract.schema.columns:
+                field_def: dict[str, Any] = {"name": col_name}
+                if col_dtype:
+                    fl_type = _pb_dtype_to_frictionless_type(str(col_dtype))
+                    if fl_type:
+                        field_def["type"] = fl_type
+                fields.append(field_def)
+
+        # Apply step constraints
+        field_map = {f["name"]: f for f in fields}
+        for step in contract.steps:
+            _apply_step_to_fields(step.method, step.kwargs, field_map, fields)
+
+        table_schema: dict[str, Any] = {"fields": fields}
+        return table_schema
+
