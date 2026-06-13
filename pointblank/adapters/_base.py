@@ -180,3 +180,43 @@ class ContractAdapter:
         """
         raise NotImplementedError
 
+    def import_contract(self, source: Any, **kwargs: Any) -> ContractImport:
+        """Import from the external format.
+
+        Parameters
+        ----------
+        source
+            The source to import from (file path, dict, or Python object).
+        **kwargs
+            Format-specific options.
+
+        Returns
+        -------
+        ContractImport
+            The import result with columns, constraints, and metadata.
+        """
+        raise NotImplementedError
+
+    def export_contract(
+        self,
+        validation_or_contract: Any,
+        destination: str | None = None,
+        **kwargs: Any,
+    ) -> str | dict[str, Any]:
+        """Export to the external format.
+
+        Parameters
+        ----------
+        validation_or_contract
+            A `Validate` or `Contract` object to export.
+        destination
+            Optional file path to write the output. If `None`, returns the result.
+        **kwargs
+            Format-specific options.
+
+        Returns
+        -------
+        str | dict
+            The exported content (string or dict), also written to file if destination given.
+        """
+        raise NotImplementedError
