@@ -392,3 +392,25 @@ class FrictionlessAdapter(ContractAdapter):
         return {"fields": fields}
 
 
+def _pb_dtype_to_frictionless_type(dtype: str) -> str | None:
+    """Map a Pointblank/Narwhals dtype to a Frictionless field type."""
+    dtype_lower = dtype.lower()
+    if "int" in dtype_lower:
+        return "integer"
+    if "float" in dtype_lower or "double" in dtype_lower or "decimal" in dtype_lower:
+        return "number"
+    if "str" in dtype_lower or "utf8" in dtype_lower or "object" in dtype_lower:
+        return "string"
+    if "bool" in dtype_lower:
+        return "boolean"
+    if "datetime" in dtype_lower or "timestamp" in dtype_lower:
+        return "datetime"
+    if "date" in dtype_lower:
+        return "date"
+    if "time" in dtype_lower:
+        return "time"
+    if "duration" in dtype_lower:
+        return "duration"
+    return None
+
+
