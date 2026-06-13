@@ -376,3 +376,167 @@ class TestJSONSchemaImport:
         assert col_map["nickname"] == "String"
 
 
+class TestJSONSchemaExport:
+    def test_export_from_contract(self):
+        contract = pb.Contract(
+            name="test_export",
+            schema=pb.Schema(age="Int64", name="String"),
+            steps=[
+                pb.Step("col_vals_ge", columns="age", value=0),
+                pb.Step("col_vals_not_null", columns="name"),
+            ],
+        )
+        result = export_contract(contract, format="json_schema")
+
+        assert result["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+        assert result["title"] == "test_export"
+        assert "properties" in result
+        assert result["properties"]["age"]["type"] == "integer"
+        assert result["properties"]["age"]["minimum"] == 0
+        assert "name" in result["required"]
+
+    def test_export_to_file(self):
+        contract = pb.Contract(
+            name="test_file_export",
+            schema=pb.Schema(id="Int64"),
+            steps=[],
+        )
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            export_contract(contract, f.name, format="json_schema")
+            f.flush()
+
+        with open(f.name) as fh:
+            data = json.load(fh)
+
+        assert data["title"] == "test_file_export"
+        assert "properties" in data
+
+    def test_export_invalid_type_raises(self):
+        with pytest.raises(TypeError, match="Expected a Validate or Contract"):
+            export_contract("not a contract", format="json_schema")
+
+
+class TestFrictionlessImport:
+    def test_import_from_dict(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+
+        assert result.source_format == "frictionless"
+        assert len(result.columns) == 5
+
+        col_map = dict(result.columns)
+        assert col_map["id"] == "Int64"
+        assert col_map["name"] == "String"
+        assert col_map["age"] == "Int64"
+        assert col_map["status"] == "String"
+
+    def test_import_constraints_required(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("col_vals_not_null", {"columns": "id"}) in methods
+        assert ("col_vals_not_null", {"columns": "name"}) in methods
+
+    def test_import_constraints_unique(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("rows_distinct", {"columns_subset": "id"}) in methods
+
+    def test_import_constraints_min_max(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert ("col_vals_ge", {"columns": "age", "value": 0}) in methods
+        assert ("col_vals_le", {"columns": "age", "value": 150}) in methods
+
+    def test_import_constraints_enum(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert (
+            "col_vals_in_set",
+            {"columns": "status", "set": ["active", "inactive"]},
+        ) in methods
+
+    def test_import_constraints_pattern(self, frictionless_schema_dict):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        assert (
+            "col_vals_regex",
+            {"columns": "email", "pattern": r"^[^@]+@[^@]+\.[^@]+$"},
+        ) in methods
+
+    def test_import_primary_key(self, frictionless_schema_dict):
+        """Primary key should generate not_null + distinct constraints."""
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+
+        # Primary key "id" should have not_null
+        not_null_cols = [
+            c.kwargs["columns"] for c in result.constraints if c.method == "col_vals_not_null"
+        ]
+        assert "id" in not_null_cols
+
+    def test_import_from_datapackage(self, frictionless_datapackage_dict):
+        """Import from a Data Package selects the first resource by default."""
+        result = import_contract(frictionless_datapackage_dict, format="frictionless")
+        assert len(result.columns) == 5  # users table
+
+    def test_import_from_datapackage_by_name(self, frictionless_datapackage_dict):
+        """Import a specific resource by name."""
+        result = import_contract(
+            frictionless_datapackage_dict, format="frictionless", resource="orders"
+        )
+        assert len(result.columns) == 2
+        col_names = [name for name, _ in result.columns]
+        assert "order_id" in col_names
+
+    def test_import_from_datapackage_by_index(self, frictionless_datapackage_dict):
+        result = import_contract(frictionless_datapackage_dict, format="frictionless", resource=1)
+        assert len(result.columns) == 2
+
+    def test_import_from_datapackage_invalid_name(self, frictionless_datapackage_dict):
+        with pytest.raises(ValueError, match="not found"):
+            import_contract(
+                frictionless_datapackage_dict, format="frictionless", resource="nonexistent"
+            )
+
+    def test_import_from_file(self, frictionless_schema_dict):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(frictionless_schema_dict, f)
+            f.flush()
+            result = import_contract(f.name, format="frictionless")
+
+        assert result.source_format == "frictionless"
+        assert result.source_path == f.name
+
+    def test_import_foreign_key_warning(self):
+        """Foreign keys should produce a warning since cross-table is unsupported."""
+        schema = {
+            "fields": [
+                {"name": "user_id", "type": "integer"},
+            ],
+            "foreignKeys": [
+                {
+                    "fields": ["user_id"],
+                    "reference": {"resource": "users", "fields": ["id"]},
+                }
+            ],
+        }
+        result = import_contract(schema, format="frictionless")
+        assert len(result.warnings) == 1
+        assert "Foreign key" in result.warnings[0]
+        assert result.coverage < 1.0
+
+    def test_to_validate_end_to_end(self, frictionless_schema_dict, simple_df):
+        result = import_contract(frictionless_schema_dict, format="frictionless")
+        validation = result.to_validate(data=simple_df)
+        validation.interrogate()
+
+    def test_auto_detect_frictionless(self, frictionless_schema_dict):
+        """Auto-detection works for Frictionless dicts."""
+        result = import_contract(frictionless_schema_dict)
+        assert result.source_format == "frictionless"
+
+
