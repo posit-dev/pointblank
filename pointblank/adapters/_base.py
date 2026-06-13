@@ -67,3 +67,39 @@ class ContractImport:
     warnings: list[str] = field(default_factory=list)
     coverage: float = 1.0
 
+    def to_validate(self, data: Any, **kwargs: Any) -> Validate:
+        """Build a Validate object from the imported contract.
+
+        Parameters
+        ----------
+        data
+            The data table to validate.
+        **kwargs
+            Additional keyword arguments passed to the Validate constructor.
+
+        Returns
+        -------
+        Validate
+            A Validate object with all imported checks applied (not yet interrogated).
+        """
+        from pointblank.schema import Schema
+        from pointblank.validate import Validate
+
+        validation = Validate(data=data, **kwargs)
+
+        # Add schema check if columns with types were detected
+        schema_cols = {name: dtype for name, dtype in self.columns if dtype is not None}
+        if schema_cols:
+            schema = Schema(**schema_cols)
+            validation = validation.col_schema_match(schema=schema)
+
+        # Add each mapped constraint as a validation step
+        for constraint in self.constraints:
+            method = getattr(validation, constraint.method, None)
+            if method is None:
+                self.warnings.append(f"Validate has no method '{constraint.method}' — skipped.")
+                continue
+            validation = method(**constraint.kwargs)
+
+        return validation
+
