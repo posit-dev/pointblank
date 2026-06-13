@@ -89,3 +89,45 @@ class JSONSchemaAdapter(ContractAdapter):
 
         return self._parse_schema(schema_doc, source_path=source_path)
 
+    def export_contract(
+        self,
+        validation_or_contract: Any,
+        destination: str | None = None,
+        **kwargs: Any,
+    ) -> str | dict[str, Any]:
+        """Export a Validate or Contract to JSON Schema format.
+
+        Parameters
+        ----------
+        validation_or_contract
+            A `Validate` or `Contract` object.
+        destination
+            Optional file path to write the JSON Schema.
+        **kwargs
+            Not currently used.
+
+        Returns
+        -------
+        dict
+            The JSON Schema document as a dict.
+        """
+        from pointblank.contract import Contract
+        from pointblank.validate import Validate
+
+        if isinstance(validation_or_contract, Contract):
+            schema_doc = self._export_from_contract(validation_or_contract)
+        elif isinstance(validation_or_contract, Validate):
+            schema_doc = self._export_from_validate(validation_or_contract)
+        else:
+            raise TypeError(
+                f"Expected a Validate or Contract object, got {type(validation_or_contract).__name__}"
+            )
+
+        if destination is not None:
+            path = Path(destination)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "w") as f:
+                json.dump(schema_doc, f, indent=2)
+
+        return schema_doc
+
