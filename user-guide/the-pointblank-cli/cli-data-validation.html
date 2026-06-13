@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="443" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -479,6 +479,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">YAML Contracts &amp; Pipelines</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing External Schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/custom-adapters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Custom Adapters</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -536,7 +548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For more complex validation logic, the <code>pb run</code> command serves as a runner for validation scripts written with the Pointblank Python API, allowing you to execute custom validation workflows from the command line.</p>
 <section id="pb-validate-quick-one-line-data-checks" class="level1">
 <h1><code>pb validate</code>: Quick, One-Line Data Checks</h1>
-<p>The <code>pb validate</code> command is your go-to for running common validation checks directly on your data source. It’s perfect for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the <code>--check</code> option, making your intent clear and your validation explicit.</p>
+<p>The <code>pb validate</code> command is your go-to for running common validation checks directly on your data source. It’s great for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the <code>--check</code> option, making your intent clear and your validation explicit.</p>
 <p>Here’s how you construct a validation command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> <span class="op">&lt;</span>check-name<span class="op">&gt;</span> [other options]</span></code></pre></div>
 <p>You always provide the data source first, then specify one or more checks with <code>--check</code>. Each check can have its own options, such as <code>--column</code> or <code>--value</code>, depending on what you want to validate.</p>

@@ -1580,6 +1580,179 @@ target_passed
     True if the target boundary validation passes.
 
 
+## Contract Import/Export
+
+Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
+
+
+
+import_contract(source: 'Any', *, format: 'str | None' = None, **kwargs: 'Any') -> 'ContractImport'
+
+Import a contract/schema from an external format.
+
+Reads an external schema definition (JSON Schema, Frictionless Table Schema, dbt schema.yml,
+Pandera schema, Pydantic model, etc.) and produces a `ContractImport` with validation steps
+mapped to Pointblank methods.
+
+Parameters
+----------
+source
+    The source to import from. Can be: (1) a file path (str) to a schema/contract file, (2) a
+    Python dict with schema content already loaded, or (3) a Python object (e.g., a Pandera
+    `DataFrameSchema` or Pydantic model class).
+format
+    The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, etc.). If `None`,
+    the format is auto-detected from file extension or content.
+**kwargs
+    Format-specific options passed to the adapter.
+
+Returns
+-------
+ContractImport
+    An object containing the imported columns, constraints, and methods to generate `Validate`
+    objects, `Contract` objects, Python code, or YAML.
+
+Raises
+------
+ValueError
+    If the format cannot be detected or no adapter is registered for it.
+
+Examples
+--------
+```python
+import pointblank as pb
+
+# Import from JSON Schema
+result = pb.import_contract("user_profile.schema.json", format="json_schema")
+validation = result.to_validate(data=my_df)
+validation.interrogate()
+
+# Auto-detect format
+result = pb.import_contract("datapackage.json")
+
+# Import from a dict
+schema_dict = {"type": "object", "properties": {"age": {"type": "integer", "minimum": 0}}}
+result = pb.import_contract(schema_dict, format="json_schema")
+```
+
+export_contract(validation_or_contract: 'Any', destination: 'str | None' = None, *, format: 'str', **kwargs: 'Any') -> 'str | dict[str, Any]'
+
+Export a Pointblank validation or contract to an external format.
+
+Parameters
+----------
+validation_or_contract
+    A `Validate` or `Contract` object to export.
+destination
+    Optional file path to write the output. If None, the result is returned without writing to
+    disk.
+format
+    The target format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, etc.).
+**kwargs
+    Format-specific options passed to the adapter.
+
+Returns
+-------
+str | dict
+    The exported content.
+
+Raises
+------
+ValueError
+    If no adapter is registered for the format, or the adapter doesn't support export.
+
+Examples
+--------
+```python
+import pointblank as pb
+
+validation = pb.Validate(data=df).col_vals_gt(columns="age", value=0).interrogate()
+pb.export_contract(validation, "output.schema.json", format="json_schema")
+```
+
+list_adapters() -> 'dict[str, dict[str, Any]]'
+
+List all registered adapters with their capabilities.
+
+Returns
+-------
+dict
+    A dictionary mapping format names to adapter info dicts with keys:
+
+    - "class": the adapter class name
+    - "file_extensions": associated file extensions
+    - "supports_import": whether import is supported
+    - "supports_export": whether export is supported
+
+register_adapter(format_name: 'str | None' = None)
+
+Register a contract adapter class.
+
+Can be used as a decorator (with or without arguments) or called directly.
+
+Parameters
+----------
+format_name
+    The format name to register under. If `None`, uses the class's `format_name` attribute.
+
+Returns
+-------
+type
+    The adapter class (unmodified), enabling use as a decorator.
+
+Examples
+--------
+```python
+@pb.register_adapter("my_format")
+class MyAdapter(pb.ContractAdapter):
+    format_name = "my_format"
+    ...
+```
+
+ContractImport(source_format: 'str', source_path: 'str | None' = None, source_version: 'str | None' = None, columns: 'list[tuple[str, str | None]]' = <factory>, constraints: 'list[MappedConstraint]' = <factory>, metadata: 'dict[str, Any]' = <factory>, warnings: 'list[str]' = <factory>, coverage: 'float' = 1.0) -> None
+
+Result of importing an external contract/schema.
+
+Contains the parsed schema information, mapped validation steps, and any warnings about
+constraints that couldn't be fully translated.
+
+Parameters
+----------
+source_format
+    The adapter format name (e.g., `"json_schema"`, `"frictionless"`, etc.).
+source_path
+    File path if loaded from a file, else None.
+source_version
+    Version of the source format specification, if detectable.
+columns
+    List of (column_name, dtype_string_or_None) tuples detected from the source.
+constraints
+    List of MappedConstraint objects ready for translation to Validate steps.
+metadata
+    Any additional metadata from the source (title, description, etc.).
+warnings
+    Messages about constraints that couldn't be mapped.
+coverage
+    Fraction of source constraints successfully mapped (`0.0` to `1.0`).
+
+ContractAdapter()
+
+Base class for contract import/export adapters.
+
+Subclass this to add support for a new external format.
+
+Attributes
+----------
+format_name
+    Short identifier for this format (e.g., `"json_schema"`).
+file_extensions
+    File extensions associated with this format (e.g., `[".json"]`).
+supports_import
+    Whether this adapter supports importing from the format.
+supports_export
+    Whether this adapter supports exporting to the format.
+
+
 ## Validation Steps
 
 Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
@@ -19651,7 +19824,7 @@ pb validate small_table --check col-exists --column a
 pb validate small_table --check col-vals-lt --column a --value 10
 ```
 
-The CLI is perfect for:
+The CLI is useful for:
 
 - quick data quality checks in CI/CD pipelines
 - exploratory data analysis from the terminal
@@ -29851,7 +30024,7 @@ command line.
 ## `pb validate`: Quick, One-Line Data Checks
 
 The `pb validate` command is your go-to for running common validation checks directly on your data
-source. It’s perfect for quick, one-off checks or for use in automated pipelines. You specify
+source. It’s great for quick, one-off checks or for use in automated pipelines. You specify
 exactly which check you want to run using the `--check` option, making your intent clear and your
 validation explicit.
 
@@ -31007,8 +31180,8 @@ emitted (no external collector needed).
 ### Setup
 
 Before exporting any signals we need OTel providers to receive them. The SDK's in-memory providers
-are perfect for exploration: they capture every metric, span, and log record in Python lists so we
-can print them without running a collector.
+are very useful for exploration: they capture every metric, span, and log record in Python lists so
+we can print them without running a collector.
 
 ```{python}
 #| eval: false
@@ -32173,7 +32346,7 @@ pb.config(report_incl_footer_timings=False)
 ```
 
 Contracts and pipelines are designed to be **data, not code**. They serialize cleanly to YAML,
-making them ideal for version control, team collaboration, and configuration-driven workflows. This
+making them useful for version control, team collaboration, and configuration-driven workflows. This
 guide covers how to write, load, and use YAML-based contracts and pipelines.
 
 When you define a contract in Python, it lives inside your application code. That's fine for quick
@@ -32268,7 +32441,7 @@ case.
 | `consumers` | No | List of teams or systems that depend on data conforming to this contract |
 | `description` | No | Longer prose describing the contract's purpose and context |
 | `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
-| `schema` | No | Column name → data type mapping; triggers a `col_schema_match()` check |
+| `schema` | No | Column name -> data type mapping; triggers a `col_schema_match()` check |
 | `steps` | No | Ordered list of validation steps to execute |
 | `thresholds` | No | Threshold levels (`warning`, `error`, `critical`) as fractions or absolute counts |
 
@@ -32742,12 +32915,1022 @@ The table below summarizes the key operations and how they map between the Pytho
 | Save | `.to_yaml("path.yaml")` | --- |
 | Load contract | `pb.Contract.from_yaml("path.yaml")` | --- |
 | Load pipeline | `pb.Pipeline.from_yaml("path.yaml")` | --- |
-| Validate | `.validate(data)` | Load → validate in Python |
-| Run pipeline | `.run(data, transform)` | Load → run in Python |
+| Validate | `.validate(data)` | Load -> validate in Python |
+| Run pipeline | `.run(data, transform)` | Load -> run in Python |
 
 YAML contracts and pipelines give you the best of both worlds: declarative, reviewable
 specifications that integrate seamlessly with Pointblank's Python execution engine. The separation
 of *what* (YAML contracts) from *how* (Python transforms) creates a clean architecture where data
 quality expectations can evolve independently from processing logic: reviewed by different people,
 on different timelines, with clear accountability at each boundary.
+
+
+### Importing External Schemas
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Many teams already have data schemas defined in other tools: JSON Schema files for API validation,
+Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or
+Pandera/Pydantic models in application code. Rather than manually rewriting these specifications as
+Pointblank validation steps, you can **import** them directly.
+
+The `import_contract()` function reads an external schema definition and produces a `ContractImport`
+object containing everything Pointblank needs to validate data: column types, constraints, and
+mapped validation steps. From there you can create a `Validate` workflow, a `Contract` object,
+generate equivalent Python code, or produce a YAML definition, all with a single function call.
+
+## Quick Start
+
+The fastest path from an external schema to running validation:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define a JSON Schema (could also be loaded from a file)
+user_schema = {
+    "type": "object",
+    "properties": {
+        "user_id": {"type": "integer"},
+        "email": {"type": "string", "format": "email"},
+        "age": {"type": "integer", "minimum": 0, "maximum": 150},
+        "status": {"type": "string", "enum": ["active", "inactive", "pending"]},
+    },
+    "required": ["user_id", "email"],
+}
+
+# Import the schema
+result = pb.import_contract(user_schema, format="json_schema")
+
+# Create sample data and validate
+users = pl.DataFrame(
+    {
+        "user_id": [1, 2, 3, 4, 5],
+        "email": [
+            "alice@example.com",
+            "bob@corp.io",
+            "charlie@mail.org",
+            "dave@startup.co",
+            "eve@company.net",
+        ],
+        "age": [28, 34, 45, 22, 31],
+        "status": ["active", "active", "inactive", "pending", "active"],
+    }
+)
+
+result.to_validate(data=users).interrogate()
+```
+
+That's it. The JSON Schema `minimum`, `maximum`, `enum`, `format`, and `required` keywords were
+automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a
+dedicated validation check: `minimum` becomes `col_vals_ge()`, `maximum` becomes `col_vals_le()`,
+`enum` becomes `col_vals_in_set()`, and so on. The schema's `required` array generates
+`col_vals_not_null()` steps for each listed field, ensuring that null values are caught at
+validation time.
+
+## How It Works
+
+The import process has three stages:
+
+1. **Parse**: the external schema is read (from a file path, a dict, or a Python object)
+2. **Map**: each constraint in the source format is translated to a Pointblank validation method
+3. **Package**: the results are stored in a `ContractImport` object with multiple output options
+
+```{mermaid}
+flowchart LR
+    A[External Schema] --> B[import_contract]
+    B --> C[ContractImport]
+    C --> D[.to_validate‹data›]
+    C --> E[.to_contract‹›]
+    C --> F[.to_python‹›]
+    C --> G[.to_yaml‹›]
+```
+
+The `ContractImport` object is your bridge between the external world and Pointblank. It doesn't
+execute anything on its own. Rather, it holds the *translated specification* and lets you choose
+how to use it. This separation is intentional: you can inspect the translation results, check
+for any warnings, and decide how to proceed before committing to a particular output format.
+
+## The `ContractImport` Object
+
+After calling `import_contract()`, you get back a `ContractImport` with these key attributes and
+methods:
+
+| Attribute / Method | Description |
+|---|---|
+| `.columns` | List of `(column_name, dtype)` tuples detected from the source |
+| `.constraints` | List of `MappedConstraint` objects (method + kwargs) |
+| `.warnings` | Messages about constraints that couldn't be translated |
+| `.coverage` | Fraction of source constraints successfully mapped (0.0–1.0) |
+| `.metadata` | Extra metadata (title, description) from the source |
+| `.to_validate(data)` | Build a `Validate` object ready for `.interrogate()` |
+| `.to_contract(name)` | Build a `Contract` object for pipeline use |
+| `.to_python()` | Generate equivalent Python code as a string |
+| `.to_yaml()` | Generate Pointblank YAML configuration |
+| `.summary()` | Return a human-readable summary |
+
+### Inspecting What Was Imported
+
+Before running validation, it's often useful to inspect what the import produced:
+
+```{python}
+result = pb.import_contract(user_schema, format="json_schema")
+print(result.summary())
+```
+
+If any constraints couldn't be mapped, they appear in `.warnings`:
+
+```{python}
+# A schema with an unmappable format
+schema_with_date = {
+    "type": "object",
+    "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+    },
+}
+result = pb.import_contract(schema_with_date, format="json_schema")
+
+if result.warnings:
+    for w in result.warnings:
+        print(f"⚠ {w}")
+
+print(f"\nCoverage: {result.coverage:.0%}")
+```
+
+The `coverage` metric tells you what fraction of the source constraints were successfully
+translated. A coverage of 100% means everything mapped cleanly; lower values mean some constraints
+were skipped (with details in `warnings`). This transparency is important because no translation
+between formats is perfect. By checking `coverage` and `warnings` before running validation, you
+can be confident about exactly which parts of your original schema are being enforced and which
+parts might need manual attention.
+
+## Supported Formats
+
+Pointblank ships with adapters for the two most universal tabular schema formats. Additional
+adapters (dbt, Pydantic, Pandera) are planned for future releases.
+
+```{python}
+pb.list_adapters()
+```
+
+### JSON Schema
+
+[JSON Schema](https://json-schema.org/) is a widely used format for describing the structure of JSON
+data. Because tabular data (DataFrames) can be modeled as arrays of JSON objects, JSON Schema is a
+natural fit for defining column-level constraints.
+
+**Constraint mapping:**
+
+| JSON Schema Keyword | Pointblank Method |
+|---|---|
+| `type: "integer"` / `"number"` / `"string"` / `"boolean"` | Schema dtype check |
+| `minimum` | `col_vals_ge()` |
+| `maximum` | `col_vals_le()` |
+| `exclusiveMinimum` | `col_vals_gt()` |
+| `exclusiveMaximum` | `col_vals_lt()` |
+| `enum` | `col_vals_in_set()` |
+| `pattern` | `col_vals_regex()` |
+| `format: "email"` | `col_vals_within_spec(spec="email")` |
+| `format: "uri"` | `col_vals_within_spec(spec="url")` |
+| `format: "ipv4"` / `"ipv6"` | `col_vals_within_spec(spec="ipv4"/"ipv6")` |
+| `const` | `col_vals_eq()` |
+| `required` (array of field names) | `col_vals_not_null()` |
+
+**Importing from a file:**
+
+```python
+# File-based import (auto-detects .schema.json extension)
+result = pb.import_contract("models/user_profile.schema.json")
+```
+
+**Importing from a dict:**
+
+```{python}
+product_schema = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Product Catalog",
+    "description": "Expected structure for product data",
+    "type": "object",
+    "properties": {
+        "sku": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{4}$"},
+        "price": {"type": "number", "exclusiveMinimum": 0},
+        "category": {"type": "string", "enum": ["electronics", "clothing", "food", "other"]},
+        "in_stock": {"type": "boolean"},
+    },
+    "required": ["sku", "price", "category"],
+}
+
+result = pb.import_contract(product_schema, format="json_schema")
+
+# Inspect what was mapped
+for c in result.constraints:
+    print(f"  {c.method}({c.kwargs})")
+```
+
+Each constraint from the JSON Schema has been translated into the corresponding Pointblank method
+call. The `pattern` keyword on the `sku` field became a `col_vals_regex()` step, `exclusiveMinimum`
+became `col_vals_gt()` (note the strict inequality), and the three `required` fields each generated
+a `col_vals_not_null()` step. You can iterate over `result.constraints` like this to verify the
+translation before running any validation.
+
+### Frictionless Data Table Schema
+
+[Frictionless Data](https://frictionlessdata.io/) is a set of standards for describing and
+packaging data. The **Table Schema** format is particularly well-suited for tabular data validation,
+with explicit support for column types, constraints, and primary/foreign keys.
+
+**Constraint mapping:**
+
+| Frictionless Feature | Pointblank Method |
+|---|---|
+| `type` | Schema dtype check |
+| `constraints.required: true` | `col_vals_not_null()` |
+| `constraints.unique: true` | `rows_distinct()` |
+| `constraints.minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
+| `constraints.enum` | `col_vals_in_set()` |
+| `constraints.pattern` | `col_vals_regex()` |
+| `primaryKey` | `col_vals_not_null()` + `rows_distinct()` |
+| `foreignKeys` | ⚠ Warning (cross-table not yet supported) |
+
+**Importing a standalone Table Schema:**
+
+```{python}
+inventory_schema = {
+    "fields": [
+        {"name": "item_id", "type": "integer", "constraints": {"required": True, "unique": True}},
+        {"name": "name", "type": "string", "constraints": {"required": True}},
+        {"name": "quantity", "type": "integer", "constraints": {"minimum": 0}},
+        {"name": "warehouse", "type": "string", "constraints": {"enum": ["NYC", "LAX", "ORD"]}},
+    ],
+    "primaryKey": "item_id",
+}
+
+result = pb.import_contract(inventory_schema, format="frictionless")
+print(result.summary())
+```
+
+Notice how the `primaryKey` field generates both a not-null check and a uniqueness check for
+`item_id`. This is the correct semantic interpretation: a primary key must always be present and
+must uniquely identify each row. The field-level `constraints.required` and `constraints.unique`
+also contribute their own checks, so the adapter deduplicates where appropriate.
+
+**Importing from a Data Package:**
+
+Data Packages bundle multiple resources (tables) together. You can select which resource to import
+by name or index:
+
+```{python}
+data_package = {
+    "name": "ecommerce-data",
+    "resources": [
+        {
+            "name": "customers",
+            "path": "customers.csv",
+            "schema": {
+                "fields": [
+                    {"name": "id", "type": "integer", "constraints": {"required": True}},
+                    {"name": "email", "type": "string"},
+                ],
+            },
+        },
+        {
+            "name": "orders",
+            "path": "orders.csv",
+            "schema": {
+                "fields": [
+                    {"name": "order_id", "type": "integer", "constraints": {"required": True}},
+                    {"name": "amount", "type": "number", "constraints": {"minimum": 0}},
+                ],
+            },
+        },
+    ],
+}
+
+# Import a specific resource by name
+orders_import = pb.import_contract(data_package, format="frictionless", resource="orders")
+print(f"Columns: {[name for name, _ in orders_import.columns]}")
+print(f"Constraints: {len(orders_import.constraints)}")
+```
+
+The `resource=` parameter accepts either a string (the resource name) or an integer (the resource
+index). When omitted, the first resource in the package is used. This makes it straightforward to
+work with multi-table data packages where each table has its own schema definition.
+
+## Output Options
+
+Once you have a `ContractImport`, you can use it in several ways depending on your workflow.
+
+### Direct Validation with `.to_validate()`
+
+The most common path is to get a `Validate` object, pass your data, and run it:
+
+```{python}
+schema = {
+    "type": "object",
+    "properties": {
+        "temperature": {"type": "number", "minimum": -50, "maximum": 60},
+        "humidity": {"type": "number", "minimum": 0, "maximum": 100},
+        "station_id": {"type": "string"},
+    },
+    "required": ["temperature", "humidity", "station_id"],
+}
+
+weather_data = pl.DataFrame(
+    {
+        "temperature": [22.5, 18.3, -5.1, 35.0, 28.7],
+        "humidity": [45.0, 78.2, 30.0, 92.5, 55.0],
+        "station_id": ["WX-001", "WX-002", "WX-003", "WX-001", "WX-004"],
+    }
+)
+
+imported = pb.import_contract(schema, format="json_schema")
+imported.to_validate(data=weather_data).interrogate()
+```
+
+The `.to_validate()` method returns a fully configured `Validate` object with all imported
+constraints already applied as validation steps. You get the familiar validation report showing
+pass/fail counts for each check. Because the `Validate` object is not yet interrogated when
+created, you also have the option of adding additional validation steps before calling
+`.interrogate()`.
+
+You can also pass additional arguments to the `Validate` constructor:
+
+```python
+imported.to_validate(
+    data=weather_data,
+    tbl_name="weather_readings",
+    label="Daily sensor check",
+    thresholds=pb.Thresholds(warning=0.05, error=0.10),
+)
+```
+
+Any keyword argument accepted by the `Validate` class can be passed through here, including
+`tbl_name`, `label`, `thresholds`, `owner`, and `consumers`. This gives you full control over
+how the validation is configured without needing to modify the import result.
+
+### Creating a Reusable Contract with `.to_contract()`
+
+If you want to store the imported schema as a Pointblank `Contract` for use in pipelines or
+repeated validation:
+
+```{python}
+imported = pb.import_contract(inventory_schema, format="frictionless")
+contract = imported.to_contract(name="inventory_check", version="1.0.0", owner="warehouse-team")
+print(contract)
+```
+
+The resulting `Contract` can be serialized to YAML, used in `Pipeline`, or shared with other teams.
+This is particularly valuable when you want to maintain a stable contract definition that outlives
+the original external schema file. The `Contract` object carries all the metadata (version, owner,
+description) that makes it suitable for team workflows and CI/CD pipelines.
+
+### Generating Python Code with `.to_python()`
+
+When you want to see (or save) the equivalent Pointblank Python code that would be generated from
+the import:
+
+```{python}
+imported = pb.import_contract(user_schema, format="json_schema")
+print(imported.to_python())
+```
+
+The generated code is syntactically valid Python that you can copy directly into a script or
+notebook. It uses the standard Pointblank method-chaining style, making it easy to read and modify.
+This is especially useful for:
+
+- understanding exactly what validation steps an import produces
+- generating starter code that you can then customize
+- documentation and onboarding (show teams what their schema "means" in validation terms)
+
+Once you have the generated code, you can paste it into your project and modify it freely. Add
+extra validation steps, remove checks that don't apply, or adjust parameter values. The generated
+code has no dependency on the original schema file, so it serves as a clean handoff point between
+the schema world and your Python codebase.
+
+### Generating YAML with `.to_yaml()`
+
+For workflows that use Pointblank's YAML-based validation:
+
+```{python}
+imported = pb.import_contract(user_schema, format="json_schema")
+print(imported.to_yaml())
+```
+
+The YAML output follows Pointblank's validation YAML format, with each constraint appearing as a
+separate step entry. You can save this output to a file and use it with `pb.yaml_interrogate()` or
+`pb.validate_yaml()` for configuration-driven workflows where validation rules are managed as YAML
+files rather than Python code.
+
+## Exporting Contracts
+
+The reverse operation (taking a Pointblank `Contract` or `Validate` object and writing it out in
+an external format) is handled by `export_contract()`:
+
+```{python}
+# Create a contract
+contract = pb.Contract(
+    name="sensor_data",
+    schema=pb.Schema(temperature="Float64", humidity="Float64", station_id="String"),
+    steps=[
+        pb.Step("col_vals_ge", columns="temperature", value=-50),
+        pb.Step("col_vals_le", columns="temperature", value=60),
+        pb.Step("col_vals_ge", columns="humidity", value=0),
+        pb.Step("col_vals_le", columns="humidity", value=100),
+        pb.Step("col_vals_not_null", columns=["temperature", "humidity", "station_id"]),
+    ],
+)
+
+# Export to JSON Schema
+json_schema = pb.export_contract(contract, format="json_schema")
+json_schema
+```
+
+```{python}
+# Export to Frictionless Table Schema
+table_schema = pb.export_contract(contract, format="frictionless")
+table_schema
+```
+
+Each format produces the output structure that is native to that standard. JSON Schema export
+creates a valid `$schema`-annotated document with `properties`, `type`, and `required` fields.
+Frictionless export creates a Table Schema with `fields` and `constraints` entries. Both formats
+can be fed directly into tools that consume those standards, such as form validators, data catalogs,
+or documentation generators.
+
+You can also write directly to a file:
+
+```python
+pb.export_contract(contract, "output/sensor_data.schema.json", format="json_schema")
+pb.export_contract(contract, "output/sensor_data.resource.json", format="frictionless")
+```
+
+When a `destination` path is provided, the output is written to that file (creating parent
+directories as needed) and also returned from the function. This makes it convenient to both
+persist the output and inspect it in the same call.
+
+## Round-Trip Fidelity
+
+Importing a schema and then exporting it back should produce an equivalent result. This is
+important for workflows where you maintain schemas in an external format but want to validate with
+Pointblank:
+
+```{python}
+# Start with a JSON Schema
+original = {
+    "type": "object",
+    "properties": {
+        "score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "grade": {"type": "string", "enum": ["A", "B", "C", "D", "F"]},
+    },
+    "required": ["score"],
+}
+
+# Import → Contract → Export
+imported = pb.import_contract(original, format="json_schema")
+contract = imported.to_contract(name="grades")
+exported = pb.export_contract(contract, format="json_schema")
+
+# The exported schema preserves the constraints
+print(f"Original constraints on 'score': minimum={original['properties']['score']['minimum']}, "
+      f"maximum={original['properties']['score']['maximum']}")
+print(f"Exported constraints on 'score': minimum={exported['properties']['score'].get('minimum')}, "
+      f"maximum={exported['properties']['score'].get('maximum')}")
+```
+
+Round-trip fidelity is tested as part of Pointblank's test suite. The general guarantee is that
+any constraint that can be expressed in both Pointblank and the target format will survive the
+round trip. Constraints that are unique to one format (like JSON Schema's `$ref` or Pointblank's
+`pre=` argument) may not survive, but the core numeric bounds, enum checks, null checks, and
+pattern constraints will always round-trip cleanly.
+
+## Auto-Detection
+
+When the format is obvious from the source content, you can omit the `format=` parameter:
+
+```{python}
+# JSON Schema: detected by presence of "$schema" or "type" + "properties"
+result = pb.import_contract({"type": "object", "properties": {"x": {"type": "integer"}}})
+print(f"Detected: {result.source_format}")
+
+# Frictionless: detected by presence of "fields" list
+result = pb.import_contract({"fields": [{"name": "x", "type": "integer"}]})
+print(f"Detected: {result.source_format}")
+```
+
+For file-based imports, the extension is also used for detection (`.schema.json` maps to JSON
+Schema, `.resource.json` or `.datapackage.json` maps to Frictionless). Auto-detection is a
+convenience feature that works well for common cases. When working with ambiguous files or dict
+inputs that could match multiple formats, it is best to specify `format=` explicitly to avoid
+any possibility of misdetection.
+
+## Combining Imports with Extra Checks
+
+An imported schema gives you a baseline, but you can always add more Pointblank checks on top:
+
+```{python}
+imported = pb.import_contract(user_schema, format="json_schema")
+
+# Start from the import but add custom checks
+validation = (
+    imported
+    .to_validate(data=users, tbl_name="enriched_check")
+    .col_vals_regex(columns="email", pattern=r".*\.(com|io|org|net|co)$")
+    .rows_distinct(columns_subset="user_id")
+    .interrogate()
+)
+
+validation
+```
+
+This pattern works well when the external schema covers structural and type constraints, but your
+team has additional business rules that only make sense in the Pointblank context. The imported
+constraints form the foundation, and your additional `.col_vals_*()` or `.rows_*()` calls layer
+on top. Because `.to_validate()` returns a standard `Validate` object, you have full access to
+the entire Pointblank API for adding checks, setting thresholds, or attaching actions.
+
+## Migration from Other Tools
+
+A key use case for `import_contract()` is **migration**: bringing existing validation definitions
+from other tools into Pointblank without manual rewriting.
+
+### Coming from JSON Schema
+
+If your team uses JSON Schema for API validation and you want the same rules applied to DataFrames:
+
+```python
+# Your existing JSON Schema (maybe generated by your API framework)
+result = pb.import_contract("api/schemas/user.schema.json")
+
+# Now use it for DataFrame validation in your data pipeline
+validation = result.to_validate(data=raw_users_df).interrogate()
+```
+
+This approach is particularly powerful when your API team already maintains JSON Schema definitions
+for request/response validation. Those same schemas can now serve double duty: validating API
+payloads at the service boundary and validating the resulting DataFrames in your analytics pipeline.
+You get consistent enforcement across both layers without writing the rules twice.
+
+### Coming from Frictionless
+
+If you have data packages from open data sources or research datasets:
+
+```python
+# Import from an existing data package descriptor
+result = pb.import_contract("data/datapackage.json", resource="observations")
+
+# Validate the actual CSV data against the declared schema
+validation = result.to_validate(data=observations_df).interrogate()
+```
+
+Frictionless Data Packages are common in open data portals, government datasets, and academic
+research repositories. By importing their Table Schemas directly, you can validate downloaded data
+against its declared structure without needing to manually inspect the descriptor file and rewrite
+each constraint. This is especially valuable when working with unfamiliar datasets where the schema
+descriptor is your primary documentation of what the data should contain.
+
+### Generating a Starting Point
+
+Even if you don't plan to keep using the external format, importing is a great way to bootstrap
+a Pointblank contract:
+
+```python
+# Import from your existing schema
+imported = pb.import_contract("legacy_schema.json", format="json_schema")
+
+# Save as a YAML contract you'll maintain going forward
+contract = imported.to_contract(name="my_table", version="1.0.0")
+contract.to_yaml("contracts/my_table.yaml")
+```
+
+Now you have a Pointblank-native contract that you can extend and evolve independently of the
+original source. You can add new validation steps, adjust thresholds, or incorporate business rules
+that go beyond what the original schema format could express.
+
+## Conclusion
+
+The contract import/export system lets you bridge the gap between external schema definitions and
+Pointblank's validation engine. Rather than maintaining duplicate specifications across tools, you
+can keep your source of truth in whichever format suits your team and import it into Pointblank
+whenever you need runtime validation. The key points to remember:
+
+- Use `pb.import_contract()` to read external schemas and translate them into Pointblank checks
+- The `ContractImport` object gives you multiple output options: direct validation, reusable
+  contracts, generated Python code, or YAML
+- Check `.coverage` and `.warnings` to understand how completely the translation covered your
+  original schema
+- Use `pb.export_contract()` to write Pointblank contracts back to external formats for sharing
+  with other tools
+- Combine imports with additional Pointblank-specific checks for the most thorough validation
+  coverage
+
+Whether you are migrating from another validation tool, bootstrapping contracts from existing
+schemas, or maintaining interoperability with external systems, the adapter framework gives you a
+clean path between external specifications and Pointblank's validation engine. As new adapters are
+added in future releases, the same `import_contract()` interface will continue to work, so any code
+you write today will gain new format support automatically.
+
+
+### Custom Adapters
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Pointblank's contract import/export system is designed to be extensible. If your organization uses
+a proprietary schema format, an internal data catalog, or any other schema definition tool that
+isn't covered by the built-in adapters, you can write a **custom adapter** and register it with
+the framework.
+
+Once registered, your custom adapter works seamlessly with `import_contract()` and
+`export_contract()`, the same API surface your team already uses for JSON Schema and Frictionless.
+
+## The Adapter Architecture
+
+Every adapter follows the same pattern:
+
+1. **Subclass** `ContractAdapter` and set a few class attributes
+2. **Implement** `detect()` (for auto-detection), `import_contract()`, and optionally
+   `export_contract()`
+3. **Register** the adapter with the `@register_adapter` decorator
+
+Here's a minimal example to illustrate the structure:
+
+```{python}
+from pointblank.adapters import ContractAdapter, ContractImport, MappedConstraint, register_adapter
+
+
+@register_adapter("my_format")
+class MyFormatAdapter(ContractAdapter):
+    """Adapter for My Company's internal schema format."""
+
+    format_name = "my_format"
+    file_extensions = [".myschema"]
+    supports_import = True
+    supports_export = False  # export not implemented yet
+
+    @staticmethod
+    def detect(source) -> bool:
+        """Return True if this adapter can handle the source."""
+        if isinstance(source, dict):
+            return "my_format_version" in source
+        return False
+
+    def import_contract(self, source, **kwargs) -> ContractImport:
+        """Parse the source and return a ContractImport."""
+        # Your parsing logic here
+        columns = [("id", "Int64"), ("value", "Float64")]
+        constraints = [
+            MappedConstraint(
+                method="col_vals_not_null",
+                kwargs={"columns": "id"},
+                source_description="id is required",
+            ),
+        ]
+        return ContractImport(
+            source_format="my_format",
+            columns=columns,
+            constraints=constraints,
+        )
+```
+
+After registration, it's immediately usable:
+
+```{python}
+# Now this works
+result = pb.import_contract({"my_format_version": "1.0", "fields": []}, format="my_format")
+print(result)
+```
+
+The adapter is now part of the Pointblank ecosystem. Any call to `import_contract()` with
+`format="my_format"` will route through this adapter, and the auto-detection system will call
+`detect()` when no format is specified.
+
+```{python}
+# And it shows up in the adapter list
+pb.list_adapters()
+```
+
+The `list_adapters()` output confirms your adapter is registered alongside the built-in ones,
+showing its supported file extensions and whether it handles import, export, or both.
+
+## The `ContractAdapter` Base Class
+
+Here are the class attributes and methods you can define:
+
+| Attribute | Type | Purpose |
+|---|---|---|
+| `format_name` | `str` | Short identifier (e.g., `"json_schema"`, `"my_format"`) |
+| `file_extensions` | `list[str]` | File extensions for auto-detection (e.g., `[".schema.json"]`) |
+| `supports_import` | `bool` | Whether `import_contract()` is implemented |
+| `supports_export` | `bool` | Whether `export_contract()` is implemented |
+
+| Method | Required? | Purpose |
+|---|---|---|
+| `detect(source)` | Recommended | Returns `True` if this adapter handles the given source |
+| `import_contract(source, **kwargs)` | If `supports_import` | Parses source, returns `ContractImport` |
+| `export_contract(obj, destination, **kwargs)` | If `supports_export` | Exports to the format |
+
+## Building an Import Adapter
+
+Let's build a more realistic adapter, one that reads a simple YAML-based schema format used
+internally at a hypothetical company:
+
+```yaml
+# company_schema.yaml
+version: "2.0"
+table: user_events
+columns:
+  - name: event_id
+    type: string
+    required: true
+    unique: true
+  - name: user_id
+    type: integer
+    required: true
+  - name: event_type
+    type: string
+    values: [click, view, purchase, signup]
+  - name: amount
+    type: float
+    min: 0
+```
+
+Here's the adapter that handles this format:
+
+```{python}
+import yaml
+from pointblank.adapters import ContractAdapter, ContractImport, MappedConstraint, register_adapter
+
+
+@register_adapter("company_schema")
+class CompanySchemaAdapter(ContractAdapter):
+    """Adapter for our company's internal YAML schema format."""
+
+    format_name = "company_schema"
+    file_extensions = [".company.yaml", ".company.yml"]
+    supports_import = True
+    supports_export = False
+
+    # Type mapping from our format to Pointblank dtypes
+    TYPE_MAP = {
+        "string": "String",
+        "integer": "Int64",
+        "float": "Float64",
+        "boolean": "Boolean",
+        "date": "Date",
+        "datetime": "Datetime",
+    }
+
+    @staticmethod
+    def detect(source) -> bool:
+        """Detect our format by looking for the 'version' + 'columns' keys."""
+        if isinstance(source, dict):
+            return "version" in source and "columns" in source and "table" in source
+        return False
+
+    def import_contract(self, source, **kwargs) -> ContractImport:
+        """Import from our company schema format."""
+        # Load from file or use dict directly
+        if isinstance(source, str):
+            from pathlib import Path
+
+            with open(Path(source)) as f:
+                doc = yaml.safe_load(f)
+        elif isinstance(source, dict):
+            doc = source
+        else:
+            raise TypeError(f"Expected str or dict, got {type(source).__name__}")
+
+        columns = []
+        constraints = []
+        warnings = []
+        total = 0
+
+        for col_def in doc.get("columns", []):
+            col_name = col_def["name"]
+            col_type = col_def.get("type", "string")
+            dtype = self.TYPE_MAP.get(col_type)
+            columns.append((col_name, dtype))
+
+            if col_def.get("required", False):
+                total += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_not_null",
+                        kwargs={"columns": col_name},
+                        source_description=f"{col_name} is required",
+                    )
+                )
+
+            if col_def.get("unique", False):
+                total += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="rows_distinct",
+                        kwargs={"columns_subset": col_name},
+                        source_description=f"{col_name} must be unique",
+                    )
+                )
+
+            if "values" in col_def:
+                total += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_in_set",
+                        kwargs={"columns": col_name, "set": col_def["values"]},
+                        source_description=f"{col_name} allowed values: {col_def['values']}",
+                    )
+                )
+
+            if "min" in col_def:
+                total += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_ge",
+                        kwargs={"columns": col_name, "value": col_def["min"]},
+                        source_description=f"{col_name} >= {col_def['min']}",
+                    )
+                )
+
+            if "max" in col_def:
+                total += 1
+                constraints.append(
+                    MappedConstraint(
+                        method="col_vals_le",
+                        kwargs={"columns": col_name, "value": col_def["max"]},
+                        source_description=f"{col_name} <= {col_def['max']}",
+                    )
+                )
+
+        coverage = 1.0 if total == 0 else (total - len(warnings)) / total
+
+        return ContractImport(
+            source_format="company_schema",
+            source_path=source if isinstance(source, str) else None,
+            source_version=doc.get("version"),
+            columns=columns,
+            constraints=constraints,
+            metadata={"table": doc.get("table")},
+            warnings=warnings,
+            coverage=coverage,
+        )
+```
+
+Now let's use it:
+
+```{python}
+import polars as pl
+
+# Simulate a company schema document
+company_schema = {
+    "version": "2.0",
+    "table": "user_events",
+    "columns": [
+        {"name": "event_id", "type": "string", "required": True, "unique": True},
+        {"name": "user_id", "type": "integer", "required": True},
+        {"name": "event_type", "type": "string", "values": ["click", "view", "purchase", "signup"]},
+        {"name": "amount", "type": "float", "min": 0},
+    ],
+}
+
+# Import using our custom adapter
+result = pb.import_contract(company_schema, format="company_schema")
+print(result.summary())
+```
+
+The summary shows four columns detected and five constraints mapped (two `required` fields, one
+`unique` field, one `values` check, and one `min` bound). All constraints were successfully
+translated, giving 100% coverage.
+
+```{python}
+# Validate some data
+events = pl.DataFrame(
+    {
+        "event_id": ["E001", "E002", "E003", "E004", "E005"],
+        "user_id": [101, 102, 101, 103, 104],
+        "event_type": ["click", "view", "purchase", "signup", "click"],
+        "amount": [0.0, 0.0, 49.99, 0.0, 0.0],
+    }
+)
+
+result.to_validate(data=events).interrogate()
+```
+
+The validation report shows each imported constraint as a separate step, just as if you had written
+the validation by hand. From the user's perspective, there is no difference between validation steps
+that came from a custom adapter and those written directly in Python.
+
+## The `MappedConstraint` Class
+
+Each constraint from the external format gets mapped to a `MappedConstraint`, which is a simple
+data container holding:
+
+- `method`: the Pointblank `Validate` method name (e.g., `"col_vals_gt"`)
+- `kwargs`: the keyword arguments to pass to that method
+- `source_description`: optional human-readable note about what this was in the source format
+
+```{python}
+# Creating constraints manually
+c1 = MappedConstraint(
+    method="col_vals_between",
+    kwargs={"columns": "temperature", "left": -40, "right": 60},
+    source_description="Temperature must be in physical range",
+)
+print(c1)
+```
+
+The `source_description` is stored for debugging and documentation but doesn't affect validation.
+When users call `.summary()` or inspect the `ContractImport` object, these descriptions help them
+understand the provenance of each validation step. This is especially useful when debugging why a
+particular check was generated or when comparing the import output against the original schema.
+
+## Handling Unmappable Constraints
+
+Not every constraint in every format has a clean Pointblank equivalent. When you encounter something
+that can't be translated, add it to the warnings list rather than silently dropping it:
+
+```python
+# In your import_contract() method:
+if "custom_check" in col_def:
+    total += 1
+    warnings.append(
+        f"Column '{col_name}': 'custom_check' has no Pointblank equivalent, skipped."
+    )
+```
+
+This follows Pointblank's design principle of **best-effort translation**: generate everything you
+can, be transparent about what was skipped, and never silently lose information. Users can then
+review the warnings list and decide whether to add manual validation steps for the missing
+constraints or whether the gap is acceptable for their use case.
+
+## Auto-Detection Tips
+
+The `detect()` method enables format auto-detection. Good detection should be:
+
+- **Fast**: don't load the entire file just to check if it's your format
+- **Specific**: avoid false positives that could conflict with other adapters
+- **Graceful**: return `False` (never raise) if the source isn't your format
+
+The detection system iterates through all registered adapters and calls `detect()` on each one.
+Because of this, your detection logic should be as lightweight as possible. Checking for the
+presence of a few distinctive keys in a dict is ideal. Avoid expensive operations like parsing
+large files or making network requests inside `detect()`.
+
+```python
+@staticmethod
+def detect(source) -> bool:
+    if isinstance(source, dict):
+        # Check for a distinctive key combination
+        return "my_format_version" in source and "tables" in source
+
+    if isinstance(source, str):
+        # Check file extension first (cheapest check)
+        return source.lower().endswith(".myformat.yaml")
+
+    return False
+```
+
+## Best Practices
+
+1. **Map as much as possible**: users expect high coverage. If a constraint is *close* to
+   something Pointblank supports, map it (possibly with reduced precision) rather than skipping it.
+
+2. **Use descriptive source_description**: this helps users understand what each generated
+   validation step corresponds to in their original schema.
+
+3. **Set coverage accurately**: track the total number of source constraints and how many were
+   successfully mapped. This gives users confidence in the import quality.
+
+4. **Handle both file paths and dicts**: users should be able to pass either a path string or
+   pre-loaded data. Most adapters check `isinstance(source, str)` for file paths and
+   `isinstance(source, dict)` for pre-parsed content.
+
+5. **Fail clearly on bad input**: raise `TypeError` for wrong source types, `FileNotFoundError`
+   for missing files, and `ValueError` for malformed content. Don't return partial results
+   silently.
+
+6. **Keep dependencies optional**: if your adapter needs a third-party library, check for it at
+   import time and give a clear installation hint if it's missing.
+
+## Conclusion
+
+Custom adapters let you extend Pointblank's import/export system to handle any schema format your
+organization uses. The plugin architecture is intentionally simple: subclass `ContractAdapter`,
+implement one or two methods, and register it with a decorator. From that point forward, your
+format participates in the same `import_contract()` and `export_contract()` workflow that the
+built-in adapters use.
+
+This extensibility means that Pointblank can serve as a universal validation layer regardless of
+where your data contracts originate. Whether your schemas live in a proprietary YAML format, an
+internal data catalog API, or a custom metadata store, a short adapter class is all you need to
+bring them into the Pointblank ecosystem and benefit from its validation reporting, threshold
+system, and pipeline integration.
 

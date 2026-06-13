@@ -45,6 +45,31 @@ Binds source and target contracts into a pipeline boundary enforcement unit.
 Result of a pipeline boundary validation run.
 
 
+## Contract Import/Export
+
+
+Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
+
+
+[import_contract()](import_contract.md#pointblank.import_contract)  
+Import a contract/schema from an external format.
+
+[export_contract()](export_contract.md#pointblank.export_contract)  
+Export a Pointblank validation or contract to an external format.
+
+[list_adapters()](list_adapters.md#pointblank.list_adapters)  
+List all registered adapters with their capabilities.
+
+[register_adapter()](register_adapter.md#pointblank.register_adapter)  
+Register a contract adapter class.
+
+[ContractImport](ContractImport.md#pointblank.ContractImport)  
+Result of importing an external contract/schema.
+
+[ContractAdapter](ContractAdapter.md#pointblank.ContractAdapter)  
+Base class for contract import/export adapters.
+
+
 ## Validation Steps
 
 

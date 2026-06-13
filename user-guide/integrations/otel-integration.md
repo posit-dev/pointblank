@@ -143,7 +143,7 @@ Let's walk through a complete example using in-memory providers so you can see e
 
 ## Setup
 
-Before exporting any signals we need OTel providers to receive them. The SDK's in-memory providers are perfect for exploration: they capture every metric, span, and log record in Python lists so we can print them without running a collector.
+Before exporting any signals we need OTel providers to receive them. The SDK's in-memory providers are very useful for exploration: they capture every metric, span, and log record in Python lists so we can print them without running a collector.
 
 
 ``` python

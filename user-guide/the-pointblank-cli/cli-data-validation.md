@@ -11,7 +11,7 @@ For more complex validation logic, the `pb run` command serves as a runner for v
 
 # `pb validate`: Quick, One-Line Data Checks
 
-The `pb validate` command is your go-to for running common validation checks directly on your data source. It's perfect for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the `--check` option, making your intent clear and your validation explicit.
+The `pb validate` command is your go-to for running common validation checks directly on your data source. It's great for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the `--check` option, making your intent clear and your validation explicit.
 
 Here's how you construct a validation command:
 

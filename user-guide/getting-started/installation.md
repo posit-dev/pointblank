@@ -228,7 +228,7 @@ pb validate small_table --check col-exists --column a
 pb validate small_table --check col-vals-lt --column a --value 10
 ```
 
-The CLI is perfect for:
+The CLI is useful for:
 
 - quick data quality checks in CI/CD pipelines
 - exploratory data analysis from the terminal

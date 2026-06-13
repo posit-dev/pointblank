@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Custom Adapters – Pointblank | Pointblank</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/contracts-and-pipelines/importing-contracts.html" rel="prev">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-3bf6dc44f1d1c4f1986ae0ab89442a35.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
+<script src="../../theme-init.js"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <meta name="description" content="Pointblank’s contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data...">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Custom Adapters – Pointblank | Pointblank">
+  <meta property="og:description" content="Pointblank’s contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data...">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/custom-adapters.html">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Custom Adapters – Pointblank | Pointblank">
+  <meta name="twitter:description" content="Pointblank’s contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data...">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.25.0</code><br>Released 2026-06-12">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class=""></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/index.html"> 
+<span class="menu-text">API Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="443" data-forks="28"></div>
+    </span>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs">Custom Adapters</h1>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Getting Started</span></a>
+</div>
+      <ul id="quarto-sidebar-section-1" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/quickstart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quickstart</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validation Plan</span></a>
+</div>
+      <ul id="quarto-sidebar-section-2" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Methods</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/column-selection-patterns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Selection Patterns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/preprocessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preprocessing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/segmentation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Segmentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/briefs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Briefs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Advanced Validation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-3" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Expression-Based Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/schema-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Schema Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/assertions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assertions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/draft-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Draft Validation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">YAML</span></a>
+</div>
+      <ul id="quarto-sidebar-section-4" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Validation Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Post Interrogation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-5" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/validation-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/step-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/sundering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sundering Validated Data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Data Inspection</span></a>
+</div>
+      <ul id="quarto-sidebar-section-6" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previewing Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/col-summary-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Summaries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/missing-vals-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing Values Reporting</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Test Data Generation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-7" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/test-data-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Test Data Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">The Pointblank CLI</span></a>
+</div>
+      <ul id="quarto-sidebar-section-8" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Inspection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CLI Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">MCP Server</span></a>
+</div>
+      <ul id="quarto-sidebar-section-9" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP Quick Start</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-10" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenTelemetry Integration</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Contracts &amp; Pipelines</span></a>
+</div>
+      <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Contracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/pipelines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pipeline Boundary Enforcement</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/yaml-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Contracts &amp; Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing External Schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/custom-adapters.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Custom Adapters</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#the-adapter-architecture" id="toc-the-adapter-architecture" class="nav-link active" data-scroll-target="#the-adapter-architecture">The Adapter Architecture</a></li>
+  <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The <code>ContractAdapter</code> Base Class</a></li>
+  <li><a href="#building-an-import-adapter" id="toc-building-an-import-adapter" class="nav-link" data-scroll-target="#building-an-import-adapter">Building an Import Adapter</a></li>
+  <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The <code>MappedConstraint</code> Class</a></li>
+  <li><a href="#handling-unmappable-constraints" id="toc-handling-unmappable-constraints" class="nav-link" data-scroll-target="#handling-unmappable-constraints">Handling Unmappable Constraints</a></li>
+  <li><a href="#auto-detection-tips" id="toc-auto-detection-tips" class="nav-link" data-scroll-target="#auto-detection-tips">Auto-Detection Tips</a></li>
+  <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Custom Adapters</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Pointblank’s contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data catalog, or any other schema definition tool that isn’t covered by the built-in adapters, you can write a <strong>custom adapter</strong> and register it with the framework.</p>
+<p>Once registered, your custom adapter works seamlessly with <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> and <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a>, the same API surface your team already uses for JSON Schema and Frictionless.</p>
+<section id="the-adapter-architecture" class="level1">
+<h1>The Adapter Architecture</h1>
+<p>Every adapter follows the same pattern:</p>
+<ol type="1">
+<li><strong>Subclass</strong> <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a> and set a few class attributes</li>
+<li><strong>Implement</strong> <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> (for auto-detection), <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a>, and optionally <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></li>
+<li><strong>Register</strong> the adapter with the <code>@register_adapter</code> decorator</li>
+</ol>
+<p>Here’s a minimal example to illustrate the structure:</p>
+<div id="af6435ca" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> ContractAdapter, ContractImport, MappedConstraint, register_adapter</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">@register_adapter</span>(<span class="st">"my_format"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MyFormatAdapter(ContractAdapter):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Adapter for My Company's internal schema format."""</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"my_format"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    file_extensions <span class="op">=</span> [<span class="st">".myschema"</span>]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    supports_import <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    supports_export <span class="op">=</span> <span class="va">False</span>  <span class="co"># export not implemented yet</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> detect(source) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Return True if this adapter can handle the source."""</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">"my_format_version"</span> <span class="kw">in</span> source</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> import_contract(<span class="va">self</span>, source, <span class="op">**</span>kwargs) <span class="op">-&gt;</span> ContractImport:</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Parse the source and return a ContractImport."""</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Your parsing logic here</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        columns <span class="op">=</span> [(<span class="st">"id"</span>, <span class="st">"Int64"</span>), (<span class="st">"value"</span>, <span class="st">"Float64"</span>)]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        constraints <span class="op">=</span> [</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            MappedConstraint(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">"col_vals_not_null"</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>                kwargs<span class="op">=</span>{<span class="st">"columns"</span>: <span class="st">"id"</span>},</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                source_description<span class="op">=</span><span class="st">"id is required"</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ContractImport(</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            source_format<span class="op">=</span><span class="st">"my_format"</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            columns<span class="op">=</span>columns,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            constraints<span class="op">=</span>constraints,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div>
+</div>
+<p>After registration, it’s immediately usable:</p>
+<div id="c10c5a42" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now this works</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.import_contract({<span class="st">"my_format_version"</span>: <span class="st">"1.0"</span>, <span class="st">"fields"</span>: []}, <span class="bu">format</span><span class="op">=</span><span class="st">"my_format"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ContractImport(format='my_format', columns=2, constraints=1, coverage=100%)</code></pre>
+</div>
+</div>
+<p>The adapter is now part of the Pointblank ecosystem. Any call to <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> with <code>format="my_format"</code> will route through this adapter, and the auto-detection system will call <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> when no format is specified.</p>
+<div id="7c11c456" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And it shows up in the adapter list</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pb.list_adapters()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>{'frictionless': {'class': 'FrictionlessAdapter',
+  'file_extensions': ['.resource.json', '.datapackage.json'],
+  'supports_import': True,
+  'supports_export': True},
+ 'json_schema': {'class': 'JSONSchemaAdapter',
+  'file_extensions': ['.schema.json'],
+  'supports_import': True,
+  'supports_export': True},
+ 'my_format': {'class': 'MyFormatAdapter',
+  'file_extensions': ['.myschema'],
+  'supports_import': True,
+  'supports_export': False}}</code></pre>
+</div>
+</div>
+<p>The <a href="../../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a> output confirms your adapter is registered alongside the built-in ones, showing its supported file extensions and whether it handles import, export, or both.</p>
+</section>
+<section id="the-contractadapter-base-class" class="level1">
+<h1>The <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a> Base Class</h1>
+<p>Here are the class attributes and methods you can define:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Attribute</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.format_name" class="gdls-link gdls-code">format_name</a></td>
+<td><code>str</code></td>
+<td>Short identifier (e.g., <code>"json_schema"</code>, <code>"my_format"</code>)</td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.file_extensions" class="gdls-link gdls-code">file_extensions</a></td>
+<td><code>list[str]</code></td>
+<td>File extensions for auto-detection (e.g., <code>[".schema.json"]</code>)</td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_import" class="gdls-link gdls-code">supports_import</a></td>
+<td><code>bool</code></td>
+<td>Whether <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> is implemented</td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_export" class="gdls-link gdls-code">supports_export</a></td>
+<td><code>bool</code></td>
+<td>Whether <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> is implemented</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Required?</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>detect(source)</code></td>
+<td>Recommended</td>
+<td>Returns <code>True</code> if this adapter handles the given source</td>
+</tr>
+<tr class="even">
+<td><code>import_contract(source, **kwargs)</code></td>
+<td>If <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_import" class="gdls-link gdls-code">supports_import</a></td>
+<td>Parses source, returns <a href="../../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a></td>
+</tr>
+<tr class="odd">
+<td><code>export_contract(obj, destination, **kwargs)</code></td>
+<td>If <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_export" class="gdls-link gdls-code">supports_export</a></td>
+<td>Exports to the format</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="building-an-import-adapter" class="level1">
+<h1>Building an Import Adapter</h1>
+<p>Let’s build a more realistic adapter, one that reads a simple YAML-based schema format used internally at a hypothetical company:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># company_schema.yaml</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"2.0"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span><span class="kw">:</span><span class="at"> user_events</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> event_id</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">required</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">unique</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> user_id</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">required</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> event_type</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">values</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">click</span><span class="kw">,</span><span class="at"> view</span><span class="kw">,</span><span class="at"> purchase</span><span class="kw">,</span><span class="at"> signup</span><span class="kw">]</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> amount</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> float</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span></code></pre></div>
+<p>Here’s the adapter that handles this format:</p>
+<div id="952ccf1f" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yaml</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> ContractAdapter, ContractImport, MappedConstraint, register_adapter</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">@register_adapter</span>(<span class="st">"company_schema"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CompanySchemaAdapter(ContractAdapter):</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Adapter for our company's internal YAML schema format."""</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"company_schema"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    file_extensions <span class="op">=</span> [<span class="st">".company.yaml"</span>, <span class="st">".company.yml"</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    supports_import <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    supports_export <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Type mapping from our format to Pointblank dtypes</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    TYPE_MAP <span class="op">=</span> {</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"string"</span>: <span class="st">"String"</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"integer"</span>: <span class="st">"Int64"</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"float"</span>: <span class="st">"Float64"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"boolean"</span>: <span class="st">"Boolean"</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"date"</span>: <span class="st">"Date"</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"datetime"</span>: <span class="st">"Datetime"</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> detect(source) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Detect our format by looking for the 'version' + 'columns' keys."""</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>):</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">"version"</span> <span class="kw">in</span> source <span class="kw">and</span> <span class="st">"columns"</span> <span class="kw">in</span> source <span class="kw">and</span> <span class="st">"table"</span> <span class="kw">in</span> source</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> import_contract(<span class="va">self</span>, source, <span class="op">**</span>kwargs) <span class="op">-&gt;</span> ContractImport:</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Import from our company schema format."""</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Load from file or use dict directly</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">str</span>):</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>            <span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(Path(source)) <span class="im">as</span> f:</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>                doc <span class="op">=</span> yaml.safe_load(f)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>):</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>            doc <span class="op">=</span> source</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="ss">f"Expected str or dict, got </span><span class="sc">{</span><span class="bu">type</span>(source)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        columns <span class="op">=</span> []</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>        constraints <span class="op">=</span> []</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        warnings <span class="op">=</span> []</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> col_def <span class="kw">in</span> doc.get(<span class="st">"columns"</span>, []):</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>            col_name <span class="op">=</span> col_def[<span class="st">"name"</span>]</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>            col_type <span class="op">=</span> col_def.get(<span class="st">"type"</span>, <span class="st">"string"</span>)</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>            dtype <span class="op">=</span> <span class="va">self</span>.TYPE_MAP.get(col_type)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>            columns.append((col_name, dtype))</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> col_def.get(<span class="st">"required"</span>, <span class="va">False</span>):</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>                        method<span class="op">=</span><span class="st">"col_vals_not_null"</span>,</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>                        kwargs<span class="op">=</span>{<span class="st">"columns"</span>: col_name},</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>                        source_description<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss"> is required"</span>,</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> col_def.get(<span class="st">"unique"</span>, <span class="va">False</span>):</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>                        method<span class="op">=</span><span class="st">"rows_distinct"</span>,</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>                        kwargs<span class="op">=</span>{<span class="st">"columns_subset"</span>: col_name},</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>                        source_description<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss"> must be unique"</span>,</span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"values"</span> <span class="kw">in</span> col_def:</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>                        method<span class="op">=</span><span class="st">"col_vals_in_set"</span>,</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>                        kwargs<span class="op">=</span>{<span class="st">"columns"</span>: col_name, <span class="st">"set"</span>: col_def[<span class="st">"values"</span>]},</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>                        source_description<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss"> allowed values: </span><span class="sc">{</span>col_def[<span class="st">'values'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"min"</span> <span class="kw">in</span> col_def:</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>                        method<span class="op">=</span><span class="st">"col_vals_ge"</span>,</span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>                        kwargs<span class="op">=</span>{<span class="st">"columns"</span>: col_name, <span class="st">"value"</span>: col_def[<span class="st">"min"</span>]},</span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>                        source_description<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss"> &gt;= </span><span class="sc">{</span>col_def[<span class="st">'min'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"max"</span> <span class="kw">in</span> col_def:</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>                        method<span class="op">=</span><span class="st">"col_vals_le"</span>,</span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>                        kwargs<span class="op">=</span>{<span class="st">"columns"</span>: col_name, <span class="st">"value"</span>: col_def[<span class="st">"max"</span>]},</span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>                        source_description<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss"> &lt;= </span><span class="sc">{</span>col_def[<span class="st">'max'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>        coverage <span class="op">=</span> <span class="fl">1.0</span> <span class="cf">if</span> total <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> (total <span class="op">-</span> <span class="bu">len</span>(warnings)) <span class="op">/</span> total</span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ContractImport(</span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>            source_format<span class="op">=</span><span class="st">"company_schema"</span>,</span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>            source_path<span class="op">=</span>source <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">str</span>) <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>            source_version<span class="op">=</span>doc.get(<span class="st">"version"</span>),</span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>            columns<span class="op">=</span>columns,</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>            constraints<span class="op">=</span>constraints,</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>            metadata<span class="op">=</span>{<span class="st">"table"</span>: doc.get(<span class="st">"table"</span>)},</span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>            warnings<span class="op">=</span>warnings,</span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>            coverage<span class="op">=</span>coverage,</span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div>
+</div>
+<p>Now let’s use it:</p>
+<div id="69c39c3c" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate a company schema document</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>company_schema <span class="op">=</span> {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"version"</span>: <span class="st">"2.0"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"table"</span>: <span class="st">"user_events"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"columns"</span>: [</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"event_id"</span>, <span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"required"</span>: <span class="va">True</span>, <span class="st">"unique"</span>: <span class="va">True</span>},</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"user_id"</span>, <span class="st">"type"</span>: <span class="st">"integer"</span>, <span class="st">"required"</span>: <span class="va">True</span>},</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"event_type"</span>, <span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"values"</span>: [<span class="st">"click"</span>, <span class="st">"view"</span>, <span class="st">"purchase"</span>, <span class="st">"signup"</span>]},</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"amount"</span>, <span class="st">"type"</span>: <span class="st">"float"</span>, <span class="st">"min"</span>: <span class="dv">0</span>},</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Import using our custom adapter</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.import_contract(company_schema, <span class="bu">format</span><span class="op">=</span><span class="st">"company_schema"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Contract Import Summary
+  Format: company_schema
+  Format version: 2.0
+  Columns detected: 4
+  Constraints mapped: 5
+  Coverage: 100%</code></pre>
+</div>
+</div>
+<p>The summary shows four columns detected and five constraints mapped (two <code>required</code> fields, one <code>unique</code> field, one <code>values</code> check, and one <code>min</code> bound). All constraints were successfully translated, giving 100% coverage.</p>
+<div id="40babf30" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate some data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>events <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"event_id"</span>: [<span class="st">"E001"</span>, <span class="st">"E002"</span>, <span class="st">"E003"</span>, <span class="st">"E004"</span>, <span class="st">"E005"</span>],</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">101</span>, <span class="dv">103</span>, <span class="dv">104</span>],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"event_type"</span>: [<span class="st">"click"</span>, <span class="st">"view"</span>, <span class="st">"purchase"</span>, <span class="st">"signup"</span>, <span class="st">"click"</span>],</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">49.99</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>result.to_validate(data<span class="op">=</span>events).interrogate()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-06-13|17:47:01</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_schema_match</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_schema_match" transform="translate(0.000000, 0.310345)">
+            <path d="M56.712234,1.01466935 C59.1975153,1.01466935 61.4475153,2.02202867 63.076195,3.65070832 C64.7048747,5.27938798 65.712234,7.52938798 65.712234,10.0146694 L65.712234,10.0146694 L65.712234,65.0146694 L10.712234,65.0146694 C8.22695259,65.0146694 5.97695259,64.00731 4.34827294,62.3786304 C2.71959328,60.7499507 1.71223397,58.4999507 1.71223397,56.0146694 L1.71223397,56.0146694 L1.71223397,10.0146694 C1.71223397,7.52938798 2.71959328,5.27938798 4.34827294,3.65070832 C5.97695259,2.02202867 8.22695259,1.01466935 10.712234,1.01466935 L10.712234,1.01466935 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M53.712234,39.7885268 L54.212234,56.2885268 L42.212234,56.7885268 L42.212234,39.7885268 L53.712234,39.7885268 Z M39.712234,39.7885268 L39.712234,56.7885268 L27.712234,56.7885268 L27.712234,39.7885268 L39.712234,39.7885268 Z M25.212234,39.7885268 L25.212234,56.7885268 L13.712234,56.7885268 L13.212234,40.2885268 L25.212234,39.7885268 Z" id="columns_schema" stroke="#000000" fill-rule="nonzero"></path>
+            <g id="vertical_equal" transform="translate(30.000000, 29.000000)" stroke="#000000" stroke-linecap="square">
+                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="Line"></line>
+                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line-Copy"></line>
+            </g>
+            <path d="M41.712234,9.01466935 L41.712234,27.0146694 L53.712234,27.0146694 C54.262234,27.0146694 54.712234,26.5646694 54.712234,26.0146694 L54.712234,10.0146694 C54.712234,9.46466935 54.262234,9.01466935 53.712234,9.01466935 L41.712234,9.01466935 Z M27.212234,9.01466935 C27.212234,9.01466935 27.212234,15.0146694 27.212234,27.0146694 L40.212234,27.0146694 L40.212234,9.01466935 C31.5455673,9.01466935 27.212234,9.01466935 27.212234,9.01466935 Z M13.712234,9.01466935 C13.162234,9.01466935 12.712234,9.46466935 12.712234,10.0146694 L12.712234,26.0146694 C12.712234,26.5646694 13.162234,27.0146694 13.712234,27.0146694 L25.712234,27.0146694 L25.712234,9.01466935 L13.712234,9.01466935 Z" id="columns_real" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_schema_match()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">SCHEMA</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_not_null</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_not_null" transform="translate(0.000000, 0.551724)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="omega" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
+            <polygon id="line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_id</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>rows_distinct</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rows_distinct" transform="translate(0.000000, 0.482759)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="no_gemini" transform="translate(17.000000, 13.000000)">
+                <path d="M3.66705619,6.62107508 C3.12510104,6.64066386 2.67455974,7.04767444 2.60273432,7.58527682 C2.52873228,8.1228792 2.85303526,8.6343627 3.37104848,8.79760239 C4.40489909,9.15455286 6.70113553,9.87063021 9.86580595,10.364702 L9.86580595,30.7369976 C6.65978137,31.2332458 4.37225104,31.964559 3.37104848,32.3215095 C2.78991555,32.5282797 2.48520173,33.1681784 2.69197196,33.7493114 C2.8987422,34.3304443 3.53864094,34.6351581 4.11977387,34.4283879 C5.54975217,33.9190808 10.2031678,32.4608072 16.5172734,32.4608072 C22.7943781,32.4608072 27.5500901,33.8907855 29.0540706,34.4109757 C29.6352036,34.6133926 30.2707495,34.304326 30.4731664,33.7231931 C30.6755833,33.1420601 30.3665167,32.5065142 29.7853838,32.3040973 C28.7493568,31.9449704 26.4313554,31.2441283 23.2383897,30.7544098 L23.2383897,10.3821143 C26.4444143,9.88804243 28.745004,9.16108259 29.7679716,8.79760239 C30.3491045,8.59083215 30.6538184,7.95093341 30.4470481,7.36980048 C30.2402779,6.78866755 29.6003791,6.48395373 29.0192462,6.69072396 C27.5587963,7.20873774 22.9162637,8.65830464 16.6391589,8.65830464 C10.3707603,8.65830464 5.61287188,7.21309051 4.10236166,6.69072396 C3.96306391,6.6384873 3.81506005,6.61454548 3.66705619,6.62107508 Z M12.0945699,10.6432975 C13.4940771,10.789125 15.0198226,10.8870686 16.6391589,10.8870686 C18.1997289,10.8870686 19.6623552,10.7978311 21.0096257,10.6607098 L21.0096257,30.4584021 C19.623178,30.316928 18.1191975,30.2320433 16.5172734,30.2320433 C14.9327615,30.2320433 13.4570763,30.3191044 12.0945699,30.4584021 L12.0945699,10.6432975 Z" id="gemini" stroke="#000000" stroke-width="2" fill="#000000" fill-rule="nonzero"></path>
+                <path d="M16.6605354,-5.05929499 C16.9366778,-5.05929499 17.1605354,-4.83543737 17.1605354,-4.55929499 L17.1605354,44.5687509 C17.1605354,44.8448933 16.9366778,45.0687509 16.6605354,45.0687509 C16.384393,45.0687509 16.1605354,44.8448933 16.1605354,44.5687509 L16.1605354,-4.55929499 C16.1605354,-4.83543737 16.384393,-5.05929499 16.6605354,-5.05929499 Z" id="line_black" fill="#000000" transform="translate(16.660535, 20.004728) rotate(-320.000000) translate(-16.660535, -20.004728) "></path>
+                <polygon id="line_white" fill="#FFFFFF" transform="translate(18.560032, 19.158031) rotate(-320.000000) translate(-18.560032, -19.158031) " points="18.0600316 -4.45366735 19.0600316 -4.45366735 19.0600316 42.7697299 18.0600316 42.7697299"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>rows_distinct()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_id</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_not_null</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_not_null" transform="translate(0.000000, 0.551724)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="omega" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
+            <polygon id="line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">user_id</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_in_set</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_in_set" transform="translate(0.000000, 0.172414)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M44.127969,41.1538382 L31.0814568,41.1538382 C29.9510748,41.1536429 28.8827052,40.9256134 27.9079888,40.5136953 C26.4467442,39.8960136 25.19849,38.8599685 24.3189894,37.5577099 C23.8792391,36.906727 23.5314818,36.1899233 23.2936866,35.4252675 C23.2130217,35.16589 23.1460289,34.9005554 23.0913409,34.6307286 L44.1278714,34.6307286 C45.028466,34.6306309 45.7586488,33.9004481 45.7586488,32.9998535 C45.7586488,32.0992589 45.028466,31.3690761 44.1278714,31.3690761 L23.0905596,31.3690761 C23.1990567,30.8337194 23.3597028,30.3180894 23.5675173,29.8264831 C24.185199,28.3652386 25.2212442,27.1169844 26.5236004,26.2374838 C27.1745833,25.7977334 27.891387,25.4499762 28.6560428,25.2122786 C29.4208939,24.9744833 30.2334994,24.8459665 31.0813591,24.8459665 L44.1277737,24.8459665 C45.0283683,24.8459665 45.7586488,24.1157837 45.7586488,23.2151891 C45.7586488,22.3145945 45.0283683,21.5844117 44.1277737,21.5844117 L31.0813591,21.5844117 C29.5096643,21.5844117 28.0039858,21.9038483 26.6373711,22.4820765 C24.5866678,23.3498583 22.8469049,24.7950871 21.6163267,26.616296 C20.3856508,28.4362354 19.665136,30.6413347 19.6658191,33.0000488 C19.6658191,34.5717436 19.9852563,36.0774222 20.5635822,37.4440369 C21.4312663,39.4947402 22.8765927,41.2345031 24.697704,42.4650813 C26.5176434,43.6957572 28.7227427,44.4155883 31.0814568,44.4155883 L44.1278714,44.4155883 C45.028466,44.4155883 45.7586488,43.6854055 45.7586488,42.7848109 C45.7586488,41.8842163 45.0285636,41.1538382 44.127969,41.1538382 Z" id="set_of" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_in_set()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_type</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">click, view, purchase, signup</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">6</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_ge</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_ge" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M43.5238095,46.6666667 L20.4761905,46.6666667 L20.4761905,44.5714286 L43.5238095,44.5714286 L43.5238095,46.6666667 Z M22.0161905,40.2552381 L21.0314286,38.4114286 L39.1761905,28.8571429 L21.0314286,19.3028571 L22.0161905,17.4590476 L43.6809524,28.8571429 L22.0161905,40.2552381 Z" id="greater_than_equal" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_ge()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">amount</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+</tbody>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(schema_check)</span> <span style="color:#4CA64C;">✓</span> Schema validation <strong>passed</strong>.</p>
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555; margin-bottom: -5px;">Schema Comparison</summary>
+<div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
+<div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_step_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+<p>#pb_step_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+tr { background-color: transparent; }
+#pb_step_tbl p { margin: 0; padding: 0; }
+#pb_step_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+#pb_step_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+#pb_step_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+#pb_step_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+#pb_step_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+#pb_step_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+#pb_step_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+#pb_step_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+#pb_step_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+#pb_step_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+#pb_step_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+#pb_step_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+#pb_step_tbl .gt_spanner_row { border-bottom-style: hidden; }
+#pb_step_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+#pb_step_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+#pb_step_tbl .gt_from_md&gt; :first-child { margin-top: 0; }
+#pb_step_tbl .gt_from_md&gt; :last-child { margin-bottom: 0; }
+#pb_step_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+#pb_step_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+#pb_step_tbl .gt_row_group_first td { border-top-width: 2px; }
+#pb_step_tbl .gt_row_group_first th { border-top-width: 2px; }
+#pb_step_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+#pb_step_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+#pb_step_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+#pb_step_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+#pb_step_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+#pb_step_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+#pb_step_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+#pb_step_tbl .gt_sourcenote { font-size: 12px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+#pb_step_tbl .gt_left { text-align: left; }
+#pb_step_tbl .gt_center { text-align: center; }
+#pb_step_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+#pb_step_tbl .gt_font_normal { font-weight: normal; }
+#pb_step_tbl .gt_font_bold { font-weight: bold; }
+#pb_step_tbl .gt_font_italic { font-style: italic; }
+#pb_step_tbl .gt_super { font-size: 65%; }
+#pb_step_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+#pb_step_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+#pb_step_tbl .gt_sourcenote { font-size: 12px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+#pb_step_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+#pb_step_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }</p>
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:40px;">
+  <col style="width:190px;">
+  <col style="width:190px;">
+  <col style="width:40px;">
+  <col style="width:190px;">
+  <col style="width:30px;">
+  <col style="width:190px;">
+  <col style="width:30px;">
+</colgroup>
+<thead>
+<tr class="gt_col_headings gt_spanner_row">
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="pb_step_tbl-TARGET">
+    <span class="gt_column_spanner">TARGET</span>
+  </th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="pb_step_tbl-EXPECTED">
+    <span class="gt_column_spanner">EXPECTED</span>
+  </th>
+</tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-index_target"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-col_name_target">COLUMN</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-dtype_target">DATA TYPE</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-index_exp"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-col_name_exp">COLUMN</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-col_name_exp_correct"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-dtype_exp">DATA TYPE</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="pb_step_tbl-dtype_exp_correct"></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-size: 13px;" class="gt_row gt_right">1</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_id</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">String</td>
+    <td style="font-size: 13px; border-left: 3px double #E5E5E5;" class="gt_row gt_right">1</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_id</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">String</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+  </tr>
+  <tr>
+    <td style="font-size: 13px;" class="gt_row gt_right">2</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">user_id</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">Int64</td>
+    <td style="font-size: 13px; border-left: 3px double #E5E5E5;" class="gt_row gt_right">2</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">user_id</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">Int64</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+  </tr>
+  <tr>
+    <td style="font-size: 13px;" class="gt_row gt_right">3</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_type</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">String</td>
+    <td style="font-size: 13px; border-left: 3px double #E5E5E5;" class="gt_row gt_right">3</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">event_type</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">String</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+  </tr>
+  <tr>
+    <td style="font-size: 13px;" class="gt_row gt_right">4</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">amount</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">Float64</td>
+    <td style="font-size: 13px; border-left: 3px double #E5E5E5;" class="gt_row gt_right">4</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">amount</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">Float64</td>
+    <td class="gt_row gt_left"><span style="color: #4CA64C;">✓</span></td>
+  </tr>
+</tbody>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="8"><span class="gt_from_md"><div style="padding-bottom: 2px;">Supplied Column Schema:</div><div style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px; padding-bottom: 3px;"><code style="color: #303030; font-family: monospace; font-size: 8px;">[('event_id', 'String'), ('user_id', 'Int64'), ('event_type', 'String'), ('amount', 'Float64')]</code></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="8"><span class="gt_from_md">
+<div style="padding-bottom: 2px;">Schema Match Settings</div>
+<div style="padding-bottom: 4px;"><div style="display: flex; font-size: 13.7px; padding-top: 2px;"><div style="border-style: solid; border-width: 1px; border-color: #87CEFA; border-radius: 5px; background-color: #F0F8FF; font-size: x-small; padding-left: 4px; padding-right: 4px; margin-left: 5px; margin-right: 5px;  margin-top: 2px; ">COMPLETE</div><div style="border-style: solid; border-width: 1px; border-color: #87CEFA; border-radius: 5px; background-color: #F0F8FF; font-size: x-small; padding-left: 4px; padding-right: 4px; margin-left: 5px; margin-right: 5px;  margin-top: 2px; ">IN ORDER</div><div style="border-style: solid; border-width: 1px; border-color: #A9A9A9; border-radius: 5px; background-color: #F5F5F5; font-size: x-small; padding-left: 4px; padding-right: 4px; margin-left: 5px; margin-right: 5px;  margin-top: 2px; ">COLUMN ≠ column</div><div style="border-style: solid; border-width: 1px; border-color: #A9A9A9; border-radius: 5px; background-color: #F5F5F5; font-size: x-small; padding-left: 4px; padding-right: 4px; margin-left: 5px; margin-right: 5px;  margin-top: 2px; ">DTYPE ≠ dtype</div><div style="border-style: solid; border-width: 1px; border-color: #A9A9A9; border-radius: 5px; background-color: #F5F5F5; font-size: x-small; padding-left: 4px; padding-right: 4px; margin-left: 5px; margin-right: 5px;  margin-top: 2px; ">float ≠ float64</div></div></div>
+</span></td></tr></tfoot>
+</table>
+</div>
+</div>
+</details>
+</span></td></tr></tfoot>
+</table>
+
+</div>
+</div>
+</div>
+<p>The validation report shows each imported constraint as a separate step, just as if you had written the validation by hand. From the user’s perspective, there is no difference between validation steps that came from a custom adapter and those written directly in Python.</p>
+</section>
+<section id="the-mappedconstraint-class" class="level1">
+<h1>The <code>MappedConstraint</code> Class</h1>
+<p>Each constraint from the external format gets mapped to a <code>MappedConstraint</code>, which is a simple data container holding:</p>
+<ul>
+<li><code>method</code>: the Pointblank <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> method name (e.g., <code>"col_vals_gt"</code>)</li>
+<li><code>kwargs</code>: the keyword arguments to pass to that method</li>
+<li><code>source_description</code>: optional human-readable note about what this was in the source format</li>
+</ul>
+<div id="bba9f986" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating constraints manually</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>c1 <span class="op">=</span> MappedConstraint(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"col_vals_between"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    kwargs<span class="op">=</span>{<span class="st">"columns"</span>: <span class="st">"temperature"</span>, <span class="st">"left"</span>: <span class="op">-</span><span class="dv">40</span>, <span class="st">"right"</span>: <span class="dv">60</span>},</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    source_description<span class="op">=</span><span class="st">"Temperature must be in physical range"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(c1)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MappedConstraint('col_vals_between', columns='temperature', left=-40, right=60)</code></pre>
+</div>
+</div>
+<p>The <code>source_description</code> is stored for debugging and documentation but doesn’t affect validation. When users call <code>.summary()</code> or inspect the <a href="../../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a> object, these descriptions help them understand the provenance of each validation step. This is especially useful when debugging why a particular check was generated or when comparing the import output against the original schema.</p>
+</section>
+<section id="handling-unmappable-constraints" class="level1">
+<h1>Handling Unmappable Constraints</h1>
+<p>Not every constraint in every format has a clean Pointblank equivalent. When you encounter something that can’t be translated, add it to the warnings list rather than silently dropping it:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In your import_contract() method:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"custom_check"</span> <span class="kw">in</span> col_def:</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    warnings.append(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Column '</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss">': 'custom_check' has no Pointblank equivalent, skipped."</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<p>This follows Pointblank’s design principle of <strong>best-effort translation</strong>: generate everything you can, be transparent about what was skipped, and never silently lose information. Users can then review the warnings list and decide whether to add manual validation steps for the missing constraints or whether the gap is acceptable for their use case.</p>
+</section>
+<section id="auto-detection-tips" class="level1">
+<h1>Auto-Detection Tips</h1>
+<p>The <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> method enables format auto-detection. Good detection should be:</p>
+<ul>
+<li><strong>Fast</strong>: don’t load the entire file just to check if it’s your format</li>
+<li><strong>Specific</strong>: avoid false positives that could conflict with other adapters</li>
+<li><strong>Graceful</strong>: return <code>False</code> (never raise) if the source isn’t your format</li>
+</ul>
+<p>The detection system iterates through all registered adapters and calls <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> on each one. Because of this, your detection logic should be as lightweight as possible. Checking for the presence of a few distinctive keys in a dict is ideal. Avoid expensive operations like parsing large files or making network requests inside <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a>.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="at">@staticmethod</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> detect(source) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>):</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check for a distinctive key combination</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"my_format_version"</span> <span class="kw">in</span> source <span class="kw">and</span> <span class="st">"tables"</span> <span class="kw">in</span> source</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">str</span>):</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check file extension first (cheapest check)</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> source.lower().endswith(<span class="st">".myformat.yaml"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+</section>
+<section id="best-practices" class="level1">
+<h1>Best Practices</h1>
+<ol type="1">
+<li><p><strong>Map as much as possible</strong>: users expect high coverage. If a constraint is <em>close</em> to something Pointblank supports, map it (possibly with reduced precision) rather than skipping it.</p></li>
+<li><p><strong>Use descriptive source_description</strong>: this helps users understand what each generated validation step corresponds to in their original schema.</p></li>
+<li><p><strong>Set coverage accurately</strong>: track the total number of source constraints and how many were successfully mapped. This gives users confidence in the import quality.</p></li>
+<li><p><strong>Handle both file paths and dicts</strong>: users should be able to pass either a path string or pre-loaded data. Most adapters check <code>isinstance(source, str)</code> for file paths and <code>isinstance(source, dict)</code> for pre-parsed content.</p></li>
+<li><p><strong>Fail clearly on bad input</strong>: raise <code>TypeError</code> for wrong source types, <code>FileNotFoundError</code> for missing files, and <code>ValueError</code> for malformed content. Don’t return partial results silently.</p></li>
+<li><p><strong>Keep dependencies optional</strong>: if your adapter needs a third-party library, check for it at import time and give a clear installation hint if it’s missing.</p></li>
+</ol>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Custom adapters let you extend Pointblank’s import/export system to handle any schema format your organization uses. The plugin architecture is intentionally simple: subclass <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a>, implement one or two methods, and register it with a decorator. From that point forward, your format participates in the same <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> and <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> workflow that the built-in adapters use.</p>
+<p>This extensibility means that Pointblank can serve as a universal validation layer regardless of where your data contracts originate. Whether your schemas live in a proprietary YAML format, an internal data catalog API, or a custom metadata store, a short adapter class is all you need to bring them into the Pointblank ecosystem and benefit from its validation reporting, threshold system, and pipeline integration.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html" class="pagination-link" aria-label="Importing External Schemas">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Importing External Schemas</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+</div>
+</footer>
+<script src="../../github-widget.js"></script>
+<script src="../../copy-page.js"></script>
+<script src="../../sidebar-wrap.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
+<script src="../../sidebar-filter.js"></script>
+<script src="../../dark-mode-toggle.js"></script>
+<script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
+<script src="../../keyboard-nav.js"></script>
+<script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
+<script src="../../mermaid-renderer.js"></script>
+<script src="../../reference-switcher.js"></script>
+<script src="../../tooltips.js"></script>
+<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script src="../../responsive-tables.js"></script>
+<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
+<script src="../../navbar-widgets.js"></script>
+
+
+
+
+</body></html>
