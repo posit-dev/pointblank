@@ -300,3 +300,39 @@ class JSONSchemaAdapter(ContractAdapter):
             coverage=coverage,
         )
 
+    def _export_from_contract(self, contract: Any) -> dict[str, Any]:
+        """Export a Contract object to JSON Schema."""
+
+        schema_doc: dict[str, Any] = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "title": contract.name,
+        }
+
+        if contract.description:
+            schema_doc["description"] = contract.description
+
+        properties: dict[str, Any] = {}
+        required: list[str] = []
+
+        # From the contract's Schema
+        if contract.schema is not None and contract.schema.columns is not None:
+            for col_name, col_dtype in contract.schema.columns:
+                prop: dict[str, Any] = {}
+                if col_dtype:
+                    json_type = _pb_dtype_to_json_type(str(col_dtype))
+                    if json_type:
+                        prop["type"] = json_type
+                properties[col_name] = prop
+
+        # From the contract's Steps
+        for step in contract.steps:
+            _apply_step_to_properties(step.method, step.kwargs, properties, required)
+
+        if properties:
+            schema_doc["properties"] = properties
+        if required:
+            schema_doc["required"] = required
+
+        return schema_doc
+
