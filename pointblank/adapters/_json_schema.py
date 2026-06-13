@@ -367,3 +367,17 @@ class JSONSchemaAdapter(ContractAdapter):
         return schema_doc
 
 
+def _pb_dtype_to_json_type(dtype: str) -> str | None:
+    """Map a Pointblank/Narwhals dtype string to a JSON Schema type."""
+    dtype_lower = dtype.lower()
+    if "int" in dtype_lower:
+        return "integer"
+    if "float" in dtype_lower or "double" in dtype_lower or "decimal" in dtype_lower:
+        return "number"
+    if "str" in dtype_lower or "utf8" in dtype_lower or "object" in dtype_lower:
+        return "string"
+    if "bool" in dtype_lower:
+        return "boolean"
+    return None
+
+
