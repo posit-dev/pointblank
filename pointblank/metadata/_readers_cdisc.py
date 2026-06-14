@@ -271,3 +271,87 @@ def _parse_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
     return codelists
 
 
+def _parse_item_defs(
+    mdv, ns: dict[str, str], codelists: dict[str, Codelist]
+) -> dict[str, dict[str, Any]]:
+    """Parse `ItemDef` elements into a lookup dict.
+
+    Parameters
+    ----------
+    mdv
+        The `MetaDataVersion` XML element.
+    ns
+        Namespace dictionary.
+    codelists
+        Already-parsed codelists for cross-referencing.
+
+    Returns
+    -------
+    dict
+        Mapping of `ItemDef` OID to a dict of variable properties.
+    """
+    item_defs: dict[str, dict[str, Any]] = {}
+
+    for item_el in mdv.findall("odm:ItemDef", ns):
+        oid = item_el.get("OID", "")
+        name = item_el.get("Name", "")
+        data_type = item_el.get("DataType", "text")
+        length_str = item_el.get("Length")
+        sig_digits_str = item_el.get("SignificantDigits")
+        label = item_el.get("Comment", "")
+
+        # Get def:Label attribute (Define-XML standard)
+        if not label and "def" in ns:
+            def_label = item_el.get(f"{{{ns['def']}}}Label", "")
+            if def_label:
+                label = def_label
+
+        # Get the Description/TranslatedText (overrides if present)
+        desc_el = item_el.find("odm:Description/odm:TranslatedText", ns)
+        if desc_el is not None and desc_el.text:
+            label = desc_el.text
+
+        # Map CDISC data type to Pointblank dtype
+        dtype = _CDISC_TYPE_MAP.get(data_type.lower(), "String")
+
+        # Get CodeList reference (standard ODM or Define-XML namespace)
+        cl_ref_el = item_el.find("odm:CodeListRef", ns)
+        if cl_ref_el is None and "def" in ns:
+            cl_ref_el = item_el.find(f"{{{ns['def']}}}CodeListRef", ns)
+        codelist_oid = cl_ref_el.get("CodeListOID") if cl_ref_el is not None else None
+
+        # Get Origin (CRF, Derived, Assigned, Protocol)
+        origin = None
+        origin_el = item_el.find(f"{{{ns['def']}}}Origin", ns) if "def" in ns else None
+        if origin_el is None:
+            # Try alternative path
+            origin_el = item_el.find("def:Origin", ns)
+        if origin_el is not None:
+            origin = origin_el.get("Type")
+
+        # Get computational method reference (for derived variables)
+        comp_method = None
+        if origin == "Derived":
+            # In Define-XML 2.1, methods are linked via MethodOID
+            method_ref = item_el.find(f"{{{ns['def']}}}MethodRef", ns)
+            if method_ref is None:
+                method_ref = item_el.find("def:MethodRef", ns)
+            # Store MethodOID for later resolution if needed
+            if method_ref is not None:
+                comp_method = method_ref.get("MethodOID")
+
+        item_defs[oid] = {
+            "name": name,
+            "label": label,
+            "dtype": dtype,
+            "data_type_raw": data_type,
+            "length": int(length_str) if length_str else None,
+            "significant_digits": int(sig_digits_str) if sig_digits_str else None,
+            "codelist_oid": codelist_oid,
+            "origin": origin,
+            "computational_method": comp_method,
+        }
+
+    return item_defs
+
+
