@@ -317,3 +317,26 @@ class MetadataImport:
 
         return _metadata_to_validate(self, data, **kwargs)
 
+    def get_variable(self, name: str) -> VariableMetadata:
+        """Get metadata for a specific variable by name.
+
+        Parameters
+        ----------
+        name
+            The variable name to look up.
+
+        Returns
+        -------
+        VariableMetadata
+            The metadata for the named variable.
+
+        Raises
+        ------
+        KeyError
+            If no variable with that name exists.
+        """
+        for var in self.variables:
+            if var.name == name:
+                return var
+        raise KeyError(f"No variable named '{name}' in imported metadata")
+
