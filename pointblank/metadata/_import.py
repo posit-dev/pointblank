@@ -138,3 +138,71 @@ def _detect_json_format(path: Path) -> str:
     )
 
 
+def _detect_xml_format(path: Path) -> str:
+    """Detect the CDISC XML format by examining the root element and namespaces.
+
+    Parameters
+    ----------
+    path
+        Path to the XML file.
+
+    Returns
+    -------
+    str
+        Detected format: `"cdisc_define"` or `"cdisc_ct"`.
+
+    Raises
+    ------
+    ValueError
+        If the XML format cannot be determined.
+    """
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {path}")
+
+    # Read just enough of the file to determine the format
+    # Use iterparse to avoid loading the entire file
+    try:
+        from lxml import etree
+    except ImportError:
+        raise ImportError(
+            "The 'lxml' package is required for XML format detection. "
+            "Install it with: pip install lxml"
+        ) from None
+
+    try:
+        # Parse just the root element
+        context = etree.iterparse(str(path), events=("start",))
+        _, root = next(context)
+    except Exception as e:
+        raise ValueError(f"Cannot parse XML file '{path.name}': {e}") from None
+
+    nsmap = root.nsmap
+
+    # Check for Define-XML namespace (def:)
+    for uri in nsmap.values():
+        if uri and "cdisc.org/ns/def" in uri:
+            return "cdisc_define"
+
+    # Check for NCI/EVS namespace (indicates Controlled Terminology)
+    for uri in nsmap.values():
+        if uri and "ncicb.nci.nih.gov" in uri:
+            return "cdisc_ct"
+
+    # Filename heuristics
+    name_lower = path.name.lower()
+    if "define" in name_lower:
+        return "cdisc_define"
+    if any(x in name_lower for x in ("sdtm", "adam", "send", "terminology", "_ct")):
+        return "cdisc_ct"
+
+    # If it has ODM namespace, treat as CT (generic ODM)
+    for uri in nsmap.values():
+        if uri and "cdisc.org/ns/odm" in uri:
+            return "cdisc_ct"
+
+    raise ValueError(
+        f"Cannot auto-detect XML format for '{path.name}'. "
+        f"Please specify format='cdisc_define' or format='cdisc_ct' explicitly."
+    )
+
+
