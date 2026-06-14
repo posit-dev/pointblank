@@ -20,14 +20,14 @@ class ADaMVariableSpec:
     Parameters
     ----------
     name
-        Variable name (e.g., "USUBJID", "AVAL", "PARAMCD").
+        Variable name (e.g., `"USUBJID"`, `"AVAL"`, `"PARAMCD"`).
     label
-        Variable label (e.g., "Unique Subject Identifier").
+        Variable label (e.g., `"Unique Subject Identifier"`).
     dtype
-        Expected data type ("Char" or "Num").
+        Expected data type (`"Char"` or `"Num"`).
     core
-        ADaM core designation: "Req" (required), "Cond" (conditionally required),
-        or "Perm" (permissible).
+        ADaM core designation: `"Req"` (required), `"Cond"` (conditionally required), or `"Perm"`
+        (permissible).
     required
         Whether the variable is unconditionally required.
     max_length
@@ -35,11 +35,11 @@ class ADaMVariableSpec:
     controlled_term
         Name of the associated controlled terminology codelist.
     source
-        Traceability: expected source (e.g., "SDTM.DM", "Derived").
+        Traceability: expected source (e.g., `"SDTM.DM"`, `"Derived"`).
     condition
         For conditional variables, describes when they are required.
     is_population_flag
-        Whether this is a population flag variable (e.g., SAFFL, ITTFL).
+        Whether this is a population flag variable (e.g., `"SAFFL"`, `"ITTFL"`).
     """
 
     name: str
@@ -61,13 +61,13 @@ class ADaMDatasetTemplate:
     Parameters
     ----------
     name
-        Dataset name (e.g., "ADSL", "ADVS", "ADAE", "ADTTE").
+        Dataset name (e.g., `"ADSL"`, `"ADVS"`, `"ADAE"`, `"ADTTE"`).
     label
-        Dataset label (e.g., "Subject Level Analysis Dataset").
+        Dataset label (e.g., `"Subject Level Analysis Dataset"`).
     description
         Brief description of the dataset's purpose.
     dataset_class
-        ADaM dataset class: "ADSL", "BDS", "ADAE", or "ADTTE".
+        ADaM dataset class: `"ADSL"`, `"BDS"`, `"ADAE"`, or `"ADTTE"`.
     variables
         Ordered list of variable specifications.
     natural_keys
@@ -110,7 +110,7 @@ class ADaMDatasetTemplate:
 
 
 def _adsl_template() -> ADaMDatasetTemplate:
-    """ADSL — Subject-Level Analysis Dataset."""
+    """ADSL: Subject-Level Analysis Dataset."""
     return ADaMDatasetTemplate(
         name="ADSL",
         label="Subject Level Analysis Dataset",
@@ -368,11 +368,10 @@ def _adsl_template() -> ADaMDatasetTemplate:
 
 
 def _bds_template() -> ADaMDatasetTemplate:
-    """BDS — Basic Data Structure (e.g., ADVS, ADLB, ADEG).
+    """BDS: Basic Data Structure (e.g., ADVS, ADLB, ADEG).
 
-    The BDS is the most common ADaM structure for analysis datasets
-    containing one or more records per subject per analysis parameter per
-    analysis timepoint.
+    The BDS is the most common ADaM structure for analysis datasets containing one or more records
+    per subject per analysis parameter per analysis timepoint.
     """
     return ADaMDatasetTemplate(
         name="BDS",
@@ -509,7 +508,7 @@ def _bds_template() -> ADaMDatasetTemplate:
 
 
 def _adae_template() -> ADaMDatasetTemplate:
-    """ADAE — Adverse Event Analysis Dataset."""
+    """ADAE: Adverse Event Analysis Dataset."""
     return ADaMDatasetTemplate(
         name="ADAE",
         label="Adverse Event Analysis Dataset",
@@ -675,7 +674,7 @@ def _adae_template() -> ADaMDatasetTemplate:
 
 
 def _adtte_template() -> ADaMDatasetTemplate:
-    """ADTTE — Time-to-Event Analysis Dataset."""
+    """ADTTE: Time-to-Event Analysis Dataset."""
     return ADaMDatasetTemplate(
         name="ADTTE",
         label="Time-to-Event Analysis Dataset",
@@ -765,8 +764,7 @@ def get_adam_dataset(name: str) -> ADaMDatasetTemplate:
     Parameters
     ----------
     name
-        Dataset name (e.g., "ADSL", "BDS", "ADAE", "ADTTE").
-        Case-insensitive.
+        Dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
 
     Returns
     -------
@@ -808,7 +806,7 @@ def validate_adam_structure(
     data
         A DataFrame (pandas, polars) to check.
     dataset
-        ADaM dataset name (e.g., "ADSL", "BDS", "ADAE", "ADTTE").
+        ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
     strict
         If True, also reports missing conditional variables and unknown variables.
 
@@ -816,6 +814,7 @@ def validate_adam_structure(
     -------
     dict
         Validation results with keys:
+
         - "dataset": the dataset name
         - "dataset_class": ADaM class
         - "valid": True if no required violations found
