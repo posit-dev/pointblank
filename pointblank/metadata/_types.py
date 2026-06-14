@@ -295,3 +295,25 @@ class MetadataImport:
 
         return _metadata_to_schema(self)
 
+    def to_validate(self, data: Any, **kwargs: Any) -> Validate:
+        """Generate a `Validate` workflow from the imported metadata.
+
+        Creates validation steps for all constraints found in the metadata: value ranges, allowed
+        values, required fields, string lengths, etc.
+
+        Parameters
+        ----------
+        data
+            The DataFrame or table to validate.
+        **kwargs
+            Additional keyword arguments passed to the `Validate` constructor.
+
+        Returns
+        -------
+        `Validate`
+            A configured (but not yet interrogated) `Validate` object.
+        """
+        from pointblank.metadata._convert import _metadata_to_validate
+
+        return _metadata_to_validate(self, data, **kwargs)
+
