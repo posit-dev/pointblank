@@ -97,3 +97,28 @@ class Codelist:
         return len(self.codes)
 
 
+@dataclass
+class MissingValueCode:
+    """A structured missing value definition from an external standard.
+
+    In SPSS, SAS, and clinical data, missing values carry meaning
+    (REFUSED, NOT_APPLICABLE, NOT_ASKED, etc.).
+
+    Parameters
+    ----------
+    value
+        The sentinel value (e.g., -99, ".A", "").
+    label
+        What this missing code means.
+    category
+        Category of missingness (e.g., "system_missing", "user_missing").
+    reason
+        Why data is missing.
+    """
+
+    value: Any
+    label: str
+    category: str | None = None
+    reason: str | None = None
+
+
