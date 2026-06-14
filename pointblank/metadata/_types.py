@@ -47,8 +47,8 @@ class CodelistEntry:
 class Codelist:
     """A controlled terminology / value set from an external standard.
 
-    Represents a set of permitted values from standards like CDISC controlled
-    terminology, SPSS value labels, DDI code schemes, etc.
+    Represents a set of permitted values from standards like CDISC controlled terminology, SPSS
+    value labels, DDI code schemes, etc.
 
     Parameters
     ----------
