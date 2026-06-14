@@ -61,3 +61,48 @@ _CDISC_TYPE_MAP: dict[str, str] = {
 }
 
 
+def _ensure_lxml() -> None:
+    """Check that lxml is available, raise helpful error if not."""
+    try:
+        import lxml.etree  # noqa: F401
+    except ImportError:
+        raise ImportError(
+            "The 'lxml' package is required for CDISC XML parsing. "
+            "Install it with: pip install lxml"
+        ) from None
+
+
+def _detect_define_version(root) -> tuple[dict[str, str], str]:
+    """Detect the Define-XML version from the root element.
+
+    Parameters
+    ----------
+    root
+        The lxml root element.
+
+    Returns
+    -------
+    tuple
+        (namespace_dict, version_string)
+    """
+    # Check namespace declarations on root
+    nsmap = root.nsmap
+
+    # Look for def namespace version
+    for prefix, uri in nsmap.items():
+        if "def/v2.1" in uri:
+            return _DEFINE_NS_21, "2.1"
+        if "def/v2.0" in uri:
+            return _DEFINE_NS_20, "2.0"
+
+    # Fallback: check for DefineVersion attribute
+    define_version = root.get("def:DefineVersion") or root.get("DefineVersion")
+    if define_version:
+        if define_version.startswith("2.1"):
+            return _DEFINE_NS_21, "2.1"
+        return _DEFINE_NS_20, "2.0"
+
+    # Default to 2.0
+    return _DEFINE_NS_20, "2.0"
+
+
