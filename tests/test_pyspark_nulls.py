@@ -2,25 +2,44 @@ from __future__ import annotations
 
 import datetime
 import os
+import subprocess
+import sys
 
 import pytest
 
-try:
-    from pyspark.sql import SparkSession
-    from pyspark.sql.types import (
-        BooleanType,
-        DateType,
-        DoubleType,
-        IntegerType,
-        StringType,
-        StructField,
-        StructType,
-        TimestampType,
-    )
+PYSPARK_AVAILABLE = False
 
-    PYSPARK_AVAILABLE = True
-except ImportError:
-    PYSPARK_AVAILABLE = False
+if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() not in ("true", "1", "yes"):
+    try:
+        from pyspark.sql import SparkSession
+        from pyspark.sql.types import (
+            BooleanType,
+            DateType,
+            DoubleType,
+            IntegerType,
+            StringType,
+            StructField,
+            StructType,
+            TimestampType,
+        )
+
+        # Verify Spark can actually start (catches Netty/Java runtime errors)
+        _check = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "from pyspark.sql import SparkSession; "
+                "s = SparkSession.builder.appName('check').master('local[1]')"
+                ".config('spark.ui.enabled','false').getOrCreate(); s.stop()",
+            ],
+            capture_output=True,
+            timeout=30,
+        )
+        if _check.returncode == 0:
+            PYSPARK_AVAILABLE = True
+
+    except (ImportError, subprocess.TimeoutExpired, OSError):
+        pass
 
 pytestmark = pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 
