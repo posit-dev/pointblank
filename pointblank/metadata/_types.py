@@ -61,7 +61,7 @@ class Codelist:
     version
         Version of the terminology.
     source
-        Where this codelist comes from (e.g., "CDISC CT 2024-09").
+        Where this codelist comes from (e.g., `"CDISC CT 2024-09"`).
     extensible
         Whether additional values beyond the codelist are allowed.
     """
@@ -101,8 +101,8 @@ class Codelist:
 class MissingValueCode:
     """A structured missing value definition from an external standard.
 
-    In SPSS, SAS, and clinical data, missing values carry meaning
-    (REFUSED, NOT_APPLICABLE, NOT_ASKED, etc.).
+    In SPSS, SAS, and clinical data, missing values carry meaning (`REFUSED`, `NOT_APPLICABLE`,
+    `NOT_ASKED`, etc.).
 
     Parameters
     ----------
