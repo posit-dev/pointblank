@@ -77,3 +77,109 @@ _CSVW_DATATYPE_MAP: dict[str, str] = {
 }
 
 
+def _read_frictionless_metadata(
+    path: Path,
+    resource: str | int | None = None,
+    **kwargs: Any,
+) -> MetadataImport | MetadataPackage:
+    """Read metadata from a Frictionless Table Schema or Data Package.
+
+    Supports both standalone Table Schema files and full Data Package descriptors
+    (`datapackage.json`). For Data Packages with multiple resources, returns a `MetadataPackage`.
+
+    Parameters
+    ----------
+    path
+        Path to the JSON file (Table Schema or Data Package descriptor).
+    resource
+        For Data Packages: name or index of a specific resource to import.
+        If None and the package has multiple resources, returns a `MetadataPackage`.
+    **kwargs
+        Additional options (currently unused).
+
+    Returns
+    -------
+    MetadataImport | MetadataPackage
+        A `MetadataImport` for single-resource files or when a specific resource
+        is selected, or a `MetadataPackage` for multi-resource packages.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist.
+    ValueError
+        If the JSON is not a valid Frictionless schema or package.
+    """
+    if not path.exists():
+        raise FileNotFoundError(f"Frictionless schema file not found: {path}")
+
+    with open(path) as f:
+        doc = json.load(f)
+
+    # Determine if this is a Table Schema or a Data Package
+    if "fields" in doc and isinstance(doc["fields"], list):
+        # Standalone Table Schema
+        return _parse_frictionless_table_schema(doc, source_path=str(path))
+
+    elif "resources" in doc:
+        # Data Package
+        resources = doc["resources"]
+        if not resources:
+            raise ValueError("Data Package has no resources.")
+
+        # If a specific resource is requested, return a single MetadataImport
+        if resource is not None:
+            schema = _extract_resource_schema(resources, resource)
+            resource_name = (
+                resources[resource].get("name", f"resource_{resource}")
+                if isinstance(resource, int)
+                else resource
+            )
+            meta = _parse_frictionless_table_schema(
+                schema, source_path=str(path), dataset_name=resource_name
+            )
+            meta.dataset_description = doc.get("description")
+            return meta
+
+        # Single resource → return MetadataImport
+        if len(resources) == 1:
+            res = resources[0]
+            schema = res.get("schema", {})
+            if "fields" not in schema:
+                raise ValueError("Resource has no 'schema.fields'.")
+            meta = _parse_frictionless_table_schema(
+                schema,
+                source_path=str(path),
+                dataset_name=res.get("name", path.stem),
+            )
+            meta.dataset_description = res.get("description") or doc.get("description")
+            return meta
+
+        # Multiple resources → return MetadataPackage
+        items: dict[str, MetadataImport] = {}
+        for i, res in enumerate(resources):
+            res_name = res.get("name", f"resource_{i}")
+            schema = res.get("schema", {})
+            if "fields" in schema:
+                meta = _parse_frictionless_table_schema(
+                    schema,
+                    source_path=str(path),
+                    dataset_name=res_name,
+                )
+                meta.dataset_description = res.get("description")
+                items[res_name] = meta
+
+        return MetadataPackage(
+            name=doc.get("name"),
+            description=doc.get("description"),
+            version=doc.get("version"),
+            items=items,
+        )
+
+    else:
+        raise ValueError(
+            "JSON document is neither a Frictionless Table Schema (no 'fields') "
+            "nor a Data Package (no 'resources')."
+        )
+
+
