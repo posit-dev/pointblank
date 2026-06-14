@@ -107,7 +107,9 @@ dev = [
     "pytest-rerunfailures>=15.0",
     "pytest-snapshot",
     "pytest-xdist>=3.6.1",
+    "pyreadstat>=1.2.0",
     "pytz>=2025.2",
+    "lxml>=4.9.0",
     "ruff==0.14.10",  # NOTE: must match rev in .pre-commit-config.yaml
     "shiny>=1.4.0",
     "openpyxl>=3.0.0",
