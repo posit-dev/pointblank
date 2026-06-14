@@ -39,3 +39,43 @@ _EXTENSION_MAP: dict[str, str] = {
 _XML_FORMATS: set[str] = {"cdisc_define", "define_xml", "cdisc_ct"}
 
 
+def _detect_format(path: str | Path) -> str:
+    """Detect the metadata format from a file path.
+
+    Parameters
+    ----------
+    path
+        Path to the metadata file.
+
+    Returns
+    -------
+    str
+        Detected format identifier.
+
+    Raises
+    ------
+    ValueError
+        If the format cannot be determined from the file extension.
+    """
+    p = Path(path)
+    suffix = p.suffix.lower()
+
+    if suffix in _EXTENSION_MAP:
+        return _EXTENSION_MAP[suffix]
+
+    # For JSON files, peek at the content to detect the format
+    if suffix == ".json":
+        return _detect_json_format(p)
+
+    # For XML files, peek at the content to detect CDISC format
+    if suffix == ".xml":
+        return _detect_xml_format(p)
+
+    raise ValueError(
+        f"Cannot auto-detect metadata format from extension '{suffix}'. "
+        f"Please specify the format= parameter explicitly. "
+        f"Supported extensions: {sorted(_EXTENSION_MAP.keys())}, .json "
+        f"(auto-detected as frictionless or csvw), and .xml (CDISC)."
+    )
+
+
