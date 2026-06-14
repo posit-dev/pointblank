@@ -57,6 +57,30 @@ from pointblank.field import (
 from pointblank.generate.base import GeneratorConfig
 from pointblank.inspect import has_columns, has_rows
 from pointblank.integrations.otel import emit_otel
+from pointblank.metadata import (
+    ADaMDatasetTemplate,
+    ADaMVariableSpec,
+    Codelist,
+    CodelistEntry,
+    MetadataImport,
+    MetadataPackage,
+    MissingValueCode,
+    SDTMDomainTemplate,
+    SDTMVariableSpec,
+    VariableMetadata,
+    adam_to_metadata,
+    export_metadata,
+    get_adam_dataset,
+    get_sdtm_domain,
+    import_metadata,
+    list_adam_datasets,
+    list_sdtm_domains,
+    sdtm_to_metadata,
+    validate_adam,
+    validate_adam_structure,
+    validate_sdtm,
+    validate_sdtm_structure,
+)
 from pointblank.pipeline import Pipeline, PipelineResult
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
@@ -162,4 +186,29 @@ __all__ = [
     "export_contract",
     "list_adapters",
     "register_adapter",
+    # Metadata standards import/export
+    "import_metadata",
+    "export_metadata",
+    "MetadataImport",
+    "MetadataPackage",
+    "VariableMetadata",
+    "Codelist",
+    "CodelistEntry",
+    "MissingValueCode",
+    # SDTM domain validation
+    "SDTMDomainTemplate",
+    "SDTMVariableSpec",
+    "get_sdtm_domain",
+    "list_sdtm_domains",
+    "validate_sdtm_structure",
+    "sdtm_to_metadata",
+    "validate_sdtm",
+    # ADaM dataset validation
+    "ADaMDatasetTemplate",
+    "ADaMVariableSpec",
+    "get_adam_dataset",
+    "list_adam_datasets",
+    "validate_adam_structure",
+    "adam_to_metadata",
+    "validate_adam",
 ]

@@ -1,0 +1,542 @@
+---
+title: CDISC Clinical Data Standards
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Clinical trial data follows strict organizational standards defined by CDISC (Clinical Data
+Interchange Standards Consortium). These standards specify exactly which variables must appear in
+each dataset, what values are permitted, how dates should be formatted, and how analysis datasets
+trace back to their source observations. Regulatory agencies like the FDA and PMDA require
+CDISC-compliant data for drug submissions, making adherence to these standards mandatory for
+pharmaceutical organizations.
+
+Pointblank provides native support for the three major CDISC data models: **SDTM** (Study Data
+Tabulation Model) for raw collected data, **ADaM** (Analysis Data Model) for analysis-ready
+datasets, and **Define-XML** for the metadata documents that describe both. Whether you are
+preparing a regulatory submission, running quality checks on incoming CRO data, or building
+automated validation pipelines for clinical data warehouses, Pointblank can generate the
+appropriate checks directly from the standard specifications.
+
+## Prerequisites
+
+CDISC XML parsing (Define-XML and Controlled Terminology files) requires the `lxml` library:
+
+```bash
+pip install lxml
+```
+
+Or install Pointblank with the CDISC extra:
+
+```bash
+pip install pointblank[cdisc]
+```
+
+The SDTM and ADaM domain templates are built into Pointblank and require no additional
+dependencies. They encode the structural requirements from the SDTM Implementation Guide 3.4 and
+the ADaM Implementation Guide 1.1 directly in Python, so you can validate clinical datasets
+without needing the original XML specification documents.
+
+## Define-XML Import
+
+Define-XML is the CDISC standard for documenting dataset structure. It describes every variable in
+a submission package: its name, label, data type, length, origin, and associated controlled
+terminology. Pointblank can parse Define-XML 2.0 and 2.1 documents and extract this metadata into
+a form suitable for validation.
+
+### Importing a Define-XML File
+
+The `import_metadata()` function with `format="cdisc_define"` reads a Define-XML file and returns
+a `MetadataPackage` containing metadata for all datasets defined in the document:
+
+```python
+import pointblank as pb
+
+# Import all datasets from a Define-XML
+package = pb.import_metadata("define.xml", format="cdisc_define")
+
+# List the datasets defined in the document
+for name, meta in package.datasets.items():
+    print(f"{name}: {meta.dataset_label} ({len(meta.variables)} variables)")
+```
+
+Each dataset in the package is a `MetadataImport` object with full variable-level metadata. You
+can access individual datasets by name and generate validation from them:
+
+```python
+# Get metadata for the Demographics domain
+dm_meta = package["DM"]
+
+# Generate validation for your Demographics data
+validation = dm_meta.to_validate(data=dm_dataframe).interrogate()
+```
+
+### What Gets Extracted
+
+Define-XML documents contain rich structural metadata. Pointblank extracts the following elements:
+
+| Define-XML Element | Pointblank Mapping |
+|--------------------|-------------------|
+| ItemGroupDef (dataset) | `MetadataImport` per dataset |
+| ItemDef (variable) | `VariableMetadata` with name, label, dtype |
+| DataType attribute | Mapped to Pointblank dtype (String, Int64, Float64, etc.) |
+| Length attribute | `max_length` constraint on `VariableMetadata` |
+| SignificantDigits | `significant_digits` on `VariableMetadata` |
+| Origin (CRF, Derived, etc.) | `origin` field |
+| CodeListRef | `codelist_ref` linking to the associated codelist |
+| ComputationalMethod | `computational_method` for derived variables |
+| Role/RoleCodeListOID | `cdisc_role` (Identifier, Topic, etc.) |
+| CodeList | `Codelist` object with all permitted values |
+| Mandatory="Yes" | `required=True` on `VariableMetadata` |
+
+### Controlled Terminology from Define-XML
+
+Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a
+Define-XML, all codelists are extracted and linked to their respective variables. The `to_validate()`
+method then generates `col_vals_in_set()` checks for each variable that references a codelist:
+
+```python
+package = pb.import_metadata("define.xml", format="cdisc_define")
+dm_meta = package["DM"]
+
+# Inspect codelists referenced by this domain
+for cl_name, codelist in dm_meta.codelists.items():
+    print(f"{cl_name}: {codelist.to_set()[:5]}...")  # first 5 values
+    print(f"  Extensible: {codelist.extensible}")
+```
+
+Non-extensible codelists require strict adherence: any value not in the codelist is a validation
+failure. Extensible codelists permit sponsor-defined additions, so Pointblank treats values outside
+the set as warnings rather than hard failures.
+
+## CDISC Controlled Terminology Import
+
+Beyond the codelists embedded in Define-XML, CDISC publishes standalone Controlled Terminology
+packages as XML files. These contain the canonical value sets for concepts like SEX, RACE,
+ROUTE OF ADMINISTRATION, and hundreds of others. Pointblank can parse these directly:
+
+```python
+import pointblank as pb
+
+# Import a CDISC CT package
+ct = pb.import_metadata("SDTM_CT_2024-03-29.xml", format="cdisc_ct")
+
+# Access individual codelists by C-code
+sex_codelist = ct.codelists.get("C66731")
+if sex_codelist:
+    print(f"SEX values: {sex_codelist.to_set()}")
+    print(f"Extensible: {sex_codelist.extensible}")
+
+# Use in validation
+validation = (
+    pb.Validate(data=demographics_df)
+    .col_vals_in_set(columns="SEX", set=sex_codelist.to_set())
+    .interrogate()
+)
+```
+
+Controlled Terminology packages version quarterly (e.g., 2024-03-29, 2024-06-28). Referencing a
+specific version ensures reproducible validation results. In production pipelines, you would pin
+the CT version to match what was specified in your study's Define-XML.
+
+## SDTM Domain Templates
+
+The Study Data Tabulation Model organizes clinical trial data into domains: Demographics (DM),
+Adverse Events (AE), Laboratory Results (LB), Vital Signs (VS), and many others. Each domain has a
+defined set of required and expected variables, with specific roles, types, and length constraints.
+
+Pointblank includes built-in templates for eight commonly used SDTM domains. These templates encode
+the structural requirements from the SDTM Implementation Guide 3.4 directly, so you can validate
+data against the standard without needing a Define-XML file.
+
+### Available Domains
+
+```{python}
+import pointblank as pb
+from pointblank.metadata import list_sdtm_domains, get_sdtm_domain
+
+# List all available SDTM domain templates
+domains = list_sdtm_domains()
+for d in domains:
+    template = get_sdtm_domain(d)
+    req_count = sum(1 for v in template.variables if v.required)
+    print(f"  {d}: {template.label} ({req_count} required, {len(template.variables)} total vars)")
+```
+
+Each template provides the full variable specification for its domain, including which variables
+are required (core="Req"), expected (core="Exp"), or permissible (core="Perm") per the
+Implementation Guide.
+
+### Inspecting a Domain Template
+
+You can examine the variable specifications for any domain to understand what Pointblank will
+check:
+
+```{python}
+# Get the Demographics domain template
+dm = get_sdtm_domain("DM")
+
+print(f"Domain: {dm.domain} - {dm.label}")
+print(f"Class: {dm.domain_class}")
+print(f"Repeating: {dm.repeating}")
+print()
+
+# Show required variables
+print("Required variables (core='Req'):")
+for var in dm.variables:
+    if var.required:
+        ct_info = f" [CT: {var.controlled_term}]" if var.controlled_term else ""
+        print(f"  {var.name:12s} {var.dtype:4s} {var.role:12s} {var.label}{ct_info}")
+```
+
+### Structural Validation
+
+The `validate_sdtm_structure()` function performs a quick check that a dataset contains all
+required variables for its domain. This is useful as a fast pre-check before running the full
+validation workflow:
+
+```{python}
+import polars as pl
+from pointblank.metadata import validate_sdtm_structure
+
+# A minimal Demographics dataset
+dm_data = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN": ["DM"] * 4,
+    "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003", "STUDY01-004"],
+    "SUBJID": ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "2024-01-20", "2024-02-01", "2024-02-10"],
+    "RFENDTC": ["2024-06-15", "2024-06-20", "2024-07-01", "2024-07-10"],
+    "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02"],
+    "AGE": [45, 62, 38, 55],
+    "AGEU": ["YEARS"] * 4,
+    "SEX": ["M", "F", "M", "F"],
+    "RACE": ["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE"],
+    "ARMCD": ["DRUG", "PLACEBO", "DRUG", "PLACEBO"],
+    "ARM": ["Active Drug 10mg", "Placebo", "Active Drug 10mg", "Placebo"],
+    "COUNTRY": ["USA", "USA", "GBR", "GBR"],
+})
+
+result = validate_sdtm_structure(dm_data, domain="DM")
+print(f"Valid: {result['valid']}")
+if result["missing_required"]:
+    print(f"Missing required: {result['missing_required']}")
+if result["unknown_variables"]:
+    print(f"Unknown variables: {result['unknown_variables'][:5]}")
+```
+
+### Full SDTM Validation
+
+The `validate_sdtm()` function generates a comprehensive validation workflow that checks far more
+than just structure. It produces a `Validate` object with checks for required variable non-nullness,
+DOMAIN value correctness, sequence number positivity, string length constraints, and ISO 8601 date
+formatting:
+
+```{python}
+from pointblank.metadata import validate_sdtm
+
+# Generate and run the full SDTM DM validation
+validation = validate_sdtm(data=dm_data, domain="DM").interrogate()
+validation
+```
+
+The validation checks the following rules automatically:
+
+| Check | Description |
+|-------|-------------|
+| Required variables non-null | Every variable with core="Req" must have no nulls |
+| DOMAIN value | The DOMAIN column must contain only the expected domain code |
+| Sequence numbers | `--SEQ` variables must be positive integers |
+| String lengths | Character variables must not exceed their defined max length |
+| ISO 8601 dates | All `--DTC` timing variables must match the CDISC date pattern |
+
+### ISO 8601 Date Validation
+
+CDISC uses a specific subset of ISO 8601 that allows partial dates. A date might be fully
+specified as `2024-03-15T10:30:00` or partially specified as just `2024-03` (year and month known,
+day unknown). The validation checks that all timing variables (`--DTC` columns like `RFSTDTC`,
+`AESTDTC`, `LBDTC`) conform to this pattern:
+
+```
+Valid:   2024-03-15T10:30:00  (full datetime)
+Valid:   2024-03-15            (date only)
+Valid:   2024-03               (year-month only)
+Valid:   2024                   (year only)
+Invalid: 03/15/2024            (wrong format)
+Invalid: 15-Mar-2024           (wrong format)
+```
+
+This catches a common data quality issue where dates are entered in locale-specific formats
+rather than the required ISO 8601 pattern.
+
+### Converting SDTM Templates to MetadataImport
+
+If you prefer to work with the standard `MetadataImport` interface (for example, to use
+`to_schema()` or combine SDTM metadata with other sources), you can convert a domain template:
+
+```{python}
+from pointblank.metadata import sdtm_to_metadata
+
+# Convert the DM template to a MetadataImport
+dm_meta = sdtm_to_metadata(domain="DM", study_id="STUDY01")
+
+print(f"Format: {dm_meta.source_format}")
+print(f"Dataset: {dm_meta.dataset_name}")
+print(f"Variables: {len(dm_meta.variables)}")
+
+# Generate a schema from it
+schema = dm_meta.to_schema()
+print(f"Schema columns: {len(schema.columns)}")
+```
+
+## ADaM Dataset Templates
+
+The Analysis Data Model builds on top of SDTM by adding derived variables, population flags,
+and analysis-specific structures. ADaM datasets are the basis for statistical analyses in
+clinical trials, and their structure is tightly specified to ensure reproducibility and
+traceability back to the source data.
+
+Pointblank includes templates for four ADaM dataset structures: **ADSL** (subject-level analysis),
+**BDS** (Basic Data Structure for repeated measures), **ADAE** (adverse events analysis), and
+**ADTTE** (time-to-event analysis).
+
+### Available ADaM Datasets
+
+```{python}
+from pointblank.metadata import list_adam_datasets, get_adam_dataset
+
+# List all available ADaM dataset templates
+datasets = list_adam_datasets()
+for d in datasets:
+    template = get_adam_dataset(d)
+    req_count = sum(1 for v in template.variables if v.required)
+    flag_count = sum(1 for v in template.variables if v.is_population_flag)
+    print(f"  {d}: {template.label}")
+    print(f"      {req_count} required vars, {flag_count} population flags")
+```
+
+### ADSL: Subject-Level Analysis
+
+ADSL is the foundational ADaM dataset. It contains one row per subject with all the key
+demographic and treatment information needed for analysis. Every other ADaM dataset merges back
+to ADSL for population definitions.
+
+```{python}
+adsl_template = get_adam_dataset("ADSL")
+print(f"Dataset class: {adsl_template.dataset_class}")
+print(f"\nPopulation flags:")
+for var in adsl_template.variables:
+    if var.is_population_flag:
+        print(f"  {var.name}: {var.label}")
+```
+
+Population flags (SAFFL, ITTFL, EFFFL, etc.) define which subjects belong to each analysis
+population. They must contain only the values "Y" or "N", with no nulls. Pointblank's ADaM
+validation checks this automatically.
+
+### Full ADaM Validation
+
+The `validate_adam()` function generates comprehensive checks tailored to each dataset type:
+
+```{python}
+import polars as pl
+from pointblank.metadata import validate_adam
+
+# Create a minimal ADSL dataset
+adsl_data = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 5,
+    "USUBJID": [f"STUDY01-{i:03d}" for i in range(1, 6)],
+    "SUBJID": [f"{i:03d}" for i in range(1, 6)],
+    "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02", "SITE01"],
+    "TRT01P": ["Drug A", "Placebo", "Drug A", "Placebo", "Drug A"],
+    "TRT01A": ["Drug A", "Placebo", "Drug A", "Placebo", "Drug A"],
+    "AGE": [45, 62, 38, 55, 48],
+    "AGEU": ["YEARS"] * 5,
+    "SEX": ["M", "F", "M", "F", "M"],
+    "RACE": ["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE", "WHITE"],
+    "SAFFL": ["Y", "Y", "Y", "Y", "N"],
+    "ITTFL": ["Y", "Y", "Y", "Y", "Y"],
+    "EFFFL": ["Y", "Y", "N", "Y", "N"],
+    "TRTSDT": ["2024-01-15", "2024-01-20", "2024-02-01", "2024-02-10", "2024-02-15"],
+    "TRTEDT": ["2024-06-15", "2024-06-20", "2024-07-01", "2024-07-10", "2024-07-15"],
+})
+
+# Run ADaM ADSL validation
+validation = validate_adam(data=adsl_data, dataset="ADSL").interrogate()
+validation
+```
+
+### ADaM Validation Checks by Dataset Type
+
+The checks generated by `validate_adam()` vary depending on the dataset type. Each type has its
+own domain-specific rules in addition to the common required-variable and population-flag checks:
+
+| Dataset | Specific Checks |
+|---------|----------------|
+| **ADSL** | TRT01P non-null, all population flags are Y/N |
+| **BDS** | PARAMCD length at most 8 characters |
+| **ADAE** | TRTEMFL is Y/N, AESEQ is positive |
+| **ADTTE** | CNSR is 0 or 1, AVAL (time) is non-negative |
+
+Here is an example validating a BDS (Basic Data Structure) dataset:
+
+```{python}
+# Create a minimal BDS dataset (e.g., ADLB - laboratory analysis)
+bds_data = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 6,
+    "USUBJID": ["STUDY01-001"] * 3 + ["STUDY01-002"] * 3,
+    "PARAMCD": ["ALT", "AST", "BILI"] * 2,
+    "PARAM": [
+        "Alanine Aminotransferase (U/L)",
+        "Aspartate Aminotransferase (U/L)",
+        "Bilirubin (umol/L)",
+    ] * 2,
+    "AVAL": [25.0, 30.0, 12.0, 45.0, 38.0, 15.0],
+    "ABLFL": ["Y", "Y", "Y", "N", "N", "N"],
+    "ANL01FL": ["Y"] * 6,
+    "TRTA": ["Drug A"] * 3 + ["Placebo"] * 3,
+})
+
+validation = validate_adam(data=bds_data, dataset="BDS").interrogate()
+validation
+```
+
+### Structural Validation
+
+Like SDTM, ADaM provides a quick structural check via `validate_adam_structure()`:
+
+```{python}
+from pointblank.metadata import validate_adam_structure
+
+result = validate_adam_structure(adsl_data, dataset="ADSL")
+print(f"Valid: {result['valid']}")
+print(f"Missing required: {result['missing_required']}")
+print(f"Population flags present: {result.get('population_flags_present', [])}")
+```
+
+### Converting ADaM Templates to MetadataImport
+
+The `adam_to_metadata()` function converts an ADaM template into the standard `MetadataImport`
+format, giving you access to `to_schema()` and `to_validate()`:
+
+```{python}
+from pointblank.metadata import adam_to_metadata
+
+# Convert ADSL template to MetadataImport
+adsl_meta = adam_to_metadata(dataset="ADSL", study_id="STUDY01")
+
+print(f"Format: {adsl_meta.source_format}")
+print(f"Version: {adsl_meta.source_version}")
+print(f"Variables: {len(adsl_meta.variables)}")
+
+# You can also use it through the import_metadata dispatcher
+meta = pb.import_metadata("ADSL", format="cdisc_adam", dataset="ADSL")
+print(f"Same result: {meta.dataset_name}")
+```
+
+## Frictionless Data Packages
+
+While not a clinical standard, Frictionless Data Packages are widely used in open data and
+research contexts. They describe tabular data with JSON schemas that specify column types,
+constraints (minimum, maximum, enum, pattern), and primary keys. Pointblank imports these
+seamlessly.
+
+### Importing a Frictionless Schema
+
+```python
+import pointblank as pb
+
+# Import from a datapackage.json
+meta = pb.import_metadata("datapackage.json", format="frictionless")
+
+# Or from a standalone Table Schema
+meta = pb.import_metadata("schema.json", format="table_schema")
+
+# Frictionless constraints map directly:
+# - "required": true  ->  col_vals_not_null()
+# - "unique": true    ->  rows_distinct()
+# - "minimum": 0      ->  col_vals_ge(value=0)
+# - "maximum": 100    ->  col_vals_le(value=100)
+# - "pattern": "..."  ->  col_vals_regex(pattern="...")
+# - "enum": [...]     ->  col_vals_in_set(set=[...])
+```
+
+The constraint mapping is direct and complete. Every constraint expressible in a Frictionless
+Table Schema has a corresponding Pointblank validation step, making the translation lossless.
+
+### CSVW (CSV on the Web)
+
+The W3C's CSVW standard provides similar capabilities to Frictionless but uses JSON-LD and aligns
+with linked data principles. Pointblank imports CSVW metadata with the same interface:
+
+```python
+meta = pb.import_metadata("metadata.json", format="csvw")
+
+# CSVW column descriptors become VariableMetadata
+# datatype constraints become validation steps
+validation = meta.to_validate(data=df).interrogate()
+```
+
+## Exporting Metadata
+
+Pointblank can also export validation metadata in Frictionless format. This is useful when you want
+to share data quality expectations with tools that understand the Frictionless ecosystem:
+
+```python
+import pointblank as pb
+
+# Export a MetadataImport as Frictionless Table Schema
+meta = pb.import_metadata("clinical_data.xpt", format="xpt")
+pb.export_metadata(meta, "table_schema.json", format="frictionless")
+```
+
+The exported document contains the column definitions and constraints from the original metadata,
+formatted as a valid Frictionless Table Schema that other tools can consume.
+
+## Combining Multiple Metadata Sources
+
+In practice, clinical data validation often combines metadata from multiple sources. The
+Define-XML provides the authoritative variable definitions, but you might also want to check
+against SDTM domain rules and controlled terminology packages. Pointblank supports this by
+letting you compose validation workflows from different metadata sources:
+
+```python
+import pointblank as pb
+from pointblank.metadata import validate_sdtm
+
+# Load the Define-XML for variable-level constraints
+package = pb.import_metadata("define.xml", format="cdisc_define")
+dm_meta = package["DM"]
+
+# Generate validation from Define-XML metadata
+validation = dm_meta.to_validate(data=dm_data)
+
+# The SDTM template adds domain-specific rules not in the Define-XML
+# (ISO 8601 checks, sequence number rules, etc.)
+sdtm_validation = validate_sdtm(data=dm_data, domain="DM")
+
+# Run both and compare results
+define_results = validation.interrogate()
+sdtm_results = sdtm_validation.interrogate()
+```
+
+This layered approach gives you the flexibility to apply different levels of validation depending
+on your needs. The Define-XML checks enforce what was specifically documented for your study,
+while the SDTM template checks enforce the broader standard requirements that apply universally.
+
+## Conclusion
+
+CDISC data validation with Pointblank covers the full spectrum of clinical trial data management:
+from parsing Define-XML documents and controlled terminology packages to validating individual
+datasets against SDTM and ADaM structural rules. The built-in domain templates encode years of
+regulatory guidance into ready-to-use validation workflows, letting you check data compliance
+with a single function call. For teams preparing regulatory submissions, this means catching
+structural issues, date format errors, and terminology violations early in the data pipeline,
+well before the formal submission review process begins.

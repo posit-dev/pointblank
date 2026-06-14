@@ -56,42 +56,59 @@ import pytz
 import ibis
 
 # PySpark import with environment setup for cross-platform compatibility
-try:
-    import os
+import os
 
-    # Set Java home for compatibility if not already set
-    if "JAVA_HOME" not in os.environ:
-        # Try common Java locations across platforms
-        java_paths = [
-            "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",  # macOS
-            "/usr/lib/jvm/java-11-openjdk-amd64",  # Ubuntu/Debian
-            "/usr/lib/jvm/java-11-openjdk",  # CentOS/RHEL
-            "/usr/lib/jvm/default-java",  # Generic Ubuntu
-        ]
+PYSPARK_AVAILABLE = False
 
-        for java_path in java_paths:
-            if os.path.exists(java_path):
-                os.environ["JAVA_HOME"] = java_path
-                break
+# Allow skipping PySpark tests via environment variable (check first to avoid slow Spark init)
+if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() not in ("true", "1", "yes"):
+    try:
+        # Set Java home for compatibility if not already set
+        if "JAVA_HOME" not in os.environ:
+            # Try common Java locations across platforms
+            java_paths = [
+                "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",  # macOS
+                "/usr/lib/jvm/java-11-openjdk-amd64",  # Ubuntu/Debian
+                "/usr/lib/jvm/java-11-openjdk",  # CentOS/RHEL
+                "/usr/lib/jvm/default-java",  # Generic Ubuntu
+            ]
 
-    from pyspark.sql import SparkSession
-    from pyspark.sql.types import (
-        BooleanType,
-        DoubleType,
-        IntegerType,
-        StringType,
-        StructField,
-        StructType,
-    )
-    import pyspark.sql.functions as F
+            for java_path in java_paths:
+                if os.path.exists(java_path):
+                    os.environ["JAVA_HOME"] = java_path
+                    break
 
-    PYSPARK_AVAILABLE = True
-except ImportError:
-    PYSPARK_AVAILABLE = False
+        from pyspark.sql import SparkSession
+        from pyspark.sql.types import (
+            BooleanType,
+            DoubleType,
+            IntegerType,
+            StringType,
+            StructField,
+            StructType,
+        )
+        import pyspark.sql.functions as F
 
-## If we specifically disable tests in pytest set the availability to False
-if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
-    PYSPARK_AVAILABLE = False
+        # Verify Spark can actually start (catches Netty/Java runtime errors)
+        import subprocess
+        import sys
+
+        _check = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "from pyspark.sql import SparkSession; "
+                "s = SparkSession.builder.appName('check').master('local[1]')"
+                ".config('spark.ui.enabled','false').getOrCreate(); s.stop()",
+            ],
+            capture_output=True,
+            timeout=30,
+        )
+        if _check.returncode == 0:
+            PYSPARK_AVAILABLE = True
+
+    except (ImportError, subprocess.TimeoutExpired, OSError):
+        pass
 SQLITE_AVAILABLE = True
 if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
     SQLITE_AVAILABLE = False

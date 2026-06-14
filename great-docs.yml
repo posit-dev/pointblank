@@ -116,10 +116,10 @@ reference:
   sections:
     - title: Validate
       desc: >
-        When performing data validation, use the `Validate` class to get the process started.
-        It takes the target table and options for metadata and failure thresholds (using the
-        `Thresholds` class or shorthands). The `Validate` class has numerous methods for
-        defining validation steps and for obtaining post-interrogation metrics and data.
+        When performing data validation, use the `Validate` class to get the process started. It
+        takes the target table and options for metadata and failure thresholds (using the
+        `Thresholds` class or shorthands). The `Validate` class has numerous methods for defining
+        validation steps and for obtaining post-interrogation metrics and data.
       contents:
         - name: Validate
           members: false
@@ -150,9 +150,9 @@ reference:
 
     - title: Contract Import/Export
       desc: >
-        Import external schema definitions (JSON Schema, Frictionless Table Schema, and more)
-        into Pointblank validation workflows, or export Pointblank contracts to those formats.
-        Use `import_contract()` as the entry point, `export_contract()` for the reverse, and
+        Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into
+        Pointblank validation workflows, or export Pointblank contracts to those formats. Use
+        `import_contract()` as the entry point, `export_contract()` for the reverse, and
         `register_adapter()` to add support for custom formats.
       contents:
         - import_contract
@@ -166,9 +166,9 @@ reference:
 
     - title: Validation Steps
       desc: >
-        Validation steps are sequential validations on the target data. Call Validate's
-        validation methods to build up a validation plan: a collection of steps that provides
-        good validation coverage.
+        Validation steps are sequential validations on the target data. Call `Validate`'s validation
+        methods to build up a validation plan: a collection of steps that provides good validation
+        coverage.
       contents:
         - Validate.col_vals_gt
         - Validate.col_vals_lt
@@ -223,9 +223,9 @@ reference:
 
     - title: Column Selection
       desc: >
-        Use the `col()` function along with column selection helpers to flexibly select columns
-        for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting
-        multiple target columns.
+        Use the `col()` function along with column selection helpers to flexibly select columns for
+        validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple
+        target columns.
       contents:
         - col
         - starts_with
@@ -245,8 +245,8 @@ reference:
 
     - title: Interrogation and Reporting
       desc: >
-        The validation plan is executed when `interrogate()` is called. After interrogation,
-        view validation reports, extract metrics, or split data based on results.
+        The validation plan is executed when `interrogate()` is called. After interrogation, view
+        validation reports, extract metrics, or split data based on results.
       contents:
         - Validate.interrogate
         - Validate.set_tbl
@@ -271,9 +271,9 @@ reference:
 
     - title: Inspection and Assistance
       desc: >
-        Functions for getting to grips with a new data table. Use DataScan for a quick
-        overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries,
-        and `missing_vals_tbl()` for missing value analysis.
+        Functions for getting to grips with a new data table. Use `DataScan` for a quick overview,
+        `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and
+        `missing_vals_tbl()` for missing value analysis.
       contents:
         - DataScan
         - preview
@@ -286,9 +286,9 @@ reference:
 
     - title: Table Pre-checks
       desc: >
-        Helper functions for use with the `active=` parameter of validation methods. These
-        inspect the target table before a step runs and conditionally skip the step when
-        preconditions are not met.
+        Helper functions for use with the `active=` parameter of validation methods. These inspect
+        the target table before a step runs and conditionally skip the step when preconditions are
+        not met.
       contents:
         - has_columns
         - has_rows
@@ -338,11 +338,65 @@ reference:
         - send_slack_notification
         - emit_otel
 
+    - title: Metadata Import/Export
+      desc: >
+        Import variable-level metadata from external data standards files (CDISC Define-XML,
+        Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata
+        to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for
+        the reverse.
+      contents:
+        - import_metadata
+        - export_metadata
+        - name: MetadataImport
+          members: true
+        - name: MetadataPackage
+          members: true
+        - name: VariableMetadata
+          members: true
+        - name: Codelist
+          members: true
+        - name: CodelistEntry
+          members: true
+        - name: MissingValueCode
+          members: true
+
+    - title: SDTM Validation
+      desc: >
+        Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sdtm()` to
+        generate a full `Validate` workflow, or `validate_sdtm_structure()` for a quick structural
+        conformance check. Retrieve domain templates with `get_sdtm_domain()` and
+        `list_sdtm_domains()`.
+      contents:
+        - validate_sdtm
+        - validate_sdtm_structure
+        - sdtm_to_metadata
+        - get_sdtm_domain
+        - list_sdtm_domains
+        - name: SDTMDomainTemplate
+          members: true
+        - name: SDTMVariableSpec
+          members: true
+
+    - title: ADaM Validation
+      desc: >
+        Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` to generate a
+        full `Validate` workflow, or `validate_adam_structure()` for a quick structural conformance
+        check. Retrieve dataset templates with `get_adam_dataset()` and `list_adam_datasets()`.
+      contents:
+        - validate_adam
+        - validate_adam_structure
+        - adam_to_metadata
+        - get_adam_dataset
+        - list_adam_datasets
+        - name: ADaMDatasetTemplate
+          members: true
+        - name: ADaMVariableSpec
+          members: true
+
     - title: Integrations
       desc: >
-        Classes for integrating Pointblank with external observability and monitoring
-        systems. Use `OTelExporter` to export validation results as OpenTelemetry
-        metrics, traces, and logs.
+        Classes for integrating Pointblank with external observability and monitoring systems. Use
+        `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.
       contents:
         - name: integrations.otel.OTelExporter
           members: true
