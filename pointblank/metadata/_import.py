@@ -206,3 +206,146 @@ def _detect_xml_format(path: Path) -> str:
     )
 
 
+def import_metadata(
+    source: str | Path | Any,
+    format: str | None = None,
+    **kwargs: Any,
+) -> MetadataImport | MetadataPackage:
+    """Import metadata from an external standard or file.
+
+    Reads metadata definitions from statistical package files (SPSS, SAS, Stata), standards
+    documents (CDISC Define-XML, Frictionless), or scientific formats (NetCDF/CF) and returns a
+    structured representation that can be converted to Pointblank validation workflows.
+
+    Parameters
+    ----------
+    source
+        Path to a metadata file, or an object containing metadata (e.g., an xarray Dataset). For
+        file paths, the format will be auto-detected from the extension if not specified.
+    format
+        Explicit format identifier. If None, auto-detected from the file extension. Supported
+        formats: `"spss"`, `"sav"`, `"xpt"`, `"sas"`, `"stata"`, `"dta"`, `"frictionless"`,
+        `"datapackage"`, `"table_schema"`, `"csvw"`, `"cdisc_define"`, `"define_xml"`, `"cdisc_ct"`.
+    **kwargs
+        Additional format-specific options passed to the reader.
+
+    Returns
+    -------
+    MetadataImport | MetadataPackage
+        A MetadataImport for single-dataset sources, or a MetadataPackage for multi-dataset sources
+        (e.g., multi-domain CDISC studies).
+
+    Raises
+    ------
+    ValueError
+        If the format cannot be determined or is not supported.
+    ImportError
+        If the required optional dependency is not installed.
+
+    Examples
+    --------
+    Import SPSS metadata and generate validation:
+
+    ```python
+    import pointblank as pb
+
+    meta = pb.import_metadata("survey_data.sav")
+    meta.summary()
+
+    # Convert to a validation workflow
+    validation = meta.to_validate(data=df).interrogate()
+    ```
+
+    Import SAS Transport metadata:
+
+    ```python
+    meta = pb.import_metadata("clinical_data.xpt", format="xpt")
+    schema = meta.to_schema()
+    ```
+    """
+    # Resolve path
+    if isinstance(source, (str, Path)):
+        path = Path(source)
+
+        # Auto-detect format if not specified
+        if format is None:
+            format = _detect_format(path)
+
+        # Normalize format name
+        format = format.lower().strip()
+
+        # Route to the appropriate reader
+        if format in ("spss", "sav"):
+            from pointblank.metadata._readers_stats import _read_spss_metadata
+
+            return _read_spss_metadata(path, **kwargs)
+
+        elif format in ("xpt", "sas"):
+            from pointblank.metadata._readers_stats import _read_xpt_metadata
+
+            return _read_xpt_metadata(path, **kwargs)
+
+        elif format in ("stata", "dta"):
+            from pointblank.metadata._readers_stats import _read_stata_metadata
+
+            return _read_stata_metadata(path, **kwargs)
+
+        elif format in ("frictionless", "datapackage", "table_schema"):
+            from pointblank.metadata._readers_frictionless import (
+                _read_frictionless_metadata,
+            )
+
+            return _read_frictionless_metadata(path, **kwargs)
+
+        elif format == "csvw":
+            from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+            return _read_csvw_metadata(path, **kwargs)
+
+        elif format in ("cdisc_define", "define_xml"):
+            from pointblank.metadata._readers_cdisc import _read_define_xml_metadata
+
+            return _read_define_xml_metadata(path, **kwargs)
+
+        elif format == "cdisc_ct":
+            from pointblank.metadata._readers_cdisc import _read_cdisc_ct_metadata
+
+            return _read_cdisc_ct_metadata(path, **kwargs)
+
+        elif format == "cdisc_sdtm":
+            from pointblank.metadata._sdtm_validate import sdtm_to_metadata
+
+            # For SDTM, the "source" can be a domain code string or file path
+            # If a domain kwarg is provided, use that; otherwise try to infer
+            domain = kwargs.pop("domain", None)
+            if domain is None:
+                raise ValueError(
+                    "format='cdisc_sdtm' requires a domain= parameter "
+                    "(e.g., domain='DM', domain='AE')."
+                )
+            return sdtm_to_metadata(domain=domain, **kwargs)
+
+        elif format == "cdisc_adam":
+            from pointblank.metadata._adam_validate import adam_to_metadata
+
+            # For ADaM, the "source" can be a dataset name or file path
+            dataset = kwargs.pop("dataset", None)
+            if dataset is None:
+                raise ValueError(
+                    "format='cdisc_adam' requires a dataset= parameter "
+                    "(e.g., dataset='ADSL', dataset='BDS')."
+                )
+            return adam_to_metadata(dataset=dataset, **kwargs)
+
+        else:
+            raise ValueError(
+                f"Unsupported metadata format: '{format}'. "
+                f"Currently supported: 'spss', 'xpt', 'stata', 'frictionless', 'csvw', "
+                f"'cdisc_define', 'cdisc_ct', 'cdisc_sdtm', 'cdisc_adam'. "
+                f"Future support planned for: 'netcdf', 'ddi'."
+            )
+    else:
+        raise TypeError(
+            f"Expected a file path (str or Path), got {type(source).__name__}. "
+            f"Object-based import (e.g., from xarray Datasets) is planned for a future release."
+        )
