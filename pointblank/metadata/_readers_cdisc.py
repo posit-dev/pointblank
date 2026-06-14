@@ -489,3 +489,110 @@ def _parse_item_groups(
     return item_groups
 
 
+def _read_cdisc_ct_metadata(
+    path: str | Path,
+    codelist: str | None = None,
+    **kwargs: Any,
+) -> MetadataImport | MetadataPackage:
+    """Read CDISC Controlled Terminology from an ODM-XML file.
+
+    Parses NCI/CDISC-format controlled terminology files (e.g., SDTM Terminology, ADaM Terminology,
+    SEND Terminology).
+
+    Parameters
+    ----------
+    path
+        Path to the CDISC CT XML file (ODM format with NCI extensions).
+    codelist
+        If provided, return only this specific codelist as a single `MetadataImport`. If `None`,
+        returns a `MetadataPackage` with all codelists.
+
+    Returns
+    -------
+    `MetadataImport` | `MetadataPackage`
+        A `MetadataImport` with codelists for a single codelist request, or a `MetadataPackage` with
+        all codelists.
+    """
+    _ensure_lxml()
+    from lxml import etree
+
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"CDISC CT file not found: {path}")
+
+    # Parse the XML
+    tree = etree.parse(str(path))  # noqa: S320
+    root = tree.getroot()
+
+    # Determine namespaces — CT files use ODM + NCI extensions
+    nsmap = root.nsmap
+    ns = _build_ct_namespaces(nsmap)
+
+    # Extract study-level info for version/date
+    study_el = root.find(".//odm:Study", ns)
+    creation_dt = root.get("CreationDateTime", "")
+
+    # Find MetaDataVersion
+    mdv = root.find(".//odm:Study/odm:MetaDataVersion", ns)
+    if mdv is None:
+        mdv = root.find(".//odm:MetaDataVersion", ns)
+    if mdv is None:
+        raise ValueError(f"No MetaDataVersion element found in {path.name}")
+
+    mdv_name = mdv.get("Name", "")
+    mdv_description = mdv.get("Description", "")
+
+    # Parse all CodeLists
+    codelists = _parse_ct_codelists(mdv, ns)
+
+    if codelist is not None:
+        # Find the specific codelist (match by name or OID)
+        target_cl = None
+        for cl in codelists.values():
+            if cl.name == codelist or cl.name.upper() == codelist.upper():
+                target_cl = cl
+                break
+
+        if target_cl is None:
+            # Try OID match
+            if codelist in codelists:
+                target_cl = codelists[codelist]
+
+        if target_cl is None:
+            available = sorted(cl.name for cl in codelists.values())
+            raise KeyError(
+                f"Codelist '{codelist}' not found in CT file. "
+                f"Available codelists ({len(available)}): {available[:20]}..."
+            )
+
+        return MetadataImport(
+            source_format="cdisc_ct",
+            source_path=str(path),
+            source_version=mdv_name or None,
+            dataset_name=target_cl.name,
+            dataset_label=target_cl.label,
+            creation_date=creation_dt or None,
+            codelists={target_cl.name: target_cl},
+        )
+
+    # Return all codelists as a MetadataPackage
+    items: dict[str, MetadataImport] = {}
+    for cl_oid, cl in codelists.items():
+        items[cl.name] = MetadataImport(
+            source_format="cdisc_ct",
+            source_path=str(path),
+            source_version=mdv_name or None,
+            dataset_name=cl.name,
+            dataset_label=cl.label,
+            creation_date=creation_dt or None,
+            codelists={cl.name: cl},
+        )
+
+    return MetadataPackage(
+        name=mdv_name or path.stem,
+        items=items,
+        description=mdv_description or f"CDISC Controlled Terminology ({path.name})",
+        version=creation_dt[:10] if creation_dt else None,
+    )
+
+
