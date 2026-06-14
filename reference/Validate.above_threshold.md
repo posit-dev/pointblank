@@ -45,7 +45,7 @@ If an invalid threshold level is provided.
 
 ## Examples
 
-Below are some examples of how to use the [above_threshold()](Validate.above_threshold.md#pointblank.Validate.above_threshold) method. First, we'll create a simple Polars DataFrame with a single column (`values`).
+Below are some examples of how to use the [above_threshold()](Validate.above_threshold.md#pointblank.Validate.above_threshold) method. First, we'll create a simple Polars DataFrame with a single column ([values](MetadataPackage.md#pointblank.MetadataPackage.values)).
 
 
 ``` python

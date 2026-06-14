@@ -292,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">### Validation Steps</span></span>
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Validation steps are sequential validations on the target data. Call <span class="in">`Validate`</span>'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.col_vals_gt`</span></span>
@@ -396,7 +396,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspection and Assistance</span></span>
 <span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use DataScan for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use <span class="in">`DataScan`</span> for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
 <span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DataScan`</span>: Get a summary of a dataset</span>
@@ -463,17 +463,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`send_slack_notification`</span>: Create a Slack notification function using a webhook URL</span>
 <span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`emit_otel`</span>: Create an OTel export action for use in <span class="in">`FinalActions`</span></span>
 <span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integrations</span></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="fu">### Metadata Import/Export</span></span>
 <span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>Classes for integrating Pointblank with external observability and monitoring systems. Use <span class="in">`OTelExporter`</span> to export validation results as OpenTelemetry metrics, traces, and logs.</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <span class="in">`.sav`</span>, SAS XPORT, Stata <span class="in">`.dta`</span>, and more) and export metadata to various formats. Use <span class="in">`import_metadata()`</span> as the entry point and <span class="in">`export_metadata()`</span> for the reverse.</span>
 <span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`integrations.otel.OTelExporter`</span></span>
-<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
-<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
-<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`import_metadata`</span>: Import metadata from an external standard or file</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`export_metadata`</span>: Export metadata to an external standard format</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataImport`</span>: Parsed metadata from an external standard</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataPackage`</span>: A collection of <span class="in">`MetadataImport`</span> objects from a multi-dataset source</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`VariableMetadata`</span>: Metadata for a single variable/column, as imported from an external standard</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Codelist`</span>: A controlled terminology / value set from an external standard</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`CodelistEntry`</span>: A single entry in a codelist (controlled terminology)</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MissingValueCode`</span>: A structured missing value definition from an external standard</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### SDTM Validation</span></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>Validate clinical datasets against CDISC SDTM domain templates. Use <span class="in">`validate_sdtm()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_sdtm_structure()`</span> for a quick structural conformance check. Retrieve domain templates with <span class="in">`get_sdtm_domain()`</span> and <span class="in">`list_sdtm_domains()`</span>.</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm`</span>: Generate a comprehensive SDTM validation workflow for a dataset</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm_structure`</span>: Validate the structural conformance of a dataset against an SDTM domain template</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`sdtm_to_metadata`</span>: Convert an SDTM domain template to a <span class="in">`MetadataImport`</span> object</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_sdtm_domain`</span>: Get the SDTM template for a specific domain</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_sdtm_domains`</span>: List all available SDTM domain codes</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMDomainTemplate`</span>: Structural template for an SDTM domain</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMVariableSpec`</span>: Specification for a single variable in an SDTM domain template</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a><span class="fu">### ADaM Validation</span></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>Validate analysis datasets against CDISC ADaM templates. Use <span class="in">`validate_adam()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_adam_structure()`</span> for a quick structural conformance check. Retrieve dataset templates with <span class="in">`get_adam_dataset()`</span> and <span class="in">`list_adam_datasets()`</span>.</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam`</span>: Generate a comprehensive ADaM validation workflow for a dataset</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam_structure`</span>: Validate structural conformance of a dataset against an ADaM template</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`adam_to_metadata`</span>: Convert an ADaM dataset template to a MetadataImport object</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_adam_dataset`</span>: Get the ADaM template for a specific dataset</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_adam_datasets`</span>: List all available ADaM dataset template names</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMDatasetTemplate`</span>: Structural template for an ADaM dataset</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMVariableSpec`</span>: Specification for a single variable in an ADaM dataset template</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integrations</span></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a>Classes for integrating Pointblank with external observability and monitoring systems. Use <span class="in">`OTelExporter`</span> to export validation results as OpenTelemetry metrics, traces, and logs.</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`integrations.otel.OTelExporter`</span></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
 </pre>
 
 

@@ -73,7 +73,7 @@ Base class for contract import/export adapters.
 ## Validation Steps
 
 
-Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
+Validation steps are sequential validations on the target data. Call `Validate`'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
 
 
 [Validate.col_vals_gt()](Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)  
@@ -330,7 +330,7 @@ Get the 'critical' level status for each validation step.
 ## Inspection and Assistance
 
 
-Functions for getting to grips with a new data table. Use DataScan for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
+Functions for getting to grips with a new data table. Use `DataScan` for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
 
 
 [DataScan](DataScan.md#pointblank.DataScan)  
@@ -466,6 +466,93 @@ Create a Slack notification function using a webhook URL.
 
 [emit_otel()](emit_otel.md#pointblank.emit_otel)  
 Create an OTel export action for use in `FinalActions`.
+
+
+## Metadata Import/Export
+
+
+Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for the reverse.
+
+
+[import_metadata()](import_metadata.md#pointblank.import_metadata)  
+Import metadata from an external standard or file.
+
+[export_metadata()](export_metadata.md#pointblank.export_metadata)  
+Export metadata to an external standard format.
+
+[MetadataImport](MetadataImport.md#pointblank.MetadataImport)  
+Parsed metadata from an external standard.
+
+[MetadataPackage](MetadataPackage.md#pointblank.MetadataPackage)  
+A collection of `MetadataImport` objects from a multi-dataset source.
+
+[VariableMetadata](VariableMetadata.md#pointblank.VariableMetadata)  
+Metadata for a single variable/column, as imported from an external standard.
+
+[Codelist](Codelist.md#pointblank.Codelist)  
+A controlled terminology / value set from an external standard.
+
+[CodelistEntry](CodelistEntry.md#pointblank.CodelistEntry)  
+A single entry in a codelist (controlled terminology).
+
+[MissingValueCode](MissingValueCode.md#pointblank.MissingValueCode)  
+A structured missing value definition from an external standard.
+
+
+## SDTM Validation
+
+
+Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sdtm()` to generate a full `Validate` workflow, or `validate_sdtm_structure()` for a quick structural conformance check. Retrieve domain templates with `get_sdtm_domain()` and `list_sdtm_domains()`.
+
+
+[validate_sdtm()](validate_sdtm.md#pointblank.validate_sdtm)  
+Generate a comprehensive SDTM validation workflow for a dataset.
+
+[validate_sdtm_structure()](validate_sdtm_structure.md#pointblank.validate_sdtm_structure)  
+Validate the structural conformance of a dataset against an SDTM domain template.
+
+[sdtm_to_metadata()](sdtm_to_metadata.md#pointblank.sdtm_to_metadata)  
+Convert an SDTM domain template to a `MetadataImport` object.
+
+[get_sdtm_domain()](get_sdtm_domain.md#pointblank.get_sdtm_domain)  
+Get the SDTM template for a specific domain.
+
+[list_sdtm_domains()](list_sdtm_domains.md#pointblank.list_sdtm_domains)  
+List all available SDTM domain codes.
+
+[SDTMDomainTemplate](SDTMDomainTemplate.md#pointblank.SDTMDomainTemplate)  
+Structural template for an SDTM domain.
+
+[SDTMVariableSpec](SDTMVariableSpec.md#pointblank.SDTMVariableSpec)  
+Specification for a single variable in an SDTM domain template.
+
+
+## ADaM Validation
+
+
+Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` to generate a full `Validate` workflow, or `validate_adam_structure()` for a quick structural conformance check. Retrieve dataset templates with `get_adam_dataset()` and `list_adam_datasets()`.
+
+
+[validate_adam()](validate_adam.md#pointblank.validate_adam)  
+Generate a comprehensive ADaM validation workflow for a dataset.
+
+[validate_adam_structure()](validate_adam_structure.md#pointblank.validate_adam_structure)  
+Validate structural conformance of a dataset against an ADaM template.
+
+[adam_to_metadata()](adam_to_metadata.md#pointblank.adam_to_metadata)  
+Convert an ADaM dataset template to a MetadataImport object.
+
+[get_adam_dataset()](get_adam_dataset.md#pointblank.get_adam_dataset)  
+Get the ADaM template for a specific dataset.
+
+[list_adam_datasets()](list_adam_datasets.md#pointblank.list_adam_datasets)  
+List all available ADaM dataset template names.
+
+[ADaMDatasetTemplate](ADaMDatasetTemplate.md#pointblank.ADaMDatasetTemplate)  
+Structural template for an ADaM dataset.
+
+[ADaMVariableSpec](ADaMVariableSpec.md#pointblank.ADaMVariableSpec)  
+Specification for a single variable in an ADaM dataset template.
 
 
 ## Integrations

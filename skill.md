@@ -54,7 +54,7 @@ Import external schema definitions (JSON Schema, Frictionless Table Schema, and 
 
 ### Validation Steps
 
-Validation steps are sequential validations on the target data. Call Validate's validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
+Validation steps are sequential validations on the target data. Call `Validate`'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
 
 
 - `Validate.col_vals_gt`
@@ -158,7 +158,7 @@ The validation plan is executed when `interrogate()` is called. After interrogat
 
 ### Inspection and Assistance
 
-Functions for getting to grips with a new data table. Use DataScan for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
+Functions for getting to grips with a new data table. Use `DataScan` for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
 
 
 - `DataScan`: Get a summary of a dataset
@@ -224,6 +224,46 @@ Prebuilt action functions for common notification patterns.
 
 - `send_slack_notification`: Create a Slack notification function using a webhook URL
 - `emit_otel`: Create an OTel export action for use in `FinalActions`
+
+### Metadata Import/Export
+
+Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for the reverse.
+
+
+- `import_metadata`: Import metadata from an external standard or file
+- `export_metadata`: Export metadata to an external standard format
+- `MetadataImport`: Parsed metadata from an external standard
+- `MetadataPackage`: A collection of `MetadataImport` objects from a multi-dataset source
+- `VariableMetadata`: Metadata for a single variable/column, as imported from an external standard
+- `Codelist`: A controlled terminology / value set from an external standard
+- `CodelistEntry`: A single entry in a codelist (controlled terminology)
+- `MissingValueCode`: A structured missing value definition from an external standard
+
+### SDTM Validation
+
+Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sdtm()` to generate a full `Validate` workflow, or `validate_sdtm_structure()` for a quick structural conformance check. Retrieve domain templates with `get_sdtm_domain()` and `list_sdtm_domains()`.
+
+
+- `validate_sdtm`: Generate a comprehensive SDTM validation workflow for a dataset
+- `validate_sdtm_structure`: Validate the structural conformance of a dataset against an SDTM domain template
+- `sdtm_to_metadata`: Convert an SDTM domain template to a `MetadataImport` object
+- `get_sdtm_domain`: Get the SDTM template for a specific domain
+- `list_sdtm_domains`: List all available SDTM domain codes
+- `SDTMDomainTemplate`: Structural template for an SDTM domain
+- `SDTMVariableSpec`: Specification for a single variable in an SDTM domain template
+
+### ADaM Validation
+
+Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` to generate a full `Validate` workflow, or `validate_adam_structure()` for a quick structural conformance check. Retrieve dataset templates with `get_adam_dataset()` and `list_adam_datasets()`.
+
+
+- `validate_adam`: Generate a comprehensive ADaM validation workflow for a dataset
+- `validate_adam_structure`: Validate structural conformance of a dataset against an ADaM template
+- `adam_to_metadata`: Convert an ADaM dataset template to a MetadataImport object
+- `get_adam_dataset`: Get the ADaM template for a specific dataset
+- `list_adam_datasets`: List all available ADaM dataset template names
+- `ADaMDatasetTemplate`: Structural template for an ADaM dataset
+- `ADaMVariableSpec`: Specification for a single variable in an ADaM dataset template
 
 ### Integrations
 

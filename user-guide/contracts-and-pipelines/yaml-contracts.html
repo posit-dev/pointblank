@@ -496,6 +496,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Metadata Import</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/metadata-import.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing Metadata from External Standards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/statistical-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical Package Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/cdisc-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CDISC Clinical Data Standards</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -722,7 +748,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="saving-to-yaml" class="level2">
 <h2 class="anchored" data-anchor-id="saving-to-yaml">Saving to YAML</h2>
 <p>The <code>.to_yaml()</code> method serializes a <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> object to a YAML string. You can optionally pass a file path to write directly to disk. The resulting YAML is clean, readable, and contains all the information needed to reconstruct the contract exactly.</p>
-<div id="56710034" class="cell" data-execution_count="2">
+<div id="810af959" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -791,7 +817,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="loading-from-yaml" class="level2">
 <h2 class="anchored" data-anchor-id="loading-from-yaml">Loading from YAML</h2>
 <p>The <a href="../../reference/Contract.html#pointblank.Contract.from_yaml" class="gdls-link gdls-code">Contract.from_yaml()</a> class method reads a YAML file and reconstructs the full <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> object, including schema, steps, thresholds, and all metadata. The loaded contract is identical in behavior to one created directly in Python (there’s no functional difference).</p>
-<div id="06d3af44" class="cell" data-execution_count="3">
+<div id="951caf89" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the contract back</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>loaded_contract <span class="op">=</span> pb.Contract.from_yaml(<span class="st">"product_contract.yaml"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loaded_contract)</span>
@@ -807,7 +833,7 @@ Version: 1.0.0</code></pre>
 <section id="validating-with-a-loaded-contract" class="level2">
 <h2 class="anchored" data-anchor-id="validating-with-a-loaded-contract">Validating with a Loaded Contract</h2>
 <p>Once loaded, a contract works exactly like one defined in Python. Call <code>.validate(data)</code> to compile it into a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, execute all checks, and get the standard Pointblank validation report. This is the core value proposition of YAML contracts: define once, validate anywhere.</p>
-<div id="f30d5157" class="cell" data-execution_count="4">
+<div id="36ffc2d1" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>products <span class="op">=</span> pl.DataFrame(</span>
@@ -1397,7 +1423,7 @@ tr { background-color: transparent; }
 <p>While individual contracts validate data at a single point, <strong>pipelines</strong> enforce quality at both the input and output boundaries of a transformation. A pipeline YAML file packages the source contract, target contract, and pipeline-level settings (like global thresholds and short-circuit behavior) into a single, self-contained document.</p>
 <p>This is especially powerful for team workflows: a data engineer defines the pipeline specification in YAML, commits it to version control, and any downstream system can load and execute it without knowing anything about the implementation details.</p>
 <p>Let’s build a pipeline in Python and export it to see what the YAML looks like:</p>
-<div id="4ad30bf7" class="cell" data-execution_count="5">
+<div id="a62ccc80" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a pipeline and export to YAML</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pb.Contract(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"raw_events"</span>,</span>
@@ -1548,7 +1574,7 @@ target:
 <section id="loading-and-running-a-pipeline-from-yaml" class="level2">
 <h2 class="anchored" data-anchor-id="loading-and-running-a-pipeline-from-yaml">Loading and Running a Pipeline from YAML</h2>
 <p>Loading a pipeline from YAML works the same way as loading a contract: call the <a href="../../reference/Contract.html#pointblank.Contract.from_yaml" class="gdls-link gdls-code">from_yaml()</a> class method with the file path. The returned <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> object is fully functional and ready to validate data or run a complete boundary enforcement workflow.</p>
-<div id="ef2225a0" class="cell" data-execution_count="6">
+<div id="c1d7a0d6" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the pipeline from YAML</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>loaded_pipeline <span class="op">=</span> pb.Pipeline.from_yaml(<span class="st">"event_pipeline.yaml"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loaded_pipeline)</span></code></pre></div>
@@ -1562,7 +1588,7 @@ target:
 </div>
 </div>
 <p>With the pipeline loaded, you provide data and a transform function just as you would with a pipeline defined in Python. The YAML only stores the <em>contract specifications</em> whereas the transform logic always lives in your Python code (since transforms are arbitrary functions that can’t be meaningfully serialized to YAML).</p>
-<div id="fb3ea902" class="cell" data-execution_count="7">
+<div id="bbdcc287" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create test data and run the pipeline</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>events <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1588,7 +1614,7 @@ target:
 <pre><code>Pipeline passed: True</code></pre>
 </div>
 </div>
-<div id="464ca767" class="cell" data-execution_count="8">
+<div id="01417c83" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2159,7 +2185,7 @@ tr { background-color: transparent; }
 <section id="pattern-1-environment-specific-pipelines" class="level2">
 <h2 class="anchored" data-anchor-id="pattern-1-environment-specific-pipelines">Pattern 1: Environment-Specific Pipelines</h2>
 <p>A common need is to apply different tolerance levels in different environments. In development, you might accept 20% failure rates while iterating on a transform. In production, anything above 1% is a critical issue. YAML contracts make this easy: store the same validation logic in a shared contract, but load different pipeline configurations that set environment-appropriate thresholds.</p>
-<div id="386e4212" class="cell" data-execution_count="9">
+<div id="915d245b" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same contracts, different thresholds</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>dev_pipeline <span class="op">=</span> pb.Pipeline(</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span>source,</span>
@@ -2221,7 +2247,7 @@ tr { background-color: transparent; }
 <h2 class="anchored" data-anchor-id="pattern-4-composing-steps-from-multiple-sources">Pattern 4: Composing Steps from Multiple Sources</h2>
 <p>Sometimes you want to define a set of “base” validation rules that apply to all tables (like “every table must have a non-null <code>id</code> column that’s unique”), and then layer on table-specific rules. YAML makes this easy because you can parse step definitions from YAML fragments and combine them programmatically.</p>
 <p>This pattern is especially useful when you have organization-wide data quality standards that every contract should inherit.</p>
-<div id="a1317f57" class="cell" data-execution_count="10">
+<div id="c07b780c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base steps that apply to all tables</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>base_steps_yaml <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_not_null:</span></span>
@@ -2259,7 +2285,7 @@ tr { background-color: transparent; }
 <h1>Round-Trip Fidelity</h1>
 <p>A critical property of Pointblank’s YAML serialization is <strong>round-trip fidelity</strong>: when you save a contract to YAML and load it back, you get an identical object. No information is lost, no defaults are silently changed, and no steps are reordered. This guarantee means you can confidently use YAML as your source of truth without worrying about subtle differences between the YAML representation and the in-memory object.</p>
 <p>Let’s verify this with a fully-specified contract:</p>
-<div id="f52d06de" class="cell" data-execution_count="11">
+<div id="b2878056" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original contract</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>original <span class="op">=</span> pb.Contract(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"fidelity_test"</span>,</span>

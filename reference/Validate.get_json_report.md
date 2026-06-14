@@ -44,7 +44,7 @@ The JSON report can include any of the standard validation report fields, includ
 - `i_o`: the original step index from the validation plan (pre-expansion)
 - `assertion_type`: the type of validation assertion (e.g., `"col_vals_gt"`, etc.)
 - `column`: the column being validated (or columns used in certain validations)
-- `values`: the comparison values or parameters used in the validation
+- [values](MetadataPackage.md#pointblank.MetadataPackage.values): the comparison values or parameters used in the validation
 - `inclusive`: whether the comparison is inclusive (for range-based validations)
 - `na_pass`: whether `NA`/`Null` values are considered passing (for certain validations)
 - `pre`: preprocessing function applied before validation
@@ -116,8 +116,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-06-13T17:51:48.139+00:00",
-            "proc_duration_s": 0.008011
+            "time_processed": "2026-06-14T21:05:42.461+00:00",
+            "proc_duration_s": 0.008003
         },
         {
             "i": 2,
@@ -142,8 +142,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-06-13T17:51:48.143+00:00",
-            "proc_duration_s": 0.003327
+            "time_processed": "2026-06-14T21:05:42.464+00:00",
+            "proc_duration_s": 0.003009
         }
     ]
 

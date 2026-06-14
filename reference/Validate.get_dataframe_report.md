@@ -48,7 +48,7 @@ The returned DataFrame contains the following columns:
 - `step_number`: The 1-indexed step number.
 - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
 - `columns`: The column name validated.
-- `values`: The comparison value used in the validation. For regex validations, just the pattern string is included.
+- [values](MetadataPackage.md#pointblank.MetadataPackage.values): The comparison value used in the validation. For regex validations, just the pattern string is included.
 - `step_evaluated`: Whether the step was evaluated without error.
 - `units`: Total number of test units.
 - `all_units_passed`: Whether every test unit passed.
