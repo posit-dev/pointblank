@@ -26,3 +26,16 @@ _FORMAT_REGISTRY: dict[str, str] = {
     "cdisc_adam": "_adam_validate",
 }
 
+# File extension to format mapping for auto-detection
+_EXTENSION_MAP: dict[str, str] = {
+    ".sav": "spss",
+    ".zsav": "spss",
+    ".xpt": "xpt",
+    ".sas7bdat": "sas",
+    ".dta": "stata",
+}
+
+# XML files that may need content-based detection
+_XML_FORMATS: set[str] = {"cdisc_define", "define_xml", "cdisc_ct"}
+
+
