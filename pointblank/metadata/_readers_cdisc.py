@@ -200,3 +200,74 @@ def _read_define_xml_metadata(
     )
 
 
+def _parse_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
+    """Parse `CodeList` elements from `MetaDataVersion`.
+
+    Parameters
+    ----------
+    mdv
+        The `MetaDataVersion` XML element.
+    ns
+        Namespace dictionary.
+
+    Returns
+    -------
+    dict
+        Mapping of `CodeList` OID to `Codelist` object.
+    """
+    codelists: dict[str, Codelist] = {}
+
+    for cl_el in mdv.findall("odm:CodeList", ns):
+        oid = cl_el.get("OID", "")
+        name = cl_el.get("Name", oid)
+        data_type = cl_el.get("DataType", "text")
+
+        entries: list[CodelistEntry] = []
+        for item in cl_el.findall("odm:CodeListItem", ns):
+            value = item.get("CodedValue", "")
+            # Coerce to int/float based on DataType
+            if data_type in ("integer",):
+                try:
+                    value = int(value)
+                except (ValueError, TypeError):
+                    pass
+            elif data_type in ("float", "double"):
+                try:
+                    value = float(value)
+                except (ValueError, TypeError):
+                    pass
+
+            # Get the Decode (display label)
+            decode_el = item.find("odm:Decode/odm:TranslatedText", ns)
+            label = decode_el.text if decode_el is not None and decode_el.text else value
+
+            # Check for NCI code (extensible attribute)
+            # nci:ExtCodeID or similar
+            entry = CodelistEntry(value=value, label=str(label))
+            entries.append(entry)
+
+        # Also check for EnumeratedItem (no Decode needed, value = label)
+        for item in cl_el.findall("odm:EnumeratedItem", ns):
+            value = item.get("CodedValue", "")
+            if data_type in ("integer",):
+                try:
+                    value = int(value)
+                except (ValueError, TypeError):
+                    pass
+            elif data_type in ("float", "double"):
+                try:
+                    value = float(value)
+                except (ValueError, TypeError):
+                    pass
+            entries.append(CodelistEntry(value=value, label=str(value)))
+
+        codelists[oid] = Codelist(
+            name=name,
+            codes=entries,
+            label=name,
+            source="CDISC Define-XML",
+        )
+
+    return codelists
+
+
