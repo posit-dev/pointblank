@@ -106,3 +106,97 @@ def _detect_define_version(root) -> tuple[dict[str, str], str]:
     return _DEFINE_NS_20, "2.0"
 
 
+def _read_define_xml_metadata(
+    path: str | Path,
+    dataset: str | None = None,
+    **kwargs: Any,
+) -> MetadataImport | MetadataPackage:
+    """Read metadata from a CDISC Define-XML file.
+
+    Extracts ItemGroup (dataset) definitions, ItemDef (variable) definitions, CodeList definitions,
+    and Where Clause conditions from Define-XML 2.0/2.1.
+
+    Parameters
+    ----------
+    path
+        Path to the Define-XML file.
+    dataset
+        If provided, return metadata only for this specific dataset/domain. If `None` and multiple
+        datasets exist, returns a MetadataPackage.
+
+    Returns
+    -------
+    MetadataImport | MetadataPackage
+        A `MetadataImport` for a single dataset, or `MetadataPackage` for multiple.
+    """
+    _ensure_lxml()
+    from lxml import etree
+
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"Define-XML file not found: {path}")
+
+    # Parse the XML
+    tree = etree.parse(str(path))  # noqa: S320
+    root = tree.getroot()
+
+    # Detect Define-XML version and get appropriate namespaces
+    ns, version = _detect_define_version(root)
+
+    # Extract study-level info
+    study_el = root.find(".//odm:Study", ns)
+    study_oid = study_el.get("OID") if study_el is not None else None
+
+    # Find the MetaDataVersion element
+    mdv = root.find(".//odm:Study/odm:MetaDataVersion", ns)
+    if mdv is None:
+        # Try without Study wrapper (some exports flatten)
+        mdv = root.find(".//odm:MetaDataVersion", ns)
+    if mdv is None:
+        raise ValueError(f"No MetaDataVersion element found in {path.name}")
+
+    # Extract all CodeLists
+    codelists = _parse_codelists(mdv, ns)
+
+    # Extract all ItemDefs (variable definitions)
+    item_defs = _parse_item_defs(mdv, ns, codelists)
+
+    # Extract ItemGroups (datasets)
+    item_groups = _parse_item_groups(mdv, ns, item_defs, codelists)
+
+    # If a specific dataset is requested, return just that one
+    if dataset is not None:
+        dataset_upper = dataset.upper()
+        if dataset_upper not in item_groups:
+            available = sorted(item_groups.keys())
+            raise KeyError(
+                f"Dataset '{dataset}' not found in Define-XML. Available datasets: {available}"
+            )
+        meta = item_groups[dataset_upper]
+        meta.source_path = str(path)
+        meta.source_version = f"Define-XML {version}"
+        meta.study_id = study_oid
+        return meta
+
+    # If there's only one dataset, return it directly
+    if len(item_groups) == 1:
+        meta = next(iter(item_groups.values()))
+        meta.source_path = str(path)
+        meta.source_version = f"Define-XML {version}"
+        meta.study_id = study_oid
+        return meta
+
+    # Multiple datasets → MetadataPackage
+    for meta in item_groups.values():
+        meta.source_path = str(path)
+        meta.source_version = f"Define-XML {version}"
+        meta.study_id = study_oid
+
+    return MetadataPackage(
+        name=study_oid or path.stem,
+        items=item_groups,
+        description=f"CDISC Define-XML {version} study metadata",
+        version=version,
+    )
+
+
