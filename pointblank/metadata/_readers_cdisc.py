@@ -629,3 +629,92 @@ def _build_ct_namespaces(nsmap: dict) -> dict[str, str]:
     return ns
 
 
+def _parse_ct_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
+    """Parse CodeLists from a CDISC CT file with NCI extensions.
+
+    Parameters
+    ----------
+    mdv
+        The `MetaDataVersion` element.
+    ns
+        Namespace dictionary.
+
+    Returns
+    -------
+    dict
+        Mapping of CodeList OID to `Codelist`.
+    """
+    codelists: dict[str, Codelist] = {}
+    nci_ns = ns.get("nciodm")
+
+    for cl_el in mdv.findall("odm:CodeList", ns):
+        oid = cl_el.get("OID", "")
+        name = cl_el.get("Name", oid)
+        data_type = cl_el.get("DataType", "text")
+
+        # Check for NCI extensible attribute
+        extensible = False
+        if nci_ns:
+            ext_val = cl_el.get(f"{{{nci_ns}}}ExtCodeID")
+            # Extensible codelists are often marked via CodeListExtensible
+            ext_attr = cl_el.get(f"{{{nci_ns}}}CodeListExtensible")
+            if ext_attr and ext_attr.lower() == "yes":
+                extensible = True
+
+        # Get description
+        desc_el = cl_el.find("odm:Description/odm:TranslatedText", ns)
+        label = desc_el.text if desc_el is not None and desc_el.text else name
+
+        entries: list[CodelistEntry] = []
+
+        # Parse EnumeratedItems (value-only, typical in CT)
+        for item in cl_el.findall("odm:EnumeratedItem", ns):
+            value = item.get("CodedValue", "")
+
+            # Get NCI preferred term if available
+            pref_term = None
+            synonyms = None
+            if nci_ns:
+                pref_term = item.get(f"{{{nci_ns}}}PreferredTerm")
+                synonym_str = item.get(f"{{{nci_ns}}}CDISCSynonym")
+                if synonym_str:
+                    synonyms = [s.strip() for s in synonym_str.split(";")]
+
+            item_label = pref_term or value
+            entry = CodelistEntry(
+                value=value,
+                label=item_label,
+                synonyms=synonyms,
+            )
+            entries.append(entry)
+
+        # Parse CodeListItems (value + decode)
+        for item in cl_el.findall("odm:CodeListItem", ns):
+            value = item.get("CodedValue", "")
+
+            decode_el = item.find("odm:Decode/odm:TranslatedText", ns)
+            item_label = decode_el.text if decode_el is not None and decode_el.text else value
+
+            # Get NCI extensions
+            synonyms = None
+            if nci_ns:
+                synonym_str = item.get(f"{{{nci_ns}}}CDISCSynonym")
+                if synonym_str:
+                    synonyms = [s.strip() for s in synonym_str.split(";")]
+
+            entry = CodelistEntry(
+                value=value,
+                label=item_label,
+                synonyms=synonyms,
+            )
+            entries.append(entry)
+
+        codelists[oid] = Codelist(
+            name=name,
+            codes=entries,
+            label=label,
+            source="CDISC Controlled Terminology",
+            extensible=extensible,
+        )
+
+    return codelists
