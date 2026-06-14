@@ -107,11 +107,11 @@ class MissingValueCode:
     Parameters
     ----------
     value
-        The sentinel value (e.g., -99, ".A", "").
+        The sentinel value (e.g., `-99`, `".A"`, `""`).
     label
         What this missing code means.
     category
-        Category of missingness (e.g., "system_missing", "user_missing").
+        Category of missingness (e.g., `"system_missing"`, `"user_missing"`).
     reason
         Why data is missing.
     """
