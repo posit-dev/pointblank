@@ -355,3 +355,137 @@ def _parse_item_defs(
     return item_defs
 
 
+def _parse_item_groups(
+    mdv,
+    ns: dict[str, str],
+    item_defs: dict[str, dict[str, Any]],
+    codelists: dict[str, Codelist],
+) -> dict[str, MetadataImport]:
+    """Parse `ItemGroupDef` elements into `MetadataImport` objects.
+
+    Parameters
+    ----------
+    mdv
+        The `MetaDataVersion` XML element.
+    ns
+        Namespace dictionary.
+    item_defs
+        Parsed `ItemDef` lookup.
+    codelists
+        Parsed `CodeList` lookup.
+
+    Returns
+    -------
+    dict
+        Mapping of dataset name to `MetadataImport`.
+    """
+    item_groups: dict[str, MetadataImport] = {}
+
+    # Parse MethodDefs for computational method descriptions
+    methods: dict[str, str] = {}
+    for method_el in mdv.findall("odm:MethodDef", ns):
+        method_oid = method_el.get("OID", "")
+        desc_el = method_el.find("odm:Description/odm:TranslatedText", ns)
+        if desc_el is not None and desc_el.text:
+            methods[method_oid] = desc_el.text
+
+    for ig_el in mdv.findall("odm:ItemGroupDef", ns):
+        ig_name = ig_el.get("Name", "")
+        ig_label = ig_el.get("Comment", "")
+        ig_domain = ig_el.get("Domain", ig_name)
+
+        # Get label from def:Label attribute (Define-XML standard)
+        def_label = ig_el.get(f"{{{ns.get('def', '')}}}Label", "")
+        if not def_label:
+            # Try with prefix notation for lxml
+            for attr_name, attr_val in ig_el.attrib.items():
+                if attr_name.endswith("}Label") or attr_name == "def:Label":
+                    def_label = attr_val
+                    break
+        if def_label:
+            ig_label = def_label
+
+        # Get description (overrides label if present)
+        desc_el = ig_el.find("odm:Description/odm:TranslatedText", ns)
+        if desc_el is not None and desc_el.text:
+            ig_label = desc_el.text
+
+        # Get the dataset label from def:leaf or SASDatasetName
+        sas_name = ig_el.get("SASDatasetName", ig_name)
+
+        # Determine if this is repeating
+        is_repeating = ig_el.get("Repeating", "No") == "Yes"
+
+        # Get purpose (Tabulation or Analysis)
+        purpose = ig_el.get("Purpose")
+
+        # Parse ItemRefs within this ItemGroup
+        variables: list[VariableMetadata] = []
+        group_codelists: dict[str, Codelist] = {}
+        group_missing: dict[str, list[MissingValueCode]] = {}
+
+        for item_ref in ig_el.findall("odm:ItemRef", ns):
+            item_oid = item_ref.get("ItemOID", "")
+            mandatory = item_ref.get("Mandatory", "No") == "Yes"
+            role = item_ref.get("Role")
+            order_number = item_ref.get("OrderNumber")
+
+            if item_oid not in item_defs:
+                continue
+
+            item_info = item_defs[item_oid]
+
+            # Resolve codelist
+            codelist_ref_name = None
+            allowed_values = None
+            cl_oid = item_info.get("codelist_oid")
+            if cl_oid and cl_oid in codelists:
+                cl = codelists[cl_oid]
+                codelist_ref_name = cl.name
+                group_codelists[cl.name] = cl
+                allowed_values = cl.to_set()
+
+            # Resolve computational method
+            comp_method = item_info.get("computational_method")
+            if comp_method and comp_method in methods:
+                comp_method = methods[comp_method]
+
+            # Build max_length constraint for text types
+            max_length = None
+            if item_info["dtype"] == "String" and item_info.get("length"):
+                max_length = item_info["length"]
+
+            var = VariableMetadata(
+                name=item_info["name"],
+                label=item_info["label"] or None,
+                dtype=item_info["dtype"],
+                required=mandatory,
+                role=role,
+                max_length=max_length,
+                allowed_values=allowed_values,
+                codelist_ref=codelist_ref_name,
+                display_format=item_info.get("data_type_raw"),
+                origin=item_info.get("origin"),
+                computational_method=comp_method,
+                controlled_term=codelist_ref_name,
+                significant_digits=item_info.get("significant_digits"),
+                cdisc_domain=ig_domain,
+                cdisc_role=role,
+            )
+            variables.append(var)
+
+        meta = MetadataImport(
+            source_format="cdisc_define",
+            dataset_name=ig_name,
+            dataset_label=ig_label or None,
+            domain=ig_domain,
+            variables=variables,
+            codelists=group_codelists,
+            missing_value_codes=group_missing,
+        )
+
+        item_groups[ig_name.upper()] = meta
+
+    return item_groups
+
+
