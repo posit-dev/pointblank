@@ -122,3 +122,105 @@ class MissingValueCode:
     reason: str | None = None
 
 
+@dataclass
+class VariableMetadata:
+    """Metadata for a single variable/column, as imported from an external standard.
+
+    Parameters
+    ----------
+    name
+        Variable/column name.
+    label
+        Human-readable label.
+    description
+        Longer description of the variable.
+    dtype
+        Data type (mapped to Narwhals/Polars type names).
+    role
+        Variable role (e.g., `"identifier"`, `"measure"`, `"classifier"`).
+    required
+        Whether the variable must be non-null.
+    unique
+        Whether all values must be distinct.
+    min_val
+        Minimum allowed value (inclusive).
+    max_val
+        Maximum allowed value (inclusive).
+    min_length
+        Minimum string length.
+    max_length
+        Maximum string length.
+    pattern
+        Regex pattern that values must match.
+    allowed_values
+        Explicit list of allowed values.
+    codelist_ref
+        Reference to a named codelist.
+    display_format
+        Display format from source system (e.g., `"F8.2"`, `"DATETIME20."`).
+    value_labels
+        Value-to-label mapping (e.g., `{1: "Male", 2: "Female"}`).
+    missing_values
+        Sentinel values representing missingness (e.g., `-99`, `".A"`, `""`).
+    missing_value_labels
+        Labels for missing value sentinels (e.g., `"Refused"`, `"Not Applicable"`).
+    origin
+        How the variable was created (`"CRF"`, `"Derived"`, `"Assigned"`).
+    computational_method
+        Derivation algorithm for computed variables.
+    controlled_term
+        CDISC controlled terminology reference.
+    significant_digits
+        Number of significant digits.
+    cdisc_domain
+        CDISC domain code (e.g., `"DM"`, `"AE"`, `"LB"`, `"VS"`).
+    cdisc_role
+        CDISC variable role (`"Identifier"`, `"Topic"`, `"Timing"`, `"Qualifier"`, `"Rule"`).
+    adam_derivation
+        ADaM derivation algorithm description.
+    traceability_ref
+        ADaM traceability reference back to SDTM source.
+    unit
+        Unit of measurement (e.g., `"kg"`, `"mmHg"`, `"years"`).
+    unit_system
+        Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
+    """
+
+    name: str
+    label: str | None = None
+    description: str | None = None
+    dtype: str | None = None
+    role: str | None = None
+
+    # Constraints (map directly to validation steps)
+    required: bool = False
+    unique: bool = False
+    min_val: float | None = None
+    max_val: float | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    pattern: str | None = None
+    allowed_values: list[Any] | None = None
+    codelist_ref: str | None = None
+
+    # Statistical package metadata
+    display_format: str | None = None
+    value_labels: dict[Any, str] | None = None
+    missing_values: list[Any] | None = None
+    missing_value_labels: dict[Any, str] | None = None
+
+    # Clinical/regulatory (CDISC)
+    origin: str | None = None
+    computational_method: str | None = None
+    controlled_term: str | None = None
+    significant_digits: int | None = None
+    cdisc_domain: str | None = None
+    cdisc_role: str | None = None
+    adam_derivation: str | None = None
+    traceability_ref: str | None = None
+
+    # Units
+    unit: str | None = None
+    unit_system: str | None = None
+
+
