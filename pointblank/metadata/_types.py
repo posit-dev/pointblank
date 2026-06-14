@@ -224,3 +224,59 @@ class VariableMetadata:
     unit_system: str | None = None
 
 
+@dataclass
+class MetadataImport:
+    """Parsed metadata from an external standard.
+
+    Contains variable definitions, value labels, missing value codes, controlled terminologies, and
+    dataset-level metadata: all mapped to Pointblank concepts.
+
+    Parameters
+    ----------
+    source_format
+        The format this metadata was imported from (e.g., `"spss"`, `"xpt"`, `"stata"`).
+    source_path
+        Path to the source file, if imported from a file.
+    source_version
+        Version of the source format/standard.
+    dataset_name
+        Name of the dataset.
+    dataset_label
+        Human-readable label for the dataset.
+    dataset_description
+        Description of the dataset.
+    creation_date
+        When the dataset/metadata was created.
+    study_id
+        Study identifier (for clinical data).
+    domain
+        Domain identifier (e.g., `"DM"`, `"AE"` for CDISC).
+    variables
+        List of variable metadata definitions.
+    codelists
+        Named codelists (controlled terminologies).
+    missing_value_codes
+        Named missing value code definitions.
+    """
+
+    source_format: str
+    source_path: str | None = None
+    source_version: str | None = None
+
+    # Dataset-level metadata
+    dataset_name: str | None = None
+    dataset_label: str | None = None
+    dataset_description: str | None = None
+    creation_date: str | None = None
+    study_id: str | None = None
+    domain: str | None = None
+
+    # Variable-level metadata
+    variables: list[VariableMetadata] = dataclass_field(default_factory=list)
+
+    # Controlled terminologies / codelists
+    codelists: dict[str, Codelist] = dataclass_field(default_factory=dict)
+
+    # Missing value definitions
+    missing_value_codes: dict[str, list[MissingValueCode]] = dataclass_field(default_factory=dict)
+
