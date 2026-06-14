@@ -79,3 +79,62 @@ def _detect_format(path: str | Path) -> str:
     )
 
 
+def _detect_json_format(path: Path) -> str:
+    """Detect whether a JSON file is Frictionless or CSVW.
+
+    Parameters
+    ----------
+    path
+        Path to the JSON file.
+
+    Returns
+    -------
+    str
+        Either `"frictionless"` or `"csvw"`.
+
+    Raises
+    ------
+    ValueError
+        If the JSON format cannot be determined.
+    """
+    import json
+
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {path}")
+
+    try:
+        with open(path) as f:
+            doc = json.load(f)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON file: {path} — {e}") from None
+
+    if not isinstance(doc, dict):
+        raise ValueError(f"Expected a JSON object, got {type(doc).__name__}")
+
+    # Frictionless: has "fields" (Table Schema) or "resources" (Data Package)
+    if "fields" in doc and isinstance(doc.get("fields"), list):
+        return "frictionless"
+    if "resources" in doc:
+        return "frictionless"
+
+    # CSVW: has "tables" (TableGroup) or "tableSchema" (Table)
+    if "tables" in doc:
+        return "csvw"
+    if "tableSchema" in doc:
+        return "csvw"
+    if "url" in doc and ("dialect" in doc or "tableSchema" in doc):
+        return "csvw"
+
+    # Filename heuristics
+    name_lower = path.name.lower()
+    if "datapackage" in name_lower or "table-schema" in name_lower:
+        return "frictionless"
+    if "csv-metadata" in name_lower or "csvw" in name_lower:
+        return "csvw"
+
+    raise ValueError(
+        f"Cannot auto-detect JSON format for '{path.name}'. "
+        f"Please specify format='frictionless' or format='csvw' explicitly."
+    )
+
+
