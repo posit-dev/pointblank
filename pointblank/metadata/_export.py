@@ -80,3 +80,90 @@ def export_metadata(
     return result
 
 
+def _export_to_frictionless(
+    meta: MetadataImport,
+    include_constraints: bool = True,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Export MetadataImport to Frictionless Table Schema format.
+
+    Parameters
+    ----------
+    meta
+        The metadata to export.
+    include_constraints
+        Whether to include field constraints in the output. Default is `True`.
+
+    Returns
+    -------
+    dict
+        A Frictionless Table Schema dict.
+    """
+    fields: list[dict[str, Any]] = []
+    primary_key: list[str] = []
+
+    for var in meta.variables:
+        field_def: dict[str, Any] = {"name": var.name}
+
+        # Type
+        frictionless_type = _DTYPE_TO_FRICTIONLESS.get(var.dtype or "String", "string")
+        field_def["type"] = frictionless_type
+
+        # Title (label)
+        if var.label:
+            field_def["title"] = var.label
+
+        # Description
+        if var.description:
+            field_def["description"] = var.description
+
+        # Format
+        if var.display_format:
+            field_def["format"] = var.display_format
+
+        # Constraints
+        if include_constraints:
+            constraints: dict[str, Any] = {}
+
+            if var.required:
+                constraints["required"] = True
+            if var.unique:
+                constraints["unique"] = True
+            if var.min_val is not None:
+                constraints["minimum"] = var.min_val
+            if var.max_val is not None:
+                constraints["maximum"] = var.max_val
+            if var.min_length is not None:
+                constraints["minLength"] = var.min_length
+            if var.max_length is not None:
+                constraints["maxLength"] = var.max_length
+            if var.pattern is not None:
+                constraints["pattern"] = var.pattern
+            if var.allowed_values is not None:
+                constraints["enum"] = var.allowed_values
+
+            if constraints:
+                field_def["constraints"] = constraints
+
+        # Missing values (field-level)
+        if var.missing_values:
+            field_def["missingValues"] = [""] + [str(v) for v in var.missing_values]
+
+        # Track primary key candidates (required + unique)
+        if var.required and var.unique:
+            primary_key.append(var.name)
+
+        fields.append(field_def)
+
+    # Build the Table Schema
+    table_schema: dict[str, Any] = {"fields": fields}
+
+    if primary_key:
+        table_schema["primaryKey"] = primary_key[0] if len(primary_key) == 1 else primary_key
+
+    if meta.dataset_label:
+        table_schema["title"] = meta.dataset_label
+    if meta.dataset_description:
+        table_schema["description"] = meta.dataset_description
+
+    return table_schema
