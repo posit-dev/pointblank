@@ -427,3 +427,95 @@ class MetadataImport:
         return len(self.variables)
 
 
+@dataclass
+class MetadataPackage:
+    """A collection of `MetadataImport` objects from a multi-dataset source.
+
+    Used for multi-domain CDISC studies, Frictionless Data Packages, etc.
+
+    Parameters
+    ----------
+    name
+        Package name/identifier.
+    items
+        Named `MetadataImport` objects.
+    description
+        Description of the package.
+    version
+        Package/study version.
+    """
+
+    name: str | None = None
+    items: dict[str, MetadataImport] = dataclass_field(default_factory=dict)
+    description: str | None = None
+    version: str | None = None
+
+    def __getitem__(self, key: str) -> MetadataImport:
+        return self.items[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.items
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def keys(self):
+        """Get the names of all datasets/domains."""
+        return self.items.keys()
+
+    def values(self):
+        """Get all MetadataImport objects."""
+        return self.items.values()
+
+    def get_domain(self, name: str) -> MetadataImport:
+        """Get metadata for a specific domain/dataset.
+
+        Parameters
+        ----------
+        name
+            Domain or dataset name (e.g., `"DM"`, `"AE"`).
+
+        Returns
+        -------
+        MetadataImport
+            The metadata for the named domain.
+
+        Raises
+        ------
+        KeyError
+            If no domain with that name exists.
+        """
+        if name not in self.items:
+            raise KeyError(
+                f"No domain/dataset named '{name}'. Available: {list(self.items.keys())}"
+            )
+        return self.items[name]
+
+    def summary(self) -> str:
+        """Return a human-readable summary of the package.
+
+        Returns
+        -------
+        str
+            Formatted summary string.
+        """
+        lines = []
+        lines.append("Metadata Package")
+        if self.name:
+            lines.append(f"  Name: {self.name}")
+        if self.description:
+            lines.append(f"  Description: {self.description}")
+        lines.append(f"  Datasets: {len(self.items)}")
+        lines.append("")
+        for name, meta in self.items.items():
+            lines.append(f"  [{name}] {len(meta.variables)} variables")
+        return "\n".join(lines)
+
+    def __str__(self) -> str:
+        return self.summary()
+
+    def __repr__(self) -> str:
+        return f"MetadataPackage(name={self.name!r}, datasets={len(self.items)})"
