@@ -183,3 +183,32 @@ def _read_frictionless_metadata(
         )
 
 
+def _extract_resource_schema(
+    resources: list[dict[str, Any]], resource_key: str | int
+) -> dict[str, Any]:
+    """Extract the schema from a specific resource in a Data Package."""
+    if isinstance(resource_key, int):
+        if resource_key >= len(resources):
+            raise IndexError(
+                f"Resource index {resource_key} out of range "
+                f"(package has {len(resources)} resources)."
+            )
+        res = resources[resource_key]
+    elif isinstance(resource_key, str):
+        res = None
+        for r in resources:
+            if r.get("name") == resource_key:
+                res = r
+                break
+        if res is None:
+            available = [r.get("name", f"<index {i}>") for i, r in enumerate(resources)]
+            raise ValueError(f"Resource '{resource_key}' not found. Available: {available}")
+    else:
+        raise TypeError(f"resource must be str or int, got {type(resource_key).__name__}")
+
+    schema = res.get("schema", {})
+    if "fields" not in schema:
+        raise ValueError(f"Resource has no 'schema.fields'. Got keys: {list(schema.keys())}")
+    return schema
+
+
