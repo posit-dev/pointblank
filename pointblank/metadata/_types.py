@@ -280,3 +280,18 @@ class MetadataImport:
     # Missing value definitions
     missing_value_codes: dict[str, list[MissingValueCode]] = dataclass_field(default_factory=dict)
 
+    def to_schema(self) -> Schema:
+        """Convert imported metadata to a Pointblank `Schema` with `Field` objects.
+
+        Maps variable metadata to appropriate `Field` types with constraints (min/max, allowed
+        values, nullable, etc.).
+
+        Returns
+        -------
+        Schema
+            A Pointblank `Schema` object with typed fields.
+        """
+        from pointblank.metadata._convert import _metadata_to_schema
+
+        return _metadata_to_schema(self)
+
