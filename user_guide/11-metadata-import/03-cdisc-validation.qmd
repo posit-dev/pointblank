@@ -228,8 +228,8 @@ result = validate_sdtm_structure(dm_data, domain="DM")
 print(f"Valid: {result['valid']}")
 if result["missing_required"]:
     print(f"Missing required: {result['missing_required']}")
-if result["extra_variables"]:
-    print(f"Extra variables: {result['extra_variables'][:5]}")
+if result["unknown_variables"]:
+    print(f"Unknown variables: {result['unknown_variables'][:5]}")
 ```
 
 ### Full SDTM Validation
