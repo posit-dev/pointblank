@@ -596,3 +596,36 @@ def _read_cdisc_ct_metadata(
     )
 
 
+def _build_ct_namespaces(nsmap: dict) -> dict[str, str]:
+    """Build namespace dict for CT files, handling varied namespace URIs.
+
+    Parameters
+    ----------
+    nsmap
+        The namespace map from the root element.
+
+    Returns
+    -------
+    dict
+        Normalized namespace dictionary.
+    """
+    ns = {}
+
+    # Find ODM namespace (could be v1.3 or v1.3.2)
+    for prefix, uri in nsmap.items():
+        if uri and "cdisc.org/ns/odm" in uri:
+            ns["odm"] = uri
+            break
+    else:
+        # Fallback
+        ns["odm"] = "http://www.cdisc.org/ns/odm/v1.3"
+
+    # Find NCI namespace
+    for prefix, uri in nsmap.items():
+        if uri and "ncicb.nci.nih.gov" in uri:
+            ns["nciodm"] = uri
+            break
+
+    return ns
+
+
