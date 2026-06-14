@@ -324,3 +324,217 @@ def _parse_frictionless_table_schema(
     )
 
 
+def _read_csvw_metadata(path: Path, **kwargs: Any) -> MetadataImport | MetadataPackage:
+    """Read metadata from a CSVW (CSV on the Web) metadata document.
+
+    CSVW defines how to describe CSV files using JSON-LD metadata. This reader extracts column
+    definitions, datatypes, constraints, and null markers.
+
+    Parameters
+    ----------
+    path
+        Path to the CSVW metadata JSON-LD file.
+    **kwargs
+        Additional options (currently unused).
+
+    Returns
+    -------
+    MetadataImport | MetadataPackage
+        A `MetadataImport` for single-table CSVW, or a `MetadataPackage` for multi-table groups.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist.
+    ValueError
+        If the JSON is not a valid CSVW metadata document.
+
+    References
+    ----------
+    - https://www.w3.org/TR/tabular-metadata/
+    - https://www.w3.org/TR/tabular-data-primer/
+    """
+    if not path.exists():
+        raise FileNotFoundError(f"CSVW metadata file not found: {path}")
+
+    with open(path) as f:
+        doc = json.load(f)
+
+    # CSVW can be a Table (has "tableSchema") or a TableGroup (has "tables")
+    if "tables" in doc:
+        # TableGroup — multiple tables
+        tables = doc["tables"]
+        if len(tables) == 1:
+            return _parse_csvw_table(tables[0], source_path=str(path))
+
+        items: dict[str, MetadataImport] = {}
+        for i, table in enumerate(tables):
+            table_url = table.get("url", f"table_{i}")
+            name = Path(table_url).stem if table_url else f"table_{i}"
+            items[name] = _parse_csvw_table(table, source_path=str(path))
+
+        return MetadataPackage(
+            name=doc.get("dc:title") or doc.get("rdfs:label"),
+            description=doc.get("dc:description"),
+            items=items,
+        )
+
+    elif "tableSchema" in doc or "url" in doc:
+        # Single Table
+        return _parse_csvw_table(doc, source_path=str(path))
+
+    else:
+        raise ValueError(
+            "JSON document is not a valid CSVW metadata file. "
+            "Expected 'tables' (TableGroup) or 'tableSchema'/'url' (Table)."
+        )
+
+
+def _parse_csvw_table(
+    table_doc: dict[str, Any],
+    source_path: str | None = None,
+) -> MetadataImport:
+    """Parse a single CSVW Table definition into a `MetadataImport`."""
+    variables: list[VariableMetadata] = []
+    codelists: dict[str, Codelist] = {}
+
+    table_schema = table_doc.get("tableSchema", {})
+    columns = table_schema.get("columns", [])
+
+    # Table-level null markers
+    table_null = table_doc.get("null", table_schema.get("null", [""]))
+    if isinstance(table_null, str):
+        table_null = [table_null]
+
+    # Primary key
+    primary_key = table_schema.get("primaryKey", [])
+    if isinstance(primary_key, str):
+        primary_key = [primary_key]
+
+    # Dataset name from URL or table properties
+    table_url = table_doc.get("url")
+    dataset_name = None
+    if table_url:
+        dataset_name = Path(table_url).stem
+
+    missing_codes: dict[str, list[MissingValueCode]] = {}
+
+    for col_def in columns:
+        col_name = col_def.get("name") or col_def.get("titles")
+        if isinstance(col_name, list):
+            col_name = col_name[0] if col_name else None
+        if not col_name:
+            continue
+
+        # Skip virtual columns (computed, not in the CSV)
+        if col_def.get("virtual", False):
+            continue
+
+        # Suppress columns (columns that should be suppressed in output)
+        if col_def.get("suppressOutput", False):
+            continue
+
+        # Datatype
+        datatype = col_def.get("datatype")
+        dtype = "String"
+        min_val = None
+        max_val = None
+        min_length = None
+        max_length = None
+        pattern = None
+
+        if datatype:
+            if isinstance(datatype, str):
+                dtype = _CSVW_DATATYPE_MAP.get(datatype, "String")
+            elif isinstance(datatype, dict):
+                base = datatype.get("base", "string")
+                dtype = _CSVW_DATATYPE_MAP.get(base, "String")
+
+                # Constraints within the datatype object
+                min_val_raw = datatype.get("minimum") or datatype.get("minInclusive")
+                max_val_raw = datatype.get("maximum") or datatype.get("maxInclusive")
+                if datatype.get("minExclusive") is not None:
+                    min_val_raw = datatype["minExclusive"]
+                if datatype.get("maxExclusive") is not None:
+                    max_val_raw = datatype["maxExclusive"]
+
+                if min_val_raw is not None:
+                    try:
+                        min_val = float(min_val_raw)
+                    except (TypeError, ValueError):
+                        pass
+                if max_val_raw is not None:
+                    try:
+                        max_val = float(max_val_raw)
+                    except (TypeError, ValueError):
+                        pass
+
+                min_length = datatype.get("minLength")
+                max_length = datatype.get("maxLength") or datatype.get("length")
+                pattern = datatype.get("format")
+
+        # Required
+        required = col_def.get("required", False)
+        if col_name in primary_key:
+            required = True
+
+        # Title and description
+        title = col_def.get("titles")
+        if isinstance(title, list):
+            title = title[0] if title else None
+        elif isinstance(title, dict):
+            # Language map: {"en": "Title"}
+            title = next(iter(title.values()), None)
+
+        description = col_def.get("dc:description") or col_def.get("rdfs:comment")
+
+        # Column-level null markers
+        col_null = col_def.get("null")
+        if col_null is not None:
+            if isinstance(col_null, str):
+                col_null = [col_null]
+            null_vals = [v for v in col_null if v != ""]
+        else:
+            null_vals = [v for v in table_null if v != ""]
+
+        missing_vals = null_vals if null_vals else None
+        if missing_vals:
+            missing_codes[col_name] = [
+                MissingValueCode(
+                    value=v,
+                    label=f"Null marker: {v!r}",
+                    category="system_missing",
+                )
+                for v in missing_vals
+            ]
+
+        # Separator means this is a list-valued column
+        separator = col_def.get("separator")
+
+        variables.append(
+            VariableMetadata(
+                name=col_name,
+                label=title if title != col_name else None,
+                description=description,
+                dtype=dtype,
+                required=required,
+                unique=col_name in primary_key,
+                min_val=min_val,
+                max_val=max_val,
+                min_length=min_length,
+                max_length=max_length,
+                pattern=pattern,
+                missing_values=missing_vals,
+            )
+        )
+
+    return MetadataImport(
+        source_format="csvw",
+        source_path=source_path,
+        dataset_name=dataset_name,
+        dataset_label=table_doc.get("dc:title") or table_schema.get("dc:title"),
+        dataset_description=table_doc.get("dc:description"),
+        variables=variables,
+        codelists=codelists,
+        missing_value_codes=missing_codes,
+    )
