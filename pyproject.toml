@@ -65,6 +65,7 @@ otel = [
 ]
 
 excel = ["openpyxl>=3.0.0"]
+cdisc = ["lxml>=4.9.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
 duckdb = ["ibis-framework[duckdb]>=9.5.0"]
