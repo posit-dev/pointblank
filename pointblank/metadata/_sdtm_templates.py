@@ -48,3 +48,56 @@ class SDTMVariableSpec:
     core: str = "Perm"  # "Req", "Exp", "Perm"
 
 
+@dataclass
+class SDTMDomainTemplate:
+    """Structural template for an SDTM domain.
+
+    Parameters
+    ----------
+    domain
+        Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`).
+    label
+        Domain label (e.g., `"Demographics"`, `"Adverse Events"`).
+    description
+        Brief description of the domain's purpose.
+    domain_class
+        SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"`, or `"Findings"`.
+    repeating
+        Whether the domain is a repeating (multi-row per subject) domain.
+    variables
+        Ordered list of variable specifications.
+    natural_keys
+        List of variable names that form the natural key.
+    """
+
+    domain: str
+    label: str
+    description: str
+    domain_class: str
+    repeating: bool
+    variables: list[SDTMVariableSpec] = dataclass_field(default_factory=list)
+    natural_keys: list[str] = dataclass_field(default_factory=list)
+
+    @property
+    def required_variables(self) -> list[str]:
+        """Get names of all required variables."""
+        return [v.name for v in self.variables if v.required]
+
+    @property
+    def expected_variables(self) -> list[str]:
+        """Get names of all expected (Exp core) variables."""
+        return [v.name for v in self.variables if v.core == "Exp"]
+
+    @property
+    def identifier_variables(self) -> list[str]:
+        """Get names of all Identifier-role variables."""
+        return [v.name for v in self.variables if v.role == "Identifier"]
+
+    def get_variable(self, name: str) -> SDTMVariableSpec | None:
+        """Get a variable spec by name."""
+        for v in self.variables:
+            if v.name == name:
+                return v
+        return None
+
+
