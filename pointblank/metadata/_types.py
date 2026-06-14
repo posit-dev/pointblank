@@ -340,3 +340,90 @@ class MetadataImport:
                 return var
         raise KeyError(f"No variable named '{name}' in imported metadata")
 
+    def get_codelist(self, name: str) -> Codelist:
+        """Get a specific codelist by name.
+
+        Parameters
+        ----------
+        name
+            The codelist name or identifier.
+
+        Returns
+        -------
+        Codelist
+            The requested codelist.
+
+        Raises
+        ------
+        KeyError
+            If no codelist with that name exists.
+        """
+        if name not in self.codelists:
+            raise KeyError(f"No codelist named '{name}'. Available: {list(self.codelists.keys())}")
+        return self.codelists[name]
+
+    @property
+    def variable_names(self) -> list[str]:
+        """Get the list of all variable names."""
+        return [v.name for v in self.variables]
+
+    def summary(self) -> str:
+        """Return a human-readable summary of the imported metadata.
+
+        Returns
+        -------
+        str
+            Formatted summary string.
+        """
+        lines = []
+        lines.append(f"Metadata Import ({self.source_format})")
+        if self.source_path:
+            lines.append(f"  Source: {self.source_path}")
+        if self.dataset_name:
+            lines.append(f"  Dataset: {self.dataset_name}")
+        if self.dataset_label:
+            lines.append(f"  Label: {self.dataset_label}")
+        if self.domain:
+            lines.append(f"  Domain: {self.domain}")
+
+        lines.append(f"  Variables: {len(self.variables)}")
+        lines.append(f"  Codelists: {len(self.codelists)}")
+
+        # Show variable summary
+        if self.variables:
+            lines.append("")
+            lines.append("  Variables:")
+            for var in self.variables:
+                dtype_str = f" ({var.dtype})" if var.dtype else ""
+                label_str = f" — {var.label}" if var.label else ""
+                constraints = []
+                if var.required:
+                    constraints.append("required")
+                if var.unique:
+                    constraints.append("unique")
+                if var.min_val is not None or var.max_val is not None:
+                    constraints.append(f"range=[{var.min_val}, {var.max_val}]")
+                if var.allowed_values:
+                    n = len(var.allowed_values)
+                    constraints.append(f"{n} allowed values")
+                if var.codelist_ref:
+                    constraints.append(f"codelist={var.codelist_ref}")
+                constraint_str = f" [{', '.join(constraints)}]" if constraints else ""
+                lines.append(f"    {var.name}{dtype_str}{label_str}{constraint_str}")
+
+        return "\n".join(lines)
+
+    def __str__(self) -> str:
+        return self.summary()
+
+    def __repr__(self) -> str:
+        return (
+            f"MetadataImport(source_format={self.source_format!r}, "
+            f"variables={len(self.variables)}, "
+            f"codelists={len(self.codelists)})"
+        )
+
+    def __len__(self) -> int:
+        return len(self.variables)
+
+
