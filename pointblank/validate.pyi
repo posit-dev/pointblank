@@ -78,7 +78,9 @@ def preview(
     min_tbl_width: int = 500,
     incl_header: bool | None = None,
 ) -> GT: ...
-def missing_vals_tbl(data: Any, missing: dict[str, MissingSpec] | None = None) -> GT: ...
+def missing_vals_tbl(
+    data: Any, missing: dict[str, MissingSpec] | None = None, as_heatmap: bool = False
+) -> GT: ...
 def get_column_count(data: Any) -> int: ...
 def get_row_count(data: Any) -> int: ...
 @dataclass
@@ -432,6 +434,20 @@ class Validate:
         brief: str | bool | None = None,
         active: bool | Callable = True,
     ) -> Validate: ...
+    def col_missing_only_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        allowed: Collection[Any] | None = None,
+        min_val: float | int | None = None,
+        max_val: float | int | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate: ...
     def rows_distinct(
         self,
         columns_subset: str | list[str] | None = None,
@@ -445,6 +461,18 @@ class Validate:
     def rows_complete(
         self,
         columns_subset: str | list[str] | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate: ...
+    def col_missing_consistent(
+        self,
+        columns: list[str],
+        missing: MissingSpec,
+        when_reason: str,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
