@@ -20004,6 +20004,40 @@ def _create_text_col_pct_null(
     return text
 
 
+def _create_text_col_pct_missing(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+    locale: str | None = None,
+) -> str:
+    """Create autobrief/failure text for col_pct_missing validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    fmt_locale = locale if locale else lang
+
+    max_pct_value = value.get("max_pct", 0) * 100  # Convert to percentage
+    max_pct_formatted = _format_number_safe(max_pct_value, decimals=1, locale=fmt_locale)
+
+    return EXPECT_FAIL_TEXT[f"col_pct_missing_{type_}_text"][lang].format(
+        column_text=column_text,
+        max_pct=max_pct_formatted,
+    )
+
+
+def _create_text_col_missing_coded(lang: str, column: str | None, for_failure: bool = False) -> str:
+    """Create autobrief/failure text for col_missing_coded validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    return EXPECT_FAIL_TEXT[f"col_missing_coded_{type_}_text"][lang].format(
+        column_text=column_text,
+    )
+
+
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
