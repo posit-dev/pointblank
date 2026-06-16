@@ -275,6 +275,8 @@ class YAMLValidator:
         "col_pct_null": "col_pct_null",
         "col_pct_missing": "col_pct_missing",
         "col_missing_coded": "col_missing_coded",
+        "col_missing_only_coded": "col_missing_only_coded",
+        "col_missing_consistent": "col_missing_consistent",
         "rows_distinct": "rows_distinct",
         "rows_complete": "rows_complete",
         "col_count_match": "col_count_match",
