@@ -78,6 +78,8 @@ from pointblank._interrogation import (
     interrogate_lt,
     interrogate_ne,
     interrogate_missing_coded,
+    interrogate_missing_consistent,
+    interrogate_missing_only_coded,
     interrogate_not_null,
     interrogate_notin,
     interrogate_null,
@@ -2684,9 +2686,15 @@ def _prettify_reason_label(reason: str) -> str:
     return reason.replace("_", " ").title()
 
 
-def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) -> GT:
+def _build_structured_missing_tbl(
+    data: Any, missing: dict[str, MissingSpec], as_heatmap: bool = False
+) -> GT:
     """Build a structured-missingness breakdown table (one row per column, columns for the count
-    and percentage of complete values and of each missing reason)."""
+    and percentage of complete values and of each missing reason).
+
+    When `as_heatmap=True`, render the reason proportions as a color-coded heatmap (cells shaded
+    from light to dark by the proportion missing for each reason) instead of count/percent text.
+    """
     if not isinstance(missing, dict):
         raise TypeError(
             f"`missing=` must be a dict mapping column names to MissingSpec objects, "
@@ -2745,18 +2753,32 @@ def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) ->
         total_missing = sum(counts.values())
         complete = total - total_missing
 
-        def _fmt(count: int) -> str:
-            pct = round(100 * count / total) if total > 0 else 0
-            return f"{count} ({pct}%)"
+        def _prop(count: int) -> float:
+            return (count / total) if total > 0 else 0.0
 
-        record: dict[str, Any] = {
-            "columns": column,
-            "total_n": str(total),
-            "complete": _fmt(complete),
-        }
-        # Fill every reason column in the union (0 for reasons this spec doesn't define)
-        for r in reason_order:
-            record[r] = _fmt(counts.get(r, 0))
+        if as_heatmap:
+            # Numeric proportions (0..1) so cells can be color-shaded by missingness
+            record: dict[str, Any] = {
+                "columns": column,
+                "total_n": str(total),
+                "complete": _prop(complete),
+            }
+            for r in reason_order:
+                record[r] = _prop(counts.get(r, 0))
+        else:
+
+            def _fmt(count: int) -> str:
+                pct = round(100 * count / total) if total > 0 else 0
+                return f"{count} ({pct}%)"
+
+            record = {
+                "columns": column,
+                "total_n": str(total),
+                "complete": _fmt(complete),
+            }
+            # Fill every reason column in the union (0 for reasons this spec doesn't define)
+            for r in reason_order:
+                record[r] = _fmt(counts.get(r, 0))
         records.append(record)
 
     # Build a DataFrame from the records using the available DataFrame library
@@ -2770,9 +2792,6 @@ def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) ->
 
         breakdown_df = pd.DataFrame(records)
 
-    title = "Missing Values by Reason"
-    subtitle = "Counts and percentages of complete values and each missing reason, per column."
-
     cols_labels = {
         "columns": "Column",
         "total_n": "Total N",
@@ -2783,23 +2802,55 @@ def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) ->
 
     value_columns = ["total_n", "complete"] + reason_order
 
-    gt_tbl = (
-        GT(breakdown_df)
-        .tab_header(title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle)
-        .opt_table_font(font=google_font(name="IBM Plex Sans"))
-        .opt_align_table_header(align="left")
-        .cols_label(cases=cols_labels)
-        .cols_align(align="right", columns=value_columns)
-        .cols_align(align="left", columns="columns")
-        .tab_style(
-            style=style.text(font=google_font(name="IBM Plex Mono"), size="12px"),
-            locations=loc.body(columns=value_columns),
+    if as_heatmap:
+        title = "Missing Pattern Heatmap"
+        subtitle = "Proportion of each missing reason per column (darker = more missing)."
+        prop_columns = ["complete"] + reason_order
+
+        gt_tbl = (
+            GT(breakdown_df)
+            .tab_header(
+                title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle
+            )
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .cols_label(cases=cols_labels)
+            .cols_align(align="center", columns=value_columns)
+            .cols_align(align="left", columns="columns")
+            .fmt_percent(columns=prop_columns, decimals=0)
+            .data_color(
+                columns=reason_order,
+                palette=["#F5F5F5", "#000000"],
+                domain=[0, 1],
+            )
+            .tab_style(
+                style=style.text(weight="bold"),
+                locations=loc.body(columns="columns"),
+            )
         )
-        .tab_style(
-            style=style.text(weight="bold"),
-            locations=loc.body(columns="columns"),
+    else:
+        title = "Missing Values by Reason"
+        subtitle = "Counts and percentages of complete values and each missing reason, per column."
+
+        gt_tbl = (
+            GT(breakdown_df)
+            .tab_header(
+                title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle
+            )
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .cols_label(cases=cols_labels)
+            .cols_align(align="right", columns=value_columns)
+            .cols_align(align="left", columns="columns")
+            .tab_style(
+                style=style.text(font=google_font(name="IBM Plex Mono"), size="12px"),
+                locations=loc.body(columns=value_columns),
+            )
+            .tab_style(
+                style=style.text(weight="bold"),
+                locations=loc.body(columns="columns"),
+            )
         )
-    )
 
     if version("great_tables") >= "0.17.0":
         gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
@@ -2807,7 +2858,9 @@ def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) ->
     return gt_tbl
 
 
-def missing_vals_tbl(data: Any, missing: dict[str, MissingSpec] | None = None) -> GT:
+def missing_vals_tbl(
+    data: Any, missing: dict[str, MissingSpec] | None = None, as_heatmap: bool = False
+) -> GT:
     """
     Display a table that shows the missing values in the input table.
 
@@ -2832,6 +2885,10 @@ def missing_vals_tbl(data: Any, missing: dict[str, MissingSpec] | None = None) -
         An optional dictionary mapping column names to [`MissingSpec`](`pointblank.MissingSpec`)
         objects. When provided, the function renders a structured breakdown of missingness by
         reason for the specified columns (rather than the default sector heatmap).
+    as_heatmap
+        Only applies when `missing=` is provided. When `True`, render the per-reason proportions as
+        a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of
+        the count/percentage text breakdown. Default is `False`.
 
     Returns
     -------
@@ -2913,7 +2970,7 @@ def missing_vals_tbl(data: Any, missing: dict[str, MissingSpec] | None = None) -
     # (count and percentage of complete values and each missing reason, per column) instead of
     # the default sector heatmap
     if missing is not None:
-        return _build_structured_missing_tbl(data=data, missing=missing)
+        return _build_structured_missing_tbl(data=data, missing=missing, as_heatmap=as_heatmap)
 
     # Get the number of rows in the table
     n_rows = get_row_count(data)
@@ -10894,6 +10951,168 @@ class Validate:
 
         return self
 
+    def col_missing_only_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        allowed: Collection[Any] | None = None,
+        min_val: float | int | None = None,
+        max_val: float | int | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate:
+        """
+        Validate that a column contains only documented codes and legitimate values.
+
+        The `col_missing_only_coded()` method checks that every value in a column is *accounted
+        for*: it is either a declared missing-value code (a sentinel in the
+        [`MissingSpec`](`pointblank.MissingSpec`), or a null when `null_is_missing=True`), or a
+        legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set)
+        and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a
+        legitimate real value is flagged — this catches *undocumented* sentinel codes (e.g., a
+        stray `-95`) that aren't part of the spec.
+
+        At least one of `allowed=`, `min_val=`, or `max_val=` must be provided so that legitimate
+        real values can be distinguished from undocumented codes. This validation operates over the
+        number of test units equal to the number of rows in the table.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) declaring the documented sentinel codes.
+        allowed
+            An explicit set of legitimate real values. A value in this set passes. Can be combined
+            with `min_val=`/`max_val=` (a value passes if it satisfies either constraint).
+        min_val
+            Lower bound (inclusive) of the legitimate real-value range.
+        max_val
+            Upper bound (inclusive) of the legitimate real-value range.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        The `age` column should contain real ages in `[0, 120]` or the documented codes `-99`/`-98`.
+        The value `-95` is an *undocumented* code and should be flagged:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame({"age": [34, -98, 41, -95, 29, -99, 55]})
+
+        age_missing = pb.MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_only_coded(columns="age", missing=age_missing, min_val=0, max_val=120)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports one failing test unit: the row where `age` is `-95`, which is
+        neither a real age in range nor a declared sentinel.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(
+                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
+            )
+
+        if allowed is None and min_val is None and max_val is None:
+            raise ValueError(
+                "`col_missing_only_coded()` requires at least one of `allowed=`, `min_val=`, or "
+                "`max_val=` so that legitimate real values can be distinguished from undocumented "
+                "codes."
+            )
+
+        sentinels = missing.sentinel_values()
+        count_null = missing.null_is_missing
+        allowed_list = list(allowed) if allowed is not None else None
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        columns = _resolve_columns(columns)
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={
+                    "sentinels": sentinels,
+                    "count_null": count_null,
+                    "allowed": allowed_list,
+                    "min_val": min_val,
+                    "max_val": max_val,
+                    "spec": missing,
+                },
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def rows_distinct(
         self,
         columns_subset: str | list[str] | None = None,
@@ -11374,6 +11593,167 @@ class Validate:
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             column=columns_subset,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_missing_consistent(
+        self,
+        columns: list[str],
+        missing: MissingSpec,
+        when_reason: str,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate:
+        """
+        Validate that related columns share a consistent missingness pattern for a given reason.
+
+        The `col_missing_consistent()` method checks that, across a set of related columns, the
+        "missing for a specific reason" status is *consistent*: for each row, either *none* of the
+        columns are missing for `when_reason=`, or *all* of them are. This is useful for structured
+        survey or clinical data where a skip pattern should propagate across related fields — for
+        example, if a question wasn't asked (`"not_asked"`) then all of its dependent fields should
+        also be coded `"not_asked"`.
+
+        A value is considered "missing for the reason" when it is one of the sentinel values mapped
+        to `when_reason=` in the [`MissingSpec`](`pointblank.MissingSpec`) (and, when the reason is
+        the spec's `null_reason` and `null_is_missing=True`, an actual null). This validation
+        operates over the number of test units equal to the number of rows in the table. A row fails
+        when some — but not all — of the columns are missing for the given reason.
+
+        Parameters
+        ----------
+        columns
+            A list of related columns to check for consistent missingness.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values and their
+            reasons for the columns.
+        when_reason
+            The reason label whose presence should be consistent across `columns=`. If one column
+            in a row is missing for this reason, all of them should be.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Here, `income_source` and `income_amount` should both be coded `"not_asked"` (`-99`) together
+        when the income question wasn't asked. The last row is inconsistent — only one field is
+        coded `-99`:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "income_source": [1, -99, 2, -99],
+                "income_amount": [50000, -99, 42000, 38000],
+            }
+        )
+
+        income_missing = pb.MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_consistent(
+                columns=["income_source", "income_amount"],
+                missing=income_missing,
+                when_reason="not_asked",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports one failing test unit: the final row, where `income_source` is coded
+        `-99` (`"not_asked"`) but `income_amount` is a real value.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(
+                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
+            )
+
+        if isinstance(columns, str):
+            columns = [columns]
+        columns = list(columns)
+        if len(columns) < 2:
+            raise ValueError(
+                "`col_missing_consistent()` requires at least two columns to compare."
+            )
+
+        # Resolve which sentinel values (and whether nulls) represent `when_reason`
+        sentinels = missing.values_for_reason(when_reason)
+        count_null = missing.null_is_missing and missing.null_reason == when_reason
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=columns,
+            values={
+                "sentinels": sentinels,
+                "count_null": count_null,
+                "when_reason": when_reason,
+                "spec": missing,
+            },
             pre=pre,
             segments=segments,
             thresholds=thresholds,
@@ -14260,6 +14640,7 @@ class Validate:
                         "col_vals_null",
                         "col_vals_not_null",
                         "col_missing_coded",
+                        "col_missing_only_coded",
                         "col_vals_increasing",
                         "col_vals_decreasing",
                         "col_vals_between",
@@ -14304,6 +14685,16 @@ class Validate:
                             results_tbl = interrogate_not_null(tbl=tbl, column=column)
                         elif assertion_method == "missing_coded":
                             results_tbl = interrogate_missing_coded(tbl=tbl, column=column)
+                        elif assertion_method == "missing_only_coded":
+                            results_tbl = interrogate_missing_only_coded(
+                                tbl=tbl,
+                                column=column,
+                                sentinels=value["sentinels"],
+                                count_null=value["count_null"],
+                                allowed=value["allowed"],
+                                min_val=value["min_val"],
+                                max_val=value["max_val"],
+                            )
 
                         elif assertion_type == "col_vals_increasing":
                             from pointblank._interrogation import interrogate_increasing
@@ -14426,6 +14817,14 @@ class Validate:
 
                     elif assertion_type == "rows_complete":
                         results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
+
+                    elif assertion_type == "col_missing_consistent":
+                        results_tbl = interrogate_missing_consistent(
+                            tbl=data_tbl_step,
+                            columns=column,
+                            sentinels=value["sentinels"],
+                            count_null=value["count_null"],
+                        )
 
                     elif assertion_type == "prompt":
                         from pointblank._interrogation import interrogate_prompt
@@ -15048,7 +15447,8 @@ class Validate:
             if (
                 collect_extracts
                 and assertion_type
-                in ROW_BASED_VALIDATION_TYPES + ["rows_distinct", "rows_complete"]
+                in ROW_BASED_VALIDATION_TYPES
+                + ["rows_distinct", "rows_complete", "col_missing_consistent"]
                 and tbl_type not in IBIS_BACKENDS
             ):
                 # Add row numbers to the results table
@@ -17480,6 +17880,20 @@ class Validate:
             ]:
                 values_upd.append("&mdash;")
 
+            elif assertion_type[i] in ["col_missing_consistent"]:
+                # Show the reason being checked for cross-column consistency
+                values_upd.append(f"when_reason = {value.get('when_reason')}")
+
+            elif assertion_type[i] in ["col_missing_only_coded"]:
+                # Show the allowed real values and/or range used to define legitimate values
+                parts = []
+                if value.get("allowed") is not None:
+                    allowed_str = str(value["allowed"])[1:-1].replace("'", "")
+                    parts.append(f"allowed = {allowed_str}")
+                if value.get("min_val") is not None or value.get("max_val") is not None:
+                    parts.append(f"[{value.get('min_val')}, {value.get('max_val')}]")
+                values_upd.append("<br/>".join(parts) if parts else "&mdash;")
+
             elif assertion_type[i] in ["col_pct_null"]:
                 # Extract p and tol from the values dict for nice formatting
                 p_value = value["p"]
@@ -17632,6 +18046,20 @@ class Validate:
             # If the assertion type is not recognized, add the value as a string
             else:  # pragma: no cover
                 values_upd.append(str(value))  # pragma: no cover
+
+        # Annotate `col_vals_*` steps that carry a `missing=` MissingSpec so the report shows that
+        # structured-missing values (sentinels and, optionally, nulls) were excluded from the check.
+        # The `missing` spec is fetched directly from the validation steps (it isn't a report field).
+        missing_specs = [getattr(v, "missing", None) for v in self.validation_info]
+        for i, spec in enumerate(missing_specs):
+            if spec is None or i >= len(values_upd):
+                continue
+            reasons = ", ".join(spec.reasons_list()) if hasattr(spec, "reasons_list") else ""
+            annotation = (
+                "<br/><span style='font-size: 9px; color: #999999;'>"
+                f"missing-aware: {reasons}</span>"
+            )
+            values_upd[i] = f"{values_upd[i]}{annotation}"
 
         # Remove the `inclusive` entry from the dictionary
         validation_info_dict.pop("inclusive")
@@ -18357,7 +18785,7 @@ class Validate:
         # if get_row_count(extract) == 0:
         #    return "No rows were extracted."
 
-        if assertion_type in ROW_BASED_VALIDATION_TYPES + ["rows_complete"]:
+        if assertion_type in ROW_BASED_VALIDATION_TYPES + ["rows_complete", "col_missing_consistent"]:
             # Get the extracted data for the step
             extract = self.get_data_extracts(i=i, frame=True)
 
@@ -18438,6 +18866,20 @@ class Validate:
 
         else:
             step_report = None  # pragma: no cover
+
+        # If the step is associated with a MissingSpec, append a legend of the missing-value codes
+        # and their reasons so that sentinel values appearing in the failing rows can be interpreted
+        step_spec = getattr(self.validation_info[i - 1], "missing", None)
+        if step_spec is None and isinstance(values, MissingSpec):
+            # col_missing_coded stores the spec directly in `values`
+            step_spec = values
+        if step_spec is None and isinstance(values, dict) and isinstance(values.get("spec"), MissingSpec):
+            # col_missing_only_coded and col_missing_consistent stash the spec under `values["spec"]`
+            step_spec = values["spec"]
+        if step_spec is not None and step_report is not None:
+            legend_html = _missing_legend_html(step_spec)
+            if legend_html and hasattr(step_report, "tab_source_note"):
+                step_report = step_report.tab_source_note(source_note=html(legend_html))
 
         return step_report
 
@@ -19828,6 +20270,21 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "col_missing_only_coded":
+        return _create_text_col_missing_only_coded(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
+        )
+
+    if assertion_type == "col_missing_consistent":
+        return _create_text_col_missing_consistent(
+            lang=lang,
+            columns=column,
+            value=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "conjointly":
         return _create_text_conjointly(lang=lang, for_failure=for_failure)
 
@@ -20271,6 +20728,38 @@ def _create_text_col_missing_coded(lang: str, column: str | None, for_failure: b
     )
 
 
+def _create_text_col_missing_only_coded(
+    lang: str, column: str | None, for_failure: bool = False
+) -> str:
+    """Create autobrief/failure text for col_missing_only_coded validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    return EXPECT_FAIL_TEXT[f"col_missing_only_coded_{type_}_text"][lang].format(
+        column_text=column_text,
+    )
+
+
+def _create_text_col_missing_consistent(
+    lang: str, columns: Any, value: dict, for_failure: bool = False
+) -> str:
+    """Create autobrief/failure text for col_missing_consistent validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    if isinstance(columns, (list, tuple)):
+        columns_text = _prep_values_text(values=list(columns), lang=lang, limit=5)
+    else:
+        columns_text = _prep_column_text(column=columns)
+
+    reason = value.get("when_reason") if isinstance(value, dict) else None
+
+    return EXPECT_FAIL_TEXT[f"col_missing_consistent_{type_}_text"][lang].format(
+        columns_text=columns_text,
+        reason=reason,
+    )
+
+
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -20616,6 +21105,21 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
     return data_tbl
+
+
+def _missing_legend_html(spec: Any) -> str:
+    """Build an HTML legend of a MissingSpec's sentinel codes and their reasons, for step reports."""
+    if not hasattr(spec, "reasons"):
+        return ""
+    items = [f"<code>{value}</code> &rarr; {reason}" for value, reason in spec.reasons.items()]
+    if getattr(spec, "null_is_missing", False):
+        items.append(f"<code>null</code> &rarr; {spec.null_reason}")
+    if not items:
+        return ""
+    return (
+        "<div style='font-size: 10px; color: #555555; padding-top: 4px;'>"
+        "<strong>Missing codes:</strong> " + "; ".join(items) + "</div>"
+    )
 
 
 def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
@@ -22344,6 +22848,17 @@ def _step_report_row_based(
             text = STEP_REPORT_TEXT["rows_complete_all"][lang]
         else:
             text = STEP_REPORT_TEXT["rows_complete_subset"][lang]
+    elif assertion_type == "col_missing_coded":
+        text = f"{column} is missing-coded"
+    elif assertion_type == "col_missing_only_coded":
+        text = f"{column} only documented codes"
+    elif assertion_type == "col_missing_consistent":
+        cols = ", ".join(column) if isinstance(column, (list, tuple)) else str(column)
+        reason = values.get("when_reason") if isinstance(values, dict) else None
+        text = f"consistent &ldquo;{reason}&rdquo; across {{{cols}}}"
+    else:
+        # Fallback for any other assertion type: show the assertion type name
+        text = str(assertion_type)
 
     # Wrap assertion text in a <code> tag
     text = (
