@@ -755,6 +755,52 @@ def col_pct_null(
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
 
+def col_pct_missing(
+    data_tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    max_pct: float,
+) -> bool:
+    """Check that the percentage of missing values in a column does not exceed `max_pct`.
+
+    Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
+    null values. The percentage is computed over the total number of rows.
+    """
+    nw_frame = nw.from_native(data_tbl)
+
+    # Build a boolean expression that flags missing values
+    missing_expr = None
+    if sentinels:
+        missing_expr = nw.col(column).is_in(sentinels)
+    if count_null:
+        null_expr = nw.col(column).is_null()
+        missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
+
+    if missing_expr is None:
+        # Nothing counts as missing under this spec/filter
+        return 0.0 <= max_pct
+
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_missing=missing_expr.cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_missing: int = int(stats["n_missing"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_missing = int(nw_frame.select(missing_expr.cast(nw.Int32).sum()).item())
+
+    if total_rows == 0:
+        return True
+
+    pct_missing = n_missing / total_rows
+    return pct_missing <= max_pct
+
+
 def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
     """
     Check if DataFrame column count matches expected count.
@@ -2528,6 +2574,19 @@ def interrogate_null(tbl: IntoFrame, column: str) -> Any:
 def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
     """Not null interrogation."""
 
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
+    """Missing-coded interrogation.
+
+    A row passes when its value is *not* a raw null. Under the structured-missingness model, every
+    absence should be expressed with an explicit sentinel code (which is non-null), so a raw null
+    represents *uncoded* missingness and fails the test unit.
+    """
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
