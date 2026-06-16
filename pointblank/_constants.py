@@ -94,6 +94,7 @@ ROW_BASED_VALIDATION_TYPES = [
     "col_vals_decreasing",
     "col_vals_null",
     "col_vals_not_null",
+    "col_missing_coded",
     "col_vals_expr",
     "conjointly",
     "prompt",
