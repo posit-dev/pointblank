@@ -84,3 +84,28 @@ class TestStructuredMissingTbl:
         spec = pb.MissingSpec(reasons={-99: "not_asked"})
         with pytest.raises(ValueError, match="not found"):
             pb.missing_vals_tbl(tbl_pl, missing={"nonexistent": spec})
+
+
+class TestMissingHeatmap:
+    def test_heatmap_returns_gt(self, tbl_pl, specs):
+        result = pb.missing_vals_tbl(tbl_pl, missing=specs, as_heatmap=True)
+        assert isinstance(result, GT)
+
+    def test_heatmap_title_and_labels(self, tbl_pl, specs):
+        html = pb.missing_vals_tbl(tbl_pl, missing=specs, as_heatmap=True).as_raw_html()
+        assert "Missing Pattern Heatmap" in html
+        assert "Refused" in html and "Below Threshold" in html
+        assert "%" in html  # proportions formatted as percentages
+
+    def test_heatmap_pandas(self, specs):
+        tbl = pd.DataFrame(
+            {
+                "age": [34, -98, 41, -99, 29, -98, 55, None],
+                "income": [50000, -99, -1, None, 42000, -99, 38000, 61000],
+            }
+        )
+        assert isinstance(pb.missing_vals_tbl(tbl, missing=specs, as_heatmap=True), GT)
+
+    def test_as_heatmap_ignored_without_missing(self, tbl_pl):
+        # as_heatmap only applies with missing=; default sector view still returned
+        assert isinstance(pb.missing_vals_tbl(tbl_pl, as_heatmap=True), GT)
