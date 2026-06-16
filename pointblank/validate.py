@@ -10576,6 +10576,145 @@ class Validate:
             self._add_validation(validation_info=val_info)
 
         return self
+
+    def col_missing_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate:
+        """
+        Validate that all missing values in a column are *coded* (no uncoded nulls).
+
+        The `col_missing_coded()` validation method checks that every absent value in a column is
+        expressed with an explicit missing-value code, rather than a raw null. Under the structured
+        missingness model (see [`MissingSpec`](`pointblank.MissingSpec`)), every absence should
+        carry a *reason* — encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null
+        represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing
+        test units while declared sentinel values and real values pass.
+
+        This validation operates over the number of test units equal to the number of rows in the
+        table (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values (and their
+            reasons) that encode missingness for this column. The spec documents which codes are
+            considered valid expressions of missingness.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Here, the `age` column codes its missingness with sentinel values, except for one row that
+        has a raw null (an uncoded absence):
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame({"age": [34, -98, 41, None, 29, -99, 55, 38]})
+
+        age_missing = pb.MissingSpec(
+            reasons={-99: "not_asked", -98: "refused", -97: "dont_know"},
+        )
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_coded(columns="age", missing=age_missing)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports a single failing test unit: the row where `age` is a raw null, which
+        represents missingness without a documented reason.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(
+                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
+            )
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        columns = _resolve_columns(columns)
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def rows_distinct(
         self,
         columns_subset: str | list[str] | None = None,
