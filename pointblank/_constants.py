@@ -21,6 +21,7 @@ COMPATIBLE_DTYPES = {
     "within_spec": ["str"],
     "null": ["str", "numeric", "bool", "datetime", "duration"],
     "not_null": ["str", "numeric", "bool", "datetime", "duration"],
+    "missing_coded": ["str", "numeric", "bool", "datetime", "duration"],
 }
 
 ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
