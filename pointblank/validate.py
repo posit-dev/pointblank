@@ -63,6 +63,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_missing,
     col_pct_null,
     col_schema_match,
     col_vals_expr,
@@ -75,6 +76,7 @@ from pointblank._interrogation import (
     interrogate_le,
     interrogate_lt,
     interrogate_ne,
+    interrogate_missing_coded,
     interrogate_not_null,
     interrogate_notin,
     interrogate_null,
@@ -85,6 +87,7 @@ from pointblank._interrogation import (
     rows_complete,
 )
 from pointblank._typing import SegmentSpec
+from pointblank.missing import MissingSpec
 from pointblank._utils import (
     _check_any_df_lib,
     _check_invalid_fields,
@@ -14080,6 +14083,7 @@ class Validate:
                         "col_vals_le",
                         "col_vals_null",
                         "col_vals_not_null",
+                        "col_missing_coded",
                         "col_vals_increasing",
                         "col_vals_decreasing",
                         "col_vals_between",
@@ -14122,6 +14126,8 @@ class Validate:
                             results_tbl = interrogate_null(tbl=tbl, column=column)
                         elif assertion_method == "not_null":
                             results_tbl = interrogate_not_null(tbl=tbl, column=column)
+                        elif assertion_method == "missing_coded":
+                            results_tbl = interrogate_missing_coded(tbl=tbl, column=column)
 
                         elif assertion_type == "col_vals_increasing":
                             from pointblank._interrogation import interrogate_increasing
@@ -14199,6 +14205,22 @@ class Validate:
                             column=column,
                             p=value["p"],
                             bound_finder=value["bound_finder"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "col_pct_missing":
+                        result_bool = col_pct_missing(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            sentinels=value["sentinels"],
+                            count_null=value["count_null"],
+                            max_pct=value["max_pct"],
                         )
 
                         validation.all_passed = result_bool
@@ -17267,6 +17289,7 @@ class Validate:
             elif assertion_type[i] in [
                 "col_vals_null",
                 "col_vals_not_null",
+                "col_missing_coded",
                 "col_exists",
                 "rows_distinct",
                 "rows_complete",
@@ -17281,6 +17304,16 @@ class Validate:
                 bound_finder = value.get("bound_finder")
                 tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
                 values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
+
+            elif assertion_type[i] in ["col_pct_missing"]:
+                # Format the max_pct and any reason/category filter for display
+                max_pct_value = value["max_pct"]
+                filter_line = ""
+                if value.get("reason") is not None:
+                    filter_line = f"<br/>reason = {value['reason']}"
+                elif value.get("category") is not None:
+                    filter_line = f"<br/>category = {value['category']}"
+                values_upd.append(f"max_pct = {max_pct_value}{filter_line}")
 
             elif assertion_type[i] in ["data_freshness"]:
                 # Format max_age nicely for display
@@ -19593,6 +19626,22 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
             locale=locale if locale else lang,
             n_rows=n_rows,
+        )
+
+    if assertion_type == "col_pct_missing":
+        return _create_text_col_pct_missing(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
+        )
+
+    if assertion_type == "col_missing_coded":
+        return _create_text_col_missing_coded(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
         )
 
     if assertion_type == "conjointly":
