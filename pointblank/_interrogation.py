@@ -2610,6 +2610,82 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     return nw_tbl.to_native()
 
 
+def interrogate_missing_only_coded(
+    tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    allowed: list | None,
+    min_val: Any,
+    max_val: Any,
+) -> Any:
+    """Missing-only-coded interrogation.
+
+    A row passes when its value is either a declared sentinel (a documented missing code), a null
+    (when `count_null=True`), or a legitimate "real" value — one in `allowed` or within the
+    `[min_val, max_val]` range. Any other value is treated as an *undocumented* code and fails.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    good = None
+
+    def _or(expr):
+        nonlocal good
+        good = expr if good is None else (good | expr)
+
+    if sentinels:
+        _or(nw.col(column).is_in(sentinels).fill_null(False))
+    if count_null:
+        _or(nw.col(column).is_null())
+    if allowed:
+        _or(nw.col(column).is_in(allowed).fill_null(False))
+    if min_val is not None or max_val is not None:
+        range_expr = nw.lit(True)
+        if min_val is not None:
+            range_expr = range_expr & (nw.col(column) >= min_val)
+        if max_val is not None:
+            range_expr = range_expr & (nw.col(column) <= max_val)
+        _or(range_expr.fill_null(False))
+
+    if good is None:
+        good = nw.lit(False)
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=good)
+    return result_tbl.to_native()
+
+
+def interrogate_missing_consistent(
+    tbl: IntoFrame, columns: list[str], sentinels: list, count_null: bool
+) -> Any:
+    """Cross-column missing-consistency interrogation.
+
+    Given a set of related `columns`, a row passes when the "missing for a given reason" status is
+    consistent across all of them: either *none* of the columns carry the reason, or *all* of them
+    do. A row fails when some-but-not-all of the columns are missing for that reason. Missingness
+    for the reason is encoded by the `sentinels` values (and, when `count_null=True`, actual nulls).
+    """
+    nw_tbl = nw.from_native(tbl)
+    n_cols = len(columns)
+
+    count_expr = None
+    for c in columns:
+        if sentinels:
+            col_expr = nw.col(c).is_in(sentinels).fill_null(False)
+        else:
+            col_expr = nw.lit(False)  # noqa
+        if count_null:
+            col_expr = col_expr | nw.col(c).is_null()
+        col_count = col_expr.cast(nw.Int32)
+        count_expr = col_count if count_expr is None else (count_expr + col_count)
+
+    result_tbl = nw_tbl.with_columns(_n_reason_=count_expr)
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=((nw.col("_n_reason_") == 0) | (nw.col("_n_reason_") == n_cols))
+    )
+    result_tbl = result_tbl.drop("_n_reason_")
+    return result_tbl.to_native()
+
+
 def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
     """Missing-coded interrogation.
 
