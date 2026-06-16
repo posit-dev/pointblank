@@ -7,6 +7,7 @@ from pathlib import Path
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
+from pointblank.missing import MissingSpec
 from pointblank.schema import Schema
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
@@ -390,6 +391,29 @@ class Validate:
         p: float,
         tol: Tolerance = 0,
         thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate: ...
+    def col_pct_missing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        max_pct: float,
+        reason: str | None = None,
+        category: str | None = None,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate: ...
+    def col_missing_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
