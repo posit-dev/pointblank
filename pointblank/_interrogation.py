@@ -2580,6 +2580,36 @@ def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
     return result_tbl.to_native()
 
 
+def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> Any:
+    """Mark rows with structured-missing values as passing.
+
+    Given a `results_tbl` that already carries a boolean `pb_is_good_` column, force that column to
+    `True` for any row whose value in `column` is a declared sentinel of `spec` (a `MissingSpec`),
+    or a null when `spec.null_is_missing` is `True`. This implements the `missing=` exclusion on
+    `col_vals_*` validation methods: sentinel/missing values are excluded from the check (they pass)
+    so that only the "real" values are validated.
+    """
+    sentinels = spec.sentinel_values()
+
+    # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
+    # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
+    # sentinel mask is explicitly filled with `False` for null rows.
+    mask = None
+    if sentinels:
+        mask = nw.col(column).is_in(sentinels).fill_null(False)
+    if spec.null_is_missing:
+        null_expr = nw.col(column).is_null()
+        mask = null_expr if mask is None else (mask | null_expr)
+
+    if mask is None:
+        return results_tbl
+
+    nw_tbl = nw.from_native(results_tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
+    return nw_tbl.to_native()
+
+
 def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
     """Missing-coded interrogation.
 
