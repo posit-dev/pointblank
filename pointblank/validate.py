@@ -10404,6 +10404,178 @@ class Validate:
 
         return self
 
+    def col_pct_missing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        max_pct: float,
+        reason: str | None = None,
+        category: str | None = None,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+    ) -> Validate:
+        """
+        Validate that the percentage of *structured* missing values stays within a limit.
+
+        The `col_pct_missing()` validation method checks whether the percentage of missing values
+        in a column is at most `max_pct=`. Unlike [`col_pct_null()`](`pointblank.Validate.col_pct_null`),
+        which only considers actual null values, this method uses a
+        [`MissingSpec`](`pointblank.MissingSpec`) to define which values count as missing: declared
+        sentinel values (e.g., `-99` for `"refused"`) and, when `null_is_missing=True`, actual null
+        values. This validation operates at the column level, generating a single validation step
+        per column that passes when the missing percentage does not exceed `max_pct=`.
+
+        You can narrow the check to a single reason (via `reason=`) or a category of reasons (via
+        `category=`), making it possible to assert things like "at most 10% of values were refused"
+        or "at most 15% are item nonresponse".
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values (and their
+            reasons) that encode missingness for this column.
+        max_pct
+            The maximum allowable percentage of missing values, expressed as a decimal between
+            `0.0` and `1.0`. For example, `max_pct=0.20` means at most 20% of values may be missing.
+        reason
+            If provided, only count missing values whose reason matches this label. Cannot be
+            combined with `category=`.
+        category
+            If provided, only count missing values whose reason falls in this category (as defined
+            in `MissingSpec.categories`). Cannot be combined with `reason=`.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Survey data often encodes missingness with sentinel values rather than nulls. Here, the
+        `age` column uses `-99` (`"not_asked"`), `-98` (`"refused"`), and `-97` (`"dont_know"`):
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {"age": [34, -98, 41, -99, 29, -98, 55, 38]},
+        )
+
+        age_missing = pb.MissingSpec(
+            reasons={-99: "not_asked", -98: "refused", -97: "dont_know"},
+            categories={"item_nonresponse": ["refused", "dont_know"]},
+        )
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_missing(columns="age", missing=age_missing, max_pct=0.5)
+            .col_pct_missing(columns="age", missing=age_missing, reason="refused", max_pct=0.30)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(
+                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
+            )
+
+        if reason is not None and category is not None:
+            raise ValueError("Only one of `reason=` or `category=` can be specified.")
+
+        if not 0.0 <= max_pct <= 1.0:
+            raise ValueError(f"`max_pct=` must be between 0.0 and 1.0, got {max_pct}.")
+
+        # Resolve which sentinel values (and whether nulls) count as missing for this step
+        if reason is not None:
+            sentinels = missing.values_for_reason(reason)
+            count_null = missing.null_is_missing and missing.null_reason == reason
+        elif category is not None:
+            sentinels = missing.values_for_category(category)
+            cat_reasons = (missing.categories or {}).get(category, [])
+            count_null = missing.null_is_missing and missing.null_reason in cat_reasons
+        else:
+            sentinels = missing.sentinel_values()
+            count_null = missing.null_is_missing
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={
+                    "sentinels": sentinels,
+                    "count_null": count_null,
+                    "max_pct": max_pct,
+                    "reason": reason,
+                    "category": category,
+                },
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
     def rows_distinct(
         self,
         columns_subset: str | list[str] | None = None,
