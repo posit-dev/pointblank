@@ -61,6 +61,7 @@ from pointblank._constants_translations import (
 from pointblank._interrogation import (
     NumberOfTestUnits,
     SpeciallyValidation,
+    apply_missing_exclusion,
     col_count_match,
     col_exists,
     col_pct_missing,
@@ -2677,7 +2678,136 @@ def _generate_display_table(
     return gt_tbl
 
 
-def missing_vals_tbl(data: Any) -> GT:
+def _prettify_reason_label(reason: str) -> str:
+    """Turn a snake_case reason label into a Title Case display label (e.g. 'not_asked' ->
+    'Not Asked')."""
+    return reason.replace("_", " ").title()
+
+
+def _build_structured_missing_tbl(data: Any, missing: dict[str, MissingSpec]) -> GT:
+    """Build a structured-missingness breakdown table (one row per column, columns for the count
+    and percentage of complete values and of each missing reason)."""
+    if not isinstance(missing, dict):
+        raise TypeError(
+            f"`missing=` must be a dict mapping column names to MissingSpec objects, "
+            f"got {type(missing).__name__}."
+        )
+    for col_name, spec in missing.items():
+        if not isinstance(spec, MissingSpec):
+            raise TypeError(
+                f"`missing[{col_name!r}]` must be a MissingSpec, got {type(spec).__name__}."
+            )
+
+    nw_frame = nw.from_native(data)
+    is_lazy = isinstance(nw_frame, nw.LazyFrame)
+
+    available_columns = list(nw_frame.columns)
+
+    # Build the ordered union of reason labels across all specs (first-seen order)
+    reason_order: list[str] = []
+    for spec in missing.values():
+        for r in spec.reasons_list():
+            if r not in reason_order:
+                reason_order.append(r)
+
+    records: list[dict[str, Any]] = []
+    for column, spec in missing.items():
+        if column not in available_columns:
+            raise ValueError(
+                f"Column '{column}' given in `missing=` was not found in the table."
+            )
+
+        # Build one aggregation per reason that has an expression (sentinels and/or nulls)
+        select_exprs: dict[str, Any] = {"__total__": nw.len()}
+        reason_alias: dict[str, str] = {}
+        for i, r in enumerate(spec.reasons_list()):
+            sentinels = spec.values_for_reason(r)
+            expr = None
+            if sentinels:
+                expr = nw.col(column).is_in(sentinels)
+            if r == spec.null_reason and spec.null_is_missing:
+                null_expr = nw.col(column).is_null()
+                expr = null_expr if expr is None else (expr | null_expr)
+            if expr is not None:
+                alias = f"__r{i}__"
+                reason_alias[r] = alias
+                select_exprs[alias] = expr.cast(nw.Int32).sum()
+
+        out = nw_frame.select(**select_exprs)
+        if is_lazy:
+            out = out.collect()
+
+        total = int(out["__total__"][0])
+        counts: dict[str, int] = {}
+        for r in spec.reasons_list():
+            counts[r] = int(out[reason_alias[r]][0]) if r in reason_alias else 0
+
+        total_missing = sum(counts.values())
+        complete = total - total_missing
+
+        def _fmt(count: int) -> str:
+            pct = round(100 * count / total) if total > 0 else 0
+            return f"{count} ({pct}%)"
+
+        record: dict[str, Any] = {
+            "columns": column,
+            "total_n": str(total),
+            "complete": _fmt(complete),
+        }
+        # Fill every reason column in the union (0 for reasons this spec doesn't define)
+        for r in reason_order:
+            record[r] = _fmt(counts.get(r, 0))
+        records.append(record)
+
+    # Build a DataFrame from the records using the available DataFrame library
+    df_lib_gt = _select_df_lib(preference="polars")
+    if df_lib_gt.__name__ == "polars":
+        import polars as pl
+
+        breakdown_df = pl.DataFrame(records)
+    else:
+        import pandas as pd
+
+        breakdown_df = pd.DataFrame(records)
+
+    title = "Missing Values by Reason"
+    subtitle = "Counts and percentages of complete values and each missing reason, per column."
+
+    cols_labels = {
+        "columns": "Column",
+        "total_n": "Total N",
+        "complete": "Complete",
+    }
+    for r in reason_order:
+        cols_labels[r] = _prettify_reason_label(r)
+
+    value_columns = ["total_n", "complete"] + reason_order
+
+    gt_tbl = (
+        GT(breakdown_df)
+        .tab_header(title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle)
+        .opt_table_font(font=google_font(name="IBM Plex Sans"))
+        .opt_align_table_header(align="left")
+        .cols_label(cases=cols_labels)
+        .cols_align(align="right", columns=value_columns)
+        .cols_align(align="left", columns="columns")
+        .tab_style(
+            style=style.text(font=google_font(name="IBM Plex Mono"), size="12px"),
+            locations=loc.body(columns=value_columns),
+        )
+        .tab_style(
+            style=style.text(weight="bold"),
+            locations=loc.body(columns="columns"),
+        )
+    )
+
+    if version("great_tables") >= "0.17.0":
+        gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+
+    return gt_tbl
+
+
+def missing_vals_tbl(data: Any, missing: dict[str, MissingSpec] | None = None) -> GT:
     """
     Display a table that shows the missing values in the input table.
 
@@ -2685,12 +2815,23 @@ def missing_vals_tbl(data: Any) -> GT:
     table. The table is displayed using the Great Tables API, which allows for further customization
     of the table's appearance if so desired.
 
+    By default, missingness is treated as binary (a value is either Null or it isn't) and the
+    function renders a sector-based heatmap of the proportion of Null values across the rows of each
+    column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
+    is supplied, the function instead renders a *structured missingness* breakdown: one row per
+    column with the count and percentage of complete values and of each missing *reason* (e.g.,
+    "Refused", "Not Asked", "Unknown").
+
     Parameters
     ----------
     data
         The table for which to display the missing values. This could be a DataFrame object, an
         Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
         Read the *Supported Input Table Types* section for details on the supported table types.
+    missing
+        An optional dictionary mapping column names to [`MissingSpec`](`pointblank.MissingSpec`)
+        objects. When provided, the function renders a structured breakdown of missingness by
+        reason for the specified columns (rather than the default sector heatmap).
 
     Returns
     -------
@@ -2767,6 +2908,12 @@ def missing_vals_tbl(data: Any) -> GT:
     tbl_type = _get_tbl_type(data=data)
     if "pyspark" not in tbl_type:
         data = copy.deepcopy(data)
+
+    # If a `missing=` spec mapping is provided, render the structured missingness breakdown
+    # (count and percentage of complete values and each missing reason, per column) instead of
+    # the default sector heatmap
+    if missing is not None:
+        return _build_structured_missing_tbl(data=data, missing=missing)
 
     # Get the number of rows in the table
     n_rows = get_row_count(data)
@@ -3818,6 +3965,7 @@ class _ValidationInfo:
     values: Any | list[Any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
+    missing: Any | None = None
     pre: Callable | None = None
     segments: Any | None = None
     thresholds: Thresholds | None = None
@@ -5211,6 +5359,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -5483,6 +5632,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -5500,6 +5650,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -5779,6 +5930,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -5796,6 +5948,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -6075,6 +6228,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -6092,6 +6246,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -6369,6 +6524,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -6386,6 +6542,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -6666,6 +6823,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -6683,6 +6841,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -6963,6 +7122,7 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -6982,6 +7142,7 @@ class Validate:
         right: float | int | Column,
         inclusive: tuple[bool, bool] = (True, True),
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -7288,6 +7449,7 @@ class Validate:
                 values=value,
                 inclusive=inclusive,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -7307,6 +7469,7 @@ class Validate:
         right: float | int | Column,
         inclusive: tuple[bool, bool] = (True, True),
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -7613,6 +7776,7 @@ class Validate:
                 values=value,
                 inclusive=inclusive,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -7629,6 +7793,7 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         set: Collection[Any],
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -7935,6 +8100,7 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=set,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -7951,6 +8117,7 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         set: Collection[Any],
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -8229,6 +8396,7 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=set,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -8247,6 +8415,7 @@ class Validate:
         allow_stationary: bool = False,
         decreasing_tol: float | None = None,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -8425,6 +8594,7 @@ class Validate:
                 column=column,
                 values="",
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -8447,6 +8617,7 @@ class Validate:
         allow_stationary: bool = False,
         increasing_tol: float | None = None,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -8625,6 +8796,7 @@ class Validate:
                 column=column,
                 values="",
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -9143,6 +9315,7 @@ class Validate:
         pattern: str,
         na_pass: bool = False,
         inverse: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -9394,6 +9567,7 @@ class Validate:
                 column=column,
                 values=values,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -9411,6 +9585,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         spec: str,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -9684,6 +9859,7 @@ class Validate:
                 column=column,
                 values=values,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
@@ -14197,6 +14373,14 @@ class Validate:
 
                             results_tbl = interrogate_within_spec(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
+                            )
+
+                        # Apply structured-missingness exclusion: any row whose value is a
+                        # declared sentinel (or a null when `null_is_missing=True`) is treated
+                        # as a passing test unit, so only the "real" values are validated
+                        if validation.missing is not None and results_tbl is not None:
+                            results_tbl = apply_missing_exclusion(
+                                results_tbl=results_tbl, column=column, spec=validation.missing
                             )
 
                     elif assertion_type == "col_pct_null":
