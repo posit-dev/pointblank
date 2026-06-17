@@ -2680,12 +2680,6 @@ def _generate_display_table(
     return gt_tbl
 
 
-def _prettify_reason_label(reason: str) -> str:
-    """Turn a snake_case reason label into a Title Case display label (e.g. 'not_asked' ->
-    'Not Asked')."""
-    return reason.replace("_", " ").title()
-
-
 def _build_structured_missing_tbl(
     data: Any, missing: dict[str, MissingSpec], as_heatmap: bool = False
 ) -> GT:
@@ -2711,12 +2705,17 @@ def _build_structured_missing_tbl(
 
     available_columns = list(nw_frame.columns)
 
-    # Build the ordered union of reason labels across all specs (first-seen order)
+    # Build the ordered union of *declared* (coded) reason labels across all specs (first-seen
+    # order). Raw Null/None/NA values are tallied separately in a fixed "Null" column rather than
+    # being treated as a reason, since they are not part of any MissingSpec.
     reason_order: list[str] = []
     for spec in missing.values():
-        for r in spec.reasons_list():
+        for r in spec.reasons.values():
             if r not in reason_order:
                 reason_order.append(r)
+
+    # A "Null" column is shown only if at least one spec counts raw nulls as missing
+    has_null_col = any(spec.null_is_missing for spec in missing.values())
 
     records: list[dict[str, Any]] = []
     for column, spec in missing.items():
@@ -2725,60 +2724,56 @@ def _build_structured_missing_tbl(
                 f"Column '{column}' given in `missing=` was not found in the table."
             )
 
-        # Build one aggregation per reason that has an expression (sentinels and/or nulls)
+        # One aggregation per declared reason (sentinel values only), plus a separate raw-null
+        # count when the spec treats nulls as missing; coded reasons and raw nulls are kept distinct
+        declared_reasons = list(dict.fromkeys(spec.reasons.values()))
         select_exprs: dict[str, Any] = {"__total__": nw.len()}
         reason_alias: dict[str, str] = {}
-        for i, r in enumerate(spec.reasons_list()):
-            sentinels = spec.values_for_reason(r)
-            expr = None
-            if sentinels:
-                expr = nw.col(column).is_in(sentinels)
-            if r == spec.null_reason and spec.null_is_missing:
-                null_expr = nw.col(column).is_null()
-                expr = null_expr if expr is None else (expr | null_expr)
-            if expr is not None:
-                alias = f"__r{i}__"
-                reason_alias[r] = alias
-                select_exprs[alias] = expr.cast(nw.Int32).sum()
+        for i, r in enumerate(declared_reasons):
+            reason_alias[r] = f"__r{i}__"
+            select_exprs[reason_alias[r]] = (
+                nw.col(column).is_in(spec.values_for_reason(r)).cast(nw.Int32).sum()
+            )
+        if spec.null_is_missing:
+            select_exprs["__null__"] = nw.col(column).is_null().cast(nw.Int32).sum()
 
         out = nw_frame.select(**select_exprs)
         if is_lazy:
             out = out.collect()
 
         total = int(out["__total__"][0])
-        counts: dict[str, int] = {}
-        for r in spec.reasons_list():
-            counts[r] = int(out[reason_alias[r]][0]) if r in reason_alias else 0
+        coded_counts = {r: int(out[reason_alias[r]][0]) for r in declared_reasons}
+        n_null = int(out["__null__"][0]) if spec.null_is_missing else 0
 
-        total_missing = sum(counts.values())
+        total_missing = sum(coded_counts.values()) + n_null
         complete = total - total_missing
+
+        # A coded reason only *applies* to a column if its spec declares it; non-applicable reasons
+        # render as an em dash (not "0"). The "Null" column applies only when null_is_missing=True.
+        applicable = set(declared_reasons)
 
         def _prop(count: int) -> float:
             return (count / total) if total > 0 else 0.0
 
         if as_heatmap:
-            # Numeric proportions (0..1) so cells can be color-shaded by missingness
-            record: dict[str, Any] = {
-                "columns": column,
-                "total_n": str(total),
-                "complete": _prop(complete),
-            }
+            # Numeric proportions (0..1) so reason cells can be color-shaded; non-applicable cells
+            # are left as None (shown as an em dash, uncolored)
+            record: dict[str, Any] = {"columns": column, "complete": _prop(complete)}
             for r in reason_order:
-                record[r] = _prop(counts.get(r, 0))
+                record[r] = _prop(coded_counts.get(r, 0)) if r in applicable else None
+            if has_null_col:
+                record["null"] = _prop(n_null) if spec.null_is_missing else None
         else:
 
             def _fmt(count: int) -> str:
                 pct = round(100 * count / total) if total > 0 else 0
                 return f"{count} ({pct}%)"
 
-            record = {
-                "columns": column,
-                "total_n": str(total),
-                "complete": _fmt(complete),
-            }
-            # Fill every reason column in the union (0 for reasons this spec doesn't define)
+            record = {"columns": column, "complete": _fmt(complete)}
             for r in reason_order:
-                record[r] = _fmt(counts.get(r, 0))
+                record[r] = _fmt(coded_counts.get(r, 0)) if r in applicable else "—"
+            if has_null_col:
+                record["null"] = _fmt(n_null) if spec.null_is_missing else "—"
         records.append(record)
 
     # Build a DataFrame from the records using the available DataFrame library
@@ -2792,26 +2787,52 @@ def _build_structured_missing_tbl(
 
         breakdown_df = pd.DataFrame(records)
 
-    cols_labels = {
-        "columns": "Column",
-        "total_n": "Total N",
-        "complete": "Complete",
-    }
-    for r in reason_order:
-        cols_labels[r] = _prettify_reason_label(r)
+    # Reason columns keep their raw input form as labels (e.g. "not_asked", not "Not Asked"); the
+    # fixed columns are relabeled. The total row count is already shown in the header, so there's no
+    # redundant "Total N" column. Raw nulls appear in a fixed "Null" column (styled like "Complete"),
+    # not as a reason.
+    cols_labels = {"columns": "Column", "complete": "Complete"}
+    if has_null_col:
+        cols_labels["null"] = "Null"
 
-    value_columns = ["total_n", "complete"] + reason_order
+    value_columns = ["complete"] + reason_order + (["null"] if has_null_col else [])
+
+    # Build a header that matches the default `missing_vals_tbl()` look: a plain (large) title in
+    # IBM Plex Sans and a subtitle showing the table type and dimensions
+    tbl_type = _get_tbl_type(data=data)
+    n_rows_total = get_row_count(data)
+    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        columns=len(available_columns), rows=n_rows_total, font_size="10px"
+    )
+    combined_subtitle = (
+        "<div>"
+        '<div style="padding-top: 0; padding-bottom: 7px;">'
+        f"{table_type_html}"
+        f"{tbl_dims_html}"
+        "</div>"
+        "</div>"
+    )
+
+    # The left "Column" column is rendered in monospace, matching the default report's body font
+    column_name_style = style.text(
+        color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+    )
+    # The reason column labels keep their raw input form and are shown in monospace
+    reason_label_style = style.text(font=google_font(name="IBM Plex Mono"), size="12px")
+
+    # Columns that should show an em dash for non-applicable cells (reason columns + the Null column)
+    em_dash_columns = reason_order + (["null"] if has_null_col else [])
 
     if as_heatmap:
         title = "Missing Pattern Heatmap"
-        subtitle = "Proportion of each missing reason per column (darker = more missing)."
-        prop_columns = ["complete"] + reason_order
+        # "complete" and "null" are shown as plain percentages (uncolored, like the default report);
+        # only the coded reason columns are color-shaded by proportion
+        prop_columns = ["complete"] + reason_order + (["null"] if has_null_col else [])
 
         gt_tbl = (
             GT(breakdown_df)
-            .tab_header(
-                title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle
-            )
+            .tab_header(title=title, subtitle=html(combined_subtitle))
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .opt_align_table_header(align="left")
             .cols_label(cases=cols_labels)
@@ -2822,21 +2843,18 @@ def _build_structured_missing_tbl(
                 columns=reason_order,
                 palette=["#F5F5F5", "#000000"],
                 domain=[0, 1],
+                na_color="#FFFFFF",
             )
-            .tab_style(
-                style=style.text(weight="bold"),
-                locations=loc.body(columns="columns"),
-            )
+            .sub_missing(columns=em_dash_columns, missing_text="—")
+            .tab_style(style=column_name_style, locations=loc.body(columns="columns"))
+            .tab_style(style=reason_label_style, locations=loc.column_labels(columns=reason_order))
         )
     else:
         title = "Missing Values by Reason"
-        subtitle = "Counts and percentages of complete values and each missing reason, per column."
 
         gt_tbl = (
             GT(breakdown_df)
-            .tab_header(
-                title=html(f"<div style='font-size: 14px;'>{title}</div>"), subtitle=subtitle
-            )
+            .tab_header(title=title, subtitle=html(combined_subtitle))
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .opt_align_table_header(align="left")
             .cols_label(cases=cols_labels)
@@ -2846,11 +2864,14 @@ def _build_structured_missing_tbl(
                 style=style.text(font=google_font(name="IBM Plex Mono"), size="12px"),
                 locations=loc.body(columns=value_columns),
             )
-            .tab_style(
-                style=style.text(weight="bold"),
-                locations=loc.body(columns="columns"),
-            )
+            .tab_style(style=column_name_style, locations=loc.body(columns="columns"))
+            .tab_style(style=reason_label_style, locations=loc.column_labels(columns=reason_order))
         )
+
+    # Group only the coded reasons under a "Missing Reasons" spanner. Raw nulls live in the fixed
+    # "Null" column (styled like "Complete"), so they aren't mistaken for declared spec reasons.
+    if reason_order:
+        gt_tbl = gt_tbl.tab_spanner(label="Missing Reasons", columns=reason_order)
 
     if version("great_tables") >= "0.17.0":
         gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
@@ -2873,7 +2894,17 @@ def missing_vals_tbl(
     column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
     is supplied, the function instead renders a *structured missingness* breakdown: one row per
     column with the count and percentage of complete values and of each missing *reason* (e.g.,
-    "Refused", "Not Asked", "Unknown").
+    `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner
+    and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of
+    the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
+    they aren't mistaken for declared reasons.
+
+    Note that supplying `missing=` produces a *different report* than the default view: it is a
+    distinct visualization (a per-reason breakdown table, or a per-reason heatmap with
+    `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles
+    differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing
+    Pattern Heatmap" for the structured views), and the shared header/title styling makes the family
+    resemblance clear.
 
     Parameters
     ----------
@@ -2884,7 +2915,10 @@ def missing_vals_tbl(
     missing
         An optional dictionary mapping column names to [`MissingSpec`](`pointblank.MissingSpec`)
         objects. When provided, the function renders a structured breakdown of missingness by
-        reason for the specified columns (rather than the default sector heatmap).
+        reason for the specified columns (rather than the default sector heatmap). The reason
+        columns are the union of reasons across the supplied specs; a reason that isn't defined for
+        a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved
+        reason (shown as `0 (0%)`).
     as_heatmap
         Only applies when `missing=` is provided. When `True`, render the per-reason proportions as
         a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of

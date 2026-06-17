@@ -94,6 +94,16 @@ When you pass a `missing=` mapping of column names to `MissingSpec` objects, `mi
 switches from the sector heatmap to a *structured breakdown*: one row per column with the count and
 percentage of complete values and of each missing reason.
 
+::: {.callout-note}
+## Supplying `missing=` produces a different report
+
+The structured breakdown is a *distinct visualization*, not an annotated version of the default
+sector heatmap. Adding `missing=` changes the table's whole layout. The report title changes too
+(from "Missing Values" to "Missing Values by Reason", or "Missing Pattern Heatmap" with
+`as_heatmap=True`), and the shared title styling and monospaced column list keep the two views
+recognizably part of the same family.
+:::
+
 ```{python}
 import polars as pl
 
@@ -112,9 +122,17 @@ specs = {
 pb.missing_vals_tbl(survey, missing=specs)
 ```
 
-Each `MissingSpec` declares the sentinel values for a column and the reason each one represents. By
-default, actual `Null` values are also counted as missing (with the reason `"unknown"`); set
-`null_is_missing=False` on the spec if raw nulls should be treated as real values instead.
+Each `MissingSpec` declares the sentinel values for a column and the reason each one represents.
+Those declared (coded) reasons are grouped under the **Missing Reasons** spanner. By default, actual
+`Null` values are also counted as missing; because those are raw `Null`/`None`/`NA` values and *not*
+part of the spec, they're tallied in a fixed **Null** column at the far right (styled like
+**Complete**), rather than as a reason. Set `null_is_missing=False` on the spec if raw nulls should
+be treated as real values instead — then there's no **Null** column at all.
+
+The reason columns are the *union* of reasons across all the specs you provide. When a reason isn't
+defined for a particular column, that cell shows an em dash (`—`) rather than `0`. This signals
+"not applicable to this column", as distinct from a reason that *is* defined but simply wasn't
+observed (which shows `0 (0%)`).
 
 ### Viewing the pattern as a heatmap
 
