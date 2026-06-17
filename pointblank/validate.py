@@ -10802,6 +10802,7 @@ class Validate:
                     "max_pct": max_pct,
                     "reason": reason,
                     "category": category,
+                    "spec": missing,
                 },
                 thresholds=thresholds,
                 actions=actions,
@@ -14309,6 +14310,15 @@ class Validate:
             )
 
             validation.autobrief = autobrief
+
+            # If the step carries structured-missingness context (a `missing=` spec or a dedicated
+            # missing method), attach a one-line note summarizing the codes and any reason/range
+            # filter. This keeps the VALUES cell minimal while surfacing detail in the Notes section.
+            missing_note = _build_missing_note(validation)
+            if missing_note is not None:
+                validation._add_note(
+                    key="missing_spec", markdown=missing_note[0], text=missing_note[1]
+                )
 
             # ------------------------------------------------
             # Bypassing the validation step if conditions met
@@ -17881,18 +17891,16 @@ class Validate:
                 values_upd.append("&mdash;")
 
             elif assertion_type[i] in ["col_missing_consistent"]:
-                # Show the reason being checked for cross-column consistency
-                values_upd.append(f"when_reason = {value.get('when_reason')}")
+                # Minimal cell: a compact badge (the reason and columns live in the step note)
+                values_upd.append(
+                    "<span style='font-weight: 600; letter-spacing: 0.5px;'>CONSISTENT</span>"
+                )
 
             elif assertion_type[i] in ["col_missing_only_coded"]:
-                # Show the allowed real values and/or range used to define legitimate values
-                parts = []
-                if value.get("allowed") is not None:
-                    allowed_str = str(value["allowed"])[1:-1].replace("'", "")
-                    parts.append(f"allowed = {allowed_str}")
-                if value.get("min_val") is not None or value.get("max_val") is not None:
-                    parts.append(f"[{value.get('min_val')}, {value.get('max_val')}]")
-                values_upd.append("<br/>".join(parts) if parts else "&mdash;")
+                # Minimal cell: a compact badge (allowed values/range live in the step note)
+                values_upd.append(
+                    "<span style='font-weight: 600; letter-spacing: 0.5px;'>ONLY CODED</span>"
+                )
 
             elif assertion_type[i] in ["col_pct_null"]:
                 # Extract p and tol from the values dict for nice formatting
@@ -17904,14 +17912,8 @@ class Validate:
                 values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
 
             elif assertion_type[i] in ["col_pct_missing"]:
-                # Format the max_pct and any reason/category filter for display
-                max_pct_value = value["max_pct"]
-                filter_line = ""
-                if value.get("reason") is not None:
-                    filter_line = f"<br/>reason = {value['reason']}"
-                elif value.get("category") is not None:
-                    filter_line = f"<br/>category = {value['category']}"
-                values_upd.append(f"max_pct = {max_pct_value}{filter_line}")
+                # Minimal cell: just the threshold (reason/category detail lives in the step note)
+                values_upd.append(f"&le; {value['max_pct']}")
 
             elif assertion_type[i] in ["data_freshness"]:
                 # Format max_age nicely for display
@@ -18054,10 +18056,10 @@ class Validate:
         for i, spec in enumerate(missing_specs):
             if spec is None or i >= len(values_upd):
                 continue
-            reasons = ", ".join(spec.reasons_list()) if hasattr(spec, "reasons_list") else ""
+            # Keep the cell minimal: a compact badge. The reason/code detail lives in the step note.
             annotation = (
-                "<br/><span style='font-size: 9px; color: #999999;'>"
-                f"missing-aware: {reasons}</span>"
+                "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+                "color: #7B68A6;'>MISSING-AWARE</span>"
             )
             values_upd[i] = f"{values_upd[i]}{annotation}"
 
@@ -21105,6 +21107,76 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
     return data_tbl
+
+
+def _resolve_step_missing_spec(validation: Any) -> Any:
+    """Return the `MissingSpec` associated with a validation step, if any.
+
+    The spec lives in different places depending on the method: on `validation.missing` for
+    `col_vals_*` steps that used `missing=`; directly in `validation.values` for `col_missing_coded`;
+    and under `validation.values["spec"]` for `col_pct_missing`, `col_missing_only_coded`, and
+    `col_missing_consistent`.
+    """
+    spec = getattr(validation, "missing", None)
+    if spec is not None:
+        return spec
+    vals = getattr(validation, "values", None)
+    if isinstance(vals, MissingSpec):
+        return vals
+    if isinstance(vals, dict) and isinstance(vals.get("spec"), MissingSpec):
+        return vals["spec"]
+    return None
+
+
+def _build_missing_note(validation: Any) -> tuple[str, str] | None:
+    """Build a one-line (markdown, text) note summarizing a step's structured-missingness context.
+
+    Returns `None` when the step has no associated `MissingSpec`.
+    """
+    spec = _resolve_step_missing_spec(validation)
+    if spec is None or not hasattr(spec, "reasons"):
+        return None
+
+    codes_md = ", ".join(f"`{value}`&rarr;{reason}" for value, reason in spec.reasons.items())
+    codes_tx = ", ".join(f"{value}->{reason}" for value, reason in spec.reasons.items())
+    if getattr(spec, "null_is_missing", False):
+        codes_md += f", `null`&rarr;{spec.null_reason}"
+        codes_tx += f", null->{spec.null_reason}"
+
+    md = f"**Missing codes:** {codes_md}"
+    tx = f"Missing codes: {codes_tx}"
+
+    # Method-specific context appended to the one-line summary
+    assertion_type = getattr(validation, "assertion_type", None)
+    vals = getattr(validation, "values", None)
+
+    if assertion_type == "col_pct_missing" and isinstance(vals, dict):
+        if vals.get("reason") is not None:
+            md += f". Counting reason `{vals['reason']}`"
+            tx += f". Counting reason {vals['reason']}"
+        elif vals.get("category") is not None:
+            md += f". Counting category `{vals['category']}`"
+            tx += f". Counting category {vals['category']}"
+    elif assertion_type == "col_missing_only_coded" and isinstance(vals, dict):
+        bits_md = []
+        bits_tx = []
+        if vals.get("allowed") is not None:
+            allowed_str = ", ".join(str(a) for a in vals["allowed"])
+            bits_md.append(f"allowed {{{allowed_str}}}")
+            bits_tx.append(f"allowed {{{allowed_str}}}")
+        if vals.get("min_val") is not None or vals.get("max_val") is not None:
+            rng = f"[{vals.get('min_val')}, {vals.get('max_val')}]"
+            bits_md.append(f"range {rng}")
+            bits_tx.append(f"range {rng}")
+        if bits_md:
+            md += f". Legitimate values: {', '.join(bits_md)}"
+            tx += f". Legitimate values: {', '.join(bits_tx)}"
+    elif assertion_type == "col_missing_consistent" and isinstance(vals, dict):
+        if vals.get("when_reason") is not None:
+            md += f". Consistency required for reason `{vals['when_reason']}`"
+            tx += f". Consistency required for reason {vals['when_reason']}"
+
+    return md, tx
 
 
 def _missing_legend_html(spec: Any) -> str:
