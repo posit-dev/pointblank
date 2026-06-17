@@ -31,9 +31,7 @@ class TestColMissingConsistent:
         assert info.n_failed == 1  # last row: only one column is -99
 
     def test_all_consistent_passes(self, spec):
-        tbl = pl.DataFrame(
-            {"a": [1, -99, 2, -99], "b": [5, -99, 6, -99]}
-        )
+        tbl = pl.DataFrame({"a": [1, -99, 2, -99], "b": [5, -99, 6, -99]})
         v = (
             pb.Validate(data=tbl)
             .col_missing_consistent(columns=["a", "b"], missing=spec, when_reason="not_asked")
@@ -54,9 +52,7 @@ class TestColMissingConsistent:
         assert _info(v).n_failed == 1
 
     def test_three_columns(self, spec):
-        tbl = pl.DataFrame(
-            {"a": [-99, 1, -99], "b": [-99, 2, -99], "c": [-99, 3, 7]}
-        )
+        tbl = pl.DataFrame({"a": [-99, 1, -99], "b": [-99, 2, -99], "c": [-99, 3, 7]})
         v = (
             pb.Validate(data=tbl)
             .col_missing_consistent(columns=["a", "b", "c"], missing=spec, when_reason="not_asked")
@@ -80,9 +76,7 @@ class TestColMissingConsistent:
             )
 
     def test_pandas_backend(self, spec):
-        tbl = pd.DataFrame(
-            {"a": [1, -99, -99], "b": [5, -99, 6]}
-        )
+        tbl = pd.DataFrame({"a": [1, -99, -99], "b": [5, -99, 6]})
         v = (
             pb.Validate(data=tbl)
             .col_missing_consistent(columns=["a", "b"], missing=spec, when_reason="not_asked")
