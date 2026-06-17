@@ -41,6 +41,7 @@ def _missing_spec_to_code(spec: MissingSpec) -> str:
         parts.append(f"description={spec.description!r}")
     return f"pb.MissingSpec({', '.join(parts)})"
 
+
 if TYPE_CHECKING:
     from typing import Literal
 

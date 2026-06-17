@@ -2720,9 +2720,7 @@ def _build_structured_missing_tbl(
     records: list[dict[str, Any]] = []
     for column, spec in missing.items():
         if column not in available_columns:
-            raise ValueError(
-                f"Column '{column}' given in `missing=` was not found in the table."
-            )
+            raise ValueError(f"Column '{column}' given in `missing=` was not found in the table.")
 
         # One aggregation per declared reason (sentinel values only), plus a separate raw-null
         # count when the spec treats nulls as missing; coded reasons and raw nulls are kept distinct
@@ -10814,9 +10812,7 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         if not isinstance(missing, MissingSpec):
-            raise TypeError(
-                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
-            )
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
 
         if reason is not None and category is not None:
             raise ValueError("Only one of `reason=` or `category=` can be specified.")
@@ -11026,9 +11022,7 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         if not isinstance(missing, MissingSpec):
-            raise TypeError(
-                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
-            )
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -11214,9 +11208,7 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         if not isinstance(missing, MissingSpec):
-            raise TypeError(
-                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
-            )
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
 
         if allowed is None and min_val is None and max_val is None:
             raise ValueError(
@@ -11916,17 +11908,13 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         if not isinstance(missing, MissingSpec):
-            raise TypeError(
-                f"`missing=` must be a MissingSpec, got {type(missing).__name__}."
-            )
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
 
         if isinstance(columns, str):
             columns = [columns]
         columns = list(columns)
         if len(columns) < 2:
-            raise ValueError(
-                "`col_missing_consistent()` requires at least two columns to compare."
-            )
+            raise ValueError("`col_missing_consistent()` requires at least two columns to compare.")
 
         # Resolve which sentinel values (and whether nulls) represent `when_reason`
         sentinels = missing.values_for_reason(when_reason)
@@ -18981,7 +18969,10 @@ class Validate:
         # if get_row_count(extract) == 0:
         #    return "No rows were extracted."
 
-        if assertion_type in ROW_BASED_VALIDATION_TYPES + ["rows_complete", "col_missing_consistent"]:
+        if assertion_type in ROW_BASED_VALIDATION_TYPES + [
+            "rows_complete",
+            "col_missing_consistent",
+        ]:
             # Get the extracted data for the step
             extract = self.get_data_extracts(i=i, frame=True)
 
@@ -19069,7 +19060,11 @@ class Validate:
         if step_spec is None and isinstance(values, MissingSpec):
             # col_missing_coded stores the spec directly in `values`
             step_spec = values
-        if step_spec is None and isinstance(values, dict) and isinstance(values.get("spec"), MissingSpec):
+        if (
+            step_spec is None
+            and isinstance(values, dict)
+            and isinstance(values.get("spec"), MissingSpec)
+        ):
             # col_missing_only_coded and col_missing_consistent stash the spec under `values["spec"]`
             step_spec = values["spec"]
         if step_spec is not None and step_report is not None:

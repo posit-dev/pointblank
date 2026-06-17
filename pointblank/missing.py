@@ -140,9 +140,7 @@ class MissingSpec:
                 )
 
         if not isinstance(self.null_reason, str):
-            raise TypeError(
-                f"null_reason must be a string, got {type(self.null_reason).__name__}."
-            )
+            raise TypeError(f"null_reason must be a string, got {type(self.null_reason).__name__}.")
 
         if self.categories is not None:
             if not isinstance(self.categories, dict):
@@ -309,7 +307,12 @@ class MissingSpec:
         """
         reasons = dict(_CDISC_NULL_FLAVORS)
         categories = {
-            "unknown": ["no_information", "unknown", "asked_but_unknown", "temporarily_unavailable"],
+            "unknown": [
+                "no_information",
+                "unknown",
+                "asked_but_unknown",
+                "temporarily_unavailable",
+            ],
             "not_applicable": ["not_applicable", "not_asked", "not_present"],
             "boundary": ["positive_infinity", "negative_infinity"],
         }
