@@ -755,6 +755,52 @@ def col_pct_null(
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
 
+def col_pct_missing(
+    data_tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    max_pct: float,
+) -> bool:
+    """Check that the percentage of missing values in a column does not exceed `max_pct`.
+
+    Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
+    null values. The percentage is computed over the total number of rows.
+    """
+    nw_frame = nw.from_native(data_tbl)
+
+    # Build a boolean expression that flags missing values
+    missing_expr = None
+    if sentinels:
+        missing_expr = nw.col(column).is_in(sentinels)
+    if count_null:
+        null_expr = nw.col(column).is_null()
+        missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
+
+    if missing_expr is None:
+        # Nothing counts as missing under this spec/filter
+        return 0.0 <= max_pct
+
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_missing=missing_expr.cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_missing: int = int(stats["n_missing"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_missing = int(nw_frame.select(missing_expr.cast(nw.Int32).sum()).item())
+
+    if total_rows == 0:
+        return True
+
+    pct_missing = n_missing / total_rows
+    return pct_missing <= max_pct
+
+
 def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
     """
     Check if DataFrame column count matches expected count.
@@ -2528,6 +2574,125 @@ def interrogate_null(tbl: IntoFrame, column: str) -> Any:
 def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
     """Not null interrogation."""
 
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> Any:
+    """Mark rows with structured-missing values as passing.
+
+    Given a `results_tbl` that already carries a boolean `pb_is_good_` column, force that column to
+    `True` for any row whose value in `column` is a declared sentinel of `spec` (a `MissingSpec`),
+    or a null when `spec.null_is_missing` is `True`. This implements the `missing=` exclusion on
+    `col_vals_*` validation methods: sentinel/missing values are excluded from the check (they pass)
+    so that only the "real" values are validated.
+    """
+    sentinels = spec.sentinel_values()
+
+    # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
+    # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
+    # sentinel mask is explicitly filled with `False` for null rows.
+    mask = None
+    if sentinels:
+        mask = nw.col(column).is_in(sentinels).fill_null(False)
+    if spec.null_is_missing:
+        null_expr = nw.col(column).is_null()
+        mask = null_expr if mask is None else (mask | null_expr)
+
+    if mask is None:
+        return results_tbl
+
+    nw_tbl = nw.from_native(results_tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
+    return nw_tbl.to_native()
+
+
+def interrogate_missing_only_coded(
+    tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    allowed: list | None,
+    min_val: Any,
+    max_val: Any,
+) -> Any:
+    """Missing-only-coded interrogation.
+
+    A row passes when its value is either a declared sentinel (a documented missing code), a null
+    (when `count_null=True`), or a legitimate "real" value — one in `allowed` or within the
+    `[min_val, max_val]` range. Any other value is treated as an *undocumented* code and fails.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    good = None
+
+    def _or(expr):
+        nonlocal good
+        good = expr if good is None else (good | expr)
+
+    if sentinels:
+        _or(nw.col(column).is_in(sentinels).fill_null(False))
+    if count_null:
+        _or(nw.col(column).is_null())
+    if allowed:
+        _or(nw.col(column).is_in(allowed).fill_null(False))
+    if min_val is not None or max_val is not None:
+        range_expr = nw.lit(True)
+        if min_val is not None:
+            range_expr = range_expr & (nw.col(column) >= min_val)
+        if max_val is not None:
+            range_expr = range_expr & (nw.col(column) <= max_val)
+        _or(range_expr.fill_null(False))
+
+    if good is None:
+        good = nw.lit(False)
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=good)
+    return result_tbl.to_native()
+
+
+def interrogate_missing_consistent(
+    tbl: IntoFrame, columns: list[str], sentinels: list, count_null: bool
+) -> Any:
+    """Cross-column missing-consistency interrogation.
+
+    Given a set of related `columns`, a row passes when the "missing for a given reason" status is
+    consistent across all of them: either *none* of the columns carry the reason, or *all* of them
+    do. A row fails when some-but-not-all of the columns are missing for that reason. Missingness
+    for the reason is encoded by the `sentinels` values (and, when `count_null=True`, actual nulls).
+    """
+    nw_tbl = nw.from_native(tbl)
+    n_cols = len(columns)
+
+    count_expr = None
+    for c in columns:
+        if sentinels:
+            col_expr = nw.col(c).is_in(sentinels).fill_null(False)
+        else:
+            col_expr = nw.lit(False)  # noqa
+        if count_null:
+            col_expr = col_expr | nw.col(c).is_null()
+        col_count = col_expr.cast(nw.Int32)
+        count_expr = col_count if count_expr is None else (count_expr + col_count)
+
+    result_tbl = nw_tbl.with_columns(_n_reason_=count_expr)
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=((nw.col("_n_reason_") == 0) | (nw.col("_n_reason_") == n_cols))
+    )
+    result_tbl = result_tbl.drop("_n_reason_")
+    return result_tbl.to_native()
+
+
+def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
+    """Missing-coded interrogation.
+
+    A row passes when its value is *not* a raw null. Under the structured-missingness model, every
+    absence should be expressed with an explicit sentinel code (which is non-null), so a raw null
+    represents *uncoded* missingness and fails the test unit.
+    """
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())

@@ -57,6 +57,7 @@ from pointblank.field import (
 from pointblank.generate.base import GeneratorConfig
 from pointblank.inspect import has_columns, has_rows
 from pointblank.integrations.otel import emit_otel
+from pointblank.missing import MissingSpec
 from pointblank.metadata import (
     ADaMDatasetTemplate,
     ADaMVariableSpec,
@@ -120,6 +121,7 @@ __all__ = [
     "PipelineResult",
     "DataScan",
     "DraftValidation",
+    "MissingSpec",
     "col",
     "ref",
     "expr_col",

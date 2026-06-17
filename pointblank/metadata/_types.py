@@ -223,6 +223,21 @@ class VariableMetadata:
     unit: str | None = None
     unit_system: str | None = None
 
+    def to_missing_spec(self) -> Any:
+        """Build a [`MissingSpec`](`pointblank.MissingSpec`) from this variable's missing values.
+
+        Reads `missing_values` and derives reason labels from `missing_value_labels` or
+        `value_labels` when available.
+
+        Returns
+        -------
+        MissingSpec | None
+            A `MissingSpec` for the variable, or `None` if no missing values are declared.
+        """
+        from pointblank.missing import MissingSpec
+
+        return MissingSpec.from_variable_metadata(self)
+
 
 @dataclass
 class MetadataImport:
@@ -339,6 +354,39 @@ class MetadataImport:
             if var.name == name:
                 return var
         raise KeyError(f"No variable named '{name}' in imported metadata")
+
+    def missing_specs(self) -> dict[str, Any]:
+        """Auto-generate [`MissingSpec`](`pointblank.MissingSpec`) objects for all variables.
+
+        Builds a mapping of column name to `MissingSpec` for every imported variable that declares
+        missing values (e.g., SPSS user-defined missing values, SAS special missing). The result
+        can be passed directly to validation methods (via `missing=`) or to
+        [`missing_vals_tbl()`](`pointblank.missing_vals_tbl`).
+
+        Returns
+        -------
+        dict[str, MissingSpec]
+            A mapping of column name to `MissingSpec`. Variables without declared missing values
+            are omitted.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        meta = pb.import_metadata("survey.sav", format="spss")
+        specs = meta.missing_specs()
+
+        # Use the auto-generated specs in a missingness report
+        pb.missing_vals_tbl(data, missing=specs)
+        ```
+        """
+        specs: dict[str, Any] = {}
+        for var in self.variables:
+            spec = var.to_missing_spec()
+            if spec is not None:
+                specs[var.name] = spec
+        return specs
 
     def get_codelist(self, name: str) -> Codelist:
         """Get a specific codelist by name.

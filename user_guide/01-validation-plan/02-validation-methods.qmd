@@ -293,6 +293,78 @@ In summary, `na_pass=` works like this:
 - `na_pass=True`: missing values pass validation regardless of the condition being tested
 - `na_pass=False` (the default): missing values fail validation
 
+### Structured Missingness with `missing=`
+
+`na_pass=` treats missingness as binary, but real-world data often encodes *why* a value is absent
+using sentinel codes (e.g., `-99` for "not asked", `-98` for "refused"). The
+[`MissingSpec`](`pointblank.MissingSpec`) class captures these codes and their reasons, and most
+validation methods accept a `missing=` argument that uses it.
+
+When you pass `missing=` to a `col_vals_*()` method, declared sentinel values (and, by default,
+`Null` values) are *excluded* from the check, so only the "real" values are validated:
+
+```{python}
+import polars as pl
+
+tbl = pl.DataFrame({"age": [34, -98, 41, -99, 29, 200, 55, None]})
+
+age_missing = pb.MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+
+validation = (
+    pb.Validate(data=tbl)
+    .col_vals_between(columns="age", left=0, right=120, missing=age_missing)
+    .interrogate()
+)
+
+validation
+```
+
+Only the real value `200` is out of range; the sentinel codes and the `Null` are excluded and pass.
+In the report, such steps are marked with a compact `MISSING-AWARE` badge, and a one-line summary of
+the codes appears in the step's notes.
+
+Pointblank also provides dedicated missingness validation methods that use a `MissingSpec`:
+
+- [`Validate.col_pct_missing()`](`Validate.col_pct_missing`): assert the percentage of missing
+  values stays within a limit, optionally filtered by a specific `reason=` or `category=`.
+- [`Validate.col_missing_coded()`](`Validate.col_missing_coded`): assert every absence is expressed
+  as a documented code (no uncoded raw `Null` values).
+- [`Validate.col_missing_only_coded()`](`Validate.col_missing_only_coded`): assert a column contains
+  only documented codes and legitimate values (catching undocumented codes like a stray `-95`),
+  paired with an `allowed=` set or a `min_val`/`max_val` range.
+- [`Validate.col_missing_consistent()`](`Validate.col_missing_consistent`): assert related columns
+  share a consistent missingness pattern for a given reason (e.g., a survey skip pattern).
+
+```{python}
+income_missing = pb.MissingSpec(reasons={-99: "not_asked", -1: "below_threshold"})
+
+survey = pl.DataFrame(
+    {
+        "income_source": [1, -99, 2, -99],
+        "income_amount": [50000, -99, 42000, 38000],
+    }
+)
+
+validation = (
+    pb.Validate(data=survey)
+    # No more than 30% of income values may be "not_asked"
+    .col_pct_missing(columns="income_amount", missing=income_missing, reason="not_asked", max_pct=0.30)
+    # If income wasn't asked, both related columns should be coded together
+    .col_missing_consistent(
+        columns=["income_source", "income_amount"], missing=income_missing, when_reason="not_asked"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+`MissingSpec` also offers pre-built factories for common standards (e.g.,
+`pb.MissingSpec.from_cdisc_null_flavors()`, `pb.MissingSpec.from_sas()`,
+`pb.MissingSpec.from_spss()`), and importing metadata from SPSS/Stata/SAS files can auto-generate
+specs via [`MetadataImport.missing_specs()`](`pointblank.MetadataImport`). For a fuller treatment of
+structured-missingness *reporting*, see the *Missing Values Reporting* article.
+
 ## 2. Row-based Validations
 
 Row-based validations focus on examining properties that span across entire rows rather than

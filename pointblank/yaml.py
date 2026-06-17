@@ -8,8 +8,39 @@ import yaml
 
 from pointblank._agg import is_valid_agg
 from pointblank._utils import _is_lib_present
+from pointblank.missing import MissingSpec
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
+
+
+def _missing_spec_from_dict(spec_def: dict) -> MissingSpec:
+    """Build a `MissingSpec` from a YAML mapping."""
+    if not isinstance(spec_def, dict):
+        raise YAMLValidationError(
+            f"A missing spec must be a mapping, got {type(spec_def).__name__}."
+        )
+    return MissingSpec(
+        reasons=spec_def.get("reasons", {}),
+        categories=spec_def.get("categories"),
+        null_is_missing=spec_def.get("null_is_missing", True),
+        null_reason=spec_def.get("null_reason", "unknown"),
+        description=spec_def.get("description"),
+    )
+
+
+def _missing_spec_to_code(spec: MissingSpec) -> str:
+    """Render a `MissingSpec` as a `pb.MissingSpec(...)` constructor call for code generation."""
+    parts = [f"reasons={spec.reasons!r}"]
+    if spec.categories is not None:
+        parts.append(f"categories={spec.categories!r}")
+    if spec.null_is_missing is not True:
+        parts.append(f"null_is_missing={spec.null_is_missing!r}")
+    if spec.null_reason != "unknown":
+        parts.append(f"null_reason={spec.null_reason!r}")
+    if spec.description is not None:
+        parts.append(f"description={spec.description!r}")
+    return f"pb.MissingSpec({', '.join(parts)})"
+
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -243,6 +274,10 @@ class YAMLValidator:
         "col_vals_decreasing": "col_vals_decreasing",
         "col_vals_within_spec": "col_vals_within_spec",
         "col_pct_null": "col_pct_null",
+        "col_pct_missing": "col_pct_missing",
+        "col_missing_coded": "col_missing_coded",
+        "col_missing_only_coded": "col_missing_only_coded",
+        "col_missing_consistent": "col_missing_consistent",
         "rows_distinct": "rows_distinct",
         "rows_complete": "rows_complete",
         "col_count_match": "col_count_match",
@@ -332,6 +367,7 @@ class YAMLValidator:
             "steps",
             "tbl_name",
             "label",
+            "missing_specs",
             "thresholds",
             "actions",
             "final_actions",
@@ -608,10 +644,45 @@ class YAMLValidator:
                 f"Schema specification must be a dictionary, got: {type(schema_spec)}"
             )
 
+    def _parse_missing_specs(self, config: dict) -> dict[str, MissingSpec]:
+        """Parse the top-level `missing_specs` block into named `MissingSpec` objects."""
+        raw = config.get("missing_specs")
+        if raw is None:
+            return {}
+        if not isinstance(raw, dict):
+            raise YAMLValidationError("'missing_specs' must be a dictionary of named specs")
+        return {name: _missing_spec_from_dict(spec_def) for name, spec_def in raw.items()}
+
+    def _resolve_missing(
+        self, value: Any, missing_specs: Optional[dict[str, MissingSpec]]
+    ) -> MissingSpec:
+        """Resolve a step's `missing=` value to a `MissingSpec`.
+
+        The value can be a named reference into the top-level `missing_specs` block, an inline
+        mapping defining a spec, or an already-constructed `MissingSpec`.
+        """
+        if isinstance(value, MissingSpec):
+            return value
+        if isinstance(value, str):
+            if not missing_specs or value not in missing_specs:
+                available = sorted(missing_specs.keys()) if missing_specs else []
+                raise YAMLValidationError(
+                    f"Unknown missing spec '{value}'. Define it under the top-level "
+                    f"'missing_specs' block. Available: {available}"
+                )
+            return missing_specs[value]
+        if isinstance(value, dict):
+            return _missing_spec_from_dict(value)
+        raise YAMLValidationError(
+            f"Invalid 'missing' value: {value!r}. Use a named reference, an inline mapping, "
+            "or a MissingSpec."
+        )
+
     def _parse_validation_step(
         self,
         step_config: Union[str, dict],
         namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+        missing_specs: Optional[dict[str, MissingSpec]] = None,
     ) -> tuple[str, dict]:
         """Parse a single validation step from YAML configuration.
 
@@ -676,12 +747,21 @@ class YAMLValidator:
             # (e.g., `active: pb.has_columns("col_a")` or `active: false`)
             elif key == "active" and isinstance(value, str):
                 processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+            elif key == "missing":
+                # Pass the raw value through (a spec name, inline mapping, or MissingSpec); it is
+                # resolved to a MissingSpec below, after the loop
+                processed_parameters[key] = value
             else:
                 # Normal processing (requires python: block syntax)
                 processed_parameters[key] = _process_python_expressions(
                     value, namespaces=namespaces
                 )
         parameters = processed_parameters
+
+        # Resolve a `missing=` parameter (used by col_pct_missing, col_missing_coded) into a
+        # MissingSpec, looking up named references in the top-level `missing_specs` block
+        if "missing" in parameters:
+            parameters["missing"] = self._resolve_missing(parameters["missing"], missing_specs)
 
         # Convert `columns=` specification
         if "columns" in parameters:
@@ -832,10 +912,13 @@ class YAMLValidator:
 
         validation = Validate(data, **validate_kwargs)
 
+        # Parse any named missing specs declared at the top level
+        missing_specs = self._parse_missing_specs(config)
+
         # Add validation steps
         for step_config in config["steps"]:
             method_name, parameters = self._parse_validation_step(
-                step_config, namespaces=namespaces
+                step_config, namespaces=namespaces, missing_specs=missing_specs
             )
 
             # Get the method from the validation object
@@ -1644,6 +1727,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     validator = YAMLValidator()
     config = validator.load_config(yaml)
 
+    # Parse any named missing specs so steps referencing them can be rendered
+    missing_specs = validator._parse_missing_specs(config)
+
     # Start building the Python code
     code_lines = []
 
@@ -1780,7 +1866,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
         # Handle string steps (parameterless methods like "rows_distinct")
         if isinstance(step_config, str):
-            method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
+            method_name, parameters = validator._parse_validation_step(
+                step_config, namespaces=None, missing_specs=missing_specs
+            )
             code_lines.append(f"    .{method_name}()")
             continue
 
@@ -1802,7 +1890,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             elif isinstance(step_params["expr"], str):
                 original_expressions["expr"] = step_params["expr"]
 
-        method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
+        method_name, parameters = validator._parse_validation_step(
+            step_config, namespaces=None, missing_specs=missing_specs
+        )
 
         # Apply the original expressions to override the converted lambda functions
         if method_name == "conjointly" and "expressions" in original_expressions:
@@ -1852,6 +1942,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         param_parts.append(f"{key}={columns_str}")
                 else:
                     param_parts.append(f'{key}="{value}"')  # pragma: no cover
+            elif key == "missing" and isinstance(value, MissingSpec):
+                # Render a resolved MissingSpec as a `pb.MissingSpec(...)` constructor call
+                param_parts.append(f"missing={_missing_spec_to_code(value)}")
             elif key == "brief":
                 # Handle `brief=` parameter: can be a boolean or a string
                 if isinstance(value, bool):
