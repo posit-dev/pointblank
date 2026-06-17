@@ -123,9 +123,7 @@ class TestColPctMissing:
             )
 
     def test_multiple_columns(self, age_missing):
-        tbl = pl.DataFrame(
-            {"a": [1, -98, 3, 4], "b": [-99, -99, 3, 4]}
-        )
+        tbl = pl.DataFrame({"a": [1, -98, 3, 4], "b": [-99, -99, 3, 4]})
         validation = (
             pb.Validate(data=tbl)
             .col_pct_missing(columns=["a", "b"], missing=age_missing, max_pct=0.5)
