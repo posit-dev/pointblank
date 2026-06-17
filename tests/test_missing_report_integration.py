@@ -20,11 +20,7 @@ def test_tabular_report_annotates_missing_aware_steps():
 
 def test_tabular_report_no_annotation_without_missing():
     tbl = pl.DataFrame({"age": [34, -98, 41, 200]})
-    v = (
-        pb.Validate(data=tbl)
-        .col_vals_between(columns="age", left=0, right=120)
-        .interrogate()
-    )
+    v = pb.Validate(data=tbl).col_vals_between(columns="age", left=0, right=120).interrogate()
     html = v.get_tabular_report().as_raw_html()
     assert "MISSING-AWARE" not in html
     assert "Missing codes" not in html
