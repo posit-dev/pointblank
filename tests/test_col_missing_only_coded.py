@@ -94,9 +94,7 @@ class TestColMissingOnlyCoded:
         tbl = pl.DataFrame({"age": [34, -98, -95, 41]})
         v = (
             pb.Validate(data=tbl)
-            .col_missing_only_coded(
-                columns="age", missing=spec, min_val=0, max_val=120, brief=True
-            )
+            .col_missing_only_coded(columns="age", missing=spec, min_val=0, max_val=120, brief=True)
             .interrogate()
         )
         assert v.get_tabular_report() is not None
@@ -107,9 +105,7 @@ class TestColMissingOnlyCoded:
         tbl = pl.DataFrame({"age": [34, -95]})
         v = (
             pb.Validate(data=tbl, lang=lang)
-            .col_missing_only_coded(
-                columns="age", missing=spec, min_val=0, max_val=120, brief=True
-            )
+            .col_missing_only_coded(columns="age", missing=spec, min_val=0, max_val=120, brief=True)
             .interrogate()
         )
         assert _info(v).autobrief
