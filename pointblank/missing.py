@@ -1,11 +1,37 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
 __all__ = [
     "MissingSpec",
 ]
+
+
+# Standard HL7/CDISC null flavors mapped to snake_case reason labels
+_CDISC_NULL_FLAVORS: dict[str, str] = {
+    "NI": "no_information",
+    "NA": "not_applicable",
+    "UNK": "unknown",
+    "ASKU": "asked_but_unknown",
+    "NAV": "temporarily_unavailable",
+    "NASK": "not_asked",
+    "OTH": "other",
+    "PINF": "positive_infinity",
+    "NINF": "negative_infinity",
+    "MSK": "masked",
+    "DER": "derived",
+    "QS": "sufficient_quantity",
+    "TRC": "trace",
+    "NP": "not_present",
+}
+
+
+def _slugify(label: Any) -> str:
+    """Convert a human-readable label into a snake_case reason identifier."""
+    slug = re.sub(r"[^0-9a-zA-Z]+", "_", str(label).strip().lower()).strip("_")
+    return slug or "missing"
 
 
 @dataclass
@@ -240,3 +266,233 @@ class MissingSpec:
         if self.null_is_missing:
             seen.setdefault(self.null_reason, None)
         return list(seen.keys())
+
+    # ------------------------------------------------------------------
+    # Factory methods (pre-built specs and metadata-import integration)
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def from_cdisc_null_flavors(
+        cls,
+        null_is_missing: bool = True,
+        null_reason: str = "no_information",
+        description: str | None = "CDISC/HL7 null flavors",
+    ) -> "MissingSpec":
+        """Create a `MissingSpec` for the standard HL7/CDISC *null flavors*.
+
+        Clinical data uses standardized null flavor codes to record *why* a value is absent (e.g.,
+        `"NASK"` for "not asked", `"UNK"` for "unknown"). This returns a ready-to-use spec mapping
+        those codes to reason labels.
+
+        Parameters
+        ----------
+        null_is_missing
+            Whether actual null values should also be treated as missing. Default is `True`.
+        null_reason
+            The reason label for actual null values. Default is `"no_information"`.
+        description
+            Optional description. Default identifies the spec as CDISC/HL7 null flavors.
+
+        Returns
+        -------
+        MissingSpec
+            A spec with the standard null flavor codes.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        cdisc_missing = pb.MissingSpec.from_cdisc_null_flavors()
+        cdisc_missing.reason_for("NASK")   # "not_asked"
+        ```
+        """
+        reasons = dict(_CDISC_NULL_FLAVORS)
+        categories = {
+            "unknown": ["no_information", "unknown", "asked_but_unknown", "temporarily_unavailable"],
+            "not_applicable": ["not_applicable", "not_asked", "not_present"],
+            "boundary": ["positive_infinity", "negative_infinity"],
+        }
+        return cls(
+            reasons=reasons,
+            categories=categories,
+            null_is_missing=null_is_missing,
+            null_reason=null_reason,
+            description=description,
+        )
+
+    # Convenient short alias
+    @classmethod
+    def from_cdisc(cls, **kwargs: Any) -> "MissingSpec":
+        """Alias for [`from_cdisc_null_flavors()`](`pointblank.MissingSpec.from_cdisc_null_flavors`)."""
+        return cls.from_cdisc_null_flavors(**kwargs)
+
+    @classmethod
+    def from_sas(
+        cls,
+        reasons: dict[str, str] | None = None,
+        include_underscore: bool = True,
+        null_is_missing: bool = True,
+        null_reason: str = "system_missing",
+        description: str | None = "SAS special missing values",
+    ) -> "MissingSpec":
+        """Create a `MissingSpec` for SAS special missing values.
+
+        SAS encodes missingness with `"."` (system missing), `"._"`, and `".A"` through `".Z"` (27
+        user-defined missing codes). This returns a spec covering all of them; you can override the
+        reason label for any specific code via `reasons=`.
+
+        Parameters
+        ----------
+        reasons
+            Optional mapping of specific SAS missing codes to custom reason labels (e.g.,
+            `{".A": "not_applicable", ".B": "below_detection"}`). These override the defaults.
+        include_underscore
+            Whether to include the `"._"` special missing code. Default is `True`.
+        null_is_missing
+            Whether actual null values should also be treated as missing. Default is `True`.
+        null_reason
+            The reason label for actual null values. Default is `"system_missing"`.
+        description
+            Optional description. Default identifies the spec as SAS special missing values.
+
+        Returns
+        -------
+        MissingSpec
+            A spec covering the SAS special missing values.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        sas_missing = pb.MissingSpec.from_sas(
+            reasons={".A": "not_applicable", ".B": "below_detection"}
+        )
+        sas_missing.reason_for(".A")   # "not_applicable"
+        sas_missing.reason_for(".C")   # "user_missing_c"
+        ```
+        """
+        built: dict[Any, str] = {".": "system_missing"}
+        if include_underscore:
+            built["._"] = "system_missing"
+        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            built[f".{letter}"] = f"user_missing_{letter.lower()}"
+        if reasons:
+            for code, label in reasons.items():
+                built[code] = label
+        return cls(
+            reasons=built,
+            null_is_missing=null_is_missing,
+            null_reason=null_reason,
+            description=description,
+        )
+
+    @classmethod
+    def from_spss(
+        cls,
+        missing_values: list,
+        labels: dict[Any, str] | None = None,
+        null_is_missing: bool = True,
+        null_reason: str = "unknown",
+        description: str | None = "SPSS user-defined missing values",
+    ) -> "MissingSpec":
+        """Create a `MissingSpec` from SPSS-style user-defined missing values.
+
+        SPSS supports up to 3 user-defined missing values per variable (plus a range). Pass the
+        missing values (and optionally their value labels) to build a spec. Reason labels are
+        derived from the labels when available, otherwise a `"missing_<value>"` placeholder is used.
+
+        Parameters
+        ----------
+        missing_values
+            The sentinel values that SPSS marks as missing for the variable (e.g., `[-99, -98]`).
+        labels
+            Optional mapping of sentinel value to human-readable label (e.g., `{-99: "Refused"}`).
+            Labels are slugified into reason identifiers (e.g., `"Refused"` -> `"refused"`).
+        null_is_missing
+            Whether actual null values should also be treated as missing. Default is `True`.
+        null_reason
+            The reason label for actual null values. Default is `"unknown"`.
+        description
+            Optional description. Default identifies the spec as SPSS user-defined missing values.
+
+        Returns
+        -------
+        MissingSpec
+            A spec built from the SPSS missing values.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        spss_missing = pb.MissingSpec.from_spss(
+            missing_values=[-99, -98],
+            labels={-99: "Not asked", -98: "Refused"},
+        )
+        spss_missing.reason_for(-98)   # "refused"
+        ```
+        """
+        labels = labels or {}
+        reasons = {
+            value: (_slugify(labels[value]) if value in labels else f"missing_{_slugify(value)}")
+            for value in missing_values
+        }
+        return cls(
+            reasons=reasons,
+            null_is_missing=null_is_missing,
+            null_reason=null_reason,
+            description=description,
+        )
+
+    @classmethod
+    def from_variable_metadata(
+        cls,
+        variable: Any,
+        null_is_missing: bool = True,
+        null_reason: str = "unknown",
+    ) -> "MissingSpec | None":
+        """Create a `MissingSpec` from an imported variable's metadata.
+
+        This works with a [`VariableMetadata`](`pointblank.VariableMetadata`) object (as produced by
+        [`import_metadata()`](`pointblank.import_metadata`) for SPSS, Stata, and SAS files). It reads
+        the variable's `missing_values` and derives reason labels from `missing_value_labels` or
+        `value_labels` when available.
+
+        Parameters
+        ----------
+        variable
+            A variable-metadata object exposing `missing_values` and (optionally)
+            `missing_value_labels` / `value_labels` attributes.
+        null_is_missing
+            Whether actual null values should also be treated as missing. Default is `True`.
+        null_reason
+            The reason label for actual null values. Default is `"unknown"`.
+
+        Returns
+        -------
+        MissingSpec | None
+            A spec built from the variable's missing values, or `None` if the variable declares no
+            missing values.
+        """
+        missing_values = getattr(variable, "missing_values", None) or []
+        if not missing_values:
+            return None
+
+        labels = getattr(variable, "missing_value_labels", None) or {}
+        value_labels = getattr(variable, "value_labels", None) or {}
+
+        reasons: dict[Any, str] = {}
+        for value in missing_values:
+            label = labels.get(value)
+            if label is None:
+                label = value_labels.get(value)
+            reasons[value] = _slugify(label) if label else f"missing_{_slugify(value)}"
+
+        return cls(
+            reasons=reasons,
+            null_is_missing=null_is_missing,
+            null_reason=null_reason,
+            description=f"Imported missing values for '{getattr(variable, 'name', 'variable')}'",
+        )
