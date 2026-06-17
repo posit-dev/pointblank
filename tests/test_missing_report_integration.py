@@ -12,7 +12,9 @@ def test_tabular_report_annotates_missing_aware_steps():
         .interrogate()
     )
     html = v.get_tabular_report().as_raw_html()
-    assert "missing-aware" in html
+    # The VALUES cell carries a compact badge; the reason/code detail goes to the step note
+    assert "MISSING-AWARE" in html
+    assert "Missing codes" in html
     assert "refused" in html and "not_asked" in html
 
 
@@ -23,10 +25,12 @@ def test_tabular_report_no_annotation_without_missing():
         .col_vals_between(columns="age", left=0, right=120)
         .interrogate()
     )
-    assert "missing-aware" not in v.get_tabular_report().as_raw_html()
+    html = v.get_tabular_report().as_raw_html()
+    assert "MISSING-AWARE" not in html
+    assert "Missing codes" not in html
 
 
-def test_dedicated_methods_show_context():
+def test_dedicated_methods_show_minimal_cell_and_note():
     tbl = pl.DataFrame({"age": [34, -98, 41, -99]})
     spec = pb.MissingSpec(
         reasons={-99: "not_asked", -98: "refused"},
@@ -39,9 +43,15 @@ def test_dedicated_methods_show_context():
         .interrogate()
     )
     html = v.get_tabular_report().as_raw_html()
-    # col_pct_missing shows the reason filter; col_missing_only_coded shows the range
-    assert "reason = refused" in html
-    assert "[0, 120]" in html
+    # Compact VALUES cells: a threshold for col_pct_missing and an "ONLY CODED" badge
+    assert "ONLY CODED" in html
+    # Detail is surfaced via the auto Notes system
+    assert "Missing codes" in html
+    assert "Counting reason" in html and "refused" in html
+    assert "Legitimate values" in html and "[0, 120]" in html
+    # The old verbose VALUES strings should no longer be present
+    assert "reason = refused" not in html
+    assert "max_pct = " not in html
 
 
 def test_step_report_shows_missing_codes_legend():
