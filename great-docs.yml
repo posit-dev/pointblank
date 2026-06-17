@@ -131,6 +131,8 @@ reference:
           members: false
         - name: DraftValidation
           members: false
+        - name: MissingSpec
+          members: true
 
     - title: Contracts and Pipelines
       desc: >
@@ -189,6 +191,10 @@ reference:
         - Validate.col_vals_expr
         - Validate.col_exists
         - Validate.col_pct_null
+        - Validate.col_pct_missing
+        - Validate.col_missing_coded
+        - Validate.col_missing_only_coded
+        - Validate.col_missing_consistent
         - Validate.rows_distinct
         - Validate.rows_complete
         - Validate.col_schema_match
