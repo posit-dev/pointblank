@@ -81,3 +81,72 @@ pb.missing_vals_tbl(game_revenue)
 We see nothing but light blue in this report! The header also indicates that there are no missing
 values by displaying a large green check mark (the other report tables provided a count of total
 missing values across all columns).
+
+## Structured Missingness by Reason
+
+So far we've treated missingness as binary: a value is either `Null` or it isn't. But real-world
+data often encodes *why* a value is absent. Survey data distinguishes *refused* from *not asked*
+from *don't know*; clinical and statistical-package data use sentinel codes like `-99`, `".A"`, or
+`"NOT DONE"`. Pointblank captures this with the [`MissingSpec`](`pointblank.MissingSpec`) class,
+which maps sentinel values to human-readable *reasons*.
+
+When you pass a `missing=` mapping of column names to `MissingSpec` objects, `missing_vals_tbl()`
+switches from the sector heatmap to a *structured breakdown*: one row per column with the count and
+percentage of complete values and of each missing reason.
+
+```{python}
+import polars as pl
+
+survey = pl.DataFrame(
+    {
+        "age": [34, -98, 41, -99, 29, -98, 55, None],
+        "income": [50000, -99, -1, None, 42000, -99, 38000, 61000],
+    }
+)
+
+specs = {
+    "age": pb.MissingSpec(reasons={-99: "not_asked", -98: "refused", -97: "dont_know"}),
+    "income": pb.MissingSpec(reasons={-99: "not_asked", -1: "below_threshold"}),
+}
+
+pb.missing_vals_tbl(survey, missing=specs)
+```
+
+Each `MissingSpec` declares the sentinel values for a column and the reason each one represents. By
+default, actual `Null` values are also counted as missing (with the reason `"unknown"`); set
+`null_is_missing=False` on the spec if raw nulls should be treated as real values instead.
+
+### Viewing the pattern as a heatmap
+
+For a more visual read of *where* missingness concentrates, pass `as_heatmap=True`. The reason
+columns are then shaded from light to dark by the proportion missing:
+
+```{python}
+pb.missing_vals_tbl(survey, missing=specs, as_heatmap=True)
+```
+
+### Pre-built specs for common standards
+
+You don't always have to define reasons by hand. `MissingSpec` provides factory methods for common
+encodings, including CDISC/HL7 null flavors and SAS special missing values:
+
+```{python}
+cdisc = pb.MissingSpec.from_cdisc_null_flavors()
+print("NASK ->", cdisc.reason_for("NASK"))   # not_asked
+print("UNK  ->", cdisc.reason_for("UNK"))     # unknown
+```
+
+When metadata is imported from SPSS, Stata, or SAS files (see the *Metadata Import* section),
+[`MetadataImport.missing_specs()`](`pointblank.MetadataImport`) auto-generates a `{column:
+MissingSpec}` mapping from the variables' declared missing values, ready to pass straight to
+`missing_vals_tbl()`.
+
+::: {.callout-note}
+The same `MissingSpec` objects power missingness-aware *validation*, not just reporting. You can
+pass `missing=` to the `col_vals_*()` methods (to exclude sentinel values from a check) and use the
+dedicated [`col_pct_missing()`](`pointblank.Validate.col_pct_missing`),
+[`col_missing_coded()`](`pointblank.Validate.col_missing_coded`),
+[`col_missing_only_coded()`](`pointblank.Validate.col_missing_only_coded`), and
+[`col_missing_consistent()`](`pointblank.Validate.col_missing_consistent`) validation steps. See the
+*Validation Methods* article for details.
+:::
