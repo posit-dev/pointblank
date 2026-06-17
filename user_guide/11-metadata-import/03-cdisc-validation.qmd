@@ -531,6 +531,27 @@ This layered approach gives you the flexibility to apply different levels of val
 on your needs. The Define-XML checks enforce what was specifically documented for your study,
 while the SDTM template checks enforce the broader standard requirements that apply universally.
 
+## Null Flavors and Structured Missingness
+
+Clinical data uses standardized HL7/CDISC *null flavors* to record *why* a value is absent (e.g.,
+`"NASK"` = not asked, `"UNK"` = unknown, `"NA"` = not applicable). Pointblank ships a pre-built
+[`MissingSpec`](`pointblank.MissingSpec`) for these codes via
+`MissingSpec.from_cdisc_null_flavors()`:
+
+```{python}
+cdisc = pb.MissingSpec.from_cdisc_null_flavors()
+
+print("NASK ->", cdisc.reason_for("NASK"))   # not_asked
+print("UNK  ->", cdisc.reason_for("UNK"))     # unknown
+print("boundary codes:", cdisc.values_for_category("boundary"))
+```
+
+This spec can be passed to `missing_vals_tbl()` for a reason-by-reason breakdown, or to the
+`col_vals_*()` and dedicated missingness validation methods (`col_pct_missing()`,
+`col_missing_coded()`, `col_missing_only_coded()`, `col_missing_consistent()`) to validate data
+while accounting for the null flavor codes. See the *Missing Values Reporting* and *Validation
+Methods* articles for the full set of capabilities.
+
 ## Conclusion
 
 CDISC data validation with Pointblank covers the full spectrum of clinical trial data management:
