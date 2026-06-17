@@ -82,7 +82,7 @@ col_vals_le()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-14 21:11:54 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-14 21:11:54 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-17 20:56:24 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-06-17 20:56:24 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -105,14 +105,14 @@ col_vals_le()
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -126,7 +126,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -154,7 +154,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>
@@ -248,14 +248,14 @@ Preview of Input Table
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -269,7 +269,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -297,7 +297,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>

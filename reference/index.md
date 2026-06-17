@@ -25,6 +25,9 @@ Definition of a schema object.
 [DraftValidation](DraftValidation.md#pointblank.DraftValidation)  
 Draft a validation plan for a given table using an LLM.
 
+[MissingSpec](MissingSpec.md#pointblank.MissingSpec)  
+Specification for structured missing values in a column.
+
 
 ## Contracts and Pipelines
 
@@ -132,6 +135,18 @@ Validate whether one or more columns exist in the table.
 
 [Validate.col_pct_null()](Validate.col_pct_null.md#pointblank.Validate.col_pct_null)  
 Validate whether a column has a specific percentage of Null values.
+
+[Validate.col_pct_missing()](Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing)  
+Validate that the percentage of *structured* missing values stays within a limit.
+
+[Validate.col_missing_coded()](Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded)  
+Validate that all missing values in a column are *coded* (no uncoded nulls).
+
+[Validate.col_missing_only_coded()](Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded)  
+Validate that a column contains only documented codes and legitimate values.
+
+[Validate.col_missing_consistent()](Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent)  
+Validate that related columns share a consistent missingness pattern for a given reason.
 
 [Validate.rows_distinct()](Validate.rows_distinct.md#pointblank.Validate.rows_distinct)  
 Validate whether rows in the table are distinct.

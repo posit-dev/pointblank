@@ -11,6 +11,7 @@ Validate.col_vals_lt(
     columns,
     value,
     na_pass=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3bf6dc44f1d1c4f1986ae0ab89442a35.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,6 +108,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-compare.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script src="../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -194,7 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="443" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -266,6 +272,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/DraftValidation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MissingSpec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">MissingSpec</span></span></a>
   </div>
 </li>
       </ul>
@@ -464,6 +476,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.col_pct_null.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_null()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_pct_missing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_missing()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_coded()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_only_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_only_coded()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_consistent.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_consistent()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1265,6 +1301,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#get_codelist" id="toc-get_codelist" class="nav-link" data-scroll-target="#get_codelist"><span class="doc-object-name doc-function doc-label doc-label-method">get_codelist()</span></a></li>
   <li><a href="#get_variable" id="toc-get_variable" class="nav-link" data-scroll-target="#get_variable"><span class="doc-object-name doc-function doc-label doc-label-method">get_variable()</span></a></li>
+  <li><a href="#missing_specs" id="toc-missing_specs" class="nav-link" data-scroll-target="#missing_specs"><span class="doc-object-name doc-function doc-label doc-label-method">missing_specs()</span></a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></a></li>
   <li><a href="#to_schema" id="toc-to_schema" class="nav-link" data-scroll-target="#to_schema"><span class="doc-object-name doc-function doc-label doc-label-method">to_schema()</span></a></li>
   <li><a href="#to_validate" id="toc-to_validate" class="nav-link" data-scroll-target="#to_validate"><span class="doc-object-name doc-function doc-label doc-label-method">to_validate()</span></a></li>
@@ -1299,7 +1336,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L227-L427" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L242-L475" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">MetadataImport</span>()</span></code></pre></div>
@@ -1429,6 +1466,14 @@ Get metadata for a specific variable by name.
 </tr>
 <tr>
 <td>
+<a href="#missing_specs" class="doc-function doc-label doc-label-method">missing_specs()</a>
+</td>
+<td>
+Auto-generate <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
+</td>
+</tr>
+<tr>
+<td>
 <a href="#summary" class="doc-function doc-label doc-label-method">summary()</a>
 </td>
 <td>
@@ -1461,7 +1506,7 @@ Generate a <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-cod
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L343-L363" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L391-L411" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>get_codelist(name)</span></code></pre></div>
@@ -1508,7 +1553,7 @@ If no codelist with that name exists.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L320-L341" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L335-L356" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>get_variable(name)</span></code></pre></div>
@@ -1548,6 +1593,44 @@ If no variable with that name exists.
 </section>
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
+<section id="missing_specs" class="level3">
+<h4 class="anchored" data-anchor-id="missing_specs"><span class="doc-object-name doc-function doc-label doc-label-method">missing_specs()</span></h4>
+<div class="doc-subject">
+<p>Auto-generate <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.</p>
+</div>
+<div class="doc-usage-source">
+<p>Usage</p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L358-L389" target="_blank" rel="noopener">Source</a></p>
+</div>
+<div class="doc-signature doc-Kind.FUNCTION">
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>missing_specs()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Builds a mapping of column name to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via <code>missing=</code>) or to <a href="missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>.</p>
+</div>
+<section id="returns-2" class="level4 doc-returns">
+<h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">dict[str, MissingSpec]</span></code></dt>
+<dd>
+A mapping of column name to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a>. Variables without declared missing values are omitted.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level4 doc-examples">
+<h5 class="doc-examples anchored" data-anchor-id="examples">Examples</h5>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"survey.sav"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"spss"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>specs <span class="op">=</span> meta.missing_specs()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the auto-generated specs in a missingness report</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>pb.missing_vals_tbl(data, missing<span class="op">=</span>specs)</span></code></pre></div>
+</section>
+</section>
+<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="summary" class="level3">
 <h4 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h4>
 <div class="doc-subject">
@@ -1555,13 +1638,13 @@ If no variable with that name exists.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L370-L414" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L418-L462" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>summary()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>summary()</span></code></pre></div>
 </div>
-<section id="returns-2" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
+<section id="returns-3" class="level4 doc-returns">
+<h5 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h5>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1580,16 +1663,16 @@ Formatted summary string.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L283-L296" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L298-L311" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>to_schema()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>to_schema()</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Maps variable metadata to appropriate <code>Field</code> types with constraints (min/max, allowed values, nullable, etc.).</p>
 </div>
-<section id="returns-3" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h5>
+<section id="returns-4" class="level4 doc-returns">
+<h5 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h5>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Schema</span></code></dt>
@@ -1608,10 +1691,10 @@ A Pointblank <a href="Schema.html#pointblank.Schema" class="gdls-link gdls-code"
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L298-L318" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L313-L333" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>to_validate(data, <span class="op">**</span>kwargs)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>to_validate(data, <span class="op">**</span>kwargs)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Creates validation steps for all constraints found in the metadata: value ranges, allowed values, required fields, string lengths, etc.</p>
@@ -1631,8 +1714,8 @@ Additional keyword arguments passed to the <a href="Validate.html#pointblank.Val
 </dl>
 </div>
 </section>
-<section id="returns-4" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h5>
+<section id="returns-5" class="level4 doc-returns">
+<h5 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h5>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation"><a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a></span></code></dt>

@@ -246,14 +246,14 @@ EXTRACT OF ALL <strong>2</strong> ROWS (WITH <span style="color: #B22222;">TEST 
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -267,7 +267,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -295,7 +295,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>
@@ -359,14 +359,14 @@ PREVIEW OF TARGET TABLE:
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -380,7 +380,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -408,7 +408,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>
@@ -563,7 +563,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -620,14 +620,14 @@ EXTRACT OF FIRST <strong>5</strong> ROWS (WITH <span style="color: #B22222;">TES
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px; border-left: 2px solid black; border-right: 2px solid black" scope="col"><div>
@@ -641,7 +641,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -669,7 +669,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>

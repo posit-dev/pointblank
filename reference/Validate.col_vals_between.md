@@ -13,6 +13,7 @@ Validate.col_vals_between(
     right,
     inclusive=(True, True),
     na_pass=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

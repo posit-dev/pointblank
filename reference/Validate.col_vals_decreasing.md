@@ -12,6 +12,7 @@ Validate.col_vals_decreasing(
     allow_stationary=False,
     increasing_tol=None,
     na_pass=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

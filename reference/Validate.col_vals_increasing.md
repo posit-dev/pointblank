@@ -12,6 +12,7 @@ Validate.col_vals_increasing(
     allow_stationary=False,
     decreasing_tol=None,
     na_pass=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

@@ -7,11 +7,19 @@ Display a table that shows the missing values in the input table.
 Usage
 
 ``` python
-missing_vals_tbl(data)
+missing_vals_tbl(
+    data,
+    missing=None,
+    as_heatmap=False,
+)
 ```
 
 
 The [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) function generates a table that shows the missing values in the input table. The table is displayed using the Great Tables API, which allows for further customization of the table's appearance if so desired.
+
+By default, missingness is treated as binary (a value is either Null or it isn't) and the function renders a sector-based heatmap of the proportion of Null values across the rows of each column. When a `missing=` mapping of columns to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects is supplied, the function instead renders a *structured missingness* breakdown: one row per column with the count and percentage of complete values and of each missing *reason* (e.g., `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so they aren't mistaken for declared reasons.
+
+Note that supplying `missing=` produces a *different report* than the default view: it is a distinct visualization (a per-reason breakdown table, or a per-reason heatmap with `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing Pattern Heatmap" for the structured views), and the shared header/title styling makes the family resemblance clear.
 
 
 ## Parameters
@@ -19,6 +27,12 @@ The [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) functi
 
 `data: Any`  
 The table for which to display the missing values. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database connection string. Read the *Supported Input Table Types* section for details on the supported table types.
+
+`missing: dict[str, MissingSpec] | None = None`  
+An optional dictionary mapping column names to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. When provided, the function renders a structured breakdown of missingness by reason for the specified columns (rather than the default sector heatmap). The reason columns are the union of reasons across the supplied specs; a reason that isn't defined for a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved reason (shown as `0 (0%)`).
+
+`as_heatmap: bool = ``False`  
+Only applies when `missing=` is provided. When `True`, render the per-reason proportions as a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of the count/percentage text breakdown. Default is `False`.
 
 
 ## Returns

@@ -278,42 +278,42 @@ pb.preview(game_revenue)
 
 player_id
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-session_id" class="gt_col_heading gt_columns_bottom_border gt_left" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 session_id
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-session_start" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 session_start
 
-<em>datetime64[us, UTC]</em>
+<em>datetime64[ns, UTC]</em>
 
 </div></th>
 <th id="pb_preview_tbl-time" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 time
 
-<em>datetime64[us, UTC]</em>
+<em>datetime64[ns, UTC]</em>
 
 </div></th>
 <th id="pb_preview_tbl-item_type" class="gt_col_heading gt_columns_bottom_border gt_left" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 item_type
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-item_name" class="gt_col_heading gt_columns_bottom_border gt_left" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 item_name
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-item_revenue" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -334,21 +334,21 @@ session_duration
 
 start_day
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-acquisition" class="gt_col_heading gt_columns_bottom_border gt_left" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 acquisition
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-country" class="gt_col_heading gt_columns_bottom_border gt_left" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 country
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>

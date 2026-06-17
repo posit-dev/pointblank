@@ -102,6 +102,30 @@ for var_name, codes in meta.missing_value_codes.items():
 Missing value codes are preserved in the [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) object so downstream tools can handle them appropriately. When validation is generated, these codes are documented in the metadata rather than generating explicit exclusion rules, since the correct handling depends on your analysis context.
 
 
+### Turning missing codes into [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects
+
+To put these codes to work in validation and reporting, convert them into <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_specs()</code></a> method does this for every variable that declares missing values, returning a `{column: MissingSpec}` mapping (the reason labels are derived from the variables' value labels):
+
+``` python
+meta = pb.import_metadata("survey.sav")
+
+# Auto-generate a {column: MissingSpec} mapping from the declared missing values
+specs = meta.missing_specs()
+
+# Use the specs in a structured missingness report...
+pb.missing_vals_tbl(data, missing=specs)
+
+# ...or in missingness-aware validation
+validation = (
+    pb.Validate(data=data)
+    .col_vals_between(columns="age", left=0, right=120, missing=specs["age"])
+    .interrogate()
+)
+```
+
+You can also build a spec for a single variable with <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata.to_missing_spec()</code></a>, or construct one directly from SPSS-style values via `pb.MissingSpec.from_spss(missing_values=[...], labels={...})`. See the *Missing Values Reporting* and *Validation Methods* articles for what you can do with these specs.
+
+
 ## Type Detection from Formats
 
 SPSS stores numeric variables with format strings that indicate how they should be displayed. These formats also carry type information. A format like `DATE11` indicates a date variable, `DATETIME20` indicates a datetime, and `F8.0` (eight characters, zero decimal places) suggests an integer. Pointblank uses these format strings to infer the most appropriate Pointblank dtype:

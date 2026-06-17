@@ -12,6 +12,7 @@ Validate.col_vals_regex(
     pattern,
     na_pass=False,
     inverse=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

@@ -34,6 +34,11 @@ actions:                               # OPTIONAL: Global failure actions
 final_actions:                         # OPTIONAL: Actions triggered after all steps complete
   warning: "Post-validation warning"
   error: "Post-validation error"
+missing_specs:                         # OPTIONAL: Named structured-missingness specs
+  standard_survey:
+    reasons:
+      -99: not_asked
+      -98: refused
 steps:                                 # REQUIRED: List of validation steps
   - validation_method_name
   - validation_method_name:
@@ -183,6 +188,59 @@ Template variables available for action strings:
 - `{type}`: validation method type
 - `{level}`: severity level ('warning'/'error'/'critical')
 - `{time}`: timestamp of validation
+
+
+## Structured Missingness ([missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs))
+
+The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, [null_is_missing](../../reference/MissingSpec.md#pointblank.MissingSpec.null_is_missing), and [null_reason](../../reference/MissingSpec.md#pointblank.MissingSpec.null_reason):
+
+``` yaml
+missing_specs:
+  standard_survey:
+    reasons:
+      -99: not_asked
+      -98: refused
+      -97: dont_know
+    categories:
+      nonresponse: [refused, dont_know]
+    null_is_missing: true        # OPTIONAL (default true)
+    null_reason: unknown         # OPTIONAL (default "unknown")
+```
+
+Steps reference a named spec by name through the `missing:` parameter. This works both on the `col_vals_*` methods (to exclude sentinel values from a check) and on the dedicated missingness methods ([col_pct_missing](../../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [col_missing_coded](../../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded), [col_missing_only_coded](../../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded), [col_missing_consistent](../../reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent)):
+
+``` yaml
+missing_specs:
+  standard_survey:
+    reasons:
+      -99: not_asked
+      -98: refused
+
+steps:
+  - col_vals_between:
+      columns: age
+      left: 0
+      right: 120
+      missing: standard_survey       # excludes -99/-98 (and nulls) from the range check
+  - col_pct_missing:
+      columns: age
+      missing: standard_survey
+      reason: refused
+      max_pct: 0.30
+```
+
+A step can also define a spec inline (an anonymous mapping) instead of referencing a named one:
+
+``` yaml
+steps:
+  - col_pct_missing:
+      columns: age
+      max_pct: 0.5
+      missing:
+        reasons:
+          -99: not_asked
+          -98: refused
+```
 
 
 # Validation Methods Reference

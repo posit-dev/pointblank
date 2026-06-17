@@ -10,6 +10,7 @@ Usage
 Validate.col_vals_in_set(
     columns,
     set,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

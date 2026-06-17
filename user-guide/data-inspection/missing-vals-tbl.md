@@ -724,3 +724,185 @@ ROW SECTORS
 
 
 We see nothing but light blue in this report! The header also indicates that there are no missing values by displaying a large green check mark (the other report tables provided a count of total missing values across all columns).
+
+
+# Structured Missingness by Reason
+
+So far we've treated missingness as binary: a value is either `Null` or it isn't. But real-world data often encodes *why* a value is absent. Survey data distinguishes *refused* from *not asked* from *don't know*; clinical and statistical-package data use sentinel codes like `-99`, `".A"`, or `"NOT DONE"`. Pointblank captures this with the <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> class, which maps sentinel values to human-readable *reasons*.
+
+When you pass a `missing=` mapping of column names to [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects, [missing_vals_tbl()](../../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl) switches from the sector heatmap to a *structured breakdown*: one row per column with the count and percentage of complete values and of each missing reason.
+
+> **Note: Supplying `missing=` produces a different report**
+>
+> The structured breakdown is a *distinct visualization*, not an annotated version of the default sector heatmap. Adding `missing=` changes the table's whole layout. The report title changes too (from "Missing Values" to "Missing Values by Reason", or "Missing Pattern Heatmap" with `as_heatmap=True`), and the shared title styling and monospaced column list keep the two views recognizably part of the same family.
+
+
+``` python
+import polars as pl
+
+survey = pl.DataFrame(
+    {
+        "age": [34, -98, 41, -99, 29, -98, 55, None],
+        "income": [50000, -99, -1, None, 42000, -99, 38000, 61000],
+    }
+)
+
+specs = {
+    "age": pb.MissingSpec(reasons={-99: "not_asked", -98: "refused", -97: "dont_know"}),
+    "income": pb.MissingSpec(reasons={-99: "not_asked", -1: "below_threshold"}),
+}
+
+pb.missing_vals_tbl(survey, missing=specs)
+```
+
+
+<table class="gt_table" style="width:100%;" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="gt_heading">
+<th colspan="7" class="gt_heading gt_title gt_font_normal">Missing Values by Reason</th>
+</tr>
+<tr class="gt_heading">
+<th colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div>
+
+<span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">8</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">2</span>
+
+</div></th>
+</tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th rowspan="2" id="columns" class="gt_col_heading gt_columns_bottom_border gt_left" scope="col">Column</th>
+<th rowspan="2" id="complete" class="gt_col_heading gt_columns_bottom_border gt_right" scope="col">Complete</th>
+<th colspan="4" id="Missing-Reasons" class="gt_center gt_columns_top_border gt_column_spanner_outer" scope="colgroup">Missing Reasons</th>
+<th rowspan="2" id="null" class="gt_col_heading gt_columns_bottom_border gt_right" scope="col">Null</th>
+</tr>
+<tr class="gt_col_headings">
+<th id="not_asked" class="gt_col_heading gt_columns_bottom_border gt_right" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">not_asked</th>
+<th id="refused" class="gt_col_heading gt_columns_bottom_border gt_right" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">refused</th>
+<th id="dont_know" class="gt_col_heading gt_columns_bottom_border gt_right" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">dont_know</th>
+<th id="below_threshold" class="gt_col_heading gt_columns_bottom_border gt_right" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">below_threshold</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 12px">age</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">4 (50%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">1 (12%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">2 (25%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">0 (0%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">--</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">1 (12%)</td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 12px">income</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">4 (50%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">2 (25%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">--</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">--</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">1 (12%)</td>
+<td class="gt_row gt_right" style="font-family: IBM Plex Mono; font-size: 12px">1 (12%)</td>
+</tr>
+</tbody>
+</table>
+
+
+Each [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) declares the sentinel values for a column and the reason each one represents. Those declared (coded) reasons are grouped under the **Missing Reasons** spanner. By default, actual `Null` values are also counted as missing; because those are raw `Null`/`None`/`NA` values and *not* part of the spec, they're tallied in a fixed **Null** column at the far right (styled like **Complete**), rather than as a reason. Set `null_is_missing=False` on the spec if raw nulls should be treated as real values instead -- then there's no **Null** column at all.
+
+The reason columns are the *union* of reasons across all the specs you provide. When a reason isn't defined for a particular column, that cell shows an em dash (`--`) rather than `0`. This signals "not applicable to this column", as distinct from a reason that *is* defined but simply wasn't observed (which shows `0 (0%)`).
+
+
+## Viewing the pattern as a heatmap
+
+For a more visual read of *where* missingness concentrates, pass `as_heatmap=True`. The reason columns are then shaded from light to dark by the proportion missing:
+
+
+``` python
+pb.missing_vals_tbl(survey, missing=specs, as_heatmap=True)
+```
+
+
+<table class="gt_table" style="width:100%;" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="gt_heading">
+<th colspan="7" class="gt_heading gt_title gt_font_normal">Missing Pattern Heatmap</th>
+</tr>
+<tr class="gt_heading">
+<th colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div>
+
+<span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">8</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">2</span>
+
+</div></th>
+</tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th rowspan="2" id="columns" class="gt_col_heading gt_columns_bottom_border gt_left" scope="col">Column</th>
+<th rowspan="2" id="complete" class="gt_col_heading gt_columns_bottom_border gt_center" scope="col">Complete</th>
+<th colspan="4" id="Missing-Reasons" class="gt_center gt_columns_top_border gt_column_spanner_outer" scope="colgroup">Missing Reasons</th>
+<th rowspan="2" id="null" class="gt_col_heading gt_columns_bottom_border gt_center" scope="col">Null</th>
+</tr>
+<tr class="gt_col_headings">
+<th id="not_asked" class="gt_col_heading gt_columns_bottom_border gt_center" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">not_asked</th>
+<th id="refused" class="gt_col_heading gt_columns_bottom_border gt_center" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">refused</th>
+<th id="dont_know" class="gt_col_heading gt_columns_bottom_border gt_center" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">dont_know</th>
+<th id="below_threshold" class="gt_col_heading gt_columns_bottom_border gt_center" style="font-family: IBM Plex Mono; font-size: 12px" scope="col">below_threshold</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 12px">age</td>
+<td class="gt_row gt_center">50%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #d6d6d6">12%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #b8b8b8">25%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #f5f5f5">0%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #FFFFFF">--</td>
+<td class="gt_row gt_center">12%</td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="color: black; font-family: IBM Plex Mono; font-size: 12px">income</td>
+<td class="gt_row gt_center">50%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #b8b8b8">25%</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #FFFFFF">--</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #FFFFFF">--</td>
+<td class="gt_row gt_center" style="color: #000000; background-color: #d6d6d6">12%</td>
+<td class="gt_row gt_center">12%</td>
+</tr>
+</tbody>
+</table>
+
+
+## Pre-built specs for common standards
+
+You don't always have to define reasons by hand. [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) provides factory methods for common encodings, including CDISC/HL7 null flavors and SAS special missing values:
+
+
+``` python
+cdisc = pb.MissingSpec.from_cdisc_null_flavors()
+print("NASK ->", cdisc.reason_for("NASK"))   # not_asked
+print("UNK  ->", cdisc.reason_for("UNK"))     # unknown
+```
+
+
+    NASK -> not_asked
+    UNK  -> unknown
+
+
+When metadata is imported from SPSS, Stata, or SAS files (see the *Metadata Import* section), <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_specs()</code></a> auto-generates a `{column: MissingSpec}` mapping from the variables' declared missing values, ready to pass straight to [missing_vals_tbl()](../../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl).
+
+> **Note: Note**
+>
+> The same [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects power missingness-aware *validation*, not just reporting. You can pass `missing=` to the `col_vals_*()` methods (to exclude sentinel values from a check) and use the dedicated <a href="../../reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link"><code>col_pct_missing()</code></a>, <a href="../../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link"><code>col_missing_coded()</code></a>, <a href="../../reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="gdls-link"><code>col_missing_only_coded()</code></a>, and <a href="../../reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link"><code>col_missing_consistent()</code></a> validation steps. See the *Validation Methods* article for details.

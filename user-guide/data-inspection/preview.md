@@ -641,14 +641,14 @@ pb.preview(small_table, n_head=3, n_tail=1)
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -662,7 +662,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -690,7 +690,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>
@@ -769,14 +769,14 @@ pb.preview(small_table, n_head=10, n_tail=10)
 
 date_time
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-date" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
 
 date
 
-<em>datetime64[us]</em>
+<em>datetime64[ns]</em>
 
 </div></th>
 <th id="pb_preview_tbl-a" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -790,7 +790,7 @@ a
 
 b
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-c" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>
@@ -818,7 +818,7 @@ e
 
 f
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 </tr>

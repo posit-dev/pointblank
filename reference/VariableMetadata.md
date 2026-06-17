@@ -7,36 +7,7 @@ Metadata for a single variable/column, as imported from an external standard.
 Usage
 
 ``` python
-VariableMetadata(
-    name,
-    label=None,
-    description=None,
-    dtype=None,
-    role=None,
-    required=False,
-    unique=False,
-    min_val=None,
-    max_val=None,
-    min_length=None,
-    max_length=None,
-    pattern=None,
-    allowed_values=None,
-    codelist_ref=None,
-    display_format=None,
-    value_labels=None,
-    missing_values=None,
-    missing_value_labels=None,
-    origin=None,
-    computational_method=None,
-    controlled_term=None,
-    significant_digits=None,
-    cdisc_domain=None,
-    cdisc_role=None,
-    adam_derivation=None,
-    traceability_ref=None,
-    unit=None,
-    unit_system=None
-)
+VariableMetadata()
 ```
 
 
@@ -126,3 +97,35 @@ Unit of measurement (e.g., `"kg"`, `"mmHg"`, `"years"`).
 
 `unit_system: str | None = None`  
 Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
+
+
+## Methods
+
+| Name | Description |
+|----|----|
+| [to_missing_spec()](#to_missing_spec) | Build a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values. |
+
+------------------------------------------------------------------------
+
+
+#### to_missing_spec()
+
+
+Build a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values.
+
+
+Usage
+
+``` python
+to_missing_spec()
+```
+
+
+Reads `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
+
+
+##### Returns
+
+
+`MissingSpec | None`  
+A [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for the variable, or `None` if no missing values are declared.

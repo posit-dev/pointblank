@@ -11,6 +11,7 @@ Validate.col_vals_within_spec(
     columns,
     spec,
     na_pass=False,
+    missing=None,
     pre=None,
     segments=None,
     thresholds=None,

@@ -311,7 +311,7 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
 
 name
 
-<em>str</em>
+<em>object</em>
 
 </div></th>
 <th id="pb_preview_tbl-age" class="gt_col_heading gt_columns_bottom_border gt_right" style="color: gray20; font-family: IBM Plex Mono; font-size: 12px" scope="col"><div>

@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3bf6dc44f1d1c4f1986ae0ab89442a35.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -110,6 +110,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-compare.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -169,7 +175,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="443" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -677,6 +683,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> code <span class="kw">in</span> codes:</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var_name<span class="sc">}</span><span class="ss">: value=</span><span class="sc">{</span>code<span class="sc">.</span>value<span class="sc">}</span><span class="ss">, meaning=</span><span class="sc">{</span>code<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <p>Missing value codes are preserved in the <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object so downstream tools can handle them appropriately. When validation is generated, these codes are documented in the metadata rather than generating explicit exclusion rules, since the correct handling depends on your analysis context.</p>
+<section id="turning-missing-codes-into-missingspec-objects" class="level3">
+<h3 class="anchored" data-anchor-id="turning-missing-codes-into-missingspec-objects">Turning missing codes into <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> objects</h3>
+<p>To put these codes to work in validation and reporting, convert them into <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_specs()</code></a> method does this for every variable that declares missing values, returning a <code>{column: MissingSpec}</code> mapping (the reason labels are derived from the variables’ value labels):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"survey.sav"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-generate a {column: MissingSpec} mapping from the declared missing values</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>specs <span class="op">=</span> meta.missing_specs()</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the specs in a structured missingness report...</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>pb.missing_vals_tbl(data, missing<span class="op">=</span>specs)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or in missingness-aware validation</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>data)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>, missing<span class="op">=</span>specs[<span class="st">"age"</span>])</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>You can also build a spec for a single variable with <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata.to_missing_spec()</code></a>, or construct one directly from SPSS-style values via <code>pb.MissingSpec.from_spss(missing_values=[...], labels={...})</code>. See the <em>Missing Values Reporting</em> and <em>Validation Methods</em> articles for what you can do with these specs.</p>
+</section>
 </section>
 <section id="type-detection-from-formats" class="level2">
 <h2 class="anchored" data-anchor-id="type-detection-from-formats">Type Detection from Formats</h2>
@@ -764,24 +789,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="basic-usage-1" class="level2">
 <h2 class="anchored" data-anchor-id="basic-usage-1">Basic Usage</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from a SAS Transport file</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"demographics.xpt"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"xpt"</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine the extracted metadata</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset: </span><span class="sc">{</span>meta<span class="sc">.</span>dataset_name<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Label: </span><span class="sc">{</span>meta<span class="sc">.</span>dataset_label<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> meta.variables:</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    constraint_info <span class="op">=</span> []</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var.max_length:</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        constraint_info.append(<span class="ss">f"max_length=</span><span class="sc">{</span>var<span class="sc">.</span>max_length<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var.required:</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        constraint_info.append(<span class="st">"required"</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>var<span class="sc">.</span>dtype<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>var<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> constraint_info:</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Constraints: </span><span class="sc">{</span><span class="st">', '</span><span class="sc">.</span>join(constraint_info)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from a SAS Transport file</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"demographics.xpt"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"xpt"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine the extracted metadata</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset: </span><span class="sc">{</span>meta<span class="sc">.</span>dataset_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Label: </span><span class="sc">{</span>meta<span class="sc">.</span>dataset_label<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> meta.variables:</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    constraint_info <span class="op">=</span> []</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var.max_length:</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        constraint_info.append(<span class="ss">f"max_length=</span><span class="sc">{</span>var<span class="sc">.</span>max_length<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var.required:</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        constraint_info.append(<span class="st">"required"</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>var<span class="sc">.</span>dtype<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>var<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> constraint_info:</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Constraints: </span><span class="sc">{</span><span class="st">', '</span><span class="sc">.</span>join(constraint_info)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 </section>
 <section id="length-constraints" class="level2">
 <h2 class="anchored" data-anchor-id="length-constraints">Length Constraints</h2>
@@ -861,17 +886,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="basic-usage-2" class="level2">
 <h2 class="anchored" data-anchor-id="basic-usage-2">Basic Usage</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from a Stata file</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"panel_data.dta"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"stata"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect what was found</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variables: </span><span class="sc">{</span><span class="bu">len</span>(meta.variables)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> meta.variables:</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    type_info <span class="op">=</span> <span class="ss">f"(</span><span class="sc">{</span>var<span class="sc">.</span>dtype<span class="sc">}</span><span class="ss">)"</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    label_info <span class="op">=</span> <span class="ss">f" - </span><span class="sc">{</span>var<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span> <span class="cf">if</span> var.label <span class="cf">else</span> <span class="st">""</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>type_info<span class="sc">}{</span>label_info<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from a Stata file</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"panel_data.dta"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"stata"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect what was found</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variables: </span><span class="sc">{</span><span class="bu">len</span>(meta.variables)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> meta.variables:</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    type_info <span class="op">=</span> <span class="ss">f"(</span><span class="sc">{</span>var<span class="sc">.</span>dtype<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    label_info <span class="op">=</span> <span class="ss">f" - </span><span class="sc">{</span>var<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span> <span class="cf">if</span> var.label <span class="cf">else</span> <span class="st">""</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>type_info<span class="sc">}{</span>label_info<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 </section>
 <section id="type-mapping" class="level2">
 <h2 class="anchored" data-anchor-id="type-mapping">Type Mapping</h2>
@@ -911,29 +936,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> steps for variables marked as required</li>
 <li><a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> steps for variables with length constraints (from SAS Transport)</li>
 </ol>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import and validate in one chain</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"study_data.sav"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> meta.to_validate(data<span class="op">=</span>df).interrogate()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Or generate just the schema for a lightweight structural check</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> meta.to_schema()</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>lightweight <span class="op">=</span> (</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>df)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(schema<span class="op">=</span>schema)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>You can also combine metadata-generated validation with your own custom steps. The <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a> method returns an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so you can chain additional methods before calling <code>.interrogate()</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"survey.sav"</span>)</span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from metadata, add custom business rules</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    meta.to_validate(data<span class="op">=</span>df)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"completion_time_min"</span>, left<span class="op">=</span><span class="dv">5</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    .rows_distinct(columns_subset<span class="op">=</span>[<span class="st">"respondent_id"</span>])</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import and validate in one chain</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"study_data.sav"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> meta.to_validate(data<span class="op">=</span>df).interrogate()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Or generate just the schema for a lightweight structural check</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> meta.to_schema()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>lightweight <span class="op">=</span> (</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>df)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(schema<span class="op">=</span>schema)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>You can also combine metadata-generated validation with your own custom steps. The <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a> method returns an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so you can chain additional methods before calling <code>.interrogate()</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"survey.sav"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from metadata, add custom business rules</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    meta.to_validate(data<span class="op">=</span>df)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"completion_time_min"</span>, left<span class="op">=</span><span class="dv">5</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    .rows_distinct(columns_subset<span class="op">=</span>[<span class="st">"respondent_id"</span>])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>

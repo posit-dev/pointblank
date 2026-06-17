@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3bf6dc44f1d1c4f1986ae0ab89442a35.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -73,6 +73,12 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-compare.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script src="../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -147,7 +153,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="443" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -219,6 +225,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/DraftValidation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MissingSpec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">MissingSpec</span></span></a>
   </div>
 </li>
       </ul>
@@ -417,6 +429,30 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.col_pct_null.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_null()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_pct_missing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_missing()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_coded()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_only_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_only_coded()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_consistent.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_missing_consistent()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1282,6 +1318,10 @@ ul.task-list li input[type="checkbox"] {
 <dd>
 <p>Draft a validation plan for a given table using an LLM.</p>
 </dd>
+<dt><a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="doc-class doc-label doc-label-dataclass">MissingSpec</a></dt>
+<dd>
+<p>Specification for structured missing values in a column.</p>
+</dd>
 </dl>
 </section>
 <section id="contracts-and-pipelines" class="level2 doc-group">
@@ -1421,6 +1461,22 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="doc-function doc-label doc-label-method">Validate.col_pct_null()</a></dt>
 <dd>
 <p>Validate whether a column has a specific percentage of Null values.</p>
+</dd>
+<dt><a href="../reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="doc-function doc-label doc-label-method">Validate.col_pct_missing()</a></dt>
+<dd>
+<p>Validate that the percentage of <em>structured</em> missing values stays within a limit.</p>
+</dd>
+<dt><a href="../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="doc-function doc-label doc-label-method">Validate.col_missing_coded()</a></dt>
+<dd>
+<p>Validate that all missing values in a column are <em>coded</em> (no uncoded nulls).</p>
+</dd>
+<dt><a href="../reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="doc-function doc-label doc-label-method">Validate.col_missing_only_coded()</a></dt>
+<dd>
+<p>Validate that a column contains only documented codes and legitimate values.</p>
+</dd>
+<dt><a href="../reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="doc-function doc-label doc-label-method">Validate.col_missing_consistent()</a></dt>
+<dd>
+<p>Validate that related columns share a consistent missingness pattern for a given reason.</p>
 </dd>
 <dt><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="doc-function doc-label doc-label-method">Validate.rows_distinct()</a></dt>
 <dd>

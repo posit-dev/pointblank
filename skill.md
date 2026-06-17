@@ -29,6 +29,7 @@ When performing data validation, use the `Validate` class to get the process sta
 - `FinalActions`: Define actions to be taken after validation is complete
 - `Schema`: Definition of a schema object
 - `DraftValidation`: Draft a validation plan for a given table using an LLM
+- `MissingSpec`: Specification for structured missing values in a column
 
 ### Contracts and Pipelines
 
@@ -76,6 +77,10 @@ Validation steps are sequential validations on the target data. Call `Validate`'
 - `Validate.col_vals_expr`
 - `Validate.col_exists`
 - `Validate.col_pct_null`
+- `Validate.col_pct_missing`
+- `Validate.col_missing_coded`
+- `Validate.col_missing_only_coded`
+- `Validate.col_missing_consistent`
 - `Validate.rows_distinct`
 - `Validate.rows_complete`
 - `Validate.col_schema_match`

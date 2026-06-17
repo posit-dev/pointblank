@@ -16,6 +16,7 @@
 - [FinalActions](reference/FinalActions.html): Define actions to be taken after validation is complete
 - [Schema](reference/Schema.html): Definition of a schema object
 - [DraftValidation](reference/DraftValidation.html): Draft a validation plan for a given table using an LLM
+- [MissingSpec](reference/MissingSpec.html): Specification for structured missing values in a column
 
 #### Contracts and Pipelines
 > Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
@@ -60,6 +61,10 @@
 - [Validate.col_vals_expr](reference/Validate.col_vals_expr.html)
 - [Validate.col_exists](reference/Validate.col_exists.html)
 - [Validate.col_pct_null](reference/Validate.col_pct_null.html)
+- [Validate.col_pct_missing](reference/Validate.col_pct_missing.html)
+- [Validate.col_missing_coded](reference/Validate.col_missing_coded.html)
+- [Validate.col_missing_only_coded](reference/Validate.col_missing_only_coded.html)
+- [Validate.col_missing_consistent](reference/Validate.col_missing_consistent.html)
 - [Validate.rows_distinct](reference/Validate.rows_distinct.html)
 - [Validate.rows_complete](reference/Validate.rows_complete.html)
 - [Validate.col_schema_match](reference/Validate.col_schema_match.html)
