@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -125,6 +125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html">
   <meta name="description" content="While validation reports provide a comprehensive overview of all validation steps, sometimes you need to focus on a specific validation step in greater...">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Step Reports – Pointblank | Pointblank">
@@ -178,7 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -582,7 +583,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="creating-a-step-report" class="level1">
 <h1>Creating a Step Report</h1>
 <p>To create a step report, you first need to run a validation and then use the <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>Validate.get_step_report()</code></a> method, specifying which validation step you want to examine:</p>
-<div id="140efea8" class="cell" data-execution_count="2">
+<div id="2ede9778" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -776,7 +777,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="value-based-validation-step-reports" class="level2">
 <h2 class="anchored" data-anchor-id="value-based-validation-step-reports">Value-Based Validation Step Reports</h2>
 <p>Value-based step reports focus on showing individual rows where values in the target column failed the validation check. These reports highlight the specific column being validated and clearly display which values violated the condition.</p>
-<div id="4d7f5511" class="cell" data-execution_count="3">
+<div id="b1c15de9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data with some validation failures</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">8</span>),</span>
@@ -915,7 +916,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="uniqueness-validation-step-reports" class="level2">
 <h2 class="anchored" data-anchor-id="uniqueness-validation-step-reports">Uniqueness Validation Step Reports</h2>
 <p>Uniqueness checks produce a different type of step report that groups duplicate records together. This format makes it easy to identify patterns in duplicate data.</p>
-<div id="2453f325" class="cell" data-execution_count="4">
+<div id="ee4a2786" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data with some duplicate rows based on the combination of columns</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"customer_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">101</span>, <span class="dv">104</span>, <span class="dv">105</span>, <span class="dv">102</span>],</span>
@@ -1039,7 +1040,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schema-validation-step-reports" class="level2">
 <h2 class="anchored" data-anchor-id="schema-validation-step-reports">Schema Validation Step Reports</h2>
 <p>Schema validation step reports have a completely different structure, comparing expected versus actual column data types and presence.</p>
-<div id="2e48cb28" class="cell" data-execution_count="5">
+<div id="5746d0b0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"date_time"</span>, <span class="st">"timestamp"</span>),</span>
@@ -1257,7 +1258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Customizing Step Reports</h1>
 <p>Step reports can be customized with several parameters to better focus your analysis and tailor the output to your specific needs. The <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>Validate.get_step_report()</code></a> method offers multiple customization options to help you create more effective reports.</p>
 <p>When a dataset has many columns, you might want to focus on just those relevant to your analysis. You can create a step report containing only a subset of the columns in the target table:</p>
-<div id="6ff5b9b6" class="cell" data-execution_count="6">
+<div id="8f1be9fa" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1385,7 +1386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This approach makes step reports much easier to interpret by highlighting just the essential columns that help understand the validation failures.</p>
 <p>For large datasets with many failing rows, you might want to use <code>limit=</code> to set a cap on the number of rows shown in the report:</p>
-<div id="5e3e80dc" class="cell" data-execution_count="7">
+<div id="25d4d606" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1502,7 +1503,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The report header can also be extensively customized to provide more specific context. You can replace the default header with plain text or Markdown formatting:</p>
-<div id="c2d28e93" class="cell" data-execution_count="8">
+<div id="8e8b6178" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="st">"Category Values Validation: *Critical Analysis*"</span></span>
@@ -1641,7 +1642,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>For more advanced header customization, you can use the templating system with the <code>{title}</code> and <code>{details}</code> elements to retain parts of the default header while adding your own content. The <code>{title}</code> template is the default title whereas <code>{details}</code> provides information on the assertion, number of failures, etc. Let’s move away from the default template of <code>{title}{details}</code> and provide a custom title to go with the details text:</p>
-<div id="6af3675f" class="cell" data-execution_count="9">
+<div id="2077647a" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="st">"Custom Category Validation Report </span><span class="sc">{details}</span><span class="st">"</span></span>
@@ -1780,7 +1781,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>We can keep <code>{title}</code> and <code>{details}</code> and add some more context in between the two:</p>
-<div id="e68d84ae" class="cell" data-execution_count="10">
+<div id="17ae8f72" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span>(</span>
@@ -1925,7 +1926,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>You could always use more HTML and CSS to do <em>a lot</em> of customization:</p>
-<div id="0c4c3d2b" class="cell" data-execution_count="11">
+<div id="17784160" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span>(</span>
@@ -2073,7 +2074,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>If you prefer no header at all, simply set <code>header=None</code>:</p>
-<div id="be20aa5b" class="cell" data-execution_count="12">
+<div id="71e1d2f3" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="va">None</span></span>
@@ -2209,7 +2210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>These customization options can be combined to create highly focused reports tailored to specific needs:</p>
-<div id="5623eb54" class="cell" data-execution_count="13">
+<div id="97fca22a" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    columns_subset<span class="op">=</span>[<span class="st">"id"</span>, <span class="st">"category"</span>],</span>
@@ -2319,7 +2320,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-step-reports-for-data-investigation" class="level1">
 <h1>Using Step Reports for Data Investigation</h1>
 <p>Step reports can be powerful tools for investigating data quality issues. Let’s look at a more complex example:</p>
-<div id="5e863c60" class="cell" data-execution_count="14">
+<div id="d6899439" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a more complex dataset with multiple issues</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>complex_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>),</span>
@@ -2451,7 +2452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="combining-step-reports-with-extracts" class="level1">
 <h1>Combining Step Reports with Extracts</h1>
 <p>For more advanced analysis, you can extract the actual data from a step report into a DataFrame:</p>
-<div id="0e415bc6" class="cell" data-execution_count="15">
+<div id="681e69fd" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the data from the step report</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>failing_ratios <span class="op">=</span> validation_complex.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2481,7 +2482,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-reports-with-segmented-data" class="level1">
 <h1>Step Reports with Segmented Data</h1>
 <p>When working with segmented validation, step reports become even more valuable as they allow you to investigate issues within specific segments:</p>
-<div id="f26e63b8" class="cell" data-execution_count="16">
+<div id="eab611c0" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create data with different regions</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>segmented_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>),</span>
@@ -3007,9 +3008,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>
 <script src="../../tooltips.js"></script>
-<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
 <script src="../../responsive-tables.js"></script>
-<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
 <script src="../../navbar-widgets.js"></script>
 

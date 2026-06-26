@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,6 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html">
   <meta name="description" content="Validate whether the column count of the table matches a specified count.">
   <script type="application/ld+json">
 [
@@ -203,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -1415,7 +1416,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples here, we’ll use the built in dataset <code>"game_revenue"</code>. The table can be obtained by calling <code>load_dataset("game_revenue")</code>.</p>
-<div id="e73335a2" class="cell" data-execution_count="2">
+<div id="b55b6419" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>)</span>
@@ -1667,7 +1668,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Let’s validate that the number of columns in the table matches a fixed value. In this case, we will use the value <code>11</code> as the expected column count.</p>
-<div id="4e9cc7f7" class="cell" data-execution_count="3">
+<div id="eec086cc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>game_revenue)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_count_match(count<span class="op">=</span><span class="dv">11</span>)</span>
@@ -2195,9 +2196,9 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>
 <script src="../tooltips.js"></script>
-<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
 <script src="../responsive-tables.js"></script>
-<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
 <script src="../navbar-widgets.js"></script>
 

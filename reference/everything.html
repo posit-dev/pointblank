@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,6 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/everything.html">
   <meta name="description" content="Find out if your data is what you think it is.">
   <script type="application/ld+json">
 [
@@ -203,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -1388,7 +1389,7 @@ An <code>Everything</code> object, which can be used to select all columns.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Suppose we have a table with several numeric columns and we’d like to validate that all these columns have less than <code>1000</code>. We can use the <a href="everything.html#pointblank.everything" class="gdls-link gdls-code">everything()</a> column selector function to select all columns for validation.</p>
-<div id="a95e5e7f" class="cell" data-execution_count="2">
+<div id="6c218c1c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1680,7 +1681,7 @@ An <code>Everything</code> object, which can be used to select all columns.
 </div>
 <p>From the results of the validation table we get four validation steps, one each column in the table. The values in every column were all lower than <code>1000</code>.</p>
 <p>We can also use the <a href="everything.html#pointblank.everything" class="gdls-link gdls-code">everything()</a> function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select every column except those that begin with <code>"2023"</code> we can use the <code>-</code> operator to combine column selectors.</p>
-<div id="e7684f9d" class="cell" data-execution_count="3">
+<div id="c2bb49d2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2023_hours"</span>: [<span class="dv">182</span>, <span class="dv">168</span>, <span class="dv">175</span>],</span>
@@ -2253,9 +2254,9 @@ An <code>Everything</code> object, which can be used to select all columns.
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>
 <script src="../tooltips.js"></script>
-<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
 <script src="../responsive-tables.js"></script>
-<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
 <script src="../navbar-widgets.js"></script>
 

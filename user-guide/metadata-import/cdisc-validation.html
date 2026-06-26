@@ -79,7 +79,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -124,6 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html">
   <meta name="description" content="Clinical trial data follows strict organizational standards defined by CDISC (Clinical Data Interchange Standards Consortium). These standards specify...">
   <meta property="og:type" content="website">
   <meta property="og:title" content="CDISC Clinical Data Standards – Pointblank | Pointblank">
@@ -177,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -727,7 +728,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Pointblank includes built-in templates for eight commonly used SDTM domains. These templates encode the structural requirements from the SDTM Implementation Guide 3.4 directly, so you can validate data against the standard without needing a Define-XML file.</p>
 <section id="available-domains" class="level2">
 <h2 class="anchored" data-anchor-id="available-domains">Available Domains</h2>
-<div id="f16ebf69" class="cell" data-execution_count="2">
+<div id="3a44288d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> list_sdtm_domains, get_sdtm_domain</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -753,7 +754,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="inspecting-a-domain-template" class="level2">
 <h2 class="anchored" data-anchor-id="inspecting-a-domain-template">Inspecting a Domain Template</h2>
 <p>You can examine the variable specifications for any domain to understand what Pointblank will check:</p>
-<div id="830e967e" class="cell" data-execution_count="3">
+<div id="810c6bf2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the Demographics domain template</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> get_sdtm_domain(<span class="st">"DM"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -789,7 +790,7 @@ Required variables (core='Req'):
 <section id="structural-validation" class="level2">
 <h2 class="anchored" data-anchor-id="structural-validation">Structural Validation</h2>
 <p>The <a href="../../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link gdls-code">validate_sdtm_structure()</a> function performs a quick check that a dataset contains all required variables for its domain. This is useful as a fast pre-check before running the full validation workflow:</p>
-<div id="a5f0187e" class="cell" data-execution_count="4">
+<div id="d1915f0f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_sdtm_structure</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -825,7 +826,7 @@ Required variables (core='Req'):
 <section id="full-sdtm-validation" class="level2">
 <h2 class="anchored" data-anchor-id="full-sdtm-validation">Full SDTM Validation</h2>
 <p>The <a href="../../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a> function generates a comprehensive validation workflow that checks far more than just structure. It produces a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with checks for required variable non-nullness, DOMAIN value correctness, sequence number positivity, string length constraints, and ISO 8601 date formatting:</p>
-<div id="feb1cbfa" class="cell" data-execution_count="5">
+<div id="d0c06f1e" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_sdtm</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate and run the full SDTM DM validation</span></span>
@@ -2051,7 +2052,7 @@ Invalid: 15-Mar-2024           (wrong format)</code></pre>
 <section id="converting-sdtm-templates-to-metadataimport" class="level2">
 <h2 class="anchored" data-anchor-id="converting-sdtm-templates-to-metadataimport">Converting SDTM Templates to MetadataImport</h2>
 <p>If you prefer to work with the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> interface (for example, to use <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> or combine SDTM metadata with other sources), you can convert a domain template:</p>
-<div id="6ec39e41" class="cell" data-execution_count="6">
+<div id="8dfff817" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> sdtm_to_metadata</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the DM template to a MetadataImport</span></span>
@@ -2079,7 +2080,7 @@ Schema columns: 26</code></pre>
 <p>Pointblank includes templates for four ADaM dataset structures: <strong>ADSL</strong> (subject-level analysis), <strong>BDS</strong> (Basic Data Structure for repeated measures), <strong>ADAE</strong> (adverse events analysis), and <strong>ADTTE</strong> (time-to-event analysis).</p>
 <section id="available-adam-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="available-adam-datasets">Available ADaM Datasets</h2>
-<div id="3ea5202e" class="cell" data-execution_count="7">
+<div id="1d1b7454" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> list_adam_datasets, get_adam_dataset</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># List all available ADaM dataset templates</span></span>
@@ -2105,7 +2106,7 @@ Schema columns: 26</code></pre>
 <section id="adsl-subject-level-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="adsl-subject-level-analysis">ADSL: Subject-Level Analysis</h2>
 <p>ADSL is the foundational ADaM dataset. It contains one row per subject with all the key demographic and treatment information needed for analysis. Every other ADaM dataset merges back to ADSL for population definitions.</p>
-<div id="eb1cd854" class="cell" data-execution_count="8">
+<div id="90f6053e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>adsl_template <span class="op">=</span> get_adam_dataset(<span class="st">"ADSL"</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset class: </span><span class="sc">{</span>adsl_template<span class="sc">.</span>dataset_class<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Population flags:"</span>)</span>
@@ -2130,7 +2131,7 @@ Population flags:
 <section id="full-adam-validation" class="level2">
 <h2 class="anchored" data-anchor-id="full-adam-validation">Full ADaM Validation</h2>
 <p>The <a href="../../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link gdls-code">validate_adam()</a> function generates comprehensive checks tailored to each dataset type:</p>
-<div id="f3e78299" class="cell" data-execution_count="9">
+<div id="da5bfb0b" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_adam</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2680,7 +2681,7 @@ Population flags:
 </tbody>
 </table>
 <p>Here is an example validating a BDS (Basic Data Structure) dataset:</p>
-<div id="050267ed" class="cell" data-execution_count="10">
+<div id="174cb10c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a minimal BDS dataset (e.g., ADLB - laboratory analysis)</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>bds_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">6</span>,</span>
@@ -3072,7 +3073,7 @@ Population flags:
 <section id="structural-validation-1" class="level2">
 <h2 class="anchored" data-anchor-id="structural-validation-1">Structural Validation</h2>
 <p>Like SDTM, ADaM provides a quick structural check via <a href="../../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="gdls-link gdls-code">validate_adam_structure()</a>:</p>
-<div id="6be1602e" class="cell" data-execution_count="11">
+<div id="39e2ba81" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_adam_structure</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> validate_adam_structure(adsl_data, dataset<span class="op">=</span><span class="st">"ADSL"</span>)</span>
@@ -3089,7 +3090,7 @@ Population flags present: []</code></pre>
 <section id="converting-adam-templates-to-metadataimport" class="level2">
 <h2 class="anchored" data-anchor-id="converting-adam-templates-to-metadataimport">Converting ADaM Templates to MetadataImport</h2>
 <p>The <a href="../../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a> function converts an ADaM template into the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> format, giving you access to <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> and <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a>:</p>
-<div id="d07d3a1c" class="cell" data-execution_count="12">
+<div id="e7165111" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> adam_to_metadata</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert ADSL template to MetadataImport</span></span>
@@ -3178,7 +3179,7 @@ Same result: ADSL</code></pre>
 <section id="null-flavors-and-structured-missingness" class="level1">
 <h1>Null Flavors and Structured Missingness</h1>
 <p>Clinical data uses standardized HL7/CDISC <em>null flavors</em> to record <em>why</em> a value is absent (e.g., <code>"NASK"</code> = not asked, <code>"UNK"</code> = unknown, <code>"NA"</code> = not applicable). Pointblank ships a pre-built <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> for these codes via <a href="../../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link gdls-code">MissingSpec.from_cdisc_null_flavors()</a>:</p>
-<div id="7f7fb132" class="cell" data-execution_count="13">
+<div id="2d193b79" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>cdisc <span class="op">=</span> pb.MissingSpec.from_cdisc_null_flavors()</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NASK -&gt;"</span>, cdisc.reason_for(<span class="st">"NASK"</span>))   <span class="co"># not_asked</span></span>
@@ -3569,9 +3570,9 @@ boundary codes: ['PINF', 'NINF']</code></pre>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>
 <script src="../../tooltips.js"></script>
-<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
 <script src="../../responsive-tables.js"></script>
-<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
 <script src="../../navbar-widgets.js"></script>
 

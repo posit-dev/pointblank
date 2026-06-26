@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0e18effa8c39a483f938cc6d6b41e179.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,6 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html">
   <meta name="description" content="Do column data lie outside of two specified values or data in other columns?">
   <script type="application/ld+json">
 [
@@ -203,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="444" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -1467,7 +1468,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="589dee53" class="cell" data-execution_count="2">
+<div id="517076e7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1603,7 +1604,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all outside the fixed boundary values of <code>1</code> and <code>4</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="8b781054" class="cell" data-execution_count="3">
+<div id="dbc87986" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">4</span>)</span>
@@ -1770,7 +1771,7 @@ segments=["region", "date"]</code></pre>
 <li><code>left=column</code>, <code>right=literal</code></li>
 </ol>
 <p>For the next example, we’ll use <a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link gdls-code">col_vals_outside()</a> to check whether the values in column <code>b</code> are outside of the range formed by the corresponding values in columns <code>a</code> (lower bound) and <code>c</code> (upper bound).</p>
-<div id="e85f9ad2" class="cell" data-execution_count="4">
+<div id="49bef5c5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"b"</span>, left<span class="op">=</span>pb.col(<span class="st">"a"</span>), right<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>
@@ -2301,9 +2302,9 @@ segments=["region", "date"]</code></pre>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>
 <script src="../tooltips.js"></script>
-<script>(function(){var s=document.createElement('script');s.src=(document.querySelector('link[rel="canonical"]')||{href:location.href}).href.replace(/\/[^\/]*$/,'').replace(/\/[^\/]*$/,'')+'/color-swatch.js';var h=document.currentScript;h.parentNode.insertBefore(s,h.nextSibling);})()</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
 <script src="../responsive-tables.js"></script>
-<script src="video-embed.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'termshow.js';document.body.appendChild(s);})();</script>
 <script src="../navbar-widgets.js"></script>
 
