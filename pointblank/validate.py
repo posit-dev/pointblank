@@ -96,8 +96,7 @@ from pointblank._utils import (
     _check_invalid_fields,
     _column_test_prep,
     _copy_dataframe,
-    _count_null_values_in_column,
-    _count_true_values_in_column,
+    _count_validation_units,
     _derive_bounds,
     _format_to_integer_value,
     _get_fn_name,
@@ -15437,22 +15436,23 @@ class Validate:
             # called `pb_is_good_` that contains boolean values; we can then use this table to
             # determine the number of test units that passed and failed
             if results_tbl is not None:
-                # Count the number of passing and failing test units
-                validation.n_passed = _count_true_values_in_column(
+                # Count passing/failing test units and the total row count in a single pass.
+                # Doing this together avoids re-executing the (possibly lazy) results-table plan
+                # multiple times, which would otherwise scan the data once per count.
+                n_units, n_passed, n_failed, n_null = _count_validation_units(
                     tbl=results_tbl, column="pb_is_good_"
                 )
-                validation.n_failed = _count_true_values_in_column(
-                    tbl=results_tbl, column="pb_is_good_", inverse=True
-                )
+
+                validation.n_passed = n_passed
+                validation.n_failed = n_failed
 
                 # Solely for the col_vals_in_set assertion type, any Null values in the
                 # `pb_is_good_` column are counted as failing test units
                 if assertion_type == "col_vals_in_set":
-                    null_count = _count_null_values_in_column(tbl=results_tbl, column="pb_is_good_")
-                    validation.n_failed += null_count
+                    validation.n_failed += n_null
 
                 # For column-value validations, the number of test units is the number of rows
-                validation.n = get_row_count(data=results_tbl)
+                validation.n = n_units
 
                 # Set the `all_passed` attribute based on whether there are any failing test units
                 validation.all_passed = validation.n_failed == 0
