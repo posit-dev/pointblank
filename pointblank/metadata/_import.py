@@ -3,9 +3,44 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from importlib_resources import files
+
 from pointblank.metadata._types import MetadataImport, MetadataPackage
 
-__all__ = ["import_metadata"]
+__all__ = ["import_metadata", "load_metadata_example"]
+
+# Bundled metadata example files, mapped to a short description and the format that
+# `import_metadata()` uses to read them. These ship with the package so the documentation
+# examples (and your own experimentation) can run against real files without any external
+# downloads.
+_METADATA_EXAMPLES: dict[str, tuple[str, str]] = {
+    "define.xml": (
+        "cdisc_define",
+        "CDISC Define-XML 2.0 document describing the DM and AE domains of study XYZ789.",
+    ),
+    "sdtm_ct.xml": (
+        "cdisc_ct",
+        "CDISC SDTM Controlled Terminology package with a handful of common codelists "
+        "(SEX, RACE, severity, etc.).",
+    ),
+    "datapackage.json": (
+        "frictionless",
+        "Frictionless Data Package describing a 'transactions' table with typed columns "
+        "and constraints.",
+    ),
+    "table_schema.json": (
+        "table_schema",
+        "Standalone Frictionless Table Schema for a sensor-readings table.",
+    ),
+    "weather_csvw.json": (
+        "csvw",
+        "W3C CSVW (CSV on the Web) metadata for a weather-observations table.",
+    ),
+    "dm.xpt": (
+        "xpt",
+        "SAS Transport (XPT) file containing a small SDTM Demographics (DM) dataset.",
+    ),
+}
 
 # Mapping of format strings to reader functions
 _FORMAT_REGISTRY: dict[str, str] = {
@@ -37,6 +72,68 @@ _EXTENSION_MAP: dict[str, str] = {
 
 # XML files that may need content-based detection
 _XML_FORMATS: set[str] = {"cdisc_define", "define_xml", "cdisc_ct"}
+
+
+def load_metadata_example(name: str) -> Path:
+    """Get the path to a bundled metadata example file.
+
+    Pointblank ships a small collection of metadata example files (CDISC Define-XML, CDISC
+    Controlled Terminology, Frictionless, CSVW, and SAS Transport) so the documentation examples can
+    run against real files without any external downloads. This function returns the filesystem path
+    to one of those bundled files, which you can then pass directly to
+    [`import_metadata()`](`pointblank.import_metadata`).
+
+    Parameters
+    ----------
+    name
+        The file name of the example to load. Use `load_metadata_example()` with an invalid name to
+        see the available options, or consult the table below.
+
+    Returns
+    -------
+    Path
+        A filesystem path to the bundled example file.
+
+    Available Examples
+    ------------------
+    | Name | Format | Description |
+    |------|--------|-------------|
+    | `"define.xml"` | `cdisc_define` | Define-XML 2.0 document with the DM and AE domains |
+    | `"sdtm_ct.xml"` | `cdisc_ct` | SDTM Controlled Terminology with common codelists |
+    | `"datapackage.json"` | `frictionless` | Frictionless Data Package for a transactions table |
+    | `"table_schema.json"` | `table_schema` | Frictionless Table Schema for sensor readings |
+    | `"weather_csvw.json"` | `csvw` | W3C CSVW metadata for weather observations |
+    | `"dm.xpt"` | `xpt` | SAS Transport file with a small SDTM Demographics dataset |
+
+    Examples
+    --------
+    Use `load_metadata_example()` to locate a bundled Define-XML document, then import it with
+    [`import_metadata()`](`pointblank.import_metadata`):
+
+    ```python
+    import pointblank as pb
+
+    define_path = pb.load_metadata_example("define.xml")
+    package = pb.import_metadata(define_path, format="cdisc_define")
+
+    for name in package.keys():
+        meta = package[name]
+        print(f"{name}: {meta.dataset_label} ({len(meta.variables)} variables)")
+    ```
+    """
+    if name not in _METADATA_EXAMPLES:
+        available = "\n".join(
+            f"- `{fname}` ({fmt}): {desc}"
+            for fname, (fmt, desc) in _METADATA_EXAMPLES.items()
+        )
+        raise ValueError(
+            f"The metadata example `{name}` is not valid. Choose one of the following:\n"
+            f"{available}"
+        )
+
+    resource = files("pointblank.data") / "metadata_examples" / name
+
+    return Path(str(resource))
 
 
 def _detect_format(path: str | Path) -> str:
