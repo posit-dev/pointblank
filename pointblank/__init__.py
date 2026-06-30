@@ -76,6 +76,7 @@ from pointblank.metadata import (
     import_metadata,
     list_adam_datasets,
     list_sdtm_domains,
+    load_metadata_example,
     sdtm_to_metadata,
     validate_adam,
     validate_adam_structure,
@@ -190,6 +191,7 @@ __all__ = [
     "register_adapter",
     # Metadata standards import/export
     "import_metadata",
+    "load_metadata_example",
     "export_metadata",
     "MetadataImport",
     "MetadataPackage",
