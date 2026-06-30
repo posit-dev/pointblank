@@ -386,9 +386,7 @@ def test_count_validation_units_with_nulls():
     # A LazyFrame and an eager DataFrame should yield identical counts; Null values are excluded
     # from both the pass and fail counts and surfaced separately
     for native in (df, df.lazy()):
-        n, n_passed, n_failed, n_null = _count_validation_units(
-            tbl=native, column="pb_is_good_"
-        )
+        n, n_passed, n_failed, n_null = _count_validation_units(tbl=native, column="pb_is_good_")
         assert (n, n_passed, n_failed, n_null) == (5, 2, 1, 2)
 
 
