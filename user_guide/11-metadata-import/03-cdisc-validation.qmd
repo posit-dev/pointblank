@@ -577,6 +577,7 @@ Pointblank can also export validation metadata in Frictionless format. This is u
 to share data quality expectations with tools that understand the Frictionless ecosystem:
 
 ```{python}
+import json
 import tempfile
 from pathlib import Path
 
@@ -588,8 +589,10 @@ meta = pb.import_metadata(xpt_path, format="xpt")
 out_path = Path(tempfile.gettempdir()) / "dm_table_schema.json"
 pb.export_metadata(meta, out_path, format="frictionless")
 
-# Inspect the first part of the exported schema
-print(out_path.read_text()[:300])
+# Inspect the exported schema: how many fields, and the first two definitions
+schema = json.loads(out_path.read_text())
+print(f"Exported {len(schema['fields'])} field definitions. First two:")
+print(json.dumps(schema["fields"][:2], indent=2))
 ```
 
 The exported document contains the column definitions and constraints from the original metadata,
