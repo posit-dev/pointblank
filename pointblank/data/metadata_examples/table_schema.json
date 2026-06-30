@@ -1,0 +1,42 @@
+{
+  "fields": [
+    {
+      "name": "sensor_id",
+      "type": "string",
+      "description": "Unique sensor identifier",
+      "constraints": {"required": true, "pattern": "^SNS-[0-9]{4}$"}
+    },
+    {
+      "name": "reading_time",
+      "type": "datetime",
+      "description": "ISO 8601 timestamp of reading",
+      "constraints": {"required": true}
+    },
+    {
+      "name": "temperature",
+      "type": "number",
+      "description": "Temperature in Celsius",
+      "constraints": {"minimum": -40, "maximum": 85}
+    },
+    {
+      "name": "pressure_hpa",
+      "type": "number",
+      "description": "Atmospheric pressure in hectopascals",
+      "constraints": {"minimum": 870, "maximum": 1084}
+    },
+    {
+      "name": "battery_pct",
+      "type": "integer",
+      "description": "Battery level percentage",
+      "constraints": {"required": true, "minimum": 0, "maximum": 100}
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Sensor operational status",
+      "constraints": {"enum": ["active", "maintenance", "offline", "error"]}
+    }
+  ],
+  "primaryKey": ["sensor_id", "reading_time"],
+  "missingValues": ["", "NA"]
+}
