@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>pb – Pointblank | Pointblank</title>
+<title>CLI Reference – Pointblank | Pointblank</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -22,41 +22,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -78,7 +43,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-566d17bf37d26476530052504b6f1b11.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-f594b883fa7f57eff983ceed828115fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -121,7 +86,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
   <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/cli/">
-  <meta name="description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
+  <meta name="description" content="Find out if your data is what you think it is.">
   <script type="application/ld+json">
 [
   {
@@ -150,16 +115,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ]
 </script>
   <meta property="og:type" content="website">
-  <meta property="og:title" content="pb – Pointblank | Pointblank">
-  <meta property="og:description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
+  <meta property="og:title" content="CLI Reference – Pointblank | Pointblank">
+  <meta property="og:description" content="Find out if your data is what you think it is.">
   <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/cli/">
   <meta property="og:site_name" content="Pointblank">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="pb – Pointblank | Pointblank">
-  <meta name="twitter:description" content="Pointblank CLI: Data validation and quality tools for data engineers.">
+  <meta name="twitter:title" content="CLI Reference – Pointblank | Pointblank">
+  <meta name="twitter:description" content="Find out if your data is what you think it is.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-reference doc-cli-reference quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -215,7 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">great-docs</span></h1>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">CLI</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Index</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -228,8 +193,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
+  <div class="sidebar-item-container" style="padding-bottom: 0.5rem; padding-top: 0.25rem;"> 
+  <a href="../../reference/cli/index.html" style="font-family: &quot;Open Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">CLI Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../reference/cli/index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../reference/cli/pb.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></span></a>
   </div>
 </li>
@@ -303,8 +274,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#options" id="toc-options" class="nav-link active" data-scroll-target="#options">Options</a></li>
-  <li><a href="#commands" id="toc-commands" class="nav-link" data-scroll-target="#commands">Commands</a></li>
+  <li><a href="#commands" id="toc-commands" class="nav-link active" data-scroll-target="#commands">Commands</a></li>
   </ul>
 </nav>
     </div>
@@ -313,7 +283,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title cli-title"><span class="doc-object-name doc-function doc-label doc-label-cli-group">pb</span></h1>
+<h1 class="title">CLI Reference</h1>
 </div>
 
 
@@ -330,114 +300,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="doc-subject">
-<p>Pointblank CLI: Data validation and quality tools for data engineers.</p>
-</div>
-<div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span> COMMAND <span class="pp">[</span><span class="ss">ARGS</span><span class="pp">]</span>...</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>Use this CLI to validate data quality, explore datasets, and generate comprehensive reports for CSV, Parquet, and database sources. Suitable for data pipelines, ETL validation, and exploratory data analysis from the command line.</p>
-<p>Quick Examples:</p>
-<p>pb preview data.csv Preview your data pb scan data.csv Generate data profile pb validate data.csv Run basic validation</p>
-<p>Use pb COMMAND –help for detailed help on any command.</p>
-</div>
-<details class="gd-details">
-<summary class="gd-details-summary"><span class="gd-details-chevron" aria-hidden="true"></span><span class="gd-details-title">Full --help output</span></summary>
-<div class="gd-details-body">
-<div class="cli-manpage">
-<pre><code>Usage: pb [OPTIONS] COMMAND [ARGS]...
-
-  Pointblank CLI: Data validation and quality tools for data engineers.
-
-  Use this CLI to validate data quality, explore datasets, and generate
-  comprehensive reports for CSV, Parquet, and database sources. Suitable for
-  data pipelines, ETL validation, and exploratory data analysis from the
-  command line.
-
-  Quick Examples:
-
-    pb preview data.csv              Preview your data
-    pb scan data.csv                 Generate data profile
-    pb validate data.csv             Run basic validation
-
-  Use pb COMMAND --help for detailed help on any command.
-
-Options:
-  -v, --version  Show the version and exit.
-  -h, --help     Show this message and exit.
-
-Commands:
-  info           Display information about a data source.
-  preview        Preview a data table showing head and tail rows.
-  scan           Generate a data scan profile report.
-  missing        Generate a missing values report for a data table.
-  validate       Perform single or multiple data validations.
-  run            Run a Pointblank validation script or YAML configuration.
-  make-template  Create a validation script or YAML configuration template.
-  pl             Execute Polars expressions and display results.
-  datasets       List available built-in datasets.
-  requirements   Check installed dependencies and their availability.</code></pre>
-</div>
-</div>
-</details>
-<section id="options" class="level1 doc-parameters">
-<h1 class="doc-parameters">Options</h1>
-<div class="doc-definition-items">
 <dl>
-<dt><code><span class="doc-parameter-name">-v, --version</span></code></dt>
+<dt><a href="../../reference/cli/pb.html" class="doc-function doc-label doc-label-cli-group">pb</a></dt>
 <dd>
-Show the version and exit.
+Pointblank CLI: Data validation and quality tools for data engineers.
 </dd>
 </dl>
-</div>
-</section>
-<section id="commands" class="level1 doc-parameters">
-<h1 class="doc-parameters">Commands</h1>
-<div class="doc-definition-items">
+<section id="commands" class="level1 doc-group">
+<h1 class="doc-group">Commands</h1>
 <dl>
-<dt><code><span class="doc-parameter-name">info</span></code></dt>
+<dt><a href="../../reference/cli/info.html" class="doc-function doc-label doc-label-cli">info</a></dt>
 <dd>
-<a href="../../reference/cli/info.html">Display information about a data source.</a>
+Display information about a data source.
 </dd>
-<dt><code><span class="doc-parameter-name">preview</span></code></dt>
+<dt><a href="../../reference/cli/preview.html" class="doc-function doc-label doc-label-cli">preview</a></dt>
 <dd>
-<a href="../../reference/cli/preview.html">Preview a data table showing head and tail rows.</a>
+Preview a data table showing head and tail rows.
 </dd>
-<dt><code><span class="doc-parameter-name">scan</span></code></dt>
+<dt><a href="../../reference/cli/scan.html" class="doc-function doc-label doc-label-cli">scan</a></dt>
 <dd>
-<a href="../../reference/cli/scan.html">Generate a data scan profile report.</a>
+Generate a data scan profile report.
 </dd>
-<dt><code><span class="doc-parameter-name">missing</span></code></dt>
+<dt><a href="../../reference/cli/missing.html" class="doc-function doc-label doc-label-cli">missing</a></dt>
 <dd>
-<a href="../../reference/cli/missing.html">Generate a missing values report for a data table.</a>
+Generate a missing values report for a data table.
 </dd>
-<dt><code><span class="doc-parameter-name">validate</span></code></dt>
+<dt><a href="../../reference/cli/validate.html" class="doc-function doc-label doc-label-cli">validate</a></dt>
 <dd>
-<a href="../../reference/cli/validate.html">Perform single or multiple data validations.</a>
+Perform single or multiple data validations.
 </dd>
-<dt><code><span class="doc-parameter-name">datasets</span></code></dt>
+<dt><a href="../../reference/cli/datasets.html" class="doc-function doc-label doc-label-cli">datasets</a></dt>
 <dd>
-<a href="../../reference/cli/datasets.html">List available built-in datasets.</a>
+List available built-in datasets.
 </dd>
-<dt><code><span class="doc-parameter-name">requirements</span></code></dt>
+<dt><a href="../../reference/cli/requirements.html" class="doc-function doc-label doc-label-cli">requirements</a></dt>
 <dd>
-<a href="../../reference/cli/requirements.html">Check installed dependencies and their availability.</a>
+Check installed dependencies and their availability.
 </dd>
-<dt><code><span class="doc-parameter-name">make-template</span></code></dt>
+<dt><a href="../../reference/cli/make_template.html" class="doc-function doc-label doc-label-cli">make-template</a></dt>
 <dd>
-<a href="../../reference/cli/make_template.html">Create a validation script or YAML configuration template.</a>
+Create a validation script or YAML configuration template.
 </dd>
-<dt><code><span class="doc-parameter-name">run</span></code></dt>
+<dt><a href="../../reference/cli/run.html" class="doc-function doc-label doc-label-cli">run</a></dt>
 <dd>
-<a href="../../reference/cli/run.html">Run a Pointblank validation script or YAML configuration.</a>
+Run a Pointblank validation script or YAML configuration.
 </dd>
-<dt><code><span class="doc-parameter-name">pl</span></code></dt>
+<dt><a href="../../reference/cli/pl.html" class="doc-function doc-label doc-label-cli">pl</a></dt>
 <dd>
-<a href="../../reference/cli/pl.html">Execute Polars expressions and display results.</a>
+Execute Polars expressions and display results.
 </dd>
 </dl>
-</div>
 
 
 </section>
@@ -790,7 +702,6 @@ Show the version and exit.
 </div>
 </footer>
 <script src="../../github-widget.js"></script>
-<script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
 <script src="../../sidebar-filter.js"></script>

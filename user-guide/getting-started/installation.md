@@ -158,7 +158,7 @@ Pointblank includes experimental support for AI-assisted validation plan generat
 pip install pointblank[generate]
 ```
 
-This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the [Draft Validation](draft-validation.qmd) article for how to create validation plans from existing data.
+This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the [Draft Validation](../../user-guide/advanced-validation/draft-validation.md) article for how to create validation plans from existing data.
 
 
 ## Development Version
@@ -236,6 +236,6 @@ The CLI is useful for:
 
 > **Tip: See the CLI in Action**
 >
-> Watch our [interactive CLI demonstrations](../demos/cli-interactive/index.qmd) to see these commands executing in real-time with actual output formatting.
+> Watch our [interactive CLI demonstrations](../../examples/advanced-topics/cli-interactive.md) to see these commands executing in real-time with actual output formatting.
 
-Learn more about the CLI capabilities in the [Command Line Interface](cli.qmd) guide.
+Learn more about the CLI capabilities in the [Command Line Interface](../../user-guide/the-pointblank-cli/index.md) guide.
