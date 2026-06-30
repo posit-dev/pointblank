@@ -24,6 +24,7 @@ from pointblank._utils import (
     _copy_dataframe,
     _count_null_values_in_column,
     _count_true_values_in_column,
+    _count_validation_units,
     _derive_bounds,
     _derive_single_bound,
     _format_to_float_value,
@@ -362,6 +363,31 @@ def test_count_null_values_in_column(tbl_type):
     data = load_dataset(dataset="small_table", tbl_type=tbl_type)
 
     assert _count_null_values_in_column(tbl=data, column="c") == 2
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_count_validation_units(tbl_type):
+    data = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Column `e` has 8 True and 5 False values (13 rows total, no nulls)
+    n, n_passed, n_failed, n_null = _count_validation_units(tbl=data, column="e")
+
+    assert n == 13
+    assert n_passed == 8
+    assert n_failed == 5
+    assert n_null == 0
+
+
+def test_count_validation_units_with_nulls():
+    import polars as pl
+
+    df = pl.DataFrame({"pb_is_good_": [True, False, True, None, None]})
+
+    # A LazyFrame and an eager DataFrame should yield identical counts; Null values are excluded
+    # from both the pass and fail counts and surfaced separately
+    for native in (df, df.lazy()):
+        n, n_passed, n_failed, n_null = _count_validation_units(tbl=native, column="pb_is_good_")
+        assert (n, n_passed, n_failed, n_null) == (5, 2, 1, 2)
 
 
 def test_format_to_integer_value():

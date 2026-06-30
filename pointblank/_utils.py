@@ -395,6 +395,61 @@ def _count_null_values_in_column(
     return int(result.item())
 
 
+def _count_validation_units(
+    tbl: IntoFrame,
+    column: str,
+) -> tuple[int, int, int, int]:
+    """
+    Compute the row count and pass/fail/null counts for a results table in a single pass.
+
+    Given a results table with a boolean `column` (typically ``pb_is_good_``), this returns
+    the total number of rows, the number of `True` values (passing test units), the number of
+    `False` values (failing test units), and the number of Null values.
+
+    Computing all four quantities in one aggregation is important for LazyFrames: otherwise each
+    separate count would trigger its own `collect()`, re-executing the entire (potentially
+    expensive) lazy plan multiple times.
+
+    Parameters
+    ----------
+    tbl
+        A Narwhals-compatible DataFrame or table-like object.
+    column
+        The boolean column to summarize.
+
+    Returns
+    -------
+    tuple[int, int, int, int]
+        A tuple of ``(n, n_passed, n_failed, n_null)``.
+    """
+
+    # Convert the DataFrame to a Narwhals DataFrame (no detrimental effect if
+    # already a Narwhals DataFrame)
+    tbl_nw = nw.from_native(tbl)
+
+    # Build a single aggregation that computes all counts at once. Casting booleans to Int32
+    # before summing is required for backends like PySpark (which can't sum booleans), and the
+    # sums naturally ignore Null values (so `n_passed`/`n_failed` exclude nulls).
+    result = tbl_nw.select(
+        nw.len().alias("n"),
+        nw.col(column).cast(nw.Int32).sum().alias("n_passed"),
+        (~nw.col(column)).cast(nw.Int32).sum().alias("n_failed"),
+        nw.col(column).is_null().cast(nw.Int32).sum().alias("n_null"),
+    )
+
+    if is_narwhals_lazyframe(result):
+        result = result.collect()
+
+    row = result.rows(named=True)[0]
+
+    n = int(row["n"])
+    n_passed = int(row["n_passed"] or 0)
+    n_failed = int(row["n_failed"] or 0)
+    n_null = int(row["n_null"] or 0)
+
+    return n, n_passed, n_failed, n_null
+
+
 def _is_numeric_dtype(dtype: str) -> bool:
     """
     Check if a given data type string represents a numeric type.
