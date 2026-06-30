@@ -319,6 +319,39 @@ Invalid: 15-Mar-2024           (wrong format)
 This catches a common data quality issue where dates are entered in locale-specific formats
 rather than the required ISO 8601 pattern.
 
+### Catching Conformance Problems
+
+The examples so far have used clean data, so every check passes. The point of validation, of course,
+is to surface problems. Here is the same DM domain with three deliberate defects: a missing
+`USUBJID` (a required variable), a row where `DOMAIN` is `"AE"` instead of `"DM"`, and a `RFSTDTC`
+value entered in the wrong date format:
+
+```{python}
+# A Demographics dataset with three injected conformance issues
+dm_data_with_issues = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN": ["DM", "DM", "AE", "DM"],                       # row 3: wrong domain code
+    "USUBJID": ["STUDY01-001", "STUDY01-002", None, "STUDY01-004"],  # row 3: required but null
+    "SUBJID": ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "03/15/2024", "2024-02-01", "2024-02-10"],  # row 2: not ISO 8601
+    "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02"],
+    "AGE": [45, 62, 38, 55],
+    "AGEU": ["YEARS"] * 4,
+    "SEX": ["M", "F", "M", "F"],
+    "RACE": ["WHITE", "ASIAN", "WHITE", "ASIAN"],
+    "ARMCD": ["DRUG", "PLACEBO", "DRUG", "PLACEBO"],
+    "ARM": ["Active Drug 10mg", "Placebo", "Active Drug 10mg", "Placebo"],
+})
+
+validation = validate_sdtm(data=dm_data_with_issues, domain="DM").interrogate()
+validation
+```
+
+Three steps now report a failing unit: the `col_vals_not_null()` check on `USUBJID`, the
+`col_vals_in_set()` check on `DOMAIN`, and the ISO 8601 `col_vals_regex()` check on `RFSTDTC`. Each
+failing step links to the specific rows so you can trace a conformance issue back to the offending
+records.
+
 ### Converting SDTM Templates to MetadataImport
 
 If you prefer to work with the standard `MetadataImport` interface (for example, to use
