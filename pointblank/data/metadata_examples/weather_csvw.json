@@ -1,0 +1,64 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "weather_observations.csv",
+  "dc:title": "Weather Station Observations",
+  "dc:description": "Hourly weather observations from monitoring stations",
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "station_id",
+        "titles": "Station ID",
+        "datatype": "string",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "titles": "Observation Time",
+        "datatype": {"base": "datetime"},
+        "required": true
+      },
+      {
+        "name": "temperature_c",
+        "titles": "Temperature (Celsius)",
+        "datatype": {
+          "base": "decimal",
+          "minimum": -50,
+          "maximum": 60
+        },
+        "required": true
+      },
+      {
+        "name": "humidity_pct",
+        "titles": "Relative Humidity (%)",
+        "datatype": {
+          "base": "decimal",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      {
+        "name": "wind_speed_kmh",
+        "titles": "Wind Speed (km/h)",
+        "datatype": {
+          "base": "decimal",
+          "minimum": 0,
+          "maximum": 400
+        }
+      },
+      {
+        "name": "precipitation_mm",
+        "titles": "Precipitation (mm)",
+        "datatype": {
+          "base": "decimal",
+          "minimum": 0
+        }
+      },
+      {
+        "name": "condition",
+        "titles": "Weather Condition",
+        "datatype": "string"
+      }
+    ],
+    "primaryKey": ["station_id", "timestamp"]
+  }
+}
