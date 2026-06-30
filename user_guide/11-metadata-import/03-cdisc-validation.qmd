@@ -39,6 +39,13 @@ Or install Pointblank with the CDISC extra:
 pip install pointblank[cdisc]
 ```
 
+Reading metadata from SAS Transport (`.xpt`) files (used in the *Exporting Metadata* example below)
+additionally requires the `pyreadstat` library:
+
+```bash
+pip install pyreadstat
+```
+
 The SDTM and ADaM domain templates are built into Pointblank and require no additional
 dependencies. They encode the structural requirements from the SDTM Implementation Guide 3.4 and
 the ADaM Implementation Guide 1.1 directly in Python, so you can validate clinical datasets
