@@ -123,12 +123,10 @@ def load_metadata_example(name: str) -> Path:
     """
     if name not in _METADATA_EXAMPLES:
         available = "\n".join(
-            f"- `{fname}` ({fmt}): {desc}"
-            for fname, (fmt, desc) in _METADATA_EXAMPLES.items()
+            f"- `{fname}` ({fmt}): {desc}" for fname, (fmt, desc) in _METADATA_EXAMPLES.items()
         )
         raise ValueError(
-            f"The metadata example `{name}` is not valid. Choose one of the following:\n"
-            f"{available}"
+            f"The metadata example `{name}` is not valid. Choose one of the following:\n{available}"
         )
 
     resource = files("pointblank.data") / "metadata_examples" / name
