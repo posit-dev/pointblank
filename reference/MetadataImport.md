@@ -7,7 +7,20 @@ Parsed metadata from an external standard.
 Usage
 
 ``` python
-MetadataImport()
+MetadataImport(
+    source_format,
+    source_path=None,
+    source_version=None,
+    dataset_name=None,
+    dataset_label=None,
+    dataset_description=None,
+    creation_date=None,
+    study_id=None,
+    domain=None,
+    variables=list(),
+    codelists=dict(),
+    missing_value_codes=dict()
+)
 ```
 
 

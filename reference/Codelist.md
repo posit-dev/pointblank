@@ -7,7 +7,14 @@ A controlled terminology / value set from an external standard.
 Usage
 
 ``` python
-Codelist()
+Codelist(
+    name,
+    codes=list(),
+    label=None,
+    version=None,
+    source=None,
+    extensible=False
+)
 ```
 
 

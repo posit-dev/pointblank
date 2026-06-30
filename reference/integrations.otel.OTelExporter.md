@@ -7,7 +7,20 @@ Export Pointblank validation results as OpenTelemetry signals.
 Usage
 
 ``` python
-integrations.otel.OTelExporter()
+integrations.otel.OTelExporter(
+    *,
+    meter_name="pointblank",
+    meter_version=None,
+    enable_metrics=True,
+    enable_tracing=False,
+    enable_logging=False,
+    meter_provider=None,
+    tracer_provider=None,
+    logger_provider=None,
+    metric_prefix="pb.validation",
+    log_level="warning",
+    extra_attributes=None
+)
 ```
 
 

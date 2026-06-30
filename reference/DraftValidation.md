@@ -7,7 +7,12 @@ Draft a validation plan for a given table using an LLM.
 Usage
 
 ``` python
-DraftValidation()
+DraftValidation(
+    data,
+    model,
+    api_key=None,
+    verify_ssl=True,
+)
 ```
 
 

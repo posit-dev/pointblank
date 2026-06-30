@@ -7,7 +7,12 @@ A collection of [MetadataImport](MetadataImport.md#pointblank.MetadataImport) ob
 Usage
 
 ``` python
-MetadataPackage()
+MetadataPackage(
+    name=None,
+    items=dict(),
+    description=None,
+    version=None,
+)
 ```
 
 

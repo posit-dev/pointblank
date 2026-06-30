@@ -7,7 +7,15 @@ Structural template for an SDTM domain.
 Usage
 
 ``` python
-SDTMDomainTemplate()
+SDTMDomainTemplate(
+    domain,
+    label,
+    description,
+    domain_class,
+    repeating,
+    variables=list(),
+    natural_keys=list()
+)
 ```
 
 

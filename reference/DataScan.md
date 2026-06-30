@@ -7,7 +7,10 @@ Get a summary of a dataset.
 Usage
 
 ``` python
-DataScan()
+DataScan(
+    data,
+    tbl_name=None,
+)
 ```
 
 

@@ -36018,6 +36018,13 @@ Or install Pointblank with the CDISC extra:
 pip install pointblank[cdisc]
 ```
 
+Reading metadata from SAS Transport (`.xpt`) files (used in the *Exporting Metadata* example below)
+additionally requires the `pyreadstat` library:
+
+```bash
+pip install pyreadstat
+```
+
 The SDTM and ADaM domain templates are built into Pointblank and require no additional
 dependencies. They encode the structural requirements from the SDTM Implementation Guide 3.4 and
 the ADaM Implementation Guide 1.1 directly in Python, so you can validate clinical datasets
@@ -36033,28 +36040,53 @@ a form suitable for validation.
 ### Importing a Define-XML File
 
 The `import_metadata()` function with `format="cdisc_define"` reads a Define-XML file and returns
-a `MetadataPackage` containing metadata for all datasets defined in the document:
+a `MetadataPackage` containing metadata for all datasets defined in the document. So that you can
+run these examples without supplying your own files, Pointblank bundles a small set of sample
+metadata documents that you can locate with `load_metadata_example()`:
 
-```python
+```{python}
 import pointblank as pb
 
-# Import all datasets from a Define-XML
-package = pb.import_metadata("define.xml", format="cdisc_define")
+# Locate the bundled Define-XML example and import all of its datasets
+define_path = pb.load_metadata_example("define.xml")
+package = pb.import_metadata(define_path, format="cdisc_define")
 
 # List the datasets defined in the document
-for name, meta in package.datasets.items():
+for name in package.keys():
+    meta = package[name]
     print(f"{name}: {meta.dataset_label} ({len(meta.variables)} variables)")
 ```
 
 Each dataset in the package is a `MetadataImport` object with full variable-level metadata. You
-can access individual datasets by name and generate validation from them:
+can access individual datasets by name and generate validation from them. Here we validate a small
+Demographics table against the metadata extracted from the Define-XML:
 
-```python
+```{python}
+import polars as pl
+
 # Get metadata for the Demographics domain
 dm_meta = package["DM"]
 
-# Generate validation for your Demographics data
-validation = dm_meta.to_validate(data=dm_dataframe).interrogate()
+# A small Demographics dataset to validate
+dm_data = pl.DataFrame({
+    "STUDYID": ["XYZ789"] * 4,
+    "DOMAIN": ["DM"] * 4,
+    "USUBJID": ["XYZ789-001", "XYZ789-002", "XYZ789-003", "XYZ789-004"],
+    "SUBJID": ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "2024-01-20", "2024-02-01", "2024-02-10"],
+    "RFENDTC": ["2024-06-15", "2024-06-20", "2024-07-01", "2024-07-10"],
+    "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02"],
+    "AGE": [45, 62, 38, 55],
+    "AGEU": ["YEARS"] * 4,
+    "SEX": ["M", "F", "M", "F"],
+    "RACE": ["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE"],
+    "ARMCD": ["DRUG", "PLACEBO", "DRUG", "PLACEBO"],
+    "ARM": ["Active Drug 10mg", "Placebo", "Active Drug 10mg", "Placebo"],
+})
+
+# Generate validation for the Demographics data from the Define-XML metadata
+validation = dm_meta.to_validate(data=dm_data).interrogate()
+validation
 ```
 
 ### What Gets Extracted
@@ -36081,44 +36113,55 @@ Define-XML documents embed the codelists that constrain variable values. When Po
 Define-XML, all codelists are extracted and linked to their respective variables. The `to_validate()`
 method then generates `col_vals_in_set()` checks for each variable that references a codelist:
 
-```python
-package = pb.import_metadata("define.xml", format="cdisc_define")
-dm_meta = package["DM"]
-
-# Inspect codelists referenced by this domain
+```{python}
+# Inspect codelists referenced by the Demographics domain
 for cl_name, codelist in dm_meta.codelists.items():
     print(f"{cl_name}: {codelist.to_set()[:5]}...")  # first 5 values
     print(f"  Extensible: {codelist.extensible}")
 ```
 
-Non-extensible codelists require strict adherence: any value not in the codelist is a validation
-failure. Extensible codelists permit sponsor-defined additions, so Pointblank treats values outside
-the set as warnings rather than hard failures.
+The `extensible` flag records an important distinction. Non-extensible codelists require strict
+adherence: any value not in the codelist is a conformance issue. Extensible codelists permit
+sponsor-defined additions, so a value outside the published set is not necessarily an error.
+
+Pointblank currently generates the same `col_vals_in_set()` check for both kinds of codelist. For
+extensible codelists you will typically want to relax that step to reflect that additions are
+allowed, for example by attaching a warning-level threshold to the step rather than treating every
+out-of-set value as a hard failure.
 
 ## CDISC Controlled Terminology Import
 
 Beyond the codelists embedded in Define-XML, CDISC publishes standalone Controlled Terminology
 packages as XML files. These contain the canonical value sets for concepts like SEX, RACE,
-ROUTE OF ADMINISTRATION, and hundreds of others. Pointblank can parse these directly:
+ROUTE OF ADMINISTRATION, and hundreds of others. Pointblank can parse these directly.
 
-```python
-import pointblank as pb
+Importing a CT package returns a `MetadataPackage` whose entries are keyed by codelist name. Each
+entry is a `MetadataImport` that holds the codelist itself:
 
-# Import a CDISC CT package
-ct = pb.import_metadata("SDTM_CT_2024-03-29.xml", format="cdisc_ct")
+```{python}
+# Import the bundled CDISC CT example
+ct_path = pb.load_metadata_example("sdtm_ct.xml")
+ct = pb.import_metadata(ct_path, format="cdisc_ct")
 
-# Access individual codelists by C-code
-sex_codelist = ct.codelists.get("C66731")
-if sex_codelist:
-    print(f"SEX values: {sex_codelist.to_set()}")
-    print(f"Extensible: {sex_codelist.extensible}")
+# List the codelists in the package
+print(list(ct.keys()))
 
-# Use in validation
+# Access a codelist by name
+sex_codelist = ct["Sex"].codelists["Sex"]
+print(f"SEX values: {sex_codelist.to_set()}")
+print(f"Extensible: {sex_codelist.extensible}")
+```
+
+Once you have a codelist, its permitted values feed directly into a `col_vals_in_set()` check:
+
+```{python}
+# Use the CT-derived value set in a validation
 validation = (
-    pb.Validate(data=demographics_df)
+    pb.Validate(data=dm_data)
     .col_vals_in_set(columns="SEX", set=sex_codelist.to_set())
     .interrogate()
 )
+validation
 ```
 
 Controlled Terminology packages version quarterly (e.g., 2024-03-29, 2024-06-28). Referencing a
@@ -36254,6 +36297,39 @@ Invalid: 15-Mar-2024           (wrong format)
 
 This catches a common data quality issue where dates are entered in locale-specific formats
 rather than the required ISO 8601 pattern.
+
+### Catching Conformance Problems
+
+The examples so far have used clean data, so every check passes. The point of validation, of course,
+is to surface problems. Here is the same DM domain with three deliberate defects: a missing
+`USUBJID` (a required variable), a row where `DOMAIN` is `"AE"` instead of `"DM"`, and a `RFSTDTC`
+value entered in the wrong date format:
+
+```{python}
+# A Demographics dataset with three injected conformance issues
+dm_data_with_issues = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN": ["DM", "DM", "AE", "DM"],                       # row 3: wrong domain code
+    "USUBJID": ["STUDY01-001", "STUDY01-002", None, "STUDY01-004"],  # row 3: required but null
+    "SUBJID": ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "03/15/2024", "2024-02-01", "2024-02-10"],  # row 2: not ISO 8601
+    "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02"],
+    "AGE": [45, 62, 38, 55],
+    "AGEU": ["YEARS"] * 4,
+    "SEX": ["M", "F", "M", "F"],
+    "RACE": ["WHITE", "ASIAN", "WHITE", "ASIAN"],
+    "ARMCD": ["DRUG", "PLACEBO", "DRUG", "PLACEBO"],
+    "ARM": ["Active Drug 10mg", "Placebo", "Active Drug 10mg", "Placebo"],
+})
+
+validation = validate_sdtm(data=dm_data_with_issues, domain="DM").interrogate()
+validation
+```
+
+Three steps now report a failing unit: the `col_vals_not_null()` check on `USUBJID`, the
+`col_vals_in_set()` check on `DOMAIN`, and the ISO 8601 `col_vals_regex()` check on `RFSTDTC`. Each
+failing step links to the specific rows so you can trace a conformance issue back to the offending
+records.
 
 ### Converting SDTM Templates to MetadataImport
 
@@ -36429,38 +36505,49 @@ seamlessly.
 
 ### Importing a Frictionless Schema
 
-```python
-import pointblank as pb
+The bundled `datapackage.json` example describes a transactions table. Importing it yields a
+`MetadataImport` with one `VariableMetadata` per column:
 
-# Import from a datapackage.json
-meta = pb.import_metadata("datapackage.json", format="frictionless")
+```{python}
+# Import the bundled Frictionless Data Package example
+datapackage_path = pb.load_metadata_example("datapackage.json")
+meta = pb.import_metadata(datapackage_path, format="frictionless")
 
-# Or from a standalone Table Schema
-meta = pb.import_metadata("schema.json", format="table_schema")
-
-# Frictionless constraints map directly:
-# - "required": true  ->  col_vals_not_null()
-# - "unique": true    ->  rows_distinct()
-# - "minimum": 0      ->  col_vals_ge(value=0)
-# - "maximum": 100    ->  col_vals_le(value=100)
-# - "pattern": "..."  ->  col_vals_regex(pattern="...")
-# - "enum": [...]     ->  col_vals_in_set(set=[...])
+print(f"Dataset: {meta.dataset_name}")
+for v in meta.variables:
+    print(f"  {v.name:16s} {v.dtype}")
 ```
+
+Frictionless constraints map directly onto Pointblank validation steps:
+
+| Frictionless constraint | Pointblank step |
+|-------------------------|-----------------|
+| `"required": true` | `col_vals_not_null()` |
+| `"unique": true` | `rows_distinct()` |
+| `"minimum": 0` | `col_vals_ge(value=0)` |
+| `"maximum": 100` | `col_vals_le(value=100)` |
+| `"pattern": "..."` | `col_vals_regex(pattern="...")` |
+| `"enum": [...]` | `col_vals_in_set(set=[...])` |
 
 The constraint mapping is direct and complete. Every constraint expressible in a Frictionless
 Table Schema has a corresponding Pointblank validation step, making the translation lossless.
+
+A standalone Table Schema (without the surrounding data package wrapper) imports the same way with
+`format="table_schema"`.
 
 ### CSVW (CSV on the Web)
 
 The W3C's CSVW standard provides similar capabilities to Frictionless but uses JSON-LD and aligns
 with linked data principles. Pointblank imports CSVW metadata with the same interface:
 
-```python
-meta = pb.import_metadata("metadata.json", format="csvw")
+```{python}
+# Import the bundled CSVW example
+csvw_path = pb.load_metadata_example("weather_csvw.json")
+meta = pb.import_metadata(csvw_path, format="csvw")
 
 # CSVW column descriptors become VariableMetadata
-# datatype constraints become validation steps
-validation = meta.to_validate(data=df).interrogate()
+print(f"Dataset: {meta.dataset_name} ({len(meta.variables)} variables)")
+print("Columns:", ", ".join(v.name for v in meta.variables))
 ```
 
 ## Exporting Metadata
@@ -36468,12 +36555,23 @@ validation = meta.to_validate(data=df).interrogate()
 Pointblank can also export validation metadata in Frictionless format. This is useful when you want
 to share data quality expectations with tools that understand the Frictionless ecosystem:
 
-```python
-import pointblank as pb
+```{python}
+import json
+import tempfile
+from pathlib import Path
 
-# Export a MetadataImport as Frictionless Table Schema
-meta = pb.import_metadata("clinical_data.xpt", format="xpt")
-pb.export_metadata(meta, "table_schema.json", format="frictionless")
+# Read metadata from the bundled SAS Transport (XPT) example
+xpt_path = pb.load_metadata_example("dm.xpt")
+meta = pb.import_metadata(xpt_path, format="xpt")
+
+# Export it as a Frictionless Table Schema
+out_path = Path(tempfile.gettempdir()) / "dm_table_schema.json"
+pb.export_metadata(meta, out_path, format="frictionless")
+
+# Inspect the exported schema: how many fields, and the first two definitions
+schema = json.loads(out_path.read_text())
+print(f"Exported {len(schema['fields'])} field definitions. First two:")
+print(json.dumps(schema["fields"][:2], indent=2))
 ```
 
 The exported document contains the column definitions and constraints from the original metadata,
@@ -36486,12 +36584,11 @@ Define-XML provides the authoritative variable definitions, but you might also w
 against SDTM domain rules and controlled terminology packages. Pointblank supports this by
 letting you compose validation workflows from different metadata sources:
 
-```python
-import pointblank as pb
+```{python}
 from pointblank.metadata import validate_sdtm
 
 # Load the Define-XML for variable-level constraints
-package = pb.import_metadata("define.xml", format="cdisc_define")
+package = pb.import_metadata(pb.load_metadata_example("define.xml"), format="cdisc_define")
 dm_meta = package["DM"]
 
 # Generate validation from Define-XML metadata
@@ -36501,9 +36598,12 @@ validation = dm_meta.to_validate(data=dm_data)
 # (ISO 8601 checks, sequence number rules, etc.)
 sdtm_validation = validate_sdtm(data=dm_data, domain="DM")
 
-# Run both and compare results
+# Run both and compare how many checks each contributes
 define_results = validation.interrogate()
 sdtm_results = sdtm_validation.interrogate()
+
+print(f"Define-XML checks: {len(define_results.validation_info)}")
+print(f"SDTM template checks: {len(sdtm_results.validation_info)}")
 ```
 
 This layered approach gives you the flexibility to apply different levels of validation depending

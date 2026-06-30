@@ -7,7 +7,18 @@ A declarative boundary contract for pipeline data.
 Usage
 
 ``` python
-Contract()
+Contract(
+    name,
+    direction="source",
+    schema=None,
+    steps=list(),
+    version=None,
+    owner=None,
+    consumers=None,
+    description=None,
+    thresholds=None,
+    on_violation="warn"
+)
 ```
 
 

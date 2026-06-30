@@ -7,7 +7,15 @@ Binds source and target contracts into a pipeline boundary enforcement unit.
 Usage
 
 ``` python
-Pipeline()
+Pipeline(
+    source=None,
+    target=None,
+    thresholds=None,
+    actions=None,
+    final_actions=None,
+    label=None,
+    short_circuit=True
+)
 ```
 
 

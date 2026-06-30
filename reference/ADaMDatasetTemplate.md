@@ -7,7 +7,14 @@ Structural template for an ADaM dataset.
 Usage
 
 ``` python
-ADaMDatasetTemplate()
+ADaMDatasetTemplate(
+    name,
+    label,
+    description,
+    dataset_class,
+    variables=list(),
+    natural_keys=list()
+)
 ```
 
 

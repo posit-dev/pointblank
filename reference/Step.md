@@ -7,7 +7,10 @@ A single validation step in a Contract, defined declaratively.
 Usage
 
 ``` python
-Step()
+Step(
+    method,
+    **kwargs,
+)
 ```
 
 

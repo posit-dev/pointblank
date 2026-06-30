@@ -7,7 +7,7 @@ Define actions to be taken after validation is complete.
 Usage
 
 ``` python
-FinalActions()
+FinalActions(*args)
 ```
 
 

@@ -201,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="449" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="450" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -1293,8 +1293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h3 id="toc-title">On this page</h3>
    
   <ul class="collapse">
-  <li><a href="#parameter-attributes" id="toc-parameter-attributes" class="nav-link active" data-scroll-target="#parameter-attributes">Parameter Attributes</a></li>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a>
   <ul class="collapse">
   <li><a href="#passed" id="toc-passed" class="nav-link" data-scroll-target="#passed"><span class="doc-object-name doc-attribute doc-label doc-label-property">passed</span></a></li>
@@ -1338,38 +1337,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L17-L107" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">PipelineResult</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">PipelineResult</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">source_validation</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">target_validation</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">transform_output</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">_source_passed</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">_target_passed</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Contains the validation results for both source and target boundaries, plus metadata about the run.</p>
 </div>
-<section id="parameter-attributes" class="level2 doc-parameter-attributes">
-<h2 class="doc-parameter-attributes">Parameter Attributes</h2>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">source_validation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Validate | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-
-</dd>
-<dt><code><span class="doc-parameter-name">target_validation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Validate | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-
-</dd>
-<dt><code><span class="doc-parameter-name">transform_output</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-
-</dd>
-<dt><code><span class="doc-parameter-name">_source_passed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-
-</dd>
-<dt><code><span class="doc-parameter-name">_target_passed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-
-</dd>
-</dl>
-</div>
-</section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes">Attributes</h2>
 <div class="doc-definition-items">

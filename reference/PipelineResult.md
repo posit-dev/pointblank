@@ -7,25 +7,17 @@ Result of a pipeline boundary validation run.
 Usage
 
 ``` python
-PipelineResult()
+PipelineResult(
+    source_validation=None,
+    target_validation=None,
+    transform_output=None,
+    _source_passed=None,
+    _target_passed=None
+)
 ```
 
 
 Contains the validation results for both source and target boundaries, plus metadata about the run.
-
-
-## Parameter Attributes
-
-
-`source_validation: Validate | None = None`  
-
-`target_validation: Validate | None = None`  
-
-`transform_output: Any = None`  
-
-`_source_passed: bool | None = None`  
-
-`_target_passed: bool | None = None`  
 
 
 ## Attributes

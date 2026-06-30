@@ -7,7 +7,11 @@ Definition of threshold values.
 Usage
 
 ``` python
-Thresholds()
+Thresholds(
+    warning=None,
+    error=None,
+    critical=None,
+)
 ```
 
 

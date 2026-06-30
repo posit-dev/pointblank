@@ -7,7 +7,13 @@ Specification for structured missing values in a column.
 Usage
 
 ``` python
-MissingSpec()
+MissingSpec(
+    reasons,
+    categories=None,
+    null_is_missing=True,
+    null_reason="unknown",
+    description=None
+)
 ```
 
 

@@ -7,7 +7,16 @@ Result of importing an external contract/schema.
 Usage
 
 ``` python
-ContractImport()
+ContractImport(
+    source_format,
+    source_path=None,
+    source_version=None,
+    columns=list(),
+    constraints=list(),
+    metadata=dict(),
+    warnings=list(),
+    coverage=1.0
+)
 ```
 
 
