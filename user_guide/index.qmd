@@ -62,11 +62,11 @@ validation.get_tabular_report(title="Game Revenue Validation Report")
 That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
 your team. And if you need help getting started or want to work faster, Pointblank has built-in AI
 support through the [`assistant()`](`assistant`) function to guide you along the way.
-You can also use [`DraftValidation`](user-guide/draft-validation.qmd) to quickly generate a
+You can also use [`DraftValidation`](advanced-validation/draft-validation.qmd) to quickly generate a
 validation plan from your existing data (great for getting started fast).
 
-Ready to validate? Start with our [Installation](user-guide/installation.qmd) guide or jump straight
-to the [User Guide](user-guide/index.qmd).
+Ready to validate? Start with our [Installation](getting-started/installation.qmd) guide or jump straight
+to the [Quickstart](getting-started/quickstart.qmd).
 
 By the way, Pointblank is made with 💙 by [Posit](https://posit.co/).
 
@@ -78,7 +78,7 @@ and communicate results to both technical and non-technical stakeholders.
 
 With Pointblank you can:
 
-- **Validate data** through a fluent, chainable API with [25+ validation methods](reference/index.qmd#validation-steps)
+- **Validate data** through a fluent, chainable API with [25+ validation methods](../reference/index.qmd#validation-steps)
 - **Set thresholds** to define acceptable levels of data quality (warning, error, critical)
 - **Take actions** when thresholds are exceeded (notifications, logging, custom functions)
 - **Generate reports** that make data quality issues immediately understandable
@@ -169,7 +169,7 @@ pip install "pointblank[duckdb]"   # DuckDB support
 pip install "pointblank[postgres]" # PostgreSQL support
 ```
 
-See the [Installation guide](user-guide/installation.qmd) for more details.
+See the [Installation guide](getting-started/installation.qmd) for more details.
 
 ## Join the Community
 
