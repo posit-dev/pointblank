@@ -141,9 +141,14 @@ for cl_name, codelist in dm_meta.codelists.items():
     print(f"  Extensible: {codelist.extensible}")
 ```
 
-Non-extensible codelists require strict adherence: any value not in the codelist is a validation
-failure. Extensible codelists permit sponsor-defined additions, so Pointblank treats values outside
-the set as warnings rather than hard failures.
+The `extensible` flag records an important distinction. Non-extensible codelists require strict
+adherence: any value not in the codelist is a conformance issue. Extensible codelists permit
+sponsor-defined additions, so a value outside the published set is not necessarily an error.
+
+Pointblank currently generates the same `col_vals_in_set()` check for both kinds of codelist. For
+extensible codelists you will typically want to relax that step to reflect that additions are
+allowed, for example by attaching a warning-level threshold to the step rather than treating every
+out-of-set value as a hard failure.
 
 ## CDISC Controlled Terminology Import
 
