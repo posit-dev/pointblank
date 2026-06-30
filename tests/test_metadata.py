@@ -3013,9 +3013,7 @@ class TestLoadMetadataExample:
         """The bundled Define-XML example imports into a usable MetadataPackage."""
         from pointblank.metadata._import import import_metadata, load_metadata_example
 
-        package = import_metadata(
-            load_metadata_example("define.xml"), format="cdisc_define"
-        )
+        package = import_metadata(load_metadata_example("define.xml"), format="cdisc_define")
         assert isinstance(package, MetadataPackage)
         assert "DM" in package.keys()
 
