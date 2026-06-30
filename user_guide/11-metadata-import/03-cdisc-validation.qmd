@@ -541,14 +541,14 @@ for v in meta.variables:
 
 Frictionless constraints map directly onto Pointblank validation steps:
 
-```python
-# - "required": true  ->  col_vals_not_null()
-# - "unique": true    ->  rows_distinct()
-# - "minimum": 0      ->  col_vals_ge(value=0)
-# - "maximum": 100    ->  col_vals_le(value=100)
-# - "pattern": "..."  ->  col_vals_regex(pattern="...")
-# - "enum": [...]     ->  col_vals_in_set(set=[...])
-```
+| Frictionless constraint | Pointblank step |
+|-------------------------|-----------------|
+| `"required": true` | `col_vals_not_null()` |
+| `"unique": true` | `rows_distinct()` |
+| `"minimum": 0` | `col_vals_ge(value=0)` |
+| `"maximum": 100` | `col_vals_le(value=100)` |
+| `"pattern": "..."` | `col_vals_regex(pattern="...")` |
+| `"enum": [...]` | `col_vals_in_set(set=[...])` |
 
 The constraint mapping is direct and complete. Every constraint expressible in a Frictionless
 Table Schema has a corresponding Pointblank validation step, making the translation lossless.
