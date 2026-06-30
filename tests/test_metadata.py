@@ -2987,3 +2987,40 @@ class TestValidateADaM:
         ]
         assert len(saffl_checks) > 0
         assert saffl_checks[0].n_failed > 0
+
+
+class TestLoadMetadataExample:
+    """Tests for the `load_metadata_example()` bundled-file accessor."""
+
+    def test_returns_existing_path_for_each_example(self):
+        """Every advertised example resolves to a file that exists on disk."""
+        from pointblank.metadata._import import _METADATA_EXAMPLES, load_metadata_example
+
+        for name in _METADATA_EXAMPLES:
+            path = load_metadata_example(name)
+            assert isinstance(path, Path)
+            assert path.exists()
+            assert path.name == name
+
+    def test_invalid_name_raises_with_available_options(self):
+        """An unknown example name raises ValueError listing valid options."""
+        from pointblank.metadata._import import load_metadata_example
+
+        with pytest.raises(ValueError, match="is not valid"):
+            load_metadata_example("does_not_exist.xml")
+
+    def test_define_example_imports(self):
+        """The bundled Define-XML example imports into a usable MetadataPackage."""
+        from pointblank.metadata._import import import_metadata, load_metadata_example
+
+        package = import_metadata(
+            load_metadata_example("define.xml"), format="cdisc_define"
+        )
+        assert isinstance(package, MetadataPackage)
+        assert "DM" in package.keys()
+
+    def test_exposed_at_top_level(self):
+        """`load_metadata_example` is exported from the top-level package."""
+        import pointblank as pb
+
+        assert hasattr(pb, "load_metadata_example")
