@@ -4660,7 +4660,9 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return value
     if isinstance(value, (datetime.datetime, datetime.date)):
         return value.isoformat()
-    if isinstance(value, ReferenceColumn):  # pragma: no cover
+    if isinstance(value, ReferenceColumn):
+        # A column reference used as a comparison value must round-trip as a Python expression,
+        # not a bare string (which YAML would treat as a literal).
         return {"python": f"pb.ref({value.column_name!r})"}
     if isinstance(value, Column):
         name = _column_to_name(value)
