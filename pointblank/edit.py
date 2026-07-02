@@ -43,7 +43,7 @@ def _rows_to_dataframe(rows: list[dict[str, Any]]) -> Any:
         return pd.DataFrame(rows, columns=columns)
     except ImportError:  # pragma: no cover
         raise ImportError(
-            "`EditValidation.preview()` requires either Polars or Pandas to be installed."
+            "`EditValidation.review()` requires either Polars or Pandas to be installed."
         )
 
 
@@ -311,7 +311,7 @@ class EditValidation:
         This is a lightweight way to compare an original plan against a revised one and review the
         difference with [`diff()`](`pointblank.EditValidation.diff`),
         [`changed_steps()`](`pointblank.EditValidation.changed_steps`), and
-        [`preview()`](`pointblank.EditValidation.preview`). It is useful for reviewing the change
+        [`review()`](`pointblank.EditValidation.review`). It is useful for reviewing the change
         between two saved versions of a plan (for example, in code review) and does not require an
         LLM provider or any API key.
 
@@ -325,7 +325,7 @@ class EditValidation:
             The revised plan, in any of the same forms as `original`.
         instruction
             An optional label describing the comparison (shown as the subtitle in
-            [`preview()`](`pointblank.EditValidation.preview`)).
+            [`review()`](`pointblank.EditValidation.review`)).
 
         Returns
         -------
@@ -333,7 +333,7 @@ class EditValidation:
             An `EditValidation` whose `original`/`revised` plans are the ones supplied, ready for
             [`diff()`](`pointblank.EditValidation.diff`),
             [`changed_steps()`](`pointblank.EditValidation.changed_steps`),
-            [`preview()`](`pointblank.EditValidation.preview`), and
+            [`review()`](`pointblank.EditValidation.review`), and
             [`accept()`](`pointblank.EditValidation.accept`).
 
         Examples
@@ -408,12 +408,13 @@ class EditValidation:
         new_steps = _extract_chain_steps(self.edited_code)
         return _diff_plan_steps(old_steps, new_steps)
 
-    def preview(self) -> Any:
+    def review(self) -> Any:
         """
         Return a `great_tables` GT object summarizing the step-level changes.
 
-        The preview renders the added, removed, and modified steps side by side for quick human
-        review before accepting the edit.
+        This renders the added, removed, and modified steps side by side for quick human review
+        before accepting the edit. It pairs with [`accept()`](`pointblank.EditValidation.accept`):
+        review the change, then accept it.
 
         Returns
         -------
