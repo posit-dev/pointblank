@@ -298,6 +298,70 @@ class EditValidation:
         self.response = response
         self.edited_code = code
 
+    @classmethod
+    def from_plans(
+        cls,
+        original: Any,
+        revised: Any,
+        instruction: str = "Manual plan comparison",
+    ) -> "EditValidation":
+        """
+        Build an `EditValidation` from two known plans, without calling a model.
+
+        This is a lightweight way to compare an original plan against a revised one and review the
+        difference with [`diff()`](`pointblank.EditValidation.diff`),
+        [`changed_steps()`](`pointblank.EditValidation.changed_steps`), and
+        [`preview()`](`pointblank.EditValidation.preview`). It is useful for reviewing the change
+        between two saved versions of a plan (for example, in code review) and does not require an
+        LLM provider or any API key.
+
+        Parameters
+        ----------
+        original
+            The original plan. Accepts anything the `validation=` argument accepts: a
+            [`Validate`](`pointblank.Validate`) object, a code string, a YAML string, or a file
+            path.
+        revised
+            The revised plan, in any of the same forms as `original`.
+        instruction
+            An optional label describing the comparison (shown as the subtitle in
+            [`preview()`](`pointblank.EditValidation.preview`)).
+
+        Returns
+        -------
+        EditValidation
+            An `EditValidation` whose `original`/`revised` plans are the ones supplied, ready for
+            [`diff()`](`pointblank.EditValidation.diff`),
+            [`changed_steps()`](`pointblank.EditValidation.changed_steps`),
+            [`preview()`](`pointblank.EditValidation.preview`), and
+            [`accept()`](`pointblank.EditValidation.accept`).
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        v1 = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=100)
+        v2 = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=50)
+
+        comparison = pb.EditValidation.from_plans(v1, v2)
+        print(comparison.diff())
+        ```
+        """
+        # Bypass __init__/__post_init__ (which would call the model) and populate directly
+        obj = cls.__new__(cls)
+        obj.validation = original
+        obj.instruction = instruction
+        obj.model = ""
+        obj.data = None
+        obj.api_key = None
+        obj.verify_ssl = True
+        obj.max_reprompts = 0
+        obj.original_code = _normalize_to_code(original)
+        obj.edited_code = _normalize_to_code(revised)
+        obj.response = obj.edited_code
+        return obj
+
     def to_code(self) -> str:
         """Return the revised validation plan as Python code."""
         return self.edited_code
