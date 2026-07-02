@@ -136,6 +136,52 @@ def test_edit_fail_invalid_provider(small_table):
         EditValidation(validation=validation, instruction="do it", model="invalid:model")
 
 
+def test_edit_fail_model_without_colon(small_table):
+    pytest.importorskip("chatlas")
+    validation = Validate(data=small_table).col_vals_gt(columns="d", value=0)
+    with pytest.raises(ValueError, match="provider:model"):
+        EditValidation(validation=validation, instruction="do it", model="anthropic")
+
+
+def test_edit_accept_strips_model_added_interrogate(small_table):
+    pytest.importorskip("chatlas")
+    resp = (
+        "```python\nimport pointblank as pb\n"
+        'validation = pb.Validate(data=your_data).col_vals_gt(columns="d", value=50)'
+        ".interrogate()\n```"
+    )
+    ctx, _ = _patch_chat([resp])
+    with ctx:
+        edited = EditValidation(
+            validation=Validate(data=small_table).col_vals_gt(columns="d", value=100),
+            instruction="loosen",
+            model="anthropic:claude-opus-4-8",
+            data=small_table,
+        )
+    plan = edited.accept()
+    # accept() must return a plan that is NOT yet interrogated, per its contract
+    assert plan.validation_info[0].n_passed is None
+    assert plan.interrogate().validation_info[0].n_passed is not None
+
+
+def test_edit_accept_finds_validate_under_other_name(small_table):
+    pytest.importorskip("chatlas")
+    resp = (
+        "```python\nimport pointblank as pb\n"
+        'my_plan = pb.Validate(data=your_data).col_vals_gt(columns="d", value=50)\n```'
+    )
+    ctx, _ = _patch_chat([resp])
+    with ctx:
+        edited = EditValidation(
+            validation=Validate(data=small_table).col_vals_gt(columns="d", value=100),
+            instruction="x",
+            model="anthropic:claude-opus-4-8",
+            data=small_table,
+        )
+    plan = edited.accept()
+    assert isinstance(plan, pb.Validate)
+
+
 # ─── full flow (mocked model) ────────────────────────────────────────────────────
 
 _EDITED = (
