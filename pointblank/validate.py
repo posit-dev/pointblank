@@ -4257,6 +4257,420 @@ class _ValidationInfo:
         return self.notes is not None and len(self.notes) > 0
 
 
+# ─── Plan serialization (to_code / to_yaml) ──────────────────────────────────────
+#
+# These helpers render an in-memory validation plan (a list of `_ValidationInfo`
+# objects) back into canonical Pointblank source: either a Python method chain
+# (`to_code()`) or a `yaml_interrogate()`-compatible YAML config (`to_yaml()`).
+# They power plan diffing, sharing, and the AI edit/iterate flow (`EditValidation`).
+
+# Method-name groupings used to reconstruct each step's keyword arguments from the
+# heterogeneous `_ValidationInfo.values` field.
+_SERIALIZE_COMPARE_METHODS = frozenset(
+    {"col_vals_gt", "col_vals_lt", "col_vals_eq", "col_vals_ne", "col_vals_ge", "col_vals_le"}
+)
+_SERIALIZE_RANGE_METHODS = frozenset({"col_vals_between", "col_vals_outside"})
+_SERIALIZE_SET_METHODS = frozenset({"col_vals_in_set", "col_vals_not_in_set"})
+_SERIALIZE_COLUMN_ONLY_METHODS = frozenset({"col_vals_null", "col_vals_not_null", "col_exists"})
+_SERIALIZE_SEQUENCE_METHODS = frozenset({"col_vals_increasing", "col_vals_decreasing"})
+
+# Methods whose primary argument is `columns=` and can therefore be coalesced across
+# adjacent steps that differ only by column (for compact, readable output).
+_SERIALIZE_COLUMN_METHODS = (
+    _SERIALIZE_COMPARE_METHODS
+    | _SERIALIZE_RANGE_METHODS
+    | _SERIALIZE_SET_METHODS
+    | _SERIALIZE_COLUMN_ONLY_METHODS
+    | _SERIALIZE_SEQUENCE_METHODS
+    | {"col_vals_regex", "col_vals_within_spec"}
+)
+
+
+class _UnserializablePlaceholder:
+    """Stand-in for a plan value (callable, expression) that cannot be rendered to source.
+
+    Holds a syntactically-valid Python `code` fragment (so generated code still parses and
+    runs) and a `note` explaining what was lost. Instances compare equal when their notes
+    match, so steps differing only by such a placeholder can still be coalesced.
+    """
+
+    __slots__ = ("code", "yaml_value", "note")
+
+    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None:
+        self.code = code
+        self.yaml_value = yaml_value if yaml_value is not None else code
+        self.note = note
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _UnserializablePlaceholder) and other.note == self.note
+
+    def __hash__(self) -> int:
+        return hash(self.note)
+
+
+def _thresholds_as_dict(thresholds: Thresholds | None) -> dict[str, Any]:
+    """Reduce a `Thresholds` object to a dict of only its set levels."""
+    if thresholds is None:
+        return {}
+    result: dict[str, Any] = {}
+    for level in ("warning", "error", "critical"):
+        value = getattr(thresholds, level, None)
+        if value is not None:
+            result[level] = value
+    return result
+
+
+def _column_to_name(column: Any) -> str | None:
+    """Return a simple string column name, or `None` if the column is a complex selector."""
+    if isinstance(column, str):
+        return column
+    if isinstance(column, Column):
+        exprs = getattr(column, "exprs", None)
+        if isinstance(exprs, str):
+            return exprs
+    return None
+
+
+def _validation_info_to_step(
+    vi: _ValidationInfo,
+    global_thresholds: Thresholds | None,
+    global_actions: Actions | None,
+    warnings_out: list[str],
+) -> tuple[str, dict[str, Any]] | None:
+    """Map a `_ValidationInfo` to its `(method_name, kwargs)` pair.
+
+    Returns `None` for interrogation-only/internal assertion types that have no
+    corresponding public validation method. Non-serializable content (callables,
+    expressions) is replaced with an `_UnserializablePlaceholder` and a message is
+    appended to `warnings_out`.
+    """
+    at = vi.assertion_type
+    if at is None:  # pragma: no cover
+        return None
+
+    params: dict[str, Any] = {}
+
+    def _placeholder(
+        code: str, note: str, yaml_value: str | None = None
+    ) -> _UnserializablePlaceholder:
+        warnings_out.append(note)
+        return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
+
+    def _columns_param() -> None:
+        name = _column_to_name(vi.column)
+        if name is not None:
+            params["columns"] = name
+        else:
+            params["columns"] = _placeholder(
+                code=repr(str(vi.column)),
+                note=(
+                    f"Step '{at}' uses a column selector that cannot be serialized to a "
+                    "simple column name; a placeholder was emitted."
+                ),
+            )
+
+    if at in _SERIALIZE_COMPARE_METHODS:
+        _columns_param()
+        params["value"] = vi.values
+    elif at in _SERIALIZE_RANGE_METHODS:
+        _columns_param()
+        left, right = vi.values
+        params["left"] = left
+        params["right"] = right
+        if vi.inclusive is not None and tuple(vi.inclusive) != (True, True):
+            params["inclusive"] = tuple(vi.inclusive)
+    elif at in _SERIALIZE_SET_METHODS:
+        _columns_param()
+        params["set"] = list(vi.values) if vi.values is not None else []
+    elif at == "col_vals_regex":
+        _columns_param()
+        values = vi.values or {}
+        params["pattern"] = values.get("pattern", "")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_vals_within_spec":
+        _columns_param()
+        values = vi.values or {}
+        params["spec"] = values.get("spec", "")
+    elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
+        _columns_param()
+    elif at in _SERIALIZE_SEQUENCE_METHODS:
+        _columns_param()
+        info = vi.val_info or {}
+        if info.get("allow_stationary"):
+            params["allow_stationary"] = True
+        tol_key = "decreasing_tol" if at == "col_vals_increasing" else "increasing_tol"
+        if info.get(tol_key):
+            params[tol_key] = info[tol_key]
+    elif at == "col_vals_expr":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'col_vals_expr' uses a table expression that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif at == "col_schema_match":
+        values = vi.values or {}
+        params["schema"] = values.get("schema")
+        for key in (
+            "complete",
+            "in_order",
+            "case_sensitive_colnames",
+            "case_sensitive_dtypes",
+            "full_match_dtypes",
+        ):
+            if values.get(key, True) is not True:
+                params[key] = values[key]
+    elif at == "row_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at in ("rows_distinct", "rows_complete"):
+        if vi.column is not None:
+            name = _column_to_name(vi.column)
+            if isinstance(vi.column, (list, tuple)):
+                params["columns_subset"] = list(vi.column)
+            elif name is not None:
+                params["columns_subset"] = name
+    elif at == "conjointly":
+        params["expressions"] = _placeholder(
+            code="[lambda df: df]",
+            note=(
+                "Step 'conjointly' uses callable expressions that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+            yaml_value="[]",
+        )
+    elif at == "specially":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'specially' uses a callable that cannot be serialized to source; a "
+                "placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif isinstance(vi.values, dict) and "value" in vi.values:
+        # Aggregate methods (col_sum_eq, col_avg_gt, ...) share a {"value", "tol"} shape.
+        _columns_param()
+        params["value"] = vi.values["value"]
+        if vi.values.get("tol"):
+            params["tol"] = vi.values["tol"]
+    else:
+        warnings_out.append(
+            f"Assertion type '{at}' is not supported by plan serialization and was skipped."
+        )
+        return None
+
+    # Common trailing keyword arguments, emitted only when they deviate from defaults.
+    if vi.na_pass:
+        params["na_pass"] = True
+
+    if vi.pre is not None:
+        params["pre"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has a `pre=` preprocessing callable that cannot be serialized; "
+                "it was dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.segments is not None:
+        params["segments"] = vi.segments
+
+    step_thresholds = _thresholds_as_dict(vi.thresholds)
+    if step_thresholds and step_thresholds != _thresholds_as_dict(global_thresholds):
+        params["thresholds"] = vi.thresholds
+
+    if vi.actions is not None and vi.actions is not global_actions:
+        params["actions"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has step-level `actions=` that cannot be serialized; they were "
+                "dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.brief is not None and vi.brief is not False:
+        params["brief"] = True if vi.brief == "{auto}" else vi.brief
+
+    if vi.active is not None and vi.active is not True:
+        if callable(vi.active):
+            params["active"] = _placeholder(
+                code="True",
+                note=(
+                    f"Step '{at}' has a callable `active=` condition that cannot be serialized; "
+                    "it was replaced with `True`."
+                ),
+                yaml_value="true",
+            )
+        else:
+            params["active"] = vi.active
+
+    return at, params
+
+
+def _coalesce_plan_steps(
+    steps: list[tuple[str, dict[str, Any]]],
+) -> list[tuple[str, dict[str, Any]]]:
+    """Merge adjacent column-based steps that differ only by a simple column name.
+
+    Turns e.g. two `col_vals_not_null(columns="a")` / `col_vals_not_null(columns="b")` steps
+    into a single `col_vals_not_null(columns=["a", "b"])` for compact, reviewable output.
+    """
+    merged: list[tuple[str, dict[str, Any]]] = []
+    for method, params in steps:
+        if (
+            merged
+            and method in _SERIALIZE_COLUMN_METHODS
+            and isinstance(params.get("columns"), str)
+        ):
+            prev_method, prev_params = merged[-1]
+            prev_cols = prev_params.get("columns")
+            prev_is_coalescible = isinstance(prev_cols, (str, list)) and all(
+                isinstance(c, str)
+                for c in ([prev_cols] if isinstance(prev_cols, str) else prev_cols)
+            )
+            rest = {k: v for k, v in params.items() if k != "columns"}
+            prev_rest = {k: v for k, v in prev_params.items() if k != "columns"}
+            if prev_method == method and prev_is_coalescible and rest == prev_rest:
+                cols = prev_cols if isinstance(prev_cols, list) else [prev_cols]
+                cols.append(params["columns"])
+                new_params = dict(prev_params)
+                new_params["columns"] = cols
+                merged[-1] = (method, new_params)
+                continue
+        merged.append((method, dict(params)))
+    return merged
+
+
+def _render_code_value(value: Any) -> str:
+    """Render a single Python value as source code for `to_code()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        return value.code
+    if isinstance(value, bool):
+        return "True" if value else "False"
+    if value is None:
+        return "None"
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return json.dumps(value.isoformat())
+    if isinstance(value, ReferenceColumn):
+        return f"pb.ref({json.dumps(value.column_name)})"
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return f"pb.col({json.dumps(name)})" if name is not None else json.dumps(str(value))
+    if isinstance(value, Thresholds):
+        return _render_thresholds_code(value)
+    if isinstance(value, Schema):
+        return _render_schema_code(value)
+    if isinstance(value, tuple):
+        inner = ", ".join(_render_code_value(v) for v in value)
+        return f"({inner},)" if len(value) == 1 else f"({inner})"
+    if isinstance(value, list):
+        return "[" + ", ".join(_render_code_value(v) for v in value) + "]"
+    if callable(value):  # pragma: no cover
+        return "None"
+    return repr(value)  # pragma: no cover
+
+
+def _render_thresholds_code(thresholds: Thresholds) -> str:
+    parts = [
+        f"{level}={_render_code_value(value)}"
+        for level, value in _thresholds_as_dict(thresholds).items()
+    ]
+    return "pb.Thresholds(" + ", ".join(parts) + ")"
+
+
+def _render_schema_code(schema: Schema | None) -> str:
+    if schema is None or not getattr(schema, "columns", None):
+        return "pb.Schema(columns=[])"
+    parts = []
+    for entry in schema.columns:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                dtype_code = "[" + ", ".join(json.dumps(str(d)) for d in dtype) + "]"
+                parts.append(f"({json.dumps(name)}, {dtype_code})")
+            else:
+                parts.append(f"({json.dumps(name)}, {json.dumps(str(dtype))})")
+        else:
+            parts.append(f"({json.dumps(name)},)")
+    return "pb.Schema(columns=[" + ", ".join(parts) + "])"
+
+
+def _render_columns_arg(value: Any) -> str:
+    """Render a `columns=`/`columns_subset=` value, collapsing single-item lists to a string."""
+    if isinstance(value, list) and len(value) == 1 and isinstance(value[0], str):
+        return json.dumps(value[0])
+    return _render_code_value(value)
+
+
+def _render_step_code(method: str, params: dict[str, Any]) -> str:
+    """Render one step as a chained `.method(...)` call."""
+    parts = []
+    for key, value in params.items():
+        if key in ("columns", "columns_subset"):
+            parts.append(f"{key}={_render_columns_arg(value)}")
+        else:
+            parts.append(f"{key}={_render_code_value(value)}")
+    return f"    .{method}(" + ", ".join(parts) + ")"
+
+
+def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
+    """Convert a Python value into a YAML-safe structure for `to_yaml()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        if value.yaml_value in ("null", None):
+            return None
+        warnings_out.append(value.note)
+        return value.yaml_value
+    if isinstance(value, bool) or value is None or isinstance(value, (int, float, str)):
+        return value
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return value.isoformat()
+    if isinstance(value, ReferenceColumn):  # pragma: no cover
+        return {"python": f"pb.ref({value.column_name!r})"}
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return name if name is not None else str(value)
+    if isinstance(value, Thresholds):
+        return _thresholds_as_dict(value)
+    if isinstance(value, Schema):
+        return _schema_to_yaml(value)
+    if isinstance(value, tuple):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    if isinstance(value, list):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    return str(value)  # pragma: no cover
+
+
+def _schema_to_yaml(schema: Schema | None) -> dict[str, Any]:
+    columns: list[Any] = []
+    for entry in getattr(schema, "columns", None) or []:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                columns.append([name, [str(d) for d in dtype]])
+            else:
+                columns.append([name, str(dtype)])
+        else:
+            columns.append([name])
+    return {"columns": columns}
+
+
 def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
     """
     Shared error handling for database connection failures.
