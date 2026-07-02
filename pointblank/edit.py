@@ -428,8 +428,14 @@ class EditValidation:
                 f"{message}. Inspect `.to_code()` and edit it manually."
             )
 
+        # Strip any terminal `.interrogate(...)` so the returned Validate is a plan (not yet
+        # interrogated), matching this method's contract even if the model added one.
+        import re
+
+        code = re.sub(r"\.interrogate\([^()]*\)", "", self.edited_code)
+
         namespace: dict[str, Any] = {"pb": pb, "your_data": table}
-        exec(self.edited_code, namespace)
+        exec(code, namespace)
 
         validation = namespace.get("validation")
         if validation is None:
