@@ -209,8 +209,13 @@ class EditValidation:
                 "Please install it using `pip install chatlas`."
             )
 
-        # Validate the provider up front
-        provider = self.model.split(sep=":", maxsplit=1)[0]
+        # Validate the model string and provider up front
+        if ":" not in self.model:
+            raise ValueError(
+                f"`model=` must be in 'provider:model' form (e.g., "
+                f"'anthropic:claude-opus-4-8'); got {self.model!r}."
+            )
+        provider, model_name = self.model.split(sep=":", maxsplit=1)
         if provider not in MODEL_PROVIDERS:
             raise ValueError(
                 f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
