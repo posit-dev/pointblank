@@ -67,3 +67,10 @@ def _normalize_to_code(validation: Any) -> str:
     )
 
 
+def _code_from_path(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.lower() in (".yaml", ".yml"):
+        return _yaml_text_to_code(text)
+    return text.strip()
+
+
