@@ -4666,7 +4666,7 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return {"python": f"pb.ref({value.column_name!r})"}
     if isinstance(value, Column):
         name = _column_to_name(value)
-        return name if name is not None else str(value)
+        return {"python": f"pb.col({name!r})"} if name is not None else str(value)
     if isinstance(value, Thresholds):
         return _thresholds_as_dict(value)
     if isinstance(value, Schema):
