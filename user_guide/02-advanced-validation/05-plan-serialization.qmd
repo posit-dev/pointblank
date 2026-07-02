@@ -20,7 +20,7 @@ Two methods do this:
 
 Both are ordinary, deterministic utilities: no network access, no API keys, no LLM. They're useful on
 their own for sharing plans, reviewing changes in a diff, and persisting a plan alongside its
-results. They're also the foundation for the [AI Validation Copilot](ai-validation-copilot.qmd),
+results. They're also the foundation for the [AI Validation Editor](ai-validation-editor.qmd),
 which sends the current plan to a model as editable code.
 
 ## Rendering a Plan as Python Code
@@ -144,7 +144,7 @@ session:
 - **Code review.** Serialize a plan before and after a change and diff the two to see precisely what
 moved. You can produce this comparison directly with
 [`EditValidation.from_plans()`](`EditValidation.from_plans`) (no LLM required), which is also how
-the [AI Validation Copilot](ai-validation-copilot.qmd) presents proposed edits.
+the [AI Validation Editor](ai-validation-editor.qmd) presents proposed edits.
 - **Persistence.** Store the *plan* (not just the results) alongside a validation run, so you have a
 durable, human-readable record of what was checked.
 - **Migrating between formats.** Move a plan from Python to YAML (or, via
@@ -157,4 +157,4 @@ configuration-driven workflow.
 live validation plan back into portable source. They're deterministic, require no external services,
 and round-trip through execution and [`yaml_interrogate()`](`yaml_interrogate`)
 respectively. Beyond sharing and persistence, they provide the reviewable, diffable representation
-that powers the [AI Validation Copilot](ai-validation-copilot.qmd) covered in the next section.
+that powers the [AI Validation Editor](ai-validation-editor.qmd) covered in the next section.

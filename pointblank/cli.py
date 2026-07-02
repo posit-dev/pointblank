@@ -4650,7 +4650,7 @@ def edit(
     yes: bool,
 ) -> None:
     """
-    Edit an existing validation plan with a natural-language instruction (AI Copilot).
+    Edit an existing validation plan with a natural-language instruction (AI Validation Editor).
 
     VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validation plan.
     The instruction is sent, along with the current plan, to the specified model; the proposed

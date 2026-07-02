@@ -1,5 +1,5 @@
 ---
-title: AI Validation Copilot
+title: AI Validation Editor
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
@@ -7,13 +7,13 @@ bread-crumbs: true
 ---
 
 Where [Draft Validation](draft-validation.qmd) uses a large language model (LLM) to *generate* a
-validation plan from scratch, the AI Validation Copilot uses one to *edit* a plan you already have.
+validation plan from scratch, the AI Validation Editor uses one to *edit* a plan you already have.
 You give it an existing plan plus a plain-English instruction, such as "add a not-null check on
 `user_id`, tighten the email regex, and drop the `price > 0` check", and it returns a revised plan.
 You review the change as a diff and explicitly accept it before anything runs, keeping a human in the
 loop.
 
-The Copilot is built on the [plan serialization](plan-serialization.qmd) primitives described in the
+The Editor is built on the [plan serialization](plan-serialization.qmd) primitives described in the
 previous section: it renders your current plan to code with
 [`to_code()`](`Validate.to_code`), sends that code and your instruction to the model, and
 returns the model's revised code for your review.
@@ -23,7 +23,7 @@ The main entry point is the `EditValidation` class. Two convenience methods on `
 [`from_prompt()`](`Validate.from_prompt`), wrap the same flow, and the `pb edit` CLI
 command brings it to the terminal.
 
-## How the Copilot Works
+## How the Editor Works
 
 When you edit a plan, the process works through these steps:
 
@@ -42,7 +42,7 @@ As with `DraftValidation`, the entire dataset is never sent to the model, only a
 
 ## Requirements and Setup
 
-The Copilot shares its requirements with [Draft Validation](draft-validation.qmd): an API key from
+The Editor shares its requirements with [Draft Validation](draft-validation.qmd): an API key from
 a supported LLM provider and the optional dependencies, installed with:
 
 ```bash
@@ -91,7 +91,7 @@ edit.
 
 ## Reviewing the Proposed Change
 
-The Copilot proposes; you dispose. Before anything runs, inspect what the model changed.
+The Editor proposes; you dispose. Before anything runs, inspect what the model changed.
 
 The examples below are rendered without a live model, so instead of calling `EditValidation(...)`
 we reconstruct the same before/after comparison with
@@ -219,7 +219,7 @@ plan = proposal.accept()
 
 ## Editing from the Command Line
 
-The `pb edit` command brings the Copilot to the terminal. Point it at a validation file, describe the
+The `pb edit` command brings the Editor to the terminal. Point it at a validation file, describe the
 change, and choose a model:
 
 ```bash
@@ -237,7 +237,7 @@ pb edit plan.py   -i "drop the email regex check"        -m anthropic:claude-opu
 
 ## Data Privacy {#data-privacy}
 
-The Copilot follows the same privacy posture as [Draft Validation](draft-validation.qmd): your
+The Editor follows the same privacy posture as [Draft Validation](draft-validation.qmd): your
 actual dataset is never sent to the model. When you provide `data=`, only a `DataScan` summary is
 transmitted, which includes column names and types, per-column statistics (min, max, mean, median,
 missing counts), and a small sample of values from each column. This is enough context for informed
@@ -249,7 +249,7 @@ gaps, `suggest_improvements()` and `from_prompt()` always include the summary.)
 
 ## Best Practices
 
-- **Make small, targeted edits.** The Copilot is designed to change only what your instruction
+- **Make small, targeted edits.** The Editor is designed to change only what your instruction
 implies and preserve unrelated steps verbatim. Keeping instructions focused produces minimal,
 reviewable diffs.
 - **Always review before accepting.** Read the diff or the change list; the model proposes, but you
@@ -262,7 +262,7 @@ commit it, so the plan's evolution is tracked alongside your code.
 
 ## Conclusion
 
-The AI Validation Copilot extends Pointblank's AI capabilities from generating plans to iterating on
+The AI Validation Editor extends Pointblank's AI capabilities from generating plans to iterating on
 them. By combining plan serialization, a natural-language edit prompt, structural diffing, and
 syntax guardrails, it lets you refine validation plans conversationally while keeping a human firmly
 in control of what actually runs. Together with [Draft Validation](draft-validation.qmd), it
