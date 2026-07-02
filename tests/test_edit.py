@@ -327,7 +327,7 @@ def test_from_plans_accepts_code_strings(small_table):
     assert {(c["action"], c["method"]) for c in cmp.changed_steps()} == {("modify", "col_vals_gt")}
 
 
-def test_edit_preview_returns_gt(small_table):
+def test_edit_review_returns_gt(small_table):
     pytest.importorskip("chatlas")
     pytest.importorskip("polars")
     from great_tables import GT
@@ -341,7 +341,7 @@ def test_edit_preview_returns_gt(small_table):
             model="anthropic:claude-opus-4-8",
             data=small_table,
         )
-    gt = edited.preview()
+    gt = edited.review()
     assert isinstance(gt, GT)
     # Renders without error
     assert isinstance(gt.as_raw_html(), str)
