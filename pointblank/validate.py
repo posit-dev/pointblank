@@ -4417,6 +4417,19 @@ def _validation_info_to_step(
                 "source; a placeholder was emitted and must be edited manually."
             ),
         )
+    elif at == "data_freshness":
+        values = vi.values or {}
+        params["column"] = _column_to_name(vi.column) or vi.column
+        max_age = values.get("max_age_str")
+        if max_age is None and values.get("max_age") is not None:
+            max_age = str(values["max_age"])
+        params["max_age"] = max_age
+        if values.get("reference_time") is not None:
+            params["reference_time"] = values["reference_time"]
+        if values.get("timezone") is not None:
+            params["timezone"] = values["timezone"]
+        if values.get("allow_tz_mismatch"):
+            params["allow_tz_mismatch"] = True
     elif at == "col_schema_match":
         values = vi.values or {}
         params["schema"] = values.get("schema")
