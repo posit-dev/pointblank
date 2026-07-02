@@ -29,7 +29,7 @@ command brings it to the terminal.
 The `EditValidation` calls below need a live LLM, so they're shown as **non-executable code** (what
 you'd write once your API key is set up). The output beneath each one is rendered from a
 *representative* stand-in model response, so you can see the shape of the results here without a key.
-A real model may word things slightly differently, but the mechanics (diffing, previewing,
+A real model may word things slightly differently, but the mechanics (diffing, reviewing,
 accepting) are exactly what you'll experience.
 :::
 
@@ -200,12 +200,12 @@ relevant `"old"`/`"new"` step text.
 
 ### As a Table
 
-[`preview()`](`EditValidation.preview`) renders the same change list as a
+[`review()`](`EditValidation.review`) renders the same change list as a
 [Great Tables](https://posit-dev.github.io/great-tables/) object, color-coding additions, removals,
 and modifications for quick visual review in a notebook:
 
 ```{python}
-edited.preview()
+edited.review()
 ```
 
 ## Accepting the Edit
@@ -229,7 +229,7 @@ model's proposal and execution.
 You don't need an LLM to review the difference between two plans. When you already have a "before"
 and "after" (for example, two versions of a plan from source control),
 [`EditValidation.from_plans()`](`EditValidation.from_plans`) builds the same comparison object
-directly, with all of `diff()`, `changed_steps()`, and `preview()` available and no API key
+directly, with all of `diff()`, `changed_steps()`, and `review()` available and no API key
 required. The following example is fully live:
 
 ```{python}
@@ -240,7 +240,7 @@ after = (
     .col_vals_not_null(columns="a")
 )
 
-pb.EditValidation.from_plans(before, after).preview()
+pb.EditValidation.from_plans(before, after).review()
 ```
 
 ## Guardrails
