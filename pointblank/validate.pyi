@@ -611,6 +611,23 @@ class Validate:
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
     ) -> dict[int, Any] | Any: ...
+    def to_code(self) -> str: ...
+    def to_yaml(self, path: str | Path | None = None) -> str: ...
+    def suggest_improvements(
+        self,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any: ...
+    def from_prompt(
+        self,
+        prompt: str,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any: ...
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str: ...
