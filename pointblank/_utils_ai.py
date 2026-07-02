@@ -110,25 +110,9 @@ def _create_chat_instance(
             f"Supported providers: {', '.join(MODEL_PROVIDERS)}"
         )
 
-    # System prompt with role definition and instructions
-    system_prompt = """You are a data validation assistant. Your task is to analyze rows of data and determine if they meet the specified validation criteria.
-
-INSTRUCTIONS:
-- Analyze each row in the provided data
-- For each row, determine if it meets the validation criteria (True) or not (False)
-- Return ONLY a JSON array with validation results
-- Each result should have: {"index": <row_index>, "result": <true_or_false>}
-- Do not include any explanatory text, only the JSON array
-- The row_index should match the "_pb_row_index" field from the input data
-
-EXAMPLE OUTPUT FORMAT:
-[
-  {"index": 0, "result": true},
-  {"index": 1, "result": false},
-  {"index": 2, "result": true}
-]
-
-If reference attachments (images or PDFs) are provided alongside the data, use them as context when evaluating each row."""
+    # Use the row-validation system prompt unless a caller supplies its own
+    if system_prompt is None:
+        system_prompt = _ROW_VALIDATION_SYSTEM_PROMPT
 
     # Create httpx client with SSL verification settings
     try:
