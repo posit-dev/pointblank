@@ -4357,6 +4357,13 @@ def _validation_info_to_step(
         return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
 
     def _columns_param() -> None:
+        # Aggregate methods store `column` as a list of resolved names; column-value methods
+        # store a single string (or a Column selector, which can't be serialized simply).
+        if isinstance(vi.column, (list, tuple)):
+            names = [_column_to_name(c) for c in vi.column]
+            if names and all(n is not None for n in names):
+                params["columns"] = names[0] if len(names) == 1 else names
+                return
         name = _column_to_name(vi.column)
         if name is not None:
             params["columns"] = name
