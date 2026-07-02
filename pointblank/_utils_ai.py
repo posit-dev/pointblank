@@ -45,6 +45,26 @@ class _LLMConfig:
     verify_ssl: bool = True
 
 
+_ROW_VALIDATION_SYSTEM_PROMPT = """You are a data validation assistant. Your task is to analyze rows of data and determine if they meet the specified validation criteria.
+
+INSTRUCTIONS:
+- Analyze each row in the provided data
+- For each row, determine if it meets the validation criteria (True) or not (False)
+- Return ONLY a JSON array with validation results
+- Each result should have: {"index": <row_index>, "result": <true_or_false>}
+- Do not include any explanatory text, only the JSON array
+- The row_index should match the "_pb_row_index" field from the input data
+
+EXAMPLE OUTPUT FORMAT:
+[
+  {"index": 0, "result": true},
+  {"index": 1, "result": false},
+  {"index": 2, "result": true}
+]
+
+If reference attachments (images or PDFs) are provided alongside the data, use them as context when evaluating each row."""
+
+
 def _create_chat_instance(
     provider: str, model_name: str, api_key: Optional[str] = None, verify_ssl: bool = True
 ):
