@@ -256,8 +256,13 @@ class DraftValidation:
         # Generate a table summary in JSON format using the `DataScan` class
         tbl_json = DataScan(data=self.data).to_json()
 
-        # Get the LLM provider from the `model` value
-        provider = self.model.split(sep=":", maxsplit=1)[0]
+        # Validate the model string and extract the provider and model name
+        if ":" not in self.model:
+            raise ValueError(
+                f"`model=` must be in 'provider:model' form (e.g., "
+                f"'anthropic:claude-opus-4-8'); got {self.model!r}."
+            )
+        provider, model_name = self.model.split(sep=":", maxsplit=1)
 
         # Validate that the provider is supported
         if provider not in MODEL_PROVIDERS:
