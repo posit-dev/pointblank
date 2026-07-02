@@ -85,6 +85,10 @@ def _create_chat_instance(
         Optional API key. If None, will be read from environment.
     verify_ssl
         Whether to verify SSL certificates when making requests. Defaults to True.
+    system_prompt
+        Optional system prompt to steer the model. If None, a row-validation system prompt is
+        used (the default for the AI validation flow). Other flows (e.g., drafting/editing
+        validation plans) supply their own prompt.
 
     Returns
     -------
