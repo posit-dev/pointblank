@@ -289,6 +289,44 @@ def test_edit_changed_steps(small_table):
     assert ("add", "col_vals_not_null") in actions
 
 
+def test_from_plans_compares_without_llm(small_table):
+    # No chatlas / model needed: from_plans builds a comparison directly from two plans
+    v1 = (
+        Validate(data=small_table, label="checks")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern="x")
+    )
+    v2 = (
+        Validate(data=small_table, label="checks")
+        .col_vals_gt(columns="d", value=50)
+        .col_vals_not_null(columns="a")
+    )
+    cmp = EditValidation.from_plans(v1, v2)
+
+    assert isinstance(cmp, EditValidation)
+    assert "value=100" in cmp.diff()
+    assert "value=50" in cmp.diff()
+    actions = {(c["action"], c["method"]) for c in cmp.changed_steps()}
+    assert ("modify", "col_vals_gt") in actions
+    assert ("remove", "col_vals_regex") in actions
+    assert ("add", "col_vals_not_null") in actions
+
+    plan = cmp.accept(data=small_table)
+    assert isinstance(plan, pb.Validate)
+    assert [s.assertion_type for s in plan.validation_info] == [
+        "col_vals_gt",
+        "col_vals_not_null",
+    ]
+
+
+def test_from_plans_accepts_code_strings(small_table):
+    original = 'validation = pb.Validate(data=your_data).col_vals_gt(columns="d", value=100)'
+    revised = 'validation = pb.Validate(data=your_data).col_vals_gt(columns="d", value=50)'
+    cmp = EditValidation.from_plans(original, revised, instruction="version bump")
+    assert cmp.instruction == "version bump"
+    assert {(c["action"], c["method"]) for c in cmp.changed_steps()} == {("modify", "col_vals_gt")}
+
+
 def test_edit_preview_returns_gt(small_table):
     pytest.importorskip("chatlas")
     pytest.importorskip("polars")
