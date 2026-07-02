@@ -17542,6 +17542,397 @@ class Validate:
             return result[i]
         return result
 
+    def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]:
+        """Build the coalesced `(method, kwargs)` list for this plan (shared by to_code/to_yaml)."""
+        steps: list[tuple[str, dict[str, Any]]] = []
+        for vi in self.validation_info:
+            step = _validation_info_to_step(
+                vi,
+                global_thresholds=self.thresholds,
+                global_actions=self.actions,
+                warnings_out=warnings_out,
+            )
+            if step is not None:
+                steps.append(step)
+        return _coalesce_plan_steps(steps)
+
+    def to_code(self) -> str:
+        """
+        Render this validation plan as canonical Pointblank Python code.
+
+        The `to_code()` method walks the validation plan and reconstructs the equivalent
+        `pb.Validate(...).col_vals_*()...` method chain as a string. This is the inverse of
+        writing the plan by hand: it takes an in-memory `Validate` object and produces source
+        code that, when executed, recreates the same plan.
+
+        This is useful for sharing a plan, reviewing it in a diff, persisting it alongside
+        results, and it is the foundation for the AI edit/iterate flow (see
+        [`EditValidation`](`pointblank.EditValidation`)), which sends the current plan to a model
+        as editable code.
+
+        Returns
+        -------
+        str
+            The validation plan as a block of Python code. The data source is rendered as the
+            placeholder `your_data`, since the original data variable name is not known to the
+            plan.
+
+        Notes on Fidelity
+        -----------------
+        Most validation steps round-trip exactly. Steps that carry non-serializable Python
+        objects, such as `pre=` preprocessing callables, `actions=`, callable `active=`
+        conditions, or the expressions used by
+        [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`),
+        [`conjointly()`](`pointblank.Validate.conjointly`), and
+        [`specially()`](`pointblank.Validate.specially`), cannot be reproduced from memory. For
+        those, a syntactically valid placeholder is emitted and a warning is raised so the code
+        still parses and the loss is visible.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+            .rows_distinct()
+        )
+
+        print(validation.to_code())
+        ```
+        """
+        import warnings
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        # Assemble the top-level `pb.Validate(...)` arguments (data first, with a hint comment).
+        validate_args: list[tuple[str, str | None]] = [
+            ("data=your_data", "  # Replace your_data with the actual data variable")
+        ]
+        if self.tbl_name is not None:
+            validate_args.append((f"tbl_name={json.dumps(self.tbl_name)}", None))
+        if self.label is not None:
+            validate_args.append((f"label={json.dumps(self.label)}", None))
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            validate_args.append((f"thresholds={_render_thresholds_code(self.thresholds)}", None))
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to code and were omitted."
+            )
+        if self.brief is not None and self.brief is not False:
+            brief_val = True if self.brief == "{auto}" else self.brief
+            validate_args.append((f"brief={_render_code_value(brief_val)}", None))
+        if self.lang is not None and self.lang != "en":
+            validate_args.append((f"lang={json.dumps(self.lang)}", None))
+        if self.locale is not None and self.locale != self.lang:
+            validate_args.append((f"locale={json.dumps(self.locale)}", None))
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                validate_args.append((f"{attr}={json.dumps(value)}", None))
+        if self.consumers is not None:
+            validate_args.append((f"consumers={_render_code_value(self.consumers)}", None))
+
+        lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate("]
+        for arg, comment in validate_args:
+            lines.append(f"        {arg}," + (comment or ""))
+        lines.append("    )")
+        for method, params in steps:
+            lines.append(_render_step_code(method, params))
+        lines.append(")")
+        lines.append("")
+        lines.append("validation")
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to code:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        return "\n".join(lines)
+
+    def to_yaml(self, path: str | Path | None = None) -> str:
+        """
+        Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
+
+        The `to_yaml()` method renders the validation plan as a YAML document using the same
+        schema consumed by [`yaml_interrogate()`](`pointblank.yaml_interrogate`). This enables
+        storing plans as configuration, sharing them across projects, and round-tripping a plan
+        through YAML.
+
+        Parameters
+        ----------
+        path
+            An optional file path. If provided, the YAML is written to this file (parent
+            directories are created as needed) in addition to being returned.
+
+        Returns
+        -------
+        str
+            The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
+            available, otherwise to the placeholder `your_data`; set it to a loadable data
+            source before passing the YAML to `yaml_interrogate()`.
+
+        Notes on Fidelity
+        -----------------
+        As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-serializable
+        Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
+        `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
+        placeholder is emitted and a warning is raised.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+        )
+
+        print(validation.to_yaml())
+        ```
+        """
+        import warnings
+
+        import yaml as yaml_module
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        config: dict[str, Any] = {}
+        config["tbl"] = self.tbl_name if self.tbl_name is not None else "your_data"
+        if self.tbl_name is not None:
+            config["tbl_name"] = self.tbl_name
+        if self.label is not None:
+            config["label"] = self.label
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            config["thresholds"] = global_thresholds
+        if self.brief is not None and self.brief is not False:
+            config["brief"] = True if self.brief == "{auto}" else self.brief
+        if self.lang is not None and self.lang != "en":
+            config["lang"] = self.lang
+        if self.locale is not None and self.locale != self.lang:
+            config["locale"] = self.locale
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                config[attr] = value
+        if self.consumers is not None:
+            config["consumers"] = self.consumers
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to YAML and were omitted."
+            )
+
+        yaml_steps: list[Any] = []
+        for method, params in steps:
+            if not params:
+                yaml_steps.append(method)
+                continue
+            yaml_params = {
+                key: _value_to_yaml(value, warnings_out) for key, value in params.items()
+            }
+            yaml_steps.append({method: yaml_params})
+        config["steps"] = yaml_steps
+
+        yaml_str = yaml_module.dump(config, default_flow_style=False, sort_keys=False)
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to YAML:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        if path is not None:
+            yaml_path = Path(path)
+            if yaml_path.parent != Path(""):
+                yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            yaml_path.write_text(yaml_str, encoding="utf-8")
+
+        return yaml_str
+
+    def _covered_columns(self) -> set[str]:
+        """Return the set of simple column names referenced by this plan's steps."""
+        covered: set[str] = set()
+        for vi in self.validation_info:
+            name = _column_to_name(vi.column)
+            if name is not None:
+                covered.add(name)
+            elif isinstance(vi.column, (list, tuple)):
+                covered.update(c for c in vi.column if isinstance(c, str))
+        return covered
+
+    def _auto_improvement_instruction(self) -> str:
+        """Build a natural-language "improve this plan" instruction from the data profile."""
+        try:
+            all_columns = _get_column_names_safe(self.data)
+        except Exception:  # pragma: no cover
+            all_columns = []
+        uncovered = [c for c in all_columns if c not in self._covered_columns()]
+
+        lines = [
+            "Improve this validation plan to increase data quality coverage. Use the table's "
+            "data profile to choose realistic, well-targeted checks."
+        ]
+        if uncovered:
+            lines.append(
+                "These columns currently have no validation coverage: "
+                f"{', '.join(uncovered)}. Add appropriate checks for them (for example, "
+                "not-null checks for columns with no missing values, range checks for numeric "
+                "columns, and set-membership checks for low-cardinality columns)."
+            )
+        else:
+            lines.append(
+                "All columns already have some coverage; look for additional high-value checks "
+                "such as uniqueness of key columns, tighter ranges, or row/column count checks."
+            )
+        if _thresholds_as_dict(self.thresholds) == {}:
+            lines.append(
+                "No failure thresholds are set on the plan; add sensible warning/error "
+                "thresholds via `pb.Thresholds(...)`."
+            )
+        lines.append("Preserve all existing steps unless they are clearly redundant.")
+        return " ".join(lines)
+
+    def suggest_improvements(
+        self,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Propose AI-generated improvements to this validation plan.
+
+        This is a thin, convenience wrapper over
+        [`EditValidation`](`pointblank.EditValidation`): it profiles the table with
+        [`DataScan`](`pointblank.DataScan`), derives an instruction that targets gaps in the
+        current plan (columns with no coverage, missing thresholds), and asks the model to extend
+        the plan accordingly. As with `EditValidation`, you review the proposed change as a diff
+        and explicitly accept it.
+
+        Parameters
+        ----------
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) with the proposed improvements,
+            ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
+            columns="d", value=100
+        )
+
+        proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+        print(proposal.diff())
+        improved = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        return EditValidation(
+            validation=self,
+            instruction=self._auto_improvement_instruction(),
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
+
+    def from_prompt(
+        self,
+        prompt: str,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Build a validation plan for this table from a natural-language prompt.
+
+        This is the same AI edit flow as [`EditValidation`](`pointblank.EditValidation`) but
+        starting from an *empty* plan: the model is given a bare `pb.Validate(...)` (carrying this
+        object's table name, label, and thresholds) plus a `DataScan` profile of the data, and is
+        asked to author steps that satisfy the prompt.
+
+        Parameters
+        ----------
+        prompt
+            A plain-English description of the checks the plan should perform (e.g., "ensure no
+            nulls in any id column and that ids are unique").
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) whose revised plan realizes the
+            prompt; inspect it with `.diff()`/`.to_code()` and finalize with `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+        proposal = base.from_prompt(
+            "ensure column a has no nulls and column d is always positive",
+            model="anthropic:claude-opus-4-8",
+        )
+        plan = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        # Start from an empty plan that preserves this object's top-level configuration
+        empty_plan = Validate(
+            data=self.data,
+            tbl_name=self.tbl_name,
+            label=self.label,
+            thresholds=self.thresholds,
+        )
+        empty_code = empty_plan.to_code()
+
+        return EditValidation(
+            validation=empty_code,
+            instruction=prompt,
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
+
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str:
