@@ -142,8 +142,9 @@ session:
 
 - **Sharing.** Send a colleague the exact plan as code or YAML rather than describing it.
 - **Code review.** Serialize a plan before and after a change and diff the two to see precisely what
-moved. This is exactly how the [AI Validation Copilot](ai-validation-copilot.qmd) presents proposed
-edits.
+moved. You can produce this comparison directly with
+[`EditValidation.from_plans()`](`EditValidation.from_plans`) (no LLM required), which is also how
+the [AI Validation Copilot](ai-validation-copilot.qmd) presents proposed edits.
 - **Persistence.** Store the *plan* (not just the results) alongside a validation run, so you have a
 durable, human-readable record of what was checked.
 - **Migrating between formats.** Move a plan from Python to YAML (or, via
