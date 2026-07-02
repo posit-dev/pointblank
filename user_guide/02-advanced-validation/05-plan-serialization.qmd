@@ -1,0 +1,159 @@
+---
+title: Serializing Validation Plans
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+A validation plan you build in Python isn't locked inside the `Validate` object. Pointblank can
+render an in-memory plan back into canonical source, either as a Python method chain or as a YAML
+configuration. This is the inverse of writing a plan by hand: you hand it a `Validate` object and it
+gives you the code that recreates it.
+
+Two methods do this:
+
+- [`Validate.to_code()`](`Validate.to_code`) produces the
+`pb.Validate(...).col_vals_*()...` chain as a string
+- [`Validate.to_yaml()`](`Validate.to_yaml`) produces a
+[`yaml_interrogate()`](`yaml_interrogate`)-compatible YAML document
+
+Both are ordinary, deterministic utilities: no network access, no API keys, no LLM. They're useful on
+their own for sharing plans, reviewing changes in a diff, and persisting a plan alongside its
+results. They're also the foundation for the [AI Validation Copilot](ai-validation-copilot.qmd),
+which sends the current plan to a model as editable code.
+
+## Rendering a Plan as Python Code
+
+Given any validation plan, [`to_code()`](`Validate.to_code`) returns a self-contained
+block of Python that reproduces it:
+
+```{python}
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        label="Small table checks",
+        thresholds=pb.Thresholds(warning=0.1, error=0.25),
+    )
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_not_null(columns="a")
+    .col_vals_not_null(columns="b")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+    .row_count_match(count=13)
+)
+
+print(validation.to_code())
+```
+
+A few things to notice in the output:
+
+- The table-level configuration (`tbl_name`, `label`, `thresholds`) is reproduced on the
+`pb.Validate(...)` call.
+- The data source is rendered as the placeholder `your_data`, since the plan doesn't know the name
+of the variable your data lives in. Replace it with your actual data variable before running the
+code.
+- Adjacent steps that differ only by column are collapsed into a single call: the two
+`col_vals_not_null()` steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the
+output compact and diffs minimal.
+- Only non-default arguments are emitted. A step-level threshold that matches the table-level default
+is omitted, `na_pass=True` appears only where it was set, and so on.
+
+The result is regular source you can paste into a script or notebook, commit to version control, or
+share with a colleague.
+
+## Rendering a Plan as YAML
+
+[`to_yaml()`](`Validate.to_yaml`) renders the same plan using the schema consumed by
+[`yaml_interrogate()`](`yaml_interrogate`):
+
+```{python}
+print(validation.to_yaml())
+```
+
+The `tbl` field is set from `tbl_name` when available, otherwise to the placeholder `your_data`. Set
+it to a loadable data source (a dataset name, file path, or Python expression) before handing the
+YAML to `yaml_interrogate()`. See the [YAML Validation Workflows](../yaml/yaml-validation-workflows.qmd)
+page for the full YAML schema.
+
+You can also write the YAML directly to a file by passing `path=`:
+
+```python
+validation.to_yaml(path="plans/small_table.yaml")
+```
+
+## Round-Tripping a Plan
+
+Because `to_yaml()` emits a `yaml_interrogate()`-compatible document, a plan round-trips through
+YAML. Here we serialize a plan, then rebuild and run it with `yaml_interrogate()`:
+
+```{python}
+yaml_str = validation.to_yaml()
+
+rebuilt = pb.yaml_interrogate(yaml_str)
+rebuilt
+```
+
+The rebuilt plan carries the same steps as the original. The Python code from `to_code()`
+round-trips in the same way: executing it (after replacing `your_data`) reconstructs an equivalent
+plan.
+
+## Fidelity and Limitations
+
+Most validation steps round-trip exactly. The exceptions are steps that carry live Python objects
+that can't be reconstructed from source:
+
+- `pre=` preprocessing callables
+- step-level `actions=`
+- callable `active=` conditions
+- the expressions used by [`col_vals_expr()`](`Validate.col_vals_expr`),
+[`conjointly()`](`Validate.conjointly`), and
+[`specially()`](`Validate.specially`)
+
+For these, Pointblank emits a clearly-marked placeholder so the generated code still parses and runs,
+and raises a warning describing what was lost. The following plan uses a `pre=` callable that can't
+be serialized:
+
+```{python}
+import warnings
+
+flagged = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
+    columns="d", value=100, pre=lambda df: df
+)
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    code = flagged.to_code()
+    for w in caught:
+        print("warning:", w.message)
+```
+
+When you see such a warning, review the generated plan and restore the affected step by hand. Plans
+built entirely from literal arguments (values, ranges, sets, patterns, counts, schemas) serialize
+without any loss.
+
+## When to Use Serialization
+
+Rendering a plan back to source is helpful whenever you want the plan to leave the current Python
+session:
+
+- **Sharing.** Send a colleague the exact plan as code or YAML rather than describing it.
+- **Code review.** Serialize a plan before and after a change and diff the two to see precisely what
+moved. This is exactly how the [AI Validation Copilot](ai-validation-copilot.qmd) presents proposed
+edits.
+- **Persistence.** Store the *plan* (not just the results) alongside a validation run, so you have a
+durable, human-readable record of what was checked.
+- **Migrating between formats.** Move a plan from Python to YAML (or, via
+[`yaml_to_python()`](`yaml_to_python`), from YAML to Python) to fit it into a
+configuration-driven workflow.
+
+## Conclusion
+
+[`to_code()`](`Validate.to_code`) and [`to_yaml()`](`Validate.to_yaml`) turn a
+live validation plan back into portable source. They're deterministic, require no external services,
+and round-trip through execution and [`yaml_interrogate()`](`yaml_interrogate`)
+respectively. Beyond sharing and persistence, they provide the reviewable, diffable representation
+that powers the [AI Validation Copilot](ai-validation-copilot.qmd) covered in the next section.
