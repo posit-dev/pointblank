@@ -4604,6 +4604,21 @@ def run(
         sys.exit(1)
 
 
+def _print_unified_diff(diff: str) -> None:
+    """Print a unified diff with basic color coding."""
+    for line in diff.splitlines():
+        if line.startswith(("+++", "---")):
+            console.print(f"[bold]{line}[/bold]")
+        elif line.startswith("@@"):
+            console.print(f"[cyan]{line}[/cyan]")
+        elif line.startswith("+"):
+            console.print(f"[green]{line}[/green]")
+        elif line.startswith("-"):
+            console.print(f"[red]{line}[/red]")
+        else:
+            console.print(line)
+
+
 def _format_missing_percentage(value: float) -> str:
     """Format missing value percentages for display.
 
