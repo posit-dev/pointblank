@@ -94,7 +94,14 @@ edited = pb.EditValidation(
 #| echo: false
 # Stand in for a live model so this page renders without an API key. This sets up a fake chat
 # client that returns a representative revised plan; everything else on the page is real.
+import sys
+import types
+
 from unittest.mock import patch
+
+# The optional `chatlas` dependency isn't installed in the docs build; stub it so the
+# EditValidation availability check passes (the model call itself is mocked below).
+sys.modules.setdefault("chatlas", types.ModuleType("chatlas"))
 
 
 class _DemoChat:
