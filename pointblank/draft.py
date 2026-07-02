@@ -274,9 +274,6 @@ class DraftValidation:
         with files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f:
             api_and_examples_text = f.read()
 
-        # Get the model name from the `model` value
-        model_name = self.model.split(sep=":", maxsplit=1)[1]
-
         prompt = (
             f"{api_and_examples_text}"
             "--------------------------"
