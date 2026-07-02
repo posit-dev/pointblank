@@ -23,6 +23,16 @@ The main entry point is the `EditValidation` class. Two convenience methods on `
 [`from_prompt()`](`Validate.from_prompt`), wrap the same flow, and the `pb edit` CLI
 command brings it to the terminal.
 
+::: {.callout-note}
+## About the examples on this page
+
+The `EditValidation` calls below need a live LLM, so they're shown as **non-executable code** (what
+you'd write once your API key is set up). The output beneath each one is rendered from a
+*representative* stand-in model response, so you can see the shape of the results here without a key.
+A real model may word things slightly differently, but the mechanics (diffing, previewing,
+accepting) are exactly what you'll experience.
+:::
+
 ## How the Editor Works
 
 When you edit a plan, the process works through these steps:
@@ -56,24 +66,96 @@ Validation page.
 
 ## Editing a Plan with `EditValidation`{.qd-no-link}
 
-Suppose you have an existing plan and want to make a few targeted changes:
+Suppose you have an existing plan:
 
-```python
+```{python}
 import pointblank as pb
 
-# An existing plan
 validation = (
     pb.Validate(data=pb.load_dataset("small_table"), label="Small table checks")
     .col_vals_gt(columns="d", value=100)
     .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
 )
+```
 
-# Describe the change in plain English
+Describe the change you want in plain English and hand both to `EditValidation`:
+
+```{python}
+#| eval: false
 edited = pb.EditValidation(
     validation=validation,
-    instruction=(
-        "Loosen the d check to 50, drop the b regex, and add a not-null check on a."
-    ),
+    instruction="Loosen the d check to 50, drop the b regex, and add a not-null check on a.",
+    model="anthropic:claude-opus-4-8",
+    data=pb.load_dataset("small_table"),
+)
+```
+
+```{python}
+#| echo: false
+# Stand in for a live model so this page renders without an API key. This sets up a fake chat
+# client that returns a representative revised plan; everything else on the page is real.
+from unittest.mock import patch
+
+
+class _DemoChat:
+    def __init__(self, response):
+        self._response = response
+
+    def chat(self, prompt, *args, **kwargs):
+        return self._response
+
+
+def _use_model_response(code_block):
+    patch("pointblank.edit._create_chat_instance", return_value=_DemoChat(code_block)).start()
+
+
+_EDITED = """import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=your_data,  # Replace your_data with the actual data variable
+        label="Small table checks",
+    )
+    .col_vals_gt(columns="d", value=50)
+    .col_vals_not_null(columns="a")
+)
+
+validation"""
+
+_IMPROVED = """import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=your_data,  # Replace your_data with the actual data variable
+        label="Small table checks",
+        thresholds=pb.Thresholds(warning=0.1, error=0.25),
+    )
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
+    .col_vals_not_null(columns=["a", "c", "e"])
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+)
+
+validation"""
+
+_AUTHORED = """import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=your_data,  # Replace your_data with the actual data variable
+        tbl_name="small_table",
+    )
+    .col_vals_not_null(columns="a")
+    .col_vals_gt(columns="d", value=0)
+)
+
+validation"""
+
+_use_model_response(_EDITED)
+edited = pb.EditValidation(
+    validation=validation,
+    instruction="Loosen the d check to 50, drop the b regex, and add a not-null check on a.",
     model="anthropic:claude-opus-4-8",
     data=pb.load_dataset("small_table"),
 )
@@ -91,32 +173,8 @@ edit.
 
 ## Reviewing the Proposed Change
 
-The Editor proposes; you dispose. Before anything runs, inspect what the model changed.
-
-The examples below are rendered without a live model, so instead of calling `EditValidation(...)`
-we reconstruct the same before/after comparison with
-[`EditValidation.from_plans()`](`EditValidation.from_plans`). This builds a comparison directly
-from two plans (no API key required) and is useful in its own right for reviewing the difference
-between two saved plan versions, such as in code review. Every method shown below works identically
-on the result of a real `EditValidation(...)` call.
-
-```{python}
-import pointblank as pb
-
-# The plan before and after the change
-original = (
-    pb.Validate(data=pb.load_dataset("small_table"), label="Small table checks")
-    .col_vals_gt(columns="d", value=100)
-    .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
-)
-revised = (
-    pb.Validate(data=pb.load_dataset("small_table"), label="Small table checks")
-    .col_vals_gt(columns="d", value=50)
-    .col_vals_not_null(columns="a")
-)
-
-edited = pb.EditValidation.from_plans(original, revised)
-```
+The Editor proposes; you dispose. Before anything runs, inspect what the model changed using the
+`edited` object from above.
 
 ### As a Unified Diff
 
@@ -156,15 +214,34 @@ Once you're satisfied with the proposed change,
 [`accept()`](`EditValidation.accept`) executes the revised plan and returns a `Validate`
 object, ready to interrogate:
 
-```python
+```{python}
 plan = edited.accept()          # a Validate (not yet interrogated)
-results = plan.interrogate()    # run it
+plan.interrogate()              # run it
 ```
 
 The data bound to the plan is the `data=` you passed to `EditValidation`; you can override it with
 `edited.accept(data=other_table)`. Nothing runs until you call `accept()`, and the plan isn't
 interrogated until you call `interrogate()`, so there's a clear, deliberate boundary between the
 model's proposal and execution.
+
+## Comparing Two Plans Without a Model
+
+You don't need an LLM to review the difference between two plans. When you already have a "before"
+and "after" (for example, two versions of a plan from source control),
+[`EditValidation.from_plans()`](`EditValidation.from_plans`) builds the same comparison object
+directly, with all of `diff()`, `changed_steps()`, and `preview()` available and no API key
+required. The following example is fully live:
+
+```{python}
+before = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=100)
+after = (
+    pb.Validate(data=pb.load_dataset("small_table"))
+    .col_vals_gt(columns="d", value=50)
+    .col_vals_not_null(columns="a")
+)
+
+pb.EditValidation.from_plans(before, after).preview()
+```
 
 ## Guardrails
 
@@ -191,14 +268,19 @@ Two methods on `Validate` wrap the edit flow for common cases.
 instruction targeting gaps in the current plan (columns with no coverage, missing thresholds), and
 asks the model to extend the plan. It returns an `EditValidation` you review and accept as usual:
 
-```python
-validation = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
-    columns="d", value=100
-)
-
+```{python}
+#| eval: false
 proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+```
+
+```{python}
+#| echo: false
+_use_model_response(_IMPROVED)
+proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+```
+
+```{python}
 print(proposal.diff())
-improved = proposal.accept()
 ```
 
 ### Building a Plan from a Prompt
@@ -207,14 +289,28 @@ improved = proposal.accept()
 the model authors steps that satisfy your prompt, using a `DataScan` profile of the data and any
 table name, label, and thresholds carried by the object you call it on:
 
-```python
+```{python}
+#| eval: false
 base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
 
-proposal = base.from_prompt(
+authored = base.from_prompt(
     "ensure column a has no nulls and column d is always positive",
     model="anthropic:claude-opus-4-8",
 )
-plan = proposal.accept()
+```
+
+```{python}
+#| echo: false
+base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+_use_model_response(_AUTHORED)
+authored = base.from_prompt(
+    "ensure column a has no nulls and column d is always positive",
+    model="anthropic:claude-opus-4-8",
+)
+```
+
+```{python}
+print(authored.to_code())
 ```
 
 ## Editing from the Command Line
