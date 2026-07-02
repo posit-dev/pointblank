@@ -34,6 +34,7 @@ from pointblank.column import (
 from pointblank.contract import Contract, Step
 from pointblank.datascan import DataScan, col_summary_tbl
 from pointblank.draft import DraftValidation
+from pointblank.edit import EditValidation
 from pointblank.field import (
     BoolField,
     DateField,
@@ -122,6 +123,7 @@ __all__ = [
     "PipelineResult",
     "DataScan",
     "DraftValidation",
+    "EditValidation",
     "MissingSpec",
     "col",
     "ref",

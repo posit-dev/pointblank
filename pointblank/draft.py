@@ -6,6 +6,12 @@ from typing import Any
 from importlib_resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
+from pointblank._utils_ai import (
+    _check_syntax,
+    _create_chat_instance,
+    _extract_chain_steps,
+    _extract_code,
+)
 from pointblank.datascan import DataScan
 
 __all__ = [
@@ -233,7 +239,9 @@ class DraftValidation:
     model: str
     api_key: str | None = None
     verify_ssl: bool = True
+    max_reprompts: int = 1
     response: str = field(init=False)
+    code: str = field(init=False)
 
     def __post_init__(self) -> None:
         # Check that the chatlas package is installed
@@ -248,8 +256,13 @@ class DraftValidation:
         # Generate a table summary in JSON format using the `DataScan` class
         tbl_json = DataScan(data=self.data).to_json()
 
-        # Get the LLM provider from the `model` value
-        provider = self.model.split(sep=":", maxsplit=1)[0]
+        # Validate the model string and extract the provider and model name
+        if ":" not in self.model:
+            raise ValueError(
+                f"`model=` must be in 'provider:model' form (e.g., "
+                f"'anthropic:claude-opus-4-8'); got {self.model!r}."
+            )
+        provider, model_name = self.model.split(sep=":", maxsplit=1)
 
         # Validate that the provider is supported
         if provider not in MODEL_PROVIDERS:
@@ -258,15 +271,10 @@ class DraftValidation:
             )
 
         # Read the API/examples text from a file
-        with (
-            files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f
-        ):  # pragma: no cover
+        with files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f:
             api_and_examples_text = f.read()
 
-        # Get the model name from the `model` value
-        model_name = self.model.split(sep=":", maxsplit=1)[1]  # pragma: no cover
-
-        prompt = (  # pragma: no cover
+        prompt = (
             f"{api_and_examples_text}"
             "--------------------------"
             "Knowing what you now know about the Pointblank package in Python, can you write a "
@@ -321,119 +329,62 @@ class DraftValidation:
             "    per line)"
         )
 
-        # Create httpx client with SSL verification settings
-        # This will be passed to the LLM provider's chat client
-        try:
-            import httpx  # noqa
-        except ImportError:  # pragma: no cover
-            raise ImportError(  # pragma: no cover
-                "The `httpx` package is required for SSL configuration. "
-                "Please install it using `pip install httpx`."
+        # Create the chat client (shared provider abstraction, same one used by EditValidation)
+        # and generate the plan, applying a syntax/lint guardrail with an automatic re-prompt.
+        self._generate(provider=provider, model_name=model_name, prompt=prompt)
+
+    def _generate(self, provider: str, model_name: str, prompt: str) -> None:
+        chat = _create_chat_instance(
+            provider=provider,
+            model_name=model_name,
+            api_key=self.api_key,
+            verify_ssl=self.verify_ssl,
+            system_prompt="You are a terse assistant and a Python expert.",
+        )
+
+        response = str(chat.chat(prompt, stream=False, echo="none"))
+        code = _extract_code(response)
+
+        # Syntax/lint guardrail: re-prompt on failure up to `max_reprompts` times
+        attempts = 0
+        ok, message = _check_syntax(code)
+        while not ok and attempts < self.max_reprompts:
+            attempts += 1
+            reprompt = (
+                f"The validation plan you returned has a problem: {message}. "
+                "Return the COMPLETE corrected plan again inside ```python + ``` code fences, "
+                "with no text outside the block."
             )
+            response = str(chat.chat(reprompt, stream=False, echo="none"))
+            code = _extract_code(response)
+            ok, message = _check_syntax(code)
 
-        http_client = httpx.AsyncClient(verify=self.verify_ssl)
+        self.response = response
+        self.code = code
 
-        if provider == "anthropic":  # pragma: no cover
-            # Check that the anthropic package is installed
-            try:
-                import anthropic  # noqa  # type: ignore[import-not-found]
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `anthropic` package is required to use the `DraftValidation` class with "
-                    "the `anthropic` provider. Please install it using `pip install anthropic`."
-                )
+    def validate_syntax(self) -> bool:
+        """Return whether the drafted plan parses and uses only known validation methods."""
+        ok, _ = _check_syntax(self.code)
+        return ok
 
-            from chatlas import ChatAnthropic  # pragma: no cover
+    def changed_steps(self) -> list[dict[str, Any]]:
+        """
+        Return the drafted plan's steps as a structured "added" change list.
 
-            chat = ChatAnthropic(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                api_key=self.api_key,
-                kwargs={"http_client": http_client},
-            )
+        Because `DraftValidation` generates a plan from scratch (there is no prior plan), every
+        step is reported as an addition. This mirrors
+        [`EditValidation.changed_steps()`](`pointblank.EditValidation.changed_steps`) so both
+        flows can share the same review UI.
 
-        if provider == "openai":  # pragma: no cover
-            # Check that the openai package is installed
-            try:
-                import openai  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `openai` package is required to use the `DraftValidation` class with the "
-                    "`openai` provider. Please install it using `pip install openai`."
-                )
-
-            from chatlas import ChatOpenAI  # pragma: no cover
-
-            chat = ChatOpenAI(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                api_key=self.api_key,
-                kwargs={"http_client": http_client},
-            )
-
-        if provider == "ollama":  # pragma: no cover
-            # Check that the openai package is installed
-            try:
-                import openai  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `openai` package is required to use the `DraftValidation` class with "
-                    "`ollama`. Please install it using `pip install openai`."
-                )
-
-            from chatlas import ChatOllama
-
-            chat = ChatOllama(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                kwargs={"http_client": http_client},
-            )
-
-        if provider == "bedrock":  # pragma: no cover
-            from chatlas import ChatBedrockAnthropic  # pragma: no cover
-
-            chat = ChatBedrockAnthropic(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                kwargs={"http_client": http_client},
-            )
-
-        if provider == "azure-openai":  # pragma: no cover
-            try:
-                import openai  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `openai` package is required to use the `DraftValidation` class with "
-                    "the `azure-openai` provider. Please install it using `pip install openai`."
-                )
-
-            import os
-
-            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-            api_version = os.getenv("OPENAI_API_VERSION")
-            if not endpoint:
-                raise ValueError(
-                    "AZURE_OPENAI_ENDPOINT environment variable must be set to use "
-                    "the 'azure-openai' provider."
-                )
-            if not api_version:
-                raise ValueError(
-                    "OPENAI_API_VERSION environment variable must be set to use "
-                    "the 'azure-openai' provider (e.g. '2024-06-01')."
-                )
-
-            from chatlas import ChatAzureOpenAI  # pragma: no cover
-
-            chat = ChatAzureOpenAI(  # pragma: no cover
-                endpoint=endpoint,
-                deployment_id=model_name,
-                api_version=api_version,
-                api_key=self.api_key,
-                system_prompt="You are a terse assistant and a Python expert.",
-                kwargs={"http_client": http_client},
-            )
-
-        self.response = str(chat.chat(prompt, stream=False, echo="none"))  # pragma: no cover
+        Returns
+        -------
+        list[dict]
+            One record per drafted step, each `{"action": "add", "method": str, "new": str}`.
+        """
+        return [
+            {"action": "add", "method": step["method"], "new": step["text"]}
+            for step in _extract_chain_steps(self.code)
+        ]
 
     def __str__(self) -> str:
         return self.response  # pragma: no cover

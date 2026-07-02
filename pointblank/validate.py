@@ -4257,6 +4257,442 @@ class _ValidationInfo:
         return self.notes is not None and len(self.notes) > 0
 
 
+# ─── Plan serialization (to_code / to_yaml) ──────────────────────────────────────
+#
+# These helpers render an in-memory validation plan (a list of `_ValidationInfo`
+# objects) back into canonical Pointblank source: either a Python method chain
+# (`to_code()`) or a `yaml_interrogate()`-compatible YAML config (`to_yaml()`).
+# They power plan diffing, sharing, and the AI edit/iterate flow (`EditValidation`).
+
+# Method-name groupings used to reconstruct each step's keyword arguments from the
+# heterogeneous `_ValidationInfo.values` field.
+_SERIALIZE_COMPARE_METHODS = frozenset(
+    {"col_vals_gt", "col_vals_lt", "col_vals_eq", "col_vals_ne", "col_vals_ge", "col_vals_le"}
+)
+_SERIALIZE_RANGE_METHODS = frozenset({"col_vals_between", "col_vals_outside"})
+_SERIALIZE_SET_METHODS = frozenset({"col_vals_in_set", "col_vals_not_in_set"})
+_SERIALIZE_COLUMN_ONLY_METHODS = frozenset({"col_vals_null", "col_vals_not_null", "col_exists"})
+_SERIALIZE_SEQUENCE_METHODS = frozenset({"col_vals_increasing", "col_vals_decreasing"})
+
+# Methods whose primary argument is `columns=` and can therefore be coalesced across
+# adjacent steps that differ only by column (for compact, readable output).
+_SERIALIZE_COLUMN_METHODS = (
+    _SERIALIZE_COMPARE_METHODS
+    | _SERIALIZE_RANGE_METHODS
+    | _SERIALIZE_SET_METHODS
+    | _SERIALIZE_COLUMN_ONLY_METHODS
+    | _SERIALIZE_SEQUENCE_METHODS
+    | {"col_vals_regex", "col_vals_within_spec"}
+)
+
+
+class _UnserializablePlaceholder:
+    """Stand-in for a plan value (callable, expression) that cannot be rendered to source.
+
+    Holds a syntactically-valid Python `code` fragment (so generated code still parses and
+    runs) and a `note` explaining what was lost. Instances compare equal when their notes
+    match, so steps differing only by such a placeholder can still be coalesced.
+    """
+
+    __slots__ = ("code", "yaml_value", "note")
+
+    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None:
+        self.code = code
+        self.yaml_value = yaml_value if yaml_value is not None else code
+        self.note = note
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _UnserializablePlaceholder) and other.note == self.note
+
+    def __hash__(self) -> int:
+        return hash(self.note)
+
+
+def _thresholds_as_dict(thresholds: Thresholds | None) -> dict[str, Any]:
+    """Reduce a `Thresholds` object to a dict of only its set levels."""
+    if thresholds is None:
+        return {}
+    result: dict[str, Any] = {}
+    for level in ("warning", "error", "critical"):
+        value = getattr(thresholds, level, None)
+        if value is not None:
+            result[level] = value
+    return result
+
+
+def _column_to_name(column: Any) -> str | None:
+    """Return a simple string column name, or `None` if the column is a complex selector."""
+    if isinstance(column, str):
+        return column
+    if isinstance(column, Column):
+        exprs = getattr(column, "exprs", None)
+        if isinstance(exprs, str):
+            return exprs
+    return None
+
+
+def _validation_info_to_step(
+    vi: _ValidationInfo,
+    global_thresholds: Thresholds | None,
+    global_actions: Actions | None,
+    warnings_out: list[str],
+) -> tuple[str, dict[str, Any]] | None:
+    """Map a `_ValidationInfo` to its `(method_name, kwargs)` pair.
+
+    Returns `None` for interrogation-only/internal assertion types that have no
+    corresponding public validation method. Non-serializable content (callables,
+    expressions) is replaced with an `_UnserializablePlaceholder` and a message is
+    appended to `warnings_out`.
+    """
+    at = vi.assertion_type
+    if at is None:  # pragma: no cover
+        return None
+
+    params: dict[str, Any] = {}
+
+    def _placeholder(
+        code: str, note: str, yaml_value: str | None = None
+    ) -> _UnserializablePlaceholder:
+        warnings_out.append(note)
+        return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
+
+    def _columns_param() -> None:
+        # Aggregate methods store `column` as a list of resolved names; column-value methods
+        # store a single string (or a Column selector, which can't be serialized simply).
+        if isinstance(vi.column, (list, tuple)):
+            names = [_column_to_name(c) for c in vi.column]
+            if names and all(n is not None for n in names):
+                params["columns"] = names[0] if len(names) == 1 else names
+                return
+        name = _column_to_name(vi.column)
+        if name is not None:
+            params["columns"] = name
+        else:
+            params["columns"] = _placeholder(
+                code=repr(str(vi.column)),
+                note=(
+                    f"Step '{at}' uses a column selector that cannot be serialized to a "
+                    "simple column name; a placeholder was emitted."
+                ),
+            )
+
+    if at in _SERIALIZE_COMPARE_METHODS:
+        _columns_param()
+        params["value"] = vi.values
+    elif at in _SERIALIZE_RANGE_METHODS:
+        _columns_param()
+        left, right = vi.values
+        params["left"] = left
+        params["right"] = right
+        if vi.inclusive is not None and tuple(vi.inclusive) != (True, True):
+            params["inclusive"] = tuple(vi.inclusive)
+    elif at in _SERIALIZE_SET_METHODS:
+        _columns_param()
+        params["set"] = list(vi.values) if vi.values is not None else []
+    elif at == "col_vals_regex":
+        _columns_param()
+        values = vi.values or {}
+        params["pattern"] = values.get("pattern", "")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_vals_within_spec":
+        _columns_param()
+        values = vi.values or {}
+        params["spec"] = values.get("spec", "")
+    elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
+        _columns_param()
+    elif at in _SERIALIZE_SEQUENCE_METHODS:
+        _columns_param()
+        info = vi.val_info or {}
+        if info.get("allow_stationary"):
+            params["allow_stationary"] = True
+        tol_key = "decreasing_tol" if at == "col_vals_increasing" else "increasing_tol"
+        if info.get(tol_key):
+            params[tol_key] = info[tol_key]
+    elif at == "col_vals_expr":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'col_vals_expr' uses a table expression that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif at == "data_freshness":
+        values = vi.values or {}
+        params["column"] = _column_to_name(vi.column) or vi.column
+        max_age = values.get("max_age_str")
+        if max_age is None and values.get("max_age") is not None:
+            max_age = str(values["max_age"])
+        params["max_age"] = max_age
+        if values.get("reference_time") is not None:
+            params["reference_time"] = values["reference_time"]
+        if values.get("timezone") is not None:
+            params["timezone"] = values["timezone"]
+        if values.get("allow_tz_mismatch"):
+            params["allow_tz_mismatch"] = True
+    elif at == "col_schema_match":
+        values = vi.values or {}
+        params["schema"] = values.get("schema")
+        for key in (
+            "complete",
+            "in_order",
+            "case_sensitive_colnames",
+            "case_sensitive_dtypes",
+            "full_match_dtypes",
+        ):
+            if values.get(key, True) is not True:
+                params[key] = values[key]
+    elif at == "row_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at in ("rows_distinct", "rows_complete"):
+        if vi.column is not None:
+            name = _column_to_name(vi.column)
+            if isinstance(vi.column, (list, tuple)):
+                params["columns_subset"] = list(vi.column)
+            elif name is not None:
+                params["columns_subset"] = name
+    elif at == "conjointly":
+        params["expressions"] = _placeholder(
+            code="[lambda df: df]",
+            note=(
+                "Step 'conjointly' uses callable expressions that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+            yaml_value="[]",
+        )
+    elif at == "specially":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'specially' uses a callable that cannot be serialized to source; a "
+                "placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif isinstance(vi.values, dict) and "value" in vi.values:
+        # Aggregate methods (col_sum_eq, col_avg_gt, ...) share a {"value", "tol"} shape.
+        _columns_param()
+        params["value"] = vi.values["value"]
+        if vi.values.get("tol"):
+            params["tol"] = vi.values["tol"]
+    else:
+        warnings_out.append(
+            f"Assertion type '{at}' is not supported by plan serialization and was skipped."
+        )
+        return None
+
+    # Common trailing keyword arguments, emitted only when they deviate from defaults.
+    if vi.na_pass:
+        params["na_pass"] = True
+
+    if vi.pre is not None:
+        params["pre"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has a `pre=` preprocessing callable that cannot be serialized; "
+                "it was dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.segments is not None:
+        params["segments"] = vi.segments
+
+    step_thresholds = _thresholds_as_dict(vi.thresholds)
+    if step_thresholds and step_thresholds != _thresholds_as_dict(global_thresholds):
+        params["thresholds"] = vi.thresholds
+
+    if vi.actions is not None and vi.actions is not global_actions:
+        params["actions"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has step-level `actions=` that cannot be serialized; they were "
+                "dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.brief is not None and vi.brief is not False:
+        params["brief"] = True if vi.brief == "{auto}" else vi.brief
+
+    if vi.active is not None and vi.active is not True:
+        if callable(vi.active):
+            params["active"] = _placeholder(
+                code="True",
+                note=(
+                    f"Step '{at}' has a callable `active=` condition that cannot be serialized; "
+                    "it was replaced with `True`."
+                ),
+                yaml_value="true",
+            )
+        else:
+            params["active"] = vi.active
+
+    return at, params
+
+
+def _coalesce_plan_steps(
+    steps: list[tuple[str, dict[str, Any]]],
+) -> list[tuple[str, dict[str, Any]]]:
+    """Merge adjacent column-based steps that differ only by a simple column name.
+
+    Turns e.g. two `col_vals_not_null(columns="a")` / `col_vals_not_null(columns="b")` steps
+    into a single `col_vals_not_null(columns=["a", "b"])` for compact, reviewable output.
+    """
+    merged: list[tuple[str, dict[str, Any]]] = []
+    for method, params in steps:
+        if (
+            merged
+            and method in _SERIALIZE_COLUMN_METHODS
+            and isinstance(params.get("columns"), str)
+        ):
+            prev_method, prev_params = merged[-1]
+            prev_cols = prev_params.get("columns")
+            prev_is_coalescible = isinstance(prev_cols, (str, list)) and all(
+                isinstance(c, str)
+                for c in ([prev_cols] if isinstance(prev_cols, str) else prev_cols)
+            )
+            rest = {k: v for k, v in params.items() if k != "columns"}
+            prev_rest = {k: v for k, v in prev_params.items() if k != "columns"}
+            if prev_method == method and prev_is_coalescible and rest == prev_rest:
+                cols = prev_cols if isinstance(prev_cols, list) else [prev_cols]
+                cols.append(params["columns"])
+                new_params = dict(prev_params)
+                new_params["columns"] = cols
+                merged[-1] = (method, new_params)
+                continue
+        merged.append((method, dict(params)))
+    return merged
+
+
+def _render_code_value(value: Any) -> str:
+    """Render a single Python value as source code for `to_code()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        return value.code
+    if isinstance(value, bool):
+        return "True" if value else "False"
+    if value is None:
+        return "None"
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return json.dumps(value.isoformat())
+    if isinstance(value, ReferenceColumn):
+        return f"pb.ref({json.dumps(value.column_name)})"
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return f"pb.col({json.dumps(name)})" if name is not None else json.dumps(str(value))
+    if isinstance(value, Thresholds):
+        return _render_thresholds_code(value)
+    if isinstance(value, Schema):
+        return _render_schema_code(value)
+    if isinstance(value, tuple):
+        inner = ", ".join(_render_code_value(v) for v in value)
+        return f"({inner},)" if len(value) == 1 else f"({inner})"
+    if isinstance(value, list):
+        return "[" + ", ".join(_render_code_value(v) for v in value) + "]"
+    if callable(value):  # pragma: no cover
+        return "None"
+    return repr(value)  # pragma: no cover
+
+
+def _render_thresholds_code(thresholds: Thresholds) -> str:
+    parts = [
+        f"{level}={_render_code_value(value)}"
+        for level, value in _thresholds_as_dict(thresholds).items()
+    ]
+    return "pb.Thresholds(" + ", ".join(parts) + ")"
+
+
+def _render_schema_code(schema: Schema | None) -> str:
+    if schema is None or not getattr(schema, "columns", None):
+        return "pb.Schema(columns=[])"
+    parts = []
+    for entry in schema.columns:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                dtype_code = "[" + ", ".join(json.dumps(str(d)) for d in dtype) + "]"
+                parts.append(f"({json.dumps(name)}, {dtype_code})")
+            else:
+                parts.append(f"({json.dumps(name)}, {json.dumps(str(dtype))})")
+        else:
+            parts.append(f"({json.dumps(name)},)")
+    return "pb.Schema(columns=[" + ", ".join(parts) + "])"
+
+
+def _render_columns_arg(value: Any) -> str:
+    """Render a `columns=`/`columns_subset=` value, collapsing single-item lists to a string."""
+    if isinstance(value, list) and len(value) == 1 and isinstance(value[0], str):
+        return json.dumps(value[0])
+    return _render_code_value(value)
+
+
+def _render_step_code(method: str, params: dict[str, Any]) -> str:
+    """Render one step as a chained `.method(...)` call."""
+    parts = []
+    for key, value in params.items():
+        if key in ("columns", "columns_subset"):
+            parts.append(f"{key}={_render_columns_arg(value)}")
+        else:
+            parts.append(f"{key}={_render_code_value(value)}")
+    return f"    .{method}(" + ", ".join(parts) + ")"
+
+
+def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
+    """Convert a Python value into a YAML-safe structure for `to_yaml()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        if value.yaml_value in ("null", None):
+            return None
+        warnings_out.append(value.note)
+        return value.yaml_value
+    if isinstance(value, bool) or value is None or isinstance(value, (int, float, str)):
+        return value
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return value.isoformat()
+    if isinstance(value, ReferenceColumn):
+        # A column reference used as a comparison value must round-trip as a Python expression,
+        # not a bare string (which YAML would treat as a literal).
+        return {"python": f"pb.ref({value.column_name!r})"}
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return {"python": f"pb.col({name!r})"} if name is not None else str(value)
+    if isinstance(value, Thresholds):
+        return _thresholds_as_dict(value)
+    if isinstance(value, Schema):
+        return _schema_to_yaml(value)
+    if isinstance(value, tuple):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    if isinstance(value, list):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    return str(value)  # pragma: no cover
+
+
+def _schema_to_yaml(schema: Schema | None) -> dict[str, Any]:
+    columns: list[Any] = []
+    for entry in getattr(schema, "columns", None) or []:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                columns.append([name, [str(d) for d in dtype]])
+            else:
+                columns.append([name, str(dtype)])
+        else:
+            columns.append([name])
+    return {"columns": columns}
+
+
 def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
     """
     Shared error handling for database connection failures.
@@ -17127,6 +17563,397 @@ class Validate:
         if frame and isinstance(i, int):
             return result[i]
         return result
+
+    def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]:
+        """Build the coalesced `(method, kwargs)` list for this plan (shared by to_code/to_yaml)."""
+        steps: list[tuple[str, dict[str, Any]]] = []
+        for vi in self.validation_info:
+            step = _validation_info_to_step(
+                vi,
+                global_thresholds=self.thresholds,
+                global_actions=self.actions,
+                warnings_out=warnings_out,
+            )
+            if step is not None:
+                steps.append(step)
+        return _coalesce_plan_steps(steps)
+
+    def to_code(self) -> str:
+        """
+        Render this validation plan as canonical Pointblank Python code.
+
+        The `to_code()` method walks the validation plan and reconstructs the equivalent
+        `pb.Validate(...).col_vals_*()...` method chain as a string. This is the inverse of
+        writing the plan by hand: it takes an in-memory `Validate` object and produces source
+        code that, when executed, recreates the same plan.
+
+        This is useful for sharing a plan, reviewing it in a diff, persisting it alongside
+        results, and it is the foundation for the AI edit/iterate flow (see
+        [`EditValidation`](`pointblank.EditValidation`)), which sends the current plan to a model
+        as editable code.
+
+        Returns
+        -------
+        str
+            The validation plan as a block of Python code. The data source is rendered as the
+            placeholder `your_data`, since the original data variable name is not known to the
+            plan.
+
+        Notes on Fidelity
+        -----------------
+        Most validation steps round-trip exactly. Steps that carry non-serializable Python
+        objects, such as `pre=` preprocessing callables, `actions=`, callable `active=`
+        conditions, or the expressions used by
+        [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`),
+        [`conjointly()`](`pointblank.Validate.conjointly`), and
+        [`specially()`](`pointblank.Validate.specially`), cannot be reproduced from memory. For
+        those, a syntactically valid placeholder is emitted and a warning is raised so the code
+        still parses and the loss is visible.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+            .rows_distinct()
+        )
+
+        print(validation.to_code())
+        ```
+        """
+        import warnings
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        # Assemble the top-level `pb.Validate(...)` arguments (data first, with a hint comment).
+        validate_args: list[tuple[str, str | None]] = [
+            ("data=your_data", "  # Replace your_data with the actual data variable")
+        ]
+        if self.tbl_name is not None:
+            validate_args.append((f"tbl_name={json.dumps(self.tbl_name)}", None))
+        if self.label is not None:
+            validate_args.append((f"label={json.dumps(self.label)}", None))
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            validate_args.append((f"thresholds={_render_thresholds_code(self.thresholds)}", None))
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to code and were omitted."
+            )
+        if self.brief is not None and self.brief is not False:
+            brief_val = True if self.brief == "{auto}" else self.brief
+            validate_args.append((f"brief={_render_code_value(brief_val)}", None))
+        if self.lang is not None and self.lang != "en":
+            validate_args.append((f"lang={json.dumps(self.lang)}", None))
+        if self.locale is not None and self.locale != self.lang:
+            validate_args.append((f"locale={json.dumps(self.locale)}", None))
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                validate_args.append((f"{attr}={json.dumps(value)}", None))
+        if self.consumers is not None:
+            validate_args.append((f"consumers={_render_code_value(self.consumers)}", None))
+
+        lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate("]
+        for arg, comment in validate_args:
+            lines.append(f"        {arg}," + (comment or ""))
+        lines.append("    )")
+        for method, params in steps:
+            lines.append(_render_step_code(method, params))
+        lines.append(")")
+        lines.append("")
+        lines.append("validation")
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to code:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        return "\n".join(lines)
+
+    def to_yaml(self, path: str | Path | None = None) -> str:
+        """
+        Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
+
+        The `to_yaml()` method renders the validation plan as a YAML document using the same
+        schema consumed by [`yaml_interrogate()`](`pointblank.yaml_interrogate`). This enables
+        storing plans as configuration, sharing them across projects, and round-tripping a plan
+        through YAML.
+
+        Parameters
+        ----------
+        path
+            An optional file path. If provided, the YAML is written to this file (parent
+            directories are created as needed) in addition to being returned.
+
+        Returns
+        -------
+        str
+            The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
+            available, otherwise to the placeholder `your_data`; set it to a loadable data
+            source before passing the YAML to `yaml_interrogate()`.
+
+        Notes on Fidelity
+        -----------------
+        As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-serializable
+        Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
+        `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
+        placeholder is emitted and a warning is raised.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+        )
+
+        print(validation.to_yaml())
+        ```
+        """
+        import warnings
+
+        import yaml as yaml_module
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        config: dict[str, Any] = {}
+        config["tbl"] = self.tbl_name if self.tbl_name is not None else "your_data"
+        if self.tbl_name is not None:
+            config["tbl_name"] = self.tbl_name
+        if self.label is not None:
+            config["label"] = self.label
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            config["thresholds"] = global_thresholds
+        if self.brief is not None and self.brief is not False:
+            config["brief"] = True if self.brief == "{auto}" else self.brief
+        if self.lang is not None and self.lang != "en":
+            config["lang"] = self.lang
+        if self.locale is not None and self.locale != self.lang:
+            config["locale"] = self.locale
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                config[attr] = value
+        if self.consumers is not None:
+            config["consumers"] = self.consumers
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to YAML and were omitted."
+            )
+
+        yaml_steps: list[Any] = []
+        for method, params in steps:
+            if not params:
+                yaml_steps.append(method)
+                continue
+            yaml_params = {
+                key: _value_to_yaml(value, warnings_out) for key, value in params.items()
+            }
+            yaml_steps.append({method: yaml_params})
+        config["steps"] = yaml_steps
+
+        yaml_str = yaml_module.dump(config, default_flow_style=False, sort_keys=False)
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to YAML:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        if path is not None:
+            yaml_path = Path(path)
+            if yaml_path.parent != Path(""):
+                yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            yaml_path.write_text(yaml_str, encoding="utf-8")
+
+        return yaml_str
+
+    def _covered_columns(self) -> set[str]:
+        """Return the set of simple column names referenced by this plan's steps."""
+        covered: set[str] = set()
+        for vi in self.validation_info:
+            name = _column_to_name(vi.column)
+            if name is not None:
+                covered.add(name)
+            elif isinstance(vi.column, (list, tuple)):
+                covered.update(c for c in vi.column if isinstance(c, str))
+        return covered
+
+    def _auto_improvement_instruction(self) -> str:
+        """Build a natural-language "improve this plan" instruction from the data profile."""
+        try:
+            all_columns = _get_column_names_safe(self.data)
+        except Exception:  # pragma: no cover
+            all_columns = []
+        uncovered = [c for c in all_columns if c not in self._covered_columns()]
+
+        lines = [
+            "Improve this validation plan to increase data quality coverage. Use the table's "
+            "data profile to choose realistic, well-targeted checks."
+        ]
+        if uncovered:
+            lines.append(
+                "These columns currently have no validation coverage: "
+                f"{', '.join(uncovered)}. Add appropriate checks for them (for example, "
+                "not-null checks for columns with no missing values, range checks for numeric "
+                "columns, and set-membership checks for low-cardinality columns)."
+            )
+        else:
+            lines.append(
+                "All columns already have some coverage; look for additional high-value checks "
+                "such as uniqueness of key columns, tighter ranges, or row/column count checks."
+            )
+        if _thresholds_as_dict(self.thresholds) == {}:
+            lines.append(
+                "No failure thresholds are set on the plan; add sensible warning/error "
+                "thresholds via `pb.Thresholds(...)`."
+            )
+        lines.append("Preserve all existing steps unless they are clearly redundant.")
+        return " ".join(lines)
+
+    def suggest_improvements(
+        self,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Propose AI-generated improvements to this validation plan.
+
+        This is a thin, convenience wrapper over
+        [`EditValidation`](`pointblank.EditValidation`): it profiles the table with
+        [`DataScan`](`pointblank.DataScan`), derives an instruction that targets gaps in the
+        current plan (columns with no coverage, missing thresholds), and asks the model to extend
+        the plan accordingly. As with `EditValidation`, you review the proposed change as a diff
+        and explicitly accept it.
+
+        Parameters
+        ----------
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) with the proposed improvements,
+            ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
+            columns="d", value=100
+        )
+
+        proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+        print(proposal.diff())
+        improved = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        return EditValidation(
+            validation=self,
+            instruction=self._auto_improvement_instruction(),
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
+
+    def from_prompt(
+        self,
+        prompt: str,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Build a validation plan for this table from a natural-language prompt.
+
+        This is the same AI edit flow as [`EditValidation`](`pointblank.EditValidation`) but
+        starting from an *empty* plan: the model is given a bare `pb.Validate(...)` (carrying this
+        object's table name, label, and thresholds) plus a `DataScan` profile of the data, and is
+        asked to author steps that satisfy the prompt.
+
+        Parameters
+        ----------
+        prompt
+            A plain-English description of the checks the plan should perform (e.g., "ensure no
+            nulls in any id column and that ids are unique").
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) whose revised plan realizes the
+            prompt; inspect it with `.diff()`/`.to_code()` and finalize with `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+        proposal = base.from_prompt(
+            "ensure column a has no nulls and column d is always positive",
+            model="anthropic:claude-opus-4-8",
+        )
+        plan = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        # Start from an empty plan that preserves this object's top-level configuration
+        empty_plan = Validate(
+            data=self.data,
+            tbl_name=self.tbl_name,
+            label=self.label,
+            thresholds=self.thresholds,
+        )
+        empty_code = empty_plan.to_code()
+
+        return EditValidation(
+            validation=empty_code,
+            instruction=prompt,
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
 
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
