@@ -66,7 +66,11 @@ If reference attachments (images or PDFs) are provided alongside the data, use t
 
 
 def _create_chat_instance(
-    provider: str, model_name: str, api_key: Optional[str] = None, verify_ssl: bool = True
+    provider: str,
+    model_name: str,
+    api_key: Optional[str] = None,
+    verify_ssl: bool = True,
+    system_prompt: Optional[str] = None,
 ):
     """
     Create a chatlas chat instance for the specified provider.
