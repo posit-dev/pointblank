@@ -77,6 +77,13 @@ def test_draft_fail_invalid_provider():
         DraftValidation(data=small_table, model="invalid:model")
 
 
+def test_draft_fail_model_without_colon():
+    small_table = load_dataset(dataset="small_table")
+
+    with pytest.raises(ValueError, match="provider:model"):
+        DraftValidation(data=small_table, model="anthropic")
+
+
 def test_draft_fail_azure_openai_missing_endpoint(monkeypatch):
     pytest.importorskip("openai")
     pytest.importorskip("chatlas")
