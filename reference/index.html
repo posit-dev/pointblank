@@ -154,7 +154,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="450" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -226,6 +226,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/DraftValidation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/EditValidation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">EditValidation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -732,6 +738,30 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.get_dataframe_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dataframe_report()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.to_code()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_yaml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.to_yaml()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.suggest_improvements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.suggest_improvements()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.from_prompt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.from_prompt()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1319,6 +1349,10 @@ ul.task-list li input[type="checkbox"] {
 <dd>
 <p>Draft a validation plan for a given table using an LLM.</p>
 </dd>
+<dt><a href="../reference/EditValidation.html#pointblank.EditValidation" class="doc-class doc-label doc-label-dataclass">EditValidation</a></dt>
+<dd>
+<p>Edit an existing validation plan with a plain-English instruction using an LLM.</p>
+</dd>
 <dt><a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="doc-class doc-label doc-label-dataclass">MissingSpec</a></dt>
 <dd>
 <p>Specification for structured missing values in a column.</p>
@@ -1674,6 +1708,22 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report" class="doc-function doc-label doc-label-method">Validate.get_dataframe_report()</a></dt>
 <dd>
 <p>Get a report of the validation results as a DataFrame.</p>
+</dd>
+<dt><a href="../reference/Validate.to_code.html#pointblank.Validate.to_code" class="doc-function doc-label doc-label-method">Validate.to_code()</a></dt>
+<dd>
+<p>Render this validation plan as canonical Pointblank Python code.</p>
+</dd>
+<dt><a href="../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="doc-function doc-label doc-label-method">Validate.to_yaml()</a></dt>
+<dd>
+<p>Serialize this validation plan to a <code>yaml_interrogate()</code>-compatible YAML config.</p>
+</dd>
+<dt><a href="../reference/Validate.suggest_improvements.html#pointblank.Validate.suggest_improvements" class="doc-function doc-label doc-label-method">Validate.suggest_improvements()</a></dt>
+<dd>
+<p>Propose AI-generated improvements to this validation plan.</p>
+</dd>
+<dt><a href="../reference/Validate.from_prompt.html#pointblank.Validate.from_prompt" class="doc-function doc-label doc-label-method">Validate.from_prompt()</a></dt>
+<dd>
+<p>Build a validation plan for this table from a natural-language prompt.</p>
 </dd>
 <dt><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="doc-function doc-label doc-label-method">Validate.get_sundered_data()</a></dt>
 <dd>

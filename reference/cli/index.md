@@ -33,5 +33,8 @@ Create a validation script or YAML configuration template.
 [run](../../reference/cli/run.md)  
 Run a Pointblank validation script or YAML configuration.
 
+[edit](../../reference/cli/edit.md)  
+Edit an existing validation plan with a natural-language instruction (AI Validation Editor).
+
 [pl](../../reference/cli/pl.md)  
 Execute Polars expressions and display results.

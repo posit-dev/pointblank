@@ -53,6 +53,7 @@ Use pb COMMAND -help for detailed help on any command.
       pl             Execute Polars expressions and display results.
       datasets       List available built-in datasets.
       requirements   Check installed dependencies and their availability.
+      edit           Edit an existing validation plan with a natural-language...
 
 
 # Options
@@ -91,6 +92,9 @@ Show the version and exit.
 
 `run`  
 [Run a Pointblank validation script or YAML configuration.](../../reference/cli/run.md)
+
+`edit`  
+[Edit an existing validation plan with a natural-language instruction (AI Validation Editor).](../../reference/cli/edit.md)
 
 `pl`  
 [Execute Polars expressions and display results.](../../reference/cli/pl.md)

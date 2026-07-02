@@ -29,6 +29,7 @@ When performing data validation, use the `Validate` class to get the process sta
 - `FinalActions`: Define actions to be taken after validation is complete
 - `Schema`: Definition of a schema object
 - `DraftValidation`: Draft a validation plan for a given table using an LLM
+- `EditValidation`: Edit an existing validation plan with a plain-English instruction using an LLM
 - `MissingSpec`: Specification for structured missing values in a column
 
 ### Contracts and Pipelines
@@ -146,6 +147,10 @@ The validation plan is executed when `interrogate()` is called. After interrogat
 - `Validate.get_step_report`
 - `Validate.get_json_report`
 - `Validate.get_dataframe_report`
+- `Validate.to_code`
+- `Validate.to_yaml`
+- `Validate.suggest_improvements`
+- `Validate.from_prompt`
 - `Validate.get_sundered_data`
 - `Validate.get_data_extracts`
 - `Validate.all_passed`

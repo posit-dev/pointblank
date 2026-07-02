@@ -25,6 +25,9 @@ Definition of a schema object.
 [DraftValidation](DraftValidation.md#pointblank.DraftValidation)  
 Draft a validation plan for a given table using an LLM.
 
+[EditValidation](EditValidation.md#pointblank.EditValidation)  
+Edit an existing validation plan with a plain-English instruction using an LLM.
+
 [MissingSpec](MissingSpec.md#pointblank.MissingSpec)  
 Specification for structured missing values in a column.
 
@@ -298,6 +301,18 @@ Get a report of the validation results as a JSON-formatted string.
 
 [Validate.get_dataframe_report()](Validate.get_dataframe_report.md#pointblank.Validate.get_dataframe_report)  
 Get a report of the validation results as a DataFrame.
+
+[Validate.to_code()](Validate.to_code.md#pointblank.Validate.to_code)  
+Render this validation plan as canonical Pointblank Python code.
+
+[Validate.to_yaml()](Validate.to_yaml.md#pointblank.Validate.to_yaml)  
+Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
+
+[Validate.suggest_improvements()](Validate.suggest_improvements.md#pointblank.Validate.suggest_improvements)  
+Propose AI-generated improvements to this validation plan.
+
+[Validate.from_prompt()](Validate.from_prompt.md#pointblank.Validate.from_prompt)  
+Build a validation plan for this table from a natural-language prompt.
 
 [Validate.get_sundered_data()](Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data)  
 Get the data that passed or failed the validation steps.
