@@ -220,7 +220,6 @@ class EditValidation:
             raise ValueError(
                 f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
             )
-        model_name = self.model.split(sep=":", maxsplit=1)[1]
 
         # Normalize whatever plan input we were given into canonical Pointblank code
         self.original_code = _normalize_to_code(self.validation)
