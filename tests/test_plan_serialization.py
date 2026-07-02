@@ -222,6 +222,58 @@ def test_to_yaml_warns_on_unserializable(small_table):
         validation.to_yaml()
 
 
+def test_to_code_roundtrips_column_to_column_comparison(small_table):
+    validation = Validate(data=small_table).col_vals_gt(columns="a", value=pb.col("d"))
+    code = validation.to_code()
+    assert 'value=pb.col("d")' in code
+    rebuilt = _exec_code(code, small_table)
+    from pointblank.column import Column
+
+    assert isinstance(rebuilt.validation_info[0].values, Column)
+
+
+def test_to_yaml_roundtrips_column_to_column_comparison(small_table):
+    # A column comparison value must round-trip, not degrade to a bare string literal
+    validation = Validate(data=small_table, tbl_name="small_table").col_vals_gt(
+        columns="a", value=pb.col("d")
+    )
+    yaml_str = validation.to_yaml()
+    assert "python: pb.col('d')" in yaml_str
+    rebuilt = yaml_interrogate(yaml_str)
+    from pointblank.column import Column
+
+    assert isinstance(rebuilt.validation_info[0].values, Column)
+
+
+def test_aggregate_method_columns_render_cleanly(small_table):
+    # Aggregate methods store `column` as a list; it should serialize as a clean column name
+    validation = Validate(data=small_table, tbl_name="small_table").col_sum_eq(
+        columns="d", value=100
+    )
+    code = validation.to_code()
+    assert '.col_sum_eq(columns="d", value=100)' in code
+
+    rebuilt = _exec_code(code, small_table)
+    assert rebuilt.validation_info[0].assertion_type == "col_sum_eq"
+
+    yaml_rebuilt = yaml_interrogate(validation.to_yaml())
+    assert yaml_rebuilt.validation_info[0].assertion_type == "col_sum_eq"
+
+
+def test_data_freshness_roundtrips(small_table):
+    validation = Validate(data=small_table, tbl_name="small_table").data_freshness(
+        column="date_time", max_age="1 day"
+    )
+    code = validation.to_code()
+    assert '.data_freshness(column="date_time", max_age="1 day")' in code
+
+    rebuilt = _exec_code(code, small_table)
+    assert rebuilt.validation_info[0].assertion_type == "data_freshness"
+
+    yaml_rebuilt = yaml_interrogate(validation.to_yaml())
+    assert yaml_rebuilt.validation_info[0].assertion_type == "data_freshness"
+
+
 def test_empty_plan_serializes(small_table):
     validation = Validate(data=small_table)
     with warnings.catch_warnings():
