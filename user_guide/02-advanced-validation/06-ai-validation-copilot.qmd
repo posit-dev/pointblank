@@ -1,0 +1,281 @@
+---
+title: AI Validation Copilot
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+Where [Draft Validation](draft-validation.qmd) uses a large language model (LLM) to *generate* a
+validation plan from scratch, the AI Validation Copilot uses one to *edit* a plan you already have.
+You give it an existing plan plus a plain-English instruction, such as "add a not-null check on
+`user_id`, tighten the email regex, and drop the `price > 0` check", and it returns a revised plan.
+You review the change as a diff and explicitly accept it before anything runs, keeping a human in the
+loop.
+
+The Copilot is built on the [plan serialization](plan-serialization.qmd) primitives described in the
+previous section: it renders your current plan to code with
+[`to_code()`](`Validate.to_code`), sends that code and your instruction to the model, and
+returns the model's revised code for your review.
+
+The main entry point is the `EditValidation` class. Two convenience methods on `Validate`,
+[`suggest_improvements()`](`Validate.suggest_improvements`) and
+[`from_prompt()`](`Validate.from_prompt`), wrap the same flow, and the `pb edit` CLI
+command brings it to the terminal.
+
+## How the Copilot Works
+
+When you edit a plan, the process works through these steps:
+
+1. your current plan is normalized to canonical Pointblank code via
+[`to_code()`](`Validate.to_code`)
+2. that code, your instruction, and (optionally) a `DataScan` summary of the table are assembled into
+a prompt and sent to your selected LLM provider
+3. the model returns a complete revised plan as Python code
+4. the revised code is checked for syntax and unknown methods; on failure the model is automatically
+re-prompted to fix it
+5. you inspect the proposed change as a diff and, when satisfied, accept it to obtain a runnable
+`Validate` object
+
+As with `DraftValidation`, the entire dataset is never sent to the model, only a summary. See
+[Data Privacy](#data-privacy) below.
+
+## Requirements and Setup
+
+The Copilot shares its requirements with [Draft Validation](draft-validation.qmd): an API key from
+a supported LLM provider and the optional dependencies, installed with:
+
+```bash
+pip install pointblank[generate]
+```
+
+The same five providers are supported (`anthropic`, `openai`, `ollama`, `bedrock`, and
+`azure-openai`), the model is specified in `provider:model` form, and API keys are resolved from the
+`api_key=` argument, environment variables, or a `.env` file exactly as described on the Draft
+Validation page.
+
+## Editing a Plan with `EditValidation`{.qd-no-link}
+
+Suppose you have an existing plan and want to make a few targeted changes:
+
+```python
+import pointblank as pb
+
+# An existing plan
+validation = (
+    pb.Validate(data=pb.load_dataset("small_table"), label="Small table checks")
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
+)
+
+# Describe the change in plain English
+edited = pb.EditValidation(
+    validation=validation,
+    instruction=(
+        "Loosen the d check to 50, drop the b regex, and add a not-null check on a."
+    ),
+    model="anthropic:claude-opus-4-8",
+    data=pb.load_dataset("small_table"),
+)
+```
+
+The `validation=` argument is flexible. It accepts a live `Validate` object (as above), a code string
+(such as the output of [`to_code()`](`Validate.to_code`)), a YAML configuration string, or
+a path to a `.py` or `.yaml`/`.yml` file. All of these are normalized to code before being sent to
+the model, so you can edit a plan wherever it happens to live.
+
+The optional `data=` argument is worth providing when you can: it includes a `DataScan` profile of
+the table in the prompt so the model can make *informed* edits (for example, choosing a realistic
+range from the observed min and max). It's also used as the default data source when you accept the
+edit.
+
+## Reviewing the Proposed Change
+
+The Copilot proposes; you dispose. Before anything runs, inspect what the model changed.
+
+### As a Unified Diff
+
+[`diff()`](`EditValidation.diff`) returns a textual, line-level diff of the original plan
+versus the revised plan:
+
+```python
+print(edited.diff())
+```
+
+```plaintext
+--- original_plan.py
++++ edited_plan.py
+@@ -5,8 +5,8 @@
+         data=your_data,  # Replace your_data with the actual data variable
+         label="Small table checks",
+     )
+-    .col_vals_gt(columns="d", value=100)
+-    .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
++    .col_vals_gt(columns="d", value=50)
++    .col_vals_not_null(columns="a")
+ )
+
+ validation
+```
+
+### As a Structured Change List
+
+[`changed_steps()`](`EditValidation.changed_steps`) compares the two plans at the level of
+validation steps and returns a structured list. Unlike the textual diff, this is robust to
+reformatting (it compares whole steps rather than lines):
+
+```python
+edited.changed_steps()
+```
+
+```plaintext
+[
+  {
+    "action": "modify",
+    "method": "col_vals_gt",
+    "old": "col_vals_gt(columns='d', value=100)",
+    "new": "col_vals_gt(columns='d', value=50)"
+  },
+  {
+    "action": "remove",
+    "method": "col_vals_regex",
+    "old": "col_vals_regex(columns='b', pattern='[0-9]-[a-z]{3}')"
+  },
+  {
+    "action": "add",
+    "method": "col_vals_not_null",
+    "new": "col_vals_not_null(columns='a')"
+  }
+]
+```
+
+Each record has an `"action"` of `"add"`, `"remove"`, or `"modify"`, the `"method"` involved, and the
+relevant `"old"`/`"new"` step text.
+
+### As a Table
+
+[`preview()`](`EditValidation.preview`) renders the same change list as a
+[Great Tables](https://posit-dev.github.io/great-tables/) object, color-coding additions, removals,
+and modifications for quick visual review in a notebook:
+
+```python
+edited.preview()
+```
+
+## Accepting the Edit
+
+Once you're satisfied with the proposed change,
+[`accept()`](`EditValidation.accept`) executes the revised plan and returns a `Validate`
+object, ready to interrogate:
+
+```python
+plan = edited.accept()          # a Validate (not yet interrogated)
+results = plan.interrogate()    # run it
+```
+
+The data bound to the plan is the `data=` you passed to `EditValidation`; you can override it with
+`edited.accept(data=other_table)`. Nothing runs until you call `accept()`, and the plan isn't
+interrogated until you call `interrogate()`, so there's a clear, deliberate boundary between the
+model's proposal and execution.
+
+## Guardrails
+
+Two guardrails keep the flow from handing you broken code.
+
+- **Syntax and lint check.** The revised code is parsed with `ast.parse()` and checked for
+validation-method typos before it's returned.
+[`validate_syntax()`](`EditValidation.validate_syntax`) reports whether the current
+revision passes.
+- **Automatic re-prompt.** If the check fails, the model is automatically re-prompted with the error
+message to correct itself, up to `max_reprompts` times (default `1`). If the code still doesn't pass,
+[`accept()`](`EditValidation.accept`) refuses to run it and points you at
+[`to_code()`](`EditValidation.to_code`) so you can fix it by hand.
+
+These same guardrails are also applied to [`DraftValidation`](draft-validation.qmd).
+
+## Natural-Language Refinements
+
+Two methods on `Validate` wrap the edit flow for common cases.
+
+### Suggesting Improvements
+
+[`suggest_improvements()`](`Validate.suggest_improvements`) profiles the table, derives an
+instruction targeting gaps in the current plan (columns with no coverage, missing thresholds), and
+asks the model to extend the plan. It returns an `EditValidation` you review and accept as usual:
+
+```python
+validation = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
+    columns="d", value=100
+)
+
+proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+print(proposal.diff())
+improved = proposal.accept()
+```
+
+### Building a Plan from a Prompt
+
+[`from_prompt()`](`Validate.from_prompt`) is the same flow starting from an *empty* plan:
+the model authors steps that satisfy your prompt, using a `DataScan` profile of the data and any
+table name, label, and thresholds carried by the object you call it on:
+
+```python
+base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+
+proposal = base.from_prompt(
+    "ensure column a has no nulls and column d is always positive",
+    model="anthropic:claude-opus-4-8",
+)
+plan = proposal.accept()
+```
+
+## Editing from the Command Line
+
+The `pb edit` command brings the Copilot to the terminal. Point it at a validation file, describe the
+change, and choose a model:
+
+```bash
+pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
+```
+
+The command prints the proposed change as a color diff along with a summary (for example,
+`1 added, 1 removed, 1 modified`). Provide a data source for profile-informed edits with `--data`,
+and write the revised plan to a file with `--output` (add `--yes` to skip the confirmation prompt):
+
+```bash
+pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+pb edit plan.py   -i "drop the email regex check"        -m anthropic:claude-opus-4-8 -o plan2.py -y
+```
+
+## Data Privacy {#data-privacy}
+
+The Copilot follows the same privacy posture as [Draft Validation](draft-validation.qmd): your
+actual dataset is never sent to the model. When you provide `data=`, only a `DataScan` summary is
+transmitted, which includes column names and types, per-column statistics (min, max, mean, median,
+missing counts), and a small sample of values from each column. This is enough context for informed
+edits without exposing the full table.
+
+If you prefer to send no data at all, omit `data=` on `EditValidation`; the model then edits the plan
+using only the plan code and your instruction. (Because their whole purpose is to profile coverage
+gaps, `suggest_improvements()` and `from_prompt()` always include the summary.)
+
+## Best Practices
+
+- **Make small, targeted edits.** The Copilot is designed to change only what your instruction
+implies and preserve unrelated steps verbatim. Keeping instructions focused produces minimal,
+reviewable diffs.
+- **Always review before accepting.** Read the diff or the change list; the model proposes, but you
+decide what runs.
+- **Provide data when you can.** A `DataScan` profile lets the model choose realistic bounds and set
+members rather than guessing.
+- **Version-control the accepted plan.** Once you accept an edit, serialize the result with
+[`to_code()`](`Validate.to_code`) or [`to_yaml()`](`Validate.to_yaml`) and
+commit it, so the plan's evolution is tracked alongside your code.
+
+## Conclusion
+
+The AI Validation Copilot extends Pointblank's AI capabilities from generating plans to iterating on
+them. By combining plan serialization, a natural-language edit prompt, structural diffing, and
+syntax guardrails, it lets you refine validation plans conversationally while keeping a human firmly
+in control of what actually runs. Together with [Draft Validation](draft-validation.qmd), it
+covers both halves of an AI-assisted validation workflow: create a plan, then keep improving it.
