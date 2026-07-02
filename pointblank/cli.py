@@ -4619,6 +4619,104 @@ def _print_unified_diff(diff: str) -> None:
             console.print(line)
 
 
+@cli.command(name="edit")
+@click.argument("validation_file", type=click.Path(exists=True), required=False)
+@click.option(
+    "--instruction",
+    "-i",
+    help="Plain-English description of the change to make to the plan.",
+)
+@click.option(
+    "--model",
+    "-m",
+    help="Model to use, as provider:model (e.g., anthropic:claude-opus-4-8).",
+)
+@click.option(
+    "--data",
+    "data_source",
+    type=str,
+    help="Optional data source used for DataScan-informed edits and validation.",
+)
+@click.option("--output", "-o", type=click.Path(), help="Write the revised plan to this file.")
+@click.option(
+    "--yes", "-y", is_flag=True, help="Write the output file without asking for confirmation."
+)
+def edit(
+    validation_file: str | None,
+    instruction: str | None,
+    model: str | None,
+    data_source: str | None,
+    output: str | None,
+    yes: bool,
+) -> None:
+    """
+    Edit an existing validation plan with a natural-language instruction (AI Copilot).
+
+    VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validation plan.
+    The instruction is sent, along with the current plan, to the specified model; the proposed
+    change is shown as a diff for review and can optionally be written to a file.
+
+    Examples:
+
+    \b
+    pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
+    pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+    pb edit plan.py -i "drop the email regex check" -m anthropic:claude-opus-4-8 -o plan2.py -y
+    """
+    if not validation_file:
+        console.print("[red]Error:[/red] VALIDATION_FILE is required.")
+        sys.exit(1)
+    if not instruction:
+        console.print("[red]Error:[/red] --instruction/-i is required.")
+        sys.exit(1)
+    if not model:
+        console.print("[red]Error:[/red] --model/-m is required (e.g., anthropic:claude-opus-4-8).")
+        sys.exit(1)
+
+    try:
+        data = _load_data_source(data_source) if data_source else None
+
+        console.print(f"[dim]Editing {validation_file} with {model}...[/dim]")
+        edited = pb.EditValidation(
+            validation=validation_file,
+            instruction=instruction,
+            model=model,
+            data=data,
+        )
+
+        diff = edited.diff()
+        if not diff.strip():
+            console.print("[yellow]The model returned no changes to the plan.[/yellow]")
+        else:
+            console.print(Panel.fit("Proposed changes", border_style="cyan"))
+            _print_unified_diff(diff)
+
+        changes = edited.changed_steps()
+        if changes:
+            added = sum(1 for c in changes if c["action"] == "add")
+            removed = sum(1 for c in changes if c["action"] == "remove")
+            modified = sum(1 for c in changes if c["action"] == "modify")
+            console.print(f"\n[bold]{added} added, {removed} removed, {modified} modified[/bold]")
+
+        if not edited.validate_syntax():
+            console.print(
+                "[yellow]Warning:[/yellow] the revised plan did not pass the syntax check. "
+                "Review it carefully before use."
+            )
+
+        if output:
+            if not yes:
+                click.confirm(f"Write the revised plan to {output}?", abort=True)
+            Path(output).write_text(edited.to_code(), encoding="utf-8")
+            console.print(f"[green]Wrote revised plan to {output}[/green]")
+
+    except click.exceptions.Abort:
+        console.print("[yellow]Aborted; no file written.[/yellow]")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        sys.exit(1)
+
+
 def _format_missing_percentage(value: float) -> str:
     """Format missing value percentages for display.
 
