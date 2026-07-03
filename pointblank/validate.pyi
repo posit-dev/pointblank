@@ -41,7 +41,11 @@ class PointblankConfig:
     report_incl_footer: bool = ...
     report_incl_footer_timings: bool = ...
     report_incl_footer_notes: bool = ...
+    report_incl_dimensions: bool = ...
     preview_incl_header: bool = ...
+    dimension_map: dict[str, str] | None = ...
+    dimension_weights: dict[str, float] | None = ...
+    dimension_thresholds: dict[str, float] | None = ...
     def __repr__(self) -> str: ...
 
 def config(
@@ -49,7 +53,11 @@ def config(
     report_incl_footer: bool = True,
     report_incl_footer_timings: bool = True,
     report_incl_footer_notes: bool = True,
+    report_incl_dimensions: bool = False,
     preview_incl_header: bool = True,
+    dimension_map: dict[str, str] | None = None,
+    dimension_weights: dict[str, float] | None = None,
+    dimension_thresholds: dict[str, float] | None = None,
 ) -> PointblankConfig: ...
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
@@ -97,6 +105,7 @@ class _ValidationInfo:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> _ValidationInfo: ...
     i: int | None = ...
     i_o: int | None = ...
@@ -115,6 +124,7 @@ class _ValidationInfo:
     label: str | None = ...
     brief: str | None = ...
     autobrief: str | None = ...
+    dimension: str | None = ...
     active: bool | Callable | None = ...
     eval_error: bool | None = ...
     all_passed: bool | None = ...
@@ -182,6 +192,7 @@ class Validate:
         brief: bool = False,
         actions=None,
         active: bool = True,
+        dimension: str | None = None,
     ): ...
     def set_tbl(
         self, tbl: Any, tbl_name: str | None = None, label: str | None = None
@@ -199,6 +210,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_lt(
         self,
@@ -212,6 +224,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_eq(
         self,
@@ -225,6 +238,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_ne(
         self,
@@ -238,6 +252,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_ge(
         self,
@@ -251,6 +266,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_le(
         self,
@@ -264,6 +280,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_between(
         self,
@@ -279,6 +296,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_outside(
         self,
@@ -294,6 +312,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_in_set(
         self,
@@ -306,6 +325,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_not_in_set(
         self,
@@ -318,6 +338,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_increasing(
         self,
@@ -332,6 +353,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_decreasing(
         self,
@@ -346,6 +368,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_null(
         self,
@@ -356,6 +379,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_not_null(
         self,
@@ -366,6 +390,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_regex(
         self,
@@ -380,6 +405,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_within_spec(
         self,
@@ -393,6 +419,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_vals_expr(
         self,
@@ -403,6 +430,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_exists(
         self,
@@ -411,6 +439,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_pct_null(
         self,
@@ -421,6 +450,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_pct_missing(
         self,
@@ -433,6 +463,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_missing_coded(
         self,
@@ -444,6 +475,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_missing_only_coded(
         self,
@@ -458,6 +490,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def rows_distinct(
         self,
@@ -468,6 +501,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def rows_complete(
         self,
@@ -478,6 +512,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_missing_consistent(
         self,
@@ -490,6 +525,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def prompt(
         self,
@@ -505,6 +541,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_schema_match(
         self,
@@ -519,6 +556,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def row_count_match(
         self,
@@ -530,6 +568,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def data_freshness(
         self,
@@ -543,6 +582,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def col_count_match(
         self,
@@ -553,6 +593,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def tbl_match(
         self,
@@ -562,6 +603,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def conjointly(
         self,
@@ -571,6 +613,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def specially(
         self,
@@ -580,6 +623,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate: ...
     def interrogate(
         self,
@@ -641,6 +685,12 @@ class Validate:
         verify_ssl: bool = True,
         max_reprompts: int = 1,
     ) -> Any: ...
+    def get_dimension_scores(self) -> dict[str, float]: ...
+    def get_health_score(self) -> float: ...
+    def assert_dimension_scores(
+        self, thresholds: dict[str, float] | None = None, message: str | None = None
+    ) -> None: ...
+    def get_scorecard(self, title: str | None = ":default:") -> GT: ...
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str: ...
@@ -656,6 +706,7 @@ class Validate:
         incl_footer: bool | None = None,
         incl_footer_timings: bool | None = None,
         incl_footer_notes: bool | None = None,
+        incl_dimensions: bool | None = None,
     ) -> GT: ...
     def get_step_report(
         self,
@@ -683,6 +734,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sum to a value eq some `value`.
 
@@ -697,6 +749,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -719,6 +773,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sum to a value gt some `value`.
 
@@ -733,6 +788,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -755,6 +812,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sum to a value ge some `value`.
 
@@ -769,6 +827,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -791,6 +851,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sum to a value lt some `value`.
 
@@ -805,6 +866,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -827,6 +890,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sum to a value le some `value`.
 
@@ -841,6 +905,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -863,6 +929,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column avg to a value eq some `value`.
 
@@ -877,6 +944,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -899,6 +968,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column avg to a value gt some `value`.
 
@@ -913,6 +983,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -935,6 +1007,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column avg to a value ge some `value`.
 
@@ -949,6 +1022,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -971,6 +1046,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column avg to a value lt some `value`.
 
@@ -985,6 +1061,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1007,6 +1085,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column avg to a value le some `value`.
 
@@ -1021,6 +1100,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1043,6 +1124,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sd to a value eq some `value`.
 
@@ -1057,6 +1139,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1079,6 +1163,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sd to a value gt some `value`.
 
@@ -1093,6 +1178,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1115,6 +1202,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sd to a value ge some `value`.
 
@@ -1129,6 +1217,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1151,6 +1241,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sd to a value lt some `value`.
 
@@ -1165,6 +1256,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
@@ -1187,6 +1280,7 @@ class Validate:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """Assert the values in a column sd to a value le some `value`.
 
@@ -1201,6 +1295,8 @@ class Validate:
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.

@@ -51,6 +51,7 @@ SIGNATURE = """
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
 """
 
 DOCSTRING = """
@@ -65,6 +66,8 @@ DOCSTRING = """
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
             actions (Actions | None, optional): Actions to take after validation. Defaults to None.
             active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
