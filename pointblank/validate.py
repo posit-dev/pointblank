@@ -22664,6 +22664,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
