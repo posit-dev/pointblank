@@ -20649,6 +20649,13 @@ class Validate:
         # Set the `i_o` attribute to the largest value of `i_o` plus 1
         validation_info.i_o = max_i_o + 1
 
+        # Automatically infer the data quality dimension from the assertion type if it was not
+        # set explicitly via the `dimension=` parameter on the validation method
+        if validation_info.dimension is None:
+            validation_info.dimension = _infer_dimension_from_assertion_type(
+                validation_info.assertion_type
+            )
+
         self.validation_info.append(validation_info)
 
         return self
