@@ -4101,6 +4101,7 @@ class _ValidationInfo:
         brief: str | bool = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> _ValidationInfo:
         # This factory method creates a `_ValidationInfo` instance for aggregate
         # methods. The reason this is created, is because all agg methods share the same
@@ -4116,6 +4117,7 @@ class _ValidationInfo:
             brief=_transform_auto_brief(brief=brief),
             actions=actions,
             active=active,
+            dimension=dimension,
         )
 
     # Validation plan
@@ -4136,6 +4138,7 @@ class _ValidationInfo:
     label: str | None = None
     brief: str | None = None
     autobrief: str | None = None
+    dimension: str | None = None
     active: bool | Callable | None = None
     # Interrogation results
     eval_error: bool | None = None
@@ -5728,6 +5731,7 @@ class Validate:
         brief=False,
         actions=None,
         active=True,
+        dimension: str | None = None,
     ):
         """
         Add an aggregation-based validation step to the validation plan.
@@ -5776,6 +5780,12 @@ class Validate:
         active
             Whether this validation step is active.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -5810,6 +5820,7 @@ class Validate:
                 actions=self.actions if actions is None else actions,
                 brief=self.brief if brief is None else brief,
                 active=active,
+                dimension=dimension,
             )
             self._add_validation(validation_info=val_info)
 
@@ -5965,6 +5976,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data greater than a fixed value or data in another column?
@@ -6027,6 +6039,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6238,6 +6256,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6256,6 +6275,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data less than a fixed value or data in another column?
@@ -6318,6 +6338,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6536,6 +6562,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6554,6 +6581,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data equal to a fixed value or data in another column?
@@ -6616,6 +6644,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6834,6 +6868,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6852,6 +6887,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data not equal to a fixed value or data in another column?
@@ -6914,6 +6950,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7130,6 +7172,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -7148,6 +7191,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data greater than or equal to a fixed value or data in another column?
@@ -7210,6 +7254,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7429,6 +7479,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -7447,6 +7498,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data less than or equal to a fixed value or data in another column?
@@ -7509,6 +7561,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7728,6 +7786,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -7748,6 +7807,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do column data lie between two specified values or data in other columns?
@@ -7820,6 +7880,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8055,6 +8121,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -8075,6 +8142,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do column data lie outside of two specified values or data in other columns?
@@ -8147,6 +8215,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8382,6 +8456,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -8399,6 +8474,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values are in a set of values.
@@ -8456,6 +8532,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8706,6 +8788,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -8723,6 +8806,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values are not in a set of values.
@@ -8780,6 +8864,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9002,6 +9092,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -9021,6 +9112,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data increasing by row?
@@ -9089,6 +9181,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9200,6 +9298,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
                 val_info={
                     "allow_stationary": allow_stationary,
                     "decreasing_tol": decreasing_tol if decreasing_tol else 0.0,
@@ -9223,6 +9322,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data decreasing by row?
@@ -9291,6 +9391,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9402,6 +9508,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
                 val_info={
                     "allow_stationary": allow_stationary,
                     "increasing_tol": increasing_tol if increasing_tol else 0.0,
@@ -9421,6 +9528,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether values in a column are Null.
@@ -9472,6 +9580,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9654,6 +9768,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -9669,6 +9784,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether values in a column are not Null.
@@ -9720,6 +9836,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9902,6 +10024,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -9921,6 +10044,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values match a regular expression pattern.
@@ -9981,6 +10105,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -10173,6 +10303,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -10191,6 +10322,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values fit within a specification.
@@ -10252,6 +10384,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -10465,6 +10603,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -10480,6 +10619,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate column values using a custom expression.
@@ -10532,6 +10672,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -10696,6 +10842,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -10709,6 +10856,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether one or more columns exist in the table.
@@ -10750,6 +10898,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -10875,6 +11029,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -10890,6 +11045,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether a column has a specific percentage of Null values.
@@ -10942,6 +11098,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -11176,6 +11338,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -11193,6 +11356,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate that the percentage of *structured* missing values stays within a limit.
@@ -11248,6 +11412,12 @@ class Validate:
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -11376,6 +11546,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -11392,6 +11563,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate that all missing values in a column are *coded* (no uncoded nulls).
@@ -11442,6 +11614,12 @@ class Validate:
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -11556,6 +11734,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -11575,6 +11754,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate that a column contains only documented codes and legitimate values.
@@ -11630,6 +11810,12 @@ class Validate:
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -11760,6 +11946,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -11775,6 +11962,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether rows in the table are distinct.
@@ -11826,6 +12014,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -12006,6 +12200,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -12021,6 +12216,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether row data are complete by having no missing values.
@@ -12072,6 +12268,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -12252,6 +12454,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -12269,6 +12472,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate that related columns share a consistent missingness pattern for a given reason.
@@ -12321,6 +12525,12 @@ class Validate:
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -12453,6 +12663,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -12473,6 +12684,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate rows using AI/LLM-powered analysis.
@@ -12565,6 +12777,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -12932,6 +13150,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -12951,6 +13170,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do columns in the table (and their types) match a predefined schema?
@@ -13018,6 +13238,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -13160,6 +13386,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -13176,6 +13403,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether the row count of the table matches a specified count.
@@ -13236,6 +13464,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -13384,6 +13618,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -13402,6 +13637,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate that data in a datetime column is not older than a specified maximum age.
@@ -13467,6 +13703,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -13752,6 +13994,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -13767,6 +14010,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether the column count of the table matches a specified count.
@@ -13819,6 +14063,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -13933,6 +14183,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -13947,6 +14198,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether the target table matches a comparison table.
@@ -14003,6 +14255,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -14207,6 +14465,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -14221,6 +14480,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Perform multiple row-wise validations for joint validity.
@@ -14273,6 +14533,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -14460,6 +14726,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -14474,6 +14741,7 @@ class Validate:
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Perform a specialized validation with customized logic.
@@ -14541,6 +14809,12 @@ class Validate:
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -14810,6 +15084,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
