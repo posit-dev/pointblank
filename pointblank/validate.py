@@ -22734,6 +22734,30 @@ def _compute_dimension_scores(validation_info: list[_ValidationInfo]) -> dict[st
     }
 
 
+def _compute_health_score(
+    validation_info: list[_ValidationInfo],
+    dimension_weights: dict[str, float] | None = None,
+) -> float:
+    """
+    Compute the overall, test-unit-weighted health score (0-100) across all dimensions.
+
+    With uniform weights this reduces to the overall pass rate (total passing test units over
+    total test units). Optional per-dimension weights scale each dimension's contribution; a
+    dimension not present in `dimension_weights` uses a weight of `1.0`.
+    """
+    agg = _aggregate_dimension_units(validation_info)
+    if not agg:
+        return 100.0
+    weights = dimension_weights or {}
+    numerator = 0.0
+    denominator = 0.0
+    for dimension, (n_passed, n) in agg.items():
+        weight = weights.get(dimension, 1.0)
+        numerator += weight * n_passed
+        denominator += weight * n
+    return round(numerator / denominator * 100, 2) if denominator else 100.0
+
+
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
     icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
