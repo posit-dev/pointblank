@@ -401,6 +401,9 @@ class PointblankConfig:
     report_incl_footer_timings: bool = True
     report_incl_footer_notes: bool = True
     preview_incl_header: bool = True
+    dimension_map: dict[str, str] | None = None
+    dimension_weights: dict[str, float] | None = None
+    dimension_thresholds: dict[str, float] | None = None
 
     def __repr__(self) -> str:
         return (
@@ -408,7 +411,10 @@ class PointblankConfig:
             f"report_incl_footer={self.report_incl_footer}, "
             f"report_incl_footer_timings={self.report_incl_footer_timings}, "
             f"report_incl_footer_notes={self.report_incl_footer_notes}, "
-            f"preview_incl_header={self.preview_incl_header})"
+            f"preview_incl_header={self.preview_incl_header}, "
+            f"dimension_map={self.dimension_map}, "
+            f"dimension_weights={self.dimension_weights}, "
+            f"dimension_thresholds={self.dimension_thresholds})"
         )
 
 
