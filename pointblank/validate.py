@@ -408,6 +408,7 @@ class PointblankConfig:
     report_incl_footer: bool = True
     report_incl_footer_timings: bool = True
     report_incl_footer_notes: bool = True
+    report_incl_dimensions: bool = False
     preview_incl_header: bool = True
     dimension_map: dict[str, str] | None = None
     dimension_weights: dict[str, float] | None = None
@@ -419,6 +420,7 @@ class PointblankConfig:
             f"report_incl_footer={self.report_incl_footer}, "
             f"report_incl_footer_timings={self.report_incl_footer_timings}, "
             f"report_incl_footer_notes={self.report_incl_footer_notes}, "
+            f"report_incl_dimensions={self.report_incl_dimensions}, "
             f"preview_incl_header={self.preview_incl_header}, "
             f"dimension_map={self.dimension_map}, "
             f"dimension_weights={self.dimension_weights}, "
@@ -435,6 +437,7 @@ def config(
     report_incl_footer: bool = True,
     report_incl_footer_timings: bool = True,
     report_incl_footer_notes: bool = True,
+    report_incl_dimensions: bool = False,
     preview_incl_header: bool = True,
     dimension_map: dict[str, str] | None = None,
     dimension_weights: dict[str, float] | None = None,
@@ -458,6 +461,11 @@ def config(
     report_incl_footer_notes
         Controls whether the notes from validation steps should be displayed in the footer. Only
         applies when `report_incl_footer=True`.
+    report_incl_dimensions
+        Controls whether the data quality dimension display is included in the validation report by
+        default. When `True`, each step's report shows a color-coded dimension badge on the step
+        number and a health-score summary block in the footer. This is `False` by default (opt-in);
+        it can also be toggled per-report via `get_tabular_report(incl_dimensions=...)`.
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
@@ -491,6 +499,7 @@ def config(
     global_config.report_incl_footer = report_incl_footer  # pragma: no cover
     global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
     global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
+    global_config.report_incl_dimensions = report_incl_dimensions  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
     global_config.dimension_map = dimension_map  # pragma: no cover
     global_config.dimension_weights = dimension_weights  # pragma: no cover
@@ -19163,6 +19172,7 @@ class Validate:
         incl_footer: bool | None = None,
         incl_footer_timings: bool | None = None,
         incl_footer_notes: bool | None = None,
+        incl_dimensions: bool | None = None,
     ) -> GT:
         """
         Validation report as a GT table.
@@ -19199,6 +19209,11 @@ class Validate:
         incl_footer_notes
             Controls whether notes from validation steps should be displayed in the footer. If
             `None`, uses the global configuration setting. Only applies when `incl_footer=True`.
+        incl_dimensions
+            Controls whether the data quality dimension display is shown: a color-coded dimension
+            badge on each step number and a health-score summary block in the footer. If `None`,
+            uses the global configuration setting (which defaults to `False`, i.e., opt-in). Set to
+            `True` to include it for this report.
 
         Returns
         -------
@@ -19262,6 +19277,8 @@ class Validate:
             incl_footer_timings = global_config.report_incl_footer_timings
         if incl_footer_notes is None:
             incl_footer_notes = global_config.report_incl_footer_notes
+        if incl_dimensions is None:
+            incl_dimensions = global_config.report_incl_dimensions
 
         # Do we have a DataFrame library to work with?
         _check_any_df_lib(method_used="get_tabular_report")
@@ -20035,14 +20052,16 @@ class Validate:
             validation_info_dict["i"] = list(range(1, len(validation_info_dict["type_upd"]) + 1))
 
         # Overlay a small, color-coded two-letter dimension badge on the top-left of each step
-        # number cell. This is positioned absolutely so it doesn't affect the layout of the numeral
-        # (regardless of digit count); the full dimension name is shown via a tooltip. This is done
-        # after the `i` values are finalized (they are regenerated above when not interrogated).
-        validation_info_dict["i"] = _transform_step_number_with_dimension(
-            i_values=validation_info_dict["i"],
-            dimensions=validation_info_dict["dimension"],
-            lang=lang,
-        )
+        # number cell (opt-in via `incl_dimensions`). This is positioned absolutely so it doesn't
+        # affect the layout of the numeral (regardless of digit count); the full dimension name is
+        # shown via a tooltip. This is done after the `i` values are finalized (they are regenerated
+        # above when not interrogated).
+        if incl_dimensions:
+            validation_info_dict["i"] = _transform_step_number_with_dimension(
+                i_values=validation_info_dict["i"],
+                dimensions=validation_info_dict["dimension"],
+                lang=lang,
+            )
         validation_info_dict.pop("dimension")
 
         # Create a table time string
@@ -20224,12 +20243,15 @@ class Validate:
 
         if incl_footer:
             # Add the health-score summary block (overall + per-dimension) as the first source
-            # note when the interrogation has been performed and there are scorable steps
-            if interrogation_performed:
+            # note when the dimension display is enabled, the interrogation has been performed, and
+            # there are scorable steps. The block's dotted divider is only drawn when the timings
+            # row follows it (otherwise it would double up with the next footer separator).
+            if incl_dimensions and interrogation_performed:
                 health_score_html = _create_health_score_html(
                     validation_info=self.validation_info,
                     lang=lang,
                     dimension_weights=getattr(global_config, "dimension_weights", None),
+                    show_divider=incl_footer_timings,
                 )
                 if health_score_html:
                     gt_tbl = gt_tbl.tab_source_note(source_note=html(health_score_html))
@@ -23451,10 +23473,15 @@ def _create_health_score_html(
     validation_info: list[_ValidationInfo],
     lang: str,
     dimension_weights: dict[str, float] | None = None,
+    show_divider: bool = True,
 ) -> str:
     """
     Build the health-score summary block (overall score + per-dimension breakdown) for the
     validation report footer. Returns an empty string when there are no scorable steps.
+
+    When `show_divider` is `True`, a dotted bottom border is drawn to separate the block from the
+    timings row that follows it. It should be `False` when no timings row is displayed, so the
+    divider doesn't double up with the next footer separator.
     """
     dimension_scores = _compute_dimension_scores(validation_info)
     if not dimension_scores:
@@ -23514,9 +23541,15 @@ def _create_health_score_html(
         f'infinite;">{overall:.0f}%</span>'
     )
 
+    # Only draw the dotted divider when a timings row follows this block
+    outer_style = (
+        "padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;"
+        if show_divider
+        else "padding: 3px 2px;"
+    )
     return (
         f"{style_block}"
-        '<div style="padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;">'
+        f'<div style="{outer_style}">'
         f'<span style="{caption_style}">{health_label}</span>'
         f"{score_box}"
         '<div style="padding-top: 3px;">'
