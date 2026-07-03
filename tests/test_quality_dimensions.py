@@ -9,6 +9,7 @@ from pointblank.validate import (
     get_validation_summary,
     global_config,
     _infer_dimension_from_assertion_type,
+    _base_dimension_from_assertion_type,
     _compute_dimension_scores,
     _compute_health_score,
     _aggregate_dimension_units,
@@ -435,3 +436,143 @@ def test_custom_dimension_scored_and_rendered():
     # Custom dimension: tooltip shows the title-cased name; badge derives a two-letter code
     assert 'title="Business Rules"' in html
     assert ">BU<" in html
+
+
+def test_eval_error_step_excluded_from_scoring():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    v = (
+        Validate(df)
+        .col_vals_gt(columns="nonexistent", value=0)  # eval_error -> excluded
+        .col_vals_gt(columns="b", value=0)  # validity 3/3
+        .interrogate()
+    )
+
+    # The broken step must not drag the score to 0
+    assert v.get_dimension_scores() == {"validity": 100.0}
+    assert v.get_health_score() == 100.0
+
+
+def test_only_eval_error_yields_empty_scores():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"a": [1, 2, 3]})
+    v = Validate(df).col_vals_gt(columns="nonexistent", value=0).interrogate()
+
+    assert v.get_dimension_scores() == {}
+    assert v.get_health_score() == 100.0
+
+
+def test_base_dimension_ignores_global_config(simple_df):
+    pb.config(dimension_map={"col_vals_gt": "consistency"})
+
+    # The base inference ignores the global override...
+    assert _base_dimension_from_assertion_type("col_vals_gt") == "validity"
+
+    # ...while the effective inference respects it
+    assert _infer_dimension_from_assertion_type("col_vals_gt") == "consistency"
+
+
+def test_to_code_emits_dimension_only_when_overridden(simple_df):
+    v = (
+        Validate(data=simple_df)
+        .col_vals_gt(columns="b", value=0)  # inferred validity -> no dimension=
+        .col_vals_gt(columns="b", value=0, dimension="consistency")  # override -> dimension=
+        .col_vals_not_null(columns="a")  # inferred completeness -> no dimension=
+    )
+    code = v.to_code()
+
+    assert code.count("dimension=") == 1
+    assert 'dimension="consistency"' in code
+
+
+def test_to_code_round_trip_preserves_dimension(simple_df):
+    v = (
+        Validate(data=simple_df)
+        .col_vals_gt(columns="b", value=0, dimension="consistency")
+        .col_vals_not_null(columns="a")
+    )
+    code = v.to_code()
+    ns = {"pb": pb, "your_data": simple_df}
+    exec(code.replace("validation\n", ""), ns)
+    rebuilt = ns["validation"].interrogate()
+    dims = [s.dimension for s in rebuilt.validation_info]
+
+    assert dims == ["consistency", "completeness"]
+
+
+def test_to_yaml_preserves_dimension_override(simple_df):
+    v = Validate(data=simple_df).col_vals_gt(columns="b", value=0, dimension="consistency")
+    yaml_text = v.to_yaml()
+
+    assert "dimension: consistency" in yaml_text
+
+
+def test_assert_dimension_scores_auto_interrogates(simple_df):
+    # Not interrogated yet; the assertion should interrogate and then evaluate
+    v = Validate(data=simple_df).col_vals_gt(columns="b", value=0)  # validity 3/5 = 60
+    with pytest.raises(AssertionError, match="validity"):
+        v.assert_dimension_scores(thresholds={"validity": 90})
+
+
+def test_custom_dimension_name_is_html_escaped():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"a": [1, 2, 3]})
+    v = (
+        Validate(df, tbl_name="t")
+        .col_vals_not_null(columns="a", dimension='weird"<x>')
+        .interrogate()
+    )
+    html = v.get_tabular_report().as_raw_html()
+
+    # The custom name is title-cased for display; the raw (unescaped) form must not leak into the
+    # HTML, and the escaped entities must be present instead
+    assert 'Weird"<X>' not in html
+    assert "Weird&quot;&lt;X&gt;" in html
+
+
+def test_health_score_negative_weight_clamped(simple_df):
+    v = (
+        Validate(data=simple_df)
+        .col_vals_not_null(columns="a")
+        .col_vals_gt(columns="b", value=0)
+        .interrogate()
+    )
+    # A negative weight must not push the score outside [0, 100]
+    score = _compute_health_score(v.validation_info, dimension_weights={"validity": -1.0})
+
+    assert 0.0 <= score <= 100.0
+
+
+def test_health_score_all_zero_weights(simple_df):
+    v = (
+        Validate(data=simple_df)
+        .col_vals_not_null(columns="a")
+        .col_vals_gt(columns="b", value=0)
+        .interrogate()
+    )
+
+    # All-zero weights -> no denominator -> defaults to 100.0 (same as the no-data case)
+    assert (
+        _compute_health_score(
+            v.validation_info, dimension_weights={"completeness": 0.0, "validity": 0.0}
+        )
+        == 100.0
+    )
+
+
+def test_scorecard_message_distinguishes_interrogation_state(simple_df):
+    # Interrogated but nothing scorable (all steps inactive) -> "no validation steps" message
+    v_inter = (
+        Validate(data=simple_df, tbl_name="t")
+        .col_vals_gt(columns="b", value=0, active=False)
+        .interrogate()
+    )
+    html_inter = v_inter.get_scorecard().as_raw_html()
+
+    assert "No Interrogation Performed" not in html_inter
+    assert "NO VALIDATION STEPS" in html_inter
+
+    # Not interrogated -> "no interrogation performed" message
+    v_noninter = Validate(data=simple_df, tbl_name="t").col_vals_gt(columns="b", value=0)
+
+    assert "No Interrogation Performed" in v_noninter.get_scorecard().as_raw_html()
