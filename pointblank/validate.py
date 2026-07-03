@@ -23118,6 +23118,86 @@ def _health_score_color(score: float) -> str:
     return "#C62828"  # red
 
 
+def _create_health_score_html(
+    validation_info: list[_ValidationInfo],
+    lang: str,
+    dimension_weights: dict[str, float] | None = None,
+) -> str:
+    """
+    Build the health-score summary block (overall score + per-dimension breakdown) for the
+    validation report footer. Returns an empty string when there are no scorable steps.
+    """
+    dimension_scores = _compute_dimension_scores(validation_info)
+    if not dimension_scores:
+        return ""
+
+    overall = _compute_health_score(validation_info, dimension_weights=dimension_weights)
+    health_label = _get_report_text("report_health_score", lang)
+    dimensions_label = _get_report_text("report_dimension_scores", lang)
+
+    # Order the per-dimension chips using the canonical dimension order, appending any custom
+    # dimensions (not in the canonical list) at the end
+    ordered_dimensions = [d for d in DIMENSION_NAMES if d in dimension_scores]
+    ordered_dimensions += [d for d in dimension_scores if d not in DIMENSION_NAMES]
+
+    chips: list[str] = []
+    for dimension in ordered_dimensions:
+        score = dimension_scores[dimension]
+        color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
+        label = _get_dimension_label(dimension, lang)
+        chips.append(
+            '<span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;">'
+            f'<span style="background-color: {color}; color: #FFFFFF; padding: 2px 7px; '
+            "border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; "
+            'display: inline-block; vertical-align: middle;">'
+            f"{label}</span>"
+            "<span style=\"font-family: 'IBM Plex Mono', monospace; font-size: 11px; "
+            f'color: #444444; padding-left: 5px; vertical-align: middle;">{score:g}%</span>'
+            "</span>"
+        )
+
+    # A shared caption style so the "HEALTH SCORE" and "DIMENSION SCORES" lines sit in parallel
+    caption_style = (
+        "font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; "
+        "letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;"
+    )
+
+    # The score sits in a box that pulses (glow + scale). The animation gets more vigorous — faster
+    # and with a larger pulse/glow — as the score approaches 100%. The keyframes reference CSS
+    # custom properties so a single definition adapts to the per-report values set inline.
+    color = _health_score_color(overall)
+    intensity = max(0.0, min(1.0, overall / 100))
+    duration = round(2.3 - 1.6 * intensity, 2)  # 2.3s (low) -> 0.7s (100%)
+    scale = round(1 + 0.09 * intensity, 3)  # up to 1.09x
+    glow = round(3 + 15 * intensity)  # 3px -> 18px halo
+
+    style_block = (
+        "<style>@keyframes pb-health-pulse{"
+        "0%,100%{transform:scale(1);box-shadow:0 0 0 0 var(--pb-glow-color);}"
+        "50%{transform:scale(var(--pb-scale));"
+        "box-shadow:0 0 var(--pb-glow) 1px var(--pb-glow-color);}}</style>"
+    )
+    score_box = (
+        f'<span style="display: inline-block; padding: 1px 9px; border-radius: 5px; '
+        f"background-color: {color}; color: #FFFFFF; font-weight: 700; font-size: 13px; "
+        f"vertical-align: middle; --pb-scale: {scale}; --pb-glow: {glow}px; "
+        f"--pb-glow-color: {color}; animation: pb-health-pulse {duration}s ease-in-out "
+        f'infinite;">{overall:.0f}%</span>'
+    )
+
+    return (
+        f"{style_block}"
+        '<div style="padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;">'
+        f'<span style="{caption_style}">{health_label}</span>'
+        f"{score_box}"
+        '<div style="padding-top: 3px;">'
+        f'<span style="{caption_style}">{dimensions_label}</span>'
+        f"{''.join(chips)}"
+        "</div>"
+        "</div>"
+    )
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
