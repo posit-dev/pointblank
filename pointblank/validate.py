@@ -18195,6 +18195,190 @@ class Validate:
                 )
             raise AssertionError(message)
 
+    def get_scorecard(self, title: str | None = ":default:") -> GT:
+        """
+        Get a data quality scorecard as a GT table.
+
+        The `get_scorecard()` method produces a compact, standalone scorecard that summarizes data
+        quality across dimensions. It shows the overall health score prominently, along with a
+        per-dimension breakdown (a color-coded bar, the dimension's score, and its passing/total
+        test units). Unlike the full validation report, the scorecard focuses purely on the
+        aggregate health picture, making it well-suited for dashboards and executive summaries.
+
+        The returned object is a Great Tables `GT` object, so it can be displayed directly, exported
+        to HTML (via `.as_raw_html()`), or saved to an image file (via `.save()`).
+
+        Parameters
+        ----------
+        title
+            Options for customizing the title of the scorecard. The default `":default:"` produces
+            a generic title (optionally including the table name). Use `":tbl_name:"` to show just
+            the table name, `":none:"` for no title, or provide your own Markdown text.
+
+        Returns
+        -------
+        GT
+            A `GT` object representing the scorecard.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .rows_distinct()
+            .interrogate()
+        )
+
+        validation.get_scorecard()
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) and
+        [`get_health_score()`](`pointblank.Validate.get_health_score`) for the underlying numbers,
+        and [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) for the full per-step
+        validation report.
+        """
+        # Do we have a DataFrame library to work with?
+        _check_any_df_lib(method_used="get_scorecard")
+
+        # Select the DataFrame library
+        df_lib = _select_df_lib(preference="polars")
+
+        lang = self.lang or "en"
+
+        dimension_scores = _compute_dimension_scores(self.validation_info)
+        scorecard_title = _get_report_text("report_dimension_scores", lang)
+
+        # Resolve the title text
+        if title == ":default:":
+            if self.tbl_name:
+                title_text = f"{scorecard_title} &mdash; <code>{self.tbl_name}</code>"
+            else:
+                title_text = scorecard_title
+        elif title == ":tbl_name:":
+            title_text = f"<code>{self.tbl_name}</code>" if self.tbl_name else scorecard_title
+        elif title in (":none:", None):
+            title_text = None
+        else:
+            title_text = commonmark.commonmark(title)
+
+        # If there are no scorable steps, return a minimal table with an informative message
+        if not dimension_scores:
+            no_steps_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"].get(
+                lang, VALIDATION_REPORT_TEXT["no_interrogation_performed_text"]["en"]
+            )
+            df = df_lib.DataFrame({"scorecard": [no_steps_text]})
+            gt_tbl = (
+                GT(df, id="pb_scorecard")
+                .opt_table_font(font=google_font(name="IBM Plex Sans"))
+                .cols_label(cases={"scorecard": ""})
+                .tab_style(style=style.text(color="#666666", weight="bold"), locations=loc.body())
+            )
+            if title_text is not None:
+                gt_tbl = gt_tbl.tab_header(title=html(title_text))
+            if version("great_tables") >= "0.17.0":
+                gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+            return gt_tbl
+
+        weights = getattr(global_config, "dimension_weights", None)
+        overall = _compute_health_score(self.validation_info, dimension_weights=weights)
+
+        agg = _aggregate_dimension_units(self.validation_info)
+
+        # Count the number of interrogated steps per dimension
+        step_counts: dict[str, int] = {}
+        for step in self.validation_info:
+            if step.n is None:
+                continue
+            dimension = step.dimension or "unknown"
+            step_counts[dimension] = step_counts.get(dimension, 0) + 1
+
+        # Order dimensions using the canonical order, appending any custom dimensions at the end
+        ordered_dimensions = [d for d in DIMENSION_NAMES if d in dimension_scores]
+        ordered_dimensions += [d for d in dimension_scores if d not in DIMENSION_NAMES]
+
+        dimension_cells: list[str] = []
+        score_cells: list[str] = []
+        units_cells: list[str] = []
+        for dimension in ordered_dimensions:
+            n_passed, n = agg[dimension]
+            score = dimension_scores[dimension]
+            color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
+            label = _get_dimension_label(dimension, lang)
+            dimension_cells.append(
+                f'<span style="background-color: {color}; color: #FFFFFF; padding: 3px 9px; '
+                "border-radius: 9px; font-size: 11px; font-weight: 600; white-space: nowrap; "
+                'line-height: 1; display: inline-block; vertical-align: middle;">'
+                f"{label}</span>"
+            )
+            score_cells.append(
+                '<div style="display: flex; align-items: center; gap: 8px;">'
+                '<div style="background: #EEEEEE; border-radius: 4px; width: 110px; height: 14px; '
+                'overflow: hidden;">'
+                f'<div style="background: {color}; width: {score:g}%; height: 100%;"></div></div>'
+                "<span style=\"font-family: 'IBM Plex Mono', monospace; font-size: 12px; "
+                f'color: #444444; font-weight: 600;">{score:g}%</span>'
+                "</div>"
+            )
+            units_cells.append(f"{n_passed} / {n}")
+
+        df = df_lib.DataFrame(
+            {
+                "dimension": dimension_cells,
+                "score": score_cells,
+                "test_units": units_cells,
+            }
+        )
+
+        health_label = _get_report_text("report_health_score", lang)
+        subtitle_html = (
+            '<div style="padding-top: 4px;">'
+            f'<span style="font-weight: 600; color: #444444; font-size: 13px;">{health_label}:'
+            "</span> "
+            f'<span style="font-weight: 700; font-size: 22px; color: {_health_score_color(overall)};">'
+            f"{overall:.0f}%</span>"
+            "</div>"
+        )
+
+        gt_tbl = (
+            GT(df, id="pb_scorecard")
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .cols_label(
+                cases={
+                    "dimension": _get_report_text("report_col_dimension", lang),
+                    "score": _get_report_text("report_col_score", lang),
+                    "test_units": _get_report_text("report_col_units", lang),
+                }
+            )
+            .cols_align(align="left", columns=["dimension", "score"])
+            .cols_align(align="right", columns=["test_units"])
+            .cols_width(cases={"dimension": "130px", "score": "200px", "test_units": "90px"})
+            .tab_style(
+                style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
+            )
+            .tab_style(style=style.css("height: 34px;"), locations=loc.body())
+            .tab_style(
+                style=style.text(
+                    color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+                ),
+                locations=loc.body(columns="test_units"),
+            )
+            .tab_options(table_font_size="90%")
+        )
+
+        if title_text is not None:
+            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(subtitle_html))
+
+        if version("great_tables") >= "0.17.0":
+            gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+
+        return gt_tbl
+
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str:
