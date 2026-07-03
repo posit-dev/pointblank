@@ -422,6 +422,9 @@ def config(
     report_incl_footer_timings: bool = True,
     report_incl_footer_notes: bool = True,
     preview_incl_header: bool = True,
+    dimension_map: dict[str, str] | None = None,
+    dimension_weights: dict[str, float] | None = None,
+    dimension_thresholds: dict[str, float] | None = None,
 ) -> PointblankConfig:
     """
     Configuration settings for the Pointblank library.
@@ -444,6 +447,21 @@ def config(
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
+    dimension_map
+        An optional mapping of `assertion_type` (e.g., `"col_vals_gt"`) to a data quality dimension
+        name (e.g., `"validity"`). This is merged on top of the built-in inference map, letting you
+        remap how validation steps are categorized for health scoring. Only affects steps where the
+        dimension is not set explicitly via a validation method's `dimension=` parameter.
+    dimension_weights
+        An optional mapping of dimension name to a relative weight (a positive number) used when
+        computing the overall health score. Dimensions not present in the mapping default to a
+        weight of `1.0`. When omitted, the overall score is a pure test-unit-weighted pass rate.
+    dimension_thresholds
+        An optional mapping of dimension name to a minimum acceptable health score (`0`-`100`).
+        This is used as the default by
+        [`assert_dimension_scores()`](`pointblank.Validate.assert_dimension_scores`), which raises
+        an `AssertionError` when any dimension's score falls below its minimum (e.g., to fail a CI
+        run when the completeness score drops below `95`).
 
     Returns
     -------
@@ -457,6 +475,9 @@ def config(
     global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
     global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
+    global_config.dimension_map = dimension_map  # pragma: no cover
+    global_config.dimension_weights = dimension_weights  # pragma: no cover
+    global_config.dimension_thresholds = dimension_thresholds  # pragma: no cover
     return global_config  # pragma: no cover
 
 
