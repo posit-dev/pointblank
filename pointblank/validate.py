@@ -18030,6 +18030,93 @@ class Validate:
             max_reprompts=max_reprompts,
         )
 
+    def get_dimension_scores(self) -> dict[str, float]:
+        """
+        Get per-dimension health scores from the validation results.
+
+        Each validation step is associated with a data quality dimension (e.g., `"completeness"`,
+        `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"`), either
+        inferred automatically from the assertion type or set explicitly via the `dimension=`
+        parameter on a validation method. This method rolls the per-step results up into a
+        test-unit-weighted pass rate (`0`-`100`) for each dimension present in the plan.
+
+        Scores are weighted by test units, so larger tables and steps with more test units
+        contribute proportionally more to each dimension's score. Only steps that have been
+        interrogated contribute; inactive steps are excluded.
+
+        Returns
+        -------
+        dict[str, float]
+            A dictionary mapping each dimension name to its score (a percentage from `0` to `100`).
+            Returns an empty dictionary if the validation has not been interrogated.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .rows_distinct()
+            .interrogate()
+        )
+
+        validation.get_dimension_scores()
+        ```
+
+        See Also
+        --------
+        Use [`get_health_score()`](`pointblank.Validate.get_health_score`) for a single overall
+        score across all dimensions.
+        """
+        return _compute_dimension_scores(self.validation_info)
+
+    def get_health_score(self) -> float:
+        """
+        Get the overall data quality health score from the validation results.
+
+        The health score is a single number (a percentage from `0` to `100`) that summarizes the
+        overall quality of the data across all validation steps. It is computed as a test-unit
+        weighted pass rate: the total number of passing test units divided by the total number of
+        test units. This means larger tables and steps operating over more rows contribute
+        proportionally more to the score, so it tracks data volume rather than mere step count.
+
+        Per-dimension weights can be set globally via
+        [`config(dimension_weights=...)`](`pointblank.config`) for organizations that consider some
+        dimensions (e.g., completeness) more critical than others. When weights are set, each
+        dimension's contribution to the overall score is scaled accordingly.
+
+        Returns
+        -------
+        float
+            The overall health score as a percentage from `0` to `100`. Returns `100.0` if the
+            validation has not been interrogated or contains no scorable steps.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .interrogate()
+        )
+
+        validation.get_health_score()
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) for a per-dimension
+        breakdown of the score.
+        """
+        weights = getattr(global_config, "dimension_weights", None)
+        return _compute_health_score(self.validation_info, dimension_weights=weights)
+
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str:
