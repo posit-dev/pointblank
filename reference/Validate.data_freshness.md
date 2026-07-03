@@ -244,7 +244,7 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 18:55:47</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 
@@ -362,9 +362,9 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
-<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
-<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-03 18:55:47</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
+<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 18:55:47</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
+<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 18:55:47</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
 </tr>
 </tfoot>
 
@@ -447,7 +447,7 @@ DUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuM
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 13:09:49</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 17:55:48</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
 </tr>
 </tfoot>
 
@@ -523,7 +523,7 @@ data_freshness()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>-77767789.3s</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 18:55:47</code> (age: <strong>-77784947.8s</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 
