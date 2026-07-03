@@ -19926,6 +19926,17 @@ class Validate:
             gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
         if incl_footer:
+            # Add the health-score summary block (overall + per-dimension) as the first source
+            # note when the interrogation has been performed and there are scorable steps
+            if interrogation_performed:
+                health_score_html = _create_health_score_html(
+                    validation_info=self.validation_info,
+                    lang=lang,
+                    dimension_weights=getattr(global_config, "dimension_weights", None),
+                )
+                if health_score_html:
+                    gt_tbl = gt_tbl.tab_source_note(source_note=html(health_score_html))
+
             # Add table time as HTML source note if enabled
             if incl_footer_timings:
                 gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
