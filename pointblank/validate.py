@@ -318,6 +318,10 @@ def get_validation_summary() -> dict | None:
     - `tbl_column_count` (`int`): The number of columns in the target table.
     - `tbl_name` (`str`): The name of the target table.
     - `validation_duration` (`float`): The duration of the validation in seconds.
+    - `dimension_scores` (`dict`): The test-unit-weighted health score (`0`-`100`) for each data
+      quality dimension present in the validation (e.g., `{"completeness": 99.2, "validity": 97.8}`).
+    - `overall_health_score` (`float`): The overall, test-unit-weighted health score (`0`-`100`)
+      across all dimensions.
 
     Note that the summary dictionary is only available within the context of a final action. If
     called outside of a final action (i.e., when no final action is being executed), this function
