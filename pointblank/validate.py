@@ -460,6 +460,43 @@ def config(
     return global_config  # pragma: no cover
 
 
+def _resolve_dimension_map() -> dict[str, str]:
+    """
+    Get the effective `assertion_type` to dimension mapping.
+
+    This merges any user-provided `dimension_map` (set via `pb.config()`) on top of the built-in
+    `ASSERTION_TYPE_TO_DIMENSION` defaults.
+    """
+    dimension_map = dict(ASSERTION_TYPE_TO_DIMENSION)
+    override = getattr(global_config, "dimension_map", None)
+    if override:
+        dimension_map.update(override)
+    return dimension_map
+
+
+def _infer_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
+    """
+    Infer the data quality dimension for a validation step from its `assertion_type`.
+
+    The mapping is drawn from `ASSERTION_TYPE_TO_DIMENSION` (with any `pb.config(dimension_map=...)`
+    overrides applied). Assertion types not present in the mapping are categorized as `"unknown"`.
+    Returns `None` if `assertion_type` is `None`.
+    """
+    if assertion_type is None:
+        return None
+    dimension_map = _resolve_dimension_map()
+    if assertion_type in dimension_map:
+        return dimension_map[assertion_type]
+    # Aggregate comparison methods (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`) are dynamically
+    # generated and assert that a summary statistic meets an expectation: categorize as "validity"
+    if re.match(
+        r"^col_(sum|avg|mean|median|min|max|sd|std|var)_(eq|ne|gt|ge|lt|le|between|outside)$",
+        assertion_type,
+    ):
+        return "validity"
+    return "unknown"
+
+
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
