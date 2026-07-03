@@ -20909,6 +20909,8 @@ class Validate:
             "tbl_column_count": column_count,
             "tbl_name": self.tbl_name or "Unknown",
             "validation_duration": validation_duration,
+            "dimension_scores": _compute_dimension_scores(self.validation_info),
+            "overall_health_score": self.get_health_score(),
         }
 
         # Extract the actions from FinalActions object and execute
