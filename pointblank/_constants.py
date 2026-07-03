@@ -213,6 +213,7 @@ VALIDATION_REPORT_FIELDS = [
     "thresholds",
     "label",
     "brief",
+    "dimension",
     "active",
     "all_passed",
     "n",
