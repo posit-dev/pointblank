@@ -40,7 +40,10 @@ dimensions with no changes on your part.
 
 ## Dimensions in the Validation Report
 
-Consider a validation of some sales data that touches several dimensions:
+The dimension display in the validation report is **opt-in**: pass `incl_dimensions=True` to
+[`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) (or set it globally with
+`pb.config(report_incl_dimensions=True)`). Consider a validation of some sales data that touches
+several dimensions:
 
 ```{python}
 import pointblank as pb
@@ -66,10 +69,10 @@ validation = (
     .interrogate()
 )
 
-validation
+validation.get_tabular_report(incl_dimensions=True)
 ```
 
-Two things in the report relate to dimensions:
+Two things in the report now relate to dimensions:
 
 - **A dimension badge on each step number.** Each step's number carries a small, color-coded
   two-letter badge in its top-left corner (`CM` completeness, `VA` validity, `UQ` uniqueness,
@@ -78,6 +81,9 @@ Two things in the report relate to dimensions:
 - **A health-score summary in the footer.** Below the table you'll find the overall **Health
   Score** followed by a per-dimension breakdown, with each dimension's color reinforcing the badges
   above.
+
+The scores themselves (below) are always available programmatically, whether or not the display is
+enabled.
 
 ## Overriding a Step's Dimension
 
