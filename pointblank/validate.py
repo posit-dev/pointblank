@@ -22719,6 +22719,21 @@ def _aggregate_dimension_units(validation_info: list[_ValidationInfo]) -> dict[s
     return agg
 
 
+def _compute_dimension_scores(validation_info: list[_ValidationInfo]) -> dict[str, float]:
+    """
+    Compute the test-unit-weighted pass rate (0-100) for each data quality dimension.
+
+    A dimension's score is the total number of passing test units divided by the total number of
+    test units across all of its steps, expressed as a percentage. Dimensions with zero test units
+    score `100.0`.
+    """
+    agg = _aggregate_dimension_units(validation_info)
+    return {
+        dimension: (round(n_passed / n * 100, 2) if n else 100.0)
+        for dimension, (n_passed, n) in agg.items()
+    }
+
+
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
     icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
