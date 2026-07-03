@@ -23105,6 +23105,19 @@ def _get_report_text(key: str, lang: str) -> str:
     return entry.get(lang, entry.get("en", key))
 
 
+def _health_score_color(score: float) -> str:
+    """Map a health score (0-100) to a status color for display.
+
+    Uses darker shades than the warning/error/critical severity palette so the score reads with
+    sufficient contrast against a white background.
+    """
+    if score >= 90:
+        return "#2E7D32"  # green
+    if score >= 75:
+        return "#A15C00"  # amber
+    return "#C62828"  # red
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
