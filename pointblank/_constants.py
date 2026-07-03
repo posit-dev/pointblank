@@ -62,6 +62,89 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "col_sum_eq": "sum_eq",
 }
 
+# The canonical set of data quality dimension names used for health scoring. These are the
+# categories that each validation step is tagged with (either inferred automatically from the
+# `assertion_type` or set explicitly via the `dimension=` parameter on a validation method).
+DIMENSION_NAMES: list[str] = [
+    "completeness",
+    "consistency",
+    "validity",
+    "uniqueness",
+    "timeliness",
+    "volume",
+]
+
+# Default mapping of `assertion_type` to a data quality dimension. This enables automatic
+# dimension inference for every validation step with no user effort. Users can remap globally
+# via `pb.config(dimension_map=...)` or override per step via a validation method's `dimension=`
+# parameter. Any assertion type not present here falls back to `"unknown"`.
+ASSERTION_TYPE_TO_DIMENSION: dict[str, str] = {
+    # Completeness: presence/absence of values
+    "col_vals_null": "completeness",
+    "col_vals_not_null": "completeness",
+    "col_pct_null": "completeness",
+    "col_pct_missing": "completeness",
+    "col_missing_coded": "completeness",
+    "col_missing_only_coded": "completeness",
+    "rows_complete": "completeness",
+    # Consistency: internal agreement across columns/rows/tables
+    "col_missing_consistent": "consistency",
+    "conjointly": "consistency",
+    "tbl_match": "consistency",
+    # Validity: values conform to expected rules, ranges, formats, or schema
+    "col_vals_gt": "validity",
+    "col_vals_lt": "validity",
+    "col_vals_eq": "validity",
+    "col_vals_ne": "validity",
+    "col_vals_ge": "validity",
+    "col_vals_le": "validity",
+    "col_vals_between": "validity",
+    "col_vals_outside": "validity",
+    "col_vals_in_set": "validity",
+    "col_vals_not_in_set": "validity",
+    "col_vals_regex": "validity",
+    "col_vals_within_spec": "validity",
+    "col_vals_increasing": "validity",
+    "col_vals_decreasing": "validity",
+    "col_vals_expr": "validity",
+    "col_exists": "validity",
+    "col_schema_match": "validity",
+    "col_sum_eq": "validity",
+    "prompt": "validity",
+    "specially": "validity",
+    # Uniqueness: absence of duplicate rows
+    "rows_distinct": "uniqueness",
+    # Timeliness: data recency/freshness
+    "data_freshness": "timeliness",
+    # Volume: expected row/column counts
+    "row_count_match": "volume",
+    "col_count_match": "volume",
+}
+
+# Two-letter abbreviations used for the compact, color-coded dimension badge shown in the corner of
+# the step-number cell in the validation report.
+DIMENSION_ABBR: dict[str, str] = {
+    "completeness": "CM",
+    "consistency": "CS",
+    "validity": "VA",
+    "uniqueness": "UQ",
+    "timeliness": "TM",
+    "volume": "VO",
+    "unknown": "??",
+}
+
+# Accent colors used to color-code the dimension badge in the validation report. Hues are chosen
+# to read as categorical (distinct from the warning/error/critical severity palette).
+DIMENSION_COLORS: dict[str, str] = {
+    "completeness": "#3C6E9A",  # blue
+    "consistency": "#C57B3C",  # amber
+    "validity": "#4E9A6B",  # green
+    "uniqueness": "#8E6FB5",  # purple
+    "timeliness": "#3F9C9C",  # teal
+    "volume": "#7A7A8C",  # slate
+    "unknown": "#B0B0B0",  # gray
+}
+
 COMPARISON_OPERATORS = {
     "col_vals_gt": ">",
     "col_vals_ge": ">=",
