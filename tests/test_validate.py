@@ -841,6 +841,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
@@ -924,6 +925,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
@@ -11467,10 +11469,13 @@ def test_pointblank_config_class() -> None:
     assert config.report_incl_header is True
     assert config.report_incl_footer is True
     assert config.preview_incl_header is True
+    assert config.dimension_map is None
+    assert config.dimension_weights is None
+    assert config.dimension_thresholds is None
 
     assert (
         str(config)
-        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, preview_incl_header=True)"
+        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, preview_incl_header=True, dimension_map=None, dimension_weights=None, dimension_thresholds=None)"
     )
 
 
