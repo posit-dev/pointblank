@@ -22695,6 +22695,30 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
     return validation_info_dict
 
 
+def _aggregate_dimension_units(validation_info: list[_ValidationInfo]) -> dict[str, list[int]]:
+    """
+    Aggregate passing/total test units per data quality dimension.
+
+    Only steps that have been interrogated (`n` is not `None`) contribute to the aggregation;
+    inactive steps and steps that were not interrogated are excluded. Steps with no assigned
+    dimension are grouped under `"unknown"`.
+
+    Returns
+    -------
+    dict[str, list[int]]
+        A mapping of dimension name to a two-element list `[n_passed, n]` (summed test units).
+    """
+    agg: dict[str, list[int]] = {}
+    for step in validation_info:
+        if step.n is None:
+            continue
+        dimension = step.dimension or "unknown"
+        entry = agg.setdefault(dimension, [0, 0])
+        entry[0] += step.n_passed or 0
+        entry[1] += step.n
+    return agg
+
+
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
     icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
