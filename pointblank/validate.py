@@ -468,8 +468,11 @@ def config(
         dimension is not set explicitly via a validation method's `dimension=` parameter.
     dimension_weights
         An optional mapping of dimension name to a relative weight (a positive number) used when
-        computing the overall health score. Dimensions not present in the mapping default to a
-        weight of `1.0`. When omitted, the overall score is a pure test-unit-weighted pass rate.
+        computing the overall health score. A weight scales that dimension's *test-unit*
+        contribution to the overall score, so a dimension's influence is its weight multiplied by
+        its number of test units (a heavily-weighted dimension with few test units still
+        contributes modestly). Dimensions not present in the mapping default to a weight of `1.0`;
+        when omitted entirely, the overall score is a pure test-unit-weighted pass rate.
     dimension_thresholds
         An optional mapping of dimension name to a minimum acceptable health score (`0`-`100`).
         This is used as the default by
