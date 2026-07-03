@@ -19748,6 +19748,17 @@ class Validate:
         if not interrogation_performed:
             validation_info_dict["i"] = list(range(1, len(validation_info_dict["type_upd"]) + 1))
 
+        # Overlay a small, color-coded two-letter dimension badge on the top-left of each step
+        # number cell. This is positioned absolutely so it doesn't affect the layout of the numeral
+        # (regardless of digit count); the full dimension name is shown via a tooltip. This is done
+        # after the `i` values are finalized (they are regenerated above when not interrogated).
+        validation_info_dict["i"] = _transform_step_number_with_dimension(
+            i_values=validation_info_dict["i"],
+            dimensions=validation_info_dict["dimension"],
+            lang=lang,
+        )
+        validation_info_dict.pop("dimension")
+
         # Create a table time string
         table_time = _create_table_time_html(time_start=self.time_start, time_end=self.time_end)
 
