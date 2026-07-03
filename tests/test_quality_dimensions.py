@@ -25,15 +25,18 @@ def reset_global_config():
         global_config.dimension_map,
         global_config.dimension_weights,
         global_config.dimension_thresholds,
+        global_config.report_incl_dimensions,
     )
     global_config.dimension_map = None
     global_config.dimension_weights = None
     global_config.dimension_thresholds = None
+    global_config.report_incl_dimensions = False
     yield
     (
         global_config.dimension_map,
         global_config.dimension_weights,
         global_config.dimension_thresholds,
+        global_config.report_incl_dimensions,
     ) = saved
 
 
@@ -293,7 +296,8 @@ def test_report_includes_dimension_badges_and_scores(simple_df):
         .col_vals_gt(columns="b", value=0)
         .interrogate()
     )
-    html = v.get_tabular_report().as_raw_html()
+    # The dimension display is opt-in
+    html = v.get_tabular_report(incl_dimensions=True).as_raw_html()
     # No standalone dimension column; instead a compact badge with a tooltip on the step number
     assert 'title="Completeness"' in html
     assert 'title="Validity"' in html
@@ -302,9 +306,44 @@ def test_report_includes_dimension_badges_and_scores(simple_df):
     assert "Health Score" in html
 
 
+def test_dimension_display_off_by_default(simple_df):
+    v = (
+        Validate(data=simple_df, tbl_name="demo")
+        .col_vals_not_null(columns="a")
+        .col_vals_gt(columns="b", value=0)
+        .interrogate()
+    )
+    # By default the dimension badge and health-score block are not shown (opt-in)
+    html = v.get_tabular_report().as_raw_html()
+    assert 'title="Completeness"' not in html
+    assert ">CM<" not in html
+    assert "Health Score" not in html
+
+
+def test_dimension_display_via_global_config(simple_df):
+    pb.config(report_incl_dimensions=True)
+    v = Validate(data=simple_df, tbl_name="demo").col_vals_not_null(columns="a").interrogate()
+    html = v.get_tabular_report().as_raw_html()
+    assert 'title="Completeness"' in html
+    assert "Health Score" in html
+
+
+def test_health_block_divider_only_with_timings(simple_df):
+    v = Validate(data=simple_df).col_vals_not_null(columns="a").interrogate()
+    border = "border-bottom: 1px dotted #D3D3D3"
+    with_timings = v.get_tabular_report(
+        incl_dimensions=True, incl_footer_timings=True
+    ).as_raw_html()
+    without_timings = v.get_tabular_report(
+        incl_dimensions=True, incl_footer_timings=False
+    ).as_raw_html()
+    assert border in with_timings
+    assert border not in without_timings
+
+
 def test_report_renders_without_interrogation(simple_df):
     v = Validate(data=simple_df).col_vals_not_null(columns="a")
-    html = v.get_tabular_report().as_raw_html()
+    html = v.get_tabular_report(incl_dimensions=True).as_raw_html()
     # Dimension badge still shown for the plan, but no health-score block yet
     assert 'title="Completeness"' in html
     assert "Health Score" not in html
@@ -432,7 +471,7 @@ def test_custom_dimension_scored_and_rendered():
         .interrogate()
     )
     assert v.get_dimension_scores() == {"business_rules": 80.0}
-    html = v.get_tabular_report().as_raw_html()
+    html = v.get_tabular_report(incl_dimensions=True).as_raw_html()
     # Custom dimension: tooltip shows the title-cased name; badge derives a two-letter code
     assert 'title="Business Rules"' in html
     assert ">BU<" in html
@@ -522,7 +561,7 @@ def test_custom_dimension_name_is_html_escaped():
         .col_vals_not_null(columns="a", dimension='weird"<x>')
         .interrogate()
     )
-    html = v.get_tabular_report().as_raw_html()
+    html = v.get_tabular_report(incl_dimensions=True).as_raw_html()
 
     # The custom name is title-cased for display; the raw (unescaped) form must not leak into the
     # HTML, and the escaped entities must be present instead
