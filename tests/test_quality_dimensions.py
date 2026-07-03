@@ -576,3 +576,36 @@ def test_scorecard_message_distinguishes_interrogation_state(simple_df):
     v_noninter = Validate(data=simple_df, tbl_name="t").col_vals_gt(columns="b", value=0)
 
     assert "No Interrogation Performed" in v_noninter.get_scorecard().as_raw_html()
+
+
+# ---------------------------------------------------------------------------
+# Dimension survives step expansion (column selectors, segments)
+# ---------------------------------------------------------------------------
+
+
+def test_dimension_preserved_on_column_selector_expansion():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"a1": [1, 2, 3], "a2": [4, 5, 6], "b": [7, 8, 9]})
+    # `matches("a")` expands into two steps at interrogation time
+    v = pb.Validate(df).col_vals_gt(columns=pb.matches("a"), value=0).interrogate()
+    assert len(v.validation_info) == 2
+    assert all(s.dimension == "validity" for s in v.validation_info)
+
+
+def test_dimension_preserved_on_segment_expansion():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"grp": ["x", "x", "y", "y"], "v": [1, 2, 3, 4]})
+    v = pb.Validate(df).col_vals_gt(columns="v", value=0, segments="grp").interrogate()
+    assert len(v.validation_info) == 2
+    assert all(s.dimension == "validity" for s in v.validation_info)
+
+
+def test_dimension_override_preserved_on_segment_expansion():
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame({"grp": ["x", "x", "y", "y"], "v": [1, 2, 3, 4]})
+    v = (
+        pb.Validate(df)
+        .col_vals_gt(columns="v", value=0, segments="grp", dimension="consistency")
+        .interrogate()
+    )
+    assert [s.dimension for s in v.validation_info] == ["consistency", "consistency"]
