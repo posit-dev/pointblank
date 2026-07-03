@@ -26364,6 +26364,7 @@ def make_agg_validator(name: str):
         brief: str | bool | None = None,
         actions: Actions | None = None,
         active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         # Dynamically generated aggregate validator.
         # This method is generated per assertion type and forwards all arguments
@@ -26377,6 +26378,7 @@ def make_agg_validator(name: str):
             brief=brief,
             actions=actions,
             active=active,
+            dimension=dimension,
         )
 
     # Manually set function identity so this behaves like a real method.
