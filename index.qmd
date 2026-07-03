@@ -56,27 +56,16 @@ your team.
 
 ## What is Data Validation?
 
-Data validation ensures your data meets quality standards before it's used in analysis, reports, or
-downstream systems. Pointblank provides a structured way to define validation rules, execute them,
-and communicate results to both technical and non-technical stakeholders.
+Data validation makes sure your data is what you think it is before it reaches analysis, reports, or downstream systems. Pointblank gives you a structured way to declare what good data looks like, run those checks against a real table, and communicate the results to technical and non-technical audiences alike. You build a plan with a fluent, chainable API that draws on more than 45 validation methods, set warning, error, and critical thresholds, attach actions that fire when a threshold is crossed, and get back a report anyone on the team can read. Because Pointblank runs on [Narwhals](https://narwhals-dev.github.io/narwhals/) and [Ibis](https://ibis-project.org) under the hood, the same plan executes unchanged across Polars, Pandas, DuckDB, Spark, Snowflake, BigQuery, Databricks, PostgreSQL, MySQL, SQLite, and Parquet.
 
-With Pointblank you can:
+## More than a checker
 
-- **Validate data** through a fluent, chainable API with 25+ validation methods
-- **Set thresholds** to define acceptable levels of data quality (warning, error, critical)
-- **Take actions** when thresholds are exceeded (notifications, logging, custom functions)
-- **Generate reports** that make data quality issues immediately understandable
-- **Inspect data** with built-in tools for previewing, summarizing, and finding missing values
+The reporting goes well beyond a single pass or fail. Any step can be opened in a focused [step report](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) that drills into the exact rows that failed, and those [failing rows can be pulled out](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) as their own table for debugging. The source data can even be [split into passing and failing pieces](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) for quarantine or reprocessing. Reports are localized in 40 languages, and results roll up into [quality dimensions and a single health score](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html), so completeness, validity, uniqueness, consistency, timeliness, and volume become one number you can watch over time.
 
-## Why Pointblank?
+![A step report drills into the specific rows behind a failing validation step.](https://posit-dev.github.io/pointblank/assets/pointblank-step-report.png)
 
-Pointblank is designed for the entire data team, not just engineers:
+Authoring a plan does not have to start from an empty file. Pointblank can [draft a starting plan from a natural-language prompt](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html), and from there you can [revise and iterate on it in plain English](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html) or ask it to suggest improvements. When your standards already live somewhere else, you can bring them with you. Pointblank will [import contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/importing-contracts.html) written as JSON Schema or Frictionless, pull column metadata straight from [SPSS, SAS, and Stata](https://posit-dev.github.io/pointblank/user-guide/metadata-import/statistical-packages.html) files, and for clinical work validate against [CDISC SDTM and ADaM](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html) templates or read a Define-XML specification. It can also model structured missingness, encoding [why a value is absent](https://posit-dev.github.io/pointblank/user-guide/data-inspection/missing-vals-tbl.html) instead of treating every gap identically.
 
-- 🎨 **Beautiful Reports**: Interactive validation reports that stakeholders actually want to read
-- 📊 **Threshold Management**: Define quality standards with warning, error, and critical levels
-- 🔍 **Error Drill-Down**: Inspect failing data to get to root causes quickly
-- 🔗 **Universal Compatibility**: Works with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, and more
-- 🌍 **Multilingual Support**: Reports available in 40 languages for global teams
-- 📝 **YAML Support**: Write validations in YAML for version control and team collaboration
-- ⚡ **CLI Tools**: Run validations from the command line for CI/CD pipelines or as quick checks
-- 📋 **Rich Inspection**: Preview data, analyze columns, and visualize missing values
+![Point Pointblank at a table and let it draft a starting validation plan for you.](https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png)
+
+Getting all of this into production is where Pointblank earns its place. You can define reusable [data contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html) and enforce them at [both the source and target](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html) of a transformation, keep plans as [YAML](https://posit-dev.github.io/pointblank/user-guide/yaml/yaml-validation-workflows.html) for version control and review, and run the whole thing from a [command-line interface](https://posit-dev.github.io/pointblank/user-guide/the-pointblank-cli/cli-data-validation.html) inside CI. Pointblank also speaks to machines: it ships an [MCP server](https://posit-dev.github.io/pointblank/user-guide/mcp-server/mcp-quick-start.html) and llms.txt files for AI agents, emits [OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html) traces and metrics for observability, and can [generate synthetic test data](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/test-data-generation.html) when you need something to validate against.
