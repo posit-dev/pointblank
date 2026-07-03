@@ -204,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -846,8 +846,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.above_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_health_score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_health_score()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_scorecard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_scorecard()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1362,7 +1386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11490-L11692" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11760-L11970" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_missing_only_coded</span>(</span>
@@ -1376,8 +1400,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <a href="Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="gdls-link gdls-code">col_missing_only_coded()</a> method checks that every value in a column is <em>accounted for</em>: it is either a declared missing-value code (a sentinel in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a>, or a null when <code>null_is_missing=True</code>), or a legitimate “real” value. Legitimate real values are defined by <code>allowed=</code> (an explicit set) and/or a <code>[min_val, max_val]</code> range. Any value that is neither a documented code nor a legitimate real value is flagged — this catches <em>undocumented</em> sentinel codes (e.g., a stray <code>-95</code>) that aren’t part of the spec.</p>
@@ -1429,7 +1454,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).
+<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).</p>
+</dd>
+<dt><code><span class="doc-parameter-name">dimension</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+An optional data quality dimension to categorize this validation step for health scoring. One of <code>"completeness"</code>, <code>"validity"</code>, <code>"uniqueness"</code>, <code>"consistency"</code>, <code>"timeliness"</code>, or <code>"volume"</code> (or any custom string). If <code>None</code> (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 </dd>
 </dl>
 </div>
@@ -1470,7 +1499,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>The <code>age</code> column should contain real ages in <code>[0, 120]</code> or the documented codes <code>-99</code>/<code>-98</code>. The value <code>-95</code> is an <em>undocumented</em> code and should be flagged:</p>
-<div id="81794c06" class="cell" data-execution_count="2">
+<div id="0b5d1a38" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

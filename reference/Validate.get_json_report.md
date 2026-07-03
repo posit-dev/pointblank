@@ -106,6 +106,7 @@ print(json_report)
             "thresholds": "Thresholds(warning=None, error=None, critical=None)",
             "label": null,
             "brief": null,
+            "dimension": "validity",
             "active": true,
             "all_passed": false,
             "n": 4,
@@ -116,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-07-02T14:05:44.246+00:00",
-            "proc_duration_s": 0.00819
+            "time_processed": "2026-07-03T15:10:22.269+00:00",
+            "proc_duration_s": 0.008393
         },
         {
             "i": 2,
@@ -132,6 +133,7 @@ print(json_report)
             "thresholds": "Thresholds(warning=None, error=None, critical=None)",
             "label": null,
             "brief": null,
+            "dimension": "validity",
             "active": true,
             "all_passed": false,
             "n": 4,
@@ -142,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-07-02T14:05:44.249+00:00",
-            "proc_duration_s": 0.003178
+            "time_processed": "2026-07-03T15:10:22.272+00:00",
+            "proc_duration_s": 0.003154
         }
     ]
 
@@ -199,6 +201,7 @@ print(json_report)
             "i": 1,
             "assertion_type": "col_vals_gt",
             "column": "a",
+            "dimension": "validity",
             "all_passed": false,
             "n": 4,
             "n_passed": 3,
@@ -213,6 +216,7 @@ print(json_report)
             "i": 2,
             "assertion_type": "col_vals_lt",
             "column": "b",
+            "dimension": "validity",
             "all_passed": false,
             "n": 4,
             "n_passed": 3,

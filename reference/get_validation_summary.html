@@ -201,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -843,8 +843,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.above_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_health_score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_health_score()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_scorecard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_scorecard()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1356,7 +1380,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L279-L390" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L283-L398" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">get_validation_summary</span>()</span></code></pre></div>
@@ -1401,6 +1425,8 @@ A dictionary containing validation metrics. If called outside of an final action
 <li><code>tbl_column_count</code> (<code>int</code>): The number of columns in the target table.</li>
 <li><code>tbl_name</code> (<code>str</code>): The name of the target table.</li>
 <li><code>validation_duration</code> (<code>float</code>): The duration of the validation in seconds.</li>
+<li><code>dimension_scores</code> (<code>dict</code>): The test-unit-weighted health score (<code>0</code>-<code>100</code>) for each data quality dimension present in the validation (e.g., <code>{"completeness": 99.2, "validity": 97.8}</code>).</li>
+<li><code>overall_health_score</code> (<code>float</code>): The overall, test-unit-weighted health score (<code>0</code>-<code>100</code>) across all dimensions.</li>
 </ul>
 <p>Note that the summary dictionary is only available within the context of a final action. If called outside of a final action (i.e., when no final action is being executed), this function will return <code>None</code>.</p>
 </section>

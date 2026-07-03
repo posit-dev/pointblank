@@ -204,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -846,8 +846,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.above_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_health_score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_health_score()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_scorecard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_scorecard()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1363,7 +1387,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6768-L7062" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6894-L7196" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_vals_ne</span>(</span>
@@ -1376,8 +1400,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a> validation method checks whether column values in a table are <em>not equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val != value</code>). The <code>value=</code> can be specified as a single, literal value or as a column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
@@ -1420,7 +1445,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">dimension</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+An optional data quality dimension to categorize this validation step for health scoring. One of <code>"completeness"</code>, <code>"validity"</code>, <code>"uniqueness"</code>, <code>"consistency"</code>, <code>"timeliness"</code>, or <code>"volume"</code> (or any custom string). If <code>None</code> (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 </dd>
 </dl>
 </div>
@@ -1488,7 +1517,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with two numeric columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="64dde163" class="cell" data-execution_count="2">
+<div id="7ba96cb9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1615,7 +1644,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are not equal to the value of <code>3</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="c7f2036c" class="cell" data-execution_count="3">
+<div id="7a051f56" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_ne(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">3</span>)</span>
@@ -1772,7 +1801,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a>. All test units passed, and there are no failing test units.</p>
 <p>Aside from checking a column against a literal value, we can also use a column name in the <code>value=</code> argument (with the helper function <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> to perform a column-to-column comparison. For the next example, we’ll use <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a> to check whether the values in column <code>a</code> aren’t equal to the values in column <code>b</code>.</p>
-<div id="dffd07df" class="cell" data-execution_count="4">
+<div id="3a6e95e0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_ne(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>

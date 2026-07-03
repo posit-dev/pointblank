@@ -14,7 +14,8 @@ Validate.col_avg_gt(
     thresholds=None,
     brief=False,
     actions=None,
-    active=True
+    active=True,
+    dimension=None
 )
 ```
 

@@ -18,7 +18,8 @@ Validate.col_missing_only_coded(
     thresholds=None,
     actions=None,
     brief=None,
-    active=True
+    active=True,
+    dimension=None
 )
 ```
 
@@ -63,6 +64,9 @@ An optional brief description of the validation step that will be displayed in t
 
 `active: bool | Callable = ``True`  
 A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).
+
+`dimension: str | None = None`  
+An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 
 
 ## Returns

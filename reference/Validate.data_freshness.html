@@ -204,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -846,8 +846,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.assert_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.above_threshold()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_dimension_scores()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_health_score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_health_score()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_scorecard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.get_scorecard()</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1362,7 +1386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13318-L13684" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13644-L14018" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">data_freshness</span>(</span>
@@ -1375,8 +1399,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <a href="Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> validation method checks whether the most recent timestamp in the specified datetime column is within the allowed <code>max_age=</code> from the <code>reference_time=</code> (which defaults to the current time). This is useful for ensuring data pipelines are delivering fresh data and for enforcing data SLAs.</p>
@@ -1424,7 +1449,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">dimension</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+An optional data quality dimension to categorize this validation step for health scoring. One of <code>"completeness"</code>, <code>"validity"</code>, <code>"uniqueness"</code>, <code>"consistency"</code>, <code>"timeliness"</code>, or <code>"volume"</code> (or any custom string). If <code>None</code> (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 </dd>
 </dl>
 </div>
@@ -1507,7 +1536,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>The simplest use of <a href="Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> requires just two arguments: the <code>column=</code> containing your timestamps and <code>max_age=</code> specifying how old the data can be. In this first example, we create sample data with an <code>"updated_at"</code> column containing timestamps from 1, 12, and 20 hours ago. By setting <code>max_age="24 hours"</code>, we’re asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.</p>
-<div id="3b7d1ae6" class="cell" data-execution_count="2">
+<div id="e94e28f6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -1675,14 +1704,14 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </tbody>
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>The <code>max_age=</code> parameter accepts human-readable strings with various time units. You can chain multiple <a href="Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> calls to check different freshness thresholds simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.</p>
-<div id="7c9dc1b9" class="cell" data-execution_count="3">
+<div id="3c03c780" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check data is fresh within different time windows</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
@@ -1927,16 +1956,16 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </tbody>
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>When your data contains naive datetimes (timestamps without timezone information), use the <code>timezone=</code> parameter to specify what timezone those values represent. Here we have event data recorded in Eastern Time, so we set <code>timezone="America/New_York"</code> to ensure the freshness comparison is done correctly.</p>
-<div id="55b812f4" class="cell" data-execution_count="4">
+<div id="0dc48b47" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with naive datetimes (assume they're in Eastern Time)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>eastern_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_time"</span>: [</span>
@@ -2103,14 +2132,14 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 12:05:13</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 13:09:49</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>For reproducible validations or historical checks, you can use <code>reference_time=</code> to compare against a specific point in time instead of the current time. This is particularly useful for testing or when validating data snapshots. The reference time should include a timezone offset (like <code>+00:00</code> for UTC) to avoid ambiguity.</p>
-<div id="609c6fa3" class="cell" data-execution_count="5">
+<div id="d3968377" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>
@@ -2269,7 +2298,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>-77677512.9s</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>-77767789.3s</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
 </table>
 
 </div>

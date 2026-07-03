@@ -8,7 +8,13 @@ Usage
 
 ``` python
 Validate.conjointly(
-    *exprs, pre=None, thresholds=None, actions=None, brief=None, active=True
+    *exprs,
+    pre=None,
+    thresholds=None,
+    actions=None,
+    brief=None,
+    active=True,
+    dimension=None
 )
 ```
 
@@ -38,6 +44,9 @@ An optional brief description of the validation step that will be displayed in t
 
 `active: bool | Callable = ``True`  
 A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+
+`dimension: str | None = None`  
+An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 
 
 ## Returns

@@ -175,7 +175,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="451" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -401,136 +401,140 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.all_passed`</span></span>
 <span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_passing`</span></span>
 <span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_below_threshold`</span></span>
-<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.above_threshold`</span></span>
-<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n`</span></span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_passed`</span></span>
-<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_failed`</span></span>
-<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_passed`</span></span>
-<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_failed`</span></span>
-<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.warning`</span></span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.error`</span></span>
-<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.critical`</span></span>
-<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspection and Assistance</span></span>
-<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use <span class="in">`DataScan`</span> for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.assert_dimension_scores`</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.above_threshold`</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_dimension_scores`</span></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_health_score`</span></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.get_scorecard`</span></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n`</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_passed`</span></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.n_failed`</span></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_passed`</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.f_failed`</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.warning`</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.error`</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Validate.critical`</span></span>
 <span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DataScan`</span>: Get a summary of a dataset</span>
-<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`preview`</span>: Display a table preview that shows some rows from the top, some from the bottom</span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`col_summary_tbl`</span>: Generate a column-level summary table of a dataset</span>
-<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`missing_vals_tbl`</span>: Display a table that shows the missing values in the input table</span>
-<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_dataset`</span>: Load a dataset hosted in the library as specified table type</span>
-<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_data_path`</span>: Get the file path to a dataset included with the Pointblank package</span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`connect_to_table`</span>: Connect to a database table using a connection string</span>
-<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`print_database_tables`</span>: List all tables in a database from a connection string</span>
-<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="fu">### Table Pre-checks</span></span>
-<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>Helper functions for use with the <span class="in">`active=`</span> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspection and Assistance</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>Functions for getting to grips with a new data table. Use <span class="in">`DataScan`</span> for a quick overview, <span class="in">`preview()`</span> for first/last rows, <span class="in">`col_summary_tbl()`</span> for column summaries, and <span class="in">`missing_vals_tbl()`</span> for missing value analysis.</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DataScan`</span>: Get a summary of a dataset</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`preview`</span>: Display a table preview that shows some rows from the top, some from the bottom</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`col_summary_tbl`</span>: Generate a column-level summary table of a dataset</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`missing_vals_tbl`</span>: Display a table that shows the missing values in the input table</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_dataset`</span>: Load a dataset hosted in the library as specified table type</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_data_path`</span>: Get the file path to a dataset included with the Pointblank package</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`connect_to_table`</span>: Connect to a database table using a connection string</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`print_database_tables`</span>: List all tables in a database from a connection string</span>
 <span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_columns`</span>: Check whether one or more columns exist in a table</span>
-<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_rows`</span>: Check whether a table has a certain number of rows</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="fu">### Table Pre-checks</span></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>Helper functions for use with the <span class="in">`active=`</span> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</span>
 <span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="fu">### YAML</span></span>
-<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>Functions for using YAML to orchestrate validation workflows.</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_columns`</span>: Check whether one or more columns exist in a table</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`has_rows`</span>: Check whether a table has a certain number of rows</span>
 <span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_interrogate`</span>: Execute a YAML-based validation workflow</span>
-<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_yaml`</span>: Validate YAML configuration against the expected structure</span>
-<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_to_python`</span>: Convert YAML validation configuration to equivalent Python code</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="fu">### YAML</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>Functions for using YAML to orchestrate validation workflows.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="fu">### Utility Functions</span></span>
-<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>Functions for accessing metadata about the target data and managing configuration.</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_interrogate`</span>: Execute a YAML-based validation workflow</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_yaml`</span>: Validate YAML configuration against the expected structure</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`yaml_to_python`</span>: Convert YAML validation configuration to equivalent Python code</span>
 <span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_column_count`</span>: Get the number of columns in a table</span>
-<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_row_count`</span>: Get the number of rows in a table</span>
-<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_action_metadata`</span>: Access step-level metadata when authoring custom actions</span>
-<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_validation_summary`</span>: Access validation summary information when authoring final actions</span>
-<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`write_file`</span>: Write a Validate object to disk as a serialized file</span>
-<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`read_file`</span>: Read a Validate object from disk that was previously saved with <span class="in">`write_file()`</span></span>
-<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ref`</span>: Reference a column from the reference data for aggregate comparisons</span>
-<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="fu">### Test Data Generation</span></span>
-<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>Generate synthetic test data based on schema definitions. Use <span class="in">`generate_dataset()`</span> to create data from a Schema object, or <span class="in">`schema_from_tbl()`</span> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="fu">### Utility Functions</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>Functions for accessing metadata about the target data and managing configuration.</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_column_count`</span>: Get the number of columns in a table</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_row_count`</span>: Get the number of rows in a table</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_action_metadata`</span>: Access step-level metadata when authoring custom actions</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_validation_summary`</span>: Access validation summary information when authoring final actions</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`write_file`</span>: Write a Validate object to disk as a serialized file</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`read_file`</span>: Read a Validate object from disk that was previously saved with <span class="in">`write_file()`</span></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ref`</span>: Reference a column from the reference data for aggregate comparisons</span>
 <span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`generate_dataset`</span>: Generate synthetic test data from a schema</span>
-<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`schema_from_tbl`</span>: Create a Schema from an existing table with inferred Field constraints</span>
-<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`int_field`</span>: Create an integer column specification for use in a schema</span>
-<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`float_field`</span>: Create a floating-point column specification for use in a schema</span>
-<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`string_field`</span>: Create a string column specification for use in a schema</span>
-<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`bool_field`</span>: Create a boolean column specification for use in a schema</span>
-<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`date_field`</span>: Create a date column specification for use in a schema</span>
-<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`datetime_field`</span>: Create a datetime column specification for use in a schema</span>
-<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`time_field`</span>: Create a time column specification for use in a schema</span>
-<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duration_field`</span>: Create a duration column specification for use in a schema</span>
-<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`profile_fields`</span>: Create a dict of string field specifications representing a person profile</span>
-<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prebuilt Actions</span></span>
-<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>Prebuilt action functions for common notification patterns.</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="fu">### Test Data Generation</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>Generate synthetic test data based on schema definitions. Use <span class="in">`generate_dataset()`</span> to create data from a Schema object, or <span class="in">`schema_from_tbl()`</span> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`generate_dataset`</span>: Generate synthetic test data from a schema</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`schema_from_tbl`</span>: Create a Schema from an existing table with inferred Field constraints</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`int_field`</span>: Create an integer column specification for use in a schema</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`float_field`</span>: Create a floating-point column specification for use in a schema</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`string_field`</span>: Create a string column specification for use in a schema</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`bool_field`</span>: Create a boolean column specification for use in a schema</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`date_field`</span>: Create a date column specification for use in a schema</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`datetime_field`</span>: Create a datetime column specification for use in a schema</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`time_field`</span>: Create a time column specification for use in a schema</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duration_field`</span>: Create a duration column specification for use in a schema</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`profile_fields`</span>: Create a dict of string field specifications representing a person profile</span>
 <span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`send_slack_notification`</span>: Create a Slack notification function using a webhook URL</span>
-<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`emit_otel`</span>: Create an OTel export action for use in <span class="in">`FinalActions`</span></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prebuilt Actions</span></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>Prebuilt action functions for common notification patterns.</span>
 <span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="fu">### Metadata Import/Export</span></span>
-<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <span class="in">`.sav`</span>, SAS XPORT, Stata <span class="in">`.dta`</span>, and more) and export metadata to various formats. Use <span class="in">`import_metadata()`</span> as the entry point and <span class="in">`export_metadata()`</span> for the reverse.</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`send_slack_notification`</span>: Create a Slack notification function using a webhook URL</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`emit_otel`</span>: Create an OTel export action for use in <span class="in">`FinalActions`</span></span>
 <span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`import_metadata`</span>: Import metadata from an external standard or file</span>
-<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`export_metadata`</span>: Export metadata to an external standard format</span>
-<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataImport`</span>: Parsed metadata from an external standard</span>
-<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataPackage`</span>: A collection of <span class="in">`MetadataImport`</span> objects from a multi-dataset source</span>
-<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`VariableMetadata`</span>: Metadata for a single variable/column, as imported from an external standard</span>
-<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Codelist`</span>: A controlled terminology / value set from an external standard</span>
-<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`CodelistEntry`</span>: A single entry in a codelist (controlled terminology)</span>
-<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MissingValueCode`</span>: A structured missing value definition from an external standard</span>
-<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### SDTM Validation</span></span>
-<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a>Validate clinical datasets against CDISC SDTM domain templates. Use <span class="in">`validate_sdtm()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_sdtm_structure()`</span> for a quick structural conformance check. Retrieve domain templates with <span class="in">`get_sdtm_domain()`</span> and <span class="in">`list_sdtm_domains()`</span>.</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### Metadata Import/Export</span></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <span class="in">`.sav`</span>, SAS XPORT, Stata <span class="in">`.dta`</span>, and more) and export metadata to various formats. Use <span class="in">`import_metadata()`</span> as the entry point and <span class="in">`export_metadata()`</span> for the reverse.</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`import_metadata`</span>: Import metadata from an external standard or file</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`export_metadata`</span>: Export metadata to an external standard format</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataImport`</span>: Parsed metadata from an external standard</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MetadataPackage`</span>: A collection of <span class="in">`MetadataImport`</span> objects from a multi-dataset source</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`VariableMetadata`</span>: Metadata for a single variable/column, as imported from an external standard</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`Codelist`</span>: A controlled terminology / value set from an external standard</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`CodelistEntry`</span>: A single entry in a codelist (controlled terminology)</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`MissingValueCode`</span>: A structured missing value definition from an external standard</span>
 <span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm`</span>: Generate a comprehensive SDTM validation workflow for a dataset</span>
-<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm_structure`</span>: Validate the structural conformance of a dataset against an SDTM domain template</span>
-<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`sdtm_to_metadata`</span>: Convert an SDTM domain template to a <span class="in">`MetadataImport`</span> object</span>
-<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_sdtm_domain`</span>: Get the SDTM template for a specific domain</span>
-<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_sdtm_domains`</span>: List all available SDTM domain codes</span>
-<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMDomainTemplate`</span>: Structural template for an SDTM domain</span>
-<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMVariableSpec`</span>: Specification for a single variable in an SDTM domain template</span>
-<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="fu">### ADaM Validation</span></span>
-<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>Validate analysis datasets against CDISC ADaM templates. Use <span class="in">`validate_adam()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_adam_structure()`</span> for a quick structural conformance check. Retrieve dataset templates with <span class="in">`get_adam_dataset()`</span> and <span class="in">`list_adam_datasets()`</span>.</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="fu">### SDTM Validation</span></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>Validate clinical datasets against CDISC SDTM domain templates. Use <span class="in">`validate_sdtm()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_sdtm_structure()`</span> for a quick structural conformance check. Retrieve domain templates with <span class="in">`get_sdtm_domain()`</span> and <span class="in">`list_sdtm_domains()`</span>.</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm`</span>: Generate a comprehensive SDTM validation workflow for a dataset</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_sdtm_structure`</span>: Validate the structural conformance of a dataset against an SDTM domain template</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`sdtm_to_metadata`</span>: Convert an SDTM domain template to a <span class="in">`MetadataImport`</span> object</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_sdtm_domain`</span>: Get the SDTM template for a specific domain</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_sdtm_domains`</span>: List all available SDTM domain codes</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMDomainTemplate`</span>: Structural template for an SDTM domain</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SDTMVariableSpec`</span>: Specification for a single variable in an SDTM domain template</span>
 <span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam`</span>: Generate a comprehensive ADaM validation workflow for a dataset</span>
-<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam_structure`</span>: Validate structural conformance of a dataset against an ADaM template</span>
-<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`adam_to_metadata`</span>: Convert an ADaM dataset template to a MetadataImport object</span>
-<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_adam_dataset`</span>: Get the ADaM template for a specific dataset</span>
-<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_adam_datasets`</span>: List all available ADaM dataset template names</span>
-<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMDatasetTemplate`</span>: Structural template for an ADaM dataset</span>
-<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMVariableSpec`</span>: Specification for a single variable in an ADaM dataset template</span>
-<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integrations</span></span>
-<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>Classes for integrating Pointblank with external observability and monitoring systems. Use <span class="in">`OTelExporter`</span> to export validation results as OpenTelemetry metrics, traces, and logs.</span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="fu">### ADaM Validation</span></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a>Validate analysis datasets against CDISC ADaM templates. Use <span class="in">`validate_adam()`</span> to generate a full <span class="in">`Validate`</span> workflow, or <span class="in">`validate_adam_structure()`</span> for a quick structural conformance check. Retrieve dataset templates with <span class="in">`get_adam_dataset()`</span> and <span class="in">`list_adam_datasets()`</span>.</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam`</span>: Generate a comprehensive ADaM validation workflow for a dataset</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`validate_adam_structure`</span>: Validate structural conformance of a dataset against an ADaM template</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`adam_to_metadata`</span>: Convert an ADaM dataset template to a MetadataImport object</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`get_adam_dataset`</span>: Get the ADaM template for a specific dataset</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`list_adam_datasets`</span>: List all available ADaM dataset template names</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMDatasetTemplate`</span>: Structural template for an ADaM dataset</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ADaMVariableSpec`</span>: Specification for a single variable in an ADaM dataset template</span>
 <span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`integrations.otel.OTelExporter`</span></span>
-<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integrations</span></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>Classes for integrating Pointblank with external observability and monitoring systems. Use <span class="in">`OTelExporter`</span> to export validation results as OpenTelemetry metrics, traces, and logs.</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
-<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`integrations.otel.OTelExporter`</span></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
 </pre>
 
 

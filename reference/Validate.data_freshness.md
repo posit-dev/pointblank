@@ -17,7 +17,8 @@ Validate.data_freshness(
     thresholds=None,
     actions=None,
     brief=None,
-    active=True
+    active=True,
+    dimension=None
 )
 ```
 
@@ -59,6 +60,9 @@ An optional brief description of the validation step that will be displayed in t
 
 `active: bool | Callable = ``True`  
 A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+
+`dimension: str | None = None`  
+An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 
 
 ## Returns
@@ -240,7 +244,7 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 
@@ -358,9 +362,9 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
-<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
-<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
+<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
+<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
 </tr>
 </tfoot>
 
@@ -425,7 +429,7 @@ data_freshness()
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">event_time</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">12.0h<br />
 <span style="font-size: 9px;">-04:00</span></td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjVweCIgaGVpZ2h0PSIyNXB4IiB2aWV3Ym94PSIwIDAgMjUgMjUiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgc3R5bGU9InZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Ij4KICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTAwMDAwLCAwLjU3MDE0NykiPgogICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiB4PSIwLjEyNTEzMjUwNiIgeT0iMCIgd2lkdGg9IjIzLjc0OTczNSIgaGVpZ2h0PSIyMy43ODk0NzM3IiAvPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44MDM3NTA0Niw4LjE4MTk0NzM2IEMzLjc3MTkxODMyLDguMTgxOTQ3MzYgMi4xMTg3NTA0Niw5LjgzNDk1MzI4IDIuMTE4NzUwNDYsMTEuODY2OTQ3NCBDMi4xMTg3NTA0NiwxMy44OTg5NDE0IDMuNzcxOTE4MzIsMTUuNTUxOTQ3NCA1LjgwMzc1MDQ2LDE1LjU1MTk0NzQgQzcuODM1NTgyNiwxNS41NTE5NDc0IDkuNDg4NzUwNDYsMTMuODk4OTQxNCA5LjQ4ODc1MDQ2LDExLjg2Njk0NzQgQzkuNDg4NzUwNDYsOS44MzQ5NTMyOCA3LjgzNTUyODYzLDguMTgxOTQ3MzYgNS44MDM3NTA0Niw4LjE4MTk0NzM2IFogTTUuODAzNzUwNDYsMTQuODE0OTE1IEM0LjE3ODIxOTk3LDE0LjgxNDkxNSAyLjg1NTc4Mjg1LDEzLjQ5MjQ3NzggMi44NTU3ODI4NSwxMS44NjY5NDc0IEMyLjg1NTc4Mjg1LDEwLjI0MTQxNjkgNC4xNzgyMTk5Nyw4LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
+DUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3"><span style="color:#4CA64C;">✓</span></td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px">1</td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">1<br />
@@ -443,7 +447,7 @@ data_freshness()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 12:05:13</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 13:09:49</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
 </tr>
 </tfoot>
 
@@ -519,7 +523,7 @@ data_freshness()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-02 13:05:12</code> (age: <strong>-77677512.9s</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-07-03 14:09:49</code> (age: <strong>-77767789.3s</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 

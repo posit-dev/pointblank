@@ -156,7 +156,11 @@ The validation plan is executed when `interrogate()` is called. After interrogat
 - `Validate.all_passed`
 - `Validate.assert_passing`
 - `Validate.assert_below_threshold`
+- `Validate.assert_dimension_scores`
 - `Validate.above_threshold`
+- `Validate.get_dimension_scores`
+- `Validate.get_health_score`
+- `Validate.get_scorecard`
 - `Validate.n`
 - `Validate.n_passed`
 - `Validate.n_failed`

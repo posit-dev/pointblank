@@ -329,8 +329,20 @@ Raise an `AssertionError` if all tests are not passing.
 [Validate.assert_below_threshold()](Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold)  
 Raise an `AssertionError` if validation steps exceed a specified threshold level.
 
+[Validate.assert_dimension_scores()](Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores)  
+Raise an `AssertionError` if any dimension's health score falls below a minimum.
+
 [Validate.above_threshold()](Validate.above_threshold.md#pointblank.Validate.above_threshold)  
 Check if any validation steps exceed a specified threshold level.
+
+[Validate.get_dimension_scores()](Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores)  
+Get per-dimension health scores from the validation results.
+
+[Validate.get_health_score()](Validate.get_health_score.md#pointblank.Validate.get_health_score)  
+Get the overall data quality health score from the validation results.
+
+[Validate.get_scorecard()](Validate.get_scorecard.md#pointblank.Validate.get_scorecard)  
+Get a data quality scorecard as a GT table.
 
 [Validate.n()](Validate.n.md#pointblank.Validate.n)  
 Provides a dictionary of the number of test units for each validation step.
