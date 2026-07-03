@@ -133,8 +133,10 @@ step count), the score reflects data volume. A failing check over a large table 
 more than one over a small table.
 
 ::: {.callout-note}
-Only interrogated, active steps contribute to scoring. Inactive steps (`active=False`) and steps
-that haven't been interrogated are excluded.
+Only steps that produced a pass/fail result contribute to scoring. Steps that haven't been
+interrogated, inactive steps (`active=False`), and steps that could not be evaluated (for example,
+a check that references a nonexistent column) are all excluded, so a broken check doesn't distort
+the score.
 :::
 
 ### Weighting Dimensions
