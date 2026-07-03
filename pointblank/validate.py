@@ -23099,6 +23099,12 @@ def _transform_step_number_with_dimension(
     return cells
 
 
+def _get_report_text(key: str, lang: str) -> str:
+    """Safely look up a validation report string with English fallback."""
+    entry = VALIDATION_REPORT_TEXT.get(key, {})
+    return entry.get(lang, entry.get("en", key))
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
