@@ -18117,6 +18117,84 @@ class Validate:
         weights = getattr(global_config, "dimension_weights", None)
         return _compute_health_score(self.validation_info, dimension_weights=weights)
 
+    def assert_dimension_scores(
+        self,
+        thresholds: dict[str, float] | None = None,
+        message: str | None = None,
+    ) -> None:
+        """
+        Raise an `AssertionError` if any dimension's health score falls below a minimum.
+
+        The `assert_dimension_scores()` method checks each data quality dimension's score (from
+        [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`)) against a minimum
+        acceptable value. This is useful in automated testing and CI environments where you want to
+        fail the run when, say, the completeness score drops below `95`.
+
+        Parameters
+        ----------
+        thresholds
+            A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`, the
+            minimums set via [`config(dimension_thresholds=...)`](`pointblank.config`) are used. A
+            dimension present in the thresholds but absent from the validation is ignored.
+        message
+            Custom error message to use if the assertion fails. If `None`, a default message that
+            lists the offending dimensions (with actual vs. required scores) is generated.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        AssertionError
+            If any dimension's score is below its specified minimum.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .interrogate()
+        )
+
+        # Fail if the completeness score is below 95
+        validation.assert_dimension_scores(thresholds={"completeness": 95})
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) to retrieve the
+        scores without raising, and [`config()`](`pointblank.config`) to set default per-dimension
+        thresholds globally.
+        """
+        if thresholds is None:
+            thresholds = getattr(global_config, "dimension_thresholds", None) or {}
+
+        if not thresholds:
+            return
+
+        dimension_scores = self.get_dimension_scores()
+
+        failures = []
+        for dimension, minimum in thresholds.items():
+            score = dimension_scores.get(dimension)
+            if score is not None and score < minimum:
+                failures.append((dimension, score, minimum))
+
+        if failures:
+            if message is None:
+                parts = [
+                    f"{dimension} ({score:g}% < {minimum:g}%)"
+                    for dimension, score, minimum in failures
+                ]
+                message = "Dimension health score(s) below the required minimum: " + ", ".join(
+                    parts
+                )
+            raise AssertionError(message)
+
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str:
