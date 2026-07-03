@@ -4045,6 +4045,9 @@ class _ValidationInfo:
         A brief description of the validation step.
     autobrief
         An automatically-generated brief for the validation step.
+    dimension
+        The data quality dimension for the validation step (e.g., `"completeness"`, `"validity"`,
+        `"uniqueness"`, etc.). If not set explicitly, it is inferred from the `assertion_type`.
     active
         Whether the validation step is active.
     all_passed
