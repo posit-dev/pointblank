@@ -23059,6 +23059,46 @@ def _get_dimension_label(dimension: str | None, lang: str) -> str:
     return str(key).replace("_", " ").title()
 
 
+def _transform_step_number_with_dimension(
+    i_values: list, dimensions: list[str | None], lang: str
+) -> list[str]:
+    """
+    Render each step number with a small, color-coded two-letter dimension badge in its top-left
+    corner.
+
+    The badge is absolutely positioned so it does not shift the step numeral (regardless of how
+    many digits it has). The full dimension name is exposed via a `title` tooltip, and the badge
+    color matches the per-dimension colors used in the report's health-score summary.
+    """
+    # Right-align the numeral (GT auto-aligns integer columns to the right, but treats these HTML
+    # strings as text); place the badge on the leading edge, nudged inward to clear the status bar
+    is_rtl = lang in RTL_LANGUAGES
+    text_align = "left" if is_rtl else "right"
+    badge_side = "right" if is_rtl else "left"
+
+    cells: list[str] = []
+    for i_value, dimension in zip(i_values, dimensions):
+        key = dimension or "unknown"
+        color = DIMENSION_COLORS.get(key, DIMENSION_COLORS["unknown"])
+        if key in DIMENSION_ABBR:
+            abbr = DIMENSION_ABBR[key]
+        else:
+            # Derive a two-letter code from a custom dimension name (first two letters)
+            letters = "".join(c for c in key if c.isalpha())
+            abbr = (letters[:2].upper()) or DIMENSION_ABBR["unknown"]
+        name = _get_dimension_label(key, lang)
+        badge = (
+            f'<span title="{name}" style="position: absolute; top: -11px; {badge_side}: 3px; '
+            f"background-color: {color}; color: #FFFFFF; font-size: 7px; font-weight: 700; "
+            "padding: 1px 3px; border-radius: 3px; line-height: 1; letter-spacing: 0.5px; "
+            f"font-family: 'IBM Plex Sans', sans-serif;\">{abbr}</span>"
+        )
+        cells.append(
+            f'<div style="position: relative; text-align: {text_align};">{badge}{i_value}</div>'
+        )
+    return cells
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
