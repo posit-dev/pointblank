@@ -498,41 +498,39 @@ def config(
     return global_config  # pragma: no cover
 
 
-def _resolve_dimension_map() -> dict[str, str]:
+def _base_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
     """
-    Get the effective `assertion_type` to dimension mapping.
+    Infer the data quality dimension from the built-in defaults only (ignoring any config override).
 
-    This merges any user-provided `dimension_map` (set via `pb.config()`) on top of the built-in
-    `ASSERTION_TYPE_TO_DIMENSION` defaults.
-    """
-    dimension_map = dict(ASSERTION_TYPE_TO_DIMENSION)
-    override = getattr(global_config, "dimension_map", None)
-    if override:
-        dimension_map.update(override)
-    return dimension_map
-
-
-def _infer_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
-    """
-    Infer the data quality dimension for a validation step from its `assertion_type`.
-
-    The mapping is drawn from `ASSERTION_TYPE_TO_DIMENSION` (with any `pb.config(dimension_map=...)`
-    overrides applied). Assertion types not present in the mapping are categorized as `"unknown"`.
-    Returns `None` if `assertion_type` is `None`.
+    Uses `ASSERTION_TYPE_TO_DIMENSION`, with a regex fallback for the dynamically-generated
+    aggregate comparison methods (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`). Assertion types
+    not covered are categorized as `"unknown"`. Returns `None` if `assertion_type` is `None`.
     """
     if assertion_type is None:
         return None
-    dimension_map = _resolve_dimension_map()
-    if assertion_type in dimension_map:
-        return dimension_map[assertion_type]
-    # Aggregate comparison methods (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`) are dynamically
-    # generated and assert that a summary statistic meets an expectation: categorize as "validity"
+    if assertion_type in ASSERTION_TYPE_TO_DIMENSION:
+        return ASSERTION_TYPE_TO_DIMENSION[assertion_type]
     if re.match(
         r"^col_(sum|avg|mean|median|min|max|sd|std|var)_(eq|ne|gt|ge|lt|le|between|outside)$",
         assertion_type,
     ):
         return "validity"
     return "unknown"
+
+
+def _infer_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
+    """
+    Infer the data quality dimension for a validation step from its `assertion_type`.
+
+    Any `pb.config(dimension_map=...)` override takes precedence over the built-in
+    `ASSERTION_TYPE_TO_DIMENSION` defaults. Returns `None` if `assertion_type` is `None`.
+    """
+    if assertion_type is None:
+        return None
+    override = getattr(global_config, "dimension_map", None) or {}
+    if assertion_type in override:
+        return override[assertion_type]
+    return _base_dimension_from_assertion_type(assertion_type)
 
 
 def load_dataset(
@@ -4602,6 +4600,12 @@ def _validation_info_to_step(
 
     if vi.brief is not None and vi.brief is not False:
         params["brief"] = True if vi.brief == "{auto}" else vi.brief
+
+    # Emit `dimension=` only when it deviates from the built-in default inference (i.e., an
+    # explicit per-step override or a `dimension_map` remap), so generated plans reproduce the
+    # same dimensions without depending on global config
+    if vi.dimension is not None and vi.dimension != _base_dimension_from_assertion_type(at):
+        params["dimension"] = vi.dimension
 
     if vi.active is not None and vi.active is not True:
         if callable(vi.active):
@@ -18363,8 +18367,9 @@ class Validate:
 
         Per-dimension weights can be set globally via
         [`config(dimension_weights=...)`](`pointblank.config`) for organizations that consider some
-        dimensions (e.g., completeness) more critical than others. When weights are set, each
-        dimension's contribution to the overall score is scaled accordingly.
+        dimensions (e.g., completeness) more critical than others. A weight scales that dimension's
+        test-unit contribution to the score (so a dimension's influence is its weight times its
+        test-unit count); the returned score is always within `[0, 100]`.
 
         Returns
         -------
@@ -18453,6 +18458,11 @@ class Validate:
 
         if not thresholds:
             return
+
+        # Auto-interrogate with default parameters if not already done (matches the behavior of
+        # `assert_below_threshold()`), so scores reflect actual results rather than an empty plan
+        if not hasattr(self, "time_start") or self.time_start is None:
+            self.interrogate()
 
         dimension_scores = self.get_dimension_scores()
 
@@ -18545,10 +18555,16 @@ class Validate:
         else:
             title_text = commonmark.commonmark(title)
 
-        # If there are no scorable steps, return a minimal table with an informative message
+        # If there are no scorable steps, return a minimal table with an informative message.
+        # Distinguish "not interrogated yet" from "interrogated but nothing scorable" (an empty
+        # plan, or all steps inactive/errored) so the message is accurate in each case.
         if not dimension_scores:
-            no_steps_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"].get(
-                lang, VALIDATION_REPORT_TEXT["no_interrogation_performed_text"]["en"]
+            interrogated = getattr(self, "time_start", None) is not None
+            msg_key = (
+                "no_validation_steps_text" if interrogated else "no_interrogation_performed_text"
+            )
+            no_steps_text = VALIDATION_REPORT_TEXT[msg_key].get(
+                lang, VALIDATION_REPORT_TEXT[msg_key]["en"]
             )
             df = df_lib.DataFrame({"scorecard": [no_steps_text]})
             gt_tbl = (
@@ -18568,14 +18584,6 @@ class Validate:
 
         agg = _aggregate_dimension_units(self.validation_info)
 
-        # Count the number of interrogated steps per dimension
-        step_counts: dict[str, int] = {}
-        for step in self.validation_info:
-            if step.n is None:
-                continue
-            dimension = step.dimension or "unknown"
-            step_counts[dimension] = step_counts.get(dimension, 0) + 1
-
         # Order dimensions using the canonical order, appending any custom dimensions at the end
         ordered_dimensions = [d for d in DIMENSION_NAMES if d in dimension_scores]
         ordered_dimensions += [d for d in dimension_scores if d not in DIMENSION_NAMES]
@@ -18587,7 +18595,7 @@ class Validate:
             n_passed, n = agg[dimension]
             score = dimension_scores[dimension]
             color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
-            label = _get_dimension_label(dimension, lang)
+            label = html_module.escape(_get_dimension_label(dimension, lang))
             dimension_cells.append(
                 f'<span style="background-color: {color}; color: #FFFFFF; padding: 3px 9px; '
                 "border-radius: 9px; font-size: 11px; font-weight: 600; white-space: nowrap; "
@@ -23009,9 +23017,11 @@ def _aggregate_dimension_units(validation_info: list[_ValidationInfo]) -> dict[s
     """
     Aggregate passing/total test units per data quality dimension.
 
-    Only steps that have been interrogated (`n` is not `None`) contribute to the aggregation;
-    inactive steps and steps that were not interrogated are excluded. Steps with no assigned
-    dimension are grouped under `"unknown"`.
+    Only steps that produced a pass/fail result contribute to the aggregation. Steps that were not
+    interrogated, inactive steps (`active=False`), and steps that could not be evaluated
+    (`eval_error`) all have `n_passed` unset and are therefore excluded, so a broken check (e.g., a
+    reference to a nonexistent column) doesn't distort the score. Steps with no assigned dimension
+    are grouped under `"unknown"`.
 
     Returns
     -------
@@ -23020,11 +23030,13 @@ def _aggregate_dimension_units(validation_info: list[_ValidationInfo]) -> dict[s
     """
     agg: dict[str, list[int]] = {}
     for step in validation_info:
-        if step.n is None:
+        # Skip steps without a computed result: not interrogated, inactive, or `eval_error`
+        # (these have `n_passed` as `None`)
+        if step.n is None or step.n_passed is None:
             continue
         dimension = step.dimension or "unknown"
         entry = agg.setdefault(dimension, [0, 0])
-        entry[0] += step.n_passed or 0
+        entry[0] += step.n_passed
         entry[1] += step.n
     return agg
 
@@ -23052,8 +23064,10 @@ def _compute_health_score(
     Compute the overall, test-unit-weighted health score (0-100) across all dimensions.
 
     With uniform weights this reduces to the overall pass rate (total passing test units over
-    total test units). Optional per-dimension weights scale each dimension's contribution; a
-    dimension not present in `dimension_weights` uses a weight of `1.0`.
+    total test units). Optional per-dimension weights scale each dimension's test-unit
+    contribution; a dimension not present in `dimension_weights` uses a weight of `1.0`. Weights
+    are expected to be positive; negative weights are treated as `0` (the dimension is dropped from
+    the overall score), and the returned score is always clamped to the `[0, 100]` range.
     """
     agg = _aggregate_dimension_units(validation_info)
     if not agg:
@@ -23062,10 +23076,14 @@ def _compute_health_score(
     numerator = 0.0
     denominator = 0.0
     for dimension, (n_passed, n) in agg.items():
-        weight = weights.get(dimension, 1.0)
+        # Guard against invalid (negative) weights, which could otherwise push the score
+        # out of the [0, 100] range
+        weight = max(0.0, weights.get(dimension, 1.0))
         numerator += weight * n_passed
         denominator += weight * n
-    return round(numerator / denominator * 100, 2) if denominator else 100.0
+    if not denominator:
+        return 100.0
+    return round(min(100.0, max(0.0, numerator / denominator * 100)), 2)
 
 
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
@@ -23396,7 +23414,8 @@ def _transform_step_number_with_dimension(
             # Derive a two-letter code from a custom dimension name (first two letters)
             letters = "".join(c for c in key if c.isalpha())
             abbr = (letters[:2].upper()) or DIMENSION_ABBR["unknown"]
-        name = _get_dimension_label(key, lang)
+        # Escape the tooltip text since a custom dimension name is user-provided
+        name = html_module.escape(_get_dimension_label(key, lang))
         badge = (
             f'<span title="{name}" style="position: absolute; top: -11px; {badge_side}: 3px; '
             f"background-color: {color}; color: #FFFFFF; font-size: 7px; font-weight: 700; "
@@ -23454,7 +23473,7 @@ def _create_health_score_html(
     for dimension in ordered_dimensions:
         score = dimension_scores[dimension]
         color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
-        label = _get_dimension_label(dimension, lang)
+        label = html_module.escape(_get_dimension_label(dimension, lang))
         chips.append(
             '<span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;">'
             f'<span style="background-color: {color}; color: #FFFFFF; padding: 2px 7px; '
