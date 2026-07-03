@@ -82,8 +82,8 @@ def validate_adam(
     - Population flag values (Y/N only, no nulls in flag columns)
     - BDS structure: PARAMCD, PARAM, AVAL consistency
     - ADTTE: CNSR values (0 or 1), AVAL >= 0
-    - TRT01P/TRT01A consistency (non-null, single value per subject in ADSL)
-    - Traceability variable presence
+    - TRT01P (planned treatment) present and non-null in ADSL
+    - Traceability variable presence (SRCDOM/SRCVAR/SRCSEQ non-null when present)
 
     Parameters
     ----------
