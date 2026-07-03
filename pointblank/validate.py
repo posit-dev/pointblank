@@ -23044,6 +23044,21 @@ def _transform_w_e_c(values, color, interrogation_performed):
     ]
 
 
+def _get_dimension_label(dimension: str | None, lang: str) -> str:
+    """
+    Get the localized display label for a data quality dimension.
+
+    Falls back to English (and finally to a title-cased version of the raw dimension name for
+    custom/unmapped dimensions) when a translation is not available for the requested language.
+    """
+    key = dimension or "unknown"
+    entry = VALIDATION_REPORT_TEXT.get(f"dimension_{key}")
+    if entry:
+        return entry.get(lang, entry.get("en", key))
+    # Custom or unmapped dimension: present the raw name in a readable form
+    return str(key).replace("_", " ").title()
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
