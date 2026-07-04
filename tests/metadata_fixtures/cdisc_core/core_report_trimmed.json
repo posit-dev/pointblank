@@ -1,0 +1,286 @@
+{
+ "Conformance_Details": {
+  "Report_Generation": "2026-07-03T19:37:12",
+  "Total_Runtime": "7.8 seconds",
+  "CORE_Engine_Version": "0.16.0",
+  "Issue_Limit_Per_Rule": "None",
+  "Issue_Limit_Per_Dataset": "None",
+  "Issue_Limit_Per_Sheet": null,
+  "Standard": "SDTMIG",
+  "Version": "V3.4",
+  "CT_Version": "",
+  "Define_XML_Version": null
+ },
+ "Dataset_Details": [
+  {
+   "filename": "TEST_DATASET",
+   "label": "Exposure",
+   "path": "tests/resources/report_test_data",
+   "modification_date": "2020-08-21T09:14:26",
+   "size_kb": 823.12,
+   "length": 1583
+  }
+ ],
+ "Issue_Summary": [
+  {
+   "dataset": "STUDY",
+   "core_id": "CORE-000581",
+   "message": "DM dataset is missing.",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000357",
+   "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000510",
+   "message": "Split dataset name is not 3 or 4 characters in length",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000539",
+   "message": "Split dataset is present but the two-Letter parent domain is missing.",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000598",
+   "message": "Dataset name does not begin with DOMAIN value",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000778",
+   "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-000929",
+   "message": "rule evaluation error - evaluation dataset failed to build",
+   "issues": 1
+  },
+  {
+   "dataset": "TEST_DATASET",
+   "core_id": "CORE-001081",
+   "message": "rule evaluation error - evaluation dataset failed to build",
+   "issues": 1
+  }
+ ],
+ "Issue_Details": [
+  {
+   "core_id": "CORE-000357",
+   "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": 1,
+   "SEQ": "",
+   "variables": [
+    "dataset_name"
+   ],
+   "values": [
+    "TEST_DATASET"
+   ]
+  },
+  {
+   "core_id": "CORE-000510",
+   "message": "Split dataset name is not 3 or 4 characters in length",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": 1,
+   "SEQ": "",
+   "variables": [
+    "dataset_name"
+   ],
+   "values": [
+    "TEST_DATASET"
+   ]
+  },
+  {
+   "core_id": "CORE-000539",
+   "message": "Split dataset is present but the two-Letter parent domain is missing.",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": 1,
+   "SEQ": "",
+   "variables": [
+    "dataset_name",
+    "$list_dataset_names"
+   ],
+   "values": [
+    "TEST_DATASET",
+    "['TEST_DATASET']"
+   ]
+  },
+  {
+   "core_id": "CORE-000581",
+   "message": "DM dataset is missing.",
+   "executability": "fully executable",
+   "dataset": "STUDY",
+   "USUBJID": "",
+   "row": "",
+   "SEQ": "",
+   "variables": [],
+   "values": [
+    "null"
+   ]
+  },
+  {
+   "core_id": "CORE-000598",
+   "message": "Dataset name does not begin with DOMAIN value",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": "",
+   "SEQ": "",
+   "variables": [
+    "dataset_name"
+   ],
+   "values": [
+    "TEST_DATASET"
+   ]
+  },
+  {
+   "core_id": "CORE-000778",
+   "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": "",
+   "SEQ": "",
+   "variables": [
+    "dataset_name"
+   ],
+   "values": [
+    "TEST_DATASET"
+   ]
+  },
+  {
+   "core_id": "CORE-000929",
+   "message": "rule evaluation error - evaluation dataset failed to build - Error occurred during dataset building",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": "",
+   "SEQ": "",
+   "variables": "",
+   "values": "Failed to build dataset for rule validation. Builder: DefineVariablesWithLibraryMetadataDatasetBuilder, Dataset: TEST_DATASET, Error: name=TEST_DATASET, domain=EX is not found in Define XML"
+  },
+  {
+   "core_id": "CORE-001081",
+   "message": "rule evaluation error - evaluation dataset failed to build - Error occurred during dataset building",
+   "executability": "fully executable",
+   "dataset": "TEST_DATASET",
+   "USUBJID": "",
+   "row": "",
+   "SEQ": "",
+   "variables": "",
+   "values": "Failed to build dataset for rule validation. Builder: DefineVariablesWithLibraryMetadataDatasetBuilder, Dataset: TEST_DATASET, Error: name=TEST_DATASET, domain=EX is not found in Define XML"
+  }
+ ],
+ "Rules_Report": [
+  {
+   "core_id": "CORE-000357",
+   "version": "1",
+   "cdisc_rule_id": "CG0018, TIG0303",
+   "fda_rule_id": "",
+   "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-000778",
+   "version": "1",
+   "cdisc_rule_id": "CG0650",
+   "fda_rule_id": "",
+   "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-000581",
+   "version": "1",
+   "cdisc_rule_id": "CG0368, TIG0532",
+   "fda_rule_id": "TRC1736a, TRC1736c",
+   "message": "DM dataset is missing.",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-000929",
+   "version": "1",
+   "cdisc_rule_id": "CG0001, SEND16, TIG0090, TIG0289",
+   "fda_rule_id": "",
+   "message": "DOMAIN Code is not a published DOMAIN Code in CDISC Controlled Terminology.",
+   "status": "EXECUTION ERROR"
+  },
+  {
+   "core_id": "CORE-000598",
+   "version": "1",
+   "cdisc_rule_id": "CG0413, SEND1, TIG0037, TIG0568",
+   "fda_rule_id": "",
+   "message": "Dataset name does not begin with DOMAIN value",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-000539",
+   "version": "1",
+   "cdisc_rule_id": "CG0332, TIG0498",
+   "fda_rule_id": "",
+   "message": "Split dataset is present but the two-Letter parent domain is missing.",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-000510",
+   "version": "1",
+   "cdisc_rule_id": "CG0017",
+   "fda_rule_id": "",
+   "message": "Split dataset name is not 3 or 4 characters in length",
+   "status": "ISSUE REPORTED"
+  },
+  {
+   "core_id": "CORE-001081",
+   "version": "1",
+   "cdisc_rule_id": "CG0010",
+   "fda_rule_id": "",
+   "message": "Variable role specified in the define-xml does not match the variable role in the IG (for domains) or in the model (for custom domains).",
+   "status": "EXECUTION ERROR"
+  },
+  {
+   "core_id": "CORE-000001",
+   "version": "1",
+   "cdisc_rule_id": "CG0176, TIG0405",
+   "fda_rule_id": "",
+   "message": "IEORRES is not equal to 'N' when IECAT equals 'INCLUSION'.",
+   "status": "SKIPPED"
+  },
+  {
+   "core_id": "CORE-000002",
+   "version": "1",
+   "cdisc_rule_id": "CG0208",
+   "fda_rule_id": "",
+   "message": "SESTDTC is required.",
+   "status": "SKIPPED"
+  },
+  {
+   "core_id": "CORE-000005",
+   "version": "1",
+   "cdisc_rule_id": "CG0102",
+   "fda_rule_id": "",
+   "message": "EXTRT is PLACEBO, but EXDOSE is not equal to 0.",
+   "status": "SUCCESS"
+  },
+  {
+   "core_id": "CORE-000019",
+   "version": "1",
+   "cdisc_rule_id": "CG0311, SEND3, TIG0211, TIG0486",
+   "fda_rule_id": "",
+   "message": "Variable label length should be less than or equal to 40 characters",
+   "status": "SUCCESS"
+  }
+ ]
+}
