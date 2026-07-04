@@ -64,11 +64,13 @@ from pointblank.metadata import (
     ADaMVariableSpec,
     Codelist,
     CodelistEntry,
+    ConformanceReport,
     MetadataImport,
     MetadataPackage,
     MissingValueCode,
     SDTMDomainTemplate,
     SDTMVariableSpec,
+    SubmissionPackage,
     VariableMetadata,
     adam_to_metadata,
     export_metadata,
@@ -217,4 +219,7 @@ __all__ = [
     "validate_adam_structure",
     "adam_to_metadata",
     "validate_adam",
+    # CDISC submission-package conformance
+    "SubmissionPackage",
+    "ConformanceReport",
 ]
