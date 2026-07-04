@@ -409,6 +409,20 @@ reference:
         - name: ADaMVariableSpec
           members: true
 
+    - title: CDISC Submission Conformance
+      desc: >
+        Validate an entire study submission package for CDISC conformance, spanning all datasets.
+        Use `SubmissionPackage` to model a study as a graph of related datasets (with optional
+        Define-XML and Controlled Terminology context) and `SubmissionPackage.validate_conformance()`
+        to run single-dataset structural checks plus cross-dataset checks (USUBJID referential
+        integrity, SUPP-- linkage, RELREC, and ADaM ⇄ SDTM traceability). Results are returned as a
+        `ConformanceReport`.
+      contents:
+        - name: SubmissionPackage
+          members: true
+        - name: ConformanceReport
+          members: true
+
     - title: Integrations
       desc: >
         Classes for integrating Pointblank with external observability and monitoring systems. Use
