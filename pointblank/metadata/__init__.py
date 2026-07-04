@@ -17,7 +17,15 @@ from pointblank.metadata._sdtm_templates import (
     list_sdtm_domains,
     validate_sdtm_structure,
 )
+from pointblank.metadata._cdisc_core import (
+    CoreFinding,
+    CoreIssueSummary,
+    CoreRuleResult,
+    ParsedCoreReport,
+    parse_core_report,
+)
 from pointblank.metadata._sdtm_validate import sdtm_to_metadata, validate_sdtm
+from pointblank.metadata._submission import ConformanceReport, SubmissionPackage
 from pointblank.metadata._types import (
     Codelist,
     CodelistEntry,
@@ -51,4 +59,11 @@ __all__ = [
     "validate_adam_structure",
     "adam_to_metadata",
     "validate_adam",
+    "SubmissionPackage",
+    "ConformanceReport",
+    "CoreFinding",
+    "CoreRuleResult",
+    "CoreIssueSummary",
+    "ParsedCoreReport",
+    "parse_core_report",
 ]
