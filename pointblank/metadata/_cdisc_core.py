@@ -318,3 +318,315 @@ def parse_core_report(report: dict[str, Any]) -> ParsedCoreReport:
         findings=findings,
         rules=rules,
     )
+
+
+# ── Dataset materialization (in-memory → XPT) ────────────────────────────────
+
+
+def _write_xpt(data: Any, path: str | Path, table_name: str, file_label: str = "") -> Path:
+    """Write a DataFrame to a SAS Transport (XPT) file that CORE can read.
+
+    Accepts any narwhals-supported DataFrame (Pandas, Polars, …); it is converted to Pandas for
+    `pyreadstat.write_xport`. The XPT member (table) name is uppercased and truncated to 8
+    characters — the CDISC / classic-XPT limit — which is sufficient for all SDTM/ADaM domain names.
+
+    Parameters
+    ----------
+    data
+        The DataFrame to write.
+    path
+        Destination `.xpt` file path.
+    table_name
+        The dataset/domain name to record as the XPT member name (e.g., `"DM"`).
+    file_label
+        Optional dataset label.
+
+    Returns
+    -------
+    Path
+        The path written.
+
+    Raises
+    ------
+    ImportError
+        If `pyreadstat` is not installed.
+    """
+    try:
+        import pyreadstat
+    except ImportError:
+        raise ImportError(
+            "The 'pyreadstat' package is required to write XPT files for the CDISC CORE engine. "
+            "Install it with: pip install pyreadstat"
+        ) from None
+
+    import narwhals as nw
+
+    pdf = nw.from_native(data, eager_only=True).to_pandas()
+    dest = Path(path)
+    member = str(table_name).upper()[:8]
+    pyreadstat.write_xport(pdf, str(dest), table_name=member, file_label=file_label or "")
+    return dest
+
+
+def _materialize_datasets(datasets: dict[str, Any], dest_dir: str | Path) -> dict[str, Path]:
+    """Write each dataset in a mapping to `<name>.xpt` under `dest_dir`.
+
+    Parameters
+    ----------
+    datasets
+        A mapping of dataset name (domain code) to DataFrame.
+    dest_dir
+        Directory to write the XPT files into (created if needed).
+
+    Returns
+    -------
+    dict[str, Path]
+        A mapping of dataset name to the written XPT path.
+    """
+    out_dir = Path(dest_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written: dict[str, Path] = {}
+    for name, data in datasets.items():
+        xpt_path = out_dir / f"{name.lower()}.xpt"
+        _write_xpt(data, xpt_path, table_name=name)
+        written[name] = xpt_path
+    return written
+
+
+# ── CORE subprocess runner ───────────────────────────────────────────────────
+
+
+class CoreNotFoundError(RuntimeError):
+    """Raised when no CDISC CORE executable / command can be discovered."""
+
+
+class CoreExecutionError(RuntimeError):
+    """Raised when the CDISC CORE process exits with a non-zero status."""
+
+
+def _normalize_version(version: str) -> str:
+    """Normalize a standard version to CORE's hyphenated form (e.g., ``3.4`` → ``3-4``)."""
+    return str(version).replace(".", "-")
+
+
+def _resolve_core_command(core: str | Sequence[str] | None) -> list[str]:
+    """Resolve the base command used to invoke CORE.
+
+    Resolution order:
+
+    1. An explicit `core` argument — a path/name (`str`) or a full command prefix (sequence, e.g.
+       `["python", "/path/core.py"]` for a repo checkout, or `["docker", "run", ...]`).
+    2. The `POINTBLANK_CDISC_CORE` environment variable (split on whitespace to allow a command).
+    3. A `core` / `cdisc-rules-engine` executable on `PATH`.
+
+    Returns
+    -------
+    list[str]
+        The command prefix (before the `validate` subcommand and its flags).
+
+    Raises
+    ------
+    CoreNotFoundError
+        If nothing resolves.
+    """
+    if core is not None:
+        if isinstance(core, str):
+            return [core]
+        return list(core)
+
+    env_val = os.environ.get(_CORE_ENV_VAR)
+    if env_val:
+        return env_val.split()
+
+    for name in _CORE_EXECUTABLE_NAMES:
+        found = shutil.which(name)
+        if found:
+            return [found]
+
+    raise CoreNotFoundError(
+        "Could not find the CDISC CORE engine. Install the CORE standalone executable "
+        "(https://github.com/cdisc-org/cdisc-rules-engine/releases) and either put it on your "
+        f"PATH as 'core', set the {_CORE_ENV_VAR} environment variable to its path (or a full "
+        "command such as 'python /path/to/core.py'), or pass core=... explicitly. Note: the pip "
+        "package 'cdisc-rules-engine' is a library only and ships neither the CLI nor the rules "
+        "cache."
+    )
+
+
+class _CoreRunner:
+    """Discovers and invokes the CDISC CORE engine as an external subprocess.
+
+    Parameters
+    ----------
+    core
+        How to invoke CORE. A path/name to the CORE executable (`str`), a full command prefix
+        (sequence — e.g., `["python", "core.py"]` for a repo checkout), or `None` to auto-discover
+        via the `POINTBLANK_CDISC_CORE` environment variable and then `PATH`.
+    cwd
+        Working directory to run CORE from. CORE resolves its bundled `resources/` (rules cache,
+        report templates) *relative to the current directory*, so when invoking a repo checkout
+        (`core.py`) this must be the repo root. Standalone executables bundle their resources and
+        generally do not need this. If `None`, the current process directory is used.
+    """
+
+    def __init__(
+        self,
+        core: str | Sequence[str] | None = None,
+        cwd: str | Path | None = None,
+    ) -> None:
+        self._command = _resolve_core_command(core)
+        self._cwd = str(cwd) if cwd is not None else None
+
+    @property
+    def command(self) -> list[str]:
+        """The resolved base command used to invoke CORE."""
+        return list(self._command)
+
+    @property
+    def cwd(self) -> str | None:
+        """The working directory CORE is run from (or `None` for the current directory)."""
+        return self._cwd
+
+    def run_validate(
+        self,
+        data_dir: str | Path,
+        standard: str,
+        version: str,
+        output_stem: str | Path,
+        define_xml: str | Path | None = None,
+        controlled_terminology: str | Sequence[str] | None = None,
+        output_format: str = "JSON",
+        raw_report: bool = False,
+        cache: str | Path | None = None,
+        extra_args: Sequence[str] | None = None,
+        timeout: float | None = None,
+    ) -> Path:
+        """Run `core validate` and return the path to the report it produced.
+
+        Parameters
+        ----------
+        data_dir
+            Directory of datasets to validate (XPT / Dataset-JSON).
+        standard
+            CDISC standard (e.g., `"sdtmig"`).
+        version
+            Standard version; hyphenated automatically (e.g., `"3.4"` → `"3-4"`).
+        output_stem
+            Output path *stem*. CORE appends the format extension (e.g., `.json`).
+        define_xml
+            Optional path to a `define.xml` (passed via `-dxp`; CORE ignores define files placed in
+            the data directory).
+        controlled_terminology
+            Optional CT package name(s) (passed via one or more `-ct`).
+        output_format
+            `"JSON"` (default), `"XLSX"`, or `"CSV"`.
+        raw_report
+            If `True` (JSON only), request CORE's raw report via `-rr`.
+        cache
+            Optional path to CORE's rules cache directory (passed via `-ca`).
+        extra_args
+            Additional raw CLI arguments appended verbatim.
+        timeout
+            Optional subprocess timeout in seconds.
+
+        Returns
+        -------
+        Path
+            The path to the report file CORE produced.
+
+        Raises
+        ------
+        CoreExecutionError
+            If CORE exits non-zero or the expected output file is not produced.
+        """
+        fmt = output_format.upper()
+        if fmt not in _OUTPUT_EXTENSIONS:
+            raise ValueError(
+                f"Unsupported output_format {output_format!r}. "
+                f"Choose one of {sorted(_OUTPUT_EXTENSIONS)}."
+            )
+
+        stem = Path(output_stem)
+        cmd = [
+            *self._command,
+            "validate",
+            "-s",
+            str(standard),
+            "-v",
+            _normalize_version(version),
+            "-d",
+            str(data_dir),
+            "-of",
+            fmt,
+            "-o",
+            str(stem),
+        ]
+        if define_xml is not None:
+            cmd += ["-dxp", str(define_xml)]
+        if controlled_terminology is not None:
+            cts = (
+                [controlled_terminology]
+                if isinstance(controlled_terminology, str)
+                else list(controlled_terminology)
+            )
+            for ct in cts:
+                cmd += ["-ct", str(ct)]
+        if cache is not None:
+            cmd += ["-ca", str(cache)]
+        if raw_report and fmt == "JSON":
+            cmd += ["-rr"]
+        if extra_args:
+            cmd += list(extra_args)
+
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=self._cwd,
+            )
+        except FileNotFoundError as e:
+            raise CoreExecutionError(
+                f"Failed to launch CDISC CORE (command: {cmd[0]!r}): {e}"
+            ) from None
+
+        if proc.returncode != 0:
+            raise CoreExecutionError(
+                f"CDISC CORE exited with status {proc.returncode}.\n"
+                f"Command: {' '.join(cmd)}\n"
+                f"stderr:\n{proc.stderr}"
+            )
+
+        produced = Path(f"{stem}.{_OUTPUT_EXTENSIONS[fmt]}")
+        if not produced.exists():
+            raise CoreExecutionError(
+                f"CDISC CORE completed but the expected report was not found at {produced}.\n"
+                f"stdout:\n{proc.stdout}"
+            )
+        return produced
+
+    def validate_to_report(
+        self,
+        data_dir: str | Path,
+        standard: str,
+        version: str,
+        output_stem: str | Path,
+        **kwargs: Any,
+    ) -> ParsedCoreReport:
+        """Run `core validate` (JSON) and parse the result into a `ParsedCoreReport`.
+
+        Accepts the same keyword arguments as `run_validate` (except `output_format`, which is
+        forced to `"JSON"`).
+        """
+        kwargs.pop("output_format", None)
+        report_path = self.run_validate(
+            data_dir=data_dir,
+            standard=standard,
+            version=version,
+            output_stem=output_stem,
+            output_format="JSON",
+            **kwargs,
+        )
+        with open(report_path) as f:
+            return parse_core_report(json.load(f))
