@@ -42,6 +42,8 @@ __all__ = [
     "CoreIssueSummary",
     "ParsedCoreReport",
     "parse_core_report",
+    "CoreNotFoundError",
+    "CoreExecutionError",
     "STATUS_SUCCESS",
     "STATUS_SKIPPED",
     "STATUS_ISSUE",
