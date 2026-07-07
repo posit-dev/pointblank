@@ -67,6 +67,12 @@ def _fake_runner(tmp_path: Path, exit_code: int = 0) -> _CoreRunner:
     return _CoreRunner(core=[sys.executable, str(script)])
 
 
+def _fake_core_cmd(tmp_path: Path) -> list:
+    """A `core=` command list (usable with validate_conformance) backed by the fake CORE."""
+    script = _make_fake_core(tmp_path, _FIXTURES / "core_report_trimmed.json")
+    return [sys.executable, str(script)]
+
+
 @pytest.fixture
 def full_report() -> dict:
     return _load("core_report_full.json")
