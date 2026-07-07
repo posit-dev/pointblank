@@ -1,4 +1,4 @@
-"""Parser for CDISC CORE engine JSON reports (PLAN_06 Phase 2, Path A).
+"""Parser for CDISC CORE engine JSON reports.
 
 Pointblank wraps the open-source CDISC CORE engine (`cdisc-rules-engine`) as an external process:
 datasets and Define-XML are handed to CORE, it runs the authoritative conformance rule set, and its
@@ -32,7 +32,8 @@ import json
 import os
 import shutil
 import subprocess
-from dataclasses import dataclass, field as dataclass_field
+from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from pathlib import Path
 from typing import Any, Sequence
 
