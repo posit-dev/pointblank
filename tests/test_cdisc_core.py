@@ -1,4 +1,4 @@
-"""Tests for the CDISC CORE JSON report parser and CORE-backed ConformanceReport (PLAN_06 Phase 2).
+"""Tests for the CDISC CORE JSON report parser and CORE-backed ConformanceReport.
 
 These tests run entirely against captured CORE report fixtures — no CORE engine dependency. The
 fixtures were produced by `core validate -s sdtmig -v 3-4 ... -of JSON` against CORE 0.16.0.
@@ -40,7 +40,7 @@ def _load(name: str) -> dict:
 
 # A stand-in for the CORE CLI: copies a source JSON to `<stem>.<ext>` and records its argv to
 # `<stem>.argv.json`, so tests can drive the runner and assert the built command — no real CORE.
-_FAKE_CORE_TEMPLATE = '''\
+_FAKE_CORE_TEMPLATE = """\
 import json, shutil, sys
 args = sys.argv[1:]
 def opt(flag):
@@ -52,7 +52,7 @@ with open(stem + ".argv.json", "w") as f:
     json.dump(args, f)
 shutil.copy({src!r}, stem + "." + ext)
 sys.exit({exit_code})
-'''
+"""
 
 
 def _make_fake_core(tmp_path: Path, src_json: Path, exit_code: int = 0) -> Path:
