@@ -511,3 +511,136 @@ def test_runner_launch_failure_raises(tmp_path):
             version="3.4",
             output_stem=tmp_path / "out",
         )
+
+
+# ── validate_conformance(engine="core") wiring ─────────────────────────────────
+
+
+def _dm_pkg():
+    import pointblank as pb
+
+    return pb.SubmissionPackage(
+        datasets={"DM": _dm_df()}, standard="sdtmig", standard_version="3.4"
+    )
+
+
+def test_validate_conformance_core_materializes_in_memory(tmp_path):
+    pytest.importorskip("pyreadstat")
+    rep = _dm_pkg().validate_conformance(
+        engine="core", agency="FDA", core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
+    )
+    assert rep.is_core is True
+    assert rep.agency == "FDA"
+    assert rep.summary()["standard"] == "SDTMIG"
+    # in-memory datasets were materialized to XPT for CORE
+    assert (tmp_path / "w" / "data" / "dm.xpt").exists()
+
+
+def test_validate_conformance_core_version_hyphenated(tmp_path):
+    pytest.importorskip("pyreadstat")
+    _dm_pkg().validate_conformance(
+        engine="core", core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
+    )
+    argv = json.loads((tmp_path / "w" / "core_report.argv.json").read_text())
+    assert argv[argv.index("-v") + 1] == "3-4"
+    assert argv[argv.index("-s") + 1] == "sdtmig"
+
+
+def test_validate_conformance_core_folder_passthrough(tmp_path):
+    import shutil
+
+    import pointblank as pb
+
+    folder = tmp_path / "study"
+    folder.mkdir()
+    shutil.copy(pb.load_metadata_example("dm.xpt"), folder / "dm.xpt")
+    shutil.copy(pb.load_metadata_example("define.xml"), folder / "define.xml")
+
+    pkg = pb.SubmissionPackage.from_folder(folder)
+    assert pkg.source_folder == str(folder)
+
+    rep = pkg.validate_conformance(
+        engine="core", core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
+    )
+    assert rep.is_core
+    argv = json.loads((tmp_path / "w" / "core_report.argv.json").read_text())
+    # CORE was pointed at the source folder directly, with define via -dxp
+    assert argv[argv.index("-d") + 1] == str(folder)
+    assert "-dxp" in argv
+
+
+def test_validate_conformance_rejects_bad_engine():
+    with pytest.raises(ValueError):
+        _dm_pkg().validate_conformance(engine="bogus")
+
+
+def test_validate_conformance_native_default_unchanged():
+    # engine defaults to native and yields a native report
+    rep = _dm_pkg().validate_conformance()
+    assert rep.is_core is False
+
+
+# ── validate_cdisc_submission() convenience entry point ─────────────────────────
+
+
+def test_validate_cdisc_submission_from_dict(tmp_path):
+    pytest.importorskip("pyreadstat")
+    import pointblank as pb
+
+    rep = pb.validate_cdisc_submission(
+        {"DM": _dm_df()},
+        standard="sdtmig",
+        version="3.4",
+        core=_fake_core_cmd(tmp_path),
+        workdir=tmp_path / "w",
+    )
+    assert rep.is_core
+    assert rep.summary()["n_rules"] == 12
+
+
+def test_validate_cdisc_submission_from_folder(tmp_path):
+    import shutil
+
+    import pointblank as pb
+
+    folder = tmp_path / "study"
+    folder.mkdir()
+    shutil.copy(pb.load_metadata_example("dm.xpt"), folder / "dm.xpt")
+
+    rep = pb.validate_cdisc_submission(
+        folder, core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
+    )
+    assert rep.is_core
+
+
+def test_validate_cdisc_submission_from_package(tmp_path):
+    pytest.importorskip("pyreadstat")
+    import pointblank as pb
+
+    pkg = _dm_pkg()
+    rep = pb.validate_cdisc_submission(
+        pkg, core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
+    )
+    assert rep.is_core
+    assert rep.package is pkg
+
+
+def test_validate_cdisc_submission_bad_type():
+    import pointblank as pb
+
+    with pytest.raises(TypeError):
+        pb.validate_cdisc_submission(12345)
+
+
+def test_validate_cdisc_submission_nonexistent_folder():
+    import pointblank as pb
+
+    with pytest.raises(NotADirectoryError):
+        pb.validate_cdisc_submission("/no/such/folder/here")
+
+
+def test_validate_cdisc_submission_exported():
+    import pointblank as pb
+
+    assert pb.validate_cdisc_submission is not None
+    assert "validate_cdisc_submission" in pb.__all__
