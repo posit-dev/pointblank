@@ -4,9 +4,16 @@ Pointblank wraps the open-source CDISC CORE engine (`cdisc-rules-engine`) as an 
 datasets and Define-XML are handed to CORE, it runs the authoritative conformance rule set, and its
 JSON report is parsed back into Pointblank's [`ConformanceReport`](`pointblank.ConformanceReport`).
 
-This module implements the *parsing* half — turning CORE's JSON report into typed objects. The
-subprocess runner and dataset materialization live elsewhere. The parser is written against the
-JSON schema emitted by `core validate -of JSON` (verified against CORE 0.16.0):
+This module implements:
+
+- the **parser** — turning CORE's JSON report into typed objects;
+- **dataset materialization** (`_write_xpt` / `_materialize_datasets`) — writing in-memory
+  DataFrames to a temp dir of SAS Transport (XPT) files that CORE can read; and
+- the **subprocess runner** (`_CoreRunner`) — discovering an installed CORE executable / command and
+  invoking its `validate` subcommand.
+
+The parser is written against the JSON schema emitted by `core validate -of JSON` (verified against
+CORE 0.16.0):
 
 - `Conformance_Details` — run provenance (standard, version, CT version, engine version, runtime).
 - `Dataset_Details` — one entry per validated dataset (filename, label, path, size, row count).
