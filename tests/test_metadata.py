@@ -707,7 +707,7 @@ class TestToValidate:
 
 
 # =============================================================================
-# Phase 2: Frictionless + CSVW Tests
+# Frictionless + CSVW Tests
 # =============================================================================
 
 
@@ -1473,7 +1473,7 @@ class TestJSONFormatDetection:
 
 
 # =============================================================================
-# Phase 3: CDISC Define-XML Tests
+# CDISC Define-XML Tests
 # =============================================================================
 
 
@@ -2024,7 +2024,7 @@ class TestCDISCImportMetadataIntegration:
 
 
 # =============================================================================
-# Phase 4: CDISC SDTM Domain Templates & Validation
+# CDISC SDTM Domain Templates & Validation
 # =============================================================================
 
 
@@ -2520,7 +2520,7 @@ class TestValidateSDTM:
 
 
 # =============================================================================
-# Phase 5: CDISC ADaM Templates & Validation
+# CDISC ADaM Templates & Validation
 # =============================================================================
 
 
