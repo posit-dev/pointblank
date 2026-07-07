@@ -25,7 +25,11 @@ from pointblank.metadata._cdisc_core import (
     parse_core_report,
 )
 from pointblank.metadata._sdtm_validate import sdtm_to_metadata, validate_sdtm
-from pointblank.metadata._submission import ConformanceReport, SubmissionPackage
+from pointblank.metadata._submission import (
+    ConformanceReport,
+    SubmissionPackage,
+    validate_cdisc_submission,
+)
 from pointblank.metadata._types import (
     Codelist,
     CodelistEntry,
@@ -61,6 +65,7 @@ __all__ = [
     "validate_adam",
     "SubmissionPackage",
     "ConformanceReport",
+    "validate_cdisc_submission",
     "CoreFinding",
     "CoreRuleResult",
     "CoreIssueSummary",

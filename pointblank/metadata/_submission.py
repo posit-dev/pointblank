@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field as dataclass_field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:
     from pointblank.metadata._cdisc_core import CoreFinding, CoreRuleResult, ParsedCoreReport
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 __all__ = [
     "SubmissionPackage",
     "ConformanceReport",
+    "validate_cdisc_submission",
 ]
 
 
@@ -203,6 +204,9 @@ class SubmissionPackage:
         # Normalize dataset keys to uppercase for consistent lookup.
         self.datasets = {str(k).upper(): v for k, v in self.datasets.items()}
         self._metadata: MetadataPackage | None = None
+        # Set by `from_folder`; lets the CORE engine read the on-disk datasets directly instead of
+        # re-materializing them.
+        self.source_folder: str | None = None
 
     # ── Construction ─────────────────────────────────────────────────────────
 
@@ -269,7 +273,7 @@ class SubmissionPackage:
         if define is None and define_in_folder is not None:
             define = define_in_folder
 
-        return cls(
+        package = cls(
             datasets=datasets,
             define=define,
             ct_version=ct_version,
@@ -277,6 +281,8 @@ class SubmissionPackage:
             standard_version=standard_version,
             study_id=study_id,
         )
+        package.source_folder = str(folder)
+        return package
 
     # ── Dataset graph accessors ──────────────────────────────────────────────
 
@@ -392,19 +398,28 @@ class SubmissionPackage:
     def validate_conformance(
         self,
         agency: str | None = None,
+        engine: str = "native",
         cross_dataset: bool = True,
         thresholds: Any = None,
         interrogate: bool = True,
+        *,
+        standard: str | None = None,
+        version: str | None = None,
+        controlled_terminology: str | Sequence[str] | None = None,
+        core: str | Sequence[str] | None = None,
+        core_cwd: str | Path | None = None,
+        cache: str | Path | None = None,
+        workdir: str | Path | None = None,
     ) -> ConformanceReport:
         """Validate CDISC conformance across the whole submission package.
 
-        For each dataset, this builds a Pointblank [`Validate`](`pointblank.Validate`) plan
-        combining:
+        Two engines are available:
 
-        - the existing single-dataset structural checks (via
-          [`validate_sdtm()`](`pointblank.validate_sdtm`) /
-          [`validate_adam()`](`pointblank.validate_adam`)), and
-        - cross-dataset conformance checks (when `cross_dataset=True`):
+        - **`"native"`** (default) — Pointblank's own checks. For each dataset this builds a
+          [`Validate`](`pointblank.Validate`) plan combining the single-dataset structural checks
+          (via [`validate_sdtm()`](`pointblank.validate_sdtm`) /
+          [`validate_adam()`](`pointblank.validate_adam`)) and cross-dataset conformance checks
+          (when `cross_dataset=True`):
             - **Referential integrity** — every `USUBJID` in a finding/events/interventions
               domain exists in DM.
             - **SUPP-- linkage** — `RDOMAIN` references a present domain, `USUBJID` exists in DM,
@@ -414,25 +429,69 @@ class SubmissionPackage:
             - **ADaM ⇄ SDTM traceability** — `ADSL.USUBJID ⊆ DM.USUBJID`, and every other
               ADaM dataset's `USUBJID ⊆ ADSL.USUBJID`.
 
+        - **`"core"`** — hands the package to the external CDISC CORE engine
+          (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests
+          its results. Datasets are materialized to XPT (or the source folder is used directly for
+          folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a
+          CORE-form `ConformanceReport`. Requires an installed CORE executable (see `core`).
+
         Parameters
         ----------
         agency
             Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base
             rules). Recorded on the report; agency-specific business rule sets are a later
             phase, so this currently affects labeling only.
+        engine
+            `"native"` (default) or `"core"`.
         cross_dataset
-            Whether to add cross-dataset conformance checks. Defaults to `True`.
+            (Native only.) Whether to add cross-dataset conformance checks. Defaults to `True`.
         thresholds
-            Optional thresholds passed to each dataset's `Validate` (maps failing test units
-            onto Pointblank's warning/error/critical severity model).
+            (Native only.) Optional thresholds passed to each dataset's `Validate` (maps failing
+            test units onto Pointblank's warning/error/critical severity model).
         interrogate
-            Whether to interrogate (run) the validations before returning. Defaults to `True`.
+            (Native only.) Whether to interrogate (run) the validations before returning.
+        standard
+            (CORE only.) Override the CDISC standard sent to CORE. Defaults to the package's
+            `standard` (e.g., `"sdtmig"`).
+        version
+            (CORE only.) Override the standard version. Defaults to the package's
+            `standard_version` (e.g., `"3.4"`, sent to CORE hyphenated).
+        controlled_terminology
+            (CORE only.) CT package name(s) for CORE's `-ct` (e.g., `"sdtmct-2024-03-29"`).
+        core
+            (CORE only.) How to invoke CORE — a path/name to the CORE executable, a full command
+            prefix (e.g., `["python", "core.py"]`), or `None` to auto-discover via the
+            `POINTBLANK_CDISC_CORE` environment variable and then `PATH`.
+        core_cwd
+            (CORE only.) Working directory to run CORE from; required when invoking a repo checkout
+            (CORE resolves its bundled `resources/` relative to the current directory).
+        cache
+            (CORE only.) Path to CORE's rules cache directory (`-ca`).
+        workdir
+            (CORE only.) Directory for materialized XPT and the CORE report. If `None`, a temporary
+            directory is used and cleaned up.
 
         Returns
         -------
         ConformanceReport
-            A report aggregating the per-dataset validations, keyed by dataset name.
+            A native-form report (per-dataset validations) or a CORE-form report, depending on
+            `engine`.
         """
+        if engine not in ("native", "core"):
+            raise ValueError(f"engine must be 'native' or 'core', got {engine!r}.")
+
+        if engine == "core":
+            return self._run_core_conformance(
+                agency=agency,
+                standard=standard,
+                version=version,
+                controlled_terminology=controlled_terminology,
+                core=core,
+                core_cwd=core_cwd,
+                cache=cache,
+                workdir=workdir,
+            )
+
         validations: dict[str, Validate] = {}
 
         for name in self.domains:
@@ -446,6 +505,60 @@ class SubmissionPackage:
             validations[name] = validation
 
         return ConformanceReport(validations=validations, package=self, agency=agency)
+
+    def _run_core_conformance(
+        self,
+        agency: str | None,
+        standard: str | None,
+        version: str | None,
+        controlled_terminology: str | Sequence[str] | None,
+        core: str | Sequence[str] | None,
+        core_cwd: str | Path | None,
+        cache: str | Path | None,
+        workdir: str | Path | None,
+    ) -> ConformanceReport:
+        """Run the CDISC CORE engine over the package and ingest its report."""
+        import tempfile
+
+        from pointblank.metadata._cdisc_core import _CoreRunner, _materialize_datasets
+
+        std = standard or self.standard
+        ver = version or self.standard_version
+        define_xml = self.define if isinstance(self.define, (str, Path)) else None
+
+        runner = _CoreRunner(core=core, cwd=core_cwd)
+
+        tmp: tempfile.TemporaryDirectory | None = None
+        if workdir is None:
+            tmp = tempfile.TemporaryDirectory(prefix="pb_cdisc_core_")
+            base = Path(tmp.name)
+        else:
+            base = Path(workdir)
+            base.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Prefer reading the on-disk datasets directly for folder-ingested packages; otherwise
+            # materialize the in-memory datasets to XPT.
+            if self.source_folder and Path(self.source_folder).is_dir():
+                data_dir: Path = Path(self.source_folder)
+            else:
+                data_dir = base / "data"
+                _materialize_datasets(self.datasets, data_dir)
+
+            parsed = runner.validate_to_report(
+                data_dir=data_dir,
+                standard=std,
+                version=ver,
+                output_stem=base / "core_report",
+                define_xml=define_xml,
+                controlled_terminology=controlled_terminology,
+                cache=cache,
+            )
+        finally:
+            if tmp is not None:
+                tmp.cleanup()
+
+        return ConformanceReport.from_core_report(parsed, package=self, agency=agency)
 
     def _build_dataset_validation(
         self,
@@ -1062,3 +1175,122 @@ class ConformanceReport:
 
     def __str__(self) -> str:
         return self.__repr__()
+
+
+# ── Module-level convenience entry point ──────────────────────────────────────
+
+
+def validate_cdisc_submission(
+    source: str | Path | dict | SubmissionPackage,
+    standard: str | None = None,
+    version: str | None = None,
+    define: str | Path | Any | None = None,
+    controlled_terminology: str | Sequence[str] | None = None,
+    agency: str | None = None,
+    ct_version: str | None = None,
+    study_id: str | None = None,
+    core: str | Sequence[str] | None = None,
+    core_cwd: str | Path | None = None,
+    cache: str | Path | None = None,
+    workdir: str | Path | None = None,
+) -> ConformanceReport:
+    """Validate a CDISC submission with the CDISC CORE engine, in one call.
+
+    Convenience wrapper that builds a [`SubmissionPackage`](`pointblank.SubmissionPackage`) from
+    `source` and runs [`validate_conformance()`](`pointblank.SubmissionPackage`) with
+    `engine="core"`. Requires an installed CORE executable (see `core`).
+
+    Parameters
+    ----------
+    source
+        The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON,
+        with an optional `define.xml`), a mapping of dataset name to DataFrame, or an already-built
+        `SubmissionPackage`.
+    standard
+        The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's `standard`
+        when `source` is a `SubmissionPackage`).
+    version
+        The standard version (e.g., `"3.4"`). Defaults to `"3.4"` (or the package's value).
+    define
+        Optional Define-XML path (ignored when `source` is a `SubmissionPackage` — set it on the
+        package instead). Auto-detected from a folder `source` when present.
+    controlled_terminology
+        CT package name(s) for CORE's `-ct` (e.g., `"sdtmct-2024-03-29"`).
+    agency
+        Optional agency rule-set selector recorded on the report.
+    ct_version
+        Optional Controlled Terminology version pin recorded on the package.
+    study_id
+        Optional study identifier.
+    core
+        How to invoke CORE — a path/name to the CORE executable, a full command prefix (e.g.,
+        `["python", "core.py"]`), or `None` to auto-discover via the `POINTBLANK_CDISC_CORE`
+        environment variable and then `PATH`.
+    core_cwd
+        Working directory to run CORE from; required when invoking a repo checkout.
+    cache
+        Path to CORE's rules cache directory (`-ca`).
+    workdir
+        Directory for materialized XPT and the CORE report. If `None`, a temporary directory is used.
+
+    Returns
+    -------
+    ConformanceReport
+        A CORE-form report (`is_core` is `True`).
+
+    Examples
+    --------
+    ```python
+    import pointblank as pb
+
+    report = pb.validate_cdisc_submission(
+        "study_xyz/sdtm/",
+        standard="sdtmig",
+        version="3.4",
+        agency="FDA",
+    )
+    report.summary()
+    ```
+    """
+    if isinstance(source, SubmissionPackage):
+        package = source
+    elif isinstance(source, dict):
+        package = SubmissionPackage(
+            datasets=source,
+            define=define,
+            standard=standard or "sdtmig",
+            standard_version=version or "3.4",
+            ct_version=ct_version,
+            study_id=study_id,
+        )
+    elif isinstance(source, (str, Path)):
+        folder = Path(source)
+        if not folder.is_dir():
+            raise NotADirectoryError(
+                f"Expected a folder of datasets, but '{folder}' is not a directory."
+            )
+        package = SubmissionPackage.from_folder(
+            folder,
+            define=define,
+            standard=standard or "sdtmig",
+            standard_version=version or "3.4",
+            ct_version=ct_version,
+            study_id=study_id,
+        )
+    else:
+        raise TypeError(
+            "source must be a folder path, a {name: DataFrame} mapping, or a SubmissionPackage; "
+            f"got {type(source).__name__}."
+        )
+
+    return package.validate_conformance(
+        engine="core",
+        agency=agency,
+        standard=standard,
+        version=version,
+        controlled_terminology=controlled_terminology,
+        core=core,
+        core_cwd=core_cwd,
+        cache=cache,
+        workdir=workdir,
+    )

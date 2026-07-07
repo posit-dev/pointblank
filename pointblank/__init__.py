@@ -83,6 +83,7 @@ from pointblank.metadata import (
     sdtm_to_metadata,
     validate_adam,
     validate_adam_structure,
+    validate_cdisc_submission,
     validate_sdtm,
     validate_sdtm_structure,
 )
@@ -222,4 +223,5 @@ __all__ = [
     # CDISC submission-package conformance
     "SubmissionPackage",
     "ConformanceReport",
+    "validate_cdisc_submission",
 ]
