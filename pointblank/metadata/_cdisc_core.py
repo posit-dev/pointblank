@@ -43,6 +43,15 @@ __all__ = [
     "STATUS_ERROR",
 ]
 
+# Environment variable naming the CORE executable / command to invoke.
+_CORE_ENV_VAR = "POINTBLANK_CDISC_CORE"
+
+# Executable names to probe on PATH during auto-discovery.
+_CORE_EXECUTABLE_NAMES = ("core", "cdisc-rules-engine")
+
+# File extension CORE appends to the `-o` output stem, keyed by output format.
+_OUTPUT_EXTENSIONS = {"JSON": "json", "XLSX": "xlsx", "CSV": "csv"}
+
 # Rule run-status values emitted by CORE in the `Rules_Report` section.
 STATUS_SUCCESS = "SUCCESS"  # rule ran, data conformed
 STATUS_SKIPPED = "SKIPPED"  # rule not applicable / required data absent
