@@ -28,8 +28,13 @@ gating therefore keys off rule *status*, not severity.
 
 from __future__ import annotations
 
+import json
+import os
+import shutil
+import subprocess
 from dataclasses import dataclass, field as dataclass_field
-from typing import Any
+from pathlib import Path
+from typing import Any, Sequence
 
 __all__ = [
     "CoreFinding",
