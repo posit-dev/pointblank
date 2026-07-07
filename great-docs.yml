@@ -414,10 +414,12 @@ reference:
         Validate an entire study submission package for CDISC conformance, spanning all datasets.
         Use `SubmissionPackage` to model a study as a graph of related datasets (with optional
         Define-XML and Controlled Terminology context) and `SubmissionPackage.validate_conformance()`
-        to run single-dataset structural checks plus cross-dataset checks (USUBJID referential
-        integrity, SUPP-- linkage, RELREC, and ADaM ⇄ SDTM traceability). Results are returned as a
-        `ConformanceReport`.
+        to run native single-dataset structural checks plus cross-dataset checks (USUBJID referential
+        integrity, SUPP-- linkage, RELREC, and ADaM ⇄ SDTM traceability). With `engine="core"` (or the
+        `validate_cdisc_submission()` shortcut) the package is handed to the external CDISC CORE engine
+        for the authoritative rule set. Results are returned as a `ConformanceReport`.
       contents:
+        - validate_cdisc_submission
         - name: SubmissionPackage
           members: true
         - name: ConformanceReport
