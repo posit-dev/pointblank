@@ -1111,6 +1111,178 @@ class ConformanceReport:
             return len(self.core.datasets)
         return len(self.validations)
 
+    def to_json(self, path: str | Path) -> Path:
+        """Save the conformance report as a JSON file.
+
+        For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`,
+        `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file
+        readable by anything that parses a standard CORE report. For native reports the file
+        contains `summary` and `issues` keys.
+
+        Parameters
+        ----------
+        path
+            Destination path (including filename). Parent directories are created if needed.
+
+        Returns
+        -------
+        Path
+            The path written.
+        """
+        import json
+
+        dest = Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
+        if self.is_core:
+            core = self.core
+            data: dict = {
+                "Conformance_Details": core.details,
+                "Dataset_Details": core.datasets,
+                "Issue_Summary": [
+                    {
+                        "dataset": s.dataset,
+                        "core_id": s.rule_id,
+                        "message": s.message,
+                        "issues": s.issues,
+                    }
+                    for s in core.issue_summary
+                ],
+                "Issue_Details": [
+                    {
+                        "core_id": f.rule_id,
+                        "message": f.message,
+                        "dataset": f.dataset,
+                        "executability": f.executability or "",
+                        "USUBJID": f.usubjid or "",
+                        "row": f.row,
+                        "SEQ": f.seq or "",
+                        "variables": f.variables,
+                        "values": f.values,
+                    }
+                    for f in core.findings
+                ],
+                "Rules_Report": [
+                    {
+                        "core_id": r.rule_id,
+                        "status": r.status,
+                        "message": r.message or "",
+                        "version": r.version or "",
+                        "cdisc_rule_id": r.cdisc_rule_id or "",
+                        "fda_rule_id": r.fda_rule_id or "",
+                    }
+                    for r in core.rules
+                ],
+            }
+        else:
+            data = {"summary": self.summary(), "issues": self.issues()}
+
+        with open(dest, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+        return dest
+
+    def to_excel(self, path: str | Path) -> Path:
+        """Save the conformance report as an Excel workbook.
+
+        For CORE reports the workbook contains sheets `Issue_Summary`, `Issue_Details`,
+        `Rules_Report`, and `Conformance_Details`. For native reports the workbook contains
+        `Issues` and `Summary`.
+
+        Requires the `openpyxl` package (`pip install openpyxl` or
+        `pip install 'pointblank[excel]'`).
+
+        Parameters
+        ----------
+        path
+            Destination path (including filename). Parent directories are created if needed.
+
+        Returns
+        -------
+        Path
+            The path written.
+
+        Raises
+        ------
+        ImportError
+            If `openpyxl` or `pandas` are not installed.
+        """
+        try:
+            import openpyxl  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "The 'openpyxl' package is required to export to Excel. "
+                "Install it with: pip install openpyxl"
+            ) from None
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError(
+                "The 'pandas' package is required to export to Excel. "
+                "Install it with: pip install pandas"
+            ) from None
+
+        dest = Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
+        with pd.ExcelWriter(dest, engine="openpyxl") as writer:
+            if self.is_core:
+                core = self.core
+                if core.issue_summary:
+                    pd.DataFrame(
+                        [
+                            {
+                                "Dataset": s.dataset,
+                                "Rule ID": s.rule_id,
+                                "Message": s.message,
+                                "Issues": s.issues,
+                            }
+                            for s in core.issue_summary
+                        ]
+                    ).to_excel(writer, sheet_name="Issue_Summary", index=False)
+                if core.findings:
+                    pd.DataFrame(
+                        [
+                            {
+                                "Rule ID": f.rule_id,
+                                "Message": f.message,
+                                "Dataset": f.dataset,
+                                "USUBJID": f.usubjid or "",
+                                "Row": f.row,
+                                "SEQ": f.seq or "",
+                                "Variables": ", ".join(str(v) for v in f.variables),
+                                "Values": ", ".join(str(v) for v in f.values),
+                            }
+                            for f in core.findings
+                        ]
+                    ).to_excel(writer, sheet_name="Issue_Details", index=False)
+                if core.rules:
+                    pd.DataFrame(
+                        [
+                            {
+                                "Rule ID": r.rule_id,
+                                "Status": r.status,
+                                "Message": r.message or "",
+                                "Version": r.version or "",
+                                "CDISC Rule ID": r.cdisc_rule_id or "",
+                                "FDA Rule ID": r.fda_rule_id or "",
+                            }
+                            for r in core.rules
+                        ]
+                    ).to_excel(writer, sheet_name="Rules_Report", index=False)
+                if core.details:
+                    pd.DataFrame(
+                        [{"Key": k, "Value": v} for k, v in core.details.items()]
+                    ).to_excel(writer, sheet_name="Conformance_Details", index=False)
+            else:
+                issues = self.issues()
+                if issues:
+                    pd.DataFrame(issues).to_excel(writer, sheet_name="Issues", index=False)
+                pd.DataFrame(
+                    [{"Dataset": name, **s} for name, s in self.summary().items()]
+                ).to_excel(writer, sheet_name="Summary", index=False)
+
+        return dest
+
     def _repr_html_(self) -> str:
         agency = f" — agency: {self.agency}" if self.agency else ""
 
