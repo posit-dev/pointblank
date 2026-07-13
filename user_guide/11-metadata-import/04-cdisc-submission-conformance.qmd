@@ -1,0 +1,729 @@
+---
+title: CDISC Submission Conformance
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Regulatory submissions require that every dataset in a study package passes CDISC conformance
+rules, not just individual structural checks on each domain in isolation. The submission as a
+whole must be internally consistent: every subject in an Adverse Events domain must appear in
+Demographics, every Supplemental Qualifier must resolve to a record in its parent domain, every
+ADaM dataset must trace back to ADSL, and several hundred rule engine checks must clear before
+FDA or PMDA will accept the package.
+
+Pointblank addresses this through the `SubmissionPackage` model, which treats the entire study
+as a graph of related datasets and runs conformance checks across that graph. Two validation
+engines are available:
+
+- **Native**: Pointblank's own cross-dataset checks for referential integrity, SUPP-- linkage,
+  RELREC resolution, and ADaM traceability. No external dependencies, runs in-process.
+
+- **CORE**: Delegates to the open-source
+  [CDISC CORE engine](https://github.com/cdisc-org/cdisc-rules-engine), which runs the
+  authoritative CDISC conformance rule set (430+ rules for SDTMIG 3.4). Requires the CORE
+  executable to be installed separately; Pointblank invokes it as a subprocess and ingests its
+  results.
+
+You can use both in the same workflow: native checks for fast feedback during development, CORE
+for the final pre-submission gate.
+
+## Prerequisites
+
+The `SubmissionPackage` and `ConformanceReport` classes require no additional dependencies
+beyond Pointblank itself. If you want to:
+
+- Read XPT files from a folder with `from_folder()`: install `pyreadstat`
+- Materialize in-memory DataFrames to XPT for the CORE engine: install `pyreadstat`
+- Export a report to Excel with `to_excel()`: install `openpyxl`
+
+```bash
+pip install pointblank[cdisc-core]   # adds pyreadstat
+pip install pointblank[excel]        # adds openpyxl
+```
+
+The CORE engine itself is not a Python dependency of Pointblank and must be installed
+separately. See [Installing the CDISC CORE Engine](#installing-the-cdisc-core-engine) below.
+
+## Native Cross-Dataset Validation
+
+### Building a Submission Package
+
+A `SubmissionPackage` groups the datasets of a study and understands the relationships between
+them. You construct one from a dictionary of domain names to DataFrames:
+
+```{python}
+import polars as pl
+import pointblank as pb
+
+dm = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN":  ["DM"] * 4,
+    "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003", "STUDY01-004"],
+    "SUBJID":  ["001", "002", "003", "004"],
+    "ARMCD":   ["A", "B", "A", "B"],
+    "ARM":     ["Arm A", "Arm B", "Arm A", "Arm B"],
+    "SEX":     ["M", "F", "M", "F"],
+    "RACE":    ["WHITE", "ASIAN", "WHITE", "BLACK OR AFRICAN AMERICAN"],
+    "COUNTRY": ["USA"] * 4,
+})
+
+ae = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 3,
+    "DOMAIN":  ["AE"] * 3,
+    "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+    "AESEQ":   [1, 1, 1],
+    "AETERM":  ["Headache", "Nausea", "Dizziness"],
+    "AESEV":   ["MILD", "MODERATE", "MILD"],
+})
+
+study = pb.SubmissionPackage(
+    datasets={"DM": dm, "AE": ae},
+    standard="sdtmig",
+    standard_version="3.4",
+    study_id="STUDY01",
+)
+
+print(study)
+```
+
+Dataset names are normalized to uppercase internally. You can access datasets by name and
+query the subject graph:
+
+```{python}
+print("Domains:", study.domains)
+print("Subjects in DM:", study.subject_ids("DM"))
+
+# Check whether a domain is present
+print("Has AE:", "AE" in study)
+print("Has LB:", "LB" in study)
+
+# Find subjects in AE that are not in DM (should be empty for clean data)
+print("Orphan USUBJIDs:", study.orphan_ids("AE", parent="DM"))
+```
+
+### Running Native Conformance Validation
+
+Calling `validate_conformance()` without any arguments runs the native engine. For each domain
+it builds a `Validate` plan combining SDTM structural checks with cross-dataset consistency
+checks, then interrogates them all at once:
+
+```{python}
+report = study.validate_conformance()
+print(report)
+```
+
+When every check passes the report shows `PASS` for each domain. The `all_passed()` method
+gives you a single boolean for use in scripts and pipelines:
+
+```{python}
+print("Passed:", report.all_passed())
+```
+
+### What the Cross-Dataset Checks Cover
+
+The native engine adds the following checks automatically when the relevant datasets are
+present:
+
+| Check | Condition |
+|---|---|
+| `USUBJID` referential integrity | Every domain with `USUBJID` is checked against `DM.USUBJID` |
+| SUPP-- `RDOMAIN` present | The referenced parent domain must exist in the package |
+| SUPP-- `USUBJID` in DM | Supplemental rows must link to a known subject |
+| SUPP-- `IDVAR/IDVARVAL` resolves | The sequence link must match a record in the parent domain |
+| RELREC `RDOMAIN` present | Every related-records row references a present domain |
+| ADSL traces to DM | `ADSL.USUBJID` must be a subset of `DM.USUBJID` |
+| ADaM traces to ADSL | Every other ADaM dataset's subjects must appear in ADSL |
+
+Each check is a `specially()` step in the per-dataset `Validate` plan, so the standard
+Pointblank failure drill-down workflow applies: you can see exactly which rows failed and why.
+
+### Catching Referential Integrity Problems
+
+Adding a subject who is not in DM to an AE domain is one of the most common conformance
+errors. The native engine catches it immediately:
+
+```{python}
+# Subject STUDY01-999 appears in AE but not in DM
+ae_with_orphan = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 3,
+    "DOMAIN":  ["AE"] * 3,
+    "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-999"],  # 999 is not in DM
+    "AESEQ":   [1, 1, 1],
+    "AETERM":  ["Headache", "Nausea", "Dizziness"],
+})
+
+study_with_orphan = pb.SubmissionPackage(
+    datasets={"DM": dm, "AE": ae_with_orphan},
+    study_id="STUDY01",
+)
+
+report = study_with_orphan.validate_conformance()
+print("Passed:", report.all_passed())
+
+# Drill into the specific issue
+for issue in report.issues():
+    print(f"  [{issue['dataset']}] step {issue['step']}: "
+          f"{issue['n_failed']} failing row(s)")
+```
+
+You can reach into the per-dataset `Validate` object directly to inspect individual steps:
+
+```{python}
+ae_validation = report["AE"]
+for step in ae_validation.validation_info:
+    if step.n_failed:
+        print(f"  Check: {step.brief}")
+        print(f"  Failed rows: {step.n_failed}")
+```
+
+### SUPP-- Linkage Checks
+
+Supplemental Qualifiers datasets (`SUPP--`) add non-standard variables to a parent domain. The
+native engine checks three things: the `RDOMAIN` column must reference a domain that exists in
+the package, the `USUBJID` must appear in DM, and the `IDVAR/IDVARVAL` combination must resolve
+to a record in the parent domain.
+
+```{python}
+suppae = pl.DataFrame({
+    "STUDYID":  ["STUDY01"],
+    "RDOMAIN":  ["AE"],            # must match a present domain
+    "USUBJID":  ["STUDY01-001"],   # must appear in DM
+    "IDVAR":    ["AESEQ"],         # column name in the parent AE dataset
+    "IDVARVAL": ["1"],             # value of that column; resolves to row 1 of AE
+    "QNAM":     ["AEACN"],
+    "QLABEL":   ["Action Taken"],
+    "QVAL":     ["DOSE REDUCED"],
+})
+
+study_with_supp = pb.SubmissionPackage(
+    datasets={"DM": dm, "AE": ae, "SUPPAE": suppae},
+    study_id="STUDY01",
+)
+
+report = study_with_supp.validate_conformance()
+print("Passed:", report.all_passed())
+```
+
+### ADaM Traceability
+
+For ADaM packages the native engine checks that every subject in ADSL traces to a record in DM,
+and that every other ADaM dataset's subjects trace to ADSL. These checks implement the
+"derivable from SDTM" principle at the subject level:
+
+```{python}
+adsl = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003", "STUDY01-004"],
+    "SUBJID":  ["001", "002", "003", "004"],
+    "TRT01P":  ["Arm A", "Arm B", "Arm A", "Arm B"],
+    "TRT01A":  ["Arm A", "Arm B", "Arm A", "Arm B"],
+    "AGE":     [45, 62, 38, 55],
+    "SEX":     ["M", "F", "M", "F"],
+    "RACE":    ["WHITE", "ASIAN", "WHITE", "BLACK OR AFRICAN AMERICAN"],
+    "COUNTRY": ["USA"] * 4,
+    "SAFFL":   ["Y", "Y", "Y", "Y"],
+    "ITTFL":   ["Y", "Y", "Y", "Y"],
+})
+
+adae = pl.DataFrame({
+    "STUDYID": ["STUDY01", "STUDY01"],
+    "USUBJID": ["STUDY01-001", "STUDY01-002"],
+    "AESEQ":   [1, 1],
+    "AETERM":  ["Headache", "Nausea"],
+    "TRTEMFL": ["Y", "Y"],
+})
+
+adam_study = pb.SubmissionPackage(
+    datasets={"DM": dm, "ADSL": adsl, "ADAE": adae},
+    standard="adamig",
+    standard_version="1.1",
+    study_id="STUDY01",
+)
+
+report = adam_study.validate_conformance()
+print("Passed:", report.all_passed())
+```
+
+### Disabling Cross-Dataset Checks
+
+Pass `cross_dataset=False` to run only the per-dataset structural checks without any graph
+traversal. This is useful when you want to understand the structural baseline before adding the
+relational rules:
+
+```{python}
+report = study_with_orphan.validate_conformance(cross_dataset=False)
+# The orphan subject is not flagged because referential checks are disabled
+print("Passed (structural only):", report.all_passed())
+```
+
+## Ingesting a Folder of Datasets
+
+If your study datasets live on disk as XPT files, use `from_folder()` to read them all at once.
+Pointblank reads every `.xpt` file in the folder and derives the domain name from the file stem.
+If a `define.xml` is present it is picked up automatically:
+
+```{python}
+#| eval: false
+study = pb.SubmissionPackage.from_folder(
+    "path/to/sdtm/",
+    standard="sdtmig",
+    standard_version="3.4",
+    study_id="STUDY01",
+)
+
+report = study.validate_conformance()
+```
+
+Dataset-JSON (`.json`) files in the Dataset-JSON 1.1 format are also supported alongside XPT.
+Pointblank reads both formats from the same folder.
+
+## Installing the CDISC CORE Engine
+
+The CDISC CORE engine runs the full authoritative conformance rule set. It is developed and
+maintained by CDISC as open-source software. Pointblank invokes it as an external subprocess;
+the engine is intentionally not a Python dependency so that version constraints do not conflict.
+
+### Option 1: Standalone Executable
+
+Download the pre-built standalone executable from the
+[CDISC CORE releases page](https://github.com/cdisc-org/cdisc-rules-engine/releases).
+The executable bundles the Python runtime and rules cache and requires no other installation.
+Place it somewhere on your `PATH` under the name `core`:
+
+```bash
+# On macOS/Linux, after downloading and making it executable:
+chmod +x core
+sudo mv core /usr/local/bin/
+
+# Verify:
+core --version
+```
+
+### Option 2: Docker
+
+CDISC publishes an official Docker image that includes the engine and its full rules cache:
+
+```bash
+docker pull cdisc/cdisc-rules-engine:latest
+
+# Run a validation (bind-mount your data directory):
+docker run --rm \
+    -v /path/to/study/data:/data \
+    cdisc/cdisc-rules-engine:latest \
+    validate -s sdtmig -v 3-4 -d /data -of JSON -o /data/report
+```
+
+### Option 3: Repo Checkout
+
+For development or to inspect CORE's source:
+
+```bash
+git clone https://github.com/cdisc-org/cdisc-rules-engine.git
+cd cdisc-rules-engine
+pip install -r requirements.txt
+python core.py --version
+```
+
+When using a repo checkout, CORE resolves its bundled rules cache relative to its current
+working directory. You must pass the repo root as `core_cwd` so Pointblank sets the subprocess
+working directory correctly.
+
+### Telling Pointblank Where to Find CORE
+
+Pointblank discovers CORE through three mechanisms, tried in order:
+
+1. An explicit `core=` argument to `validate_cdisc_submission()` or
+   `validate_conformance(engine="core")`.
+2. The `POINTBLANK_CDISC_CORE` environment variable. Set this to the path of the executable or
+   a full command prefix such as `"python /path/to/core.py"`.
+3. A `core` or `cdisc-rules-engine` executable on `PATH`.
+
+## Delegating to the CDISC CORE Engine
+
+### The One-Call Entry Point
+
+`validate_cdisc_submission()` is the simplest way to run a CORE validation. It accepts an
+in-memory dictionary of DataFrames, a folder path, or an existing `SubmissionPackage`:
+
+```{python}
+#| eval: false
+import polars as pl
+import pointblank as pb
+
+dm = pl.DataFrame({...})   # your DM dataset
+
+report = pb.validate_cdisc_submission(
+    {"DM": dm},
+    standard="sdtmig",
+    version="3.4",
+)
+
+print(report)
+```
+
+For a folder of XPT files:
+
+```{python}
+#| eval: false
+report = pb.validate_cdisc_submission(
+    "path/to/sdtm/",
+    standard="sdtmig",
+    version="3.4",
+    agency="FDA",
+)
+```
+
+### Using SubmissionPackage.validate_conformance()
+
+The same result with more control: build the package first, then choose the engine:
+
+```{python}
+#| eval: false
+study = pb.SubmissionPackage(
+    datasets={"DM": dm, "AE": ae},
+    standard="sdtmig",
+    standard_version="3.4",
+    study_id="STUDY01",
+)
+
+# Run the full CDISC CORE rule set
+core_report = study.validate_conformance(
+    engine="core",
+    agency="FDA",
+    controlled_terminology="sdtmct-2024-03-29",
+)
+```
+
+### How In-Memory Datasets Reach CORE
+
+When you pass DataFrames directly, Pointblank materializes them to SAS Transport (XPT) files in
+a temporary working directory, runs CORE against that directory, and then cleans up. For packages
+read with `from_folder()`, Pointblank skips the materialization step and passes the on-disk
+folder directly to CORE, which is faster and avoids any XPT conversion overhead.
+
+You can pin the working directory to avoid the cleanup and inspect the materialized files:
+
+```{python}
+#| eval: false
+report = study.validate_conformance(
+    engine="core",
+    workdir="/tmp/my_core_run",   # not cleaned up; inspect dm.xpt, ae.xpt, core_report.json
+)
+```
+
+### Repo-Checkout Invocation
+
+When using a CORE repo checkout, pass the command prefix and repo root:
+
+```{python}
+#| eval: false
+report = pb.validate_cdisc_submission(
+    {"DM": dm},
+    standard="sdtmig",
+    version="3.4",
+    core=["python", "/path/to/cdisc-rules-engine/core.py"],
+    core_cwd="/path/to/cdisc-rules-engine",
+    cache="/path/to/cdisc-rules-engine/resources/cache",
+)
+```
+
+Or configure once with environment variables and then call without any extra arguments:
+
+```bash
+export POINTBLANK_CDISC_CORE="python /path/to/core.py"
+export POINTBLANK_CDISC_CORE_CWD="/path/to/cdisc-rules-engine"
+```
+
+```{python}
+#| eval: false
+# Pointblank reads POINTBLANK_CDISC_CORE from the environment automatically
+report = pb.validate_cdisc_submission({"DM": dm}, standard="sdtmig", version="3.4")
+```
+
+## Working with a CORE ConformanceReport
+
+The examples that follow use a captured real report so that the code runs without requiring CORE
+to be installed in the docs environment. The structure is identical to what you get from a live
+CORE run.
+
+```{python}
+import json
+from pathlib import Path
+from pointblank.metadata import parse_core_report, ConformanceReport
+
+# Load a captured CORE 0.16.0 report (SDTMIG 3.4, 430 rules)
+_fixtures = Path(pb.__file__).parent.parent / "tests" / "metadata_fixtures" / "cdisc_core"
+raw = json.loads((_fixtures / "core_report_full.json").read_text())
+
+report = ConformanceReport.from_core_report(raw, agency="FDA")
+print(report)
+```
+
+### Checking the Overall Result
+
+```{python}
+# Single boolean for use in scripts and pipelines
+print("All passed:", report.all_passed())
+
+# Distinguish report types
+print("Is CORE report:", report.is_core)
+```
+
+### The Summary Dictionary
+
+`summary()` returns a high-level overview of the run: the standard and version CORE validated
+against, the engine version that produced the report, total rule count, per-status counts, total
+issue count, and the pass/fail verdict:
+
+```{python}
+s = report.summary()
+
+print(f"Standard:        {s['standard']} {s['version']}")
+print(f"Engine:          {s['engine_version']}")
+print(f"Rules evaluated: {s['n_rules']}")
+print(f"Total issues:    {s['n_issues']}")
+print()
+
+print("Rule status breakdown:")
+for status, count in sorted(s["status_counts"].items()):
+    print(f"  {status:20s}: {count}")
+```
+
+### Inspecting Issues
+
+`issues()` returns one record per (dataset, rule) pair that reported at least one issue. Each
+record includes the dataset name, rule ID, human-readable message, issue count, and the rule's
+run status:
+
+```{python}
+issues = report.issues()
+print(f"Issue entries: {len(issues)}")
+
+# Show the first few issues
+for issue in issues[:3]:
+    print()
+    print(f"  Dataset:  {issue['dataset']}")
+    print(f"  Rule:     {issue['rule_id']}")
+    print(f"  Message:  {issue['message']}")
+    print(f"  Issues:   {issue['issues']}")
+    print(f"  Status:   {issue['status']}")
+```
+
+You can filter by run status to focus on a specific category. The two failing statuses are
+`"ISSUE REPORTED"` (the rule ran and found a problem) and `"EXECUTION ERROR"` (the rule could
+not run):
+
+```{python}
+from pointblank.metadata._cdisc_core import STATUS_ISSUE, STATUS_ERROR
+
+# Rules that actually found conformance problems
+reported_issues = report.issues(status=STATUS_ISSUE)
+print(f"Rules with issues: {len(reported_issues)}")
+
+# Rules that failed to execute (data was missing something they expected)
+exec_errors = report.issues(status=STATUS_ERROR)
+print(f"Execution errors:  {len(exec_errors)}")
+for e in exec_errors:
+    print(f"  {e['rule_id']}: {e['message']}")
+```
+
+### Row-Level Findings
+
+`findings()` goes deeper: it returns the row-level detail from CORE's `Issue_Details` section.
+Each finding points to a specific dataset, row number, USUBJID, and the variable(s) that
+triggered the rule:
+
+```{python}
+from pointblank.metadata import CoreFinding
+
+findings = report.findings()
+print(f"Row-level findings: {len(findings)}")
+
+# Examine one finding in detail
+f = findings[0]
+print()
+print(f"Rule:          {f.rule_id}")
+print(f"Dataset:       {f.dataset}")
+print(f"Message:       {f.message}")
+print(f"Row:           {f.row}")
+print(f"USUBJID:       {f.usubjid}")
+print(f"Variables:     {f.variables}")
+print(f"Values:        {f.values}")
+```
+
+### Per-Rule Run Results
+
+`rules()` returns the complete `Rules_Report`: one `CoreRuleResult` per rule, with its run
+status, message, and the corresponding CDISC and FDA rule identifiers:
+
+```{python}
+from pointblank.metadata import CoreRuleResult
+from pointblank.metadata._cdisc_core import STATUS_SUCCESS, STATUS_SKIPPED
+
+all_rules = report.rules()
+print(f"Total rules: {len(all_rules)}")
+
+# Filter to rules that passed
+successful = report.rules(status=STATUS_SUCCESS)
+print(f"Successful:  {len(successful)}")
+
+# Filter to rules that were skipped (not applicable to this dataset)
+skipped = report.rules(status=STATUS_SKIPPED)
+print(f"Skipped:     {len(skipped)}")
+
+# Show one successful rule's metadata
+r = successful[0]
+print()
+print(f"Rule ID:        {r.rule_id}")
+print(f"Status:         {r.status}")
+print(f"Message:        {r.message}")
+print(f"CDISC rule ID:  {r.cdisc_rule_id}")
+print(f"FDA rule ID:    {r.fda_rule_id}")
+```
+
+Rules that are skipped are not failures. CORE skips rules when the dataset or variable they
+check is absent from the submission. A rule like "AE requires AESTDTC" is skipped if there is
+no AE domain in the package; that is expected behavior, not a problem.
+
+### Identifying Failing Rules
+
+The `is_failing` property on a `CoreRuleResult` is `True` when its status is either
+`"ISSUE REPORTED"` or `"EXECUTION ERROR"`:
+
+```{python}
+failing = [r for r in all_rules if r.is_failing]
+print(f"Failing rules: {len(failing)}")
+for r in failing:
+    print(f"  {r.rule_id:15s} [{r.status}]  {(r.message or '')[:60]}")
+```
+
+## Exporting Reports
+
+### JSON Export
+
+`to_json()` saves the report as a JSON file. For CORE reports the output mirrors the original
+CORE report structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`,
+`Issue_Details`, `Rules_Report`), so the file is parseable by `parse_core_report()` and by
+any other tool that understands CORE's JSON output:
+
+```{python}
+import tempfile
+from pathlib import Path
+
+with tempfile.TemporaryDirectory() as tmp:
+    dest = report.to_json(Path(tmp) / "conformance_report.json")
+    print(f"Written to: {dest.name}")
+    print(f"File size:  {dest.stat().st_size:,} bytes")
+
+    # Verify it round-trips cleanly
+    reloaded = json.loads(dest.read_text())
+    reparsed = parse_core_report(reloaded)
+    print(f"Rules after round-trip: {len(reparsed.rules)}")
+    print(f"Issues after round-trip: {reparsed.n_total_issues}")
+```
+
+For native reports the JSON file contains `summary` and `issues` keys, with the same content
+as `report.summary()` and `report.issues()`.
+
+### Excel Export
+
+`to_excel()` writes the report as an Excel workbook. Requires `openpyxl`:
+
+```{python}
+#| eval: false
+dest = report.to_excel("conformance_report.xlsx")
+```
+
+For CORE reports the workbook contains four sheets:
+
+| Sheet | Contents |
+|---|---|
+| `Issue_Summary` | One row per (dataset, rule) pair that reported issues |
+| `Issue_Details` | Row-level findings with USUBJID, row number, and variable values |
+| `Rules_Report` | All rules with their run status, CDISC rule ID, and FDA rule ID |
+| `Conformance_Details` | Run provenance: standard, version, engine version, timestamps |
+
+For native reports the workbook contains `Issues` and `Summary` sheets.
+
+## Setting the Agency
+
+Pass `agency="FDA"` or `agency="PMDA"` to record which regulatory context the validation was
+run for. The agency is stored on the `ConformanceReport` and appears in its text and HTML
+representations. Agency-specific business rule filtering is a later phase; this currently
+affects labeling only:
+
+```{python}
+#| eval: false
+fda_report = pb.validate_cdisc_submission(
+    {"DM": dm},
+    standard="sdtmig",
+    version="3.4",
+    agency="FDA",
+)
+print(fda_report.agency)  # "FDA"
+```
+
+## Using Both Engines in the Same Workflow
+
+The two engines complement each other. The native engine gives immediate feedback during
+development with no external dependencies. The CORE engine provides the authoritative check
+before submission:
+
+```{python}
+#| eval: false
+# Step 1: rapid iteration with the native engine
+study = pb.SubmissionPackage(
+    datasets={"DM": dm, "AE": ae},
+    study_id="STUDY01",
+)
+
+native_report = study.validate_conformance()
+if not native_report.all_passed():
+    print("Fix cross-dataset issues before running CORE:")
+    for issue in native_report.issues():
+        print(f"  [{issue['dataset']}] {issue['assertion']}: {issue['n_failed']} rows")
+    raise SystemExit(1)
+
+# Step 2: final gate with CORE
+core_report = study.validate_conformance(
+    engine="core",
+    agency="FDA",
+    controlled_terminology="sdtmct-2024-03-29",
+)
+
+if not core_report.all_passed():
+    failing = [r for r in core_report.rules() if r.is_failing]
+    print(f"CORE found {len(failing)} failing rules.")
+    core_report.to_json("core_report.json")
+    core_report.to_excel("core_report.xlsx")
+    raise SystemExit(1)
+
+print("Submission passed all conformance checks.")
+```
+
+## Running the Integration Tests
+
+Pointblank ships integration tests that run the full CORE pipeline against real data. They are
+marked with `@pytest.mark.cdisc_core` and are skipped automatically in environments where CORE
+is not discoverable:
+
+```bash
+# Run only when CORE is available on PATH:
+pytest -m cdisc_core
+
+# With a repo-checkout CORE, set env vars first:
+export POINTBLANK_CDISC_CORE="python /path/to/core.py"
+export POINTBLANK_CDISC_CORE_CWD="/path/to/cdisc-rules-engine"
+export POINTBLANK_CDISC_CORE_CACHE="/path/to/cdisc-rules-engine/resources/cache"
+pytest -m cdisc_core
+```
+
+The tests live in `tests/test_cdisc_core_integration.py` and exercise the full pipeline
+including folder passthrough, all report accessors, and both export formats.
