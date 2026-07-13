@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:
     from pointblank.metadata._cdisc_core import CoreFinding, CoreRuleResult, ParsedCoreReport
+    from pointblank.metadata._conformance.result import NativeConformanceResult, NativeRowFinding, NativeRuleResult
     from pointblank.metadata._types import MetadataPackage
     from pointblank.validate import Validate
 
@@ -405,6 +406,7 @@ class SubmissionPackage:
         *,
         standard: str | None = None,
         version: str | None = None,
+        ct_packages: list[str] | None = None,
         controlled_terminology: str | Sequence[str] | None = None,
         core: str | Sequence[str] | None = None,
         core_cwd: str | Path | None = None,
@@ -477,8 +479,8 @@ class SubmissionPackage:
             A native-form report (per-dataset validations) or a CORE-form report, depending on
             `engine`.
         """
-        if engine not in ("native", "core"):
-            raise ValueError(f"engine must be 'native' or 'core', got {engine!r}.")
+        if engine not in ("native", "core", "validate"):
+            raise ValueError(f"engine must be 'native', 'validate', or 'core', got {engine!r}.")
 
         if engine == "core":
             return self._run_core_conformance(
@@ -492,6 +494,18 @@ class SubmissionPackage:
                 workdir=workdir,
             )
 
+        # engine="validate" always uses the Validate-based approach (cross-dataset checks).
+        if engine != "validate":
+            # Try the rule-based native engine first (requires a bundled catalog).
+            std = standard or self.standard
+            ver = version or self.standard_version
+            rules_report = self._run_rules_conformance(
+                agency=agency, standard=std, version=ver, ct_packages=ct_packages
+            )
+            if rules_report is not None:
+                return rules_report
+
+        # Fallback (or engine="validate"): Validate-based approach with cross-dataset checks.
         validations: dict[str, Validate] = {}
 
         for name in self.domains:
@@ -505,6 +519,26 @@ class SubmissionPackage:
             validations[name] = validation
 
         return ConformanceReport(validations=validations, package=self, agency=agency)
+
+    def _run_rules_conformance(
+        self,
+        agency: str | None,
+        standard: str,
+        version: str,
+        ct_packages: list[str] | None,
+    ) -> ConformanceReport | None:
+        """Run the native rule-based engine; returns None if no catalog is bundled."""
+        from pointblank.metadata._conformance.engine import NativeConformanceEngine
+        from pointblank.metadata._conformance.rule_loader import RuleLoader
+
+        if not RuleLoader.catalog_path(standard, version).exists():
+            return None
+
+        engine = NativeConformanceEngine(
+            standard=standard, version=version, ct_packages=ct_packages
+        )
+        result = engine.run(self.datasets)
+        return ConformanceReport(native_result=result, package=self, agency=agency)
 
     def _run_core_conformance(
         self,
@@ -906,6 +940,7 @@ class ConformanceReport:
     package: SubmissionPackage | None = None
     agency: str | None = None
     core: ParsedCoreReport | None = None
+    native_result: NativeConformanceResult | None = None
 
     # ── Construction ─────────────────────────────────────────────────────────
 
@@ -943,6 +978,11 @@ class ConformanceReport:
         """Whether this report wraps CDISC CORE engine results (vs. native validations)."""
         return self.core is not None
 
+    @property
+    def is_rules(self) -> bool:
+        """Whether this report was produced by the native rule-based conformance engine."""
+        return self.native_result is not None
+
     def all_passed(self) -> bool:
         """Whether the run reported no conformance failures.
 
@@ -952,6 +992,8 @@ class ConformanceReport:
         """
         if self.is_core:
             return self.core.all_passed
+        if self.is_rules:
+            return self.native_result.all_passed
         return all(v.all_passed() for v in self.validations.values())
 
     def __getitem__(self, name: str) -> Validate:
@@ -983,11 +1025,25 @@ class ConformanceReport:
                 "standard": core.standard,
                 "version": core.version,
                 "engine_version": core.engine_version,
+                "engine": "core",
                 "n_rules": len(core.rules),
                 "status_counts": core.status_counts(),
                 "n_issues": core.n_total_issues,
                 "n_datasets": len(core.datasets),
                 "all_passed": core.all_passed,
+            }
+
+        if self.is_rules:
+            nr = self.native_result
+            return {
+                "standard": nr.standard,
+                "version": nr.version,
+                "engine": "native",
+                "ct_packages": nr.ct_packages,
+                "n_rules": len(nr.rule_results),
+                "status_counts": nr.status_counts(),
+                "n_issues": nr.n_total_issues,
+                "all_passed": nr.all_passed,
             }
 
         out: dict[str, dict] = {}
@@ -1026,6 +1082,9 @@ class ConformanceReport:
             For a **CORE** report, one dict per (dataset, rule) with reported issues, with keys
             `dataset`, `rule_id`, `message`, `issues` (count), and `status`.
         """
+        if self.is_rules:
+            return self.native_result.issues()
+
         if self.is_core:
             # Look up each rule's run status by rule id.
             status_by_rule = {r.rule_id: r.status for r in self.core.rules}
@@ -1073,42 +1132,47 @@ class ConformanceReport:
                 )
         return issues
 
-    def findings(self) -> list[CoreFinding]:
-        """Return the row-level CORE findings (CORE reports only).
+    def findings(self):
+        """Return the row-level findings.
 
-        Returns
-        -------
-        list[CoreFinding]
-            The row-level findings from CORE's `Issue_Details`, or an empty list for native
-            reports.
+        For CORE reports, returns `CoreFinding` objects from CORE's `Issue_Details`.
+        For native rule reports, returns `NativeRowFinding` objects.
+        For Validate-based native reports, returns an empty list.
         """
-        return list(self.core.findings) if self.is_core else []
+        if self.is_core:
+            return list(self.core.findings)
+        if self.is_rules:
+            return self.native_result.findings()
+        return []
 
-    def rules(self, status: str | None = None) -> list[CoreRuleResult]:
-        """Return the per-rule run results (CORE reports only).
+    def rules(self, status: str | None = None):
+        """Return the per-rule run results.
+
+        For CORE reports, returns `CoreRuleResult` objects.
+        For native rule reports, returns `NativeRuleResult` objects.
+        For Validate-based native reports, returns an empty list.
 
         Parameters
         ----------
         status
-            Optional status filter (e.g. `"SUCCESS"`, `"SKIPPED"`, `"ISSUE REPORTED"`,
-            `"EXECUTION ERROR"`). If `None`, all rules are returned.
-
-        Returns
-        -------
-        list[CoreRuleResult]
-            The per-rule results from CORE's `Rules_Report`, or an empty list for native reports.
+            Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For native rules:
+            `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, `"not_supported"`.
         """
-        if not self.is_core:
-            return []
-        if status is None:
-            return list(self.core.rules)
-        return [r for r in self.core.rules if r.status == status]
+        if self.is_core:
+            if status is None:
+                return list(self.core.rules)
+            return [r for r in self.core.rules if r.status == status]
+        if self.is_rules:
+            return self.native_result.rules(status=status)
+        return []
 
     @property
     def n_datasets(self) -> int:
         """Number of datasets validated."""
         if self.is_core:
             return len(self.core.datasets)
+        if self.is_rules and self.package is not None:
+            return len(self.package.datasets)
         return len(self.validations)
 
     def to_json(self, path: str | Path) -> Path:
@@ -1273,6 +1337,29 @@ class ConformanceReport:
                     pd.DataFrame(
                         [{"Key": k, "Value": v} for k, v in core.details.items()]
                     ).to_excel(writer, sheet_name="Conformance_Details", index=False)
+            elif self.is_rules:
+                nr = self.native_result
+                pd.DataFrame(
+                    [
+                        {
+                            "Rule ID": r.rule_id,
+                            "Rule Type": r.rule_type,
+                            "Dataset": r.dataset,
+                            "Status": r.status,
+                            "Sensitivity": r.sensitivity,
+                            "Issues": r.n_issues,
+                            "Message": r.message or r.description,
+                        }
+                        for r in nr.rule_results
+                    ]
+                ).to_excel(writer, sheet_name="Rules_Report", index=False)
+                issues = self.issues()
+                if issues:
+                    pd.DataFrame(issues).to_excel(writer, sheet_name="Issues", index=False)
+                s = self.summary()
+                pd.DataFrame(
+                    [{"Key": k, "Value": str(v)} for k, v in s.items()]
+                ).to_excel(writer, sheet_name="Summary", index=False)
             else:
                 issues = self.issues()
                 if issues:
@@ -1285,6 +1372,34 @@ class ConformanceReport:
 
     def _repr_html_(self) -> str:
         agency = f" — agency: {self.agency}" if self.agency else ""
+
+        if self.is_rules:
+            nr = self.native_result
+            parts = [f"<h2>CDISC Conformance Report (Native Rules){agency}</h2>"]
+            status = "PASS" if nr.all_passed else "FAIL"
+            parts.append(
+                f"<p><strong>{nr.standard} {nr.version}</strong> — "
+                f"<strong>{status}</strong></p>"
+            )
+            counts = nr.status_counts()
+            parts.append("<ul>")
+            for st, n in sorted(counts.items()):
+                parts.append(f"<li>{st}: {n}</li>")
+            parts.append(f"<li><strong>Total issues:</strong> {nr.n_total_issues}</li>")
+            parts.append("</ul>")
+            failing = [r for r in nr.rule_results if r.n_issues > 0]
+            if failing:
+                parts.append(
+                    "<table><tr><th>Dataset</th><th>Rule</th>"
+                    "<th>Issues</th><th>Message</th></tr>"
+                )
+                for r in failing:
+                    parts.append(
+                        f"<tr><td>{r.dataset}</td><td>{r.rule_id}</td>"
+                        f"<td>{r.n_issues}</td><td>{r.message or r.description}</td></tr>"
+                    )
+                parts.append("</table>")
+            return "\n".join(parts)
 
         if self.is_core:
             core = self.core
@@ -1323,6 +1438,19 @@ class ConformanceReport:
         return "\n".join(parts)
 
     def __repr__(self) -> str:
+        if self.is_rules:
+            nr = self.native_result
+            lines = ["ConformanceReport (Native Rules)"]
+            if self.agency:
+                lines.append(f"  Agency: {self.agency}")
+            lines.append(f"  {nr.standard} {nr.version}")
+            status = "PASS" if nr.all_passed else "FAIL"
+            counts = nr.status_counts()
+            counts_str = ", ".join(f"{k}={v}" for k, v in sorted(counts.items()))
+            lines.append(f"  {len(nr.rule_results)} rules ({counts_str})")
+            lines.append(f"  {nr.n_total_issues} issues — {status}")
+            return "\n".join(lines)
+
         if self.is_core:
             core = self.core
             lines = ["ConformanceReport (CORE)"]
