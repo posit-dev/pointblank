@@ -18748,7 +18748,7 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=20, seed=5))
 ```
 
-float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
+float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, precision: 'int | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
 
 Create a floating-point column specification for use in a schema.
 
@@ -18772,6 +18772,9 @@ max_val
 allowed
     List of allowed values (categorical constraint). When provided, values are sampled from
     this list. Cannot be combined with `min_val=`/`max_val=`.
+precision
+    Number of decimal places to round generated values to. Default is `None` (no rounding).
+    Must be a non-negative integer. Has no effect when `allowed=` or `generator=` is used.
 nullable
     Whether the column can contain null values. Default is `False`.
 null_probability
@@ -18795,8 +18798,8 @@ Raises
 ------
 ValueError
     If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
-    `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
-    float type.
+    `null_probability` is not between `0.0` and `1.0`, if `precision` is negative,
+    or if `dtype` is not a valid float type.
 
 Examples
 --------
@@ -18837,7 +18840,20 @@ schema = pb.Schema(
     calibration=pb.float_field(min_val=0.9, max_val=1.1),
 )
 
-pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+```
+
+Use `precision=` to round generated values to a fixed number of decimal places. This is useful
+for prices, scores, or any measurement where full floating-point precision is unwanted:
+
+```{python}
+schema = pb.Schema(
+    price=pb.float_field(min_val=1.0, max_val=200.0, precision=2),
+    score=pb.float_field(min_val=0.0, max_val=100.0, precision=1),
+    probability=pb.float_field(min_val=0.0, max_val=1.0, precision=4),
+)
+
+pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 ```
 
 Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
@@ -18853,7 +18869,7 @@ schema = pb.Schema(
     log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
 )
 
-pb.preview(pb.generate_dataset(schema, n=20, seed=99))
+pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 ```
 
 string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, pattern: 'str | None' = None, preset: 'str | None' = None, allowed: 'list[str] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'StringField'

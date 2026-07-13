@@ -125,6 +125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
 
+  <link rel="alternate" type="text/markdown" href="quality-dimensions-and-scoring.md">
   <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html">
   <meta name="description" content="Beyond knowing which validation steps passed or failed, it’s often useful to understand data quality along broad, well-understood dimensions...">
   <meta property="og:type" content="website">
@@ -179,7 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="453" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="454" data-forks="28"></div>
     </span>
   </li>  
 </ul>
@@ -644,7 +645,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dimensions-in-the-validation-report" class="level1">
 <h1>Dimensions in the Validation Report</h1>
 <p>The dimension display in the validation report is <strong>opt-in</strong>: pass <code>incl_dimensions=True</code> to <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> (or set it globally with <code>pb.config(report_incl_dimensions=True)</code>). Consider a validation of some sales data that touches several dimensions:</p>
-<div id="4b5d5a98" class="cell" data-execution_count="2">
+<div id="8eea6711" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1035,7 +1036,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><style>@keyframes pb-health-pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 var(--pb-glow-color);}50%{transform:scale(var(--pb-scale));box-shadow:0 0 var(--pb-glow) 1px var(--pb-glow-color);}}</style><div style="padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;"><span style="font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;">Health Score</span><span style="display: inline-block; padding: 1px 9px; border-radius: 5px; background-color: #A15C00; color: #FFFFFF; font-weight: 700; font-size: 13px; vertical-align: middle; --pb-scale: 1.076; --pb-glow: 16px; --pb-glow-color: #A15C00; animation: pb-health-pulse 0.95s ease-in-out infinite;">84%</span><div style="padding-top: 3px;"><span style="font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;">Dimension Scores</span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #3C6E9A; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Completeness</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">90%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #4E9A6B; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Validity</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">83.33%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #8E6FB5; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Uniqueness</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">80%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #7A7A8C; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Volume</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">100%</span></span></div></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-03 20:39:11 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-03 20:39:11 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><style>@keyframes pb-health-pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 var(--pb-glow-color);}50%{transform:scale(var(--pb-scale));box-shadow:0 0 var(--pb-glow) 1px var(--pb-glow-color);}}</style><div style="padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;"><span style="font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;">Health Score</span><span style="display: inline-block; padding: 1px 9px; border-radius: 5px; background-color: #A15C00; color: #FFFFFF; font-weight: 700; font-size: 13px; vertical-align: middle; --pb-scale: 1.076; --pb-glow: 16px; --pb-glow-color: #A15C00; animation: pb-health-pulse 0.95s ease-in-out infinite;">84%</span><div style="padding-top: 3px;"><span style="font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;">Dimension Scores</span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #3C6E9A; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Completeness</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">90%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #4E9A6B; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Validity</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">83.33%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #8E6FB5; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Uniqueness</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">80%</span></span><span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;"><span style="background-color: #7A7A8C; color: #FFFFFF; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; display: inline-block; vertical-align: middle;">Volume</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #444444; padding-left: 5px; vertical-align: middle;">100%</span></span></div></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-13 19:01:42 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-13 19:01:42 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
@@ -1051,7 +1052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="overriding-a-steps-dimension" class="level1">
 <h1>Overriding a Step’s Dimension</h1>
 <p>Automatic inference covers the common cases, but you can set a dimension explicitly with the <code>dimension=</code> parameter on any validation method. This is useful for multi-faceted checks. For example, treating a particular range check as a <em>consistency</em> rule rather than plain validity:</p>
-<div id="337fa093" class="cell" data-execution_count="3">
+<div id="f9f4c7c2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation_override <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>sales, tbl_name<span class="op">=</span><span class="st">"sales"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>, dimension<span class="op">=</span><span class="st">"consistency"</span>)</span>
@@ -1064,7 +1065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>You can also remap dimensions globally (for every step of a given type) with <a href="`pointblank.config`"><code>config()</code></a>:</p>
-<div id="dd27fff2" class="cell" data-execution_count="4">
+<div id="24e7092c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.config(dimension_map<span class="op">=</span>{<span class="st">"col_vals_gt"</span>: <span class="st">"consistency"</span>})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Now `col_vals_gt` steps are categorized as "consistency" everywhere</span></span>
@@ -1088,13 +1089,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="health-scores" class="level1">
 <h1>Health Scores</h1>
 <p>After interrogation, two methods surface the scores:</p>
-<div id="a5e8f63d" class="cell" data-execution_count="5">
+<div id="349d6ff4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.get_dimension_scores()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>{'completeness': 90.0, 'validity': 83.33, 'uniqueness': 80.0, 'volume': 100.0}</code></pre>
 </div>
 </div>
-<div id="445e85c8" class="cell" data-execution_count="6">
+<div id="065f7bb3" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.get_health_score()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>84.31</code></pre>
@@ -1117,7 +1118,7 @@ Note
 <section id="weighting-dimensions" class="level2">
 <h2 class="anchored" data-anchor-id="weighting-dimensions">Weighting Dimensions</h2>
 <p>Some organizations consider certain dimensions more critical than others. Provide per-dimension weights with <code>config(dimension_weights=...)</code> to scale each dimension’s contribution to the overall score (a dimension not listed keeps a weight of <code>1.0</code>):</p>
-<div id="ddef7660" class="cell" data-execution_count="7">
+<div id="dc27272c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pb.config(dimension_weights<span class="op">=</span>{<span class="st">"completeness"</span>: <span class="fl">3.0</span>})</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>validation_weighted <span class="op">=</span> (</span>
@@ -1141,7 +1142,7 @@ Note
 <section id="the-scorecard" class="level1">
 <h1>The Scorecard</h1>
 <p>For a compact, standalone summary (well suited to dashboards or an executive overview) use <a href="../../reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard" class="gdls-link"><code>get_scorecard()</code></a>. It shows the overall health score prominently along with a per-dimension breakdown (a color-coded bar, the score, and passing/total test units):</p>
-<div id="47dd690b" class="cell" data-execution_count="8">
+<div id="a49c17ba" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>validation.get_scorecard()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_scorecard" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1258,7 +1259,7 @@ Note
 <section id="enforcing-minimum-scores" class="level1">
 <h1>Enforcing Minimum Scores</h1>
 <p>In automated pipelines and CI you often want to <em>fail the run</em> when a dimension slips below an acceptable level. Call <a href="../../reference/Validate.assert_dimension_scores.html#pointblank.Validate.assert_dimension_scores" class="gdls-link"><code>assert_dimension_scores()</code></a> with per-dimension minimums; it raises an <code>AssertionError</code> if any dimension is below its minimum (here, uniqueness is <code>80%</code>):</p>
-<div id="039edfc1" class="cell" data-execution_count="9">
+<div id="05721d61" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_dimension_scores(thresholds<span class="op">=</span>{<span class="st">"uniqueness"</span>: <span class="dv">95</span>})</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span> <span class="im">as</span> e:</span>
@@ -1268,7 +1269,7 @@ Note
 </div>
 </div>
 <p>Dimensions present in the thresholds but absent from the validation are ignored, and a call where every dimension meets its minimum simply returns without raising. You can also set the minimums globally with <code>config(dimension_thresholds=...)</code>, and then call the method without arguments:</p>
-<div id="a46b15c5" class="cell" data-execution_count="10">
+<div id="7e2a18de" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pb.config(dimension_thresholds<span class="op">=</span>{<span class="st">"completeness"</span>: <span class="dv">95</span>})</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
@@ -1288,7 +1289,7 @@ Note
 <section id="accessing-scores-programmatically" class="level1">
 <h1>Accessing Scores Programmatically</h1>
 <p>The scores are also included in the summary available to <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> via <a href="../../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a>, under the <code>dimension_scores</code> and <code>overall_health_score</code> keys. This makes it easy to log or trend the health score over time:</p>
-<div id="4eca75d2" class="cell" data-execution_count="11">
+<div id="fb29a185" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_health():</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Overall health score: </span><span class="sc">{</span>summary[<span class="st">'overall_health_score'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1389,7 +1390,7 @@ By dimension: {'completeness': 90.0, 'validity': 70.0}</code></pre>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-03|20:39:11</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-13|19:01:43</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1494,7 +1495,7 @@ By dimension: {'completeness': 90.0, 'validity': 70.0}</code></pre>
     <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGFtb3VudCxlbWFpbCxzdGF0dXMKMiwyLC01LjAsaW52YWxpZCxwYWlkCjQsNCwwLjAsZEBleC5jb20scGFpZAoxMCwxMCwsakBleC5jb20scGFpZAo=" download="extract_0002.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-03 20:39:11 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-03 20:39:11 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-13 19:01:43 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-13 19:01:43 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
