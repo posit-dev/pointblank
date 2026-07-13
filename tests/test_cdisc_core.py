@@ -273,11 +273,12 @@ def test_trimmed_fixture_is_internally_consistent(trimmed_report):
 # ── Native/CORE separation ─────────────────────────────────────────────────────
 
 
-def test_native_report_findings_rules_empty():
-    # A native (non-CORE) report returns empty CORE accessors and is_core False.
+def test_native_rules_report_properties():
+    # A native rules-engine report: is_core False, is_rules True, has rule results.
     import pandas as pd
 
     import pointblank as pb
+    from pointblank.metadata._conformance.result import NativeRuleResult
 
     dm = pd.DataFrame(
         {
@@ -292,8 +293,13 @@ def test_native_report_findings_rules_empty():
     )
     rep = pb.SubmissionPackage(datasets={"DM": dm}).validate_conformance()
     assert rep.is_core is False
-    assert rep.findings() == []
-    assert rep.rules() == []
+    assert rep.is_rules is True
+    # findings() returns a list (may be empty for clean data)
+    assert isinstance(rep.findings(), list)
+    # rules() returns NativeRuleResult objects
+    rules = rep.rules()
+    assert len(rules) > 0
+    assert all(isinstance(r, NativeRuleResult) for r in rules)
 
 
 # ── Dataset materialization (_write_xpt / _materialize_datasets) ────────────────
@@ -698,9 +704,13 @@ def test_to_json_native(tmp_path):
     dest = rep.to_json(tmp_path / "native_report.json")
     assert dest.exists()
     data = json.loads(dest.read_text())
+    # Rules-engine native report has flat summary and issues list.
     assert "summary" in data
     assert "issues" in data
-    assert "DM" in data["summary"]
+    s = data["summary"]
+    assert s["engine"] == "native"
+    assert "standard" in s
+    assert "n_rules" in s
 
 
 def test_to_excel_core_sheets(tmp_path, full_report):
@@ -744,6 +754,8 @@ def test_to_excel_native(tmp_path):
     dest = rep.to_excel(tmp_path / "native_report.xlsx")
     assert dest.exists()
     wb = openpyxl.load_workbook(dest)
+    # Rules-engine native report produces Rules_Report and Summary sheets.
+    assert "Rules_Report" in wb.sheetnames
     assert "Summary" in wb.sheetnames
 
 
