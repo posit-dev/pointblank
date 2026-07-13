@@ -644,3 +644,120 @@ def test_validate_cdisc_submission_exported():
 
     assert pb.validate_cdisc_submission is not None
     assert "validate_cdisc_submission" in pb.__all__
+
+
+# ── ConformanceReport export methods ──────────────────────────────────────────
+
+
+def test_to_json_core_structure(tmp_path, full_report):
+    rep = ConformanceReport.from_core_report(full_report)
+    dest = rep.to_json(tmp_path / "report.json")
+    assert dest.exists()
+    import json
+
+    data = json.loads(dest.read_text())
+    assert "Conformance_Details" in data
+    assert "Issue_Summary" in data
+    assert "Issue_Details" in data
+    assert "Rules_Report" in data
+    assert len(data["Rules_Report"]) == 430
+    assert all("core_id" in r for r in data["Rules_Report"])
+
+
+def test_to_json_core_roundtrips_through_parser(tmp_path, full_report):
+    rep = ConformanceReport.from_core_report(full_report)
+    dest = rep.to_json(tmp_path / "report.json")
+    import json
+
+    from pointblank.metadata import parse_core_report
+
+    reparsed = parse_core_report(json.loads(dest.read_text()))
+    assert reparsed.standard == rep.core.standard
+    assert len(reparsed.rules) == len(rep.core.rules)
+    assert reparsed.n_total_issues == rep.core.n_total_issues
+
+
+def test_to_json_core_creates_parent_dirs(tmp_path, trimmed_report):
+    rep = ConformanceReport.from_core_report(trimmed_report)
+    dest = rep.to_json(tmp_path / "nested" / "dir" / "report.json")
+    assert dest.exists()
+
+
+def test_to_json_native(tmp_path):
+    import json
+
+    import pandas as pd
+
+    import pointblank as pb
+
+    dm = pd.DataFrame(
+        {"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"],
+         "SUBJID": ["001"], "ARMCD": ["A"], "ARM": ["A"], "COUNTRY": ["USA"]}
+    )
+    rep = pb.SubmissionPackage(datasets={"DM": dm}).validate_conformance()
+    dest = rep.to_json(tmp_path / "native_report.json")
+    assert dest.exists()
+    data = json.loads(dest.read_text())
+    assert "summary" in data
+    assert "issues" in data
+    assert "DM" in data["summary"]
+
+
+def test_to_excel_core_sheets(tmp_path, full_report):
+    pytest.importorskip("openpyxl")
+    import openpyxl
+
+    rep = ConformanceReport.from_core_report(full_report)
+    dest = rep.to_excel(tmp_path / "report.xlsx")
+    assert dest.exists()
+    wb = openpyxl.load_workbook(dest)
+    assert "Issue_Summary" in wb.sheetnames
+    assert "Issue_Details" in wb.sheetnames
+    assert "Rules_Report" in wb.sheetnames
+    assert "Conformance_Details" in wb.sheetnames
+
+
+def test_to_excel_core_row_counts(tmp_path, full_report):
+    pytest.importorskip("openpyxl")
+    import openpyxl
+
+    rep = ConformanceReport.from_core_report(full_report)
+    dest = rep.to_excel(tmp_path / "report.xlsx")
+    wb = openpyxl.load_workbook(dest)
+    # Rules_Report sheet: 1 header row + 430 data rows
+    rules_rows = wb["Rules_Report"].max_row
+    assert rules_rows == 431
+
+
+def test_to_excel_native(tmp_path):
+    pytest.importorskip("openpyxl")
+    import openpyxl
+    import pandas as pd
+
+    import pointblank as pb
+
+    dm = pd.DataFrame(
+        {"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"],
+         "SUBJID": ["001"], "ARMCD": ["A"], "ARM": ["A"], "COUNTRY": ["USA"]}
+    )
+    rep = pb.SubmissionPackage(datasets={"DM": dm}).validate_conformance()
+    dest = rep.to_excel(tmp_path / "native_report.xlsx")
+    assert dest.exists()
+    wb = openpyxl.load_workbook(dest)
+    assert "Summary" in wb.sheetnames
+
+
+def test_to_excel_missing_openpyxl(tmp_path, full_report, monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def mock_import(name, *args, **kwargs):
+        if name == "openpyxl":
+            raise ImportError("mocked missing openpyxl")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", mock_import)
+    rep = ConformanceReport.from_core_report(full_report)
+    with pytest.raises(ImportError, match="openpyxl"):
+        rep.to_excel(tmp_path / "report.xlsx")
