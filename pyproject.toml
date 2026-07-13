@@ -143,6 +143,7 @@ addopts = "-ra --cov=pointblank"
 testpaths = ["tests"]
 markers = [
     "otel: OpenTelemetry integration tests",
+    "cdisc_core: Tests that require the CDISC CORE engine to be installed and discoverable (auto-skipped when CORE is absent).",
 ]
 
 [tool.ruff]
