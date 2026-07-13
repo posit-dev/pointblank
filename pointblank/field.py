@@ -490,6 +490,7 @@ class FloatField(Field):
     min_val: float | None = None
     max_val: float | None = None
     allowed: list[float] | None = field(default=None)
+    precision: int | None = None
 
     # Override dtype with default
     dtype: str = "Float64"
@@ -517,6 +518,10 @@ class FloatField(Field):
             if len(self.allowed) == 0:
                 raise ValueError("allowed list cannot be empty")
 
+        # Validate precision
+        if self.precision is not None and self.precision < 0:
+            raise ValueError(f"precision ({self.precision}) must be a non-negative integer")
+
     def has_allowed_values(self) -> bool:
         """Check if this field has a set of allowed values."""
         return self.allowed is not None
@@ -526,6 +531,7 @@ def float_field(
     min_val: float | None = None,
     max_val: float | None = None,
     allowed: list[float] | None = None,
+    precision: int | None = None,
     nullable: bool = False,
     null_probability: float = 0.0,
     unique: bool = False,
@@ -555,6 +561,9 @@ def float_field(
     allowed
         List of allowed values (categorical constraint). When provided, values are sampled from
         this list. Cannot be combined with `min_val=`/`max_val=`.
+    precision
+        Number of decimal places to round generated values to. Default is `None` (no rounding).
+        Must be a non-negative integer. Has no effect when `allowed=` or `generator=` is used.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
@@ -578,8 +587,8 @@ def float_field(
     ------
     ValueError
         If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
-        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
-        float type.
+        `null_probability` is not between `0.0` and `1.0`, if `precision` is negative,
+        or if `dtype` is not a valid float type.
 
     Examples
     --------
@@ -620,7 +629,20 @@ def float_field(
         calibration=pb.float_field(min_val=0.9, max_val=1.1),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    Use `precision=` to round generated values to a fixed number of decimal places. This is useful
+    for prices, scores, or any measurement where full floating-point precision is unwanted:
+
+    ```{python}
+    schema = pb.Schema(
+        price=pb.float_field(min_val=1.0, max_val=200.0, precision=2),
+        score=pb.float_field(min_val=0.0, max_val=100.0, precision=1),
+        probability=pb.float_field(min_val=0.0, max_val=1.0, precision=4),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
 
     Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
@@ -636,13 +658,14 @@ def float_field(
         log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=20, seed=99))
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
     """
     return FloatField(
         min_val=min_val,
         max_val=max_val,
         allowed=allowed,
+        precision=precision,
         nullable=nullable,
         null_probability=null_probability,
         unique=unique,
