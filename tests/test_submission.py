@@ -87,7 +87,7 @@ def test_summary_and_repr():
 
 def test_conformance_clean_passes():
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": _ae(["S1-001", "S1-002"])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     assert isinstance(report, ConformanceReport)
     assert report.all_passed()
     assert report.issues() == []
@@ -102,7 +102,7 @@ def test_conformance_clean_passes():
 
 def test_referential_integrity_flags_orphan_usubjid():
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": _ae(["S1-001", "S1-999"])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     assert not report.all_passed()
     issues = report.issues()
     assert any(i["dataset"] == "AE" for i in issues)
@@ -117,7 +117,7 @@ def test_referential_integrity_flags_orphan_usubjid():
 def test_no_dm_means_no_referential_check():
     # Without DM there is no reference set, so no referential check is added.
     study = SubmissionPackage(datasets={"AE": _ae(["S1-001", "S1-002"])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     ae = report["AE"]
     assert not any(s.brief and "exist in DM" in s.brief for s in ae.validation_info)
 
@@ -129,7 +129,7 @@ def test_polars_datasets_supported():
             "AE": pl.from_pandas(_ae(["S1-001", "S1-999"])),
         }
     )
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     assert not report.all_passed()
 
 
@@ -155,7 +155,7 @@ def _suppae(idvarvals):
 def test_supp_idvar_resolution_pass():
     ae = _ae(["S1-001"])  # AESEQ == 1
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": ae, "SUPPAE": _suppae([1])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     supp = report["SUPPAE"]
     idvar_steps = [s for s in supp.validation_info if s.brief and "IDVAR" in s.brief]
     assert len(idvar_steps) == 1
@@ -165,7 +165,7 @@ def test_supp_idvar_resolution_pass():
 def test_supp_idvar_resolution_flags_dangling_link():
     ae = _ae(["S1-001"])  # AESEQ == 1 only
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": ae, "SUPPAE": _suppae([99])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     supp = report["SUPPAE"]
     idvar_steps = [s for s in supp.validation_info if s.brief and "IDVAR" in s.brief]
     assert idvar_steps[0].n_failed == 1
@@ -175,7 +175,7 @@ def test_supp_rdomain_must_be_present():
     supp = _suppae([1, 1])  # two rows
     supp["RDOMAIN"] = "ZZ"  # not a present domain
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": _ae(["S1-001"]), "SUPPAE": supp})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     supp_v = report["SUPPAE"]
     rdom_steps = [s for s in supp_v.validation_info if s.brief and "RDOMAIN" in s.brief]
     assert rdom_steps[0].n_failed == 2
@@ -210,7 +210,7 @@ def test_adam_adsl_traces_to_dm():
         standard="adamig",
         standard_version="1.1",
     )
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     adsl = report["ADSL"]
     trace = [s for s in adsl.validation_info if s.brief and "trace to DM" in s.brief]
     assert trace[0].n_failed == 1
@@ -232,7 +232,7 @@ def test_adam_dataset_traces_to_adsl():
         standard="adamig",
         standard_version="1.1",
     )
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     adae_v = report["ADAE"]
     trace = [s for s in adae_v.validation_info if s.brief and "trace to ADSL" in s.brief]
     assert trace[0].n_failed == 1
@@ -243,7 +243,7 @@ def test_adam_dataset_traces_to_adsl():
 
 def test_cross_dataset_can_be_disabled():
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": _ae(["S1-001", "S1-999"])})
-    report = study.validate_conformance(cross_dataset=False)
+    report = study.validate_conformance(cross_dataset=False, engine="validate")
     ae = report["AE"]
     assert not any(s.brief and "exist in DM" in s.brief for s in ae.validation_info)
 
@@ -253,7 +253,7 @@ def test_cross_dataset_can_be_disabled():
 
 def test_report_issues_and_html():
     study = SubmissionPackage(datasets={"DM": _dm(), "AE": _ae(["S1-001", "S1-999"])})
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     issues = report.issues()
     assert all({"dataset", "step", "assertion", "n_failed"} <= set(i) for i in issues)
     html = report._repr_html_()
@@ -266,7 +266,7 @@ def test_report_issues_and_html():
 
 def test_report_agency_recorded():
     study = SubmissionPackage(datasets={"DM": _dm()})
-    report = study.validate_conformance(agency="FDA")
+    report = study.validate_conformance(agency="FDA", engine="validate")
     assert report.agency == "FDA"
     assert "FDA" in report._repr_html_()
 
@@ -288,7 +288,7 @@ def test_from_folder_xpt_and_define_autodetect():
     assert study.define is not None
     assert study.metadata is not None
 
-    report = study.validate_conformance()
+    report = study.validate_conformance(engine="validate")
     assert report.all_passed()
 
 
