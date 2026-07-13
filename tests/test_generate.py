@@ -105,6 +105,52 @@ class TestGenerateColumnFloat:
 
         assert all(0.0 <= v <= 1.0 for v in values)
 
+    def test_generate_float_with_precision(self):
+        """Test that precision rounds generated float values."""
+        field = float_field(min_val=0.0, max_val=100.0, precision=2)
+        config = GeneratorConfig(n=50, seed=23)
+        values = generate_column(field, config)
+
+        assert all(isinstance(v, float) for v in values)
+        assert all(round(v, 2) == v for v in values)
+
+    def test_generate_float_precision_zero(self):
+        """Test that `precision=0` rounds values to whole numbers."""
+        field = float_field(min_val=0.0, max_val=100.0, precision=0)
+        config = GeneratorConfig(n=20, seed=7)
+        values = generate_column(field, config)
+
+        assert all(v == round(v, 0) for v in values)
+
+    def test_generate_float_precision_none_produces_full_precision(self):
+        """Test that `precision=None` does not round values."""
+        field = float_field(min_val=0.0, max_val=1.0)
+        config = GeneratorConfig(n=20, seed=23)
+        values = generate_column(field, config)
+
+        # Full-precision floats are very unlikely to already be rounded to 2 decimals
+        assert not all(round(v, 2) == v for v in values)
+
+    def test_generate_float_precision_with_unique(self):
+        """Test that precision composes correctly with unique=True."""
+        field = float_field(min_val=1.0, max_val=200.0, precision=2, unique=True)
+        config = GeneratorConfig(n=20, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == len(set(values))
+        assert all(round(v, 2) == v for v in values)
+
+    def test_generate_float_precision_with_nullable(self):
+        """Test that precision composes correctly with nullable."""
+        field = float_field(
+            min_val=0.0, max_val=10.0, precision=1, nullable=True, null_probability=0.3
+        )
+        config = GeneratorConfig(n=50, seed=99)
+        values = generate_column(field, config)
+
+        non_null = [v for v in values if v is not None]
+        assert all(round(v, 1) == v for v in non_null)
+
 
 class TestGenerateColumnString:
     """Tests for string column generation."""
