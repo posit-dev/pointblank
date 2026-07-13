@@ -33,9 +33,19 @@ def _clean_dm(backend="polars"):
         "DOMAIN": ["DM", "DM"],
         "USUBJID": ["S001-001", "S001-002"],
         "SUBJID": ["001", "002"],
+        "RFSTDTC": ["2024-01-01", "2024-01-02"],
+        "RFENDTC": ["2024-06-30", "2024-06-30"],
+        "SITEID": ["001", "001"],
+        "AGE": [45.0, 32.0],
+        "AGEU": ["YEARS", "YEARS"],
         "SEX": ["M", "F"],
         "RACE": ["WHITE", "ASIAN"],
+        "ETHNIC": ["NOT HISPANIC OR LATINO", "NOT HISPANIC OR LATINO"],
         "COUNTRY": ["USA", "GBR"],
+        "ARMCD": ["A", "B"],
+        "ARM": ["Arm A", "Arm B"],
+        "ACTARMCD": ["A", "B"],
+        "ACTARM": ["Arm A", "Arm B"],
         "DMDTC": ["2024-01-01", "2024-01-02"],
     }
     if backend == "pandas":
@@ -335,7 +345,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 30
+    assert len(clean_result.rule_results) == 50
 
 
 def test_engine_result_types(clean_result):
@@ -544,3 +554,275 @@ def test_submission_package_findings_accessor():
     findings = report.findings()
     assert len(findings) > 0
     assert all(isinstance(f, NativeRowFinding) for f in findings)
+
+
+# ── Phase 2: JSONata evaluator ────────────────────────────────────────────────
+
+from pointblank.metadata._conformance.jsonata import (
+    evaluate_jsonata,
+    JSONataNotSupported,
+    JSONataSyntaxError,
+)
+
+
+def test_jsonata_literals():
+    assert evaluate_jsonata("true", {}) is True
+    assert evaluate_jsonata("false", {}) is False
+    assert evaluate_jsonata("null", {}) is None
+    assert evaluate_jsonata("42", {}) == 42
+    assert evaluate_jsonata("3.14", {}) == 3.14
+    assert evaluate_jsonata('"hello"', {}) == "hello"
+
+
+def test_jsonata_field_access():
+    assert evaluate_jsonata("DOMAIN", {"DOMAIN": "AE"}) == "AE"
+    assert evaluate_jsonata("MISSING", {"DOMAIN": "AE"}) is None
+
+
+def test_jsonata_path_navigation():
+    ctx = {"Dataset": {"Variable": "USUBJID"}}
+    assert evaluate_jsonata("Dataset.Variable", ctx) == "USUBJID"
+
+
+def test_jsonata_comparison():
+    ctx = {"DOMAIN": "AE", "AGE": 30}
+    assert evaluate_jsonata('DOMAIN = "AE"', ctx) is True
+    assert evaluate_jsonata('DOMAIN != "DM"', ctx) is True
+    assert evaluate_jsonata("AGE > 25", ctx) is True
+    assert evaluate_jsonata("AGE < 25", ctx) is False
+    assert evaluate_jsonata("AGE >= 30", ctx) is True
+    assert evaluate_jsonata("AGE <= 30", ctx) is True
+
+
+def test_jsonata_arithmetic():
+    assert evaluate_jsonata("2 + 3", {}) == 5
+    assert evaluate_jsonata("10 - 4", {}) == 6
+    assert evaluate_jsonata("3 * 4", {}) == 12
+    assert evaluate_jsonata("10 / 4", {}) == 2.5
+
+
+def test_jsonata_boolean_operators():
+    assert evaluate_jsonata("true and true", {}) is True
+    assert evaluate_jsonata("true and false", {}) is False
+    assert evaluate_jsonata("false or true", {}) is True
+    assert evaluate_jsonata("not(false)", {}) is True
+    assert evaluate_jsonata("not(true)", {}) is False
+
+
+def test_jsonata_grouped():
+    assert evaluate_jsonata("(2 + 3) * 4", {}) == 20
+
+
+def test_jsonata_string_functions():
+    assert evaluate_jsonata('$uppercase("ae")', {}) == "AE"
+    assert evaluate_jsonata('$lowercase("AE")', {}) == "ae"
+    assert evaluate_jsonata('$string(42)', {}) == "42"
+    assert evaluate_jsonata('$length("hello")', {}) == 5
+    assert evaluate_jsonata('$trim("  hi  ")', {}) == "hi"
+
+
+def test_jsonata_substring():
+    assert evaluate_jsonata('$substring("STUDYID", 0, 5)', {}) == "STUDY"
+    assert evaluate_jsonata('$substring("STUDYID", 5)', {}) == "ID"
+    assert evaluate_jsonata('$substring("hello", -3)', {}) == "llo"
+
+
+def test_jsonata_aggregate_functions():
+    assert evaluate_jsonata("$count(VALS)", {"VALS": [1, 2, 3]}) == 3
+    assert evaluate_jsonata("$count(VALS)", {"VALS": None}) == 0
+    assert evaluate_jsonata("$exists(X)", {"X": "y"}) is True
+    assert evaluate_jsonata("$exists(X)", {"X": None}) is False
+    assert evaluate_jsonata("$count($distinct(VALS))", {"VALS": [1, 2, 2, 3]}) == 3
+
+
+def test_jsonata_context_field_expression():
+    ctx = {"DOMAIN": "AE", "USUBJID": "S01"}
+    assert evaluate_jsonata('$uppercase(DOMAIN) = "AE"', ctx) is True
+    assert evaluate_jsonata("$length(DOMAIN) = 2", ctx) is True
+
+
+def test_jsonata_not_supported_filter():
+    import pytest
+    # Filter expressions VALS[...] are not supported; raises either
+    # JSONataNotSupported (when reached during evaluation) or JSONataSyntaxError
+    # (when the parser hits unexpected '[' after consuming VALS).
+    with pytest.raises((JSONataNotSupported, JSONataSyntaxError)):
+        evaluate_jsonata("VALS[0]", {"VALS": [1, 2]})
+
+
+def test_jsonata_syntax_error():
+    import pytest
+    with pytest.raises(JSONataSyntaxError):
+        evaluate_jsonata("= broken", {})
+
+
+# ── Phase 2: new operations ───────────────────────────────────────────────────
+
+
+def test_has_required_variables_all_present():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "has_required_variables", "params": {"variables": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_STUDYID_present"].to_list() == [True]
+    assert result["_pb_DOMAIN_present"].to_list() == [True]
+    assert result["_pb_USUBJID_present"].to_list() == [True]
+
+
+def test_has_required_variables_missing():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "has_required_variables", "params": {"variables": ["STUDYID", "DOMAIN"]}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_STUDYID_present"].to_list() == [True]
+    assert result["_pb_DOMAIN_present"].to_list() == [False]
+
+
+def test_valid_variable_order_correct():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_variable_order_valid"].to_list() == [True]
+
+
+def test_valid_variable_order_wrong():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    # DOMAIN appears before STUDYID
+    df = nw.from_native(pl.DataFrame({"DOMAIN": ["DM"], "STUDYID": ["X"], "USUBJID": ["U1"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_variable_order_valid"].to_list() == [False]
+
+
+def test_valid_variable_order_absent_columns_skipped():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    # DOMAIN absent; remaining two are in order → True
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "USUBJID": ["U1"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_variable_order_valid"].to_list() == [True]
+
+
+def test_variable_type_check_numeric_ok():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"AGE": [45.0]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_AGE_type_valid"].to_list() == [True]
+
+
+def test_variable_type_check_numeric_fail():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"AGE": ["45"]}), eager_only=True)  # string, not numeric
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_AGE_type_valid"].to_list() == [False]
+
+
+def test_variable_type_check_absent_column_passes():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import polars as pl
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_AGE_type_valid"].to_list() == [True]
+
+
+# ── Phase 2: VARIABLE_METADATA_CHECK engine integration ──────────────────────
+
+
+def _full_dm() -> pl.DataFrame:
+    return pl.DataFrame({
+        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"], "SUBJID": ["001"],
+        "RFSTDTC": ["2020-01-01"], "RFENDTC": ["2020-06-30"],
+        "SITEID": ["001"], "AGE": [45.0], "AGEU": ["YEARS"],
+        "SEX": ["M"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
+        "COUNTRY": ["USA"], "ARMCD": ["A"], "ARM": ["Arm A"],
+        "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
+    })
+
+
+def test_variable_metadata_check_passes_for_complete_dm():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
+    result = engine.run({"DM": _full_dm()})
+    vmc = [r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"]
+    assert len(vmc) > 0
+    # With a complete DM, all Fully Executable VMC rules on DM should pass.
+    dm_rules = [r for r in vmc if "DM" in r.dataset and r.status not in ("not_supported", "not_applicable")]
+    assert all(r.status == "pass" for r in dm_rules), [(r.rule_id, r.status, r.message) for r in dm_rules]
+
+
+def test_variable_metadata_check_fails_missing_sex():
+    dm = _full_dm().drop("SEX")
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
+    result = engine.run({"DM": dm})
+    vmc = {r.rule_id: r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"}
+    # SDTM-032 checks SEX, RACE, ETHNIC, COUNTRY.
+    assert vmc["SDTM-032"].status == "fail"
+
+
+def test_variable_metadata_check_fails_wrong_order():
+    dm = _full_dm().select(["DOMAIN", "STUDYID"] + [c for c in _full_dm().columns if c not in ("DOMAIN", "STUDYID")])
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
+    result = engine.run({"DM": dm})
+    vmc = {r.rule_id: r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"}
+    assert vmc["SDTM-044"].status == "fail"
+
+
+def test_partially_executable_returns_not_applicable():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
+    result = engine.run({"DM": _full_dm()})
+    # SDTM-049 and SDTM-050 require DEFINE dataset
+    partial = {r.rule_id: r for r in result.rule_results if r.rule_id in ("SDTM-049", "SDTM-050")}
+    assert partial["SDTM-049"].status == "not_applicable"
+    assert partial["SDTM-050"].status == "not_applicable"
+    assert "not provided" in (partial["SDTM-049"].message or "")
+
+
+def test_partially_executable_runs_when_dataset_provided():
+    # When the required dataset IS present, the rule should not return not_applicable.
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
+    # SDTM-049/050 have empty conditions so they'll pass on any dataset.
+    result = engine.run({"DM": _full_dm(), "DEFINE": pl.DataFrame({"col": ["x"]})})
+    partial = {r.rule_id: r for r in result.rule_results if r.rule_id in ("SDTM-049", "SDTM-050")}
+    assert all(r.status != "not_applicable" for r in partial.values())
