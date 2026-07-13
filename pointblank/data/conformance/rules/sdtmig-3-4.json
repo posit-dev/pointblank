@@ -1,9 +1,9 @@
 {
   "standard": "sdtmig",
   "version": "3.4",
-  "generated": "2025-07-13T00:00:00Z",
+  "generated": "2026-07-13T21:56:24Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "sdtmig-3-4-v1",
+  "checksum": "4d210bbc1f1ba8e4",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -12,7 +12,9 @@
       "sensitivity": "Error",
       "description": "DM (Demographics) domain is required in every SDTM submission.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
+      "standards": [
+        "sdtmig"
+      ],
       "classes": [],
       "domains": [],
       "datasets": [],
@@ -21,7 +23,9 @@
       "actions": {
         "id": "domain_presence",
         "params": {
-          "required_domains": ["DM"],
+          "required_domains": [
+            "DM"
+          ],
           "prohibited_domains": [],
           "message": "DM domain must be present in every SDTM submission."
         }
@@ -34,19 +38,29 @@
       "sensitivity": "Error",
       "description": "STUDYID must not be null in any domain.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "STUDYID", "operator": "is_null", "value": null}
+          {
+            "name": "STUDYID",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "STUDYID must not be null."}
+        "params": {
+          "message": "STUDYID must not be null."
+        }
       }
     },
     {
@@ -56,19 +70,29 @@
       "sensitivity": "Error",
       "description": "DOMAIN must not be null in any SDTM dataset.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "DOMAIN", "operator": "is_null", "value": null}
+          {
+            "name": "DOMAIN",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "DOMAIN must not be null."}
+        "params": {
+          "message": "DOMAIN must not be null."
+        }
       }
     },
     {
@@ -78,19 +102,29 @@
       "sensitivity": "Error",
       "description": "USUBJID must not be null in any SDTM dataset.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "USUBJID", "operator": "is_null", "value": null}
+          {
+            "name": "USUBJID",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "USUBJID must not be null."}
+        "params": {
+          "message": "USUBJID must not be null."
+        }
       }
     },
     {
@@ -100,21 +134,36 @@
       "sensitivity": "Error",
       "description": "STUDYID must be consistent (same value) across all records in a dataset.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [
-        {"operator": "consistency_check", "params": {"column": "STUDYID"}}
+        {
+          "operator": "consistency_check",
+          "params": {
+            "column": "STUDYID"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "_pb_STUDYID_consistent", "operator": "equal_to", "value": false}
+          {
+            "name": "_pb_STUDYID_consistent",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_dataset_error",
-        "params": {"message": "STUDYID must be the same value across all records."}
+        "params": {
+          "message": "STUDYID must be the same value across all records."
+        }
       }
     },
     {
@@ -124,21 +173,36 @@
       "sensitivity": "Error",
       "description": "DOMAIN must be consistent (same value) across all records in a dataset.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [
-        {"operator": "consistency_check", "params": {"column": "DOMAIN"}}
+        {
+          "operator": "consistency_check",
+          "params": {
+            "column": "DOMAIN"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "_pb_DOMAIN_consistent", "operator": "equal_to", "value": false}
+          {
+            "name": "_pb_DOMAIN_consistent",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_dataset_error",
-        "params": {"message": "DOMAIN must be the same value across all records."}
+        "params": {
+          "message": "DOMAIN must be the same value across all records."
+        }
       }
     },
     {
@@ -148,22 +212,44 @@
       "sensitivity": "Error",
       "description": "SEX in DM must use values from the CDISC controlled terminology codelist SEX.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "SEX", "codelist": "SEX"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "SEX",
+            "codelist": "SEX"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "SEX", "operator": "is_not_null", "value": null},
-          {"name": "_pb_SEX_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "SEX",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_SEX_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "SEX value is not in the SEX codelist."}
+        "params": {
+          "message": "SEX value is not in the SEX codelist."
+        }
       }
     },
     {
@@ -173,22 +259,44 @@
       "sensitivity": "Error",
       "description": "RACE in DM must use values from the CDISC controlled terminology codelist RACE.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "RACE", "codelist": "RACE"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "RACE",
+            "codelist": "RACE"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "RACE", "operator": "is_not_null", "value": null},
-          {"name": "_pb_RACE_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "RACE",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_RACE_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "RACE value is not in the RACE codelist."}
+        "params": {
+          "message": "RACE value is not in the RACE codelist."
+        }
       }
     },
     {
@@ -198,22 +306,44 @@
       "sensitivity": "Error",
       "description": "COUNTRY in DM must use ISO 3166 alpha-3 country codes (CDISC COUNTRY codelist).",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "COUNTRY", "codelist": "COUNTRY"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "COUNTRY",
+            "codelist": "COUNTRY"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "COUNTRY", "operator": "is_not_null", "value": null},
-          {"name": "_pb_COUNTRY_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "COUNTRY",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_COUNTRY_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "COUNTRY value is not in the COUNTRY codelist (ISO 3166 alpha-3)."}
+        "params": {
+          "message": "COUNTRY value is not in the COUNTRY codelist (ISO 3166 alpha-3)."
+        }
       }
     },
     {
@@ -223,22 +353,43 @@
       "sensitivity": "Error",
       "description": "DMDTC in DM must be in ISO 8601 extended datetime format.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "DMDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "DMDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "DMDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_DMDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "DMDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_DMDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "DMDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "DMDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -248,22 +399,43 @@
       "sensitivity": "Error",
       "description": "RFSTDTC in DM must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "RFSTDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "RFSTDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "RFSTDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_RFSTDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "RFSTDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_RFSTDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "RFSTDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "RFSTDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -273,22 +445,43 @@
       "sensitivity": "Error",
       "description": "RFENDTC in DM must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "RFENDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "RFENDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "RFENDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_RFENDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "RFENDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_RFENDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "RFENDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "RFENDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -298,22 +491,43 @@
       "sensitivity": "Error",
       "description": "DTHDTC in DM must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "DTHDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "DTHDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "DTHDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_DTHDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "DTHDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_DTHDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "DTHDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "DTHDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -323,22 +537,44 @@
       "sensitivity": "Error",
       "description": "DTHFL in DM must use values from the NY codelist (Y or null).",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "DTHFL", "codelist": "NY"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "DTHFL",
+            "codelist": "NY"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "DTHFL", "operator": "is_not_null", "value": null},
-          {"name": "_pb_DTHFL_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "DTHFL",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_DTHFL_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "DTHFL value must be 'Y' or null (NY codelist)."}
+        "params": {
+          "message": "DTHFL value must be 'Y' or null (NY codelist)."
+        }
       }
     },
     {
@@ -348,19 +584,31 @@
       "sensitivity": "Error",
       "description": "SUBJID must not be null in DM.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "SUBJID", "operator": "is_null", "value": null}
+          {
+            "name": "SUBJID",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "SUBJID must not be null in DM."}
+        "params": {
+          "message": "SUBJID must not be null in DM."
+        }
       }
     },
     {
@@ -370,19 +618,31 @@
       "sensitivity": "Error",
       "description": "AETERM must not be null in AE.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "AETERM", "operator": "is_null", "value": null}
+          {
+            "name": "AETERM",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AETERM (Reported Term for the Adverse Event) must not be null in AE."}
+        "params": {
+          "message": "AETERM (Reported Term for the Adverse Event) must not be null in AE."
+        }
       }
     },
     {
@@ -392,19 +652,31 @@
       "sensitivity": "Error",
       "description": "AEDECOD must not be null in AE.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "AEDECOD", "operator": "is_null", "value": null}
+          {
+            "name": "AEDECOD",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AEDECOD (Dictionary-Derived Term) must not be null in AE."}
+        "params": {
+          "message": "AEDECOD (Dictionary-Derived Term) must not be null in AE."
+        }
       }
     },
     {
@@ -414,22 +686,43 @@
       "sensitivity": "Error",
       "description": "AESTDTC in AE must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "AESTDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "AESTDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "AESTDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_AESTDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "AESTDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_AESTDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AESTDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "AESTDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -439,22 +732,43 @@
       "sensitivity": "Error",
       "description": "AEENDTC in AE must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "AEENDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "AEENDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "AEENDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_AEENDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "AEENDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_AEENDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AEENDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "AEENDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -464,22 +778,44 @@
       "sensitivity": "Error",
       "description": "AESER in AE must use values from the NY codelist when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "AESER", "codelist": "NY"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "AESER",
+            "codelist": "NY"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "AESER", "operator": "is_not_null", "value": null},
-          {"name": "_pb_AESER_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "AESER",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_AESER_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AESER value must be in the NY codelist (Y/N)."}
+        "params": {
+          "message": "AESER value must be in the NY codelist (Y/N)."
+        }
       }
     },
     {
@@ -489,22 +825,44 @@
       "sensitivity": "Error",
       "description": "AEOUT in AE must use values from the AEOUT codelist when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Events"],
-      "domains": ["AE"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "AEOUT", "codelist": "AEOUT"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "AEOUT",
+            "codelist": "AEOUT"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "AEOUT", "operator": "is_not_null", "value": null},
-          {"name": "_pb_AEOUT_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "AEOUT",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_AEOUT_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "AEOUT value is not in the AEOUT codelist."}
+        "params": {
+          "message": "AEOUT value is not in the AEOUT codelist."
+        }
       }
     },
     {
@@ -514,22 +872,43 @@
       "sensitivity": "Error",
       "description": "LBDTC in LB must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Findings"],
-      "domains": ["LB"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "LBDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "LBDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "LBDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_LBDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "LBDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_LBDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "LBDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "LBDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -539,19 +918,31 @@
       "sensitivity": "Error",
       "description": "LBTEST must not be null in LB.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Findings"],
-      "domains": ["LB"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "LBTEST", "operator": "is_null", "value": null}
+          {
+            "name": "LBTEST",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "LBTEST (Lab Test Name) must not be null in LB."}
+        "params": {
+          "message": "LBTEST (Lab Test Name) must not be null in LB."
+        }
       }
     },
     {
@@ -561,19 +952,31 @@
       "sensitivity": "Error",
       "description": "LBTESTCD must not be null in LB.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Findings"],
-      "domains": ["LB"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "LBTESTCD", "operator": "is_null", "value": null}
+          {
+            "name": "LBTESTCD",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "LBTESTCD (Lab Test Short Name) must not be null in LB."}
+        "params": {
+          "message": "LBTESTCD (Lab Test Short Name) must not be null in LB."
+        }
       }
     },
     {
@@ -583,19 +986,31 @@
       "sensitivity": "Error",
       "description": "VSTEST must not be null in VS.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Findings"],
-      "domains": ["VS"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
       "datasets": [],
       "operations": [],
       "conditions": {
         "all": [
-          {"name": "VSTEST", "operator": "is_null", "value": null}
+          {
+            "name": "VSTEST",
+            "operator": "is_null",
+            "value": null
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "VSTEST (Vital Signs Test Name) must not be null in VS."}
+        "params": {
+          "message": "VSTEST (Vital Signs Test Name) must not be null in VS."
+        }
       }
     },
     {
@@ -605,22 +1020,43 @@
       "sensitivity": "Error",
       "description": "VSDTC in VS must be in ISO 8601 extended datetime format when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Findings"],
-      "domains": ["VS"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "iso8601_check", "params": {"column": "VSDTC"}}
+        {
+          "operator": "iso8601_check",
+          "params": {
+            "column": "VSDTC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "VSDTC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_VSDTC_iso8601", "operator": "equal_to", "value": false}
+          {
+            "name": "VSDTC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_VSDTC_iso8601",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "VSDTC does not conform to ISO 8601 extended datetime format."}
+        "params": {
+          "message": "VSDTC does not conform to ISO 8601 extended datetime format."
+        }
       }
     },
     {
@@ -630,21 +1066,36 @@
       "sensitivity": "Warning",
       "description": "USUBJID must be present in every SDTM domain.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [
-        {"operator": "column_presence", "params": {"column": "USUBJID"}}
+        {
+          "operator": "column_presence",
+          "params": {
+            "column": "USUBJID"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "_pb_USUBJID_present", "operator": "equal_to", "value": false}
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_dataset_error",
-        "params": {"message": "USUBJID column is required in all SDTM domains."}
+        "params": {
+          "message": "USUBJID column is required in all SDTM domains."
+        }
       }
     },
     {
@@ -654,21 +1105,36 @@
       "sensitivity": "Error",
       "description": "STUDYID must be present in every SDTM domain.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [
-        {"operator": "column_presence", "params": {"column": "STUDYID"}}
+        {
+          "operator": "column_presence",
+          "params": {
+            "column": "STUDYID"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "_pb_STUDYID_present", "operator": "equal_to", "value": false}
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_dataset_error",
-        "params": {"message": "STUDYID column is required in all SDTM domains."}
+        "params": {
+          "message": "STUDYID column is required in all SDTM domains."
+        }
       }
     },
     {
@@ -678,21 +1144,36 @@
       "sensitivity": "Error",
       "description": "DOMAIN must be present in every SDTM domain.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["All"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
       "domains": [],
       "datasets": [],
       "operations": [
-        {"operator": "column_presence", "params": {"column": "DOMAIN"}}
+        {
+          "operator": "column_presence",
+          "params": {
+            "column": "DOMAIN"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "_pb_DOMAIN_present", "operator": "equal_to", "value": false}
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_dataset_error",
-        "params": {"message": "DOMAIN column is required in all SDTM domains."}
+        "params": {
+          "message": "DOMAIN column is required in all SDTM domains."
+        }
       }
     },
     {
@@ -702,22 +1183,1122 @@
       "sensitivity": "Error",
       "description": "ETHNIC in DM must use values from the ETHNIC codelist when present.",
       "authority": "CDISC",
-      "standards": ["sdtmig"],
-      "classes": ["Special-Purpose"],
-      "domains": ["DM"],
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special-Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
       "datasets": [],
       "operations": [
-        {"operator": "codelist_check", "params": {"column": "ETHNIC", "codelist": "ETHNIC"}}
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "ETHNIC",
+            "codelist": "ETHNIC"
+          }
+        }
       ],
       "conditions": {
         "all": [
-          {"name": "ETHNIC", "operator": "is_not_null", "value": null},
-          {"name": "_pb_ETHNIC_valid", "operator": "equal_to", "value": false}
+          {
+            "name": "ETHNIC",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_ETHNIC_valid",
+            "operator": "equal_to",
+            "value": false
+          }
         ]
       },
       "actions": {
         "id": "generate_record_error",
-        "params": {"message": "ETHNIC value is not in the ETHNIC codelist."}
+        "params": {
+          "message": "ETHNIC value is not in the ETHNIC codelist."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-031",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM domain must contain all required Identifier and Topic variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "SUBJID"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_SUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM domain is missing one or more required Identifier variables (STUDYID, DOMAIN, USUBJID, SUBJID)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-032",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM domain must contain required demographic variables (SEX, RACE, ETHNIC, COUNTRY).",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "SEX",
+              "RACE",
+              "ETHNIC",
+              "COUNTRY"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_SEX_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_RACE_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_ETHNIC_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_COUNTRY_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM domain is missing one or more required demographic variables (SEX, RACE, ETHNIC, COUNTRY)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-033",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM domain must contain RFSTDTC and RFENDTC (reference start/end dates).",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "RFSTDTC",
+              "RFENDTC"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_RFSTDTC_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_RFENDTC_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM domain must include RFSTDTC (Subject Reference Start Date/Time) and RFENDTC (Subject Reference End Date/Time)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-034",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM domain must contain SITEID, AGE, and AGEU.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "SITEID",
+              "AGE",
+              "AGEU"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_SITEID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AGE_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AGEU_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM domain must include SITEID, AGE, and AGEU."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-035",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM domain must contain treatment arm variables (ARMCD, ARM, ACTARMCD, ACTARM).",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "ARMCD",
+              "ARM",
+              "ACTARMCD",
+              "ACTARM"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_ARMCD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_ARM_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_ACTARMCD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_ACTARM_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM domain must include treatment arm variables: ARMCD, ARM, ACTARMCD, ACTARM."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-036",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AE domain must contain required Identifier and sequence variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "AESEQ"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AESEQ_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "AE domain is missing required variables (STUDYID, DOMAIN, USUBJID, AESEQ)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-037",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AE domain must contain the AE term and dictionary-derived variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "AETERM",
+              "AEDECOD",
+              "AEBODSYS"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_AETERM_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AEDECOD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AEBODSYS_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "AE domain must include AETERM, AEDECOD (MedDRA preferred term), and AEBODSYS (body system)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-038",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AE domain must contain severity, seriousness, and outcome variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "AESEV",
+              "AESER",
+              "AEOUT"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_AESEV_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AESER_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AEOUT_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "AE domain must include AESEV (severity), AESER (serious flag), and AEOUT (outcome)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-039",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "VS domain must contain required Identifier and test variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "VSSEQ",
+              "VSTESTCD",
+              "VSTEST"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSSEQ_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSTESTCD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSTEST_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "VS domain is missing required variables (STUDYID, DOMAIN, USUBJID, VSSEQ, VSTESTCD, VSTEST)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-040",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "VS domain must contain result variables (VSORRES, VSORRESU, VSSTRESC, VSSTRESN, VSSTRESU).",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "VSORRES",
+              "VSORRESU",
+              "VSSTRESC",
+              "VSSTRESN",
+              "VSSTRESU"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_VSORRES_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSORRESU_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSSTRESC_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSSTRESN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_VSSTRESU_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "VS domain must include original result (VSORRES/VSORRESU) and standardized result (VSSTRESC/VSSTRESN/VSSTRESU) variables."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-041",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "LB domain must contain required Identifier and test variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "LBSEQ",
+              "LBTESTCD",
+              "LBTEST"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBSEQ_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBTESTCD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBTEST_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "LB domain is missing required variables (STUDYID, DOMAIN, USUBJID, LBSEQ, LBTESTCD, LBTEST)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-042",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "LB domain must contain result variables (LBORRES, LBORRESU, LBSTRESC, LBSTRESN, LBSTRESU).",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "LBORRES",
+              "LBORRESU",
+              "LBSTRESC",
+              "LBSTRESN",
+              "LBSTRESU"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_LBORRES_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBORRESU_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBSTRESC_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBSTRESN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_LBSTRESU_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "LB domain must include result variables (LBORRES/LBORRESU and LBSTRESC/LBSTRESN/LBSTRESU)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-043",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "EG domain must contain required Identifier and test variables.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "EG"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "has_required_variables",
+          "params": {
+            "variables": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "EGSEQ",
+              "EGTESTCD",
+              "EGTEST"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_EGSEQ_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_EGTESTCD_present",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_EGTEST_present",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "EG domain is missing required variables (STUDYID, DOMAIN, USUBJID, EGSEQ, EGTESTCD, EGTEST)."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-044",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Warning",
+      "description": "In any domain, STUDYID must appear before DOMAIN, which must appear before USUBJID.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "valid_variable_order",
+          "params": {
+            "expected_order": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_variable_order_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "Identifier variables must appear in order: STUDYID, DOMAIN, USUBJID."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-045",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Warning",
+      "description": "In findings domains (VS, LB, EG), the sequence variable (xSEQ) must appear after USUBJID.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "valid_variable_order",
+          "params": {
+            "expected_order": [
+              "STUDYID",
+              "DOMAIN",
+              "USUBJID",
+              "VSSEQ"
+            ]
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_variable_order_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "VS: VSSEQ must appear after USUBJID in the column order."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-046",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "In DM, AGE must be a numeric variable.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "variable_type_check",
+          "params": {
+            "column": "AGE",
+            "expected_type": "numeric"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_AGE_type_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "DM.AGE must be a numeric variable."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-047",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "In VS, VSSTRESN must be a numeric variable.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "VS"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "variable_type_check",
+          "params": {
+            "column": "VSSTRESN",
+            "expected_type": "numeric"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_VSSTRESN_type_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "VS.VSSTRESN must be a numeric variable."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-048",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "In LB, LBSTRESN must be a numeric variable.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Findings"
+      ],
+      "domains": [
+        "LB"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "variable_type_check",
+          "params": {
+            "column": "LBSTRESN",
+            "expected_type": "numeric"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_LBSTRESN_type_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "LB.LBSTRESN must be a numeric variable."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-049",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Variable labels in the submission must match the labels specified in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
+      "domains": [],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [],
+      "conditions": {},
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "Variable label does not match Define-XML specification."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-050",
+      "rule_type": "VARIABLE_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Variable data types in the submission must match the types declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "All"
+      ],
+      "domains": [],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [],
+      "conditions": {},
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "Variable data type does not match Define-XML specification."
+        }
       }
     }
   ]
