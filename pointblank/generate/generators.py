@@ -64,11 +64,17 @@ def _generate_float(field: Field, rng: random.Random, generator: Any | None = No
     """Generate a random float value respecting field constraints."""
     min_val = getattr(field, "min_val", None)
     max_val = getattr(field, "max_val", None)
+    precision = getattr(field, "precision", None)
 
     min_val = min_val if min_val is not None else -1e10
     max_val = max_val if max_val is not None else 1e10
 
-    return rng.uniform(float(min_val), float(max_val))
+    value = rng.uniform(float(min_val), float(max_val))
+
+    if precision is not None:
+        value = round(value, precision)
+
+    return value
 
 
 def _generate_string(
