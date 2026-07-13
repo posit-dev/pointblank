@@ -1,0 +1,724 @@
+{
+  "standard": "sdtmig",
+  "version": "3.4",
+  "generated": "2025-07-13T00:00:00Z",
+  "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
+  "checksum": "sdtmig-3-4-v1",
+  "rules": [
+    {
+      "core_id": "SDTM-001",
+      "rule_type": "DOMAIN_PRESENCE_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DM (Demographics) domain is required in every SDTM submission.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": [],
+      "domains": [],
+      "datasets": [],
+      "operations": [],
+      "conditions": {},
+      "actions": {
+        "id": "domain_presence",
+        "params": {
+          "required_domains": ["DM"],
+          "prohibited_domains": [],
+          "message": "DM domain must be present in every SDTM submission."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-002",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "STUDYID must not be null in any domain.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "STUDYID", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "STUDYID must not be null."}
+      }
+    },
+    {
+      "core_id": "SDTM-003",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DOMAIN must not be null in any SDTM dataset.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "DOMAIN", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "DOMAIN must not be null."}
+      }
+    },
+    {
+      "core_id": "SDTM-004",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "USUBJID must not be null in any SDTM dataset.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "USUBJID", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "USUBJID must not be null."}
+      }
+    },
+    {
+      "core_id": "SDTM-005",
+      "rule_type": "DATASET_CONTENTS_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "STUDYID must be consistent (same value) across all records in a dataset.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {"operator": "consistency_check", "params": {"column": "STUDYID"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "_pb_STUDYID_consistent", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_dataset_error",
+        "params": {"message": "STUDYID must be the same value across all records."}
+      }
+    },
+    {
+      "core_id": "SDTM-006",
+      "rule_type": "DATASET_CONTENTS_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DOMAIN must be consistent (same value) across all records in a dataset.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {"operator": "consistency_check", "params": {"column": "DOMAIN"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "_pb_DOMAIN_consistent", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_dataset_error",
+        "params": {"message": "DOMAIN must be the same value across all records."}
+      }
+    },
+    {
+      "core_id": "SDTM-007",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "SEX in DM must use values from the CDISC controlled terminology codelist SEX.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "SEX", "codelist": "SEX"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "SEX", "operator": "is_not_null", "value": null},
+          {"name": "_pb_SEX_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "SEX value is not in the SEX codelist."}
+      }
+    },
+    {
+      "core_id": "SDTM-008",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "RACE in DM must use values from the CDISC controlled terminology codelist RACE.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "RACE", "codelist": "RACE"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "RACE", "operator": "is_not_null", "value": null},
+          {"name": "_pb_RACE_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "RACE value is not in the RACE codelist."}
+      }
+    },
+    {
+      "core_id": "SDTM-009",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "COUNTRY in DM must use ISO 3166 alpha-3 country codes (CDISC COUNTRY codelist).",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "COUNTRY", "codelist": "COUNTRY"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "COUNTRY", "operator": "is_not_null", "value": null},
+          {"name": "_pb_COUNTRY_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "COUNTRY value is not in the COUNTRY codelist (ISO 3166 alpha-3)."}
+      }
+    },
+    {
+      "core_id": "SDTM-010",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DMDTC in DM must be in ISO 8601 extended datetime format.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "DMDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "DMDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_DMDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "DMDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-011",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "RFSTDTC in DM must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "RFSTDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "RFSTDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_RFSTDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "RFSTDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-012",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "RFENDTC in DM must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "RFENDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "RFENDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_RFENDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "RFENDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-013",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DTHDTC in DM must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "DTHDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "DTHDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_DTHDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "DTHDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-014",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DTHFL in DM must use values from the NY codelist (Y or null).",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "DTHFL", "codelist": "NY"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "DTHFL", "operator": "is_not_null", "value": null},
+          {"name": "_pb_DTHFL_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "DTHFL value must be 'Y' or null (NY codelist)."}
+      }
+    },
+    {
+      "core_id": "SDTM-015",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "SUBJID must not be null in DM.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "SUBJID", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "SUBJID must not be null in DM."}
+      }
+    },
+    {
+      "core_id": "SDTM-016",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AETERM must not be null in AE.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "AETERM", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AETERM (Reported Term for the Adverse Event) must not be null in AE."}
+      }
+    },
+    {
+      "core_id": "SDTM-017",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AEDECOD must not be null in AE.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "AEDECOD", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AEDECOD (Dictionary-Derived Term) must not be null in AE."}
+      }
+    },
+    {
+      "core_id": "SDTM-018",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AESTDTC in AE must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "AESTDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "AESTDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_AESTDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AESTDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-019",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AEENDTC in AE must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "AEENDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "AEENDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_AEENDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AEENDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-020",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AESER in AE must use values from the NY codelist when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "AESER", "codelist": "NY"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "AESER", "operator": "is_not_null", "value": null},
+          {"name": "_pb_AESER_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AESER value must be in the NY codelist (Y/N)."}
+      }
+    },
+    {
+      "core_id": "SDTM-021",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "AEOUT in AE must use values from the AEOUT codelist when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Events"],
+      "domains": ["AE"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "AEOUT", "codelist": "AEOUT"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "AEOUT", "operator": "is_not_null", "value": null},
+          {"name": "_pb_AEOUT_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "AEOUT value is not in the AEOUT codelist."}
+      }
+    },
+    {
+      "core_id": "SDTM-022",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "LBDTC in LB must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Findings"],
+      "domains": ["LB"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "LBDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "LBDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_LBDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "LBDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-023",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "LBTEST must not be null in LB.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Findings"],
+      "domains": ["LB"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "LBTEST", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "LBTEST (Lab Test Name) must not be null in LB."}
+      }
+    },
+    {
+      "core_id": "SDTM-024",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "LBTESTCD must not be null in LB.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Findings"],
+      "domains": ["LB"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "LBTESTCD", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "LBTESTCD (Lab Test Short Name) must not be null in LB."}
+      }
+    },
+    {
+      "core_id": "SDTM-025",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "VSTEST must not be null in VS.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Findings"],
+      "domains": ["VS"],
+      "datasets": [],
+      "operations": [],
+      "conditions": {
+        "all": [
+          {"name": "VSTEST", "operator": "is_null", "value": null}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "VSTEST (Vital Signs Test Name) must not be null in VS."}
+      }
+    },
+    {
+      "core_id": "SDTM-026",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "VSDTC in VS must be in ISO 8601 extended datetime format when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Findings"],
+      "domains": ["VS"],
+      "datasets": [],
+      "operations": [
+        {"operator": "iso8601_check", "params": {"column": "VSDTC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "VSDTC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_VSDTC_iso8601", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "VSDTC does not conform to ISO 8601 extended datetime format."}
+      }
+    },
+    {
+      "core_id": "SDTM-027",
+      "rule_type": "DATASET_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Warning",
+      "description": "USUBJID must be present in every SDTM domain.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {"operator": "column_presence", "params": {"column": "USUBJID"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "_pb_USUBJID_present", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_dataset_error",
+        "params": {"message": "USUBJID column is required in all SDTM domains."}
+      }
+    },
+    {
+      "core_id": "SDTM-028",
+      "rule_type": "DATASET_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "STUDYID must be present in every SDTM domain.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {"operator": "column_presence", "params": {"column": "STUDYID"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "_pb_STUDYID_present", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_dataset_error",
+        "params": {"message": "STUDYID column is required in all SDTM domains."}
+      }
+    },
+    {
+      "core_id": "SDTM-029",
+      "rule_type": "DATASET_METADATA_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "DOMAIN must be present in every SDTM domain.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["All"],
+      "domains": [],
+      "datasets": [],
+      "operations": [
+        {"operator": "column_presence", "params": {"column": "DOMAIN"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "_pb_DOMAIN_present", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_dataset_error",
+        "params": {"message": "DOMAIN column is required in all SDTM domains."}
+      }
+    },
+    {
+      "core_id": "SDTM-030",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "description": "ETHNIC in DM must use values from the ETHNIC codelist when present.",
+      "authority": "CDISC",
+      "standards": ["sdtmig"],
+      "classes": ["Special-Purpose"],
+      "domains": ["DM"],
+      "datasets": [],
+      "operations": [
+        {"operator": "codelist_check", "params": {"column": "ETHNIC", "codelist": "ETHNIC"}}
+      ],
+      "conditions": {
+        "all": [
+          {"name": "ETHNIC", "operator": "is_not_null", "value": null},
+          {"name": "_pb_ETHNIC_valid", "operator": "equal_to", "value": false}
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {"message": "ETHNIC value is not in the ETHNIC codelist."}
+      }
+    }
+  ]
+}
