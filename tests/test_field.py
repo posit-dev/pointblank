@@ -121,6 +121,26 @@ class TestFloatField:
         assert field.is_float() is True
         assert field.is_integer() is False
 
+    def test_float_field_with_precision(self):
+        """Test FloatField with precision parameter."""
+        field = float_field(min_val=0.0, max_val=100.0, precision=2)
+        assert field.precision == 2
+
+    def test_float_field_precision_none_by_default(self):
+        """Test that precision defaults to None."""
+        field = float_field()
+        assert field.precision is None
+
+    def test_float_field_precision_zero_is_valid(self):
+        """Test that `precision=0` is accepted (rounds to integer)."""
+        field = float_field(min_val=0.0, max_val=10.0, precision=0)
+        assert field.precision == 0
+
+    def test_float_field_negative_precision_raises_error(self):
+        """Test that negative precision raises ValueError."""
+        with pytest.raises(ValueError, match="precision"):
+            float_field(precision=-1)
+
 
 class TestStringField:
     """Tests for StringField and string_field()."""
