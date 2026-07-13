@@ -16,6 +16,7 @@ from pointblank.metadata._conformance.operations import apply_operations
 from pointblank.metadata._conformance.result import (
     STATUS_ERROR,
     STATUS_FAIL,
+    STATUS_NOT_APPLICABLE,
     STATUS_NOT_SUPPORTED,
     STATUS_PASS,
     NativeConformanceResult,
@@ -24,12 +25,13 @@ from pointblank.metadata._conformance.result import (
 )
 from pointblank.metadata._conformance.rule_loader import NativeRule, RuleLoader
 
-# Rule types handled in Phase 1.
+# Rule types handled natively
 _SUPPORTED_TYPES = {
     "RECORD_CHECK",
     "DATASET_METADATA_CHECK",
     "DOMAIN_PRESENCE_CHECK",
     "DATASET_CONTENTS_CHECK",
+    "VARIABLE_METADATA_CHECK",
 }
 
 # Maximum row-level findings to collect per rule (avoids blowing up memory on large datasets).
@@ -49,7 +51,7 @@ class NativeConformanceEngine:
         CT package slugs to load (e.g. `["sdtm-ct-2024-09-27"]`). If `None`, the most
         recent bundled CT package is used automatically.
     rule_types
-        Optional list of rule types to evaluate. Defaults to all Phase 1 supported types.
+        Optional list of rule types to evaluate. Defaults to all supported types.
     """
 
     def __init__(
@@ -112,11 +114,27 @@ class NativeConformanceEngine:
                 description=rule.description,
             )
 
+        # Partially Executable rules require extra datasets (e.g. Define XML metadata).
+        # Return NOT_APPLICABLE instead of failing when those inputs are absent.
+        if rule.executability == "Partially Executable":
+            missing_ds = [d for d in rule.datasets if d.upper() not in datasets]
+            if missing_ds:
+                return NativeRuleResult(
+                    rule_id=rule.core_id,
+                    rule_type=rule.rule_type,
+                    dataset=", ".join(rule.datasets),
+                    status=STATUS_NOT_APPLICABLE,
+                    sensitivity=rule.sensitivity,
+                    description=rule.description,
+                    message=f"Required input(s) not provided: {', '.join(missing_ds)}",
+                )
+
         handler = {
             "RECORD_CHECK": self._record_check,
             "DATASET_METADATA_CHECK": self._dataset_metadata_check,
             "DOMAIN_PRESENCE_CHECK": self._domain_presence_check,
             "DATASET_CONTENTS_CHECK": self._dataset_contents_check,
+            "VARIABLE_METADATA_CHECK": self._variable_metadata_check,
         }[rule.rule_type]
 
         try:
@@ -230,6 +248,18 @@ class NativeConformanceEngine:
             message=rule.message if n_issues > 0 else None,
             n_issues=n_issues,
         )
+
+    def _variable_metadata_check(
+        self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
+    ) -> NativeRuleResult:
+        """Variable-level metadata check (presence, order, type).
+
+        Delegates to ``_dataset_metadata_check``; semantically distinct from
+        ``DATASET_METADATA_CHECK`` (which checks dataset-level attributes like sort keys
+        or record count) but evaluated identically — operations add scalar broadcast
+        columns that conditions then test.
+        """
+        return self._dataset_metadata_check(rule, datasets)
 
     def _domain_presence_check(
         self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
