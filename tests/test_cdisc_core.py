@@ -708,7 +708,7 @@ def test_to_json_native(tmp_path):
     assert "summary" in data
     assert "issues" in data
     s = data["summary"]
-    assert s["engine"] == "native"
+    assert s["engine"] == "built-in"
     assert "standard" in s
     assert "n_rules" in s
 
