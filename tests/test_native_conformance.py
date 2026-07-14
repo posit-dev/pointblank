@@ -346,7 +346,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 60
+    assert len(clean_result.rule_results) == 120
 
 
 def test_engine_result_types(clean_result):
@@ -1090,4 +1090,4 @@ def test_engine_accepts_metadata_import_directly():
 def test_engine_rule_count_phase3():
     engine = NativeConformanceEngine("sdtmig", "3.4")
     result = engine.run({"DM": _clean_dm()})
-    assert len(result.rule_results) == 60
+    assert len(result.rule_results) == 120
