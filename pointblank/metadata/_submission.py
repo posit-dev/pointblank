@@ -13,13 +13,14 @@ datasets, adding the cross-dataset checks that today send sponsors to Pinnacle 2
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field as dataclass_field
+from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:
-    from pointblank.metadata._cdisc_core import CoreFinding, CoreRuleResult, ParsedCoreReport
-    from pointblank.metadata._conformance.result import NativeConformanceResult, NativeRowFinding, NativeRuleResult
+    from pointblank.metadata._cdisc_core import ParsedCoreReport
+    from pointblank.metadata._conformance.result import NativeConformanceResult
     from pointblank.metadata._types import MetadataPackage
     from pointblank.validate import Validate
 
