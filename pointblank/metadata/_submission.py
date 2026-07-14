@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:
+    from great_tables import GT
     from pointblank.metadata._cdisc_core import ParsedCoreReport
     from pointblank.metadata._conformance.result import NativeConformanceResult
     from pointblank.metadata._types import MetadataPackage
