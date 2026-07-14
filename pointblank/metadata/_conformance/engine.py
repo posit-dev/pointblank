@@ -257,6 +257,7 @@ class NativeConformanceEngine:
                 continue
             # Operations add the computed columns that conditions reference.
             df = apply_operations(df, rule.operations, self._ct, datasets)
+            df = apply_operations(df, rule.operations, self._ct, datasets, define_meta)
             # For metadata checks the condition is evaluated once against a single-row summary
             # DataFrame (all computed columns).  If any operation added a False column, the
             # condition fires.
@@ -285,12 +286,32 @@ class NativeConformanceEngine:
     ) -> NativeRuleResult:
         """Variable-level metadata check (presence, order, type).
 
-        Delegates to ``_dataset_metadata_check``; semantically distinct from
-        ``DATASET_METADATA_CHECK`` (which checks dataset-level attributes like sort keys
-        or record count) but evaluated identically — operations add scalar broadcast
-        columns that conditions then test.
+        Delegates to `_dataset_metadata_check`; semantically distinct from `DATASET_METADATA_CHECK`
+        (which checks dataset-level attributes like sort keys or record count) but evaluated
+        identically. Operations add scalar broadcast columns that conditions then test.
         """
         return self._dataset_metadata_check(rule, datasets)
+
+    def _define_item_metadata_check(
+        self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
+    ) -> NativeRuleResult:
+        """Check submission variables against Define-XML item declarations.
+
+        Operations add broadcast computed columns (e.g. `_pb_SEX_in_define`, `_pb_SEX_mandatory_ok`)
+        using the domain's `MetadataImport`; conditions then test those columns. Behaves like a
+        dataset-level metadata check.
+        """
+        return self._dataset_metadata_check(rule, datasets)
+
+    def _define_codelist_check(
+        self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
+    ) -> NativeRuleResult:
+        """Check that codelist values in the submission match Define-XML declarations.
+
+        Per-row check: `define_codelist_check` operations add `_pb_<col>_define_valid` columns;
+        conditions flag rows where the value is outside the declared codelist.
+        """
+        return self._record_check(rule, datasets)
 
     def _domain_presence_check(
         self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
