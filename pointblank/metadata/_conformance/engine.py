@@ -6,9 +6,12 @@ expressions. No subprocesses, no external installs, no API calls at runtime.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
+
+if TYPE_CHECKING:
+    from pointblank.metadata._types import MetadataImport, MetadataPackage
 
 from pointblank.metadata._conformance.ct import ControlledTerminology
 from pointblank.metadata._conformance.evaluator import EvaluationError, evaluate_conditions
@@ -32,9 +35,11 @@ _SUPPORTED_TYPES = {
     "DOMAIN_PRESENCE_CHECK",
     "DATASET_CONTENTS_CHECK",
     "VARIABLE_METADATA_CHECK",
+    "DEFINE_ITEM_METADATA_CHECK",
+    "DEFINE_CODELIST_CHECK",
 }
 
-# Maximum row-level findings to collect per rule (avoids blowing up memory on large datasets).
+# Maximum row-level findings to collect per rule (avoids blowing up memory on large datasets)
 _MAX_FINDINGS = 100
 
 
@@ -68,18 +73,30 @@ class NativeConformanceEngine:
             self._ct = ControlledTerminology.load_default()
         else:
             self._ct = ControlledTerminology.load(ct_packages)
+        self._define_pkg: MetadataPackage | None = None
 
     @property
     def ct_packages(self) -> list[str]:
         return self._ct.packages
 
-    def run(self, datasets: dict[str, Any]) -> NativeConformanceResult:
+    def run(
+        self,
+        datasets: dict[str, Any],
+        define_xml: Any = None,
+    ) -> NativeConformanceResult:
         """Evaluate all rules against `datasets`.
 
         Parameters
         ----------
         datasets
             Mapping of domain name (e.g. `"DM"`) to a Pandas or Polars DataFrame.
+        define_xml
+            Optional Define-XML metadata. Accepted forms:
+
+            * A file path (`str` or `pathlib.Path`): the file is parsed automatically.
+            * A `MetadataPackage` object (already parsed).
+            * A `MetadataImport` object (single domain).
+            * `None`: no Define-XML; rules that require it return `STATUS_NOT_APPLICABLE`.
 
         Returns
         -------
@@ -88,6 +105,7 @@ class NativeConformanceEngine:
         nw_datasets: dict[str, nw.DataFrame] = {
             k.upper(): nw.from_native(v, eager_only=True) for k, v in datasets.items()
         }
+        self._define_pkg: MetadataPackage | None = self._load_define_xml(define_xml)
         results: list[NativeRuleResult] = []
         for rule in self._rules:
             result = self._evaluate_rule(rule, nw_datasets)
@@ -117,7 +135,8 @@ class NativeConformanceEngine:
         except ImportError:
             return None
         result = _read_define_xml_metadata(str(define_xml))
-        from pointblank.metadata._types import MetadataPackage as _Pkg, MetadataImport as _MI
+        from pointblank.metadata._types import MetadataPackage as _Pkg
+
         if isinstance(result, _Pkg):
             return result
         pkg = _Pkg()
@@ -145,10 +164,16 @@ class NativeConformanceEngine:
                 description=rule.description,
             )
 
-        # Partially Executable rules require extra datasets (e.g. Define XML metadata).
-        # Return NOT_APPLICABLE instead of failing when those inputs are absent.
+        # Partially Executable rules require extra inputs.
+        # "DEFINE" is satisfied by define_xml; all others must be present as DataFrame keys.
         if rule.executability == "Partially Executable":
-            missing_ds = [d for d in rule.datasets if d.upper() not in datasets]
+            missing_ds = []
+            for d in rule.datasets:
+                if d.upper() == "DEFINE":
+                    if self._define_pkg is None:
+                        missing_ds.append(d)
+                elif d.upper() not in datasets:
+                    missing_ds.append(d)
             if missing_ds:
                 return NativeRuleResult(
                     rule_id=rule.core_id,
@@ -166,6 +191,8 @@ class NativeConformanceEngine:
             "DOMAIN_PRESENCE_CHECK": self._domain_presence_check,
             "DATASET_CONTENTS_CHECK": self._dataset_contents_check,
             "VARIABLE_METADATA_CHECK": self._variable_metadata_check,
+            "DEFINE_ITEM_METADATA_CHECK": self._define_item_metadata_check,
+            "DEFINE_CODELIST_CHECK": self._define_codelist_check,
         }[rule.rule_type]
 
         try:
@@ -197,7 +224,8 @@ class NativeConformanceEngine:
             df = datasets.get(domain.upper())
             if df is None:
                 continue
-            df = apply_operations(df, rule.operations, self._ct, datasets)
+            define_meta = self._define_meta_for(domain)
+            df = apply_operations(df, rule.operations, self._ct, datasets, define_meta)
             try:
                 mask = evaluate_conditions(df, rule.conditions)
             except EvaluationError:
@@ -255,8 +283,8 @@ class NativeConformanceEngine:
             df = datasets.get(domain.upper())
             if df is None:
                 continue
+            define_meta = self._define_meta_for(domain)
             # Operations add the computed columns that conditions reference.
-            df = apply_operations(df, rule.operations, self._ct, datasets)
             df = apply_operations(df, rule.operations, self._ct, datasets, define_meta)
             # For metadata checks the condition is evaluated once against a single-row summary
             # DataFrame (all computed columns).  If any operation added a False column, the
