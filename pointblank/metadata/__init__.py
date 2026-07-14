@@ -29,6 +29,7 @@ from pointblank.metadata._submission import (
     ConformanceReport,
     SubmissionPackage,
     validate_cdisc_submission,
+    validate_sdtmig,
 )
 from pointblank.metadata._types import (
     Codelist,
@@ -66,6 +67,7 @@ __all__ = [
     "SubmissionPackage",
     "ConformanceReport",
     "validate_cdisc_submission",
+    "validate_sdtmig",
     "CoreFinding",
     "CoreRuleResult",
     "CoreIssueSummary",
