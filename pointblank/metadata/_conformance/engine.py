@@ -49,10 +49,25 @@ _MAX_FINDINGS = 100
 # Columns checked as candidate identifiers when building a row finding (in priority order).
 # The first one that's present in the dataset is included in `context`.
 _CONTEXT_CANDIDATES = [
-    "STUDYID", "DOMAIN", "SUBJID",
-    "VISITNUM", "VISIT", "EPOCH",
-    "AESEQ", "CMSEQ", "LBSEQ", "VSSEQ", "EXSEQ", "MHSEQ", "DSSEQ", "EGSEQ",
-    "AETERM", "CMTRT", "LBTESTCD", "VSTESTCD", "EGTESTCD",
+    "STUDYID",
+    "DOMAIN",
+    "SUBJID",
+    "VISITNUM",
+    "VISIT",
+    "EPOCH",
+    "AESEQ",
+    "CMSEQ",
+    "LBSEQ",
+    "VSSEQ",
+    "EXSEQ",
+    "MHSEQ",
+    "DSSEQ",
+    "EGSEQ",
+    "AETERM",
+    "CMTRT",
+    "LBTESTCD",
+    "VSTESTCD",
+    "EGTESTCD",
 ]
 
 
@@ -329,8 +344,7 @@ class NativeConformanceEngine:
         else:
             # Exclude SUPP-- and RELREC from catch-all iteration; they have non-standard structure.
             target_domains = [
-                k for k in datasets
-                if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
+                k for k in datasets if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
             ]
         all_findings: list[NativeRowFinding] = []
         n_issues = 0
@@ -394,8 +408,7 @@ class NativeConformanceEngine:
         else:
             # Exclude SUPP-- and RELREC from catch-all iteration; they have non-standard structure.
             target_domains = [
-                k for k in datasets
-                if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
+                k for k in datasets if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
             ]
         n_issues = 0
         first_failing_domain = ""

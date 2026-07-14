@@ -624,9 +624,7 @@ def test_validate_cdisc_submission_from_package(tmp_path):
     import pointblank as pb
 
     pkg = _dm_pkg()
-    rep = pb.validate_cdisc_submission(
-        pkg, core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w"
-    )
+    rep = pb.validate_cdisc_submission(pkg, core=_fake_core_cmd(tmp_path), workdir=tmp_path / "w")
     assert rep.is_core
     assert rep.package is pkg
 
@@ -697,8 +695,15 @@ def test_to_json_native(tmp_path):
     import pointblank as pb
 
     dm = pd.DataFrame(
-        {"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"],
-         "SUBJID": ["001"], "ARMCD": ["A"], "ARM": ["A"], "COUNTRY": ["USA"]}
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["S1-001"],
+            "SUBJID": ["001"],
+            "ARMCD": ["A"],
+            "ARM": ["A"],
+            "COUNTRY": ["USA"],
+        }
     )
     rep = pb.SubmissionPackage(datasets={"DM": dm}).validate_conformance()
     dest = rep.to_json(tmp_path / "native_report.json")
@@ -747,8 +752,15 @@ def test_to_excel_native(tmp_path):
     import pointblank as pb
 
     dm = pd.DataFrame(
-        {"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"],
-         "SUBJID": ["001"], "ARMCD": ["A"], "ARM": ["A"], "COUNTRY": ["USA"]}
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["S1-001"],
+            "SUBJID": ["001"],
+            "ARMCD": ["A"],
+            "ARM": ["A"],
+            "COUNTRY": ["USA"],
+        }
     )
     rep = pb.SubmissionPackage(datasets={"DM": dm}).validate_conformance()
     dest = rep.to_excel(tmp_path / "native_report.xlsx")

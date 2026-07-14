@@ -92,7 +92,9 @@ def _op_codelist_check(
     # Build case-insensitive lookup; SAS/XPT missing values arrive as "" — treat as null.
     upper_terms = {t.upper() for t in terms}
     values = df[col].to_list()
-    mask = [True if (v is None or str(v) == "") else (str(v).upper() in upper_terms) for v in values]
+    mask = [
+        True if (v is None or str(v) == "") else (str(v).upper() in upper_terms) for v in values
+    ]
     return df.with_columns(_new_bool_series(result_col, mask, df))
 
 

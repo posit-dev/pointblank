@@ -65,21 +65,32 @@ def engine():
 
 
 def _clean_ta() -> pl.DataFrame:
-    return pl.DataFrame({
-        "STUDYID": ["S001", "S001"], "DOMAIN": ["TA", "TA"],
-        "ARMCD": ["A", "B"], "ARM": ["Arm A", "Arm B"],
-        "TAETORD": [1, 1], "EPOCH": ["TREATMENT", "TREATMENT"],
-        "ELEMENT": ["Element 1", "Element 1"], "ETCD": ["ET1", "ET1"],
-        "TASEQ": [1, 2],
-    })
+    return pl.DataFrame(
+        {
+            "STUDYID": ["S001", "S001"],
+            "DOMAIN": ["TA", "TA"],
+            "ARMCD": ["A", "B"],
+            "ARM": ["Arm A", "Arm B"],
+            "TAETORD": [1, 1],
+            "EPOCH": ["TREATMENT", "TREATMENT"],
+            "ELEMENT": ["Element 1", "Element 1"],
+            "ETCD": ["ET1", "ET1"],
+            "TASEQ": [1, 2],
+        }
+    )
 
 
 def _clean_ts() -> pl.DataFrame:
-    return pl.DataFrame({
-        "STUDYID": ["S001"], "DOMAIN": ["TS"],
-        "TSSEQ": [1], "TSPARMCD": ["PLANSUB"],
-        "TSPARM": ["Planned Number of Subjects"], "TSVAL": ["100"],
-    })
+    return pl.DataFrame(
+        {
+            "STUDYID": ["S001"],
+            "DOMAIN": ["TS"],
+            "TSSEQ": [1],
+            "TSPARMCD": ["PLANSUB"],
+            "TSPARM": ["Planned Number of Subjects"],
+            "TSVAL": ["100"],
+        }
+    )
 
 
 @pytest.fixture
@@ -506,10 +517,18 @@ def test_engine_row_finding_has_usubjid(engine):
 def test_engine_row_finding_has_date_column(engine):
     dm = pl.DataFrame(
         {
-            "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SUBJID": ["1"],
-            "SEX": ["M"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
-            "COUNTRY": ["USA"], "ARMCD": ["A"], "ARM": ["Arm A"],
-            "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["U1"],
+            "SUBJID": ["1"],
+            "SEX": ["M"],
+            "RACE": ["WHITE"],
+            "ETHNIC": ["NOT HISPANIC OR LATINO"],
+            "COUNTRY": ["USA"],
+            "ARMCD": ["A"],
+            "ARM": ["Arm A"],
+            "ACTARMCD": ["A"],
+            "ACTARM": ["Arm A"],
             "DMDTC": ["not-a-date"],
         }
     )
@@ -643,13 +662,19 @@ def test_submission_package_findings_accessor():
 def test_findings_df_returns_dataframe():
     import polars as pl
 
-    dirty = pl.DataFrame({
-        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SEX": ["BAD"]
-    })
+    dirty = pl.DataFrame({"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SEX": ["BAD"]})
     report = pb.validate_sdtmig({"DM": dirty})
     df = report.findings_df()
     assert isinstance(df, pl.DataFrame)
-    expected_cols = {"rule_id", "dataset", "row_index", "usubjid", "checked_column", "checked_value", "description"}
+    expected_cols = {
+        "rule_id",
+        "dataset",
+        "row_index",
+        "usubjid",
+        "checked_column",
+        "checked_value",
+        "description",
+    }
     assert expected_cols.issubset(set(df.columns))
     assert len(df) > 0
 
@@ -657,10 +682,15 @@ def test_findings_df_returns_dataframe():
 def test_findings_df_captures_correct_fields():
     import polars as pl
 
-    dirty = pl.DataFrame({
-        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U99"],
-        "SUBJID": ["99"], "SEX": ["Q"],
-    })
+    dirty = pl.DataFrame(
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["U99"],
+            "SUBJID": ["99"],
+            "SEX": ["Q"],
+        }
+    )
     report = pb.validate_sdtmig({"DM": dirty})
     df = report.findings_df()
     sex_row = df.filter(pl.col("rule_id") == "SDTM-007")
@@ -695,10 +725,15 @@ def test_get_findings_table_returns_gt():
     import polars as pl
     from great_tables import GT
 
-    dirty = pl.DataFrame({
-        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"],
-        "SUBJID": ["1"], "SEX": ["Q"],
-    })
+    dirty = pl.DataFrame(
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["U1"],
+            "SUBJID": ["1"],
+            "SEX": ["Q"],
+        }
+    )
     report = pb.validate_sdtmig({"DM": dirty})
     gt = report.get_findings_table()
     assert isinstance(gt, GT)
@@ -774,7 +809,7 @@ def test_jsonata_grouped():
 def test_jsonata_string_functions():
     assert evaluate_jsonata('$uppercase("ae")', {}) == "AE"
     assert evaluate_jsonata('$lowercase("AE")', {}) == "ae"
-    assert evaluate_jsonata('$string(42)', {}) == "42"
+    assert evaluate_jsonata("$string(42)", {}) == "42"
     assert evaluate_jsonata('$length("hello")', {}) == 5
     assert evaluate_jsonata('$trim("  hi  ")', {}) == "hi"
 
@@ -801,6 +836,7 @@ def test_jsonata_context_field_expression():
 
 def test_jsonata_not_supported_filter():
     import pytest
+
     # Filter expressions VALS[...] are not supported; raises either
     # JSONataNotSupported (when reached during evaluation) or JSONataSyntaxError
     # (when the parser hits unexpected '[' after consuming VALS).
@@ -810,6 +846,7 @@ def test_jsonata_not_supported_filter():
 
 def test_jsonata_syntax_error():
     import pytest
+
     with pytest.raises(JSONataSyntaxError):
         evaluate_jsonata("= broken", {})
 
@@ -823,9 +860,16 @@ def test_has_required_variables_all_present():
     import polars as pl
     import narwhals as nw
 
-    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True)
+    df = nw.from_native(
+        pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True
+    )
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "has_required_variables", "params": {"variables": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    ops = [
+        {
+            "operator": "has_required_variables",
+            "params": {"variables": ["STUDYID", "DOMAIN", "USUBJID"]},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_STUDYID_present"].to_list() == [True]
     assert result["_pb_DOMAIN_present"].to_list() == [True]
@@ -852,9 +896,16 @@ def test_valid_variable_order_correct():
     import polars as pl
     import narwhals as nw
 
-    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True)
+    df = nw.from_native(
+        pl.DataFrame({"STUDYID": ["X"], "DOMAIN": ["DM"], "USUBJID": ["U1"]}), eager_only=True
+    )
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    ops = [
+        {
+            "operator": "valid_variable_order",
+            "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_variable_order_valid"].to_list() == [True]
 
@@ -866,9 +917,16 @@ def test_valid_variable_order_wrong():
     import narwhals as nw
 
     # DOMAIN appears before STUDYID
-    df = nw.from_native(pl.DataFrame({"DOMAIN": ["DM"], "STUDYID": ["X"], "USUBJID": ["U1"]}), eager_only=True)
+    df = nw.from_native(
+        pl.DataFrame({"DOMAIN": ["DM"], "STUDYID": ["X"], "USUBJID": ["U1"]}), eager_only=True
+    )
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    ops = [
+        {
+            "operator": "valid_variable_order",
+            "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_variable_order_valid"].to_list() == [False]
 
@@ -882,7 +940,12 @@ def test_valid_variable_order_absent_columns_skipped():
     # DOMAIN absent; remaining two are in order → True
     df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "USUBJID": ["U1"]}), eager_only=True)
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "valid_variable_order", "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]}}]
+    ops = [
+        {
+            "operator": "valid_variable_order",
+            "params": {"expected_order": ["STUDYID", "DOMAIN", "USUBJID"]},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_variable_order_valid"].to_list() == [True]
 
@@ -895,7 +958,9 @@ def test_variable_type_check_numeric_ok():
 
     df = nw.from_native(pl.DataFrame({"AGE": [45.0]}), eager_only=True)
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    ops = [
+        {"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_AGE_type_valid"].to_list() == [True]
 
@@ -908,7 +973,9 @@ def test_variable_type_check_numeric_fail():
 
     df = nw.from_native(pl.DataFrame({"AGE": ["45"]}), eager_only=True)  # string, not numeric
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    ops = [
+        {"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_AGE_type_valid"].to_list() == [False]
 
@@ -921,7 +988,9 @@ def test_variable_type_check_absent_column_passes():
 
     df = nw.from_native(pl.DataFrame({"STUDYID": ["X"]}), eager_only=True)
     ct = ControlledTerminology({}, [])
-    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    ops = [
+        {"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_AGE_type_valid"].to_list() == [True]
 
@@ -930,14 +999,27 @@ def test_variable_type_check_absent_column_passes():
 
 
 def _full_dm() -> pl.DataFrame:
-    return pl.DataFrame({
-        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"], "SUBJID": ["001"],
-        "RFSTDTC": ["2020-01-01"], "RFENDTC": ["2020-06-30"],
-        "SITEID": ["001"], "AGE": [45.0], "AGEU": ["YEARS"],
-        "SEX": ["M"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
-        "COUNTRY": ["USA"], "ARMCD": ["A"], "ARM": ["Arm A"],
-        "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
-    })
+    return pl.DataFrame(
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["S1-001"],
+            "SUBJID": ["001"],
+            "RFSTDTC": ["2020-01-01"],
+            "RFENDTC": ["2020-06-30"],
+            "SITEID": ["001"],
+            "AGE": [45.0],
+            "AGEU": ["YEARS"],
+            "SEX": ["M"],
+            "RACE": ["WHITE"],
+            "ETHNIC": ["NOT HISPANIC OR LATINO"],
+            "COUNTRY": ["USA"],
+            "ARMCD": ["A"],
+            "ARM": ["Arm A"],
+            "ACTARMCD": ["A"],
+            "ACTARM": ["Arm A"],
+        }
+    )
 
 
 def test_variable_metadata_check_passes_for_complete_dm():
@@ -946,8 +1028,12 @@ def test_variable_metadata_check_passes_for_complete_dm():
     vmc = [r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"]
     assert len(vmc) > 0
     # With a complete DM, all Fully Executable VMC rules on DM should pass.
-    dm_rules = [r for r in vmc if "DM" in r.dataset and r.status not in ("not_supported", "not_applicable")]
-    assert all(r.status == "pass" for r in dm_rules), [(r.rule_id, r.status, r.message) for r in dm_rules]
+    dm_rules = [
+        r for r in vmc if "DM" in r.dataset and r.status not in ("not_supported", "not_applicable")
+    ]
+    assert all(r.status == "pass" for r in dm_rules), [
+        (r.rule_id, r.status, r.message) for r in dm_rules
+    ]
 
 
 def test_variable_metadata_check_fails_missing_sex():
@@ -960,7 +1046,9 @@ def test_variable_metadata_check_fails_missing_sex():
 
 
 def test_variable_metadata_check_fails_wrong_order():
-    dm = _full_dm().select(["DOMAIN", "STUDYID"] + [c for c in _full_dm().columns if c not in ("DOMAIN", "STUDYID")])
+    dm = _full_dm().select(
+        ["DOMAIN", "STUDYID"] + [c for c in _full_dm().columns if c not in ("DOMAIN", "STUDYID")]
+    )
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
     result = engine.run({"DM": dm})
     vmc = {r.rule_id: r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"}
@@ -981,7 +1069,9 @@ def test_partially_executable_runs_when_dataset_provided():
     # When the required dataset IS present, the rule should not return not_applicable.
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
     # SDTM-049/050 have empty conditions so they'll pass on any dataset.
-    stub_define = MetadataPackage(items={"DM": MetadataImport(source_format="cdisc_define", dataset_name="DM")})
+    stub_define = MetadataPackage(
+        items={"DM": MetadataImport(source_format="cdisc_define", dataset_name="DM")}
+    )
     result = engine.run({"DM": _full_dm()}, define_xml=stub_define)
     partial = {r.rule_id: r for r in result.rule_results if r.rule_id in ("SDTM-049", "SDTM-050")}
     assert all(r.status != "not_applicable" for r in partial.values())
@@ -990,12 +1080,26 @@ def test_partially_executable_runs_when_dataset_provided():
 # ── Phase 3: Define-XML operations and handlers ───────────────────────────────
 
 
-def _make_var(name: str, dtype: str = "String", required: bool = False, allowed_values=None, display_format: str | None = None) -> VariableMetadata:
-    return VariableMetadata(name=name, dtype=dtype, required=required, allowed_values=allowed_values, display_format=display_format)
+def _make_var(
+    name: str,
+    dtype: str = "String",
+    required: bool = False,
+    allowed_values=None,
+    display_format: str | None = None,
+) -> VariableMetadata:
+    return VariableMetadata(
+        name=name,
+        dtype=dtype,
+        required=required,
+        allowed_values=allowed_values,
+        display_format=display_format,
+    )
 
 
 def _make_define_pkg(domain: str, variables: list[VariableMetadata]) -> MetadataPackage:
-    meta = MetadataImport(source_format="cdisc_define", dataset_name=domain, domain=domain, variables=variables)
+    meta = MetadataImport(
+        source_format="cdisc_define", dataset_name=domain, domain=domain, variables=variables
+    )
     return MetadataPackage(items={domain.upper(): meta})
 
 
@@ -1005,7 +1109,9 @@ def test_define_var_declared_present():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("STUDYID"), _make_var("SEX")],
     )
     df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "SEX": ["M"]}), eager_only=True)
@@ -1036,7 +1142,9 @@ def test_define_required_check_passes_non_null():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("STUDYID", required=True)],
     )
     df = nw.from_native(pl.DataFrame({"STUDYID": ["S1", "S2"]}), eager_only=True)
@@ -1051,7 +1159,9 @@ def test_define_required_check_flags_null():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("STUDYID", required=True)],
     )
     df = nw.from_native(pl.DataFrame({"STUDYID": ["S1", None]}), eager_only=True)
@@ -1066,7 +1176,9 @@ def test_define_required_check_not_mandatory_always_true():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("OPTIONAL_VAR", required=False)],
     )
     df = nw.from_native(pl.DataFrame({"OPTIONAL_VAR": ["X", None]}), eager_only=True)
@@ -1081,7 +1193,9 @@ def test_define_codelist_check_valid_values():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("SEX", allowed_values=["M", "F", "U"])],
     )
     df = nw.from_native(pl.DataFrame({"SEX": ["M", "F", "INVALID"]}), eager_only=True)
@@ -1096,7 +1210,9 @@ def test_define_codelist_check_null_passes():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("SEX", allowed_values=["M", "F"])],
     )
     df = nw.from_native(pl.DataFrame({"SEX": ["M", None]}), eager_only=True)
@@ -1111,7 +1227,9 @@ def test_define_codelist_check_no_codelist_always_true():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("NOTES")],  # no allowed_values
     )
     df = nw.from_native(pl.DataFrame({"NOTES": ["anything"]}), eager_only=True)
@@ -1126,7 +1244,9 @@ def test_define_type_check_numeric_ok():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("AGE", dtype="Float64", display_format="float")],
     )
     df = nw.from_native(pl.DataFrame({"AGE": [45.0]}), eager_only=True)
@@ -1141,7 +1261,9 @@ def test_define_type_check_char_mismatch():
     import narwhals as nw
 
     define_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
         variables=[_make_var("STUDYID", display_format="text")],
     )
     df = nw.from_native(pl.DataFrame({"STUDYID": [1, 2]}), eager_only=True)  # numeric, not text
@@ -1154,25 +1276,42 @@ def test_define_type_check_char_mismatch():
 
 
 def _dm_with_bad_sex() -> pl.DataFrame:
-    return pl.DataFrame({
-        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"], "SUBJID": ["001"],
-        "SEX": ["INVALID"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
-        "COUNTRY": ["USA"], "AGE": [45.0], "AGEU": ["YEARS"], "SITEID": ["001"],
-        "RFSTDTC": ["2020-01-01"], "RFENDTC": ["2020-06-30"],
-        "ARMCD": ["A"], "ARM": ["Arm A"], "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
-    })
+    return pl.DataFrame(
+        {
+            "STUDYID": ["S1"],
+            "DOMAIN": ["DM"],
+            "USUBJID": ["S1-001"],
+            "SUBJID": ["001"],
+            "SEX": ["INVALID"],
+            "RACE": ["WHITE"],
+            "ETHNIC": ["NOT HISPANIC OR LATINO"],
+            "COUNTRY": ["USA"],
+            "AGE": [45.0],
+            "AGEU": ["YEARS"],
+            "SITEID": ["001"],
+            "RFSTDTC": ["2020-01-01"],
+            "RFENDTC": ["2020-06-30"],
+            "ARMCD": ["A"],
+            "ARM": ["Arm A"],
+            "ACTARMCD": ["A"],
+            "ACTARM": ["Arm A"],
+        }
+    )
 
 
 def _dm_define_pkg() -> MetadataPackage:
-    return _make_define_pkg("DM", [
-        _make_var("STUDYID", required=True),
-        _make_var("DOMAIN", required=True),
-        _make_var("USUBJID", required=True),
-        _make_var("SEX", allowed_values=["M", "F", "U", "UNDIFFERENTIATED"]),
-        _make_var("RACE", allowed_values=["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN"]),
-        _make_var("ETHNIC", allowed_values=["NOT HISPANIC OR LATINO", "HISPANIC OR LATINO"]),
-        _make_var("AGE", dtype="Float64", display_format="float"),
-    ])
+    return _make_define_pkg(
+        "DM",
+        [
+            _make_var("STUDYID", required=True),
+            _make_var("DOMAIN", required=True),
+            _make_var("USUBJID", required=True),
+            _make_var("SEX", allowed_values=["M", "F", "U", "UNDIFFERENTIATED"]),
+            _make_var("RACE", allowed_values=["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN"]),
+            _make_var("ETHNIC", allowed_values=["NOT HISPANIC OR LATINO", "HISPANIC OR LATINO"]),
+            _make_var("AGE", dtype="Float64", display_format="float"),
+        ],
+    )
 
 
 def test_define_item_metadata_check_all_declared():
@@ -1186,10 +1325,15 @@ def test_define_item_metadata_check_all_declared():
 def test_define_item_metadata_check_undeclared_variable():
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
     # Provide a Define-XML that does NOT declare DOMAIN
-    pkg = _make_define_pkg("DM", [
-        _make_var("STUDYID", required=True),
-        _make_var("USUBJID"), _make_var("SEX"), _make_var("AGE", display_format="float"),
-    ])
+    pkg = _make_define_pkg(
+        "DM",
+        [
+            _make_var("STUDYID", required=True),
+            _make_var("USUBJID"),
+            _make_var("SEX"),
+            _make_var("AGE", display_format="float"),
+        ],
+    )
     result = engine.run({"DM": _clean_dm()}, define_xml=pkg)
     sdtm_051 = next(r for r in result.rule_results if r.rule_id == "SDTM-051")
     assert sdtm_051.status == "fail"
@@ -1214,7 +1358,8 @@ def test_define_codelist_check_passes_valid_values():
 
 def test_define_rules_not_applicable_without_define_xml():
     engine = NativeConformanceEngine(
-        "sdtmig", "3.4",
+        "sdtmig",
+        "3.4",
         rule_types=["DEFINE_ITEM_METADATA_CHECK", "DEFINE_CODELIST_CHECK"],
     )
     result = engine.run({"DM": _clean_dm()})  # no define_xml
@@ -1224,7 +1369,8 @@ def test_define_rules_not_applicable_without_define_xml():
 
 def test_define_rules_applicable_with_define_xml():
     engine = NativeConformanceEngine(
-        "sdtmig", "3.4",
+        "sdtmig",
+        "3.4",
         rule_types=["DEFINE_ITEM_METADATA_CHECK", "DEFINE_CODELIST_CHECK"],
     )
     result = engine.run({"DM": _clean_dm()}, define_xml=_dm_define_pkg())
@@ -1235,9 +1381,16 @@ def test_define_rules_applicable_with_define_xml():
 def test_engine_accepts_metadata_import_directly():
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
     dm_meta = MetadataImport(
-        source_format="cdisc_define", dataset_name="DM", domain="DM",
-        variables=[_make_var("STUDYID", required=True), _make_var("DOMAIN"), _make_var("USUBJID"),
-                   _make_var("SEX"), _make_var("AGE", display_format="float")],
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
+        variables=[
+            _make_var("STUDYID", required=True),
+            _make_var("DOMAIN"),
+            _make_var("USUBJID"),
+            _make_var("SEX"),
+            _make_var("AGE", display_format="float"),
+        ],
     )
     result = engine.run({"DM": _clean_dm()}, define_xml=dm_meta)
     sdtm_051 = next(r for r in result.rule_results if r.rule_id == "SDTM-051")

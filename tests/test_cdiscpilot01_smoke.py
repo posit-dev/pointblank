@@ -350,7 +350,15 @@ def test_findings_df_schema(pilot_report):
 
     df = pilot_report.findings_df()
     assert isinstance(df, pl.DataFrame)
-    expected = {"rule_id", "dataset", "row_index", "usubjid", "checked_column", "checked_value", "description"}
+    expected = {
+        "rule_id",
+        "dataset",
+        "row_index",
+        "usubjid",
+        "checked_column",
+        "checked_value",
+        "description",
+    }
     assert expected.issubset(set(df.columns))
 
 
