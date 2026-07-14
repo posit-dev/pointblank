@@ -339,3 +339,50 @@ def test_get_tabular_report_returns_gt(pilot_report):
 def test_repr_html_non_empty(pilot_report):
     html = pilot_report._repr_html_()
     assert html and len(html) > 500
+
+
+# ── findings_df and get_findings_table ────────────────────────────────────────
+
+
+def test_findings_df_schema(pilot_report):
+    """findings_df() returns a DataFrame with the expected column set."""
+    import polars as pl
+
+    df = pilot_report.findings_df()
+    assert isinstance(df, pl.DataFrame)
+    expected = {"rule_id", "dataset", "row_index", "usubjid", "checked_column", "checked_value", "description"}
+    assert expected.issubset(set(df.columns))
+
+
+def test_findings_df_has_usubjid_values(pilot_report):
+    """Every finding must carry a non-empty USUBJID (pilot DM has 306 subjects)."""
+    df = pilot_report.findings_df()
+    # All captured row findings (capped at 100 per rule) should have a USUBJID
+    assert (df["usubjid"] != "").all(), "Some findings are missing USUBJID"
+
+
+def test_findings_df_aerel_findings(pilot_report):
+    """findings_df() for SDTM-135 (AEREL) must capture checked_column='AEREL'."""
+    import polars as pl
+
+    df = pilot_report.findings_df()
+    aerel = df.filter(pl.col("rule_id") == "SDTM-135")
+    assert len(aerel) > 0
+    assert (aerel["checked_column"] == "AEREL").all()
+    # checked_value should be one of the old CT terms
+    old_terms = {"PROBABLE", "POSSIBLE", "REMOTE", "NONE"}
+    actual_vals = set(aerel["checked_value"].unique().to_list())
+    assert actual_vals & old_terms, f"Expected old AEREL terms, got {actual_vals}"
+
+
+def test_get_findings_table_renders(pilot_report):
+    """get_findings_table() renders a non-trivial HTML string."""
+    try:
+        from great_tables import GT
+    except ImportError:
+        pytest.skip("great_tables not installed")
+    gt = pilot_report.get_findings_table()
+    assert isinstance(gt, GT)
+    html = gt._repr_html_()
+    assert len(html) > 1000
+    assert "SDTM-" in html  # at least one rule ID visible
