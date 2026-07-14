@@ -491,6 +491,47 @@ def test_engine_row_findings_populated(engine):
     assert f.row == 0
 
 
+def test_engine_row_finding_has_usubjid(engine):
+    dm = pl.DataFrame(
+        {"STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SUBJID": ["1"], "SEX": ["Q"]}
+    )
+    result = engine.run({"DM": dm})
+    findings = result.findings()
+    sex_finding = next(f for f in findings if f.rule_id == "SDTM-007")
+    assert sex_finding.usubjid == "U1"
+    assert sex_finding.checked_column == "SEX"
+    assert sex_finding.checked_value == "Q"
+
+
+def test_engine_row_finding_has_date_column(engine):
+    dm = pl.DataFrame(
+        {
+            "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SUBJID": ["1"],
+            "SEX": ["M"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
+            "COUNTRY": ["USA"], "ARMCD": ["A"], "ARM": ["Arm A"],
+            "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
+            "DMDTC": ["not-a-date"],
+        }
+    )
+    result = engine.run({"DM": dm})
+    findings = result.findings()
+    date_finding = next((f for f in findings if f.rule_id == "SDTM-010"), None)
+    assert date_finding is not None
+    assert date_finding.checked_column == "DMDTC"
+    assert date_finding.checked_value == "not-a-date"
+    assert date_finding.usubjid == "U1"
+
+
+def test_engine_row_finding_no_usubjid_when_absent(engine):
+    # Dataset without USUBJID
+    dm = pl.DataFrame({"STUDYID": ["S1"], "DOMAIN": ["DM"], "SEX": ["Q"]})
+    result = engine.run({"DM": dm})
+    findings = result.findings()
+    sex_finding = next((f for f in findings if f.rule_id == "SDTM-007"), None)
+    if sex_finding is not None:
+        assert sex_finding.usubjid is None
+
+
 def test_engine_rules_status_filter(clean_result):
     passing = clean_result.rules(status=STATUS_PASS)
     assert all(r.status == STATUS_PASS for r in passing)
@@ -536,7 +577,7 @@ def test_submission_package_summary_has_engine_key():
     pkg = pb.SubmissionPackage(datasets={"DM": _clean_dm()})
     report = pkg.validate_conformance()
     s = report.summary()
-    assert s["engine"] == "native"
+    assert s["engine"] == "built-in"
     assert "n_rules" in s
     assert "n_issues" in s
 
@@ -551,11 +592,11 @@ def test_submission_package_dirty_data_fails():
     assert len(report.issues()) > 0
 
 
-def test_submission_package_repr_shows_native_rules():
+def test_submission_package_repr_shows_built_in_rules():
     pkg = pb.SubmissionPackage(datasets={"DM": _clean_dm()})
     report = pkg.validate_conformance()
     r = repr(report)
-    assert "Native Rules" in r
+    assert "Built-in Rules" in r
 
 
 def test_submission_package_to_json_rules(tmp_path):
@@ -563,7 +604,7 @@ def test_submission_package_to_json_rules(tmp_path):
     report = pkg.validate_conformance()
     dest = report.to_json(tmp_path / "r.json")
     data = json.loads(dest.read_text())
-    assert data["summary"]["engine"] == "native"
+    assert data["summary"]["engine"] == "built-in"
     assert isinstance(data["issues"], list)
 
 
@@ -597,6 +638,80 @@ def test_submission_package_findings_accessor():
     findings = report.findings()
     assert len(findings) > 0
     assert all(isinstance(f, NativeRowFinding) for f in findings)
+
+
+def test_findings_df_returns_dataframe():
+    import polars as pl
+
+    dirty = pl.DataFrame({
+        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"], "SEX": ["BAD"]
+    })
+    report = pb.validate_sdtmig({"DM": dirty})
+    df = report.findings_df()
+    assert isinstance(df, pl.DataFrame)
+    expected_cols = {"rule_id", "dataset", "row_index", "usubjid", "checked_column", "checked_value", "description"}
+    assert expected_cols.issubset(set(df.columns))
+    assert len(df) > 0
+
+
+def test_findings_df_captures_correct_fields():
+    import polars as pl
+
+    dirty = pl.DataFrame({
+        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U99"],
+        "SUBJID": ["99"], "SEX": ["Q"],
+    })
+    report = pb.validate_sdtmig({"DM": dirty})
+    df = report.findings_df()
+    sex_row = df.filter(pl.col("rule_id") == "SDTM-007")
+    assert len(sex_row) == 1
+    assert sex_row["usubjid"][0] == "U99"
+    assert sex_row["checked_column"][0] == "SEX"
+    assert sex_row["checked_value"][0] == "Q"
+
+
+def test_findings_df_empty_when_all_pass(clean_result):
+    """findings_df() returns an empty DataFrame (correct schema) when no issues exist."""
+    import polars as pl
+
+    report = pb.ConformanceReport(native_result=clean_result)
+    df = report.findings_df()
+    assert isinstance(df, pl.DataFrame)
+    assert len(df) == 0
+    assert "rule_id" in df.columns
+
+
+def test_findings_df_raises_for_core_report():
+    """findings_df() raises TypeError on a CORE-backed report."""
+    from pointblank.metadata._cdisc_core import ParsedCoreReport
+
+    report = pb.ConformanceReport(core=ParsedCoreReport())
+    with pytest.raises(TypeError, match="findings_df"):
+        report.findings_df()
+
+
+def test_get_findings_table_returns_gt():
+    """get_findings_table() returns a GT object."""
+    import polars as pl
+    from great_tables import GT
+
+    dirty = pl.DataFrame({
+        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["U1"],
+        "SUBJID": ["1"], "SEX": ["Q"],
+    })
+    report = pb.validate_sdtmig({"DM": dirty})
+    gt = report.get_findings_table()
+    assert isinstance(gt, GT)
+    html = gt._repr_html_()
+    assert "SDTM-007" in html
+    assert "U1" in html
+
+
+def test_get_findings_table_raises_when_no_findings(clean_result):
+    """get_findings_table() raises ValueError when there are no findings."""
+    report = pb.ConformanceReport(native_result=clean_result)
+    with pytest.raises(ValueError, match="No row-level findings"):
+        report.get_findings_table()
 
 
 # ── Phase 2: JSONata evaluator ────────────────────────────────────────────────
