@@ -45,7 +45,7 @@ def _is_relrec(name: str) -> bool:
 
 
 def _is_adam(name: str) -> bool:
-    """Whether a dataset name is an ADaM dataset (conventionally prefixed ``AD``)."""
+    """Whether a dataset name is an ADaM dataset (conventionally prefixed `AD`)."""
     return name.upper().startswith("AD")
 
 
@@ -86,13 +86,13 @@ def _read_xpt_data(path: Path) -> Any:
 def _read_dataset_json(path: Path) -> tuple[Any, str | None]:
     """Read a CDISC Dataset-JSON file into a pandas DataFrame.
 
-    Supports both the Dataset-JSON 1.1 top-level ``columns``/``rows`` layout and the older
-    ``clinicalData``/``referenceData`` → ``itemGroupData`` nesting.
+    Supports both the Dataset-JSON 1.1 top-level `columns`/`rows` layout and the older
+    `clinicalData`/`referenceData` -> `itemGroupData` nesting.
 
     Returns
     -------
     tuple[Any, str | None]
-        The DataFrame and the dataset name (domain) if discoverable, else ``None``.
+        The DataFrame and the dataset name (domain) if discoverable, else `None`.
     """
     import json
 
@@ -502,7 +502,10 @@ class SubmissionPackage:
             std = standard or self.standard
             ver = version or self.standard_version
             rules_report = self._run_rules_conformance(
-                agency=agency, standard=std, version=ver, ct_packages=ct_packages,
+                agency=agency,
+                standard=std,
+                version=ver,
+                ct_packages=ct_packages,
                 define_xml=define_xml,
             )
             if rules_report is not None:
@@ -542,8 +545,10 @@ class SubmissionPackage:
             standard=standard, version=version, ct_packages=ct_packages
         )
         # Prefer explicit define_xml argument; fall back to package's define path.
-        _define = define_xml if define_xml is not None else (
-            self.define if isinstance(self.define, (str, Path)) else None
+        _define = (
+            define_xml
+            if define_xml is not None
+            else (self.define if isinstance(self.define, (str, Path)) else None)
         )
         result = engine.run(self.datasets, define_xml=_define)
         return ConformanceReport(native_result=result, package=self, agency=agency)
@@ -727,9 +732,7 @@ class SubmissionPackage:
                 dimension="consistency",
             )
 
-    def _add_relrec_checks(
-        self, validation: Validate, data: Any, cols: set, has_dm: bool
-    ) -> None:
+    def _add_relrec_checks(self, validation: Validate, data: Any, cols: set, has_dm: bool) -> None:
         """RELREC (Related Records) resolution checks (lightweight)."""
         present_domains = set(self.datasets.keys())
         if "RDOMAIN" in cols:
@@ -886,8 +889,7 @@ def _referential_expr(column: str, valid_values: set, na_pass: bool = True):
         if column not in df.columns:
             return [True]
         return [
-            (True if (v is None and na_pass) else (v in valid_values))
-            for v in df[column].to_list()
+            (True if (v is None and na_pass) else (v in valid_values)) for v in df[column].to_list()
         ]
 
     return check
@@ -1365,9 +1367,9 @@ class ConformanceReport:
                 if issues:
                     pd.DataFrame(issues).to_excel(writer, sheet_name="Issues", index=False)
                 s = self.summary()
-                pd.DataFrame(
-                    [{"Key": k, "Value": str(v)} for k, v in s.items()]
-                ).to_excel(writer, sheet_name="Summary", index=False)
+                pd.DataFrame([{"Key": k, "Value": str(v)} for k, v in s.items()]).to_excel(
+                    writer, sheet_name="Summary", index=False
+                )
             else:
                 issues = self.issues()
                 if issues:
@@ -1378,36 +1380,191 @@ class ConformanceReport:
 
         return dest
 
+    def get_tabular_report(self) -> "GT":
+        """Build a Great Tables conformance report for the native rules engine."""
+        from importlib.metadata import version as _pkg_version
+
+        import polars as pl
+        from great_tables import GT, from_column, google_font, html, loc, style
+
+        if not self.is_rules:
+            raise TypeError(
+                "get_tabular_report() is only available for native rules results. "
+                "Use validate_conformance(engine='native') to obtain one."
+            )
+
+        nr = self.native_result
+
+        _STATUS_COLORS = {
+            "pass": "#4CA64C",
+            "fail": "#FF3300",
+            "error": "#EBBC14",
+            "not_applicable": "#AAAAAA",
+            "not_supported": "#AAAAAA",
+        }
+        _TYPE_LABELS = {
+            "RECORD_CHECK": "Record",
+            "VARIABLE_METADATA_CHECK": "Variable",
+            "DATASET_CONTENTS_CHECK": "Dataset",
+            "DOMAIN_PRESENCE_CHECK": "Domain",
+            "DATASET_METADATA_CHECK": "Metadata",
+            "DEFINE_ITEM_METADATA_CHECK": "Define",
+            "DEFINE_CODELIST_CHECK": "Codelist",
+        }
+        _STATUS_PRIORITY = {
+            "fail": 0,
+            "error": 1,
+            "pass": 2,
+            "not_applicable": 3,
+            "not_supported": 4,
+        }
+
+        rows = sorted(
+            nr.rule_results,
+            key=lambda r: (_STATUS_PRIORITY.get(r.status, 5), -r.n_issues),
+        )
+
+        def _fmt_dataset(ds: str) -> str:
+            parts = [p.strip() for p in ds.split(",")]
+            supp = [p for p in parts if p.startswith("SUPP")]
+            other = [p for p in parts if not p.startswith("SUPP")]
+            if len(supp) > 1:
+                abbrev = "SUPP--: " + ", ".join(p[4:] for p in supp)
+                return ", ".join(other + [abbrev]) if other else abbrev
+            return ds
+
+        desc_max = 90
+        data = {
+            "status_color": [_STATUS_COLORS.get(r.status, "#AAAAAA") for r in rows],
+            "rule_id": [r.rule_id for r in rows],
+            "dataset": [_fmt_dataset(r.dataset) for r in rows],
+            "type": [_TYPE_LABELS.get(r.rule_type, r.rule_type) for r in rows],
+            "n_issues": [r.n_issues for r in rows],
+            "description": [
+                r.description[:desc_max] + "…" if len(r.description) > desc_max else r.description
+                for r in rows
+            ],
+        }
+        df = pl.DataFrame(data)
+
+        # indices of rows with at least one issue (for red-text styling)
+        issue_indices = [i for i, r in enumerate(rows) if r.n_issues > 0]
+
+        counts = nr.status_counts()
+        counts_parts = []
+        _LABEL = {
+            "pass": "passed",
+            "fail": "failed",
+            "error": "error",
+            "not_applicable": "n/a",
+            "not_supported": "unsupported",
+        }
+        for st in ("pass", "fail", "error", "not_applicable", "not_supported"):
+            n = counts.get(st, 0)
+            if n:
+                counts_parts.append(f"{n}&thinsp;{_LABEL[st]}")
+        counts_str = "&ensp;·&ensp;".join(counts_parts)
+
+        agency_part = f"&ensp;·&ensp;{self.agency}" if self.agency else ""
+        subtitle_text = (
+            f"{nr.standard.upper()}&thinsp;{nr.version}{agency_part}&ensp;·&ensp;{counts_str}"
+        )
+
+        ct_note = ""
+        if nr.ct_packages:
+            ct_note = "CT: " + " | ".join(nr.ct_packages)
+
+        overall_passed = nr.all_passed
+        status_label = "PASS" if overall_passed else "FAIL"
+        status_color = "#4CA64C" if overall_passed else "#FF3300"
+        status_html = (
+            f'<span style="display:inline-block;padding:2px 9px;border-radius:10px;'
+            f"background:{'#e8f5e9' if overall_passed else '#ffebee'};"
+            f"color:{status_color};font-size:0.78em;font-weight:700;"
+            f'letter-spacing:0.04em;">{status_label}</span>'
+        )
+        title_text = f"CDISC Conformance&ensp;{status_html}"
+
+        gt_tbl = (
+            GT(df, id="pb_conformance_tbl")
+            .tab_header(
+                title=html(title_text),
+                subtitle=html(subtitle_text),
+            )
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            # ── status color bar ──────────────────────────────────────────
+            .tab_style(
+                style=style.fill(color=from_column(column="status_color")),
+                locations=loc.body(columns="status_color"),
+            )
+            .tab_style(
+                style=style.text(color="transparent", size="0px"),
+                locations=loc.body(columns="status_color"),
+            )
+            # ── monospace columns ─────────────────────────────────────────
+            .tab_style(
+                style=style.text(font=google_font(name="IBM Plex Mono"), size="11px"),
+                locations=loc.body(
+                    columns=["rule_id", "dataset", "type", "n_issues", "description"]
+                ),
+            )
+            # ── issues column: red when non-zero ──────────────────────────
+            .tab_style(
+                style=style.text(color="#c62828", weight="bold"),
+                locations=loc.body(columns="n_issues", rows=issue_indices),
+            )
+            # ── row height ────────────────────────────────────────────────
+            .tab_style(
+                style=style.css("padding-top: 2px; padding-bottom: 2px;"),
+                locations=loc.body(),
+            )
+            # ── column labels ─────────────────────────────────────────────
+            .cols_label(
+                cases={
+                    "status_color": "",
+                    "rule_id": "Rule",
+                    "dataset": "Dataset",
+                    "type": "Type",
+                    "n_issues": "Issues",
+                    "description": "Description",
+                }
+            )
+            # ── column widths ─────────────────────────────────────────────
+            # Should be 904px wide, just like the validation report table.
+            .cols_width(
+                cases={
+                    "status_color": "4px",
+                    "rule_id": "90px",
+                    "dataset": "80px",
+                    "type": "80px",
+                    "n_issues": "50px",
+                    "description": "600px",
+                }
+            )
+            # ── alignment ─────────────────────────────────────────────────
+            .cols_align(align="center", columns=["n_issues"])
+            .tab_options(table_font_size="90%")
+        )
+
+        if ct_note:
+            gt_tbl = gt_tbl.tab_source_note(
+                source_note=html(f'<span style="font-size:0.82em;color:#9e9e9e;">{ct_note}</span>')
+            )
+
+        try:
+            if _pkg_version("great_tables") >= "0.17.0":
+                gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+        except Exception:
+            pass
+
+        return gt_tbl
+
     def _repr_html_(self) -> str:
         agency = f" — agency: {self.agency}" if self.agency else ""
 
         if self.is_rules:
-            nr = self.native_result
-            parts = [f"<h2>CDISC Conformance Report (Native Rules){agency}</h2>"]
-            status = "PASS" if nr.all_passed else "FAIL"
-            parts.append(
-                f"<p><strong>{nr.standard} {nr.version}</strong> — "
-                f"<strong>{status}</strong></p>"
-            )
-            counts = nr.status_counts()
-            parts.append("<ul>")
-            for st, n in sorted(counts.items()):
-                parts.append(f"<li>{st}: {n}</li>")
-            parts.append(f"<li><strong>Total issues:</strong> {nr.n_total_issues}</li>")
-            parts.append("</ul>")
-            failing = [r for r in nr.rule_results if r.n_issues > 0]
-            if failing:
-                parts.append(
-                    "<table><tr><th>Dataset</th><th>Rule</th>"
-                    "<th>Issues</th><th>Message</th></tr>"
-                )
-                for r in failing:
-                    parts.append(
-                        f"<tr><td>{r.dataset}</td><td>{r.rule_id}</td>"
-                        f"<td>{r.n_issues}</td><td>{r.message or r.description}</td></tr>"
-                    )
-                parts.append("</table>")
-            return "\n".join(parts)
+            return self.get_tabular_report()._repr_html_()
 
         if self.is_core:
             core = self.core
@@ -1424,8 +1581,9 @@ class ConformanceReport:
             parts.append(f"<li><strong>Total issues:</strong> {core.n_total_issues}</li>")
             parts.append("</ul>")
             if core.issue_summary:
-                parts.append("<table><tr><th>Dataset</th><th>Rule</th>"
-                             "<th>Issues</th><th>Message</th></tr>")
+                parts.append(
+                    "<table><tr><th>Dataset</th><th>Rule</th><th>Issues</th><th>Message</th></tr>"
+                )
                 for item in core.issue_summary:
                     parts.append(
                         f"<tr><td>{item.dataset}</td><td>{item.rule_id}</td>"
