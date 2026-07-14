@@ -162,6 +162,30 @@ def test_ct_missing_package_raises():
         ControlledTerminology.load(["no-such-package-2099-01-01"])
 
 
+def test_ct_route_codelist(ct):
+    assert ct.is_valid("ROUTE", "ORAL")
+    assert ct.is_valid("ROUTE", "INTRAVENOUS")
+    assert not ct.is_valid("ROUTE", "PURPLE")
+
+
+def test_ct_frm_codelist(ct):
+    assert ct.is_valid("FRM", "TABLET")
+    assert ct.is_valid("FRM", "CAPSULE")
+    assert not ct.is_valid("FRM", "MYSTERY")
+
+
+def test_ct_epoch_codelist(ct):
+    assert ct.is_valid("EPOCH", "SCREENING")
+    assert ct.is_valid("EPOCH", "TREATMENT")
+    assert not ct.is_valid("EPOCH", "PHASE 99")
+
+
+def test_ct_freq_codelist(ct):
+    assert ct.is_valid("FREQ", "QD")
+    assert ct.is_valid("FREQ", "BID")
+    assert not ct.is_valid("FREQ", "WHENEVER")
+
+
 # ── Evaluator ─────────────────────────────────────────────────────────────────
 
 
@@ -364,7 +388,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 430
+    assert len(clean_result.rule_results) == 435
 
 
 def test_engine_result_types(clean_result):
@@ -1108,4 +1132,4 @@ def test_engine_accepts_metadata_import_directly():
 def test_engine_rule_count_phase3():
     engine = NativeConformanceEngine("sdtmig", "3.4")
     result = engine.run({"DM": _clean_dm()})
-    assert len(result.rule_results) == 430
+    assert len(result.rule_results) == 435
