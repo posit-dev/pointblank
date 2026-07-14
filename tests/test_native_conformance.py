@@ -64,9 +64,27 @@ def engine():
     return NativeConformanceEngine("sdtmig", "3.4")
 
 
+def _clean_ta() -> pl.DataFrame:
+    return pl.DataFrame({
+        "STUDYID": ["S001", "S001"], "DOMAIN": ["TA", "TA"],
+        "ARMCD": ["A", "B"], "ARM": ["Arm A", "Arm B"],
+        "TAETORD": [1, 1], "EPOCH": ["TREATMENT", "TREATMENT"],
+        "ELEMENT": ["Element 1", "Element 1"], "ETCD": ["ET1", "ET1"],
+        "TASEQ": [1, 2],
+    })
+
+
+def _clean_ts() -> pl.DataFrame:
+    return pl.DataFrame({
+        "STUDYID": ["S001"], "DOMAIN": ["TS"],
+        "TSSEQ": [1], "TSPARMCD": ["PLANSUB"],
+        "TSPARM": ["Planned Number of Subjects"], "TSVAL": ["100"],
+    })
+
+
 @pytest.fixture
 def clean_result(engine):
-    return engine.run({"DM": _clean_dm()})
+    return engine.run({"DM": _clean_dm(), "TA": _clean_ta(), "TS": _clean_ts()})
 
 
 # ── RuleLoader ────────────────────────────────────────────────────────────────
@@ -346,7 +364,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 120
+    assert len(clean_result.rule_results) == 430
 
 
 def test_engine_result_types(clean_result):
@@ -1090,4 +1108,4 @@ def test_engine_accepts_metadata_import_directly():
 def test_engine_rule_count_phase3():
     engine = NativeConformanceEngine("sdtmig", "3.4")
     result = engine.run({"DM": _clean_dm()})
-    assert len(result.rule_results) == 120
+    assert len(result.rule_results) == 430
