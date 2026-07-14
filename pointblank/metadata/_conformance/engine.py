@@ -39,6 +39,10 @@ _SUPPORTED_TYPES = {
     "DEFINE_CODELIST_CHECK",
 }
 
+# SUPP-- and RELREC use RDOMAIN instead of DOMAIN and have a fixed non-standard structure.
+# Catch-all rules (domains: []) must not automatically apply to them.
+_STRUCTURAL_DATASETS = frozenset({"RELREC"})
+
 # Maximum row-level findings to collect per rule (avoids blowing up memory on large datasets)
 _MAX_FINDINGS = 100
 
@@ -216,7 +220,14 @@ class NativeConformanceEngine:
         self, rule: NativeRule, datasets: dict[str, nw.DataFrame]
     ) -> NativeRuleResult:
         """Per-row check: find rows where the condition tree evaluates to True (= violation)."""
-        target_domains = rule.domains or list(datasets.keys())
+        if rule.domains:
+            target_domains = rule.domains
+        else:
+            # Exclude SUPP-- and RELREC from catch-all iteration; they have non-standard structure.
+            target_domains = [
+                k for k in datasets
+                if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
+            ]
         all_findings: list[NativeRowFinding] = []
         n_issues = 0
 
@@ -275,7 +286,14 @@ class NativeConformanceEngine:
 
         Conditions reference computed columns added by operations (e.g. `$USUBJID_present`).
         """
-        target_domains = rule.domains or list(datasets.keys())
+        if rule.domains:
+            target_domains = rule.domains
+        else:
+            # Exclude SUPP-- and RELREC from catch-all iteration; they have non-standard structure.
+            target_domains = [
+                k for k in datasets
+                if not k.startswith("SUPP") and k not in _STRUCTURAL_DATASETS
+            ]
         n_issues = 0
         first_failing_domain = ""
 
