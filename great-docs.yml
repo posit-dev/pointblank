@@ -411,14 +411,14 @@ reference:
 
     - title: CDISC Submission Conformance
       desc: >
-        Validate an entire study submission package for CDISC conformance, spanning all datasets.
-        Use `SubmissionPackage` to model a study as a graph of related datasets (with optional
-        Define-XML and Controlled Terminology context) and `SubmissionPackage.validate_conformance()`
-        to run native single-dataset structural checks plus cross-dataset checks (USUBJID referential
-        integrity, SUPP-- linkage, RELREC, and ADaM ⇄ SDTM traceability). With `engine="core"` (or the
-        `validate_cdisc_submission()` shortcut) the package is handed to the external CDISC CORE engine
-        for the authoritative rule set. Results are returned as a `ConformanceReport`.
+        Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point:
+        pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4
+        rules evaluated in-process. For full submission-package checks (cross-dataset referential
+        integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative
+        CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or
+        `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
       contents:
+        - validate_sdtmig
         - validate_cdisc_submission
         - name: SubmissionPackage
           members: true
