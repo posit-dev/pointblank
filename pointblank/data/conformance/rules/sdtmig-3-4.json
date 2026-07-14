@@ -1,9 +1,9 @@
 {
   "standard": "sdtmig",
   "version": "3.4",
-  "generated": "2026-07-14T03:44:03Z",
+  "generated": "2026-07-14T00:00:00Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "e060bbc7d0171f3a",
+  "checksum": "d46f73e9d2244fdb",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -17846,6 +17846,241 @@
         "id": "generate_record_error",
         "params": {
           "message": "IDVARVAL must not be null in SUPPEG."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-431",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "description": "CMROUTE in CM must be a valid ROUTE codelist term when present.",
+      "classes": [
+        "Interventions"
+      ],
+      "domains": [
+        "CM"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "CMROUTE",
+            "codelist": "ROUTE"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "CMROUTE",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_CMROUTE_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "CMROUTE must be a valid CDISC ROUTE term when present."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-432",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "description": "EXROUTE in EX must be a valid ROUTE codelist term when present.",
+      "classes": [
+        "Interventions"
+      ],
+      "domains": [
+        "EX"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "EXROUTE",
+            "codelist": "ROUTE"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "EXROUTE",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_EXROUTE_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "EXROUTE must be a valid CDISC ROUTE term when present."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-433",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "description": "EXDOSFRM in EX must be a valid FRM codelist term when present.",
+      "classes": [
+        "Interventions"
+      ],
+      "domains": [
+        "EX"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "EXDOSFRM",
+            "codelist": "FRM"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "EXDOSFRM",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_EXDOSFRM_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "EXDOSFRM must be a valid CDISC FRM term when present."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-434",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "description": "EPOCH in TA must be a valid EPOCH codelist term when present.",
+      "classes": [
+        "Trial Design"
+      ],
+      "domains": [
+        "TA"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "EPOCH",
+            "codelist": "EPOCH"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "EPOCH",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_EPOCH_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "EPOCH must be a valid CDISC EPOCH term when present."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-435",
+      "rule_type": "RECORD_CHECK",
+      "executability": "Fully Executable",
+      "sensitivity": "Error",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "description": "EXDOSFRQ in EX must be a valid FREQ codelist term when present (dosing frequency per interval).",
+      "classes": [
+        "Interventions"
+      ],
+      "domains": [
+        "EX"
+      ],
+      "datasets": [],
+      "operations": [
+        {
+          "operator": "codelist_check",
+          "params": {
+            "column": "EXDOSFRQ",
+            "codelist": "FREQ"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "EXDOSFRQ",
+            "operator": "is_not_null",
+            "value": null
+          },
+          {
+            "name": "_pb_EXDOSFRQ_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "EXDOSFRQ must be a valid CDISC FREQ term when present."
         }
       }
     }
