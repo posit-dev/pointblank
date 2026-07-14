@@ -1,4 +1,4 @@
-"""Native CDISC conformance engine.
+"""Built-in CDISC conformance engine.
 
 Runs bundled JSON rule catalogs against a collection of DataFrames using narwhals
 expressions. No subprocesses, no external installs, no API calls at runtime.
@@ -46,21 +46,125 @@ _STRUCTURAL_DATASETS = frozenset({"RELREC"})
 # Maximum row-level findings to collect per rule (avoids blowing up memory on large datasets)
 _MAX_FINDINGS = 100
 
+# Columns checked as candidate identifiers when building a row finding (in priority order).
+# The first one that's present in the dataset is included in `context`.
+_CONTEXT_CANDIDATES = [
+    "STUDYID", "DOMAIN", "SUBJID",
+    "VISITNUM", "VISIT", "EPOCH",
+    "AESEQ", "CMSEQ", "LBSEQ", "VSSEQ", "EXSEQ", "MHSEQ", "DSSEQ", "EGSEQ",
+    "AETERM", "CMTRT", "LBTESTCD", "VSTESTCD", "EGTESTCD",
+]
+
+
+def _condition_columns(conditions: dict) -> list[str]:
+    """Return all column names referenced in a conditions tree, depth-first."""
+    cols: list[str] = []
+    for key in ("all", "any"):
+        for sub in conditions.get(key, []):
+            cols.extend(_condition_columns(sub))
+    name = conditions.get("name")
+    if name:
+        cols.append(name)
+    return cols
+
+
+def _build_row_finding(
+    df: nw.DataFrame,
+    row_idx: int,
+    domain: str,
+    operations: list[dict],
+    conditions: dict,
+    rule_id: str,
+    message: str | None,
+) -> "NativeRowFinding":
+    """Build a NativeRowFinding with smart column selection.
+
+    Captures USUBJID, the primary rule-checked column and its value, and a small set of
+    identifying context columns (STUDYID, VISITNUM, test-code, etc.).
+    """
+    cols = set(df.columns)
+
+    # USUBJID — the most important identifier for QC workflows
+    raw_id = df["USUBJID"][row_idx] if "USUBJID" in cols else None
+    usubjid = str(raw_id) if raw_id is not None else None
+
+    # Primary checked column: first operation that names a column present in the dataset;
+    # fall back to columns referenced directly in the conditions tree (e.g. rules with no ops).
+    checked_col: str | None = None
+    for op in operations:
+        col = op.get("params", {}).get("column")
+        if col and col in cols:
+            checked_col = col
+            break
+    if checked_col is None:
+        for col in _condition_columns(conditions):
+            if col in cols:
+                checked_col = col
+                break
+
+    checked_val: str | None = None
+    if checked_col:
+        raw = df[checked_col][row_idx]
+        checked_val = str(raw) if raw is not None else ""
+
+    # Context: a small set of identifying columns (excluding USUBJID and checked_col)
+    context: dict[str, str] = {}
+    for c in _CONTEXT_CANDIDATES:
+        if c in cols and c != "USUBJID" and c != checked_col:
+            raw = df[c][row_idx]
+            if raw is not None:
+                s = str(raw)
+                if s and s != "None":
+                    context[c] = s
+
+    return NativeRowFinding(
+        rule_id=rule_id,
+        dataset=domain,
+        row=row_idx,
+        usubjid=usubjid,
+        checked_column=checked_col,
+        checked_value=checked_val,
+        context=context,
+        message=message,
+    )
+
 
 class NativeConformanceEngine:
-    """Run the bundled CDISC rule catalog against a collection of DataFrames.
+    """Evaluate a bundled CDISC rule catalog against a collection of DataFrames.
+
+    This is the low-level engine that powers [`validate_sdtmig()`](`pointblank.validate_sdtmig`).
+    Most users should call that convenience function rather than instantiating this class
+    directly. Use `NativeConformanceEngine` when you need fine-grained control over which rule
+    types to run, or when integrating Pointblank's conformance engine into a larger pipeline.
+
+    The engine loads the rule catalog for the requested standard and version from the bundled
+    JSON files shipped with Pointblank, then evaluates each rule against the supplied datasets
+    using narwhals expressions. No subprocesses, network calls, or external CDISC tools are
+    involved.
+
+    Supported rule types
+    --------------------
+    - ``RECORD_CHECK`` — per-row value checks; failing rows are collected as `NativeRowFinding`
+      objects (up to 100 per rule).
+    - ``VARIABLE_METADATA_CHECK`` — variable presence and column ordering.
+    - ``DATASET_METADATA_CHECK`` — dataset-level attributes (sort keys, required sort order).
+    - ``DATASET_CONTENTS_CHECK`` — dataset-level value constraints evaluated row-by-row.
+    - ``DOMAIN_PRESENCE_CHECK`` — required or prohibited domain presence.
+    - ``DEFINE_ITEM_METADATA_CHECK`` — variable declarations against Define-XML metadata.
+    - ``DEFINE_CODELIST_CHECK`` — codelist values against Define-XML declarations.
 
     Parameters
     ----------
     standard
-        The CDISC standard slug (e.g. `"sdtmig"`).
+        CDISC standard slug (e.g., ``"sdtmig"``).
     version
-        The standard version (e.g. `"3.4"`).
+        Standard version string (e.g., ``"3-4"``).
     ct_packages
-        CT package slugs to load (e.g. `["sdtm-ct-2024-09-27"]`). If `None`, the most
-        recent bundled CT package is used automatically.
+        CT package slug(s) to load (e.g., ``["sdtm-ct-2024-09-27"]``). When ``None`` the
+        most recent bundled CT package is loaded automatically.
     rule_types
-        Optional list of rule types to evaluate. Defaults to all supported types.
+        Optional allowlist of rule types to evaluate. When ``None`` all supported types are
+        run. Pass a subset (e.g., ``["RECORD_CHECK"]``) to restrict the run.
     """
 
     def __init__(
@@ -244,15 +348,14 @@ class NativeConformanceEngine:
             failing_rows = [i for i, v in enumerate(mask.to_list()) if v]
             n_issues += len(failing_rows)
             for row_idx in failing_rows[:_MAX_FINDINGS]:
-                variables = df.columns[:5]
-                values = [str(df[c][row_idx]) for c in variables]
                 all_findings.append(
-                    NativeRowFinding(
+                    _build_row_finding(
+                        df=df,
+                        row_idx=row_idx,
+                        domain=domain,
+                        operations=rule.operations,
+                        conditions=rule.conditions,
                         rule_id=rule.core_id,
-                        dataset=domain,
-                        row=row_idx,
-                        variables=variables,
-                        values=values,
                         message=rule.message,
                     )
                 )
