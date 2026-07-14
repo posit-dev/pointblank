@@ -3,7 +3,7 @@
   "version": "3.4",
   "generated": "2026-07-14T00:00:00Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "d46f73e9d2244fdb",
+  "checksum": "5146d20551cceca6",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -11027,144 +11027,6 @@
       }
     },
     {
-      "core_id": "SDTM-252",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "AEENDTC in AE must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "AEENDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "AEENDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_AEENDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AEENDTC must conform to ISO 8601 format in AE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-253",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "CMSTDTC in CM must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "CMSTDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "CMSTDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_CMSTDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "CMSTDTC must conform to ISO 8601 format in CM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-254",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "CMENDTC in CM must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "CMENDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "CMENDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_CMENDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "CMENDTC must conform to ISO 8601 format in CM."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-255",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -11207,98 +11069,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "EXSTDTC must conform to ISO 8601 format in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-256",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "EXENDTC in EX must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "EXENDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXENDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_EXENDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXENDTC must conform to ISO 8601 format in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-257",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "MHSTDTC in MH must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "MH"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "MHSTDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "MHSTDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_MHSTDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "MHSTDTC must conform to ISO 8601 format in MH."
         }
       }
     },
@@ -11391,52 +11161,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "DSSTDTC must conform to ISO 8601 format in DS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-260",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "DTHDTC in DM must conform to ISO 8601 format when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Special-Purpose"
-      ],
-      "domains": [
-        "DM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "iso8601_check",
-          "params": {
-            "column": "DTHDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "DTHDTC",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_DTHDTC_iso8601",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "DTHDTC must conform to ISO 8601 format in DM."
         }
       }
     },
@@ -12251,53 +11975,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "VSSTRESN must be a numeric variable in VS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-284",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "LBNRIND (reference range indicator) must use values from the NRIND controlled terminology codelist when present in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "LBNRIND",
-            "codelist": "NRIND"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "LBNRIND",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_LBNRIND_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "LBNRIND must use values from the NRIND codelist in LB."
         }
       }
     },
@@ -15457,53 +15134,6 @@
       }
     },
     {
-      "core_id": "SDTM-367",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "DTHFL in DM must use the NY (No Yes) controlled terminology codelist when present.",
-      "classes": [
-        "Special-Purpose"
-      ],
-      "domains": [
-        "DM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "DTHFL",
-            "codelist": "NY"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "DTHFL",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_DTHFL_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "DTHFL must be a valid NY codelist value (Y or N) in DM."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-368",
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
@@ -17846,53 +17476,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "IDVARVAL must not be null in SUPPEG."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-431",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "CMROUTE in CM must be a valid ROUTE codelist term when present.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "CMROUTE",
-            "codelist": "ROUTE"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "CMROUTE",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_CMROUTE_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "CMROUTE must be a valid CDISC ROUTE term when present."
         }
       }
     },
