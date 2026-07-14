@@ -21,6 +21,7 @@ from pointblank.metadata._conformance import (
 from pointblank.metadata._conformance.evaluator import evaluate_conditions, is_iso8601
 from pointblank.metadata._conformance.operations import apply_operations
 from pointblank.metadata._conformance.result import STATUS_FAIL, STATUS_PASS
+from pointblank.metadata._types import MetadataImport, MetadataPackage, VariableMetadata
 import narwhals as nw
 
 
@@ -345,7 +346,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 50
+    assert len(clean_result.rule_results) == 60
 
 
 def test_engine_result_types(clean_result):
@@ -823,6 +824,270 @@ def test_partially_executable_runs_when_dataset_provided():
     # When the required dataset IS present, the rule should not return not_applicable.
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
     # SDTM-049/050 have empty conditions so they'll pass on any dataset.
-    result = engine.run({"DM": _full_dm(), "DEFINE": pl.DataFrame({"col": ["x"]})})
+    stub_define = MetadataPackage(items={"DM": MetadataImport(source_format="cdisc_define", dataset_name="DM")})
+    result = engine.run({"DM": _full_dm()}, define_xml=stub_define)
     partial = {r.rule_id: r for r in result.rule_results if r.rule_id in ("SDTM-049", "SDTM-050")}
     assert all(r.status != "not_applicable" for r in partial.values())
+
+
+# ── Phase 3: Define-XML operations and handlers ───────────────────────────────
+
+
+def _make_var(name: str, dtype: str = "String", required: bool = False, allowed_values=None, display_format: str | None = None) -> VariableMetadata:
+    return VariableMetadata(name=name, dtype=dtype, required=required, allowed_values=allowed_values, display_format=display_format)
+
+
+def _make_define_pkg(domain: str, variables: list[VariableMetadata]) -> MetadataPackage:
+    meta = MetadataImport(source_format="cdisc_define", dataset_name=domain, domain=domain, variables=variables)
+    return MetadataPackage(items={domain.upper(): meta})
+
+
+def test_define_var_declared_present():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("STUDYID"), _make_var("SEX")],
+    )
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"], "SEX": ["M"]}), eager_only=True)
+    ct = ControlledTerminology({}, [])
+    ops = [
+        {"operator": "define_var_declared", "params": {"column": "STUDYID"}},
+        {"operator": "define_var_declared", "params": {"column": "MISSING_VAR"}},
+    ]
+    result = apply_operations(df, ops, ct, {}, define_meta)
+    assert result["_pb_STUDYID_in_define"].to_list() == [True]
+    assert result["_pb_MISSING_VAR_in_define"].to_list() == [False]
+
+
+def test_define_var_declared_no_define_meta():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["X"]}), eager_only=True)
+    ops = [{"operator": "define_var_declared", "params": {"column": "ANYTHING"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, None)
+    assert result["_pb_ANYTHING_in_define"].to_list() == [True]
+
+
+def test_define_required_check_passes_non_null():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("STUDYID", required=True)],
+    )
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["S1", "S2"]}), eager_only=True)
+    ops = [{"operator": "define_required_check", "params": {"column": "STUDYID"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_STUDYID_mandatory_ok"].to_list() == [True, True]
+
+
+def test_define_required_check_flags_null():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("STUDYID", required=True)],
+    )
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["S1", None]}), eager_only=True)
+    ops = [{"operator": "define_required_check", "params": {"column": "STUDYID"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_STUDYID_mandatory_ok"].to_list() == [True, False]
+
+
+def test_define_required_check_not_mandatory_always_true():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("OPTIONAL_VAR", required=False)],
+    )
+    df = nw.from_native(pl.DataFrame({"OPTIONAL_VAR": ["X", None]}), eager_only=True)
+    ops = [{"operator": "define_required_check", "params": {"column": "OPTIONAL_VAR"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_OPTIONAL_VAR_mandatory_ok"].to_list() == [True, True]
+
+
+def test_define_codelist_check_valid_values():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("SEX", allowed_values=["M", "F", "U"])],
+    )
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F", "INVALID"]}), eager_only=True)
+    ops = [{"operator": "define_codelist_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_SEX_define_valid"].to_list() == [True, True, False]
+
+
+def test_define_codelist_check_null_passes():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("SEX", allowed_values=["M", "F"])],
+    )
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", None]}), eager_only=True)
+    ops = [{"operator": "define_codelist_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_SEX_define_valid"].to_list() == [True, True]
+
+
+def test_define_codelist_check_no_codelist_always_true():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("NOTES")],  # no allowed_values
+    )
+    df = nw.from_native(pl.DataFrame({"NOTES": ["anything"]}), eager_only=True)
+    ops = [{"operator": "define_codelist_check", "params": {"column": "NOTES"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_NOTES_define_valid"].to_list() == [True]
+
+
+def test_define_type_check_numeric_ok():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("AGE", dtype="Float64", display_format="float")],
+    )
+    df = nw.from_native(pl.DataFrame({"AGE": [45.0]}), eager_only=True)
+    ops = [{"operator": "define_type_check", "params": {"column": "AGE"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_AGE_define_type_ok"].to_list() == [True]
+
+
+def test_define_type_check_char_mismatch():
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+    import narwhals as nw
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("STUDYID", display_format="text")],
+    )
+    df = nw.from_native(pl.DataFrame({"STUDYID": [1, 2]}), eager_only=True)  # numeric, not text
+    ops = [{"operator": "define_type_check", "params": {"column": "STUDYID"}}]
+    result = apply_operations(df, ops, ControlledTerminology({}, []), {}, define_meta)
+    assert result["_pb_STUDYID_define_type_ok"].to_list() == [False, False]
+
+
+# ── Phase 3: engine integration ───────────────────────────────────────────────
+
+
+def _dm_with_bad_sex() -> pl.DataFrame:
+    return pl.DataFrame({
+        "STUDYID": ["S1"], "DOMAIN": ["DM"], "USUBJID": ["S1-001"], "SUBJID": ["001"],
+        "SEX": ["INVALID"], "RACE": ["WHITE"], "ETHNIC": ["NOT HISPANIC OR LATINO"],
+        "COUNTRY": ["USA"], "AGE": [45.0], "AGEU": ["YEARS"], "SITEID": ["001"],
+        "RFSTDTC": ["2020-01-01"], "RFENDTC": ["2020-06-30"],
+        "ARMCD": ["A"], "ARM": ["Arm A"], "ACTARMCD": ["A"], "ACTARM": ["Arm A"],
+    })
+
+
+def _dm_define_pkg() -> MetadataPackage:
+    return _make_define_pkg("DM", [
+        _make_var("STUDYID", required=True),
+        _make_var("DOMAIN", required=True),
+        _make_var("USUBJID", required=True),
+        _make_var("SEX", allowed_values=["M", "F", "U", "UNDIFFERENTIATED"]),
+        _make_var("RACE", allowed_values=["WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN"]),
+        _make_var("ETHNIC", allowed_values=["NOT HISPANIC OR LATINO", "HISPANIC OR LATINO"]),
+        _make_var("AGE", dtype="Float64", display_format="float"),
+    ])
+
+
+def test_define_item_metadata_check_all_declared():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
+    pkg = _dm_define_pkg()
+    result = engine.run({"DM": _clean_dm()}, define_xml=pkg)
+    sdtm_051 = next(r for r in result.rule_results if r.rule_id == "SDTM-051")
+    assert sdtm_051.status == "pass"
+
+
+def test_define_item_metadata_check_undeclared_variable():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
+    # Provide a Define-XML that does NOT declare DOMAIN
+    pkg = _make_define_pkg("DM", [
+        _make_var("STUDYID", required=True),
+        _make_var("USUBJID"), _make_var("SEX"), _make_var("AGE", display_format="float"),
+    ])
+    result = engine.run({"DM": _clean_dm()}, define_xml=pkg)
+    sdtm_051 = next(r for r in result.rule_results if r.rule_id == "SDTM-051")
+    assert sdtm_051.status == "fail"
+
+
+def test_define_codelist_check_flags_bad_value():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_CODELIST_CHECK"])
+    pkg = _dm_define_pkg()
+    result = engine.run({"DM": _dm_with_bad_sex()}, define_xml=pkg)
+    sdtm_056 = next(r for r in result.rule_results if r.rule_id == "SDTM-056")
+    assert sdtm_056.status == "fail"
+    assert sdtm_056.n_issues == 1
+
+
+def test_define_codelist_check_passes_valid_values():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_CODELIST_CHECK"])
+    pkg = _dm_define_pkg()
+    result = engine.run({"DM": _clean_dm()}, define_xml=pkg)
+    sdtm_056 = next(r for r in result.rule_results if r.rule_id == "SDTM-056")
+    assert sdtm_056.status == "pass"
+
+
+def test_define_rules_not_applicable_without_define_xml():
+    engine = NativeConformanceEngine(
+        "sdtmig", "3.4",
+        rule_types=["DEFINE_ITEM_METADATA_CHECK", "DEFINE_CODELIST_CHECK"],
+    )
+    result = engine.run({"DM": _clean_dm()})  # no define_xml
+    for r in result.rule_results:
+        assert r.status == "not_applicable", f"{r.rule_id} was {r.status}"
+
+
+def test_define_rules_applicable_with_define_xml():
+    engine = NativeConformanceEngine(
+        "sdtmig", "3.4",
+        rule_types=["DEFINE_ITEM_METADATA_CHECK", "DEFINE_CODELIST_CHECK"],
+    )
+    result = engine.run({"DM": _clean_dm()}, define_xml=_dm_define_pkg())
+    statuses = {r.status for r in result.rule_results}
+    assert "not_applicable" not in statuses
+
+
+def test_engine_accepts_metadata_import_directly():
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
+    dm_meta = MetadataImport(
+        source_format="cdisc_define", dataset_name="DM", domain="DM",
+        variables=[_make_var("STUDYID", required=True), _make_var("DOMAIN"), _make_var("USUBJID"),
+                   _make_var("SEX"), _make_var("AGE", display_format="float")],
+    )
+    result = engine.run({"DM": _clean_dm()}, define_xml=dm_meta)
+    sdtm_051 = next(r for r in result.rule_results if r.rule_id == "SDTM-051")
+    assert sdtm_051.status in ("pass", "fail")  # executed, not not_applicable
+
+
+def test_engine_rule_count_phase3():
+    engine = NativeConformanceEngine("sdtmig", "3.4")
+    result = engine.run({"DM": _clean_dm()})
+    assert len(result.rule_results) == 60
