@@ -80,7 +80,7 @@ def _op_codelist_check(
     datasets: dict[str, nw.DataFrame],
     define_meta: Any = None,
 ) -> nw.DataFrame:
-    """Add `_pb_<col>_valid` (`True` = value in codelist or null)."""
+    """Add `_pb_<col>_valid` (`True` = value in codelist, null, or empty string)."""
     col: str = params["column"]
     codelist: str = params["codelist"]
     result_col = f"_pb_{col}_valid"
@@ -89,8 +89,10 @@ def _op_codelist_check(
     terms = ct.get_codelist(codelist)
     if terms is None:
         return df.with_columns(nw.lit(True).alias(result_col))
+    # Build case-insensitive lookup; SAS/XPT missing values arrive as "" — treat as null.
+    upper_terms = {t.upper() for t in terms}
     values = df[col].to_list()
-    mask = [True if v is None else (str(v) in terms) for v in values]
+    mask = [True if (v is None or str(v) == "") else (str(v).upper() in upper_terms) for v in values]
     return df.with_columns(_new_bool_series(result_col, mask, df))
 
 
@@ -106,12 +108,13 @@ def _op_consistency_check(
     result_col = f"_pb_{col}_consistent"
     if col not in df.columns:
         return df.with_columns(nw.lit(True).alias(result_col))
-    values = [v for v in df[col].to_list() if v is not None]
+    # Exclude null and SAS/XPT empty strings from mode calculation.
+    values = [v for v in df[col].to_list() if v is not None and str(v) != ""]
     if not values:
         return df.with_columns(nw.lit(True).alias(result_col))
     expected = Counter(values).most_common(1)[0][0]
     rows = df[col].to_list()
-    mask = [True if v is None else (v == expected) for v in rows]
+    mask = [True if (v is None or str(v) == "") else (v == expected) for v in rows]
     return df.with_columns(_new_bool_series(result_col, mask, df))
 
 
@@ -128,7 +131,8 @@ def _op_iso8601_check(
     if col not in df.columns:
         return df.with_columns(nw.lit(True).alias(result_col))
     values = df[col].to_list()
-    mask = [True if v is None else is_iso8601(str(v)) for v in values]
+    # SAS/XPT missing character values arrive as ""; treat as null (no violation).
+    mask = [True if (v is None or str(v) == "") else is_iso8601(str(v)) for v in values]
     return df.with_columns(_new_bool_series(result_col, mask, df))
 
 
