@@ -1760,3 +1760,69 @@ def validate_cdisc_submission(
         cache=cache,
         workdir=workdir,
     )
+
+
+def validate_sdtmig(
+    datasets: dict,
+    version: str = "3-4",
+    ct_packages: list[str] | None = None,
+    define_xml: Any = None,
+    study_id: str | None = None,
+) -> ConformanceReport:
+    """Check SDTMIG conformance and return a renderable report.
+
+    Runs the bundled SDTMIG rule catalog against the provided datasets. No external tools,
+    subprocesses, or network calls are required. The returned [`ConformanceReport`] renders as a
+    color-coded Great Tables summary.
+
+    Parameters
+    ----------
+    datasets
+        Mapping of domain name to DataFrame. Keys are case-insensitive (e.g., `"DM"` or `"dm"`).
+        Accepts Polars, pandas, or any narwhals-supported DataFrame.
+    version
+        SDTMIG version. Currently `"3-4"` (default) is the only bundled catalog.
+    ct_packages
+        Controlled Terminology package name(s) to load (e.g., `["sdtm-ct-2024-09-27"]`). Defaults
+        to the latest bundled CT package.
+    define_xml
+        Optional path to a `define.xml` file or a pre-parsed `MetadataPackage`. When provided,
+        Define-XML-aware rules (codelist declarations, mandatory variables) are activated.
+    study_id
+        Optional study identifier shown in the report header.
+
+    Returns
+    -------
+    ConformanceReport
+        A native-rules report (`is_rules` is `True`). Displays as a Great Tables table in
+        notebooks; call `.get_tabular_report()` to get the `GT` object directly.
+
+    Examples
+    --------
+    ```python
+    import polars as pl
+    from pointblank.metadata import validate_sdtmig
+
+    dm = pl.read_parquet("sdtm/dm.parquet")
+    ae = pl.read_parquet("sdtm/ae.parquet")
+
+    report = validate_sdtmig({"DM": dm, "AE": ae})
+    report
+    ```
+    """
+
+    # Normalise version separator (accept "3.4" or "3-4")
+    _ver = version.replace(".", "-")
+    pkg = SubmissionPackage(
+        datasets=datasets,
+        standard="sdtmig",
+        standard_version=_ver,
+        study_id=study_id,
+    )
+    return pkg._run_rules_conformance(
+        agency=None,
+        standard="sdtmig",
+        version=_ver,
+        ct_packages=ct_packages,
+        define_xml=define_xml,
+    )
