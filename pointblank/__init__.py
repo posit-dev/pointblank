@@ -86,6 +86,7 @@ from pointblank.metadata import (
     validate_cdisc_submission,
     validate_sdtm,
     validate_sdtm_structure,
+    validate_sdtmig,
 )
 from pointblank.pipeline import Pipeline, PipelineResult
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
@@ -224,4 +225,5 @@ __all__ = [
     "SubmissionPackage",
     "ConformanceReport",
     "validate_cdisc_submission",
+    "validate_sdtmig",
 ]
