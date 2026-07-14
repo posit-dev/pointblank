@@ -99,6 +99,37 @@ class NativeConformanceEngine:
             rule_results=results,
         )
 
+    def _load_define_xml(self, define_xml: Any) -> MetadataPackage | None:
+        if define_xml is None:
+            return None
+        from pointblank.metadata._types import MetadataImport, MetadataPackage
+
+        if isinstance(define_xml, MetadataPackage):
+            return define_xml
+        if isinstance(define_xml, MetadataImport):
+            domain = (define_xml.domain or define_xml.dataset_name or "").upper()
+            pkg = MetadataPackage()
+            pkg.items[domain] = define_xml
+            return pkg
+        # Assume path
+        try:
+            from pointblank.metadata._readers_cdisc import _read_define_xml_metadata
+        except ImportError:
+            return None
+        result = _read_define_xml_metadata(str(define_xml))
+        from pointblank.metadata._types import MetadataPackage as _Pkg, MetadataImport as _MI
+        if isinstance(result, _Pkg):
+            return result
+        pkg = _Pkg()
+        domain = (result.domain or result.dataset_name or "").upper()
+        pkg.items[domain] = result
+        return pkg
+
+    def _define_meta_for(self, domain: str) -> MetadataImport | None:
+        if self._define_pkg is None:
+            return None
+        return self._define_pkg.items.get(domain.upper())
+
     # ── Rule dispatch ─────────────────────────────────────────────────────────
 
     def _evaluate_rule(
