@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
 
 # Rule execution statuses
 STATUS_PASS = "pass"
@@ -15,14 +14,37 @@ STATUS_NOT_SUPPORTED = "not_supported"
 
 @dataclass
 class NativeRowFinding:
-    """A single row-level finding produced by a rule."""
+    """A single row-level finding produced by a record check rule.
+
+    Attributes
+    ----------
+    rule_id
+        The rule that fired (e.g. `"SDTM-135"`).
+    dataset
+        The domain in which the violation was found (e.g. `"AE"`).
+    row
+        0-based row index in the domain DataFrame.
+    usubjid
+        The `USUBJID` value at the failing row, or `None` if the column is absent.
+    checked_column
+        The primary variable the rule checks (e.g. `"AEREL"`).
+    checked_value
+        The actual value at `checked_column` for this row.
+    context
+        Additional identifying columns captured alongside the finding (e.g.,
+        `{"AESEQ": "3", "VISITNUM": "4.0"}`).
+    message
+        Short message from the rule definition, or `None`.
+    """
 
     rule_id: str
     dataset: str
     row: int | None
-    variables: list[str]
-    values: list[Any]
-    message: str
+    usubjid: str | None
+    checked_column: str | None
+    checked_value: str | None
+    context: dict[str, str]
+    message: str | None = None
 
 
 @dataclass
