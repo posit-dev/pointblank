@@ -1,9 +1,9 @@
 {
   "standard": "sdtmig",
   "version": "3.4",
-  "generated": "2026-07-13T21:56:24Z",
+  "generated": "2026-07-14T01:14:47Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "4d210bbc1f1ba8e4",
+  "checksum": "70df23d302c99e9b",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -2298,6 +2298,612 @@
         "id": "generate_variable_error",
         "params": {
           "message": "Variable data type does not match Define-XML specification."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-051",
+      "rule_type": "DEFINE_ITEM_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Each variable in the DM dataset must be declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "STUDYID"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "DOMAIN"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "USUBJID"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "SEX"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "AGE"
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_SEX_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AGE_in_define",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "One or more DM variables are not declared in Define-XML."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-052",
+      "rule_type": "DEFINE_ITEM_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Each variable in the AE dataset must be declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "STUDYID"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "DOMAIN"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "USUBJID"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "AESEQ"
+          }
+        },
+        {
+          "operator": "define_var_declared",
+          "params": {
+            "column": "AETERM"
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AESEQ_in_define",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AETERM_in_define",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "One or more AE variables are not declared in Define-XML."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-053",
+      "rule_type": "DEFINE_ITEM_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Variables declared Mandatory in Define-XML must not contain null values in DM.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "STUDYID"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "DOMAIN"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "USUBJID"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "SEX"
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_DOMAIN_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_SEX_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "A mandatory variable (Mandatory=Yes in Define-XML) contains a null value."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-054",
+      "rule_type": "DEFINE_ITEM_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Variables declared Mandatory in Define-XML must not contain null values in AE.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "STUDYID"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "USUBJID"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "AESEQ"
+          }
+        },
+        {
+          "operator": "define_required_check",
+          "params": {
+            "column": "AETERM"
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_USUBJID_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AESEQ_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AETERM_mandatory_ok",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "A mandatory AE variable (Mandatory=Yes in Define-XML) contains a null value."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-055",
+      "rule_type": "DEFINE_ITEM_METADATA_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "Variable data types in DM must match the types declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_type_check",
+          "params": {
+            "column": "STUDYID"
+          }
+        },
+        {
+          "operator": "define_type_check",
+          "params": {
+            "column": "AGE"
+          }
+        },
+        {
+          "operator": "define_type_check",
+          "params": {
+            "column": "SEX"
+          }
+        }
+      ],
+      "conditions": {
+        "any": [
+          {
+            "name": "_pb_STUDYID_define_type_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_AGE_define_type_ok",
+            "operator": "equal_to",
+            "value": false
+          },
+          {
+            "name": "_pb_SEX_define_type_ok",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_variable_error",
+        "params": {
+          "message": "A variable's data type does not match the type declared in Define-XML."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-056",
+      "rule_type": "DEFINE_CODELIST_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "SEX values in DM must be from the codelist declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_codelist_check",
+          "params": {
+            "column": "SEX"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_SEX_define_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "DM.SEX contains a value not in the Define-XML declared codelist."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-057",
+      "rule_type": "DEFINE_CODELIST_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "RACE values in DM must be from the codelist declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_codelist_check",
+          "params": {
+            "column": "RACE"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_RACE_define_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "DM.RACE contains a value not in the Define-XML declared codelist."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-058",
+      "rule_type": "DEFINE_CODELIST_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "ETHNIC values in DM must be from the codelist declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Special Purpose"
+      ],
+      "domains": [
+        "DM"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_codelist_check",
+          "params": {
+            "column": "ETHNIC"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_ETHNIC_define_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "DM.ETHNIC contains a value not in the Define-XML declared codelist."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-059",
+      "rule_type": "DEFINE_CODELIST_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "AESEV values in AE must be from the codelist declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_codelist_check",
+          "params": {
+            "column": "AESEV"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_AESEV_define_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "AE.AESEV contains a value not in the Define-XML declared codelist."
+        }
+      }
+    },
+    {
+      "core_id": "SDTM-060",
+      "rule_type": "DEFINE_CODELIST_CHECK",
+      "executability": "Partially Executable",
+      "sensitivity": "Error",
+      "description": "AEOUT values in AE must be from the codelist declared in Define-XML.",
+      "authority": "CDISC",
+      "standards": [
+        "sdtmig"
+      ],
+      "classes": [
+        "Events"
+      ],
+      "domains": [
+        "AE"
+      ],
+      "datasets": [
+        "DEFINE"
+      ],
+      "operations": [
+        {
+          "operator": "define_codelist_check",
+          "params": {
+            "column": "AEOUT"
+          }
+        }
+      ],
+      "conditions": {
+        "all": [
+          {
+            "name": "_pb_AEOUT_define_valid",
+            "operator": "equal_to",
+            "value": false
+          }
+        ]
+      },
+      "actions": {
+        "id": "generate_record_error",
+        "params": {
+          "message": "AE.AEOUT contains a value not in the Define-XML declared codelist."
         }
       }
     }
