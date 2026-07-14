@@ -407,6 +407,7 @@ class SubmissionPackage:
         standard: str | None = None,
         version: str | None = None,
         ct_packages: list[str] | None = None,
+        define_xml: Any = None,
         controlled_terminology: str | Sequence[str] | None = None,
         core: str | Sequence[str] | None = None,
         core_cwd: str | Path | None = None,
@@ -500,7 +501,8 @@ class SubmissionPackage:
             std = standard or self.standard
             ver = version or self.standard_version
             rules_report = self._run_rules_conformance(
-                agency=agency, standard=std, version=ver, ct_packages=ct_packages
+                agency=agency, standard=std, version=ver, ct_packages=ct_packages,
+                define_xml=define_xml,
             )
             if rules_report is not None:
                 return rules_report
@@ -526,6 +528,7 @@ class SubmissionPackage:
         standard: str,
         version: str,
         ct_packages: list[str] | None,
+        define_xml: Any = None,
     ) -> ConformanceReport | None:
         """Run the native rule-based engine; returns None if no catalog is bundled."""
         from pointblank.metadata._conformance.engine import NativeConformanceEngine
@@ -537,7 +540,11 @@ class SubmissionPackage:
         engine = NativeConformanceEngine(
             standard=standard, version=version, ct_packages=ct_packages
         )
-        result = engine.run(self.datasets)
+        # Prefer explicit define_xml argument; fall back to package's define path.
+        _define = define_xml if define_xml is not None else (
+            self.define if isinstance(self.define, (str, Path)) else None
+        )
+        result = engine.run(self.datasets, define_xml=_define)
         return ConformanceReport(native_result=result, package=self, agency=agency)
 
     def _run_core_conformance(
