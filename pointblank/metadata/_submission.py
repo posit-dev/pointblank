@@ -8,7 +8,7 @@ traceability) and drives Pointblank validation across the whole package.
 Where [`validate_sdtm()`](`pointblank.validate_sdtm`) and
 [`validate_adam()`](`pointblank.validate_adam`) validate a *single* dataset structurally, the
 [`SubmissionPackage`](`pointblank.SubmissionPackage`) validates a study as a graph of related
-datasets, adding the cross-dataset checks that today send sponsors to Pinnacle 21 / CDISC CORE.
+datasets.
 """
 
 from __future__ import annotations
@@ -442,18 +442,16 @@ class SubmissionPackage:
         Parameters
         ----------
         agency
-            Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base
-            rules). Recorded on the report; agency-specific business rule sets are a later
-            phase, so this currently affects labeling only.
+            Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base rules).
         engine
-            `"native"` (default) or `"core"`.
+            `"native"` (the default) or `"core"`.
         cross_dataset
-            (Native only.) Whether to add cross-dataset conformance checks. Defaults to `True`.
+            (Validate-based engine only.) Whether to add cross-dataset conformance checks. Defaults to `True`.
         thresholds
-            (Native only.) Optional thresholds passed to each dataset's `Validate` (maps failing
+            (Validate-based engine only.) Optional thresholds passed to each dataset's `Validate` (maps failing
             test units onto Pointblank's warning/error/critical severity model).
         interrogate
-            (Native only.) Whether to interrogate (run) the validations before returning.
+            (Validate-based engine only.) Whether to interrogate (run) the validations before returning.
         standard
             (CORE only.) Override the CDISC standard sent to CORE. Defaults to the package's
             `standard` (e.g., `"sdtmig"`).
@@ -478,7 +476,7 @@ class SubmissionPackage:
         Returns
         -------
         ConformanceReport
-            A native-form report (per-dataset validations) or a CORE-form report, depending on
+            A built-in engine report (per-dataset validations) or a CORE-form report, depending on
             `engine`.
         """
         if engine not in ("native", "core", "validate"):
@@ -534,7 +532,7 @@ class SubmissionPackage:
         ct_packages: list[str] | None,
         define_xml: Any = None,
     ) -> ConformanceReport | None:
-        """Run the native rule-based engine; returns None if no catalog is bundled."""
+        """Run the built-in rule-based engine; returns None if no catalog is bundled."""
         from pointblank.metadata._conformance.engine import NativeConformanceEngine
         from pointblank.metadata._conformance.rule_loader import RuleLoader
 
@@ -919,31 +917,36 @@ def _membership_expr(column: str, valid_values: set, na_pass: bool = True):
 
 @dataclass
 class ConformanceReport:
-    """The result of [`SubmissionPackage.validate_conformance()`](`pointblank.SubmissionPackage`).
+    """The result of a CDISC conformance validation run.
 
-    A `ConformanceReport` comes in one of two forms depending on the validation engine used:
+    A `ConformanceReport` is returned by [`validate_sdtmig()`](`pointblank.validate_sdtmig`) and
+    [`SubmissionPackage.validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`).
+    It exists in one of two forms depending on the engine used:
 
-    - **Native** (`engine="native"`, the default) — aggregates the per-dataset
-      [`Validate`](`pointblank.Validate`) objects produced for the submission package. Each
-      dataset's validation carries both its single-dataset structural checks and the cross-dataset
-      conformance checks that reference it.
-    - **CORE** (`engine="core"`) — wraps the results of the external CDISC CORE engine, holding its
-      rule-ID-keyed findings, per-rule run statuses, and run provenance.
+    - **Built-in rules engine** (`is_rules` is `True`) — produced by Pointblank's SDTMIG rule
+      catalog. Each rule is evaluated against the supplied datasets and receives one of five
+      statuses: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, or `"not_supported"`. Row-level
+      findings (the individual failing records) are collected for RECORD_CHECK rules and accessible
+      via [`findings_df()`](`pointblank.ConformanceReport.findings_df`) and
+      [`get_findings_table()`](`pointblank.ConformanceReport.get_findings_table`).
+    - **CDISC CORE** (`is_core` is `True`) — produced by the external CDISC CORE command-line
+      engine. Rule-keyed findings and run provenance are exposed via `findings()` and `rules()`.
 
-    The `all_passed()`, `summary()`, `issues()`, and rendering methods work for both forms; use the
-    `is_core` property to tell them apart. CORE-backed reports additionally expose `findings()` and
-    `rules()`.
+    In a Jupyter or Quarto notebook the report renders automatically as a color-coded rule summary
+    table (calling `_repr_html_()` is equivalent to `get_tabular_report()._repr_html_()`).
 
     Parameters
     ----------
     validations
-        A mapping of dataset name to its interrogated `Validate` object (native form).
+        Reserved for legacy use; not populated by the built-in engine.
     package
-        The `SubmissionPackage` the report was produced from.
+        The `SubmissionPackage` the report was produced from, if any.
     agency
-        The agency rule-set selector used for the run (or `None` for CDISC base rules).
+        The agency rule-set selector used for the run (`None` for CDISC base rules).
     core
-        The parsed CDISC CORE report (CORE form). `None` for native reports.
+        The parsed CDISC CORE report (CORE form only). `None` for built-in engine reports.
+    native_result
+        The `NativeConformanceResult` produced by the rules engine (native form only).
     """
 
     validations: dict[str, Validate] = dataclass_field(default_factory=dict)
@@ -985,18 +988,18 @@ class ConformanceReport:
 
     @property
     def is_core(self) -> bool:
-        """Whether this report wraps CDISC CORE engine results (vs. native validations)."""
+        """Whether this report wraps CDISC CORE engine results (vs. built-in engine results)."""
         return self.core is not None
 
     @property
     def is_rules(self) -> bool:
-        """Whether this report was produced by the native rule-based conformance engine."""
+        """Whether this report was produced by Pointblank's built-in rule-based conformance engine."""
         return self.native_result is not None
 
     def all_passed(self) -> bool:
         """Whether the run reported no conformance failures.
 
-        For native reports, this is `True` when every check in every dataset passed with no failing
+        For built-in engine reports, this is `True` when every check in every dataset passed with no failing
         test units. For CORE reports, this is `True` when no rule reported an issue or execution
         error.
         """
@@ -1022,7 +1025,7 @@ class ConformanceReport:
         Returns
         -------
         dict
-            For a **native** report, a mapping of dataset name to a dict with keys `n_steps`,
+            For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`,
             `n_steps_failed`, `n_failed` (failing test units), and `all_passed`.
 
             For a **CORE** report, a single dict with keys `standard`, `version`,
@@ -1048,7 +1051,7 @@ class ConformanceReport:
             return {
                 "standard": nr.standard,
                 "version": nr.version,
-                "engine": "native",
+                "engine": "built-in",
                 "ct_packages": nr.ct_packages,
                 "n_rules": len(nr.rule_results),
                 "status_counts": nr.status_counts(),
@@ -1076,7 +1079,7 @@ class ConformanceReport:
         Parameters
         ----------
         severity
-            (Native reports only.) Optional severity filter: `"warning"`, `"error"`, or
+            (Built-in engine reports only.) Optional severity filter: `"warning"`, `"error"`, or
             `"critical"`. Requires thresholds to have been set on the run. If `None`, all steps
             with failing test units are returned.
         status
@@ -1086,7 +1089,7 @@ class ConformanceReport:
         Returns
         -------
         list[dict]
-            For a **native** report, one dict per failing step, with keys `dataset`, `step`,
+            For a **built-in engine** report, one dict per failing step, with keys `dataset`, `step`,
             `assertion`, `column`, `n_failed`, `n`, and `severity`.
 
             For a **CORE** report, one dict per (dataset, rule) with reported issues, with keys
@@ -1146,8 +1149,8 @@ class ConformanceReport:
         """Return the row-level findings.
 
         For CORE reports, returns `CoreFinding` objects from CORE's `Issue_Details`.
-        For native rule reports, returns `NativeRowFinding` objects.
-        For Validate-based native reports, returns an empty list.
+        For built-in engine reports, returns `NativeRowFinding` objects.
+        For Validate-based reports, returns an empty list.
         """
         if self.is_core:
             return list(self.core.findings)
@@ -1159,14 +1162,14 @@ class ConformanceReport:
         """Return the per-rule run results.
 
         For CORE reports, returns `CoreRuleResult` objects.
-        For native rule reports, returns `NativeRuleResult` objects.
-        For Validate-based native reports, returns an empty list.
+        For built-in engine reports, returns `NativeRuleResult` objects.
+        For Validate-based reports, returns an empty list.
 
         Parameters
         ----------
         status
-            Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For native rules:
-            `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, `"not_supported"`.
+            Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For built-in
+            engine reports: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, `"not_supported"`.
         """
         if self.is_core:
             if status is None:
@@ -1190,7 +1193,7 @@ class ConformanceReport:
 
         For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`,
         `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file
-        readable by anything that parses a standard CORE report. For native reports the file
+        readable by anything that parses a standard CORE report. For built-in engine reports the file
         contains `summary` and `issues` keys.
 
         Parameters
@@ -1259,8 +1262,8 @@ class ConformanceReport:
         """Save the conformance report as an Excel workbook.
 
         For CORE reports the workbook contains sheets `Issue_Summary`, `Issue_Details`,
-        `Rules_Report`, and `Conformance_Details`. For native reports the workbook contains
-        `Issues` and `Summary`.
+        `Rules_Report`, and `Conformance_Details`. For built-in engine reports the workbook
+        contains `Issues` and `Summary`.
 
         Requires the `openpyxl` package (`pip install openpyxl` or
         `pip install 'pointblank[excel]'`).
@@ -1380,8 +1383,287 @@ class ConformanceReport:
 
         return dest
 
+    def findings_df(self):
+        """Return all row-level findings as a Polars DataFrame.
+
+        Each row represents one failing record captured during the conformance run. Use this method
+        for programmatic analysis (filtering by rule, grouping by subject, exporting to CSV, or
+        joining back to the source datasets to investigate root causes).
+
+        Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules
+        that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`,
+        `DOMAIN_PRESENCE_CHECK`) report a finding count in `get_tabular_report()` but do not appear
+        here. To see the visual findings table call `get_findings_table()` instead.
+
+        Findings are capped at **100 rows per rule** to bound memory use on large datasets. The
+        `n_issues` value shown in `get_tabular_report()` always reflects the true total count for a
+        rule, even when more than 100 records failed.
+
+        Returns
+        -------
+        polars.DataFrame
+            One row per captured finding with the following columns:
+
+            - `rule_id`: CDISC CORE rule identifier (e.g., `"SDTM-007"`).
+            - `dataset`: The SDTM domain the failing record belongs to (e.g., `"AE"`).
+            - `row_index`: 0-based row position of the failing record in the source dataset.
+            - `usubjid`: Unique Subject Identifier from the `"USUBJID"` column, if present.
+            - `checked_column`: The specific variable that violated the rule (e.g., `"SEX"`).
+            - `checked_value`: The actual value of `checked_column` in that row.
+            - `description`: Human-readable rule description.
+              Derived first from the rule's operations; falls back to the conditions tree for
+              rules with no explicit operations (e.g., range checks like `AGE < 0`).
+            - `checked_value`: The actual value of `checked_column` in that row.
+            - `description`: Human-readable rule description.
+
+            Returns an empty DataFrame (with the same schema) when all rules pass.
+
+        Raises
+        ------
+        TypeError
+            If called on a CDISC CORE-backed report. Use `findings()` instead, which returns a list
+            of `CoreFinding` objects.
+        """
+        import polars as pl
+
+        if not self.is_rules:
+            raise TypeError(
+                "findings_df() is only available for built-in engine results. "
+                "For CORE-backed reports, use findings() which returns CoreFinding objects."
+            )
+
+        rows: list[dict] = []
+        for rule_result in self.native_result.rule_results:
+            for f in rule_result.row_findings:
+                rows.append(
+                    {
+                        "rule_id": f.rule_id,
+                        "dataset": f.dataset,
+                        "row_index": f.row if f.row is not None else -1,
+                        "usubjid": f.usubjid or "",
+                        "checked_column": f.checked_column or "",
+                        "checked_value": f.checked_value or "",
+                        "description": rule_result.description,
+                    }
+                )
+
+        _SCHEMA = {
+            "rule_id": pl.String,
+            "dataset": pl.String,
+            "row_index": pl.Int64,
+            "usubjid": pl.String,
+            "checked_column": pl.String,
+            "checked_value": pl.String,
+            "description": pl.String,
+        }
+        if not rows:
+            return pl.DataFrame(schema=_SCHEMA)
+        return pl.DataFrame(rows, schema=_SCHEMA)
+
+    def get_findings_table(self) -> "GT":
+        """Build a record-level findings table as a styled Great Tables object.
+
+        Returns one row per failing record captured by Pointblank's built-in rules engine. This is the
+        drill-down companion to `get_tabular_report()`: where the tabular report shows one
+        row per rule with an aggregate issue count, the findings table shows the individual
+        offending records so reviewers can trace violations back to specific subjects and
+        variables.
+
+        Table layout
+        ------------
+        The table has two column spanners:
+
+        - **Rule**: `Domain` and `Description` identify which rule fired and in which domain.
+        - **Finding**: `USUBJID`, `Column`, `Row`, and `Value` identify the specific record.
+
+          - `USUBJID`: the unique subject identifier (e.g., `"CDISCPILOT01-01-001"`).
+          - `Column`: the variable that violated the rule (e.g., `"SEX"`).
+          - `Row`: 1-based row number of the failing record in the source domain dataset.
+          - `Value`: the actual value found in `Column` for that row.
+
+        The header shows the standard and version (e.g., `SDTMIG 3-4`) alongside a breakdown of how
+        many rules passed, failed, and were not applicable across the full run.
+
+        A narrow red bar on the left edge of each row marks it as a failure, consistent with the
+        color coding in `get_tabular_report()`.
+
+        Findings cap
+        ------------
+        At most 100 findings per rule are shown. When a rule has more than 100 failing records
+        the table shows the first 100; the true total is always visible in `get_tabular_report()`.
+
+        Returns
+        -------
+        GT
+            A styled `great_tables.GT` object. Renders automatically in Jupyter and Quarto
+            notebooks.
+
+        Raises
+        ------
+        TypeError
+            If called on a CDISC CORE-backed report. The findings table is only available for
+            built-in engine results.
+        ValueError
+            If there are no row-level findings to display (i.e., all applicable rules passed).
+        """
+        import polars as pl
+        from great_tables import GT, from_column, google_font, html, loc, style
+
+        if not self.is_rules:
+            raise TypeError("get_findings_table() is only available for built-in engine results.")
+
+        df = self.findings_df()
+        if df.is_empty():
+            raise ValueError("No row-level findings to display — all rules passed.")
+
+        # Add a red status bar column (all findings are failures)
+        df = df.with_columns(pl.lit("#FF3300").alias("status_color"))
+
+        # 1-indexed row number for easy record lookup
+        df = df.with_columns((pl.col("row_index") + 1).alias("row_1indexed"))
+
+        # Reorder columns: color bar first, then rule info, then finding details
+        df = df.select(
+            [
+                "status_color",
+                "rule_id",
+                "dataset",
+                "description",
+                "usubjid",
+                "checked_column",
+                "row_1indexed",
+                "checked_value",
+            ]
+        )
+
+        # Build header matching the tabular conformance report style
+        nr = self.native_result
+        counts = nr.status_counts()
+        _LABEL = {
+            "pass": "passed",
+            "fail": "failed",
+            "error": "error",
+            "not_applicable": "n/a",
+            "not_supported": "unsupported",
+        }
+        counts_parts = []
+        n_failed = counts.get("fail", 0)
+        n_passed = counts.get("pass", 0)
+        if n_failed:
+            counts_parts.append(f"{n_failed}&thinsp;failed&ensp;({n_passed}&thinsp;passed)")
+        for st in ("error", "not_applicable", "not_supported"):
+            n = counts.get(st, 0)
+            if n:
+                counts_parts.append(f"{n}&thinsp;{_LABEL[st]}")
+        counts_str = "&ensp;·&ensp;".join(counts_parts)
+
+        title_text = "Findings Report for CDISC Conformance"
+        subtitle_text = f"{nr.standard.upper()}&thinsp;{nr.version}&ensp;·&ensp;{counts_str}"
+
+        gt = (
+            GT(df)
+            .tab_header(title=html(title_text), subtitle=html(subtitle_text))
+            .tab_spanner(
+                label="Finding",
+                columns=["usubjid", "checked_column", "row_1indexed", "checked_value"],
+            )
+            .tab_spanner(
+                label="SDTM Rule Definition", columns=["rule_id", "dataset", "description"]
+            )
+            .cols_move_to_start(columns="status_color")
+            .cols_label(
+                status_color="",
+                rule_id="Rule",
+                dataset="Domain",
+                description="Description",
+                usubjid="USUBJID",
+                checked_column="Column",
+                row_1indexed="Row",
+                checked_value="Value",
+            )
+            # Should be 904px wide, just like the validation report table.
+            .cols_width(
+                status_color="4px",
+                rule_id="70px",
+                dataset="70px",
+                description="360px",
+                usubjid="130px",
+                checked_column="100px",
+                row_1indexed="50px",
+                checked_value="120px",
+            )
+            .tab_style(
+                style=style.fill(color=from_column("status_color")),
+                locations=loc.body(columns="status_color"),
+            )
+            .tab_style(
+                style=style.text(color=from_column("status_color"), whitespace="nowrap"),
+                locations=loc.body(columns="status_color"),
+            )
+            .tab_style(
+                style=style.text(font=google_font("IBM Plex Mono"), size="11px"),
+                locations=loc.body(),
+            )
+            .tab_style(
+                style=style.css("padding-top: 2px; padding-bottom: 2px;"),
+                locations=loc.body(),
+            )
+            .tab_style(
+                style=style.css("overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"),
+                locations=loc.body(
+                    columns=["usubjid", "checked_column", "row_1indexed", "checked_value"]
+                ),
+            )
+            .opt_table_font(font=google_font("IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .tab_options(table_font_size="90%")
+        )
+
+        return gt
+
     def get_tabular_report(self) -> "GT":
-        """Build a Great Tables conformance report for the native rules engine."""
+        """Build a rule-level conformance summary table as a styled Great Tables object.
+
+        Returns one row per rule in the catalog, summarizing whether each rule passed, failed,
+        was not applicable, or could not be evaluated. This is the high-level overview; use
+        `get_findings_table()` or `findings_df()` to drill into the individual failing records.
+
+        Table layout
+        ------------
+        Each row contains:
+
+        - A colored status bar on the left edge: green for pass, red for fail, amber for error,
+          and grey for not-applicable or not-supported.
+        - ``Rule`` — CDISC CORE rule identifier (e.g., ``"SDTM-007"``).
+        - ``Domain`` — The SDTM domain(s) the rule targets. Rules that apply to every domain
+          show a comma-separated list; rules targeting all SUPP-- datasets show ``"SUPP--"``.
+        - ``Type`` — The rule category: ``Record``, ``Variable``, ``Metadata``, ``Domain``,
+          ``Dataset``, ``Define``, or ``Codelist``.
+        - ``Issues`` — Count of failing records or dataset-level violations. Shown in bold red
+          when non-zero. This count always reflects the true total, even when the findings table
+          caps display at 100 rows per rule.
+        - ``Description`` — Human-readable explanation of what the rule checks.
+
+        Rows are sorted by severity: failing rules appear first, followed by errors, passing
+        rules, not-applicable rules, and unsupported rule types.
+
+        The table header shows ``"CDISC Conformance"`` with a ``PASS`` or ``FAIL`` badge,
+        and a subtitle line with the standard, version, and a count breakdown
+        (e.g., ``SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a``).
+
+        Returns
+        -------
+        GT
+            A styled `great_tables.GT` object set in IBM Plex Sans / IBM Plex Mono. Renders
+            automatically in Jupyter and Quarto notebooks; call `._repr_html_()` to get the
+            HTML string directly. This is the same object produced by `_repr_html_()`.
+
+        Raises
+        ------
+        TypeError
+            If called on a CDISC CORE-backed report. The tabular report is only available for
+            built-in engine results.
+        """
         from importlib.metadata import version as _pkg_version
 
         import polars as pl
@@ -1389,7 +1671,7 @@ class ConformanceReport:
 
         if not self.is_rules:
             raise TypeError(
-                "get_tabular_report() is only available for native rules results. "
+                "get_tabular_report() is only available for built-in engine results. "
                 "Use validate_conformance(engine='native') to obtain one."
             )
 
@@ -1429,21 +1711,16 @@ class ConformanceReport:
             supp = [p for p in parts if p.startswith("SUPP")]
             other = [p for p in parts if not p.startswith("SUPP")]
             if len(supp) > 1:
-                abbrev = "SUPP--: " + ", ".join(p[4:] for p in supp)
-                return ", ".join(other + [abbrev]) if other else abbrev
+                return ", ".join(other + ["SUPP--"]) if other else "SUPP--"
             return ds
 
-        desc_max = 90
         data = {
             "status_color": [_STATUS_COLORS.get(r.status, "#AAAAAA") for r in rows],
             "rule_id": [r.rule_id for r in rows],
             "dataset": [_fmt_dataset(r.dataset) for r in rows],
             "type": [_TYPE_LABELS.get(r.rule_type, r.rule_type) for r in rows],
             "n_issues": [r.n_issues for r in rows],
-            "description": [
-                r.description[:desc_max] + "…" if len(r.description) > desc_max else r.description
-                for r in rows
-            ],
+            "description": [r.description for r in rows],
         }
         df = pl.DataFrame(data)
 
@@ -1524,7 +1801,7 @@ class ConformanceReport:
                 cases={
                     "status_color": "",
                     "rule_id": "Rule",
-                    "dataset": "Dataset",
+                    "dataset": "Domain",
                     "type": "Type",
                     "n_issues": "Issues",
                     "description": "Description",
@@ -1606,7 +1883,7 @@ class ConformanceReport:
     def __repr__(self) -> str:
         if self.is_rules:
             nr = self.native_result
-            lines = ["ConformanceReport (Native Rules)"]
+            lines = ["ConformanceReport (Built-in Rules)"]
             if self.agency:
                 lines.append(f"  Agency: {self.agency}")
             lines.append(f"  {nr.standard} {nr.version}")
@@ -1769,45 +2046,103 @@ def validate_sdtmig(
     define_xml: Any = None,
     study_id: str | None = None,
 ) -> ConformanceReport:
-    """Check SDTMIG conformance and return a renderable report.
+    """Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.
 
-    Runs the bundled SDTMIG rule catalog against the provided datasets. No external tools,
-    subprocesses, or network calls are required. The returned [`ConformanceReport`] renders as a
-    color-coded Great Tables summary.
+    Runs the bundled SDTMIG 3.4 rule catalog (426 rules) against the provided SDTM domain
+    datasets using Pointblank's built-in conformance engine. No external tools, subprocesses,
+    network calls, or CDISC CORE installation are required.
+
+    The catalog covers seven rule types:
+
+    - **RECORD_CHECK** — per-row value checks (controlled terminology, ISO 8601 dates, ranges,
+      uniqueness constraints). These rules produce row-level findings accessible via
+      `findings_df()` and `get_findings_table()`.
+    - **VARIABLE_METADATA_CHECK** — variable presence and ordering (e.g., USUBJID must appear
+      before domain-specific variables).
+    - **DATASET_METADATA_CHECK** — dataset-level attributes (sort keys, required sort order).
+    - **DATASET_CONTENTS_CHECK** — dataset-level value constraints (e.g., all rows in a domain
+      must share the same STUDYID).
+    - **DOMAIN_PRESENCE_CHECK** — required or prohibited domain presence (e.g., DM must be
+      present, RELREC must not appear in an SDTM-only package).
+    - **DEFINE_ITEM_METADATA_CHECK** — variable declarations in the Define-XML (activated only
+      when `define_xml` is supplied).
+    - **DEFINE_CODELIST_CHECK** — codelist declarations in the Define-XML (activated only when
+      `define_xml` is supplied).
+
+    Controlled Terminology
+    ----------------------
+    By default the most recent bundled CT package (``sdtm-ct-2024-09-27``) is used. Codelist
+    checks are case-insensitive: a value of ``"beats/min"`` matches a term ``"BEATS/MIN"``.
+    SAS/XPT missing values (empty strings ``""``) are treated as null and skipped, so they do
+    not generate false positives for codelist or format rules.
+
+    SUPP-- and RELREC handling
+    --------------------------
+    Supplemental Qualifiers (``SUPP--``) datasets use ``RDOMAIN`` instead of ``DOMAIN`` and
+    have a fixed non-standard structure, so they are automatically excluded from catch-all rules
+    (rules with no explicit domain list). RELREC is similarly excluded.
 
     Parameters
     ----------
     datasets
-        Mapping of domain name to DataFrame. Keys are case-insensitive (e.g., `"DM"` or `"dm"`).
-        Accepts Polars, pandas, or any narwhals-supported DataFrame.
+        Mapping of SDTM domain name to a DataFrame. Keys are matched case-insensitively
+        (``"DM"`` and ``"dm"`` are equivalent). Accepts Polars, pandas, or any
+        narwhals-compatible DataFrame. Include all domains relevant to your submission;
+        rules that require a domain not in the mapping are marked ``not_applicable``.
     version
-        SDTMIG version. Currently `"3-4"` (default) is the only bundled catalog.
+        SDTMIG version string. Accepts either dot or hyphen notation (``"3.4"`` or ``"3-4"``).
+        Currently only ``"3-4"`` has a bundled catalog.
     ct_packages
-        Controlled Terminology package name(s) to load (e.g., `["sdtm-ct-2024-09-27"]`). Defaults
-        to the latest bundled CT package.
+        One or more CT package slugs to load (e.g., ``["sdtm-ct-2024-09-27"]``). When
+        ``None`` (the default) the most recent bundled package is used automatically.
     define_xml
-        Optional path to a `define.xml` file or a pre-parsed `MetadataPackage`. When provided,
-        Define-XML-aware rules (codelist declarations, mandatory variables) are activated.
+        Optional Define-XML metadata, supplied as a file path (``str`` or ``pathlib.Path``) or
+        a pre-parsed ``MetadataPackage`` object. When provided, ``DEFINE_ITEM_METADATA_CHECK``
+        and ``DEFINE_CODELIST_CHECK`` rules become active; without it they are marked
+        ``not_applicable``.
     study_id
-        Optional study identifier shown in the report header.
+        Optional study identifier (e.g., ``"CDISCPILOT01"``) shown in the report header.
 
     Returns
     -------
     ConformanceReport
-        A native-rules report (`is_rules` is `True`). Displays as a Great Tables table in
-        notebooks; call `.get_tabular_report()` to get the `GT` object directly.
+        A built-in engine report (``is_rules`` is ``True``). In Jupyter and Quarto notebooks the
+        object renders automatically as the rule-level summary table. Call
+        ``get_tabular_report()`` for the `GT` object, ``get_findings_table()`` for a
+        record-level drill-down, or ``findings_df()`` for a Polars DataFrame of failing rows.
 
     Examples
     --------
+    Validate a study from in-memory Polars DataFrames:
+
     ```python
-    import polars as pl
-    from pointblank.metadata import validate_sdtmig
+    import pointblank as pb
 
-    dm = pl.read_parquet("sdtm/dm.parquet")
-    ae = pl.read_parquet("sdtm/ae.parquet")
+    report = pb.validate_sdtmig({"DM": dm, "AE": ae, "LB": lb})
+    report  # renders the rule summary table in a notebook
+    ```
 
-    report = validate_sdtmig({"DM": dm, "AE": ae})
-    report
+    Drill down to the individual failing records:
+
+    ```python
+    report.get_findings_table()  # styled record-level table
+    report.findings_df()         # Polars DataFrame for programmatic use
+    ```
+
+    Load from XPT files using pyreadstat:
+
+    ```python
+    import pyreadstat, polars as pl
+
+    def load(path):
+        df, _ = pyreadstat.read_xport(path)
+        return pl.from_pandas(df)
+
+    report = pb.validate_sdtmig({
+        "DM": load("sdtm/dm.xpt"),
+        "AE": load("sdtm/ae.xpt"),
+        "LB": load("sdtm/lb.xpt"),
+    }, study_id="STUDY001")
     ```
     """
 
