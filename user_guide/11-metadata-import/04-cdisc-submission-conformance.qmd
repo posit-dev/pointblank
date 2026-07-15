@@ -27,6 +27,12 @@ CDISC-certified rule set. Requires the CORE executable to be installed separatel
 
 ## SDTMIG Conformance
 
+The built-in engine covers the complete SDTMIG 3.4 rule catalog, spanning per-record value checks,
+variable metadata, dataset-level constraints, domain presence, and Define-XML cross-references. The
+sections below walk through the three output surfaces (the tabular conformance report, the
+record-level findings table, and the programmatic findings DataFrame) and describe the rule catalog,
+controlled terminology handling, and optional inputs such as custom CT packages and Define-XML.
+
 ### Quick Start
 
 [`validate_sdtmig()`](`pointblank.validate_sdtmig`) is the entry point for SDTMIG conformance.
