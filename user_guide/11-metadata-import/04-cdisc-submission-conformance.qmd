@@ -313,9 +313,11 @@ gives a clean result.
 
 ### Installing the CDISC CORE Engine
 
-#### Option 1: Standalone Executable
+CORE can be obtained in three ways depending on your environment. The standalone executable is
+easiest for local use, Docker is preferred in containerized CI pipelines, and the repo checkout is
+useful when you need a specific unreleased version or want to inspect the rule definitions directly.
 
-Download the pre-built standalone executable from the
+**Option 1: Standalone executable.** Download the pre-built binary from the
 [CDISC CORE releases page](https://github.com/cdisc-org/cdisc-rules-engine/releases). Place it
 somewhere on your `PATH` under the name `core`:
 
@@ -325,9 +327,11 @@ sudo mv core /usr/local/bin/
 core --version
 ```
 
-#### Option 2: Docker
+Once the binary is on `PATH`, Pointblank will discover it automatically with no additional
+configuration required.
 
-CDISC publishes an official Docker image that includes the engine and its full rules cache:
+**Option 2: Docker.** CDISC publishes an official Docker image that includes the engine and its
+full rules cache:
 
 ```bash
 docker pull cdisc/cdisc-rules-engine:latest
