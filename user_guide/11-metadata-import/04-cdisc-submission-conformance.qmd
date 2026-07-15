@@ -342,7 +342,11 @@ docker run --rm \
     validate -s sdtmig -v 3-4 -d /data -of JSON -o /data/report
 ```
 
-#### Option 3: Repo Checkout
+When running via Docker you will typically invoke CORE directly rather than through Pointblank's
+subprocess wrapper. The resulting JSON output can be loaded with `parse_core_report()` and wrapped
+in a `ConformanceReport` for further analysis.
+
+**Option 3: Repo checkout.**
 
 ```bash
 git clone https://github.com/cdisc-org/cdisc-rules-engine.git
@@ -363,6 +367,10 @@ Pointblank discovers CORE through three mechanisms, tried in order:
 2. The `POINTBLANK_CDISC_CORE` environment variable (e.g.,
 `export POINTBLANK_CDISC_CORE="python /path/to/core.py"`).
 3. A `core` or `cdisc-rules-engine` executable on `PATH`.
+
+The environment variable approach is convenient for CI systems where the CORE path differs between
+machines, while the explicit argument is useful in notebooks where you want the path to be
+self-documenting.
 
 ### Running CORE
 
@@ -406,6 +414,9 @@ report = pb.validate_cdisc_submission(
 )
 ```
 
+In all cases the return value is a `ConformanceReport` with `is_core=True`. The sections below
+describe the accessor methods available on a CORE report.
+
 ### Working with a CORE ConformanceReport
 
 The examples below use a captured real CORE report so that the code runs without requiring CORE to
@@ -423,16 +434,16 @@ report = ConformanceReport.from_core_report(raw, agency="FDA")
 print(report)
 ```
 
-#### Checking the Overall Result
+**Overall result.** `all_passed()` returns `True` when no rules reported issues; `is_core`
+confirms the report originated from the CORE engine rather than the built-in engine:
 
 ```{python}
 print("All passed:", report.all_passed())
 print("Is CORE report:", report.is_core)
 ```
 
-#### The Summary Dictionary
-
-`summary()` returns run provenance and rule counts:
+**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary,
+useful for logging, assertions in CI scripts, or building a custom status page:
 
 ```{python}
 s = report.summary()
