@@ -254,7 +254,9 @@ report = pb.validate_sdtmig(
 ```
 
 Without `define_xml`, the 76 `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_CHECK` rules are
-marked `not_applicable`.
+marked `not_applicable`. Supplying the file allows the engine to verify that every variable present
+in your datasets is declared in Define-XML with the correct type and, where applicable, a valid
+codelist.
 
 ### Loading XPT Files
 
@@ -283,7 +285,8 @@ report = pb.validate_sdtmig(
 ```
 
 Pointblank handles the SAS empty-string convention automatically, so XPT data does not require any
-preprocessing before being passed to `validate_sdtmig()`.
+preprocessing before being passed to `validate_sdtmig()`. The same built-in handling applies whether
+data arrives from XPT files, in-memory DataFrames, or any other narwhals-compatible source.
 
 ## Prerequisites
 
