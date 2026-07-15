@@ -100,6 +100,11 @@ gt = report.get_tabular_report()
 gt
 ```
 
+The `GT` object can be passed to any Great Tables export method (for example, `gt.as_raw_html()` to
+embed the table in a custom HTML report, or `gt.gtsave("report.png")` to render it as an image).
+When failures are present, use the findings surfaces below to investigate the specific records that
+triggered each rule.
+
 ### Findings Drill-Down
 
 When rules fail, the tabular report shows how many records violated each rule but not which ones.
