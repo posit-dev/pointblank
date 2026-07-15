@@ -33,6 +33,13 @@
 | `lxml` | `>=4.9.0` | 2026-05-18 | <a href="https://pypi.org/project/lxml/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 
 
+## `cdisc-core`
+
+| Package | Version Constraint | Last Published | PyPI |
+|----|----|----|----|
+| `pyreadstat` | `>=1.2.0` | 2026-05-19 | <a href="https://pypi.org/project/pyreadstat/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
+
+
 ## `databricks`
 
 | Package | Version Constraint | Last Published | PyPI |
@@ -49,7 +56,7 @@
 | `nbformat` | `>=5.10.4` | 2024-04-04 | <a href="https://pypi.org/project/nbformat/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 | `pandas` | `<3,>=2.2.3` | 2026-05-11 | <a href="https://pypi.org/project/pandas/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 | `polars` | `>=1.17.1` | 2026-06-30 | <a href="https://pypi.org/project/polars/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
-| `pyspark` | `==3.5.6` | 2026-05-21 | <a href="https://pypi.org/project/pyspark/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
+| `pyspark` | `==3.5.6` | 2026-07-14 | <a href="https://pypi.org/project/pyspark/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 | `openpyxl` | `>=3.0.0` | 2024-06-28 | <a href="https://pypi.org/project/openpyxl/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 | `duckdb` | `<1.3.3,>=1.2.0` | 2026-06-17 | <a href="https://pypi.org/project/duckdb/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 | `lxml` | `>=4.9.0` | 2026-05-18 | <a href="https://pypi.org/project/lxml/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
@@ -137,7 +144,7 @@
 
 | Package | Version Constraint | Last Published | PyPI |
 |----|----|----|----|
-| `pyspark` | `==3.5.6` | 2026-05-21 | <a href="https://pypi.org/project/pyspark/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
+| `pyspark` | `==3.5.6` | 2026-07-14 | <a href="https://pypi.org/project/pyspark/" class="gd-pypi-link"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld2JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTUgM2g2djYiIC8+PHBhdGggZD0iTTEwIDE0IDIxIDMiIC8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiIC8+PC9zdmc+" /></a> |
 
 
 ## `snowflake`
@@ -158,5 +165,5 @@
 
 - **Requires:** Python `>=3.10`
 - **Runtime Dependencies:** 9
-- **Optional Dependencies:** 17 groups (21 unique packages)
+- **Optional Dependencies:** 18 groups (21 unique packages)
 - **Total unique dependencies:** 30

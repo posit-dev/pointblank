@@ -279,6 +279,16 @@ Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` t
 - `ADaMDatasetTemplate`: Structural template for an ADaM dataset
 - `ADaMVariableSpec`: Specification for a single variable in an ADaM dataset template
 
+### CDISC Submission Conformance
+
+Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
+
+
+- `validate_sdtmig`: Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report
+- `validate_cdisc_submission`: Validate a CDISC submission with the CDISC CORE engine, in one call
+- `SubmissionPackage`: A data-level model of a study submission package for CDISC conformance validation
+- `ConformanceReport`: The result of a CDISC conformance validation run
+
 ### Integrations
 
 Classes for integrating Pointblank with external observability and monitoring systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.

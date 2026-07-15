@@ -27,7 +27,7 @@ The [DataScan](DataScan.md#pointblank.DataScan) class provides a way to get a su
   - a sample of the data (the first 5 values)
   - statistics (if the column contains numbers, strings, or datetimes)
 
-To obtain a dictionary representation of the summary, you can use the [to_dict()](Step.md#pointblank.Step.to_dict) method. To get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON text to a file, the `save_to_json()` method could be used.
+To obtain a dictionary representation of the summary, you can use the [to_dict()](Step.md#pointblank.Step.to_dict) method. To get a JSON representation of the summary, you can use the [to_json()](ConformanceReport.md#pointblank.ConformanceReport.to_json) method. To save the JSON text to a file, the `save_to_json()` method could be used.
 
 > **Warning: Warning**
 >

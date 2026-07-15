@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f594b883fa7f57eff983ceed828115fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-8d5f439641516eb477015a9f2f8dba09.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1280,9 +1280,41 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Integrations</span></a>
+ <span class="menu-text">CDISC Submission Conformance</span></a>
 </div>
       <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">validate_sdtmig()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_cdisc_submission.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-function doc-label doc-label-function">validate_cdisc_submission()</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SubmissionPackage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">SubmissionPackage</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConformanceReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="doc-object-name doc-class doc-label doc-label-dataclass">ConformanceReport</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
@@ -1318,6 +1350,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#metadata-importexport" id="toc-metadata-importexport" class="nav-link" data-scroll-target="#metadata-importexport">Metadata Import/Export</a></li>
   <li><a href="#sdtm-validation" id="toc-sdtm-validation" class="nav-link" data-scroll-target="#sdtm-validation">SDTM Validation</a></li>
   <li><a href="#adam-validation" id="toc-adam-validation" class="nav-link" data-scroll-target="#adam-validation">ADaM Validation</a></li>
+  <li><a href="#cdisc-submission-conformance" id="toc-cdisc-submission-conformance" class="nav-link" data-scroll-target="#cdisc-submission-conformance">CDISC Submission Conformance</a></li>
   <li><a href="#integrations" id="toc-integrations" class="nav-link" data-scroll-target="#integrations">Integrations</a></li>
   </ul>
 </nav>
@@ -2113,6 +2146,30 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/ADaMVariableSpec.html#pointblank.ADaMVariableSpec" class="doc-class doc-label doc-label-dataclass">ADaMVariableSpec</a></dt>
 <dd>
 <p>Specification for a single variable in an ADaM dataset template.</p>
+</dd>
+</dl>
+</section>
+<section id="cdisc-submission-conformance" class="level2 doc-group">
+<h2 class="doc-group">CDISC Submission Conformance</h2>
+<div class="doc-description">
+<p>Validate SDTM datasets for CDISC conformance. <code>validate_sdtmig()</code> is the primary entry point: pass a dictionary of domain DataFrames and receive a <code>ConformanceReport</code> with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP– linkage, Define-XML) use <code>SubmissionPackage</code>. For the authoritative CDISC-certified rule set, use <code>validate_cdisc_submission()</code> (requires the CORE CLI) or <code>SubmissionPackage.validate_conformance(engine="core")</code>. All paths return a <code>ConformanceReport</code>.</p>
+</div>
+<dl>
+<dt><a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="doc-function doc-label doc-label-function">validate_sdtmig()</a></dt>
+<dd>
+<p>Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.</p>
+</dd>
+<dt><a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="doc-function doc-label doc-label-function">validate_cdisc_submission()</a></dt>
+<dd>
+<p>Validate a CDISC submission with the CDISC CORE engine, in one call.</p>
+</dd>
+<dt><a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="doc-class doc-label doc-label-dataclass">SubmissionPackage</a></dt>
+<dd>
+<p>A data-level model of a study submission package for CDISC conformance validation.</p>
+</dd>
+<dt><a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="doc-class doc-label doc-label-dataclass">ConformanceReport</a></dt>
+<dd>
+<p>The result of a CDISC conformance validation run.</p>
 </dd>
 </dl>
 </section>
