@@ -68,7 +68,9 @@ report
 ```
 
 Domain keys are matched case-insensitively (`"dm"` and `"DM"` are equivalent). Polars, pandas, and
-any other narwhals-compatible DataFrame are accepted.
+any other narwhals-compatible DataFrame are accepted. The report object itself renders the tabular
+summary in a notebook; read on to learn how to drill into failures and access findings
+programmatically.
 
 ### The Conformance Report
 
