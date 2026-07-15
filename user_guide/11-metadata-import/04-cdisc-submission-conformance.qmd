@@ -184,7 +184,8 @@ df.group_by("rule_id").agg(pl.len().alias("n_violations")).sort("n_violations", 
 ```
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call
-unconditionally in a script.
+unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC
+CORE engine, or to generate a custom summary report tailored to your team's workflow.
 
 ### What the Rule Catalog Covers
 
@@ -206,7 +207,9 @@ Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level finding
 
 Rules that require a domain or variable not present in your datasets are automatically marked
 `not_applicable` (they are not counted as failures). For example, a rule that checks `AESTDTC` in
-the AE domain is `not_applicable` when no AE dataset is supplied.
+the AE domain is `not_applicable` when no AE dataset is supplied. Adding more domains to the
+dictionary passed to `validate_sdtmig()` will convert more rules from `not_applicable` to
+executable, giving a more complete conformance picture.
 
 ### Controlled Terminology
 
