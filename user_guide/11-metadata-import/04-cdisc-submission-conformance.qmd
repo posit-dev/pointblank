@@ -1,0 +1,628 @@
+---
+title: CDISC Submission Conformance
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Regulatory submissions require that every dataset in a study package passes CDISC conformance
+rules. Pointblank provides a built-in conformance engine that checks your SDTM datasets against the
+full SDTMIG rule catalog with no external dependencies (no subprocess, no CLI, no network). For
+those preparing a final submission gate, Pointblank can also delegate to the external
+[CDISC CORE engine](https://github.com/cdisc-org/cdisc-rules-engine).
+
+Two engines are available:
+
+- **Built-in** (primary): Pointblank's own engine runs 426 SDTMIG 3.4 rules against your datasets
+in-process. Results are immediately renderable in a notebook. No installation beyond Pointblank is
+required.
+- **CORE** (advanced): delegates to the open-source CDISC CORE CLI, which runs the authoritative
+CDISC-certified rule set. Requires the CORE executable to be installed separately.
+
+## SDTMIG Conformance
+
+The built-in engine covers the complete SDTMIG 3.4 rule catalog, spanning per-record value checks,
+variable metadata, dataset-level constraints, domain presence, and Define-XML cross-references. The
+sections below walk through the three output surfaces (the tabular conformance report, the
+record-level findings table, and the programmatic findings DataFrame) and describe the rule catalog,
+controlled terminology handling, and optional inputs such as custom CT packages and Define-XML.
+
+### Quick Start
+
+[`validate_sdtmig()`](`pointblank.validate_sdtmig`) is the entry point for SDTMIG conformance.
+Pass a dictionary mapping domain names to DataFrames and it returns a
+[`ConformanceReport`](`pointblank.ConformanceReport`) that renders as a color-coded summary table
+in Jupyter and Quarto notebooks:
+
+```{python}
+import polars as pl
+import pointblank as pb
+
+dm = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN":  ["DM"] * 4,
+    "USUBJID": ["STUDY01-01-001", "STUDY01-01-002", "STUDY01-01-003", "STUDY01-01-004"],
+    "SUBJID":  ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "2024-01-16", "2024-01-17", "2024-01-18"],
+    "SEX":     ["M", "F", "M", "F"],
+    "RACE":    ["WHITE", "ASIAN", "WHITE", "BLACK OR AFRICAN AMERICAN"],
+    "ETHNIC":  ["NOT HISPANIC OR LATINO"] * 4,
+    "ARMCD":   ["TRT", "PBO", "TRT", "PBO"],
+    "ARM":     ["Treatment", "Placebo", "Treatment", "Placebo"],
+    "COUNTRY": ["USA"] * 4,
+    "AGE":     [45, 62, 38, 55],
+    "AGEU":    ["YEARS"] * 4,
+    "DMDTC":   ["2024-01-10"] * 4,
+    "DMDY":    [1] * 4,
+    "SITEID":  ["01"] * 4,
+})
+
+report = pb.validate_sdtmig({"DM": dm})
+report
+```
+
+Domain keys are matched case-insensitively (`"dm"` and `"DM"` are equivalent). Polars, pandas, and
+any other narwhals-compatible DataFrame are accepted. The report object itself renders the tabular
+summary in a notebook; read on to learn how to drill into failures and access findings
+programmatically.
+
+### The Conformance Report
+
+The tabular report shown above is produced by
+[`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`). Each row is one rule
+from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status:
+
+| Color | Status | Meaning |
+|---|---|---|
+| Green | `pass` | The rule was evaluated and no violations were found |
+| Red | `fail` | One or more records or datasets violated the rule |
+| Amber | `error` | The rule could not be evaluated (unexpected data state) |
+| Grey | `not_applicable` | The rule requires a dataset or variable that was not supplied |
+| Grey | `not_supported` | The rule type is not yet implemented in the built-in engine |
+
+Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.
+
+The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status
+breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
+
+Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report
+pipeline:
+
+```{python}
+#| eval: false
+gt = report.get_tabular_report()
+gt
+```
+
+The `GT` object can be passed to any Great Tables export method (for example, `gt.as_raw_html()` to
+embed the table in a custom HTML report, or `gt.gtsave("report.png")` to render it as an image).
+When failures are present, use the findings surfaces below to investigate the specific records that
+triggered each rule.
+
+### Findings Drill-Down
+
+When rules fail, the tabular report shows how many records violated each rule but not which ones.
+[`get_findings_table()`](`pointblank.ConformanceReport.get_findings_table`) provides that
+drill-down: one row per failing record, showing the subject, the specific column that violated the
+rule, the offending value, and the 1-based row number in the source dataset.
+
+To see it in action, introduce a few deliberate violations:
+
+```{python}
+dm_with_issues = pl.DataFrame({
+    "STUDYID": ["STUDY01"] * 4,
+    "DOMAIN":  ["DM"] * 4,
+    "USUBJID": ["STUDY01-01-001", "STUDY01-01-002", "STUDY01-01-003", "STUDY01-01-004"],
+    "SUBJID":  ["001", "002", "003", "004"],
+    "RFSTDTC": ["2024-01-15", "2024-01-16", "2024-01-17", "2024-01-18"],
+    "SEX":     ["M", "F", "UNKNOWN", "F"],      # "UNKNOWN" is not in the SEX codelist
+    "RACE":    ["WHITE", "ASIAN", "WHITE", "BLACK OR AFRICAN AMERICAN"],
+    "ETHNIC":  ["NOT HISPANIC OR LATINO"] * 4,
+    "ARMCD":   ["TRT", "PBO", "TRT", "PBO"],
+    "ARM":     ["Treatment", "Placebo", "Treatment", "Placebo"],
+    "COUNTRY": ["USA"] * 4,
+    "AGE":     [45, -5, 38, 55],               # -5 violates AGE >= 0
+    "AGEU":    ["YEARS"] * 4,
+    "DMDTC":   ["2024-01-10", "not-a-date", "2024-01-10", "2024-01-10"],  # invalid ISO date
+    "DMDY":    [1] * 4,
+    "SITEID":  ["01"] * 4,
+})
+
+report_with_issues = pb.validate_sdtmig({"DM": dm_with_issues})
+report_with_issues.get_findings_table()
+```
+
+The findings table groups its columns into two spanners:
+
+- **Rule**: `Domain` and `Description` identify which rule fired and where.
+- **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong;
+`Row` is the 1-based row number in the source dataset for quick lookup.
+
+At most 100 findings per rule are shown in the table. The true total for each rule is always visible
+in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source
+data, use `findings_df()` instead.
+
+### Programmatic Access with findings_df()
+
+[`findings_df()`](`pointblank.ConformanceReport.findings_df`) returns the same findings as a Polars
+DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the
+source data:
+
+```{python}
+df = report_with_issues.findings_df()
+df
+```
+
+The DataFrame schema is:
+
+| Column | Description |
+|---|---|
+| `rule_id` | CDISC CORE rule identifier (e.g., `"SDTM-007"`) |
+| `dataset` | SDTM domain the failing record belongs to |
+| `row_index` | 0-based row position in the source dataset |
+| `usubjid` | Unique Subject Identifier (`USUBJID`) for the failing record |
+| `checked_column` | The variable that violated the rule (e.g., `"SEX"`) |
+| `checked_value` | The actual value found in `checked_column` |
+| `description` | Human-readable rule description |
+
+```{python}
+import polars as pl
+
+# Filter to a specific rule
+df.filter(pl.col("rule_id") == "SDTM-007")
+```
+
+```{python}
+# Group by rule to count violations
+df.group_by("rule_id").agg(pl.len().alias("n_violations")).sort("n_violations", descending=True)
+```
+
+The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call
+unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC
+CORE engine, or to generate a custom summary report tailored to your team's workflow.
+
+### What the Rule Catalog Covers
+
+The bundled SDTMIG 3.4 catalog contains 426 rules across seven types:
+
+| Type | Description | Examples |
+|---|---|---|
+| `RECORD_CHECK` | Per-row value checks | Codelist membership, ISO 8601 dates, numeric ranges |
+| `VARIABLE_METADATA_CHECK` | Variable presence and column ordering | USUBJID must precede domain-specific variables |
+| `DATASET_METADATA_CHECK` | Dataset-level attributes | Required sort key order |
+| `DATASET_CONTENTS_CHECK` | Dataset-level value constraints | All rows in a domain must share the same STUDYID |
+| `DOMAIN_PRESENCE_CHECK` | Required or prohibited domain presence | DM must be present |
+| `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
+| `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
+
+Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings accessible via
+`findings_df()` and `get_findings_table()`. The other types report a violation count in
+`get_tabular_report()` but do not have individual record detail.
+
+Rules that require a domain or variable not present in your datasets are automatically marked
+`not_applicable` (they are not counted as failures). For example, a rule that checks `AESTDTC` in
+the AE domain is `not_applicable` when no AE dataset is supplied. Adding more domains to the
+dictionary passed to `validate_sdtmig()` will convert more rules from `not_applicable` to
+executable, giving a more complete conformance picture.
+
+### Controlled Terminology
+
+Codelist checks use the bundled CT package `sdtm-ct-2024-09-27`. Two important behaviors:
+
+- **Case-insensitive matching**: a value of `"beats/min"` matches the codelist term `"BEATS/MIN"`.
+This avoids false positives for studies that applied mixed-case CT values.
+- **SAS/XPT empty strings treated as null**: SAS Transport files encode character missing values as
+`""` (empty string) rather than `None`. The engine recognizes this and skips codelist and format
+checks for such cells, preventing the large volumes of false positives that occur with a naive
+string comparison.
+
+Both behaviors apply automatically with no configuration. If you need to pin a different CT version
+or supply additional packages, see the next section.
+
+### Supply a Custom CT Package
+
+By default the most recent bundled CT package is used. Pass `ct_packages` to pin a specific version
+or supply additional packages:
+
+```{python}
+#| eval: false
+report = pb.validate_sdtmig(
+    {"DM": dm},
+    ct_packages=["sdtm-ct-2024-09-27"],
+)
+```
+
+Pinning the CT version is useful when your study was locked against a specific CDISC CT release and
+you want the conformance check to reflect that snapshot rather than the latest terms.
+
+### Activating Define-XML Rules
+
+Pass a path to `define.xml` to activate the Define-XML-aware rule types:
+
+```{python}
+#| eval: false
+report = pb.validate_sdtmig(
+    {"DM": dm, "AE": ae},
+    define_xml="path/to/define.xml",
+)
+```
+
+Without `define_xml`, the 76 `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_CHECK` rules are
+marked `not_applicable`. Supplying the file allows the engine to verify that every variable present
+in your datasets is declared in Define-XML with the correct type and, where applicable, a valid
+codelist.
+
+### Loading XPT Files
+
+For datasets stored as SAS Transport (XPT) files, use `pyreadstat` to load them before passing to
+`validate_sdtmig()`. Install it with `pip install pyreadstat`:
+
+```{python}
+#| eval: false
+import pyreadstat
+import polars as pl
+import pointblank as pb
+
+def load_xpt(path: str) -> pl.DataFrame:
+    df, _ = pyreadstat.read_xport(path)
+    return pl.from_pandas(df)
+
+report = pb.validate_sdtmig(
+    {
+        "DM": load_xpt("sdtm/dm.xpt"),
+        "AE": load_xpt("sdtm/ae.xpt"),
+        "LB": load_xpt("sdtm/lb.xpt"),
+        "VS": load_xpt("sdtm/vs.xpt"),
+    },
+    study_id="STUDY01",
+)
+```
+
+Pointblank handles the SAS empty-string convention automatically, so XPT data does not require any
+preprocessing before being passed to `validate_sdtmig()`. The same built-in handling applies whether
+data arrives from XPT files, in-memory DataFrames, or any other narwhals-compatible source.
+
+## Prerequisites
+
+`validate_sdtmig()` and the `ConformanceReport` methods require no additional dependencies beyond
+Pointblank itself. The optional extras are:
+
+- **Reading XPT files** with `pyreadstat`: `pip install pyreadstat`
+- **Writing XPT files** for CORE (automatic, handled internally): `pip install pyreadstat`
+- **Excel export** with `to_excel()`: `pip install openpyxl`
+
+```bash
+pip install pointblank[cdisc]    # adds pyreadstat
+pip install pointblank[excel]    # adds openpyxl
+```
+
+The CDISC CORE engine is not a Python dependency of Pointblank and must be installed separately when
+needed. See [Installing the CDISC CORE Engine](#installing-the-cdisc-core-engine) below.
+
+## CDISC CORE Engine (Advanced)
+
+The CDISC CORE engine runs the full authoritative conformance rule set and produces reports accepted
+by FDA and PMDA review tools. Use it as the final pre-submission gate after the built-in engine
+gives a clean result.
+
+### Installing the CDISC CORE Engine
+
+CORE can be obtained in three ways depending on your environment. The standalone executable is
+easiest for local use, Docker is preferred in containerized CI pipelines, and the repo checkout is
+useful when you need a specific unreleased version or want to inspect the rule definitions directly.
+
+**Option 1: Standalone executable.** Download the pre-built binary from the
+[CDISC CORE releases page](https://github.com/cdisc-org/cdisc-rules-engine/releases). Place it
+somewhere on your `PATH` under the name `core`:
+
+```bash
+chmod +x core
+sudo mv core /usr/local/bin/
+core --version
+```
+
+Once the binary is on `PATH`, Pointblank will discover it automatically with no additional
+configuration required.
+
+**Option 2: Docker.** CDISC publishes an official Docker image that includes the engine and its
+full rules cache:
+
+```bash
+docker pull cdisc/cdisc-rules-engine:latest
+
+docker run --rm \
+    -v /path/to/study/data:/data \
+    cdisc/cdisc-rules-engine:latest \
+    validate -s sdtmig -v 3-4 -d /data -of JSON -o /data/report
+```
+
+When running via Docker you will typically invoke CORE directly rather than through Pointblank's
+subprocess wrapper. The resulting JSON output can be loaded with `parse_core_report()` and wrapped
+in a `ConformanceReport` for further analysis.
+
+**Option 3: Repo checkout.**
+
+```bash
+git clone https://github.com/cdisc-org/cdisc-rules-engine.git
+cd cdisc-rules-engine
+pip install -r requirements.txt
+python core.py --version
+```
+
+When using a repo checkout, pass the repo root as `core_cwd` so Pointblank sets the subprocess
+working directory correctly.
+
+### Telling Pointblank Where to Find CORE
+
+Pointblank discovers CORE through three mechanisms, tried in order:
+
+1. An explicit `core=` argument to `validate_cdisc_submission()` or
+`validate_conformance(engine="core")`.
+2. The `POINTBLANK_CDISC_CORE` environment variable (e.g.,
+`export POINTBLANK_CDISC_CORE="python /path/to/core.py"`).
+3. A `core` or `cdisc-rules-engine` executable on `PATH`.
+
+The environment variable approach is convenient for CI systems where the CORE path differs between
+machines, while the explicit argument is useful in notebooks where you want the path to be
+self-documenting.
+
+### Running CORE
+
+`validate_cdisc_submission()` is the simplest way to run a CORE validation. It accepts an in-memory
+dictionary of DataFrames, a folder path, or an existing `SubmissionPackage`:
+
+```{python}
+#| eval: false
+report = pb.validate_cdisc_submission(
+    {"DM": dm, "AE": ae},
+    standard="sdtmig",
+    version="3.4",
+    agency="FDA",
+)
+```
+
+For a folder of XPT files pass the path directly. Pointblank skips the materialization step and
+passes the folder straight to CORE:
+
+```{python}
+#| eval: false
+report = pb.validate_cdisc_submission(
+    "path/to/sdtm/",
+    standard="sdtmig",
+    version="3.4",
+    agency="FDA",
+)
+```
+
+For repo-checkout CORE, pass the command prefix and working directory:
+
+```{python}
+#| eval: false
+report = pb.validate_cdisc_submission(
+    {"DM": dm},
+    standard="sdtmig",
+    version="3.4",
+    core=["python", "/path/to/cdisc-rules-engine/core.py"],
+    core_cwd="/path/to/cdisc-rules-engine",
+    cache="/path/to/cdisc-rules-engine/resources/cache",
+)
+```
+
+In all cases the return value is a `ConformanceReport` with `is_core=True`. The sections below
+describe the accessor methods available on a CORE report.
+
+### Working with a CORE ConformanceReport
+
+The examples below use a captured real CORE report so that the code runs without requiring CORE to
+be installed in the docs environment. The structure is identical to what a live run produces.
+
+```{python}
+import json
+from pathlib import Path
+from pointblank.metadata import parse_core_report, ConformanceReport
+
+_fixtures = Path(pb.__file__).parent.parent / "tests" / "metadata_fixtures" / "cdisc_core"
+raw = json.loads((_fixtures / "core_report_full.json").read_text())
+
+report = ConformanceReport.from_core_report(raw, agency="FDA")
+print(report)
+```
+
+**Overall result.** `all_passed()` returns `True` when no rules reported issues; `is_core`
+confirms the report originated from the CORE engine rather than the built-in engine:
+
+```{python}
+print("All passed:", report.all_passed())
+print("Is CORE report:", report.is_core)
+```
+
+**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary,
+useful for logging, assertions in CI scripts, or building a custom status page:
+
+```{python}
+s = report.summary()
+
+print(f"Standard:        {s['standard']} {s['version']}")
+print(f"Engine:          {s['engine_version']}")
+print(f"Rules evaluated: {s['n_rules']}")
+print(f"Total issues:    {s['n_issues']}")
+print()
+
+print("Rule status breakdown:")
+for status, count in sorted(s["status_counts"].items()):
+    print(f"  {status:20s}: {count}")
+```
+
+The `status_counts` dictionary enumerates every status bucket CORE reported. Use it to build
+pass/fail thresholds or trend charts across multiple submission runs.
+
+**Issues.** `issues()` returns one record per (dataset, rule) pair that reported at least one
+issue. Pass a `status` filter to separate conformance violations from execution errors:
+
+```{python}
+issues = report.issues()
+print(f"Issue entries: {len(issues)}")
+
+for issue in issues[:3]:
+    print()
+    print(f"  Dataset:  {issue['dataset']}")
+    print(f"  Rule:     {issue['rule_id']}")
+    print(f"  Message:  {issue['message']}")
+    print(f"  Issues:   {issue['issues']}")
+```
+
+```{python}
+from pointblank.metadata._cdisc_core import STATUS_ISSUE, STATUS_ERROR
+
+reported_issues = report.issues(status=STATUS_ISSUE)
+print(f"Rules with issues: {len(reported_issues)}")
+
+exec_errors = report.issues(status=STATUS_ERROR)
+print(f"Execution errors:  {len(exec_errors)}")
+```
+
+Execution errors (`STATUS_ERROR`) indicate that CORE could not evaluate a rule, typically because
+a required variable or dataset was absent or had an unexpected format. They are distinct from
+conformance issues (`STATUS_ISSUE`) where the rule ran successfully but found a violation.
+
+**Row-level findings.** `findings()` returns the row-level detail from CORE's `Issue_Details`
+section, giving the exact record that triggered each rule:
+
+```{python}
+findings = report.findings()
+print(f"Row-level findings: {len(findings)}")
+
+f = findings[0]
+print()
+print(f"Rule:          {f.rule_id}")
+print(f"Dataset:       {f.dataset}")
+print(f"Row:           {f.row}")
+print(f"USUBJID:       {f.usubjid}")
+print(f"Variables:     {f.variables}")
+print(f"Values:        {f.values}")
+```
+
+Each finding carries the `USUBJID`, the affected variables and their values, and the 1-based row
+number in the source dataset, matching the information shown in the built-in engine's findings table.
+
+**Per-rule run results.** `rules()` returns one `CoreRuleResult` per rule with its run status:
+
+```{python}
+from pointblank.metadata._cdisc_core import STATUS_SUCCESS, STATUS_SKIPPED
+
+all_rules = report.rules()
+print(f"Total rules:  {len(all_rules)}")
+print(f"Successful:   {len(report.rules(status=STATUS_SUCCESS))}")
+print(f"Skipped:      {len(report.rules(status=STATUS_SKIPPED))}")
+
+failing = [r for r in all_rules if r.is_failing]
+print(f"Failing:      {len(failing)}")
+for r in failing:
+    print(f"  {r.rule_id:15s} [{r.status}]  {(r.message or '')[:60]}")
+```
+
+Rules marked skipped are not failures. CORE skips rules when the dataset or variable they check is
+absent from the submission. A skipped rule is equivalent to `not_applicable` in the built-in engine
+and should not be treated as a conformance problem.
+
+## Exporting Reports
+
+Both built-in and CORE reports can be exported for archiving, sharing with a biometrics team, or
+loading into a review tool. Two formats are supported: JSON for round-trippable machine-readable
+output, and Excel for spreadsheet-based review workflows.
+
+### JSON
+
+`to_json()` saves the report as a JSON file. For CORE reports the structure mirrors CORE's native
+output and is parseable by `parse_core_report()`:
+
+```{python}
+import tempfile
+
+with tempfile.TemporaryDirectory() as tmp:
+    dest = report.to_json(Path(tmp) / "conformance_report.json")
+    print(f"Written to: {dest.name}")
+    print(f"File size:  {dest.stat().st_size:,} bytes")
+
+    reloaded = json.loads(dest.read_text())
+    reparsed = parse_core_report(reloaded)
+    print(f"Rules after round-trip: {len(reparsed.rules)}")
+```
+
+The round-trip fidelity means a JSON file written by Pointblank can be re-loaded later without
+re-running CORE, which is useful for archiving the state of a submission at a specific point in time.
+
+### Excel
+
+`to_excel()` writes the report as a workbook. Requires `openpyxl`:
+
+```{python}
+#| eval: false
+dest = report.to_excel("conformance_report.xlsx")
+```
+
+For CORE reports the workbook has four sheets: `Issue_Summary`, `Issue_Details`, `Rules_Report`,
+and `Conformance_Details`.
+
+## Using Both Engines Together
+
+The built-in engine provides fast feedback during development; CORE is the final gate. The typical
+workflow is to iterate with the built-in engine until it reports a clean result, then run CORE once
+as a pre-submission check:
+
+```{python}
+#| eval: false
+# Step 1: fast iteration with the built-in engine
+report = pb.validate_sdtmig({"DM": dm, "AE": ae}, study_id="STUDY01")
+
+if not report.all_passed():
+    print("Fix rule violations before running CORE:")
+    df = report.findings_df()
+    print(df.group_by("rule_id").agg(pl.len().alias("n")).sort("n", descending=True))
+    raise SystemExit(1)
+
+# Step 2: final gate with CDISC CORE
+core_report = pb.validate_cdisc_submission(
+    {"DM": dm, "AE": ae},
+    standard="sdtmig",
+    version="3.4",
+    agency="FDA",
+)
+
+if not core_report.all_passed():
+    failing = [r for r in core_report.rules() if r.is_failing]
+    print(f"CORE found {len(failing)} failing rules.")
+    core_report.to_json("core_report.json")
+    raise SystemExit(1)
+
+print("Submission passed all conformance checks.")
+```
+
+This pattern catches the majority of conformance problems early (when fixing them is cheap) and
+reserves the slower CORE invocation for the final verification step. Both reports can be exported
+and archived alongside the submission package.
+
+## Running the Integration Tests
+
+Pointblank ships integration tests for the full CORE pipeline. They are skipped automatically when
+CORE is not discoverable:
+
+```bash
+# Run when CORE is on PATH:
+pytest -m cdisc_core
+
+# With a repo-checkout CORE:
+export POINTBLANK_CDISC_CORE="python /path/to/core.py"
+export POINTBLANK_CDISC_CORE_CWD="/path/to/cdisc-rules-engine"
+pytest -m cdisc_core
+```
+
+The integration tests validate the full subprocess pipeline end-to-end, including XPT materialization,
+CORE invocation, JSON parsing, and report construction. Running them against your local CORE
+installation is a good sanity check after upgrading either Pointblank or the CORE engine.

@@ -66,6 +66,11 @@ otel = [
 
 excel = ["openpyxl>=3.0.0"]
 cdisc = ["lxml>=4.9.0"]
+# For the CDISC CORE conformance engine wrapper (`validate_cdisc_submission`,
+# `SubmissionPackage.validate_conformance(engine="core")`): pyreadstat materializes in-memory
+# datasets to XPT for CORE. The CORE engine itself is an externally-installed executable / Docker
+# image, discovered at runtime and deliberately not a Python dependency of Pointblank.
+cdisc-core = ["pyreadstat>=1.2.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
 duckdb = ["ibis-framework[duckdb]>=9.5.0"]
@@ -138,6 +143,7 @@ addopts = "-ra --cov=pointblank"
 testpaths = ["tests"]
 markers = [
     "otel: OpenTelemetry integration tests",
+    "cdisc_core: Tests that require the CDISC CORE engine to be installed and discoverable (auto-skipped when CORE is absent).",
 ]
 
 [tool.ruff]

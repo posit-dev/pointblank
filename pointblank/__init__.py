@@ -64,11 +64,13 @@ from pointblank.metadata import (
     ADaMVariableSpec,
     Codelist,
     CodelistEntry,
+    ConformanceReport,
     MetadataImport,
     MetadataPackage,
     MissingValueCode,
     SDTMDomainTemplate,
     SDTMVariableSpec,
+    SubmissionPackage,
     VariableMetadata,
     adam_to_metadata,
     export_metadata,
@@ -81,8 +83,10 @@ from pointblank.metadata import (
     sdtm_to_metadata,
     validate_adam,
     validate_adam_structure,
+    validate_cdisc_submission,
     validate_sdtm,
     validate_sdtm_structure,
+    validate_sdtmig,
 )
 from pointblank.pipeline import Pipeline, PipelineResult
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
@@ -217,4 +221,9 @@ __all__ = [
     "validate_adam_structure",
     "adam_to_metadata",
     "validate_adam",
+    # CDISC submission-package conformance
+    "SubmissionPackage",
+    "ConformanceReport",
+    "validate_cdisc_submission",
+    "validate_sdtmig",
 ]

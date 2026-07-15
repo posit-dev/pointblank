@@ -1,6 +1,28 @@
 import pytest
 
 
+def pytest_collection_modifyitems(config, items):
+    """Auto-skip tests marked @pytest.mark.cdisc_core when CORE is not discoverable."""
+    try:
+        from pointblank.metadata._cdisc_core import CoreNotFoundError, _resolve_core_command
+
+        _resolve_core_command(None)
+        core_available = True
+    except Exception:
+        core_available = False
+
+    if not core_available:
+        skip = pytest.mark.skip(
+            reason=(
+                "CDISC CORE engine not found: set the POINTBLANK_CDISC_CORE env var to the "
+                "CORE executable path or install the CORE standalone binary on PATH."
+            )
+        )
+        for item in items:
+            if "cdisc_core" in item.keywords:
+                item.add_marker(skip)
+
+
 @pytest.fixture
 def half_null_ser():
     """A 1k element half null series. Exists to get around rounding issues."""

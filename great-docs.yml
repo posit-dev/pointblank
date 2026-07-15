@@ -409,6 +409,22 @@ reference:
         - name: ADaMVariableSpec
           members: true
 
+    - title: CDISC Submission Conformance
+      desc: >
+        Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point:
+        pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4
+        rules evaluated in-process. For full submission-package checks (cross-dataset referential
+        integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative
+        CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or
+        `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
+      contents:
+        - validate_sdtmig
+        - validate_cdisc_submission
+        - name: SubmissionPackage
+          members: true
+        - name: ConformanceReport
+          members: true
+
     - title: Integrations
       desc: >
         Classes for integrating Pointblank with external observability and monitoring systems. Use

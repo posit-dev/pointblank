@@ -1,0 +1,3630 @@
+{
+  "Conformance_Details": {
+    "Report_Generation": "2026-07-03T19:37:12",
+    "Total_Runtime": "7.8 seconds",
+    "CORE_Engine_Version": "0.16.0",
+    "Issue_Limit_Per_Rule": "None",
+    "Issue_Limit_Per_Dataset": "None",
+    "Issue_Limit_Per_Sheet": null,
+    "Standard": "SDTMIG",
+    "Version": "V3.4",
+    "CT_Version": "",
+    "Define_XML_Version": null
+  },
+  "Dataset_Details": [
+    {
+      "filename": "TEST_DATASET",
+      "label": "Exposure",
+      "path": "tests/resources/report_test_data",
+      "modification_date": "2020-08-21T09:14:26",
+      "size_kb": 823.12,
+      "length": 1583
+    }
+  ],
+  "Issue_Summary": [
+    {
+      "dataset": "STUDY",
+      "core_id": "CORE-000581",
+      "message": "DM dataset is missing.",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000357",
+      "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000510",
+      "message": "Split dataset name is not 3 or 4 characters in length",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000539",
+      "message": "Split dataset is present but the two-Letter parent domain is missing.",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000598",
+      "message": "Dataset name does not begin with DOMAIN value",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000778",
+      "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-000929",
+      "message": "rule evaluation error - evaluation dataset failed to build",
+      "issues": 1
+    },
+    {
+      "dataset": "TEST_DATASET",
+      "core_id": "CORE-001081",
+      "message": "rule evaluation error - evaluation dataset failed to build",
+      "issues": 1
+    }
+  ],
+  "Issue_Details": [
+    {
+      "core_id": "CORE-000357",
+      "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": 1,
+      "SEQ": "",
+      "variables": [
+        "dataset_name"
+      ],
+      "values": [
+        "TEST_DATASET"
+      ]
+    },
+    {
+      "core_id": "CORE-000510",
+      "message": "Split dataset name is not 3 or 4 characters in length",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": 1,
+      "SEQ": "",
+      "variables": [
+        "dataset_name"
+      ],
+      "values": [
+        "TEST_DATASET"
+      ]
+    },
+    {
+      "core_id": "CORE-000539",
+      "message": "Split dataset is present but the two-Letter parent domain is missing.",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": 1,
+      "SEQ": "",
+      "variables": [
+        "dataset_name",
+        "$list_dataset_names"
+      ],
+      "values": [
+        "TEST_DATASET",
+        "['TEST_DATASET']"
+      ]
+    },
+    {
+      "core_id": "CORE-000581",
+      "message": "DM dataset is missing.",
+      "executability": "fully executable",
+      "dataset": "STUDY",
+      "USUBJID": "",
+      "row": "",
+      "SEQ": "",
+      "variables": [],
+      "values": [
+        "null"
+      ]
+    },
+    {
+      "core_id": "CORE-000598",
+      "message": "Dataset name does not begin with DOMAIN value",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": "",
+      "SEQ": "",
+      "variables": [
+        "dataset_name"
+      ],
+      "values": [
+        "TEST_DATASET"
+      ]
+    },
+    {
+      "core_id": "CORE-000778",
+      "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": "",
+      "SEQ": "",
+      "variables": [
+        "dataset_name"
+      ],
+      "values": [
+        "TEST_DATASET"
+      ]
+    },
+    {
+      "core_id": "CORE-000929",
+      "message": "rule evaluation error - evaluation dataset failed to build - Error occurred during dataset building",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": "",
+      "SEQ": "",
+      "variables": "",
+      "values": "Failed to build dataset for rule validation. Builder: DefineVariablesWithLibraryMetadataDatasetBuilder, Dataset: TEST_DATASET, Error: name=TEST_DATASET, domain=EX is not found in Define XML"
+    },
+    {
+      "core_id": "CORE-001081",
+      "message": "rule evaluation error - evaluation dataset failed to build - Error occurred during dataset building",
+      "executability": "fully executable",
+      "dataset": "TEST_DATASET",
+      "USUBJID": "",
+      "row": "",
+      "SEQ": "",
+      "variables": "",
+      "values": "Failed to build dataset for rule validation. Builder: DefineVariablesWithLibraryMetadataDatasetBuilder, Dataset: TEST_DATASET, Error: name=TEST_DATASET, domain=EX is not found in Define XML"
+    }
+  ],
+  "Rules_Report": [
+    {
+      "core_id": "CORE-000001",
+      "version": "1",
+      "cdisc_rule_id": "CG0176, TIG0405",
+      "fda_rule_id": "",
+      "message": "IEORRES is not equal to 'N' when IECAT equals 'INCLUSION'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000002",
+      "version": "1",
+      "cdisc_rule_id": "CG0208",
+      "fda_rule_id": "",
+      "message": "SESTDTC is required.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000003",
+      "version": "1",
+      "cdisc_rule_id": "CG0299",
+      "fda_rule_id": "",
+      "message": "TRLOC is present when TRLOC is not included in the TR domain.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000004",
+      "version": "1",
+      "cdisc_rule_id": "CG0101, TIG0366",
+      "fda_rule_id": "",
+      "message": "ECOCCUR indicates dose was not given, but ECDOSE is not blank or has a value less than or equal to 0",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000005",
+      "version": "1",
+      "cdisc_rule_id": "CG0102",
+      "fda_rule_id": "",
+      "message": "EXTRT is PLACEBO, but EXDOSE is not equal to 0.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000006",
+      "version": "1",
+      "cdisc_rule_id": "CG0131, TIG0381",
+      "fda_rule_id": "",
+      "message": "DTHFL is not \"Y\" or null",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000007",
+      "version": "1",
+      "cdisc_rule_id": "CG0435, TIG0587",
+      "fda_rule_id": "FB0606",
+      "message": "DTHDTC is populated but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000008",
+      "version": "1",
+      "cdisc_rule_id": "CG0132",
+      "fda_rule_id": "FB0601",
+      "message": "SSTRESC in SS dataset is \"DEAD\", but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000009",
+      "version": "1",
+      "cdisc_rule_id": "CG0152, SEND124.1, TIG0061, TIG0393",
+      "fda_rule_id": "",
+      "message": "ELEMENT variable has a non-null value when ETCD has a value of 'UNPLAN'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000010",
+      "version": "1",
+      "cdisc_rule_id": "CG0153, TIG0394",
+      "fda_rule_id": "",
+      "message": "ARMCD value length is greater than 20",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000011",
+      "version": "1",
+      "cdisc_rule_id": "CG0175, TIG0404",
+      "fda_rule_id": "",
+      "message": "IEORRES is not equal to 'Y' when IECAT equals 'EXCLUSION'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000012",
+      "version": "1",
+      "cdisc_rule_id": "CG0040, TIG0319",
+      "fda_rule_id": "",
+      "message": "AEOCCUR is present in AE dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000013",
+      "version": "1",
+      "cdisc_rule_id": "CG0044, TIG0323",
+      "fda_rule_id": "",
+      "message": "AESTAT variable is present in AE dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000014",
+      "version": "1",
+      "cdisc_rule_id": "CG0087, TIG0352",
+      "fda_rule_id": "",
+      "message": "--OCCUR should only be provided when --PRESP is equal to \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000015",
+      "version": "1",
+      "cdisc_rule_id": "CG0088, TIG0353",
+      "fda_rule_id": "",
+      "message": "--PRESP is missing in dataset when --OCCUR is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000016",
+      "version": "1",
+      "cdisc_rule_id": "CG0089, TIG0354",
+      "fda_rule_id": "",
+      "message": "--PRESP should be populated as \"Y\" when --OCCUR is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000017",
+      "version": "1",
+      "cdisc_rule_id": "CG0166, TIG0398",
+      "fda_rule_id": "",
+      "message": "RDOMAIN has a missing value when IDVARVAL has a non-missing value.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000018",
+      "version": "1",
+      "cdisc_rule_id": "CG0086, TIG0351",
+      "fda_rule_id": "",
+      "message": "--OCCUR is blank when --PRESP is equal to \"Y\" and --STAT is not provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000019",
+      "version": "1",
+      "cdisc_rule_id": "CG0311, SEND3, TIG0211, TIG0486",
+      "fda_rule_id": "",
+      "message": "Variable label length should be less than or equal to 40 characters",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000020",
+      "version": "1",
+      "cdisc_rule_id": "CG0206, TIG0426",
+      "fda_rule_id": "",
+      "message": "TAETORD should be null when ETCD = 'UNPLAN'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000021",
+      "version": "1",
+      "cdisc_rule_id": "CG0397, TIG0559",
+      "fda_rule_id": "",
+      "message": "--STRESC should not be blank when either --ORRES is provided or --DRVFL = 'Y' .",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000022",
+      "version": "1",
+      "cdisc_rule_id": "CG0041, TIG0320",
+      "fda_rule_id": "",
+      "message": "At least one of the Seriousness criteria (AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP, AESLIFE, AESOD or AESMIE)  = 'Y', but AESER = 'N' or empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000023",
+      "version": "1",
+      "cdisc_rule_id": "CG0084, TIG0349",
+      "fda_rule_id": "",
+      "message": "--TOX present in dataset even though --TOXGR is not",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000024",
+      "version": "1",
+      "cdisc_rule_id": "CG0082, TIG0347",
+      "fda_rule_id": "",
+      "message": "--BODSYS is not empty and --BDSYCD is empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000025",
+      "version": "1",
+      "cdisc_rule_id": "CG0177, TIG0406",
+      "fda_rule_id": "",
+      "message": "IESTRESC is not equal to IEORRES",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000026",
+      "version": "1",
+      "cdisc_rule_id": "CG0468, TIG0598",
+      "fda_rule_id": "",
+      "message": "The --TPTNUM variable does not exist when --TPT does exist.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000027",
+      "version": "1",
+      "cdisc_rule_id": "CG0328, CG0329, SEND214, TIG0141, TIG0496, TIG0497",
+      "fda_rule_id": "",
+      "message": "At least one of TEENRL and TEDUR must be populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000028",
+      "version": "1",
+      "cdisc_rule_id": "CG0008, TIG0293",
+      "fda_rule_id": "",
+      "message": "--TPTREF is empty and --ELTM is not empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000029",
+      "version": "1",
+      "cdisc_rule_id": "CG0661, TIG0697",
+      "fda_rule_id": "",
+      "message": "--TPTNUM exists in a dataset, but --TPT does not exist. When time points are represented in SDTMIG domains, both --TPT and --TPTNUM must be used.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000030",
+      "version": "1",
+      "cdisc_rule_id": "CG0053, TIG0329",
+      "fda_rule_id": "",
+      "message": "--REASND should not be present in dataset when --PRESP is not present in dataset",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000031",
+      "version": "1",
+      "cdisc_rule_id": "CG0659",
+      "fda_rule_id": "",
+      "message": "--EVAL is present.  --EVAL must not be used to model QRS data.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000032",
+      "version": "1",
+      "cdisc_rule_id": "CG0660",
+      "fda_rule_id": "",
+      "message": "--EVALID is present.  --EVALID must not be used to model QRS data.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000033",
+      "version": "1",
+      "cdisc_rule_id": "CG0065, TIG0337",
+      "fda_rule_id": "",
+      "message": "DSDECOD is not equal to \"COMPLETED\" when DSTERM equals \"COMPLETED\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000034",
+      "version": "1",
+      "cdisc_rule_id": "CG0069, TIG0339",
+      "fda_rule_id": "",
+      "message": "DSSTDTC does not equal DM.DTHDTC, when DSDECOD equals \"DEATH\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000035",
+      "version": "1",
+      "cdisc_rule_id": "CG0658, TIG0696",
+      "fda_rule_id": "",
+      "message": "VISITDY is populated when SVPRESP is null.  VISITDY is the Planned Study Day of a visit. It should not be populated for unplanned visits.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000036",
+      "version": "1",
+      "cdisc_rule_id": "CG0657, TIG0695",
+      "fda_rule_id": "",
+      "message": "Planned visit is not found in TV.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000037",
+      "version": "1",
+      "cdisc_rule_id": "CG0653, TIG0691",
+      "fda_rule_id": "",
+      "message": "SVPRESP is not null and not equal to \"Y\". Values should be \"Y\" or null.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000038",
+      "version": "1",
+      "cdisc_rule_id": "CG0654, TIG0692",
+      "fda_rule_id": "",
+      "message": "SVPRESP is not \"Y\" when SVOCCUR is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000039",
+      "version": "1",
+      "cdisc_rule_id": "CG0655, TIG0693",
+      "fda_rule_id": "",
+      "message": "VISITNUM for planned visit is not in TV.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000040",
+      "version": "1",
+      "cdisc_rule_id": "CG0656, TIG0694",
+      "fda_rule_id": "",
+      "message": "VISITNUM for unplanned visit is present in TV.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000041",
+      "version": "1",
+      "cdisc_rule_id": "CG0459, CG0649, TIG0689",
+      "fda_rule_id": "",
+      "message": "TSVAL is not populated with an ISO 21090 null flavor or null flavor description but TSVALNF is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000042",
+      "version": "1",
+      "cdisc_rule_id": "CG0647, TIG0687",
+      "fda_rule_id": "",
+      "message": "TT dataset is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000043",
+      "version": "1",
+      "cdisc_rule_id": "CG0648, TIG0688",
+      "fda_rule_id": "",
+      "message": "TP dataset is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000044",
+      "version": "1",
+      "cdisc_rule_id": "CG0646, TIG0686",
+      "fda_rule_id": "",
+      "message": "SJ dataset is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000045",
+      "version": "1",
+      "cdisc_rule_id": "CG0517, TIG0612",
+      "fda_rule_id": "",
+      "message": "ARMNRS value is missing when ARMCD value is missing",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000046",
+      "version": "1",
+      "cdisc_rule_id": "CG0519, TIG0614",
+      "fda_rule_id": "",
+      "message": "ARMNRS is missing when ARM value is missing",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000047",
+      "version": "1",
+      "cdisc_rule_id": "CG0518, TIG0613",
+      "fda_rule_id": "",
+      "message": "ARM value in DM dataset is not among the values of ARM variable in TA dataset. This is allowed only in a multistage study with incomplete ARM assignment. Please confirm if your study is a multistage assignment study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000048",
+      "version": "1",
+      "cdisc_rule_id": "CG0621, TIG0662",
+      "fda_rule_id": "",
+      "message": "--METHOD is present in an interventions domain.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000049",
+      "version": "1",
+      "cdisc_rule_id": "CG0507, CG0622, TIG0602, TIG0663",
+      "fda_rule_id": "",
+      "message": "--USCHFL is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000050",
+      "version": "1",
+      "cdisc_rule_id": "CG0623, TIG0664",
+      "fda_rule_id": "",
+      "message": "--RSTIND is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000051",
+      "version": "1",
+      "cdisc_rule_id": "CG0624, TIG0665",
+      "fda_rule_id": "",
+      "message": "--RSTMOD is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000052",
+      "version": "1",
+      "cdisc_rule_id": "CG0625, TIG0666",
+      "fda_rule_id": "",
+      "message": "--IMPLBL is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000054",
+      "version": "1",
+      "cdisc_rule_id": "CG0627, TIG0668",
+      "fda_rule_id": "",
+      "message": "--DTHREL is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000055",
+      "version": "1",
+      "cdisc_rule_id": "CG0628, TIG0669",
+      "fda_rule_id": "",
+      "message": "--EXCLFL is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000056",
+      "version": "1",
+      "cdisc_rule_id": "CG0629, TIG0670",
+      "fda_rule_id": "",
+      "message": "--REASEX is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000057",
+      "version": "1",
+      "cdisc_rule_id": "CG0509, CG0630, TIG0604, TIG0671",
+      "fda_rule_id": "",
+      "message": "FETUSID is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000058",
+      "version": "1",
+      "cdisc_rule_id": "CG0631, TIG0672",
+      "fda_rule_id": "",
+      "message": "RPHASE is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000059",
+      "version": "1",
+      "cdisc_rule_id": "CG0632, TIG0673",
+      "fda_rule_id": "",
+      "message": "RPPLDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000060",
+      "version": "1",
+      "cdisc_rule_id": "CG0633, TIG0674",
+      "fda_rule_id": "",
+      "message": "RPPLSTDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000061",
+      "version": "1",
+      "cdisc_rule_id": "CG0634, TIG0675",
+      "fda_rule_id": "",
+      "message": "RPPLENDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000064",
+      "version": "1",
+      "cdisc_rule_id": "CG0637, TIG0678",
+      "fda_rule_id": "",
+      "message": "--RPDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000065",
+      "version": "1",
+      "cdisc_rule_id": "CG0638, TIG0679",
+      "fda_rule_id": "",
+      "message": "--RPSTDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000066",
+      "version": "1",
+      "cdisc_rule_id": "CG0639, TIG0680",
+      "fda_rule_id": "",
+      "message": "--RPENDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000067",
+      "version": "1",
+      "cdisc_rule_id": "CG0640, TIG0681",
+      "fda_rule_id": "",
+      "message": "--DETECT is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000068",
+      "version": "1",
+      "cdisc_rule_id": "CG0641, TIG0682",
+      "fda_rule_id": "",
+      "message": "AGETXT is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000069",
+      "version": "1",
+      "cdisc_rule_id": "CG0642, TIG0683",
+      "fda_rule_id": "",
+      "message": "SPECIES is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000070",
+      "version": "1",
+      "cdisc_rule_id": "CG0643, TIG0684",
+      "fda_rule_id": "",
+      "message": "STRAIN is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000071",
+      "version": "1",
+      "cdisc_rule_id": "CG0644, TIG0685",
+      "fda_rule_id": "",
+      "message": "SBSTRAIN is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000072",
+      "version": "1",
+      "cdisc_rule_id": "CG0542",
+      "fda_rule_id": "",
+      "message": "--BEATNO is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000073",
+      "version": "1",
+      "cdisc_rule_id": "CG0533",
+      "fda_rule_id": "",
+      "message": "RPATHCD is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000074",
+      "version": "1",
+      "cdisc_rule_id": "CG0508, TIG0603",
+      "fda_rule_id": "",
+      "message": "--IMPLBL is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000075",
+      "version": "1",
+      "cdisc_rule_id": "CG0304, TIG0481",
+      "fda_rule_id": "",
+      "message": "AEREASND is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000076",
+      "version": "1",
+      "cdisc_rule_id": "CG0302",
+      "fda_rule_id": "",
+      "message": "TRPORTOT is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000077",
+      "version": "1",
+      "cdisc_rule_id": "CG0301",
+      "fda_rule_id": "",
+      "message": "TRDIR is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000078",
+      "version": "1",
+      "cdisc_rule_id": "CG0300",
+      "fda_rule_id": "",
+      "message": "TRLAT is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000079",
+      "version": "1",
+      "cdisc_rule_id": "CG0095",
+      "fda_rule_id": "",
+      "message": "--LAT is present when --LOC is not present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000080",
+      "version": "1",
+      "cdisc_rule_id": "CG0093, TIG0358",
+      "fda_rule_id": "",
+      "message": "--TPTREF is present when --ELTM, --TPTNUM, and --TPT are not present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000081",
+      "version": "1",
+      "cdisc_rule_id": "CG0056, TIG0330",
+      "fda_rule_id": "",
+      "message": "--STAT is present when --PRESP is not present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000082",
+      "version": "1",
+      "cdisc_rule_id": "CG0561",
+      "fda_rule_id": "",
+      "message": "PESTRESC value is not missing when PEORRES value is missing",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000083",
+      "version": "1",
+      "cdisc_rule_id": "CG0553, TIG0641",
+      "fda_rule_id": "",
+      "message": "--ORRES is missing even though --LOBXFL= \"Y\" and either --DRVFL is not present in dataset or is not equal to \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000084",
+      "version": "1",
+      "cdisc_rule_id": "CG0057, TIG0331",
+      "fda_rule_id": "",
+      "message": "--ENTPT exists in a dataset, but --ENRTPT does not exist.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000085",
+      "version": "1",
+      "cdisc_rule_id": "CG0059, TIG0333",
+      "fda_rule_id": "",
+      "message": "--STTPT is completed and --STRTPT is empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000086",
+      "version": "1",
+      "cdisc_rule_id": "CG0075, TIG0341",
+      "fda_rule_id": "",
+      "message": "DVSTDTC is earlier than RFICDTC in DM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000087",
+      "version": "1",
+      "cdisc_rule_id": "CG0387, TIG0549",
+      "fda_rule_id": "",
+      "message": "AESER is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000088",
+      "version": "1",
+      "cdisc_rule_id": "CG0149, SEND25, TIG0169, TIG0390",
+      "fda_rule_id": "",
+      "message": "SETCD value length is greater than 8",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000089",
+      "version": "1",
+      "cdisc_rule_id": "CG0106",
+      "fda_rule_id": "",
+      "message": "Value for --VAMT is populated, when --TRTV is NULL.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000090",
+      "version": "1",
+      "cdisc_rule_id": "CG0164, TIG0397",
+      "fda_rule_id": "",
+      "message": "RDOMAIN has a missing value but IDVAR has a non-missing value",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000091",
+      "version": "1",
+      "cdisc_rule_id": "CG0108",
+      "fda_rule_id": "",
+      "message": "Value for --VAMTU is populated, when --TRTV is NULL.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000092",
+      "version": "1",
+      "cdisc_rule_id": "CG0110, CG0111, TIG0374, TIG0375",
+      "fda_rule_id": "",
+      "message": "Both --DOSE and --DOSTXT values are populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000093",
+      "version": "1",
+      "cdisc_rule_id": "CG0114, TIG0377",
+      "fda_rule_id": "",
+      "message": "Missing value for --DOSU, when --DOSE, --DOSTXT or --DOSTOT is provided",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000094",
+      "version": "1",
+      "cdisc_rule_id": "CG0112, TIG0376",
+      "fda_rule_id": "",
+      "message": "--DOSTXT value is numeric.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000095",
+      "version": "1",
+      "cdisc_rule_id": "CG0211, TIG0430",
+      "fda_rule_id": "",
+      "message": "ETCD is not 'UNPLAN', when SEUPDES is not empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000096",
+      "version": "1",
+      "cdisc_rule_id": "CG0115, TIG0378",
+      "fda_rule_id": "",
+      "message": "--PORTOT variable is present, when --LOC variable does not exist in a dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000097",
+      "version": "1",
+      "cdisc_rule_id": "CG0218, TIG0432",
+      "fda_rule_id": "",
+      "message": "EPOCH values don't match between Subject Visits (SV) and Subject Elements (SE) datasets.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000098",
+      "version": "1",
+      "cdisc_rule_id": "CG0116, TIG0379",
+      "fda_rule_id": "",
+      "message": "--DIR variable is present, when --LOC variable does not exist in a dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000099",
+      "version": "1",
+      "cdisc_rule_id": "CG0422, TIG0577",
+      "fda_rule_id": "",
+      "message": "Value for --STAT is populated, when --ORRES is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000100",
+      "version": "1",
+      "cdisc_rule_id": "CG0423, TIG0578",
+      "fda_rule_id": "",
+      "message": "Missing --TRTV value, when --VAMT value is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000101",
+      "version": "1",
+      "cdisc_rule_id": "CG0427, TIG0581",
+      "fda_rule_id": "",
+      "message": "Missing --STRESC value, when --RESCAT value is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000102",
+      "version": "1",
+      "cdisc_rule_id": "CG0428, TIG0582",
+      "fda_rule_id": "",
+      "message": "--TOXGR should not be null when --TOX is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000103",
+      "version": "1",
+      "cdisc_rule_id": "CG0429, TIG0583",
+      "fda_rule_id": "",
+      "message": "--CAT should not be null when --SCAT is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000104",
+      "version": "1",
+      "cdisc_rule_id": "CG0430, TIG0584",
+      "fda_rule_id": "",
+      "message": "--SCAT exists in a dataset, but --CAT does not exist.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000105",
+      "version": "1",
+      "cdisc_rule_id": "CG0569, TIG0653",
+      "fda_rule_id": "FB2602",
+      "message": "--LOBXFL = 'Y', but --STRESC is empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000106",
+      "version": "1",
+      "cdisc_rule_id": "CG0045, TIG0324",
+      "fda_rule_id": "",
+      "message": "--ENTPT is completed, but --ENRTPT is not completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000107",
+      "version": "1",
+      "cdisc_rule_id": "CG0554, TIG0642",
+      "fda_rule_id": "",
+      "message": "An appropriate identifier is not present; USUBJID, APID, SPDEVID, SPTOBID, POOLID, SPTOBID, STOCONID should be present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000108",
+      "version": "1",
+      "cdisc_rule_id": "CG0133, TIG0382",
+      "fda_rule_id": "FB0602",
+      "message": "DD record is present, but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000109",
+      "version": "1",
+      "cdisc_rule_id": "CG0547",
+      "fda_rule_id": "",
+      "message": "SMSTDTC is null.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000110",
+      "version": "1",
+      "cdisc_rule_id": "CG0549, TIG0637",
+      "fda_rule_id": "",
+      "message": "--STREFC is null when --ORREF is non-empty or --DRVFL is equal to 'Y'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000111",
+      "version": "1",
+      "cdisc_rule_id": "CG0564, TIG0649",
+      "fda_rule_id": "",
+      "message": "--AGENT is present in a dataset other than MS.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000112",
+      "version": "1",
+      "cdisc_rule_id": "CG0565, TIG0650",
+      "fda_rule_id": "",
+      "message": "--CONC is present in a dataset other than MS.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000113",
+      "version": "1",
+      "cdisc_rule_id": "CG0566, TIG0651",
+      "fda_rule_id": "",
+      "message": "--CONCU is present in a dataset other than MS.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000114",
+      "version": "1",
+      "cdisc_rule_id": "CG0567, TIG0652",
+      "fda_rule_id": "",
+      "message": "--EVDTYP is present in a dataset other than MH.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000115",
+      "version": "1",
+      "cdisc_rule_id": "CG0570",
+      "fda_rule_id": "",
+      "message": "ARM cannot be equal to 'Screen Failure', 'Not Assigned', 'Unplanned Treatment' or 'Not Treated'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000116",
+      "version": "1",
+      "cdisc_rule_id": "CG0619, TIG0660",
+      "fda_rule_id": "",
+      "message": "--SPCUFL is not null or equal to 'N'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000117",
+      "version": "1",
+      "cdisc_rule_id": "CG0081, TIG0346",
+      "fda_rule_id": "",
+      "message": "--STAT should equal 'NOT DONE' when --PRESP = 'Y' and --OCCUR = null",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000118",
+      "version": "1",
+      "cdisc_rule_id": "CG0404, TIG0562",
+      "fda_rule_id": "",
+      "message": "--STAT is not present in dataset when --PRESP is equal to \"Y\" and --OCCUR is blank",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000119",
+      "version": "1",
+      "cdisc_rule_id": "CG0521, TIG0616",
+      "fda_rule_id": "",
+      "message": "ARM is populated, when ARMCD is NULL",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000120",
+      "version": "1",
+      "cdisc_rule_id": "CG0522, TIG0617",
+      "fda_rule_id": "",
+      "message": "ACTARM is populated, when ACTARMCD is NULL",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000121",
+      "version": "1",
+      "cdisc_rule_id": "CG0520, TIG0615",
+      "fda_rule_id": "",
+      "message": "Value for ARMNRS is populated, when both ARMCD and ACTARMCD values are populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000122",
+      "version": "1",
+      "cdisc_rule_id": "CG0434, TIG0586",
+      "fda_rule_id": "",
+      "message": "AGEU is completed, but both AGE and AGETXT are not completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000123",
+      "version": "1",
+      "cdisc_rule_id": "CG0388, TIG0550",
+      "fda_rule_id": "",
+      "message": "AESCAN is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000124",
+      "version": "1",
+      "cdisc_rule_id": "CG0389, TIG0551",
+      "fda_rule_id": "",
+      "message": "AESCONG is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000125",
+      "version": "1",
+      "cdisc_rule_id": "CG0390, TIG0552",
+      "fda_rule_id": "",
+      "message": "AESDISAB is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000126",
+      "version": "1",
+      "cdisc_rule_id": "CG0391, TIG0553",
+      "fda_rule_id": "",
+      "message": "AESDTH is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000127",
+      "version": "1",
+      "cdisc_rule_id": "CG0392, TIG0554",
+      "fda_rule_id": "",
+      "message": "AESHOSP is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000128",
+      "version": "1",
+      "cdisc_rule_id": "CG0393, TIG0555",
+      "fda_rule_id": "",
+      "message": "AESLIFE is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000129",
+      "version": "1",
+      "cdisc_rule_id": "CG0394, TIG0556",
+      "fda_rule_id": "",
+      "message": "AESOD is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000130",
+      "version": "1",
+      "cdisc_rule_id": "CG0395, TIG0557",
+      "fda_rule_id": "",
+      "message": "AESMIE is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000131",
+      "version": "1",
+      "cdisc_rule_id": "CG0396, TIG0558",
+      "fda_rule_id": "",
+      "message": "AECONTRT is completed, but not equal to \"N\" or \"Y\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000132",
+      "version": "1",
+      "cdisc_rule_id": "CG0154, SEND213",
+      "fda_rule_id": "FB0914",
+      "message": "ETCD and ELEMENT do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000133",
+      "version": "1",
+      "cdisc_rule_id": "CG0426, TIG0580",
+      "fda_rule_id": "",
+      "message": "Missing value for --STRESC, when --STRESU is provided",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000134",
+      "version": "1",
+      "cdisc_rule_id": "CG0203, TIG0423",
+      "fda_rule_id": "",
+      "message": "RDOMAIN is not 'DM' but IDVAR is empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000135",
+      "version": "1",
+      "cdisc_rule_id": "CG0204, TIG0424",
+      "fda_rule_id": "",
+      "message": "IDVAR is not empty but IDVARVAL is empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000136",
+      "version": "1",
+      "cdisc_rule_id": "CG0201, TIG0422",
+      "fda_rule_id": "",
+      "message": "IDVARVAL and USUBJID are not completed, but IDVAR equals Sequence Number.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000137",
+      "version": "1",
+      "cdisc_rule_id": "CG0100, TIG0365",
+      "fda_rule_id": "",
+      "message": "ECOCCUR is not 'N', ECSTAT and ECDOSTXT are both empty but ECDOSE is less than or equal to 0.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000138",
+      "version": "1",
+      "cdisc_rule_id": "CG0221, TIG0435",
+      "fda_rule_id": "",
+      "message": "--STDY is not null when either --STDTC or DM.RFSTDTC do not contain complete values in their date portion",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000139",
+      "version": "1",
+      "cdisc_rule_id": "CG0223, TIG0437",
+      "fda_rule_id": "",
+      "message": "--ENDY is not null when either --ENDTC or DM.RFSTDTC do not contain complete values in their date portion",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000140",
+      "version": "1",
+      "cdisc_rule_id": "CG0225, TIG0438",
+      "fda_rule_id": "",
+      "message": "VISITDY is not null when VISITNUM is not in TV.VISITNUM",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000141",
+      "version": "1",
+      "cdisc_rule_id": "CG0240, TIG0448",
+      "fda_rule_id": "FB0922",
+      "message": "--TPT and --TPTNUM do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000142",
+      "version": "1",
+      "cdisc_rule_id": "CG0241, TIG0449",
+      "fda_rule_id": "",
+      "message": "--ELTM is not the same value across records with the same values of DOMAIN, VISITNUM, --TPTREF, and --TPTNUM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000143",
+      "version": "1",
+      "cdisc_rule_id": "CG0246, SEND24, TIG0165, TIG0450",
+      "fda_rule_id": "",
+      "message": "ETCD value is greater than 8",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000144",
+      "version": "1",
+      "cdisc_rule_id": "CG0247, TIG0451",
+      "fda_rule_id": "",
+      "message": "TAETORD is not unique within ARM",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000145",
+      "version": "1",
+      "cdisc_rule_id": "CG0255",
+      "fda_rule_id": "",
+      "message": "IETESTCD is not unique within TIVERS",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000146",
+      "version": "1",
+      "cdisc_rule_id": "CG0256",
+      "fda_rule_id": "",
+      "message": "IETESTCD is not unique",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000147",
+      "version": "1",
+      "cdisc_rule_id": "CG0257, SEND26, TIG0178, TIG0461",
+      "fda_rule_id": "",
+      "message": "Length of TSPARMCD is greater than 8",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000148",
+      "version": "1",
+      "cdisc_rule_id": "CG0258, TIG0462",
+      "fda_rule_id": "",
+      "message": "Length of TSPARM is greater than 40",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000149",
+      "version": "1",
+      "cdisc_rule_id": "CG0259",
+      "fda_rule_id": "",
+      "message": "TSVALNF is null when TSVAL is null.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000150",
+      "version": "1",
+      "cdisc_rule_id": "CG0260",
+      "fda_rule_id": "",
+      "message": "TSVALNF is not null when TSVAL is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000151",
+      "version": "1",
+      "cdisc_rule_id": "CG0261, SEND281",
+      "fda_rule_id": "",
+      "message": "TSVAL is null when TSVAL1 is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000152",
+      "version": "1",
+      "cdisc_rule_id": "CG0265, TIG0467",
+      "fda_rule_id": "",
+      "message": "There is not a one-to-one relationship between TSVAL and TSVALCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000153",
+      "version": "1",
+      "cdisc_rule_id": "CG0266",
+      "fda_rule_id": "",
+      "message": "TSVCDREF is null when TSVCDVER is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000154",
+      "version": "1",
+      "cdisc_rule_id": "CG0268, SEND246, TIG0167, TIG0470",
+      "fda_rule_id": "",
+      "message": "TSSEQ is not unique within TSPARMCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000155",
+      "version": "1",
+      "cdisc_rule_id": "CG0293, TIG0475",
+      "fda_rule_id": "",
+      "message": "ARMCD is not in TA.ARMCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000156",
+      "version": "1",
+      "cdisc_rule_id": "CG0294, TIG0476",
+      "fda_rule_id": "",
+      "message": "ARM is not in TA.ARM",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000157",
+      "version": "1",
+      "cdisc_rule_id": "CG0297, TIG0479",
+      "fda_rule_id": "",
+      "message": "Length of ARMCD is greater than 20",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000158",
+      "version": "1",
+      "cdisc_rule_id": "CG0163, TIG0396",
+      "fda_rule_id": "",
+      "message": "IDVAR should not be missing when RDOMAIN is not in (empty, DM).",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000159",
+      "version": "1",
+      "cdisc_rule_id": "CG0341, TIG0506",
+      "fda_rule_id": "",
+      "message": "--TESTCD is equal to 'OTHER'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000160",
+      "version": "1",
+      "cdisc_rule_id": "CG0342, TIG0507",
+      "fda_rule_id": "",
+      "message": "--TRT is equal to 'OTHER'",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000161",
+      "version": "1",
+      "cdisc_rule_id": "CG0343, TIG0508",
+      "fda_rule_id": "",
+      "message": "--TERM is equal to 'OTHER'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000162",
+      "version": "1",
+      "cdisc_rule_id": "CG0344, TIG0509",
+      "fda_rule_id": "",
+      "message": "--TESTCD is equal to 'MULTIPLE'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000163",
+      "version": "1",
+      "cdisc_rule_id": "CG0345, TIG0510",
+      "fda_rule_id": "",
+      "message": "--TRT is equal to 'MULTIPLE'",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000164",
+      "version": "1",
+      "cdisc_rule_id": "CG0346, TIG0511",
+      "fda_rule_id": "",
+      "message": "--TERM is equal to 'MULTIPLE'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000165",
+      "version": "1",
+      "cdisc_rule_id": "CG0090, TIG0355",
+      "fda_rule_id": "FB3701",
+      "message": "--TPTREF is missing when --RFTDTC is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000166",
+      "version": "1",
+      "cdisc_rule_id": "CG0091, TIG0356",
+      "fda_rule_id": "",
+      "message": "--TPT is not present when --TPTNUM is present in a dataset",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000167",
+      "version": "1",
+      "cdisc_rule_id": "CG0092, TIG0357",
+      "fda_rule_id": "",
+      "message": "--TPTREF must be present when --ELTM is present in a dataset",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000168",
+      "version": "1",
+      "cdisc_rule_id": "CG0034, TIG0315",
+      "fda_rule_id": "",
+      "message": "VISITNUM is not among VISITNUM in SV domain.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000169",
+      "version": "1",
+      "cdisc_rule_id": "CG0185, TIG0414",
+      "fda_rule_id": "",
+      "message": "Verify that LBTOXGR value is not from a numeric scale",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000170",
+      "version": "1",
+      "cdisc_rule_id": "CG0541, TIG0634",
+      "fda_rule_id": "",
+      "message": "Value of --LOBXFL must be 'Y' or null",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000171",
+      "version": "1",
+      "cdisc_rule_id": "CG0058, TIG0332",
+      "fda_rule_id": "",
+      "message": "--ENTPT should be present when --ENRTPT is present in a dataset",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000172",
+      "version": "1",
+      "cdisc_rule_id": "CG0409, SEND249.1, TIG0168, TIG0565",
+      "fda_rule_id": "",
+      "message": "STUDYID is not equal to DM.STUDYID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000173",
+      "version": "1",
+      "cdisc_rule_id": "CG0414, TIG0569",
+      "fda_rule_id": "",
+      "message": "ETCD is not equal to 'UNPLAN' and not equal to TE.ETCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000174",
+      "version": "1",
+      "cdisc_rule_id": "CG0356",
+      "fda_rule_id": "",
+      "message": "SPECIES is present in DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000175",
+      "version": "1",
+      "cdisc_rule_id": "CG0357",
+      "fda_rule_id": "",
+      "message": "STRAIN is present in DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000176",
+      "version": "1",
+      "cdisc_rule_id": "CG0358",
+      "fda_rule_id": "",
+      "message": "SBSTRAIN is present in DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000177",
+      "version": "1",
+      "cdisc_rule_id": "CG0227, TIG0440",
+      "fda_rule_id": "",
+      "message": "DM.RFENDTC is empty, but --ENRF is completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000178",
+      "version": "1",
+      "cdisc_rule_id": "CG0172",
+      "fda_rule_id": "",
+      "message": "SSSTRESC = 'DEAD', but SSDTC < max DS.DSSTDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000179",
+      "version": "1",
+      "cdisc_rule_id": "CG0307, TIG0482",
+      "fda_rule_id": "FB0916",
+      "message": "TSPARM and TSPARMCD do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000180",
+      "version": "1",
+      "cdisc_rule_id": "CG0308, TIG0483",
+      "fda_rule_id": "",
+      "message": "Domain value length is not equal 2.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000181",
+      "version": "1",
+      "cdisc_rule_id": "CG0309",
+      "fda_rule_id": "",
+      "message": "AP-- Domain value length is not equal to 4.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000182",
+      "version": "1",
+      "cdisc_rule_id": "CG0310, SEND2, TIG0128, TIG0485",
+      "fda_rule_id": "",
+      "message": "Variable name length is greater than 8.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000183",
+      "version": "1",
+      "cdisc_rule_id": "CG0318, TIG0489",
+      "fda_rule_id": "",
+      "message": "PP dataset is present in  study, but PC dataset is not present in study.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000184",
+      "version": "1",
+      "cdisc_rule_id": "CG0083, TIG0348",
+      "fda_rule_id": "FB0910",
+      "message": "--BODSYS and --BDSYCD do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000185",
+      "version": "1",
+      "cdisc_rule_id": "CG0123, TIG0380",
+      "fda_rule_id": "",
+      "message": "Length of ACTARMCD is greater than 20 characters",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000186",
+      "version": "1",
+      "cdisc_rule_id": "CG0150, TIG0391",
+      "fda_rule_id": "",
+      "message": "SUBJID is not unique within study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000187",
+      "version": "1",
+      "cdisc_rule_id": "CG0168, TIG0400",
+      "fda_rule_id": "",
+      "message": "CODTC is populated when IDVAR is also populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000188",
+      "version": "1",
+      "cdisc_rule_id": "CG0191",
+      "fda_rule_id": "",
+      "message": "The MB dataset is not present when the MS dataset is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000189",
+      "version": "1",
+      "cdisc_rule_id": "CG0665, TIG0699",
+      "fda_rule_id": "",
+      "message": "AGEU is missing when AGE is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000190",
+      "version": "1",
+      "cdisc_rule_id": "CG0666, TIG0700",
+      "fda_rule_id": "",
+      "message": "AGE is missing when AGEU is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000191",
+      "version": "1",
+      "cdisc_rule_id": "CG0529, TIG0622",
+      "fda_rule_id": "",
+      "message": "RFENDTC is missing when ARM is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000192",
+      "version": "1",
+      "cdisc_rule_id": "CG0530, TIG0623",
+      "fda_rule_id": "",
+      "message": "RFENDTC is not blank when ARMNRS is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000193",
+      "version": "1",
+      "cdisc_rule_id": "CG0503",
+      "fda_rule_id": "",
+      "message": "MIDS variable is missing when MIDSDTC variable is present in a dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000195",
+      "version": "1",
+      "cdisc_rule_id": "CG0338, TIG0503",
+      "fda_rule_id": "",
+      "message": "--SCAT is equal to --DECOD.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000196",
+      "version": "1",
+      "cdisc_rule_id": "CG0337, TIG0502",
+      "fda_rule_id": "",
+      "message": "--CAT is equal to --DECOD.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000197",
+      "version": "1",
+      "cdisc_rule_id": "CG0339, TIG0504",
+      "fda_rule_id": "",
+      "message": "--CAT is equal to --BODSYS.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000198",
+      "version": "1",
+      "cdisc_rule_id": "CG0340, TIG0505",
+      "fda_rule_id": "",
+      "message": "--SCAT is equal to --BODSYS.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000199",
+      "version": "1",
+      "cdisc_rule_id": "CG0406, SEND64, TIG0563",
+      "fda_rule_id": "",
+      "message": "Value length of --TEST > 40.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000200",
+      "version": "1",
+      "cdisc_rule_id": "CG0348, TIG0513",
+      "fda_rule_id": "",
+      "message": "--ORRES cannot be null when --STAT is null or --DRVFL not equal to 'Y'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000201",
+      "version": "1",
+      "cdisc_rule_id": "CG0029, SEND109, TIG0046, TIG0311",
+      "fda_rule_id": "",
+      "message": "USUBJID is not found in DM.USUBJID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000202",
+      "version": "1",
+      "cdisc_rule_id": "CG0419, TIG0574",
+      "fda_rule_id": "",
+      "message": "RELTYPE is populated when IDVAR is populated with a 'SEQ' value.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000203",
+      "version": "1",
+      "cdisc_rule_id": "CG0411, TIG0567",
+      "fda_rule_id": "",
+      "message": "The combination of IDVAR, IDVARVAL, and QNAM is not unique per parent subject record",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000204",
+      "version": "1",
+      "cdisc_rule_id": "CG0410, TIG0566",
+      "fda_rule_id": "",
+      "message": "Scheduled or Contingent visit is not unique within subject",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000206",
+      "version": "1",
+      "cdisc_rule_id": "CG0371, SEND121, TIG0058, TIG0535",
+      "fda_rule_id": "",
+      "message": "IDVARVAL does not equal a value of the variable referenced by IDVAR in domain = RDOMAIN.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000207",
+      "version": "1",
+      "cdisc_rule_id": "CG0467, SEND78, TIG0276, TIG0597",
+      "fda_rule_id": "",
+      "message": "--STDTC is present in a Findings general observation class",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000208",
+      "version": "1",
+      "cdisc_rule_id": "CG0512, TIG0607",
+      "fda_rule_id": "",
+      "message": "ACTARMCD is not in TA.ARMCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000209",
+      "version": "1",
+      "cdisc_rule_id": "CG0514, TIG0609",
+      "fda_rule_id": "",
+      "message": "ACTARM value in DM dataset is not among the values of ARM variable in the TA dataset. This is allowed only in a multistage study with incomplete ARM assignment. Please confirm if your study is a multistage assignment study.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000210",
+      "version": "1",
+      "cdisc_rule_id": "CG0516, TIG0611",
+      "fda_rule_id": "",
+      "message": "ARMCD is not present in TA.ARMCD",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000211",
+      "version": "1",
+      "cdisc_rule_id": "CG0528",
+      "fda_rule_id": "",
+      "message": "Population flag is present in SUPPDM",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000212",
+      "version": "1",
+      "cdisc_rule_id": "CG0535, TIG0628",
+      "fda_rule_id": "",
+      "message": "DSSCAT is not present when subject has more than one record per Epoch with DSCAT = 'DISPOSITION EVENT'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000213",
+      "version": "1",
+      "cdisc_rule_id": "CG0536, TIG0629",
+      "fda_rule_id": "",
+      "message": "More than one record per subject per DSSCAT per EPOCH",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000214",
+      "version": "1",
+      "cdisc_rule_id": "CG0538, TIG0631",
+      "fda_rule_id": "",
+      "message": "More than 1 record exists per subject per EPOCH with DSCAT = 'DISPOSITION EVENT' and DSSCAT = 'STUDY PARTICIPATION'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000215",
+      "version": "1",
+      "cdisc_rule_id": "CG0539",
+      "fda_rule_id": "",
+      "message": "More than 1 record exists per subject per EPOCH with DSCAT = 'DISPOSITION EVENT' and DSSCAT = 'STUDY TREATMENT'.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000216",
+      "version": "1",
+      "cdisc_rule_id": "CG0545",
+      "fda_rule_id": "",
+      "message": "MIDSTYPE is not unique within subject when MIDSTYPE = TM.MIDSTYPE and TM.TMRPT = 'N'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000217",
+      "version": "1",
+      "cdisc_rule_id": "CG0462, TIG0592",
+      "fda_rule_id": "",
+      "message": "ECDOSE is empty, ECOCCUR is not equal to 'N' and ECSTAT is empty, but ECDOSTXT is also empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000218",
+      "version": "1",
+      "cdisc_rule_id": "CG0465, SEND118, TIG0055, TIG0595",
+      "fda_rule_id": "",
+      "message": "IDVAR is empty but IDVARVAL is not empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000219",
+      "version": "1",
+      "cdisc_rule_id": "CG0350, SEND44, TIG0515",
+      "fda_rule_id": "",
+      "message": "--SCAT is equal to domain dataset label.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000220",
+      "version": "1",
+      "cdisc_rule_id": "CG0372, TIG0536",
+      "fda_rule_id": "",
+      "message": "--TESTCD > 8 chars or contains more than only letters, numbers, underscores, or starts with a number.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000221",
+      "version": "1",
+      "cdisc_rule_id": "CG0417, TIG0572",
+      "fda_rule_id": "",
+      "message": "QNAM > 8 chars or contains letters that are in not in uppercase, more than only letters, numbers, underscores, or starts with a number.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000222",
+      "version": "1",
+      "cdisc_rule_id": "CG0416, TIG0571",
+      "fda_rule_id": "",
+      "message": "QLABEL > 40 chars.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000223",
+      "version": "1",
+      "cdisc_rule_id": "CG0513, TIG0608",
+      "fda_rule_id": "",
+      "message": "ACTARMCD is empty, but ARMNRS is not completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000224",
+      "version": "1",
+      "cdisc_rule_id": "CG0515, TIG0610",
+      "fda_rule_id": "",
+      "message": "ACTARM is empty, but ARMNRS is not completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000225",
+      "version": "1",
+      "cdisc_rule_id": "CG0094, TIG0359",
+      "fda_rule_id": "",
+      "message": "--STAT should be \"NOT DONE\" when --REASND is provided.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000226",
+      "version": "1",
+      "cdisc_rule_id": "CG0352",
+      "fda_rule_id": "",
+      "message": "--DTHREL must never be used in SDTM-based data for human clinical trials",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000227",
+      "version": "1",
+      "cdisc_rule_id": "CG0178, TIG0407",
+      "fda_rule_id": "",
+      "message": "IETEST is not in TI.IETEST",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000228",
+      "version": "1",
+      "cdisc_rule_id": "CG0179, TIG0408",
+      "fda_rule_id": "",
+      "message": "IETESTCD from IE domain does not exist in IETESTCD of TI domain.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000229",
+      "version": "1",
+      "cdisc_rule_id": "CG0361",
+      "fda_rule_id": "",
+      "message": "POOLID must be null when USUBJID is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000230",
+      "version": "1",
+      "cdisc_rule_id": "CG0362",
+      "fda_rule_id": "",
+      "message": "USUBJID must be null when POOLID is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000231",
+      "version": "1",
+      "cdisc_rule_id": "CG0363",
+      "fda_rule_id": "",
+      "message": "RSUBJID when populated cannot equal USUBJID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000232",
+      "version": "1",
+      "cdisc_rule_id": "CG0364",
+      "fda_rule_id": "",
+      "message": "When RSUBJID is populated, RUSBJID cannot equal POOLID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000233",
+      "version": "1",
+      "cdisc_rule_id": "CG0365",
+      "fda_rule_id": "",
+      "message": "RDEVID must be empty when RSUBJID is populated and RSUBJID must be empty when RDEVID is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000234",
+      "version": "1",
+      "cdisc_rule_id": "CG0366",
+      "fda_rule_id": "",
+      "message": "RSUBJID must be missing when RDEVID is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000235",
+      "version": "1",
+      "cdisc_rule_id": "CG0367",
+      "fda_rule_id": "",
+      "message": "RSUBJID must equal DM.USUBJID when RSUBJID is populated and RSUBJID does not equal POOLID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000236",
+      "version": "1",
+      "cdisc_rule_id": "CG0079, TIG0345",
+      "fda_rule_id": "",
+      "message": "MHSTDTC ^= null and MHSTDTC is on or after the DM.RFSTDTC. The medical history dataset should include the subject's prior history at the start of the trial.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000237",
+      "version": "1",
+      "cdisc_rule_id": "CG0027, SEND43, TIG0309",
+      "fda_rule_id": "",
+      "message": "--SCAT is equal to --CAT",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000238",
+      "version": "1",
+      "cdisc_rule_id": "CG0147, TIG0388",
+      "fda_rule_id": "",
+      "message": "RFXENDTC does not equal the latest value of EX.EXSTDTC or EX.EXENDTC",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000239",
+      "version": "1",
+      "cdisc_rule_id": "CG0148, TIG0389",
+      "fda_rule_id": "",
+      "message": "RFXSTDTC does not equal the earliest value of EX.EXSTDTC",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000240",
+      "version": "1",
+      "cdisc_rule_id": "CG0420, TIG0575",
+      "fda_rule_id": "",
+      "message": "--STRF is populated when --OCCUR = \"N\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000241",
+      "version": "1",
+      "cdisc_rule_id": "CG0421, TIG0576",
+      "fda_rule_id": "",
+      "message": "--ENRF is populated when --OCCUR = \"N\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000242",
+      "version": "1",
+      "cdisc_rule_id": "CG0353, TIG0518",
+      "fda_rule_id": "",
+      "message": "--EXCLFL must never be used in SDTM-based human trials",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000243",
+      "version": "1",
+      "cdisc_rule_id": "CG0354, TIG0519",
+      "fda_rule_id": "",
+      "message": "--REASEX must never be used in SDTM-based human clinical trials",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000244",
+      "version": "1",
+      "cdisc_rule_id": "CG0355, TIG0520",
+      "fda_rule_id": "",
+      "message": "--DETECT must never be used in SDTM-based human trials",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000245",
+      "version": "1",
+      "cdisc_rule_id": "CG0510, CG0635, TIG0605, TIG0676",
+      "fda_rule_id": "",
+      "message": "--NOMDY is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000246",
+      "version": "1",
+      "cdisc_rule_id": "CG0511, CG0636, TIG0606, TIG0677",
+      "fda_rule_id": "",
+      "message": "--NOMLBL is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000247",
+      "version": "1",
+      "cdisc_rule_id": "CG0552, CG0626, TIG0640, TIG0667",
+      "fda_rule_id": "",
+      "message": "--RESLOC is present.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000248",
+      "version": "1",
+      "cdisc_rule_id": "CG0026, SEND63, TIG0265, TIG0308",
+      "fda_rule_id": "FB3702",
+      "message": "--TPTREF value is missing when --RFTDTC is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000249",
+      "version": "1",
+      "cdisc_rule_id": "CG0032, TIG0313",
+      "fda_rule_id": "",
+      "message": "Visit Day cannot be found in Trial Visit (TV) domain",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000250",
+      "version": "1",
+      "cdisc_rule_id": "CG0078, TIG0344",
+      "fda_rule_id": "",
+      "message": "MHENDTC ^= null and MHENDTC is on or after the DM.RFSTDTC. The medical history dataset should include the subject's prior history at the start of the trial.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000251",
+      "version": "1",
+      "cdisc_rule_id": "CG0067",
+      "fda_rule_id": "FB0614",
+      "message": "SSTRESC in SS dataset is \"DEAD\", but a record is missing in DS dataset where DSDECOD = \"DEATH\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000252",
+      "version": "1",
+      "cdisc_rule_id": "CG0136, TIG0385",
+      "fda_rule_id": "FB0605",
+      "message": "DSDECOD is 'DEATH' in DS dataset, but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000253",
+      "version": "1",
+      "cdisc_rule_id": "CG0135, TIG0384",
+      "fda_rule_id": "FB0604",
+      "message": "AESDTH is 'Y' in AE dataset, but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000254",
+      "version": "1",
+      "cdisc_rule_id": "CG0134, TIG0383",
+      "fda_rule_id": "FB0603",
+      "message": "AEOUT is 'FATAL' in AE dataset, but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000256",
+      "version": "1",
+      "cdisc_rule_id": "CG0210, SEND125.1, TIG0062, TIG0429",
+      "fda_rule_id": "",
+      "message": "Missing value for SEUPDES, when ETCD='UNPLAN'",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000258",
+      "version": "1",
+      "cdisc_rule_id": "CG0062, TIG0336",
+      "fda_rule_id": "",
+      "message": "--STRTPT is present in dataset, but --STTPT is not present in dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000259",
+      "version": "1",
+      "cdisc_rule_id": "CG0171",
+      "fda_rule_id": "FB0613",
+      "message": "SSDTC in SS dataset where SSTRESC = 'DEAD' is not equal to or after the DTHDTC in the DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000260",
+      "version": "1",
+      "cdisc_rule_id": "CG0085, TIG0350",
+      "fda_rule_id": "",
+      "message": "--PRESP does not equal 'Y' or is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000261",
+      "version": "1",
+      "cdisc_rule_id": "CG0060, TIG0334",
+      "fda_rule_id": "",
+      "message": "--STTPT is present in dataset, but --STRTPT is not present in dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000262",
+      "version": "1",
+      "cdisc_rule_id": "CG0226, TIG0439",
+      "fda_rule_id": "",
+      "message": "RFSTDTC in DM dataset is empty but --STRF is completed.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000264",
+      "version": "1",
+      "cdisc_rule_id": "CG0039",
+      "fda_rule_id": "",
+      "message": "Primary analysis used but --BODSYS and --SOC are not equal",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000266",
+      "version": "1",
+      "cdisc_rule_id": "CG0042, TIG0321",
+      "fda_rule_id": "",
+      "message": "If AESER = \"N\" then none of the seriousness criteria (AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP, AESLIFE, AESOD, AESMIE) could be equal to \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000267",
+      "version": "1",
+      "cdisc_rule_id": "CG0050, TIG0328",
+      "fda_rule_id": "",
+      "message": "--DECOD should be populated when --PTCD is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000268",
+      "version": "1",
+      "cdisc_rule_id": "CG0049, TIG0327",
+      "fda_rule_id": "FB0909",
+      "message": "--DECOD and --PTCD do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000269",
+      "version": "1",
+      "cdisc_rule_id": "CG0031, TIG0312",
+      "fda_rule_id": "",
+      "message": "For a planned visit (SVPRESP = 'Y'), non-missing VISIT value must be among those present in TV.VISIT.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000270",
+      "version": "1",
+      "cdisc_rule_id": "CG0033, TIG0314",
+      "fda_rule_id": "",
+      "message": "For a planned visit (SVPRESP = 'Y'), non-missing VISITNUM value must be among those present in TV.VISITNUM. in TV.VISITNUM",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000271",
+      "version": "1",
+      "cdisc_rule_id": "CG0009, TIG0294",
+      "fda_rule_id": "",
+      "message": "EPOCH is not in TA.EPOCH",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000272",
+      "version": "1",
+      "cdisc_rule_id": "CG0336, SEND46, TIG0501",
+      "fda_rule_id": "",
+      "message": "--CAT is equal to DOMAIN.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000289",
+      "version": "1",
+      "cdisc_rule_id": "CG0181, TIG0410",
+      "fda_rule_id": "",
+      "message": "LBORRES is not a continuous measurement but LBORNRHI is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000290",
+      "version": "1",
+      "cdisc_rule_id": "CG0180, TIG0409",
+      "fda_rule_id": "",
+      "message": "LBORRES is not a continuous measurement but LBORNRLO is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000291",
+      "version": "1",
+      "cdisc_rule_id": "CG0105, TIG0370",
+      "fda_rule_id": "",
+      "message": "EXVAMT is present when EC exists.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000292",
+      "version": "1",
+      "cdisc_rule_id": "CG0107",
+      "fda_rule_id": "",
+      "message": "EXVAMTU is present when EC domain exists.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000293",
+      "version": "1",
+      "cdisc_rule_id": "CG0205, TIG0425",
+      "fda_rule_id": "",
+      "message": "Length of dataset name of SUPP-- dataset is greater than 8.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000294",
+      "version": "1",
+      "cdisc_rule_id": "CG0270, TIG0471",
+      "fda_rule_id": "",
+      "message": "TSVAL is not in ISO 8601 format",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000295",
+      "version": "1",
+      "cdisc_rule_id": "CG0550, TIG0638",
+      "fda_rule_id": "",
+      "message": "--STREFN is null when --STREFC is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000296",
+      "version": "1",
+      "cdisc_rule_id": "CG0540, TIG0633",
+      "fda_rule_id": "",
+      "message": "There are no DS records for subject who was assigned treatment",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000297",
+      "version": "1",
+      "cdisc_rule_id": "CG0501",
+      "fda_rule_id": "",
+      "message": "TM dataset is missing when MIDS variable is present in one of the dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000298",
+      "version": "1",
+      "cdisc_rule_id": "CG0182, TIG0411",
+      "fda_rule_id": "",
+      "message": "LBORRES is not a continuous measurment but LBSTNRLO is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000299",
+      "version": "1",
+      "cdisc_rule_id": "CG0183, TIG0412",
+      "fda_rule_id": "",
+      "message": "LBORRES is not a continuous measurement but LBSTNRHI is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000302",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0920",
+      "message": "QNAM and QLABEL do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000303",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0901",
+      "message": "--TESTCD and --TEST do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000305",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4005",
+      "message": "Negative value for --DUR.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000308",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4002",
+      "message": "Negative value for --DOSE.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000310",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4001",
+      "message": "Negative value for AGE.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000318",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0902",
+      "message": "ARMCD and ARM do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000321",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3201",
+      "message": "Study Day of Visit/Collection/Exam (--DY) variable is missing when Date/Time of Collection (--DTC) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000324",
+      "version": "1",
+      "cdisc_rule_id": "CG0234, TIG0443",
+      "fda_rule_id": "",
+      "message": "--ENRTPT is not in ('BEFORE', 'COINCIDENT', 'ONGOING', 'UNKNOWN')",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000328",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3202",
+      "message": "The Study Day of Start of Observation (--STDY) is not present in the dataset when Start Date/Time of Observation (--STDTC) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000334",
+      "version": "1",
+      "cdisc_rule_id": "CG0016, SEND13, TIG0065, TIG0301",
+      "fda_rule_id": "",
+      "message": "At least one expected variable is missing from dataset",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000337",
+      "version": "1",
+      "cdisc_rule_id": "CG0140, TIG0386",
+      "fda_rule_id": "",
+      "message": "Multiple races are collected in SUPPDM but RACE in DM does not equal \"MULTIPLE\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000351",
+      "version": "1",
+      "cdisc_rule_id": "CG0151, SEND37, TIG0255, TIG0392",
+      "fda_rule_id": "",
+      "message": "USUBJID is not unique within study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000352",
+      "version": "1",
+      "cdisc_rule_id": "CG0207, SEND126, TIG0427",
+      "fda_rule_id": "",
+      "message": "SEENDTC is not equal to SESTDTC of the next element.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000354",
+      "version": "1",
+      "cdisc_rule_id": "CG0007, TIG0292",
+      "fda_rule_id": "",
+      "message": "The date portion of --DTC is not complete date or the date portion of DM.RFSTDTC is not complete date, but --DY is not empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000355",
+      "version": "1",
+      "cdisc_rule_id": "CG0014, SEND12, TIG0057, TIG0299",
+      "fda_rule_id": "",
+      "message": "At least one required variable is missing from dataset",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000356",
+      "version": "1",
+      "cdisc_rule_id": "CG0014, SEND12, TIG0057, TIG0299",
+      "fda_rule_id": "",
+      "message": "At least one Required variable has a null value",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000357",
+      "version": "1",
+      "cdisc_rule_id": "CG0018, TIG0303",
+      "fda_rule_id": "",
+      "message": "Supplemental qualifier dataset associated with a split dataset is greater than 8 characters in length",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000358",
+      "version": "1",
+      "cdisc_rule_id": "CG0022, TIG0306",
+      "fda_rule_id": "",
+      "message": "LNKGRP variable is not found in any of the other domains.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000361",
+      "version": "1",
+      "cdisc_rule_id": "CG0035, TIG0316",
+      "fda_rule_id": "FB0919",
+      "message": "VISIT and VISITNUM do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000362",
+      "version": "1",
+      "cdisc_rule_id": "CG0037",
+      "fda_rule_id": "",
+      "message": "Primary analysis was used but --SOCCD and --BDSYCD are not equal",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000363",
+      "version": "1",
+      "cdisc_rule_id": "CG0068, TIG0338",
+      "fda_rule_id": "",
+      "message": "The earliest disposition date for \"INFORMED CONSENT OBTAINED\" is not equal to DM.RFICDTC",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000365",
+      "version": "1",
+      "cdisc_rule_id": "CG0077",
+      "fda_rule_id": "",
+      "message": "MHCAT is grouping all records into one generic group. If no smaller categorization can be applied, then it is not necessary to include or populate this variable.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000370",
+      "version": "1",
+      "cdisc_rule_id": "CG0143, TIG0387",
+      "fda_rule_id": "",
+      "message": "DM.RFICDTC is not equal to the earliest DSSTDTC, when DSTERM indicates Informed consent obtained.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000374",
+      "version": "1",
+      "cdisc_rule_id": "CG0537, TIG0630",
+      "fda_rule_id": "",
+      "message": "There is more than one record per subject per EPOCH",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000376",
+      "version": "1",
+      "cdisc_rule_id": "CG0349, TIG0514",
+      "fda_rule_id": "",
+      "message": "First 2 characters of prefixed variable within custom domain do not match the DOMAIN value.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000384",
+      "version": "1",
+      "cdisc_rule_id": "CG0374, TIG0538",
+      "fda_rule_id": "",
+      "message": "RELREC.RDOMAIN does not represent a dataset present in the study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000457",
+      "version": "1",
+      "cdisc_rule_id": "CG0373, TIG0537",
+      "fda_rule_id": "",
+      "message": "SUPP--.RDOMAIN does not represent a dataset present in the study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000484",
+      "version": "1",
+      "cdisc_rule_id": "CG0200, TIG0421",
+      "fda_rule_id": "",
+      "message": "Unique RELID is NOT present on multiple RELREC records within a subject.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000502",
+      "version": "1",
+      "cdisc_rule_id": "CG0369, TIG0533",
+      "fda_rule_id": "",
+      "message": "RDOMAIN does not represent a dataset present in the study.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000505",
+      "version": "1",
+      "cdisc_rule_id": "CG0285",
+      "fda_rule_id": "TRC1734c",
+      "message": "TSVAL where TSPARMCD = SSTDTC is not in ISO 8601 format.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000510",
+      "version": "1",
+      "cdisc_rule_id": "CG0017",
+      "fda_rule_id": "",
+      "message": "Split dataset name is not 3 or 4 characters in length",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000517",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4003",
+      "message": "Negative value for --DOSTOT.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000518",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4004",
+      "message": "Negative value for --VAMT.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000522",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1401",
+      "message": "Missing DSCAT value for Disposition Event.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000527",
+      "version": "1",
+      "cdisc_rule_id": "CG0209, TIG0428",
+      "fda_rule_id": "",
+      "message": "SEENDTC is null when element is not the last.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000529",
+      "version": "1",
+      "cdisc_rule_id": "CG0006, SEND73, SEND74, TIG0274, TIG0275, TIG0291",
+      "fda_rule_id": "FB1603",
+      "message": "--DY is not correctly calculated even though the date portion of --DTC is complete, the date portion of RFSTDTC is complete, and --DY is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000534",
+      "version": "1",
+      "cdisc_rule_id": "CG0248, SEND221, TIG0148, TIG0452",
+      "fda_rule_id": "",
+      "message": "TAETORD is not an integer",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000535",
+      "version": "1",
+      "cdisc_rule_id": "CG0620, CG0662, SEND130, SEND130.1, TIG0066, TIG0661",
+      "fda_rule_id": "",
+      "message": "--SEQ is not chronological (based on --STDTC) within USUBJID",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000538",
+      "version": "1",
+      "cdisc_rule_id": "CG0334, TIG0500",
+      "fda_rule_id": "",
+      "message": "RDOMAIN does not match characters 5 and 6 of the dataset name",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000539",
+      "version": "1",
+      "cdisc_rule_id": "CG0332, TIG0498",
+      "fda_rule_id": "",
+      "message": "Split dataset is present but the two-Letter parent domain is missing.",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000540",
+      "version": "1",
+      "cdisc_rule_id": "CG0333, TIG0499",
+      "fda_rule_id": "",
+      "message": "Parent domain referenced in Findings About dataset name is not present in the study",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000541",
+      "version": "1",
+      "cdisc_rule_id": "CG0372, TIG0536",
+      "fda_rule_id": "",
+      "message": "IETESTCD > 8 chars or contains more than only letters, numbers, underscores, or starts with a number.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000542",
+      "version": "1",
+      "cdisc_rule_id": "SEND88, TIG0280",
+      "fda_rule_id": "FB3102",
+      "message": "--STRESC is numeric but --STRESN is not populated or not equal to --STRESC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000544",
+      "version": "1",
+      "cdisc_rule_id": "CG0028",
+      "fda_rule_id": "",
+      "message": "--SEQ is not a unique number per USUBJID per domain, nor a unique number per POOLID per domain, including when the domain is split into multiple files",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000550",
+      "version": "1",
+      "cdisc_rule_id": "CG0013, CG0351, TIG0298",
+      "fda_rule_id": "",
+      "message": "Variables not listed in the Model List of Allowed Variables for Observation Class should be in SUPPQUAL.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000552",
+      "version": "1",
+      "cdisc_rule_id": "CG0220, TIG0434",
+      "fda_rule_id": "",
+      "message": "--STDY is not properly calculated per study day algorithm",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000553",
+      "version": "1",
+      "cdisc_rule_id": "CG0222, TIG0436",
+      "fda_rule_id": "",
+      "message": "--ENDY is not properly calculated per study day algorithm",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000571",
+      "version": "1",
+      "cdisc_rule_id": "CG0024, TIG0307",
+      "fda_rule_id": "",
+      "message": "LNKID variable is only found in one domain.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000572",
+      "version": "1",
+      "cdisc_rule_id": "CG0235, TIG0444",
+      "fda_rule_id": "",
+      "message": "--ENRTPT is not in ('BEFORE', 'COINCIDENT', 'ONGOING', 'AFTER', 'UNKNOWN')",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000575",
+      "version": "1",
+      "cdisc_rule_id": "CG0219, SEND65, TIG0266, TIG0433",
+      "fda_rule_id": "",
+      "message": "No timing variable is provided",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000579",
+      "version": "1",
+      "cdisc_rule_id": "CG0408",
+      "fda_rule_id": "",
+      "message": "Dataset has no record.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000580",
+      "version": "1",
+      "cdisc_rule_id": "CG0325, TIG0495",
+      "fda_rule_id": "",
+      "message": "The combination of TESTRL, TEENRL, and TEDUR is not unique for each ETCD.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000581",
+      "version": "1",
+      "cdisc_rule_id": "CG0368, TIG0532",
+      "fda_rule_id": "TRC1736a, TRC1736c",
+      "message": "DM dataset is missing.",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000582",
+      "version": "1",
+      "cdisc_rule_id": "CG0262",
+      "fda_rule_id": "",
+      "message": "TSVALn is null when TSVAL(n+1) is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000594",
+      "version": "1",
+      "cdisc_rule_id": "CG0359, SEND29, TIG0205, TIG0524",
+      "fda_rule_id": "",
+      "message": "Variable label is not in title case.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000597",
+      "version": "1",
+      "cdisc_rule_id": "CG0043, TIG0322",
+      "fda_rule_id": "",
+      "message": "Missing AESMIE=Y where SUPPAE.QNAM=AESOSP",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000598",
+      "version": "1",
+      "cdisc_rule_id": "CG0413, SEND1, TIG0037, TIG0568",
+      "fda_rule_id": "",
+      "message": "Dataset name does not begin with DOMAIN value",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000616",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4403",
+      "message": "--STINT is populated, but --TPTREF is missing.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000642",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4404",
+      "message": "--ENINT is populated, but --TPTREF is missing.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000643",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2601",
+      "message": "BLFL is set to \"Y\", but no value for STRESC is provided",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000655",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2501",
+      "message": "Values between ARMCD and ACTARMCD are not matching",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000656",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2502",
+      "message": "Values between ARM and ACTARM are not matching",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000657",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3409",
+      "message": "AEENDTC is populated, when AEOUT = NOT RECOVERED/NOT RESOLVED.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000658",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3412",
+      "message": "RFICDTC falls after RFXSTDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000659",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3410",
+      "message": "AEENDTC is missing, when AEOUT = RECOVERED/RESOLVED.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000672",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3901",
+      "message": "--STNRHI is less than or equal to --STNRLO.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000679",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0608",
+      "message": "DTHFL in DM dataset is \"Y\" but a record is missing in DS dataset where DSDECOD = \"DEATH\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000685",
+      "version": "1",
+      "cdisc_rule_id": "CG0571",
+      "fda_rule_id": "FB0923",
+      "message": "--TPT and --TPTNUM do not have a one-to-one relationship per unique value of VISITNUM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000686",
+      "version": "1",
+      "cdisc_rule_id": "CG0572",
+      "fda_rule_id": "FB0924",
+      "message": "--TPT and --TPTNUM do not have a one-to-one relationship per unique value of --TPTREF.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000689",
+      "version": "1",
+      "cdisc_rule_id": "CG0573",
+      "fda_rule_id": "FB0925",
+      "message": "--TPT and --TPTNUM do not have a one-to-one relationship per unique combination of VISITNUM and --TPTREF values.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000699",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3001",
+      "message": "Standards units are inconsistent within the same test (category, sub-category, specimen and method)",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000700",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3204",
+      "message": "Date/Time of Collection (--DTC) variable is missing when Study Day of Visit/Collection/Exam (--DY) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000701",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2201",
+      "message": "EPOCH is missing for clinical subject-level observation.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000705",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0610",
+      "message": "DTHFL is \"Y\", but DTHDTC is not populated in the DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000706",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0906",
+      "message": "--LLTCD and --LLT do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000707",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3208",
+      "message": "--DY is greater than --ENDY.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000708",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3207",
+      "message": "--STDY is greater than --ENDY.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000709",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0607",
+      "message": "CETERM or CEDECOD is 'DEATH' in CE dataset, but DTHFL in DM dataset is not \"Y\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000710",
+      "version": "1",
+      "cdisc_rule_id": "CG0233, TIG0442",
+      "fda_rule_id": "",
+      "message": "--STRTPT is not in ('BEFORE', 'COINCIDENT', 'AFTER', 'UNKNOWN')",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000711",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3404",
+      "message": "RFSTDTC falls after RFENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000712",
+      "version": "1",
+      "cdisc_rule_id": "CG0370, TIG0534",
+      "fda_rule_id": "",
+      "message": "Value for IDVAR in SUPP-- does not represent a variable present in the dataset referenced in RDOMAIN.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000713",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3411",
+      "message": "RFICDTC falls after RFSTDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000714",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3408",
+      "message": "RFXSTDTC falls after RFXENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000716",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0911",
+      "message": "--SOCCD and --SOC do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000717",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3401",
+      "message": "AESTDTC falls after the last DSSTDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000718",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3209",
+      "message": "--STDTC falls after  --ENDTC.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000719",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0908",
+      "message": "--HLGTCD and --HLGT do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000720",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3406",
+      "message": "--DTC falls after RFPENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000723",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0907",
+      "message": "--HLTCD and --HLT do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000726",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB5701",
+      "message": "Ethnicity has been collected but the values is not mapped to \"HISPANIC OR LATINO\" or \"NOT HISPANIC OR LATINO\"",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000728",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0904",
+      "message": "TSVALCD and TSVAL do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000729",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0912",
+      "message": "INVNAM and INVID do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000732",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3103",
+      "message": "--STRESC is not numeric but --STRESN is not empty",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000736",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1116",
+      "message": "AGE and AGETXT are in the list of TSPARAMCDs with TSVAL populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000739",
+      "version": "1",
+      "cdisc_rule_id": "CG0407",
+      "fda_rule_id": "",
+      "message": "EX is not present in study when study includes protocol-specified study treatment",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000741",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1111",
+      "message": "The set  ('INTMODEL’, 'INTTYPE','PCLASS') is not in the list of TSPARAMCD with TSVAL populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000742",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1110",
+      "message": "TSVALNF is not equal to NA when TSPARAMCD=INDIC",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000743",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0918",
+      "message": "IETESTCD and IETEST do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000744",
+      "version": "1",
+      "cdisc_rule_id": "CG0174, TIG0403",
+      "fda_rule_id": "",
+      "message": "Related record is present in the parent domain dataset but FAOBJ is not equal to the \"TERM\", \"TRT\" or \"DECOD\" of the parent domain.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000745",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0915",
+      "message": "OIPARMCD and OIPARM do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000746",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB5801",
+      "message": "Ethnicity Term 'Spanish origin' (SUPPDM.CETHNIC) is collected but is not mapped as ETHNIC = HISPANIC OR LATINO.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000747",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB6001",
+      "message": "Race Term 'Haitian' or 'Negro' is collected (SUPPDM.CRACE) but is not mapped to RACE = BLACK OR AFRICAN AMERICAN in DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000757",
+      "version": "1",
+      "cdisc_rule_id": "CG0602, TIG0656",
+      "fda_rule_id": "",
+      "message": "Interventions parent record exists and --DECOD = null, but FAOBJ is not equal to --TRT.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000758",
+      "version": "1",
+      "cdisc_rule_id": "CG0534, TIG0627",
+      "fda_rule_id": "",
+      "message": "Milestone associated with RFSTDTC is start of treatment and ARMNRS is not null and different from 'UNPLANNED TREATMENT', but RFSTDTC is not empty.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000760",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3413",
+      "message": "RFCSTDTC falls after RFCENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000761",
+      "version": "1",
+      "cdisc_rule_id": "CG0289",
+      "fda_rule_id": "",
+      "message": "TSVCDVER is not a valid published version (date)",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000763",
+      "version": "1",
+      "cdisc_rule_id": "CG0232, TIG0441",
+      "fda_rule_id": "",
+      "message": "--STTPT is equal to the date of collection or assessment but --STRTPT is not in ('BEFORE', 'COINCIDENT',  'UNKNOWN').",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000765",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2401",
+      "message": "The submitted dataset is larger than 5 GB",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000766",
+      "version": "1",
+      "cdisc_rule_id": "CG0601",
+      "fda_rule_id": "",
+      "message": "Related record is present in the parent domain dataset and \"Other, specify\" value was coded.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000767",
+      "version": "1",
+      "cdisc_rule_id": "CG0603",
+      "fda_rule_id": "",
+      "message": "Parent record exists and --DECOD is not null, but FAOBJ is not equal to --DECOD.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000774",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4202",
+      "message": "--STAT = NOT DONE, but --REASND is missing.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000776",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3203",
+      "message": "Study Day of End of Observation (--ENDY) variable is missing when End Date/Time of Observation (--ENDTC) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000777",
+      "version": "1",
+      "cdisc_rule_id": "CG0502",
+      "fda_rule_id": "",
+      "message": "TM dataset is missing when RELMIDS variable is present in any of the dataset.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000778",
+      "version": "1",
+      "cdisc_rule_id": "CG0650",
+      "fda_rule_id": "",
+      "message": "Associated Persons non-supplemental qualifier dataset associated with a split dataset does not have a dataset name with a length greater than 4 and less than, or equal to, 6.",
+      "status": "ISSUE REPORTED"
+    },
+    {
+      "core_id": "CORE-000779",
+      "version": "1",
+      "cdisc_rule_id": "CG0376",
+      "fda_rule_id": "",
+      "message": "TDSTOFF is not equal to zero or a positive value in ISO 8601 Duration format",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000783",
+      "version": "1",
+      "cdisc_rule_id": "CG0314, SEND274, SEND274.1",
+      "fda_rule_id": "",
+      "message": "SUPP--.QNAM is present in the dataset, but the value of SUPP--.QNAM equals a variable name defined in the corresponding SDTM version.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000784",
+      "version": "1",
+      "cdisc_rule_id": "CG0217, TIG0431",
+      "fda_rule_id": "",
+      "message": "TAETORD values don't match between Subject Visits (SV) and Subject Elements (SE) datasets.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000785",
+      "version": "1",
+      "cdisc_rule_id": "CG0429, TIG0583",
+      "fda_rule_id": "",
+      "message": "IECAT should not be null when IESCAT is populated",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000786",
+      "version": "1",
+      "cdisc_rule_id": "CG0430, TIG0584",
+      "fda_rule_id": "",
+      "message": "IESCAT exists in a dataset, but IECAT does not exist.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000787",
+      "version": "1",
+      "cdisc_rule_id": "CG0291",
+      "fda_rule_id": "",
+      "message": "TSVAL is populated with an ISO 21090 null flavor or null flavor description.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000791",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0903",
+      "message": "ACTARMCD and ACTARM do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000792",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0905",
+      "message": "--CLASCD and --CLAS do not have a one-to-one relationship.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000793",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1601",
+      "message": "Collection study day (--DY) is missing when date/time of collection (--DTC) is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000841",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0612",
+      "message": "AEENDTC in AE dataset of AE where AEOUT = 'FATAL' is not equal to DTHDTC in the DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000844",
+      "version": "1",
+      "cdisc_rule_id": "CG0531",
+      "fda_rule_id": "",
+      "message": "RACE in DM equals 'MULTIPLE' but multiple races are not collected in SUPPDM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000845",
+      "version": "1",
+      "cdisc_rule_id": "CG0531",
+      "fda_rule_id": "",
+      "message": "RACE in DM equals 'MULTIPLE' but multiple races are not collected in SUPPDM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000846",
+      "version": "1",
+      "cdisc_rule_id": "CG0531",
+      "fda_rule_id": "",
+      "message": "RACE in DM equals 'MULTIPLE' but multiple races are not collected in SUPPDM.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000852",
+      "version": "1",
+      "cdisc_rule_id": "CG0330, CG0664, SEND48, TIG0698",
+      "fda_rule_id": "",
+      "message": "Variables are not in the correct order as shown in SDTM for the observation class.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000853",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1602",
+      "message": "Collection study day (--DY) is not populated when date/time of collection (--DTC) is populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000862",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3205",
+      "message": "Start Date/Time of Observation (--STDTC) variable is missing when Study Day of Start of Observation (--STDY) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000863",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3101",
+      "message": "--STRESC is populated with a numeric value, but --STRESN is not populated.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000864",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3206",
+      "message": "End Date/Time of Observation (--ENDTC) variable is missing when Study Day of End of Observation (--ENDY) is present.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000865",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4405",
+      "message": "--ELTM is populated, but --TPTREF is missing.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000866",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3210",
+      "message": "--DTC falls after --ENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000867",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1501",
+      "message": "Text variable contains leading spaces.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000880",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4006",
+      "message": "Negative value for --PDUR.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000885",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2302",
+      "message": "A subject has a record in DM but not in EX while participating in an interventional study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000886",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2306",
+      "message": "A subject has a no record in EX but is not populated ARMNRS while participating in an interventional study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000889",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3902",
+      "message": "--ORNRHI is less than or equal to --ORNRLO.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000890",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB1502",
+      "message": "Text variable contains '.' as an entire value.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000892",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB4301",
+      "message": "End timepoint is populated but start timepoint is missing.",
+      "status": "SUCCESS"
+    },
+    {
+      "core_id": "CORE-000901",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB6901",
+      "message": "The values of PPCAT and PCTEST do not match at the same reference timepoint",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000913",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0611",
+      "message": "DSSTDTC for DEATH record in DS dataset is not equal to DTHDTC in the DM dataset.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000914",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2603",
+      "message": "There are multiple records per assigned baseline flag (--BLFL).",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000915",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2604",
+      "message": "There are multiple records per assigned last observation before exposure flag (--LOBXFL).",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000916",
+      "version": "1",
+      "cdisc_rule_id": "CG0370, TIG0534",
+      "fda_rule_id": "",
+      "message": "Value for IDVAR in RELREC does not represent a variable present in the dataset referenced in RDOMAIN.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000927",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB2304",
+      "message": "A subject has a record in EX but is not assigned to a treatment while participating in an interventional study",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000929",
+      "version": "1",
+      "cdisc_rule_id": "CG0001, SEND16, TIG0090, TIG0289",
+      "fda_rule_id": "",
+      "message": "DOMAIN Code is not a published DOMAIN Code in CDISC Controlled Terminology.",
+      "status": "EXECUTION ERROR"
+    },
+    {
+      "core_id": "CORE-000952",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB3407",
+      "message": "--ENDTC falls after RFPENDTC.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-000953",
+      "version": "1",
+      "cdisc_rule_id": "CG0370, TIG0534",
+      "fda_rule_id": "",
+      "message": "Value for IDVAR in CO does not represent a variable present in the dataset referenced in RDOMAIN.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-001034",
+      "version": "1",
+      "cdisc_rule_id": "CG0562, TIG0648",
+      "fda_rule_id": "",
+      "message": "--REPNUM is null or is not unique per subject per test per timing variables.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-001043",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0501",
+      "message": "Age is missing for a non-screen failure subject.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-001078",
+      "version": "1",
+      "cdisc_rule_id": "",
+      "fda_rule_id": "FB0609",
+      "message": "DTHFL in DM dataset is \"Y\" but a record is missing in AE dataset where AESDTH = \"Y\" and AEOUT = \"FATAL\".",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-001080",
+      "version": "1",
+      "cdisc_rule_id": "CG0288",
+      "fda_rule_id": "",
+      "message": "TSVALCD is not a valid code in the CDISC CT version identified in TSVCDVER.",
+      "status": "SKIPPED"
+    },
+    {
+      "core_id": "CORE-001081",
+      "version": "1",
+      "cdisc_rule_id": "CG0010",
+      "fda_rule_id": "",
+      "message": "Variable role specified in the define-xml does not match the variable role in the IG (for domains) or in the model (for custom domains).",
+      "status": "EXECUTION ERROR"
+    },
+    {
+      "core_id": "CORE-001082",
+      "version": "1",
+      "cdisc_rule_id": "CG0012",
+      "fda_rule_id": "",
+      "message": "Variable data type specified in the dataset does not match the variable data type in the IG or the Model.",
+      "status": "SUCCESS"
+    }
+  ]
+}
