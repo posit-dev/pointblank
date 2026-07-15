@@ -145,7 +145,8 @@ The findings table groups its columns into two spanners:
 `Row` is the 1-based row number in the source dataset for quick lookup.
 
 At most 100 findings per rule are shown in the table. The true total for each rule is always visible
-in `get_tabular_report()`.
+in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source
+data, use `findings_df()` instead.
 
 ### Programmatic Access with findings_df()
 
