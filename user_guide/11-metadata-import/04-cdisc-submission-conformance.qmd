@@ -222,6 +222,9 @@ This avoids false positives for studies that applied mixed-case CT values.
 checks for such cells, preventing the large volumes of false positives that occur with a naive
 string comparison.
 
+Both behaviors apply automatically with no configuration. If you need to pin a different CT version
+or supply additional packages, see the next section.
+
 ### Supply a Custom CT Package
 
 By default the most recent bundled CT package is used. Pass `ct_packages` to pin a specific version
@@ -234,6 +237,9 @@ report = pb.validate_sdtmig(
     ct_packages=["sdtm-ct-2024-09-27"],
 )
 ```
+
+Pinning the CT version is useful when your study was locked against a specific CDISC CT release and
+you want the conformance check to reflect that snapshot rather than the latest terms.
 
 ### Activating Define-XML Rules
 
