@@ -459,9 +459,11 @@ for status, count in sorted(s["status_counts"].items()):
     print(f"  {status:20s}: {count}")
 ```
 
-#### Issues
+The `status_counts` dictionary enumerates every status bucket CORE reported. Use it to build
+pass/fail thresholds or trend charts across multiple submission runs.
 
-`issues()` returns one record per (dataset, rule) pair that reported at least one issue:
+**Issues.** `issues()` returns one record per (dataset, rule) pair that reported at least one
+issue. Pass a `status` filter to separate conformance violations from execution errors:
 
 ```{python}
 issues = report.issues()
@@ -475,8 +477,6 @@ for issue in issues[:3]:
     print(f"  Issues:   {issue['issues']}")
 ```
 
-Filter by status to separate conformance problems from execution errors:
-
 ```{python}
 from pointblank.metadata._cdisc_core import STATUS_ISSUE, STATUS_ERROR
 
@@ -487,9 +487,12 @@ exec_errors = report.issues(status=STATUS_ERROR)
 print(f"Execution errors:  {len(exec_errors)}")
 ```
 
-#### Row-Level Findings
+Execution errors (`STATUS_ERROR`) indicate that CORE could not evaluate a rule, typically because
+a required variable or dataset was absent or had an unexpected format. They are distinct from
+conformance issues (`STATUS_ISSUE`) where the rule ran successfully but found a violation.
 
-`findings()` returns the row-level detail from CORE's `Issue_Details` section:
+**Row-level findings.** `findings()` returns the row-level detail from CORE's `Issue_Details`
+section, giving the exact record that triggered each rule:
 
 ```{python}
 findings = report.findings()
@@ -505,9 +508,10 @@ print(f"Variables:     {f.variables}")
 print(f"Values:        {f.values}")
 ```
 
-#### Per-Rule Run Results
+Each finding carries the `USUBJID`, the affected variables and their values, and the 1-based row
+number in the source dataset, matching the information shown in the built-in engine's findings table.
 
-`rules()` returns one `CoreRuleResult` per rule with its run status:
+**Per-rule run results.** `rules()` returns one `CoreRuleResult` per rule with its run status:
 
 ```{python}
 from pointblank.metadata._cdisc_core import STATUS_SUCCESS, STATUS_SKIPPED
@@ -524,9 +528,14 @@ for r in failing:
 ```
 
 Rules marked skipped are not failures. CORE skips rules when the dataset or variable they check is
-absent from the submission.
+absent from the submission. A skipped rule is equivalent to `not_applicable` in the built-in engine
+and should not be treated as a conformance problem.
 
 ## Exporting Reports
+
+Both built-in and CORE reports can be exported for archiving, sharing with a biometrics team, or
+loading into a review tool. Two formats are supported: JSON for round-trippable machine-readable
+output, and Excel for spreadsheet-based review workflows.
 
 ### JSON
 
@@ -546,6 +555,9 @@ with tempfile.TemporaryDirectory() as tmp:
     print(f"Rules after round-trip: {len(reparsed.rules)}")
 ```
 
+The round-trip fidelity means a JSON file written by Pointblank can be re-loaded later without
+re-running CORE, which is useful for archiving the state of a submission at a specific point in time.
+
 ### Excel
 
 `to_excel()` writes the report as a workbook. Requires `openpyxl`:
@@ -560,7 +572,9 @@ and `Conformance_Details`.
 
 ## Using Both Engines Together
 
-The built-in engine provides fast feedback during development; CORE is the final gate:
+The built-in engine provides fast feedback during development; CORE is the final gate. The typical
+workflow is to iterate with the built-in engine until it reports a clean result, then run CORE once
+as a pre-submission check:
 
 ```{python}
 #| eval: false
@@ -590,6 +604,10 @@ if not core_report.all_passed():
 print("Submission passed all conformance checks.")
 ```
 
+This pattern catches the majority of conformance problems early (when fixing them is cheap) and
+reserves the slower CORE invocation for the final verification step. Both reports can be exported
+and archived alongside the submission package.
+
 ## Running the Integration Tests
 
 Pointblank ships integration tests for the full CORE pipeline. They are skipped automatically when
@@ -604,3 +622,7 @@ export POINTBLANK_CDISC_CORE="python /path/to/core.py"
 export POINTBLANK_CDISC_CORE_CWD="/path/to/cdisc-rules-engine"
 pytest -m cdisc_core
 ```
+
+The integration tests validate the full subprocess pipeline end-to-end, including XPT materialization,
+CORE invocation, JSON parsing, and report construction. Running them against your local CORE
+installation is a good sanity check after upgrading either Pointblank or the CORE engine.
