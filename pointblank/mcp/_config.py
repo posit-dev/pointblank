@@ -62,16 +62,21 @@ def _get_log_path() -> Path | None:
 def configure_logging() -> logging.Logger:
     """Configure and return the MCP server logger."""
     log_path = _get_log_path()
-    handlers: list = [logging.StreamHandler()]
-    if log_path:
-        handlers.append(logging.FileHandler(str(log_path)))
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=handlers,
-    )
-    return logging.getLogger("pointblank.mcp")
+    mcp_logger = logging.getLogger("pointblank.mcp")
+    mcp_logger.setLevel(logging.INFO)
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    mcp_logger.addHandler(stream_handler)
+
+    if log_path:
+        file_handler = logging.FileHandler(str(log_path))
+        file_handler.setFormatter(formatter)
+        mcp_logger.addHandler(file_handler)
+
+    return mcp_logger
 
 
 logger = configure_logging()
