@@ -605,9 +605,9 @@ class FinalActions:
 
     actions: list | str | Callable
 
-    def __init__(self, *args) -> None:
+    def __init__(self, *actions) -> None:
         # Check that all arguments are either strings or callables
-        for arg in args:
+        for arg in actions:
             if not isinstance(arg, (str, Callable)) and not (
                 isinstance(arg, list) and all(isinstance(item, (str, Callable)) for item in arg)
             ):
@@ -616,14 +616,14 @@ class FinalActions:
                     f"Got {type(arg).__name__} instead."
                 )
 
-        if len(args) == 0:
+        if len(actions) == 0:
             self.actions = []
-        elif len(args) == 1:
+        elif len(actions) == 1:
             # If a single action is provided, store it directly (not in a list)
-            self.actions = args[0]
+            self.actions = actions[0]
         else:
             # Multiple actions, store as a list
-            self.actions = list(args)
+            self.actions = list(actions)
 
     def __repr__(self) -> str:
         if isinstance(self.actions, list):
