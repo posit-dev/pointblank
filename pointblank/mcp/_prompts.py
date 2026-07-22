@@ -121,7 +121,7 @@ def prompt_get_validation_step_output(
 
 
 def prompt_interrogate_validator(
-    validator_id: Annotated[str, "ID of the Validator to interrogate."],
+    validator_id: Annotated[str, "ID of the Validator to interrogate."] = "validator_123",
 ) -> tuple:
     """Prompt guiding the LLM to run validations and generate reports."""
     return (
