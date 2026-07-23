@@ -1,0 +1,12 @@
+{
+  "hash": "ed424ed970449b8c1ed1eb83e231b11f",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\njupyter: python3\nhtml-table-processing: none\ntitle: \"C'mon C'mon: Let's Do a Pointblank Workshop!\"\nauthor: Rich Iannone\ndate: 2025-06-03\ntoc: false\n---\n\nRecently, I've been giving free workshops to data teams on Pointblank. These sorts of engagements\nenergize me, and I truly enjoy hearing what people are concerned with when it comes to data\nvalidation. If *your* team is interested, I would love to schedule something with y'all! Please\nreach out at rich@posit.co or message me on the ([Pointblank Discord](https://discord.com/invite/YH7CybCNCQ)).\n\nWorkshops have been especially helpful for understanding how people use and share Pointblank's\n[validation results table](../../user-guide/index.qmd). For example, I learned that people like to\nemail or pull up the table for stakeholders so they can walk through problem cases (it's a great\nconversation starter for getting to the heart of data quality issues).\n\nA couple of months ago, I gave a workshop to one of Apple's data teams. During the Q&A afterwards,\nsomeone asked whether you can perform the same validation on different chunks of table rows. This\nwas a very helpful nudge for me to add a [`segments=` argument](../../user-guide/segmentation.qmd)\nto all of Pointblank's validation methods!\n\nWe are excited about how things are going with the Pointblank project and are *always up* for\nproviding a workshop to your data team (at no cost). If this sounds interesting to you please feel\nfree to contact me through email or via Discord. Don't be shy. Just know that if you have a need for\ndata validation, we're here to help!\n\n## Acknowledgment\n\nI'd like to give special thanks to Rami Krispin for his interest in Pointblank and for facilitating\na recent workshop. If you're interested in more data science insights, check out\n[Rami's Data Newsletter](https://ramikrispin.substack.com) where he shares valuable perspectives\non data engineering, LLMs, and analytics.\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
