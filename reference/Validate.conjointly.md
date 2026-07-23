@@ -400,6 +400,8 @@ conjointly()
 Using <a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> allows your validation code to work consistently across Pandas, Polars, and Ibis table backends without changes, making your validation pipelines more portable.
 
 
-#### See Also
+## See Also
 
-[Look](Look.md), [information](information.md)
+[](%60~Look%60) at the documentation of the <a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function for more  
+
+[](%60~information%60) on how to use it with different table backends.

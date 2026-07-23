@@ -119,6 +119,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -157,16 +162,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../user-guide/index.html"> 
-<span class="menu-text">User Guide</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../examples/index.html"> 
@@ -176,11 +181,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/cli/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="454" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="455" data-forks="29"></div>
     </span>
   </li>  
 </ul>
@@ -268,7 +277,7 @@ Note
 <section id="the-data-validation-workflow" class="level1">
 <h1>The Data Validation Workflow</h1>
 <p>Let’s get right to performing a basic check of a Polars DataFrame. We’ll make use of the included <code>small_table</code> dataset.</p>
-<div id="6b096656" class="cell" data-execution_count="1">
+<div id="5cfa6296" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -560,7 +569,7 @@ Note
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:47 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:47 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
@@ -579,7 +588,7 @@ Note
 <p>All of those numbers under the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns have to do with test units, a measure of central importance in Pointblank. Each validation step will execute a type of validation test on the target table. For example, a <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail. This little diagram explains what those numbers mean:</p>
 <p><img src="validation-test-units.png" class="img-fluid" data-text-align="center"></p>
 <p>Failing test units can be tied to threshold levels, which can provide a better indication of whether failures should raise some basic awareness or spur you into action. Here’s a validation workflow that sets three failure threshold levels that signal the severity of data quality problems:</p>
-<div id="1b419c38" class="cell" data-execution_count="2">
+<div id="9347a40d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1144,7 +1153,7 @@ Note
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:47 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:47 UTC</span></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 7</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(pre_applied)</span> Precondition applied: table dimensions <span style="font-family: monospace;">[2,000 rows, 11 columns]</span> → <span style="font-family: monospace;">[<strong>1</strong> row, <strong>1</strong> column]</span>.</p></span></td></tr></tfoot>
 </table>
@@ -1159,7 +1168,7 @@ Note
 <h1>Reporting for Individual Validation Steps</h1>
 <p>The second validation step of the previous data validation showed 18 failing test units. That translates to 18 spots in a 2,000 row DataFrame where a data quality assertion failed. We often would like to know exactly what that failing data is; it’s usually the next step toward addressing data quality issues.</p>
 <p>Pointblank offers a method that gives you a tabular report on a specific step: <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a>. The previous tables you’ve seen (the validation report table) dealt with providing a summary of all validation steps. In contrast, a focused report on a single step can help to get to the heart of a data quality issue. Here’s how that looks for Step 2:</p>
-<div id="b1658216" class="cell" data-execution_count="3">
+<div id="300b387b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1408,7 +1417,7 @@ Note
 </div>
 <p>This report provides the 18 rows where the failure occurred. If you scroll the table to the right you’ll see the column that underwent testing (<code>session_duration</code>) is highlighted in red. All of these values are <code>5.0</code> or less, which is in violation of the assertion (in the header) that <code>session_duration &gt; 5</code>.</p>
 <p>These types of bespoke reports are useful for finding a needle in a haystack. Another good use for a step report is when validating a table schema. Using the <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method with a table schema prepared with the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> class allows us to verify our understanding of the table structure. Here is a validation that performs a schema validation with the <code>small_table</code> dataset prepared as a DuckDB table:</p>
-<div id="31e14859" class="cell" data-execution_count="4">
+<div id="62a51535" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema for the target table (`small_table` as a DuckDB table)</span></span>
@@ -1589,7 +1598,7 @@ Note
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:48 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-15 13:14:48 UTC</span></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:16:23 UTC</span></div></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(schema_check)</span> <span style="color:#FF3300;">✗</span> Schema validation <strong>failed</strong>: 1 unmatched column(s), 1 dtype mismatch(es).</p>
 <details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
@@ -1781,7 +1790,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>This step fails, but the validation report table doesn’t tell us how (or where). Using <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a> will show us what the underlying issues are:</p>
-<div id="36819f17" class="cell" data-execution_count="5">
+<div id="edba68b1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_3.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1978,7 +1987,7 @@ tr { background-color: transparent; }
 <section id="much-more-in-store" class="level1">
 <h1>Much More in Store</h1>
 <p>Pointblank tries really hard to make it easy for you to test your data. All sorts of input tables are supported since we integrate with the brilliant <a href="https://narwhals-dev.github.io/narwhals/">Narwhals</a> and <a href="https://ibis-project.org">Ibis</a> libraries. And even through the project has only started four months ago, we already have an extensive catalog of well-tested validation methods.</p>
-<p>We care a great deal about documentation so much recent effort has been placed on getting the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our <a href="../../demos/index.qmd">gallery of examples</a>.</p>
+<p>We care a great deal about documentation so much recent effort has been placed on getting the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our <a href="../../examples/index.html">gallery of examples</a>.</p>
 <p>We really care about what <strong>you</strong> want in a validation package, so talk to us :) We just started a <a href="https://discord.com/invite/YH7CybCNCQ">Discord</a> so feel free to hop on and ask us anything. Alternatively, we always like to get <a href="https://github.com/posit-dev/pointblank/issues">issues</a> so don’t be shy in letting us know how we could improve!</p>
 
 
@@ -1996,7 +2005,7 @@ tr { background-color: transparent; }
     anchorJS.add('.anchored');
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

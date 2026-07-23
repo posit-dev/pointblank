@@ -116,6 +116,8 @@ conjointly()
 The above code creates a validation object that checks the specified conditions using the [expr_col()](expr_col.md#pointblank.expr_col) function. The resulting validation table will show whether each condition was satisfied for each row in the table.
 
 
-#### See Also
+## See Also
 
-[The](The.md), [function](function.md)
+[](%60~The%60) <a href="Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a> validation method, which is where this  
+
+[](%60~function%60) should be used.

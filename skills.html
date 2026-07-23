@@ -114,6 +114,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
 <script src="theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -152,16 +157,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./user-guide/index.html"> 
-<span class="menu-text">User Guide</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./changelog.html"> 
 <span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./examples/index.html"> 
@@ -171,11 +176,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./reference/cli/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="454" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="455" data-forks="29"></div>
     </span>
   </li>  
 </ul>
@@ -221,11 +230,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="gd-skills-install-inner">
       <div class="gd-skills-install-pad">
 <p><strong>Any agent</strong> — install with <a href="https://github.com/vercel-labs/skills">npx</a>:</p>
-<div class="sourceCode"><pre class="sourceCode bash code-with-copy" style="padding-bottom: 0;"><code>npx skills add <site-url></site-url></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash code-with-copy" style="padding-bottom: 0;"><code>npx skills add https://posit-dev.github.io/pointblank/</code></pre></div>
 <p><strong>Codex / OpenCode</strong></p>
-<div class="sourceCode"><pre class="sourceCode text code-with-copy" style="padding-bottom: 0;"><code>Tell the agent:<br>Fetch the skill file at &lt;site-url&gt;/skill.md and follow the instructions.</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode text code-with-copy" style="padding-bottom: 0;"><code>Tell the agent:<br>Fetch the skill file at https://posit-dev.github.io/pointblank/skill.md and follow the instructions.</code></pre></div>
 <p><strong>Manual</strong> — download the skill file:</p>
-<div class="sourceCode"><pre class="sourceCode bash code-with-copy" style="padding-bottom: 0;"><code>curl -O &lt;site-url&gt;/skill.md</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash code-with-copy" style="padding-bottom: 0;"><code>curl -O https://posit-dev.github.io/pointblank/skill.md</code></pre></div>
 <p>Or browse the <a href="skill.md" class="gd-raw-link"><code>SKILL.md</code></a> file.</p>
       </div>
     </div>
@@ -543,8 +552,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
 <span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
-<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Full documentation</span><span class="co">](https://posit-dev.github.io/pointblank/)</span></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms.txt</span><span class="co">](llms.txt)</span> — Indexed API reference for LLMs</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">llms-full.txt</span><span class="co">](llms-full.txt)</span> — Comprehensive documentation for LLMs</span></code></pre></div>
 </pre>
 
 
@@ -561,7 +571,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     anchorJS.add('.anchored');
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

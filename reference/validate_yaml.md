@@ -205,6 +205,7 @@ In addition to all standard validation methods (e.g., [col_vals_gt](Validate.col
 - aggregate methods: [col_sum_gt](Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [col_sum_lt](Validate.col_sum_lt.md#pointblank.Validate.col_sum_lt), [col_sum_ge](Validate.col_sum_ge.md#pointblank.Validate.col_sum_ge), [col_sum_le](Validate.col_sum_le.md#pointblank.Validate.col_sum_le), [col_sum_eq](Validate.col_sum_eq.md#pointblank.Validate.col_sum_eq), [col_avg_gt](Validate.col_avg_gt.md#pointblank.Validate.col_avg_gt), [col_avg_lt](Validate.col_avg_lt.md#pointblank.Validate.col_avg_lt), [col_avg_ge](Validate.col_avg_ge.md#pointblank.Validate.col_avg_ge), [col_avg_le](Validate.col_avg_le.md#pointblank.Validate.col_avg_le), [col_avg_eq](Validate.col_avg_eq.md#pointblank.Validate.col_avg_eq), [col_sd_gt](Validate.col_sd_gt.md#pointblank.Validate.col_sd_gt), [col_sd_lt](Validate.col_sd_lt.md#pointblank.Validate.col_sd_lt), [col_sd_ge](Validate.col_sd_ge.md#pointblank.Validate.col_sd_ge), [col_sd_le](Validate.col_sd_le.md#pointblank.Validate.col_sd_le), [col_sd_eq](Validate.col_sd_eq.md#pointblank.Validate.col_sd_eq)
 
 
-#### See Also
+## See Also
 
-- [yaml_interrogate()](yaml_interrogate.md): execute YAML-based validation workflows
+[yaml_interrogate()](yaml_interrogate.md#pointblank.yaml_interrogate)  
+execute YAML-based validation workflows

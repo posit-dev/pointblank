@@ -117,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-07-15T13:20:22.908+00:00",
-            "proc_duration_s": 0.007017
+            "time_processed": "2026-07-22T23:20:31.137+00:00",
+            "proc_duration_s": 0.002339
         },
         {
             "i": 2,
@@ -144,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-07-15T13:20:22.911+00:00",
-            "proc_duration_s": 0.002224
+            "time_processed": "2026-07-22T23:20:31.139+00:00",
+            "proc_duration_s": 0.001275
         }
     ]
 
@@ -248,6 +248,15 @@ print(f"Number of failing validation steps: {len(failing_steps)}")
     Number of failing validation steps: 2
 
 
-#### See Also
+## See Also
 
-[report](report.md), [failed](failed.md)
+- <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>
+
+: Get a formatted HTML
+
+[](%60~report%60) as a GT table  
+
+\- <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>  
+Get rows that
+
+[](%60~failed%60) validation

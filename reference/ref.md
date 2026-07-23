@@ -168,6 +168,6 @@ tol=0.1</td>
 </table>
 
 
-#### See Also
+## See Also
 
-[The](The.md)
+[](%60~The%60) <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function for referencing columns within the same table.

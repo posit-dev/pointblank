@@ -3544,7 +3544,7 @@ report_with_issues.get_findings_table()
 ```
 
 
-    /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
       warnings.warn(
 
 
@@ -3675,9 +3675,9 @@ shape: (3, 2)
 | rule_id    | n_violations |
 |------------|--------------|
 | str        | u32          |
+| "SDTM-195" | 1            |
 | "SDTM-007" | 1            |
 | "SDTM-010" | 1            |
-| "SDTM-195" | 1            |
 
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.

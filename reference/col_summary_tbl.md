@@ -312,7 +312,7 @@ pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
 
 
-    /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:825: UserWarning: PyArrow Table support is currently experimental.
+    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_tbl_data.py:825: UserWarning: PyArrow Table support is currently experimental.
       warnings.warn("PyArrow Table support is currently experimental.")
 
 

@@ -7,7 +7,7 @@ Define actions to be taken after validation is complete.
 Usage
 
 ``` python
-FinalActions(*args)
+FinalActions(*actions)
 ```
 
 
@@ -87,6 +87,8 @@ validation = (
 ```
 
 
-#### See Also
+## See Also
 
-[The](The.md), [used](used.md)
+[](%60~The%60) <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which can be  
+
+[](%60~used%60) to retrieve the summary of the validation results.

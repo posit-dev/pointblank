@@ -28,6 +28,7 @@ A database connection string *without* the `::table_name` suffix. Example: `"duc
 List of table names, excluding temporary Ibis tables.
 
 
-#### See Also
+## See Also
 
-- [connect_to_table()](connect_to_table.md): Connect to a database table with full connection string documentation
+[connect_to_table()](connect_to_table.md#pointblank.connect_to_table)  
+Connect to a database table with full connection string documentation

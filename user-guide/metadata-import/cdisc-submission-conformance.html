@@ -118,6 +118,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -156,16 +161,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
-<span class="menu-text">User Guide</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../examples/index.html"> 
@@ -175,11 +180,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/cli/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="454" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="455" data-forks="29"></div>
     </span>
   </li>  
 </ul>
@@ -627,7 +636,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <p><a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a> is the entry point for SDTMIG conformance. Pass a dictionary mapping domain names to DataFrames and it returns a <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a> that renders as a color-coded summary table in Jupyter and Quarto notebooks:</p>
-<div id="19b1b187" class="cell" data-execution_count="2">
+<div id="edb32102" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4200,7 +4209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.</p>
 <p>The header shows a <code>PASS</code> or <code>FAIL</code> badge alongside the standard, version, and a full status breakdown (e.g., <code>SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a</code>).</p>
 <p>Call <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> to get the <code>GT</code> object directly if you need to embed it in a report pipeline:</p>
-<div id="3a55130e" class="cell" data-execution_count="3">
+<div id="0ede311a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gt <span class="op">=</span> report.get_tabular_report()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>gt</span></code></pre></div>
 </div>
@@ -4210,7 +4219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="findings-drill-down">Findings Drill-Down</h2>
 <p>When rules fail, the tabular report shows how many records violated each rule but not which ones. <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link"><code>get_findings_table()</code></a> provides that drill-down: one row per failing record, showing the subject, the specific column that violated the rule, the offending value, and the 1-based row number in the source dataset.</p>
 <p>To see it in action, introduce a few deliberate violations:</p>
-<div id="af8787c2" class="cell" data-execution_count="4">
+<div id="935b4e1f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dm_with_issues <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">4</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DOMAIN"</span>:  [<span class="st">"DM"</span>] <span class="op">*</span> <span class="dv">4</span>,</span>
@@ -4233,68 +4242,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>report_with_issues <span class="op">=</span> pb.validate_sdtmig({<span class="st">"DM"</span>: dm_with_issues})</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>report_with_issues.get_findings_table()</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+<pre><code>/Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
   warnings.warn(</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<div id="vtyoacwyal" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="qbphkkhurn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#vtyoacwyal table {
+#qbphkkhurn table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#vtyoacwyal thead, tbody, tfoot, tr, td, th { border-style: none; }
+#qbphkkhurn thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#vtyoacwyal p { margin: 0; padding: 0; }
- #vtyoacwyal .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #vtyoacwyal .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #vtyoacwyal .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #vtyoacwyal .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #vtyoacwyal .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #vtyoacwyal .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #vtyoacwyal .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #vtyoacwyal .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #vtyoacwyal .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #vtyoacwyal .gt_column_spanner_outer:first-child { padding-left: 0; }
- #vtyoacwyal .gt_column_spanner_outer:last-child { padding-right: 0; }
- #vtyoacwyal .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #vtyoacwyal .gt_spanner_row { border-bottom-style: hidden; }
- #vtyoacwyal .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #vtyoacwyal .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #vtyoacwyal .gt_from_md> :first-child { margin-top: 0; }
- #vtyoacwyal .gt_from_md> :last-child { margin-bottom: 0; }
- #vtyoacwyal .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #vtyoacwyal .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #vtyoacwyal .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #vtyoacwyal .gt_row_group_first td { border-top-width: 2px; }
- #vtyoacwyal .gt_row_group_first th { border-top-width: 2px; }
- #vtyoacwyal .gt_striped { color: #333333; background-color: #F4F4F4; }
- #vtyoacwyal .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #vtyoacwyal .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #vtyoacwyal .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #vtyoacwyal .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #vtyoacwyal .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #vtyoacwyal .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #vtyoacwyal .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #vtyoacwyal .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #vtyoacwyal .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #vtyoacwyal .gt_left { text-align: left; }
- #vtyoacwyal .gt_center { text-align: center; }
- #vtyoacwyal .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #vtyoacwyal .gt_font_normal { font-weight: normal; }
- #vtyoacwyal .gt_font_bold { font-weight: bold; }
- #vtyoacwyal .gt_font_italic { font-style: italic; }
- #vtyoacwyal .gt_super { font-size: 65%; }
- #vtyoacwyal .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #vtyoacwyal .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #vtyoacwyal .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #vtyoacwyal .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #vtyoacwyal .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #vtyoacwyal .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#qbphkkhurn p { margin: 0; padding: 0; }
+ #qbphkkhurn .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #qbphkkhurn .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #qbphkkhurn .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #qbphkkhurn .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #qbphkkhurn .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qbphkkhurn .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qbphkkhurn .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qbphkkhurn .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #qbphkkhurn .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #qbphkkhurn .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #qbphkkhurn .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #qbphkkhurn .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #qbphkkhurn .gt_spanner_row { border-bottom-style: hidden; }
+ #qbphkkhurn .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #qbphkkhurn .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #qbphkkhurn .gt_from_md> :first-child { margin-top: 0; }
+ #qbphkkhurn .gt_from_md> :last-child { margin-bottom: 0; }
+ #qbphkkhurn .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #qbphkkhurn .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #qbphkkhurn .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #qbphkkhurn .gt_row_group_first td { border-top-width: 2px; }
+ #qbphkkhurn .gt_row_group_first th { border-top-width: 2px; }
+ #qbphkkhurn .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #qbphkkhurn .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qbphkkhurn .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #qbphkkhurn .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #qbphkkhurn .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qbphkkhurn .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #qbphkkhurn .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #qbphkkhurn .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #qbphkkhurn .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qbphkkhurn .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #qbphkkhurn .gt_left { text-align: left; }
+ #qbphkkhurn .gt_center { text-align: center; }
+ #qbphkkhurn .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #qbphkkhurn .gt_font_normal { font-weight: normal; }
+ #qbphkkhurn .gt_font_bold { font-weight: bold; }
+ #qbphkkhurn .gt_font_italic { font-style: italic; }
+ #qbphkkhurn .gt_super { font-size: 65%; }
+ #qbphkkhurn .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qbphkkhurn .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #qbphkkhurn .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qbphkkhurn .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #qbphkkhurn .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #qbphkkhurn .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -4384,7 +4393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="programmatic-access-with-findings_df" class="level2">
 <h2 class="anchored" data-anchor-id="programmatic-access-with-findings_df">Programmatic Access with findings_df()</h2>
 <p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link"><code>findings_df()</code></a> returns the same findings as a Polars DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the source data:</p>
-<div id="5a6976ff" class="cell" data-execution_count="5">
+<div id="d3b42324" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> report_with_issues.findings_df()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -4437,7 +4446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<div id="6fb2dc19" class="cell" data-execution_count="6">
+<div id="ff6ab147" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to a specific rule</span></span>
@@ -4453,7 +4462,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (1, 7)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>rule_id</th><th>dataset</th><th>row_index</th><th>usubjid</th><th>checked_column</th><th>checked_value</th><th>description</th></tr><tr><td>str</td><td>str</td><td>i64</td><td>str</td><td>str</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>"SDTM-007"</td><td>"DM"</td><td>2</td><td>"STUDY01-01-003"</td><td>"SEX"</td><td>"UNKNOWN"</td><td>"SEX in DM must use values from…</td></tr></tbody></table></div>
 </div>
 </div>
-<div id="188d7fde" class="cell" data-execution_count="7">
+<div id="8b72ba5b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by rule to count violations</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.group_by(<span class="st">"rule_id"</span>).agg(pl.<span class="bu">len</span>().alias(<span class="st">"n_violations"</span>)).sort(<span class="st">"n_violations"</span>, descending<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -4464,7 +4473,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (3, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>rule_id</th><th>n_violations</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"SDTM-007"</td><td>1</td></tr><tr><td>"SDTM-010"</td><td>1</td></tr><tr><td>"SDTM-195"</td><td>1</td></tr></tbody></table></div>
+<small>shape: (3, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>rule_id</th><th>n_violations</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"SDTM-195"</td><td>1</td></tr><tr><td>"SDTM-007"</td><td>1</td></tr><tr><td>"SDTM-010"</td><td>1</td></tr></tbody></table></div>
 </div>
 </div>
 <p>The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team’s workflow.</p>
@@ -4533,7 +4542,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="supply-a-custom-ct-package" class="level2">
 <h2 class="anchored" data-anchor-id="supply-a-custom-ct-package">Supply a Custom CT Package</h2>
 <p>By default the most recent bundled CT package is used. Pass <code>ct_packages</code> to pin a specific version or supply additional packages:</p>
-<div id="5629c13c" class="cell" data-execution_count="8">
+<div id="94ef008b" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_sdtmig(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"DM"</span>: dm},</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    ct_packages<span class="op">=</span>[<span class="st">"sdtm-ct-2024-09-27"</span>],</span>
@@ -4544,7 +4553,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="activating-define-xml-rules" class="level2">
 <h2 class="anchored" data-anchor-id="activating-define-xml-rules">Activating Define-XML Rules</h2>
 <p>Pass a path to <code>define.xml</code> to activate the Define-XML-aware rule types:</p>
-<div id="530ea0b5" class="cell" data-execution_count="9">
+<div id="a616e827" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_sdtmig(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae},</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    define_xml<span class="op">=</span><span class="st">"path/to/define.xml"</span>,</span>
@@ -4555,7 +4564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="loading-xpt-files" class="level2">
 <h2 class="anchored" data-anchor-id="loading-xpt-files">Loading XPT Files</h2>
 <p>For datasets stored as SAS Transport (XPT) files, use <code>pyreadstat</code> to load them before passing to <a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a>. Install it with <code>pip install pyreadstat</code>:</p>
-<div id="6557165d" class="cell" data-execution_count="10">
+<div id="aa07cc1d" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyreadstat</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -4628,7 +4637,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="running-core" class="level2">
 <h2 class="anchored" data-anchor-id="running-core">Running CORE</h2>
 <p><a href="../../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> is the simplest way to run a CORE validation. It accepts an in-memory dictionary of DataFrames, a folder path, or an existing <a href="../../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>:</p>
-<div id="279b15da" class="cell" data-execution_count="11">
+<div id="c1493942" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_cdisc_submission(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae},</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
@@ -4637,7 +4646,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>For a folder of XPT files pass the path directly. Pointblank skips the materialization step and passes the folder straight to CORE:</p>
-<div id="1ae71811" class="cell" data-execution_count="12">
+<div id="c1290680" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_cdisc_submission(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"path/to/sdtm/"</span>,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
@@ -4646,7 +4655,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>For repo-checkout CORE, pass the command prefix and working directory:</p>
-<div id="e967fc99" class="cell" data-execution_count="13">
+<div id="a8d9d2c5" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_cdisc_submission(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"DM"</span>: dm},</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
@@ -4661,7 +4670,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="working-with-a-core-conformancereport" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-a-core-conformancereport">Working with a CORE ConformanceReport</h2>
 <p>The examples below use a captured real CORE report so that the code runs without requiring CORE to be installed in the docs environment. The structure is identical to what a live run produces.</p>
-<div id="83a7b16a" class="cell" data-execution_count="14">
+<div id="4f3d3c8e" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> parse_core_report, ConformanceReport</span>
@@ -4680,7 +4689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong>Overall result.</strong> <a href="../../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed()</a> returns <code>True</code> when no rules reported issues; <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link gdls-code">is_core</a> confirms the report originated from the CORE engine rather than the built-in engine:</p>
-<div id="83d2a886" class="cell" data-execution_count="15">
+<div id="9b76c2df" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All passed:"</span>, report.all_passed())</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Is CORE report:"</span>, report.is_core)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -4689,7 +4698,7 @@ Is CORE report: True</code></pre>
 </div>
 </div>
 <p><strong>Summary dictionary.</strong> <a href="../../reference/ContractImport.html#pointblank.ContractImport.summary" class="gdls-link gdls-code">summary()</a> returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:</p>
-<div id="4181df36" class="cell" data-execution_count="16">
+<div id="70a65a42" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> report.summary()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Standard:        </span><span class="sc">{</span>s[<span class="st">'standard'</span>]<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>s[<span class="st">'version'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -4716,7 +4725,7 @@ Rule status breakdown:
 </div>
 <p>The <code>status_counts</code> dictionary enumerates every status bucket CORE reported. Use it to build pass/fail thresholds or trend charts across multiple submission runs.</p>
 <p><strong>Issues.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues()</a> returns one record per (dataset, rule) pair that reported at least one issue. Pass a <code>status</code> filter to separate conformance violations from execution errors:</p>
-<div id="f4a64f3a" class="cell" data-execution_count="17">
+<div id="63fe109f" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>issues <span class="op">=</span> report.issues()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Issue entries: </span><span class="sc">{</span><span class="bu">len</span>(issues)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4745,7 +4754,7 @@ Rule status breakdown:
   Issues:   1</code></pre>
 </div>
 </div>
-<div id="6e392ca5" class="cell" data-execution_count="18">
+<div id="ce7a6287" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata._cdisc_core <span class="im">import</span> STATUS_ISSUE, STATUS_ERROR</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>reported_issues <span class="op">=</span> report.issues(status<span class="op">=</span>STATUS_ISSUE)</span>
@@ -4760,7 +4769,7 @@ Execution errors:  2</code></pre>
 </div>
 <p>Execution errors (<code>STATUS_ERROR</code>) indicate that CORE could not evaluate a rule, typically because a required variable or dataset was absent or had an unexpected format. They are distinct from conformance issues (<code>STATUS_ISSUE</code>) where the rule ran successfully but found a violation.</p>
 <p><strong>Row-level findings.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings" class="gdls-link gdls-code">findings()</a> returns the row-level detail from CORE’s <code>Issue_Details</code> section, giving the exact record that triggered each rule:</p>
-<div id="379e45ca" class="cell" data-execution_count="19">
+<div id="b5985748" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>findings <span class="op">=</span> report.findings()</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Row-level findings: </span><span class="sc">{</span><span class="bu">len</span>(findings)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4785,7 +4794,7 @@ Values:        ['TEST_DATASET']</code></pre>
 </div>
 <p>Each finding carries the <code>USUBJID</code>, the affected variables and their values, and the 1-based row number in the source dataset, matching the information shown in the built-in engine’s findings table.</p>
 <p><strong>Per-rule run results.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.rules" class="gdls-link gdls-code">rules()</a> returns one <code>CoreRuleResult</code> per rule with its run status:</p>
-<div id="2db25898" class="cell" data-execution_count="20">
+<div id="99fff7b1" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata._cdisc_core <span class="im">import</span> STATUS_SUCCESS, STATUS_SKIPPED</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>all_rules <span class="op">=</span> report.rules()</span>
@@ -4821,7 +4830,7 @@ Failing:      8
 <section id="json" class="level2">
 <h2 class="anchored" data-anchor-id="json">JSON</h2>
 <p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.to_json" class="gdls-link gdls-code">to_json()</a> saves the report as a JSON file. For CORE reports the structure mirrors CORE’s native output and is parseable by <code>parse_core_report()</code>:</p>
-<div id="5fbc7c4c" class="cell" data-execution_count="21">
+<div id="f89d8cd8" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
@@ -4843,7 +4852,7 @@ Rules after round-trip: 430</code></pre>
 <section id="excel" class="level2">
 <h2 class="anchored" data-anchor-id="excel">Excel</h2>
 <p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.to_excel" class="gdls-link gdls-code">to_excel()</a> writes the report as a workbook. Requires <code>openpyxl</code>:</p>
-<div id="88697b80" class="cell" data-execution_count="22">
+<div id="bb7b37bf" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dest <span class="op">=</span> report.to_excel(<span class="st">"conformance_report.xlsx"</span>)</span></code></pre></div>
 </div>
 <p>For CORE reports the workbook has four sheets: <code>Issue_Summary</code>, <code>Issue_Details</code>, <code>Rules_Report</code>, and <code>Conformance_Details</code>.</p>
@@ -4852,7 +4861,7 @@ Rules after round-trip: 430</code></pre>
 <section id="using-both-engines-together" class="level1">
 <h1>Using Both Engines Together</h1>
 <p>The built-in engine provides fast feedback during development; CORE is the final gate. The typical workflow is to iterate with the built-in engine until it reports a clean result, then run CORE once as a pre-submission check:</p>
-<div id="4ac39512" class="cell" data-execution_count="23">
+<div id="b861adf7" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: fast iteration with the built-in engine</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_sdtmig({<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae}, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4907,7 +4916,7 @@ Rules after round-trip: 430</code></pre>
     anchorJS.add('.anchored');
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

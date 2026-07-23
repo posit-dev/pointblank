@@ -56,6 +56,10 @@ validation.assert_dimension_scores(thresholds={"completeness": 95})
 ```
 
 
-#### See Also
+## See Also
 
-[Use](Use.md), [scores](scores.md), [thresholds](thresholds.md)
+[](%60~Use%60) <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> to retrieve the  
+
+[](%60~scores%60) without raising, and [`config()`](%60pointblank.config%60) to set default per-dimension  
+
+[](%60~thresholds%60) globally.

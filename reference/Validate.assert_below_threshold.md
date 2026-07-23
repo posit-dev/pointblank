@@ -194,6 +194,23 @@ except AssertionError as e:
     Custom error: Data quality too low for processing!
 
 
-#### See Also
+## See Also
 
-[step](step.md), [validation](validation.md), [completely](completely.md)
+- <a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>
+
+: get the 'warning' status for each validation
+
+[](%60~step%60)  
+
+\- <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
+get the 'error' status for each validation step
+
+\- <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
+get the 'critical' status for each
+
+[](%60~validation%60) step  
+
+\- <a href="Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link"><code>assert_passing()</code></a>  
+assert all validations pass
+
+[](%60~completely%60)

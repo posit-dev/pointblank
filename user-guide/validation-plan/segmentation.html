@@ -119,6 +119,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -157,16 +162,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
-<span class="menu-text">User Guide</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../examples/index.html"> 
@@ -176,11 +181,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/cli/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="454" data-forks="28"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="455" data-forks="29"></div>
     </span>
   </li>  
 </ul>
@@ -611,7 +620,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Basic Segmentation by Column Values</h1>
 <p>The simplest way to segment data is by the unique values in a column. For the upcoming example, we’ll use the <code>small_table</code> dataset, which contains a categorical-value column called <code>f</code>.</p>
 <p>First, let’s preview the dataset:</p>
-<div id="1c70d505" class="cell" data-execution_count="2">
+<div id="08f352b2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> pb.load_dataset()</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pb.preview(table)</span></code></pre></div>
@@ -825,7 +834,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Now, let’s validate that values in column <code>d</code> are greater than <code>100</code>, but we’ll also segment the validation by the categorical values in column <code>f</code>:</p>
-<div id="87e4a8b9" class="cell" data-execution_count="3">
+<div id="59da6ba8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation_1 <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1085,7 +1094,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="segmenting-on-specific-values" class="level1">
 <h1>Segmenting on Specific Values</h1>
 <p>Sometimes you don’t want to segment on all unique values in a column, but only on specific ones of interest. You can do this by providing a tuple with the column name and a list of values:</p>
-<div id="73c91ef3" class="cell" data-execution_count="4">
+<div id="c5056b30" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1302,7 +1311,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="multiple-segmentation-criteria" class="level1">
 <h1>Multiple Segmentation Criteria</h1>
 <p>For more complex segmentation, you can provide a list of columns or column-value tuples. This creates segments based on combinations of criteria:</p>
-<div id="54006117" class="cell" data-execution_count="5">
+<div id="44a96a9c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1647,7 +1656,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="segmentation-with-preprocessing" class="level1">
 <h1>Segmentation with Preprocessing</h1>
 <p>You can combine segmentation with preprocessing for powerful and flexible validations. All preprocessing is applied before segmentation occurs, which means you can create derived columns to segment on:</p>
-<div id="cce2f7d9" class="cell" data-execution_count="6">
+<div id="73360c18" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define preprocessing function for creating a categorical column</span></span>
@@ -1901,7 +1910,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="practical-example-validating-sales-data-by-region-and-product-type" class="level1">
 <h1>Practical Example: Validating Sales Data by Region and Product Type</h1>
 <p>Let’s see a more realistic example where we validate sales data segmented by both region and product type:</p>
-<div id="299cfbdc" class="cell" data-execution_count="7">
+<div id="44c92964" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2039,9 +2048,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Food</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">23</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4680.5819759229435</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4122.545156369359</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">558.0368195535848</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.11922381071929586</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4122.54515636936</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">558.0368195535839</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.11922381071929566</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
@@ -2121,7 +2130,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Now, let’s validate that profit margins are above 20% across different regions and product types:</p>
-<div id="ff88cab5" class="cell" data-execution_count="8">
+<div id="2dabc097" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation_5 <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>sales_data,</span>
@@ -2284,7 +2293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHJlZ2lvbixwcm9kdWN0X3R5cGUsdW5pdHNfc29sZCxyZXZlbnVlLGNvc3QscHJvZml0LHByb2ZpdF9tYXJnaW4KMixFYXN0LEZvb2QsMjMsNDY4MC41ODE5NzU5MjI5NDM1LDQxMjIuNTQ1MTU2MzY5MzU5LDU1OC4wMzY4MTk1NTM1ODQ4LDAuMTE5MjIzODEwNzE5Mjk1ODYKNCxFYXN0LEVsZWN0cm9uaWNzLDYyLDI5NTMuMjk4MzQ5NzIxNzI4LDMzOTIuNDA1MTEwNzUyMjE0NiwtNDM5LjEwNjc2MTAzMDQ4NjcsLTAuMTQ4NjgzNTA4NzUyODAyMTcKNSxFYXN0LENsb3RoaW5nLDQwLDI3MTMuNDA5MTIwOTc2NjI1LDM1MTEuOTI5MjU3MzAzNDA1LC03OTguNTIwMTM2MzI2Nzc5NywtMC4yOTQyODY2NzA2NTExODg3NAo2LEVhc3QsRWxlY3Ryb25pY3MsNTEsNTk2NC42NzY2MTg1NDE4NzcsNDk5MC4wMDE4NzU5MzA2MDQsOTc0LjY3NDc0MjYxMTI3MzQsMC4xNjM0MDc4MDk4MzUyMTk4NQoxMixFYXN0LENsb3RoaW5nLDc0LDE4MDYuMTkyMDEzNDQ3Mjg1LDM2NjAuMTQ1ODMxNzE4MzcxNSwtMTg1My45NTM4MTgyNzEwODY0LC0xLjAyNjQ0MzM3MDYyMDczNjgKMTYsRWFzdCxFbGVjdHJvbmljcywzOSwxMjYwLjM0NzY5NDkwODEwNzUsMjM1Ni4zMzk0MDgwNDQ5MjU3LC0xMDk1Ljk5MTcxMzEzNjgxODEsLTAuODY5NTk0NzI5NzQzNzg0OQoxOSxFYXN0LEVsZWN0cm9uaWNzLDE1LDI1NTYuODgxODg1MTUxMTE5LDIzOTIuNDcyODgyNTU5NTg5LDE2NC40MDkwMDI1OTE1MzAyMiwwLjA2NDMwMDU4NTYyNTkyMjcxCjIxLEVhc3QsQ2xvdGhpbmcsMzAsMzEyMC42MjUxMDAwMTc2ODAzLDQxODYuNTQzMjQ2NDU0ODQ2LC0xMDY1LjkxODE0NjQzNzE2NTQsLTAuMzQxNTcxOTk2NzIzMDY4OAoyNixFYXN0LEVsZWN0cm9uaWNzLDU1LDQwNzAuMDIxNTM2MDU5NTE2LDM2MjcuMzc0NjEzNTQ3NTA2LDQ0Mi42NDY5MjI1MTIwMDk5NSwwLjEwODc1Nzg4MjEzNjU1NzEKMjksRWFzdCxFbGVjdHJvbmljcyw2NywzOTk2LjI4MTAyNzQ5MDk5MDcsMzc5MC44MjM2OTMzOTEwNjM0LDIwNS40NTczMzQwOTk5MjcyNywwLjA1MTQxMjEzMzYwMjg1NjQ1Cg==" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHJlZ2lvbixwcm9kdWN0X3R5cGUsdW5pdHNfc29sZCxyZXZlbnVlLGNvc3QscHJvZml0LHByb2ZpdF9tYXJnaW4KMixFYXN0LEZvb2QsMjMsNDY4MC41ODE5NzU5MjI5NDM1LDQxMjIuNTQ1MTU2MzY5MzYsNTU4LjAzNjgxOTU1MzU4MzksMC4xMTkyMjM4MTA3MTkyOTU2Ngo0LEVhc3QsRWxlY3Ryb25pY3MsNjIsMjk1My4yOTgzNDk3MjE3MjgsMzM5Mi40MDUxMTA3NTIyMTQ2LC00MzkuMTA2NzYxMDMwNDg2NywtMC4xNDg2ODM1MDg3NTI4MDIxNwo1LEVhc3QsQ2xvdGhpbmcsNDAsMjcxMy40MDkxMjA5NzY2MjUsMzUxMS45MjkyNTczMDM0MDUsLTc5OC41MjAxMzYzMjY3Nzk3LC0wLjI5NDI4NjY3MDY1MTE4ODc0CjYsRWFzdCxFbGVjdHJvbmljcyw1MSw1OTY0LjY3NjYxODU0MTg3Nyw0OTkwLjAwMTg3NTkzMDYwNCw5NzQuNjc0NzQyNjExMjczNCwwLjE2MzQwNzgwOTgzNTIxOTg1CjEyLEVhc3QsQ2xvdGhpbmcsNzQsMTgwNi4xOTIwMTM0NDcyODUsMzY2MC4xNDU4MzE3MTgzNzE1LC0xODUzLjk1MzgxODI3MTA4NjQsLTEuMDI2NDQzMzcwNjIwNzM2OAoxNixFYXN0LEVsZWN0cm9uaWNzLDM5LDEyNjAuMzQ3Njk0OTA4MTA3NSwyMzU2LjMzOTQwODA0NDkyNTcsLTEwOTUuOTkxNzEzMTM2ODE4MSwtMC44Njk1OTQ3Mjk3NDM3ODQ5CjE5LEVhc3QsRWxlY3Ryb25pY3MsMTUsMjU1Ni44ODE4ODUxNTExMTksMjM5Mi40NzI4ODI1NTk1ODksMTY0LjQwOTAwMjU5MTUzMDIyLDAuMDY0MzAwNTg1NjI1OTIyNzEKMjEsRWFzdCxDbG90aGluZywzMCwzMTIwLjYyNTEwMDAxNzY4MDMsNDE4Ni41NDMyNDY0NTQ4NDYsLTEwNjUuOTE4MTQ2NDM3MTY1NCwtMC4zNDE1NzE5OTY3MjMwNjg4CjI2LEVhc3QsRWxlY3Ryb25pY3MsNTUsNDA3MC4wMjE1MzYwNTk1MTYsMzYyNy4zNzQ2MTM1NDc1MDYsNDQyLjY0NjkyMjUxMjAwOTk1LDAuMTA4NzU3ODgyMTM2NTU3MQoyOSxFYXN0LEVsZWN0cm9uaWNzLDY3LDM5OTYuMjgxMDI3NDkwOTkwNywzNzkwLjgyMzY5MzM5MTA2MzQsMjA1LjQ1NzMzNDA5OTkyNzI3LDAuMDUxNDEyMTMzNjAyODU2NDUK" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
   <tr>
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
@@ -2542,7 +2551,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHJlZ2lvbixwcm9kdWN0X3R5cGUsdW5pdHNfc29sZCxyZXZlbnVlLGNvc3QscHJvZml0LHByb2ZpdF9tYXJnaW4KMSxFYXN0LEZvb2QsMjMsNDY4MC41ODE5NzU5MjI5NDM1LDQxMjIuNTQ1MTU2MzY5MzU5LDU1OC4wMzY4MTk1NTM1ODQ4LDAuMTE5MjIzODEwNzE5Mjk1ODYKMyxTb3V0aCxGb29kLDE2LDk5Ni4wNDc3ODMzNTI5MzM3LDI3MjAuMjgyMzA3NDE1MTc2NSwtMTcyNC4yMzQ1MjQwNjIyNDI4LC0xLjczMTA3NjExMTg4ODk4OTIKMTUsTm9ydGgsRm9vZCwxNSwzMDc1LjExNTQxODEzODI0MzUsNDE5NC4zOTEyODI3MjkzNzMsLTExMTkuMjc1ODY0NTkxMTMsLTAuMzYzOTc4NDg5Mzg5MTEzNQoxNixTb3V0aCxGb29kLDUzLDM3ODcuOTQxOTcxMzQxMzI0NSw0NTYxLjM3NTUzMTAzMTc2OCwtNzczLjQzMzU1OTY5MDQ0MzksLTAuMjA0MTgzMDUzODk2MzAwMzQKMTksV2VzdCxGb29kLDkwLDE4OTkuOTM0MTQ1NjA2Mjg0NiwyNDE4LjkyNjIyNTAwODU5MTIsLTUxOC45OTIwNzk0MDIzMDY3LC0wLjI3MzE2MzE5Mzg5NDExODkKMjMsTm9ydGgsRm9vZCwxNCwxNDEyLjQ4MDAzMDUxNDEzMywyNzg0Ljc3ODAyMjg5MDkyNDYsLTEzNzIuMjk3OTkyMzc2NzkxNiwtMC45NzE1NTIxMzcxODQ3NTM0CjI4LFdlc3QsRm9vZCwyOCwzMDM3LjYzOTg0OTMxNDgzNyw0MzUxLjA5Mzg2ODk4NDYxNywtMTMxMy40NTQwMTk2Njk3Nzk5LC0wLjQzMjM5MjkzODIxMDI0ODgK" download="extract_0007.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHJlZ2lvbixwcm9kdWN0X3R5cGUsdW5pdHNfc29sZCxyZXZlbnVlLGNvc3QscHJvZml0LHByb2ZpdF9tYXJnaW4KMSxFYXN0LEZvb2QsMjMsNDY4MC41ODE5NzU5MjI5NDM1LDQxMjIuNTQ1MTU2MzY5MzYsNTU4LjAzNjgxOTU1MzU4MzksMC4xMTkyMjM4MTA3MTkyOTU2NgozLFNvdXRoLEZvb2QsMTYsOTk2LjA0Nzc4MzM1MjkzMzcsMjcyMC4yODIzMDc0MTUxNzY1LC0xNzI0LjIzNDUyNDA2MjI0MjgsLTEuNzMxMDc2MTExODg4OTg5MgoxNSxOb3J0aCxGb29kLDE1LDMwNzUuMTE1NDE4MTM4MjQzNSw0MTk0LjM5MTI4MjcyOTM3MywtMTExOS4yNzU4NjQ1OTExMywtMC4zNjM5Nzg0ODkzODkxMTM1CjE2LFNvdXRoLEZvb2QsNTMsMzc4Ny45NDE5NzEzNDEzMjQ1LDQ1NjEuMzc1NTMxMDMxNzY4LC03NzMuNDMzNTU5NjkwNDQzOSwtMC4yMDQxODMwNTM4OTYzMDAzNAoxOSxXZXN0LEZvb2QsOTAsMTg5OS45MzQxNDU2MDYyODQ2LDI0MTguOTI2MjI1MDA4NTkxMiwtNTE4Ljk5MjA3OTQwMjMwNjcsLTAuMjczMTYzMTkzODk0MTE4OQoyMyxOb3J0aCxGb29kLDE0LDE0MTIuNDgwMDMwNTE0MTMzLDI3ODQuNzc4MDIyODkwOTI0NiwtMTM3Mi4yOTc5OTIzNzY3OTE2LC0wLjk3MTU1MjEzNzE4NDc1MzQKMjgsV2VzdCxGb29kLDI4LDMwMzcuNjM5ODQ5MzE0ODM3LDQzNTEuMDkzODY4OTg0NjE3LC0xMzEzLjQ1NDAxOTY2OTc3OTksLTAuNDMyMzkyOTM4MjEwMjQ4OAo=" download="extract_0007.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
 
@@ -2583,7 +2592,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     anchorJS.add('.anchored');
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

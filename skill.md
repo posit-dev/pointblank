@@ -298,5 +298,6 @@ Classes for integrating Pointblank with external observability and monitoring sy
 
 ## Resources
 
+- [Full documentation](https://posit-dev.github.io/pointblank/)
 - [llms.txt](llms.txt) — Indexed API reference for LLMs
 - [llms-full.txt](llms-full.txt) — Comprehensive documentation for LLMs

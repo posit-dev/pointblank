@@ -672,6 +672,8 @@ col_vals_lt()
 In the above example the [col()](col.md#pointblank.col) function contains the invocation of the `numeric()` and <a href="matches.html#pointblank.matches" class="gdls-link"><code>matches()</code></a> column selector functions from Narwhals, combined with the `&` operator. This is necessary to specify the set of columns that are numeric *and* match the text `"2023"` or `"2024"`.
 
 
-#### See Also
+## See Also
 
-[Create](Create.md)
+[](%60~Create%60) a column expression for use in [conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly) validation with the  
+
+<a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function.

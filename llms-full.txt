@@ -835,7 +835,7 @@ See Also
 The [`get_action_metadata()`](`pointblank.get_action_metadata`) function, which can be used to
 retrieve metadata about the step where the action is executed.
 
-FinalActions(*args) -> 'None'
+FinalActions(*actions) -> 'None'
 
 Define actions to be taken after validation is complete.
 

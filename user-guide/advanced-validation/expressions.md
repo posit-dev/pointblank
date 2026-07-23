@@ -42,7 +42,7 @@ small_table_pl = pb.load_dataset(dataset="small_table", tbl_type="polars")
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -142,7 +142,7 @@ game_revenue_pl = pb.load_dataset(dataset="game_revenue", tbl_type="polars")
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -234,7 +234,7 @@ employee_df = pl.DataFrame({
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">employee_data</span>
 
@@ -313,7 +313,7 @@ When working with expressions, consider how to handle null/missing values:
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -397,7 +397,7 @@ Always provide clear documentation in the `brief=` parameter:
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -425,7 +425,7 @@ Always provide clear documentation in the `brief=` parameter:
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">1</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-ODEzNyBMNDguOTI4NzI2NCw1MS4zOTc4MTM3IEw0OC45Mjg3MjY0LDQ4LjA1Mjc1NjcgTDQ1LjU4MzY2OTMsNDguMDUyNzU2NyBDNDQuMjUwODczMiw0OC4wNTI3NTY3IDQzLjA0ODc0MzMsNDcuMjQ5MTU4NiA0Mi41NTIyMTE0LDQ2LjAxNDM2MjUgTDMxLjYyODUwOTUsMTguNzMxMjQxMSBDMzAuNjI4OTEyOCwxNi4yMzU1MTU3IDI4LjE5ODUxOTgsMTQuNjAyMTg2MyAyNS41MTMzMjcxLDE0LjYwMjE4NjMgTDIyLjE2ODI3MDEsMTQuNjAyMTg2MyBaIiBpZD0ibGFtYmRhIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
+<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Ym94PSIwIDAgNjcgNjYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+Y29sX3ZhbHNfZXhwcjwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJjb2xfdmFsc19leHByIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMC4wMDAwMDApIj4KICAgICAgICAgICAgPHBhdGggZD0iTTU2LjcxMjIzNCwxIEM1OS4xOTc1MTUzLDEgNjEuNDQ3NTE1MywyLjAwNzM1OTMxIDYzLjA3NjE5NSwzLjYzNjAzODk3IEM2NC43MDQ4NzQ3LDUuMjY0NzE4NjMgNjUuNzEyMjM0LDcuNTE0NzE4NjMgNjUuNzEyMjM0LDEwIEw2NS43MTIyMzQsMTAgTDY1LjcxMjIzNCw2NSBMMTAuNzEyMjM0LDY1IEM4LjIyNjk1MjU5LDY1IDUuOTc2OTUyNTksNjMuOTkyNjQwNyA0LjM0ODI3Mjk0LDYyLjM2Mzk2MSBDMi43MTk1OTMyOCw2MC43MzUyODE0IDEuNzEyMjMzOTcsNTguNDg1MjgxNCAxLjcxMjIzMzk3LDU2IEwxLjcxMjIzMzk3LDU2IEwxLjcxMjIzMzk3LDEwIEMxLjcxMjIzMzk3LDcuNTE0NzE4NjMgMi43MTk1OTMyOCw1LjI2NDcxODYzIDQuMzQ4MjcyOTQsMy42MzYwMzg5NyBDNS45NzY5NTI1OSwyLjAwNzM1OTMxIDguMjI2OTUyNTksMSAxMC43MTIyMzQsMSBMMTAuNzEyMjM0LDEgWiIgaWQ9InJlY3RhbmdsZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9IiNGRkZGRkYiIC8+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMi4xNjgyNzAxLDE0LjYwMjE4NjMgTDIyLjE2ODI3MDEsMTcuOTQ3MjQzMyBMMjUuNTEzMzI3MSwxNy45NDcyNDMzIEMyNi44Mzk1OTA0LDE3Ljk0NzI0MzMgMjguMDQ4MjUzMSwxOC43NTA4NDE0IDI4LjU0NDc4NSwxOS45ODU2Mzc1IEwzMS4yMTAzNzc0LDI2LjYyMzQ4NSBMMjAuNDk1NzQxNSw1MS4zOTc4MTM3IEwyNC4xNTQzOTc3LDUxLjM5NzgxMzcgTDMyLjkzNTE3MjQsMzEuMDEzODcyNCBMMzkuNDY4NDg2OSw0Ny4yNjg3NTg5IEM0MC40NjgwODM3LDQ5Ljc2NDQ4NTkgNDIuODk4NDc2Nyw1MS4zOTc4MTM3IDQ1LjU4MzY2OTMsNTEuMzk3ODEzNyBMNDguOTI4NzI2NCw1MS4zOTc4MTM3IEw0OC45Mjg3MjY0LDQ4LjA1Mjc1NjcgTDQ1LjU4MzY2OTMsNDguMDUyNzU2NyBDNDQuMjUwODczMiw0OC4wNTI3NTY3IDQzLjA0ODc0MzMsNDcuMjQ5MTU4NiA0Mi41NTIyMTE0LDQ2LjAxNDM2MjUgTDMxLjYyODUwOTUsMTguNzMxMjQxMSBDMzAuNjI4OTEyOCwxNi4yMzU1MTU3IDI4LjE5ODUxOTgsMTQuNjAyMTg2MyAyNS41MTMzMjcxLDE0LjYwMjE4NjMgTDIyLjE2ODI3MDEsMTQuNjAyMTg2MyBaIiBpZD0ibGFtYmRhIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
 
 col_vals_expr()
 
@@ -476,7 +476,7 @@ Consider potential edge cases like division by zero or nulls:
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-15|13:24:34</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:38</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 

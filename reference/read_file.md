@@ -65,6 +65,8 @@ if validation.data is not None:
 ```
 
 
-#### See Also
+## See Also
 
-[Use](Use.md), [to](to.md)
+[](%60~Use%60) the [`write_file()`](%60pointblank.Validate.write_file%60) method to save a validation object  
+
+[](%60~to%60) disk for later retrieval with this function.

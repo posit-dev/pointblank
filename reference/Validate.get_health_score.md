@@ -39,6 +39,8 @@ validation.get_health_score()
 ```
 
 
-#### See Also
+## See Also
 
-[Use](Use.md), [breakdown](breakdown.md)
+[](%60~Use%60) <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> for a per-dimension  
+
+[](%60~breakdown%60) of the score.

@@ -323,6 +323,6 @@ pip install 'ibis-framework[postgres]'  # for PostgreSQL
 ```
 
 
-#### See Also
+## See Also
 
-- [print_database_tables()](print_database_tables.md): List all available tables in a database for discovery
+print_database_tables : List all available tables in a database for discovery

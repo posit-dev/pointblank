@@ -103,6 +103,8 @@ def log_validation_results():
 Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.
 
 
-#### See Also
+## See Also
 
-[Have](Have.md), [custom](custom.md)
+[](%60~Have%60) a look at <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create  
+
+[](%60~custom%60) actions that are executed after all validation steps have been completed.

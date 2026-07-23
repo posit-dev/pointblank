@@ -263,6 +263,8 @@ pb.write_file(validation, "my_validation", keep_tbl=True)
 When you load this validation in a new session, simply import the preprocessing functions again and they will be automatically restored.
 
 
-#### See Also
+## See Also
 
-[Use](Use.md), [previously](previously.md)
+[](%60~Use%60) the <a href="read_file.html#pointblank.read_file" class="gdls-link"><code>read_file()</code></a> function to load a validation object that was  
+
+[](%60~previously%60) saved with [write_file()](write_file.md#pointblank.write_file).

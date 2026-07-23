@@ -1138,8 +1138,8 @@ shape: (4, 2)
 | str     | u32           |
 | "South" | 6             |
 | "East"  | 2             |
-| "North" | 1             |
 | "West"  | 1             |
+| "North" | 1             |
 
 
 Analysis shows that 6 out of 10 failing records (60%) are from the `"South"` region, making it the highest priority area for data quality investigation. This suggests a potential systemic issue with data collection or processing in that specific region.

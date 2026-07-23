@@ -207,6 +207,23 @@ def process_data(validation_obj):
 Note that this is just a suggestion for how to implement conditional workflow processes. You should adapt this pattern to your specific requirements, which might include different threshold levels, custom logging mechanisms, or integration with your organization's data pipelines and notification systems.
 
 
-#### See Also
+## See Also
 
-[method](method.md), [step](step.md), [validation](validation.md)
+- <a href="Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a>
+
+: a similar
+
+[](%60~method%60) that raises an exception if thresholds are exceeded  
+
+\- <a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>  
+get the 'warning' status for each validation
+
+[](%60~step%60)  
+
+\- <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
+get the 'error' status for each validation step
+
+\- <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
+get the 'critical' status for each
+
+[](%60~validation%60) step
