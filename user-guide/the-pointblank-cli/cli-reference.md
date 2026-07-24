@@ -9,7 +9,7 @@ For practical usage examples and workflows, see the [CLI Data Validation](../../
 
 The main entry point for all Pointblank CLI operations:
 
-> Usage: pb [OPTIONS] COMMAND [ARGS]...
+>     Usage: pb [OPTIONS] COMMAND [ARGS]...
 >
 >       Pointblank CLI: Data validation and quality tools for data engineers.
 >
@@ -47,7 +47,7 @@ The main entry point for all Pointblank CLI operations:
 
 Display basic information about a data source:
 
-> Usage: pb info [OPTIONS] [DATA_SOURCE]
+>     Usage: pb info [OPTIONS] [DATA_SOURCE]
 >
 >       Display information about a data source.
 >
@@ -69,7 +69,7 @@ Display basic information about a data source:
 
 Preview data showing head and tail rows:
 
-> Usage: pb preview [OPTIONS] [DATA_SOURCE]
+>     Usage: pb preview [OPTIONS] [DATA_SOURCE]
 >
 >       Preview a data table showing head and tail rows.
 >
@@ -116,7 +116,7 @@ Preview data showing head and tail rows:
 
 Generate comprehensive data profiles:
 
-> Usage: pb scan [OPTIONS] [DATA_SOURCE]
+>     Usage: pb scan [OPTIONS] [DATA_SOURCE]
 >
 >       Generate a data scan profile report.
 >
@@ -146,7 +146,7 @@ Generate comprehensive data profiles:
 
 Generate reports focused on missing values:
 
-> Usage: pb missing [OPTIONS] [DATA_SOURCE]
+>     Usage: pb missing [OPTIONS] [DATA_SOURCE]
 >
 >       Generate a missing values report for a data table.
 >
@@ -168,7 +168,7 @@ Generate reports focused on missing values:
 
 Perform single or multiple data validations:
 
-> Usage: pb validate [OPTIONS] [DATA_SOURCE]
+>     Usage: pb validate [OPTIONS] [DATA_SOURCE]
 >
 >       Perform single or multiple data validations.
 >
@@ -247,7 +247,7 @@ Perform single or multiple data validations:
 
 Run Python validation scripts or YAML configurations:
 
-> Usage: pb run [OPTIONS] [VALIDATION_FILE]
+>     Usage: pb run [OPTIONS] [VALIDATION_FILE]
 >
 >       Run a Pointblank validation script or YAML configuration.
 >
@@ -302,7 +302,7 @@ Run Python validation scripts or YAML configurations:
 
 Create validation script or YAML configuration templates:
 
-> Usage: pb make-template [OPTIONS] [OUTPUT_FILE]
+>     Usage: pb make-template [OPTIONS] [OUTPUT_FILE]
 >
 >       Create a validation script or YAML configuration template.
 >
@@ -330,7 +330,7 @@ Create validation script or YAML configuration templates:
 
 Execute Polars expressions and display results:
 
-> Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
+>     Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
 >
 >       Execute Polars expressions and display results.
 >
@@ -396,7 +396,7 @@ Execute Polars expressions and display results:
 
 List available built-in datasets:
 
-> Usage: pb datasets [OPTIONS]
+>     Usage: pb datasets [OPTIONS]
 >
 >       List available built-in datasets.
 >
@@ -408,7 +408,7 @@ List available built-in datasets:
 
 Check installed dependencies and their availability:
 
-> Usage: pb requirements [OPTIONS]
+>     Usage: pb requirements [OPTIONS]
 >
 >       Check installed dependencies and their availability.
 >

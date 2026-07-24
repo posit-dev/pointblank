@@ -35,9 +35,9 @@ Pointblank `v0.25.0` introduces powerful new capabilities for data pipeline gove
 
 ## New Features
 
-- Added the [get_dataframe_report()](reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report) method to [Validate](reference/Validate.html#pointblank.Validate) for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). ([<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha), [\#341](https://github.com/posit-dev/pointblank/issues/341))
+- Added the [get_dataframe_report()](reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report) method to [Validate](reference/Validate.html#pointblank.Validate) for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). ([<span class="citation" data-cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha), [\#341](https://github.com/posit-dev/pointblank/issues/341))
 - Added OpenTelemetry (OTel) integration for exporting validation results as metrics, traces, and logs. Available as an optional dependency via the `otel` extra. ([\#383](https://github.com/posit-dev/pointblank/issues/383))
-- Added Azure OpenAI as a model provider for both [Validate.prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt) and [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation). ([<span class="citation" cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik), [\#385](https://github.com/posit-dev/pointblank/issues/385), [\#387](https://github.com/posit-dev/pointblank/issues/387))
+- Added Azure OpenAI as a model provider for both [Validate.prompt()](reference/Validate.prompt.html#pointblank.Validate.prompt) and [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation). ([<span class="citation" data-cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik), [\#385](https://github.com/posit-dev/pointblank/issues/385), [\#387](https://github.com/posit-dev/pointblank/issues/387))
 
 
 ## Docs
@@ -49,7 +49,7 @@ Pointblank `v0.25.0` introduces powerful new capabilities for data pipeline gove
 
 ## New Contributors
 
-- [<span class="citation" cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik) made their first contribution in [\#385](https://github.com/posit-dev/pointblank/issues/385)
+- [<span class="citation" data-cites="howardbaik">@howardbaik</span>](https://github.com/howardbaik) made their first contribution in [\#385](https://github.com/posit-dev/pointblank/issues/385)
 
 Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/compare/v0.23.0...v0.24.0)
 
@@ -61,15 +61,15 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Features
 
-- We now run pyrefly to infer types. ([<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#374](https://github.com/posit-dev/pointblank/issues/374))
+- We now run pyrefly to infer types. ([<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#374](https://github.com/posit-dev/pointblank/issues/374))
 - Data generation now offers a locale code string preset. ([\#375](https://github.com/posit-dev/pointblank/issues/375))
 - A credit card provider is now a string preset for data generation. ([\#377](https://github.com/posit-dev/pointblank/issues/377))
 
 
 ## Fixes:
 
-- Audit the performance of lazy transformations by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/373
-- Aggregation and Reference Column Hardening by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/372
+- Audit the performance of lazy transformations by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/373
+- Aggregation and Reference Column Hardening by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/372
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.22.0…v0.23.0](https://github.com/posit-dev/pointblank/compare/v0.22.0...v0.23.0)
 
@@ -114,7 +114,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 - Added validation report notes output display in documentation examples. ([\#350](https://github.com/posit-dev/pointblank/issues/350))
 - Improved docstrings for [generate_dataset()](reference/generate_dataset.html#pointblank.generate_dataset) and all `*_field()` functions. ([\#353](https://github.com/posit-dev/pointblank/issues/353))
-- Fixed broken links in `quickstart.qmd` by removing incorrect path prefixes. ([<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha), [\#357](https://github.com/posit-dev/pointblank/issues/357))
+- Fixed broken links in `quickstart.qmd` by removing incorrect path prefixes. ([<span class="citation" data-cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha), [\#357](https://github.com/posit-dev/pointblank/issues/357))
 - Updated data generation documentation with new presets and features. ([\#359](https://github.com/posit-dev/pointblank/issues/359))
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.20.0…v0.21.0](https://github.com/posit-dev/pointblank/compare/v0.20.0...v0.21.0)
@@ -158,14 +158,14 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added several validation methods that work on aggregates of column values (e.g.,[col_sum_gt()](reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt), [col_sd_lt()](reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt), etc.). ([<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#332](https://github.com/posit-dev/pointblank/issues/332))
+- Added several validation methods that work on aggregates of column values (e.g.,[col_sum_gt()](reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt), [col_sd_lt()](reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt), etc.). ([<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#332](https://github.com/posit-dev/pointblank/issues/332))
 
 
 ## Fixes
 
 - Implemented fix for handling datetime strings in `_apply_segments()`. ([\#337](https://github.com/posit-dev/pointblank/issues/337))
-- Added reference data as a default for aggregation comparison values. ([<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#339](https://github.com/posit-dev/pointblank/issues/339))
-- Add experimental gradual typing for development. ([<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#198](https://github.com/posit-dev/pointblank/issues/198), [\#338](https://github.com/posit-dev/pointblank/issues/338))
+- Added reference data as a default for aggregation comparison values. ([<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#339](https://github.com/posit-dev/pointblank/issues/339))
+- Add experimental gradual typing for development. ([<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#198](https://github.com/posit-dev/pointblank/issues/198), [\#338](https://github.com/posit-dev/pointblank/issues/338))
 - Improved the display of aggregation-type methods in the validation report. ([\#342](https://github.com/posit-dev/pointblank/issues/342))
 
 
@@ -188,17 +188,17 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - Validation reports now have informative notes for steps that use the `pre=` parameter. ([\#328](https://github.com/posit-dev/pointblank/issues/328))
 - New options are available (in [get_tabular_report()](reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report) and globally in `config()`) for enabling/disabling validation report footer sections. ([\#327](https://github.com/posit-dev/pointblank/issues/327))
 - Added the `test-core` target for running core tests (large time savings compared to running all tests). ([\#331](https://github.com/posit-dev/pointblank/issues/331))
-- New validation method added, [col_pct_null()](reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null), for checking the percentage of Null values in a column. ([\#290](https://github.com/posit-dev/pointblank/issues/290), [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33))
+- New validation method added, [col_pct_null()](reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null), for checking the percentage of Null values in a column. ([\#290](https://github.com/posit-dev/pointblank/issues/290), [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33))
 
 
 ## Fixes
 
-- Removed a duplicate paragraph in the docs. ([\#329](https://github.com/posit-dev/pointblank/issues/329), [<span class="citation" cites="dpprdan">@dpprdan</span>](https://github.com/dpprdan))
+- Removed a duplicate paragraph in the docs. ([\#329](https://github.com/posit-dev/pointblank/issues/329), [<span class="citation" data-cites="dpprdan">@dpprdan</span>](https://github.com/dpprdan))
 
 
 ## New Contributors
 
-- [<span class="citation" cites="dpprdan">@dpprdan</span>](https://github.com/dpprdan) made their first contribution in https://github.com/posit-dev/pointblank/pull/329
+- [<span class="citation" data-cites="dpprdan">@dpprdan</span>](https://github.com/dpprdan) made their first contribution in https://github.com/posit-dev/pointblank/pull/329
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.16.0…v0.17.0](https://github.com/posit-dev/pointblank/compare/v0.16.0...v0.17.0)
 
@@ -211,7 +211,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 ## New Features
 
 - Use of local thresholds settings will now produce notes at the bottom of the validation report table. ([\#318](https://github.com/posit-dev/pointblank/issues/318))
-- Added the [print_database_tables()](reference/print_database_tables.html#pointblank.print_database_tables) function for printing a list of tables in a database connection. ([\#322](https://github.com/posit-dev/pointblank/issues/322), [<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha))
+- Added the [print_database_tables()](reference/print_database_tables.html#pointblank.print_database_tables) function for printing a list of tables in a database connection. ([\#322](https://github.com/posit-dev/pointblank/issues/322), [<span class="citation" data-cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha))
 - Added YAML support for several recently added validation methods. ([\#312](https://github.com/posit-dev/pointblank/issues/312))
 - There are now report translations for all official EU languages. ([\#314](https://github.com/posit-dev/pointblank/issues/314))
 
@@ -229,12 +229,12 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - Updated documentation with newly-added validation methods. ([\#311](https://github.com/posit-dev/pointblank/issues/311))
 - Added a PDF version of the User Guide to the website ([\#313](https://github.com/posit-dev/pointblank/issues/313))
 - Improved the appearance of the website's sidebar button (visible at constrained screen widths). ([\#315](https://github.com/posit-dev/pointblank/issues/315))
-- Fixed broken contributor info links. ([\#316](https://github.com/posit-dev/pointblank/issues/316), [<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha))
+- Fixed broken contributor info links. ([\#316](https://github.com/posit-dev/pointblank/issues/316), [<span class="citation" data-cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha))
 
 
 ## New Contributors
 
-- [<span class="citation" cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha) made their first contribution in https://github.com/posit-dev/pointblank/pull/316
+- [<span class="citation" data-cites="Meghansaha">@Meghansaha</span>](https://github.com/Meghansaha) made their first contribution in https://github.com/posit-dev/pointblank/pull/316
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.15.0…v0.16.0](https://github.com/posit-dev/pointblank/compare/v0.15.0...v0.16.0)
 
@@ -277,8 +277,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Docs
 
-- Summary fields in the [get_validation_summary()](reference/get_validation_summary.html#pointblank.get_validation_summary) docs examples were updated. ([<span class="citation" cites="jrycw">@jrycw</span>](https://github.com/jrycw), [\#284](https://github.com/posit-dev/pointblank/issues/284))
-- The [yaml_to_python()](reference/yaml_to_python.html#pointblank.yaml_to_python) function now has published docs on the project website. ([<span class="citation" cites="jrycw">@jrycw</span>](https://github.com/jrycw), [\#288](https://github.com/posit-dev/pointblank/issues/288))
+- Summary fields in the [get_validation_summary()](reference/get_validation_summary.html#pointblank.get_validation_summary) docs examples were updated. ([<span class="citation" data-cites="jrycw">@jrycw</span>](https://github.com/jrycw), [\#284](https://github.com/posit-dev/pointblank/issues/284))
+- The [yaml_to_python()](reference/yaml_to_python.html#pointblank.yaml_to_python) function now has published docs on the project website. ([<span class="citation" data-cites="jrycw">@jrycw</span>](https://github.com/jrycw), [\#288](https://github.com/posit-dev/pointblank/issues/288))
 - There's now a Posit badge in the header of the project website. ([\#292](https://github.com/posit-dev/pointblank/issues/292))
 
 
@@ -320,7 +320,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added the `namespaces=` parameter to [yaml_interrogate()](reference/yaml_interrogate.html#pointblank.yaml_interrogate) to facilitate authoring of custom actions. ([<span class="citation" cites="mark-druffel">@mark-druffel</span>](https://github.com/mark-druffel), [\#277](https://github.com/posit-dev/pointblank/issues/277))
+- Added the `namespaces=` parameter to [yaml_interrogate()](reference/yaml_interrogate.html#pointblank.yaml_interrogate) to facilitate authoring of custom actions. ([<span class="citation" data-cites="mark-druffel">@mark-druffel</span>](https://github.com/mark-druffel), [\#277](https://github.com/posit-dev/pointblank/issues/277))
 
 
 ## Fixes
@@ -330,7 +330,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Contributors
 
-- [<span class="citation" cites="mark-druffel">@mark-druffel</span>](https://github.com/mark-druffel) made their first contribution in https://github.com/posit-dev/pointblank/pull/277
+- [<span class="citation" data-cites="mark-druffel">@mark-druffel</span>](https://github.com/mark-druffel) made their first contribution in https://github.com/posit-dev/pointblank/pull/277
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.13.2…v0.13.3](https://github.com/posit-dev/pointblank/compare/v0.13.2...v0.13.3)
 
@@ -377,23 +377,23 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Incorporated a Model Context Protocol (MCP) server implementation. ([\#239](https://github.com/posit-dev/pointblank/issues/239), [\#264](https://github.com/posit-dev/pointblank/issues/264), [<span class="citation" cites="pipaber">@pipaber</span>](https://github.com/pipaber))
+- Incorporated a Model Context Protocol (MCP) server implementation. ([\#239](https://github.com/posit-dev/pointblank/issues/239), [\#264](https://github.com/posit-dev/pointblank/issues/264), [<span class="citation" data-cites="pipaber">@pipaber</span>](https://github.com/pipaber))
 
 
 ## Docs
 
-- New installation instructions for adding Pointblank to pixi projects. ([\#263](https://github.com/posit-dev/pointblank/issues/263), [<span class="citation" cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower))
+- New installation instructions for adding Pointblank to pixi projects. ([\#263](https://github.com/posit-dev/pointblank/issues/263), [<span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower))
 
 
 ## Chores
 
-- Added Makefile pre-commit targets. ([\#262](https://github.com/posit-dev/pointblank/issues/262), [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33))
+- Added Makefile pre-commit targets. ([\#262](https://github.com/posit-dev/pointblank/issues/262), [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33))
 - Reorganized tests and added new ones. ([\#261](https://github.com/posit-dev/pointblank/issues/261))
 
 
 ## New Contributors
 
-- [<span class="citation" cites="pipaber">@pipaber</span>](https://github.com/pipaber) made their first contribution in https://github.com/posit-dev/pointblank/pull/239
+- [<span class="citation" data-cites="pipaber">@pipaber</span>](https://github.com/pipaber) made their first contribution in https://github.com/posit-dev/pointblank/pull/239
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.12.2…v0.13.0](https://github.com/posit-dev/pointblank/compare/v0.12.2...v0.13.0)
 
@@ -447,12 +447,12 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Fixes
 
-- Specify `ignore_nulls=True` in `nw.all_horizontal`. ([<span class="citation" cites="MarcoGorelli">@MarcoGorelli</span>](https://github.com/MarcoGorelli), [\#251](https://github.com/posit-dev/pointblank/issues/251))
+- Specify `ignore_nulls=True` in `nw.all_horizontal`. ([<span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span>](https://github.com/MarcoGorelli), [\#251](https://github.com/posit-dev/pointblank/issues/251))
 
 
 ## New Contributors
 
-- [<span class="citation" cites="MarcoGorelli">@MarcoGorelli</span>](https://github.com/MarcoGorelli) made their first contribution in https://github.com/posit-dev/pointblank/pull/251
+- [<span class="citation" data-cites="MarcoGorelli">@MarcoGorelli</span>](https://github.com/MarcoGorelli) made their first contribution in https://github.com/posit-dev/pointblank/pull/251
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.11.5…v0.11.6](https://github.com/posit-dev/pointblank/compare/v0.11.5...v0.11.6)
 
@@ -567,11 +567,11 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Fixes
 
-- The [DataScan](reference/DataScan.html#pointblank.DataScan) class was refactored to expose data and statistics consistently. ([<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#94](https://github.com/posit-dev/pointblank/issues/94))
+- The [DataScan](reference/DataScan.html#pointblank.DataScan) class was refactored to expose data and statistics consistently. ([<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), [\#94](https://github.com/posit-dev/pointblank/issues/94))
 - Pass/fail result counting during interrogation is now more computationally efficient. ([\#203](https://github.com/posit-dev/pointblank/issues/203))
-- Validation steps using [col_vals_expr()](reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr) can now correctly return data extracts (and produce a CSV button in the validation report table). ([<span class="citation" cites="zilto">@zilto</span>](https://github.com/zilto), [\#197](https://github.com/posit-dev/pointblank/issues/197))
+- Validation steps using [col_vals_expr()](reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr) can now correctly return data extracts (and produce a CSV button in the validation report table). ([<span class="citation" data-cites="zilto">@zilto</span>](https://github.com/zilto), [\#197](https://github.com/posit-dev/pointblank/issues/197))
 - A dependency on Pandas during the rendering validation report tables was eliminated. ([\#220](https://github.com/posit-dev/pointblank/issues/220))
-- An unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. ([<span class="citation" cites="matt-humphrey">@matt-humphrey</span>](https://github.com/matt-humphrey), [\#218](https://github.com/posit-dev/pointblank/issues/218))
+- An unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. ([<span class="citation" data-cites="matt-humphrey">@matt-humphrey</span>](https://github.com/matt-humphrey), [\#218](https://github.com/posit-dev/pointblank/issues/218))
 
 
 ## Documentation
@@ -585,8 +585,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Contributors
 
-- [<span class="citation" cites="zilto">@zilto</span>](https://github.com/zilto) made their first contribution in https://github.com/posit-dev/pointblank/pull/197
-- [<span class="citation" cites="matt-humphrey">@matt-humphrey</span>](https://github.com/matt-humphrey) made their first contribution in https://github.com/posit-dev/pointblank/pull/218
+- [<span class="citation" data-cites="zilto">@zilto</span>](https://github.com/zilto) made their first contribution in https://github.com/posit-dev/pointblank/pull/197
+- [<span class="citation" data-cites="matt-humphrey">@matt-humphrey</span>](https://github.com/matt-humphrey) made their first contribution in https://github.com/posit-dev/pointblank/pull/218
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.9.6…v0.10.0](https://github.com/posit-dev/pointblank/compare/v0.9.6...v0.10.0)
 
@@ -625,9 +625,9 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Add the `global_sales` dataset, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/174
-- Use Python 3.8 and 3.9 compatible type aliases, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/175
-- Incorporate templating variables for segments in `brief=`, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/176
+- Add the `global_sales` dataset, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/174
+- Use Python 3.8 and 3.9 compatible type aliases, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/175
+- Incorporate templating variables for segments in `brief=`, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/176
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.9.2…v0.9.4](https://github.com/posit-dev/pointblank/compare/v0.9.2...v0.9.4)
 
@@ -639,7 +639,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## What's Changed
 
-- Added the [specially()](reference/Validate.specially.html#pointblank.Validate.specially) validation method, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/172
+- Added the [specially()](reference/Validate.specially.html#pointblank.Validate.specially) validation method, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/172
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.9.1…v0.9.2](https://github.com/posit-dev/pointblank/compare/v0.9.1...v0.9.2)
 
@@ -651,7 +651,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added the [rows_complete()](reference/Validate.rows_complete.html#pointblank.Validate.rows_complete) validation method, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/171
+- Added the [rows_complete()](reference/Validate.rows_complete.html#pointblank.Validate.rows_complete) validation method, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/171
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.9.0…v0.9.1](https://github.com/posit-dev/pointblank/compare/v0.9.0...v0.9.1)
 
@@ -663,8 +663,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- There's now support for data segmentation within a wide variety of validation methods (with the new `segments=` argument), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/170
-- Implemented parallelization of tests to decrease the overall duration of tests, by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/165
+- There's now support for data segmentation within a wide variety of validation methods (with the new `segments=` argument), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/170
+- Implemented parallelization of tests to decrease the overall duration of tests, by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/165
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.7…v0.9.0](https://github.com/posit-dev/pointblank/compare/v0.8.7...v0.9.0)
 
@@ -676,7 +676,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Allow `None` in [col_vals_in_set()](reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set) by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), https://github.com/posit-dev/pointblank/pull/162
+- Allow `None` in [col_vals_in_set()](reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set) by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33), https://github.com/posit-dev/pointblank/pull/162
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.6…v0.8.7](https://github.com/posit-dev/pointblank/compare/v0.8.6...v0.8.7)
 
@@ -688,7 +688,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added the [conjointly()](reference/Validate.conjointly.html#pointblank.Validate.conjointly) validation method, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)
+- Added the [conjointly()](reference/Validate.conjointly.html#pointblank.Validate.conjointly) validation method, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.5…v0.8.6](https://github.com/posit-dev/pointblank/compare/v0.8.5...v0.8.6)
 
@@ -700,7 +700,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added step report functionality for [rows_distinct()](reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct) validation steps, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/157
+- Added step report functionality for [rows_distinct()](reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct) validation steps, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/157
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.4…v0.8.5](https://github.com/posit-dev/pointblank/compare/v0.8.4...v0.8.5)
 
@@ -712,7 +712,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- All step reports are now translated according to the `Validate(lang=)` value, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/155
+- All step reports are now translated according to the `Validate(lang=)` value, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/155
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.3…v0.8.4](https://github.com/posit-dev/pointblank/compare/v0.8.3...v0.8.4)
 
@@ -724,7 +724,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)
+- Added Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.2…v0.8.3](https://github.com/posit-dev/pointblank/compare/v0.8.2...v0.8.3)
 
@@ -736,8 +736,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Added the [send_slack_notification()](reference/send_slack_notification.html#pointblank.send_slack_notification) function for creating a Slack notification action, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/147
-- Updated the `get_api_text()` utility function, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/148
+- Added the [send_slack_notification()](reference/send_slack_notification.html#pointblank.send_slack_notification) function for creating a Slack notification action, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/147
+- Updated the `get_api_text()` utility function, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/148
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.1…v0.8.2](https://github.com/posit-dev/pointblank/compare/v0.8.1...v0.8.2)
 
@@ -749,8 +749,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Added the ability to define final actions for validation (post interrogation), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/146
-- Refined translations for the `zh-Hant` lang, by [<span class="citation" cites="jrycw">@jrycw</span>](https://github.com/jrycw) in https://github.com/posit-dev/pointblank/pull/143
+- Added the ability to define final actions for validation (post interrogation), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/146
+- Refined translations for the `zh-Hant` lang, by [<span class="citation" data-cites="jrycw">@jrycw</span>](https://github.com/jrycw) in https://github.com/posit-dev/pointblank/pull/143
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.0…v0.8.1](https://github.com/posit-dev/pointblank/compare/v0.8.0...v0.8.1)
 
@@ -762,19 +762,19 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added `highest_level=` and `default=` parameters to the [Actions](reference/Actions.html#pointblank.Actions) class, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)
-- The `brief=` text now appears in the validation report table, plus we enabled more templating features for `brief=`, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/127
-- Add the global setting option for `brief=` in [Validate](reference/Validate.html#pointblank.Validate), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/128
-- We now allow for flexible validations using dates or datetimes, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/134, https://github.com/posit-dev/pointblank/pull/135, https://github.com/posit-dev/pointblank/pull/136)
-- The `lang=` value in [Validate](reference/Validate.html#pointblank.Validate) now translates the validation report table to `lang=`'s spoken language, and several more language translations were added, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/131, https://github.com/posit-dev/pointblank/pull/138, https://github.com/posit-dev/pointblank/pull/139)
-- We can now better customize the header in step reports through `.get_step_report(header=...)`, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/142
+- Added `highest_level=` and `default=` parameters to the [Actions](reference/Actions.html#pointblank.Actions) class, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)
+- The `brief=` text now appears in the validation report table, plus we enabled more templating features for `brief=`, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/127
+- Add the global setting option for `brief=` in [Validate](reference/Validate.html#pointblank.Validate), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/128
+- We now allow for flexible validations using dates or datetimes, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/134, https://github.com/posit-dev/pointblank/pull/135, https://github.com/posit-dev/pointblank/pull/136)
+- The `lang=` value in [Validate](reference/Validate.html#pointblank.Validate) now translates the validation report table to `lang=`'s spoken language, and several more language translations were added, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/131, https://github.com/posit-dev/pointblank/pull/138, https://github.com/posit-dev/pointblank/pull/139)
+- We can now better customize the header in step reports through `.get_step_report(header=...)`, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/142
 
 
 ## Fixes and Documentation
 
-- There's now a configurable limit (with set default) on extract rows (no matter which scheme was used for their collection), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/130
-- Renamed internal references to threshold levels, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/140
-- Enhanced the docs for [Validate](reference/Validate.html#pointblank.Validate) and the validation methods, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/137
+- There's now a configurable limit (with set default) on extract rows (no matter which scheme was used for their collection), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/130
+- Renamed internal references to threshold levels, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/140
+- Enhanced the docs for [Validate](reference/Validate.html#pointblank.Validate) and the validation methods, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/137
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.3…v0.8.0](https://github.com/posit-dev/pointblank/compare/v0.7.3...v0.8.0)
 
@@ -786,12 +786,12 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features
 
-- Added the `limit=` parameter to [get_step_report()](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/115
-- The new `min_tbl_width=` arg in [preview()](reference/preview.html#pointblank.preview) can improve the display of narrow preview tables by default, and, allows for customization, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/117
-- Added the [get_action_metadata()](reference/get_action_metadata.html#pointblank.get_action_metadata) function to help users make more powerful [Actions](reference/Actions.html#pointblank.Actions) callables, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/118
-- We now include failure text in the `_ValidationInfo` object after interrogation, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/119
-- Basic customization of the header in [get_step_report()](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report) is now possible, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/120
-- Added the ability to select a subset of columns in row-based step reports, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/123
+- Added the `limit=` parameter to [get_step_report()](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/115
+- The new `min_tbl_width=` arg in [preview()](reference/preview.html#pointblank.preview) can improve the display of narrow preview tables by default, and, allows for customization, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/117
+- Added the [get_action_metadata()](reference/get_action_metadata.html#pointblank.get_action_metadata) function to help users make more powerful [Actions](reference/Actions.html#pointblank.Actions) callables, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/118
+- We now include failure text in the `_ValidationInfo` object after interrogation, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/119
+- Basic customization of the header in [get_step_report()](reference/Validate.get_step_report.html#pointblank.Validate.get_step_report) is now possible, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/120
+- Added the ability to select a subset of columns in row-based step reports, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/123
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.2…v0.7.3](https://github.com/posit-dev/pointblank/compare/v0.7.2...v0.7.3)
 
@@ -803,14 +803,14 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Pointblank now supports the Traditional Chinese (`zh-Hant`) locale (for localization of autobriefs), by [<span class="citation" cites="jrycw">@jrycw</span>](https://github.com/jrycw) in https://github.com/posit-dev/pointblank/pull/109
-- Allow validations to work with dates/datetime comparisons across columns, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/110
-- Revised [preview()](reference/preview.html#pointblank.preview) for better operability with the Ibis PySpark backend, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/112
+- Pointblank now supports the Traditional Chinese (`zh-Hant`) locale (for localization of autobriefs), by [<span class="citation" data-cites="jrycw">@jrycw</span>](https://github.com/jrycw) in https://github.com/posit-dev/pointblank/pull/109
+- Allow validations to work with dates/datetime comparisons across columns, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/110
+- Revised [preview()](reference/preview.html#pointblank.preview) for better operability with the Ibis PySpark backend, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/112
 
 
 ## New Contributors
 
-- [<span class="citation" cites="jrycw">@jrycw</span>](https://github.com/jrycw) made their first contribution in https://github.com/posit-dev/pointblank/pull/109
+- [<span class="citation" data-cites="jrycw">@jrycw</span>](https://github.com/jrycw) made their first contribution in https://github.com/posit-dev/pointblank/pull/109
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.1…v0.7.2](https://github.com/posit-dev/pointblank/compare/v0.7.1...v0.7.2)
 
@@ -822,14 +822,14 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Added the `assistant()` function to chat with the API by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/104
-- Add note about getting a validation report from the REPL by [<span class="citation" cites="aborruso">@aborruso</span>](https://github.com/aborruso) in https://github.com/posit-dev/pointblank/pull/99
+- Added the `assistant()` function to chat with the API by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/104
+- Add note about getting a validation report from the REPL by [<span class="citation" data-cites="aborruso">@aborruso</span>](https://github.com/aborruso) in https://github.com/posit-dev/pointblank/pull/99
 
 
 ## New Contributors
 
-- [<span class="citation" cites="aborruso">@aborruso</span>](https://github.com/aborruso) made their first contribution in https://github.com/posit-dev/pointblank/pull/99
-- [<span class="citation" cites="albersonmiranda">@albersonmiranda</span>](https://github.com/albersonmiranda) made their first contribution in https://github.com/posit-dev/pointblank/pull/103
+- [<span class="citation" data-cites="aborruso">@aborruso</span>](https://github.com/aborruso) made their first contribution in https://github.com/posit-dev/pointblank/pull/99
+- [<span class="citation" data-cites="albersonmiranda">@albersonmiranda</span>](https://github.com/albersonmiranda) made their first contribution in https://github.com/posit-dev/pointblank/pull/103
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.0…v0.7.1](https://github.com/posit-dev/pointblank/compare/v0.7.0...v0.7.1)
 
@@ -841,8 +841,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Added the [get_tabular_report()](reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report) method to [DataScan](reference/DataScan.html#pointblank.DataScan) and the [col_summary_tbl()](reference/col_summary_tbl.html#pointblank.col_summary_tbl) function by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/86, https://github.com/posit-dev/pointblank/pull/88, https://github.com/posit-dev/pointblank/pull/93)
-- Introduced a `Code Checks` CI workflow to incorporate Ruff and pre-commit by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/87
+- Added the [get_tabular_report()](reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report) method to [DataScan](reference/DataScan.html#pointblank.DataScan) and the [col_summary_tbl()](reference/col_summary_tbl.html#pointblank.col_summary_tbl) function by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/86, https://github.com/posit-dev/pointblank/pull/88, https://github.com/posit-dev/pointblank/pull/93)
+- Introduced a `Code Checks` CI workflow to incorporate Ruff and pre-commit by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/87
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.3…v0.7.0](https://github.com/posit-dev/pointblank/compare/v0.6.3...v0.7.0)
 
@@ -854,15 +854,15 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Templating options are now available for strings used in `brief=` (all validation methods) and for any [Actions](reference/Actions.html#pointblank.Actions) consisting of text printed to the console, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/78
-- Much more information about a table is now collected through a [DataScan](reference/DataScan.html#pointblank.DataScan), by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/84
-- Any tables generated by Pointblank should no longer yield warnings in a Quarto publishing environment when Great Tables `0.17.0` (or higher) is installed, by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/85
-- Fixed a display issue concerning value sets within step reports, by [<span class="citation" cites="phobson">@phobson</span>](https://github.com/phobson) in https://github.com/posit-dev/pointblank/pull/80
+- Templating options are now available for strings used in `brief=` (all validation methods) and for any [Actions](reference/Actions.html#pointblank.Actions) consisting of text printed to the console, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/78
+- Much more information about a table is now collected through a [DataScan](reference/DataScan.html#pointblank.DataScan), by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/84
+- Any tables generated by Pointblank should no longer yield warnings in a Quarto publishing environment when Great Tables `0.17.0` (or higher) is installed, by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/85
+- Fixed a display issue concerning value sets within step reports, by [<span class="citation" data-cites="phobson">@phobson</span>](https://github.com/phobson) in https://github.com/posit-dev/pointblank/pull/80
 
 
 ## New Contributors
 
-- [<span class="citation" cites="phobson">@phobson</span>](https://github.com/phobson) made their first contribution in https://github.com/posit-dev/pointblank/pull/80
+- [<span class="citation" data-cites="phobson">@phobson</span>](https://github.com/phobson) made their first contribution in https://github.com/posit-dev/pointblank/pull/80
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.2…v0.6.3](https://github.com/posit-dev/pointblank/compare/v0.6.2...v0.6.3)
 
@@ -874,11 +874,11 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## New Features and Fixes
 
-- Ollama LLM provider support was added to the [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) class by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/70
-- We can now add 'briefs' and Pointblank will generate 'autobriefs' as needed by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/71
-- Added a tolerance parameter (`tol=`) to the [row_count_match()](reference/Validate.row_count_match.html#pointblank.Validate.row_count_match) validation method by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/73
-- Incorporated the use of ruff in the project by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/76
-- Enhanced the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method to indicate which tests failed by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/72
+- Ollama LLM provider support was added to the [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) class by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/70
+- We can now add 'briefs' and Pointblank will generate 'autobriefs' as needed by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/71
+- Added a tolerance parameter (`tol=`) to the [row_count_match()](reference/Validate.row_count_match.html#pointblank.Validate.row_count_match) validation method by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/73
+- Incorporated the use of ruff in the project by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/76
+- Enhanced the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method to indicate which tests failed by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/72
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.1…v0.6.2](https://github.com/posit-dev/pointblank/compare/v0.6.1...v0.6.2)
 
@@ -890,23 +890,23 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Breaking Changes
 
-- thresholds level names have been renamed to better align with standard log levels by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/69
+- thresholds level names have been renamed to better align with standard log levels by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/69
 
 
 ## New Features
 
-- Added the ability to execute actions when exceeding threshold levels by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/66
-- Added AWS Bedrock support to [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) in https://github.com/posit-dev/pointblank/pull/67
+- Added the ability to execute actions when exceeding threshold levels by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/66
+- Added AWS Bedrock support to [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" data-cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) in https://github.com/posit-dev/pointblank/pull/67
 
 
 ## Fixes
 
-- Improved the implementation of [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/68
+- Improved the implementation of [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/68
 
 
 ## New Contributors
 
-- [<span class="citation" cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) made their first contribution in https://github.com/posit-dev/pointblank/pull/67
+- [<span class="citation" data-cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) made their first contribution in https://github.com/posit-dev/pointblank/pull/67
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.0…v0.6.1](https://github.com/posit-dev/pointblank/compare/v0.6.0...v0.6.1)
 
@@ -918,26 +918,26 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ## Features
 
-- Added the experimental [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) class for drafting a validation plan based on a provided dataset by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/60, https://github.com/posit-dev/pointblank/pull/50)
-- Added the experimental [DataScan](reference/DataScan.html#pointblank.DataScan) class, which creates a succinct summary of any supported table by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/59
-- Added the [missing_vals_tbl()](reference/missing_vals_tbl.html#pointblank.missing_vals_tbl) function for providing an HTML summary of missing values in any supported table by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/53
-- Added the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method for [Validate](reference/Validate.html#pointblank.Validate) as a convenience for test suites by [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/64
-- The `nycflights` dataset is now available in [load_dataset()](reference/load_dataset.html#pointblank.load_dataset) by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/54
+- Added the experimental [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) class for drafting a validation plan based on a provided dataset by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/60, https://github.com/posit-dev/pointblank/pull/50)
+- Added the experimental [DataScan](reference/DataScan.html#pointblank.DataScan) class, which creates a succinct summary of any supported table by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/59
+- Added the [missing_vals_tbl()](reference/missing_vals_tbl.html#pointblank.missing_vals_tbl) function for providing an HTML summary of missing values in any supported table by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/53
+- Added the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method for [Validate](reference/Validate.html#pointblank.Validate) as a convenience for test suites by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/64
+- The `nycflights` dataset is now available in [load_dataset()](reference/load_dataset.html#pointblank.load_dataset) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/54
 
 
 ## Fixes and Documentation
 
-- Integer and decimal values are now better formatted in HTML displays by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/55
-- Fixed usage of the Ibis `head()` method call (changed in recent versions of Ibis) by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/52
-- Revised appearance of step reports for validations based on checks of column values by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/49
-- Improved the documentation of the [Schema](reference/Schema.html#pointblank.Schema) class by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/61
-- Added interlinks throughout the Reference API pages by [<span class="citation" cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/65
-- Fixed a typo in the `README.md` file by [<span class="citation" cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) in https://github.com/posit-dev/pointblank/pull/56
+- Integer and decimal values are now better formatted in HTML displays by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/55
+- Fixed usage of the Ibis `head()` method call (changed in recent versions of Ibis) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/52
+- Revised appearance of step reports for validations based on checks of column values by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/49
+- Improved the documentation of the [Schema](reference/Schema.html#pointblank.Schema) class by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/61
+- Added interlinks throughout the Reference API pages by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/65
+- Fixed a typo in the `README.md` file by [<span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) in https://github.com/posit-dev/pointblank/pull/56
 
 
 ## New Contributors
 
-- [<span class="citation" cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) made their first contribution in https://github.com/posit-dev/pointblank/pull/56
-- [<span class="citation" cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) made their first contribution in https://github.com/posit-dev/pointblank/pull/64
+- [<span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) made their first contribution in https://github.com/posit-dev/pointblank/pull/56
+- [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) made their first contribution in https://github.com/posit-dev/pointblank/pull/64
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.5.0…v0.6.0](https://github.com/posit-dev/pointblank/compare/v0.5.0...v0.6.0)

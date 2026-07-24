@@ -35,16 +35,16 @@ File path if loaded from a file, else None.
 `source_version: str | None = None`  
 Version of the source format specification, if detectable.
 
-`columns: list[tuple[str, str | None]] = list()`    
+`columns: list[tuple[str, str | None]] = list()`\  
 List of (column_name, dtype_string_or_None) tuples detected from the source.
 
-`constraints: list[MappedConstraint] = list()`    
+`constraints: list[MappedConstraint] = list()`\  
 List of MappedConstraint objects ready for translation to Validate steps.
 
-`metadata: dict[str, Any] = dict()`    
+`metadata: dict[str, Any] = dict()`\  
 Any additional metadata from the source (title, description, etc.).
 
-`warnings: list[str] = list()`    
+`warnings: list[str] = list()`\  
 Messages about constraints that couldn't be mapped.
 
 `coverage: float = ``1.0`  

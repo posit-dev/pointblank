@@ -25,7 +25,7 @@ Used for multi-domain CDISC studies, Frictionless Data Packages, etc.
 `name: str | None = None`  
 Package name/identifier.
 
-`items: dict[str, MetadataImport] = dict()`    
+`items: dict[str, MetadataImport] = dict()`\  
 Named [MetadataImport](MetadataImport.md#pointblank.MetadataImport) objects.
 
 `description: str | None = None`  

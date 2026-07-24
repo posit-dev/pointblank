@@ -37,10 +37,10 @@ SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"`, or `
 `repeating: bool`  
 Whether the domain is a repeating (multi-row per subject) domain.
 
-`variables: list[SDTMVariableSpec] = list()`    
+`variables: list[SDTMVariableSpec] = list()`\  
 Ordered list of variable specifications.
 
-`natural_keys: list[str] = list()`    
+`natural_keys: list[str] = list()`\  
 List of variable names that form the natural key.
 
 

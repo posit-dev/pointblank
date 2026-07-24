@@ -27,7 +27,7 @@ Represents a set of permitted values from standards like CDISC controlled termin
 `name: str`  
 Codelist identifier.
 
-`codes: list[CodelistEntry] = list()`    
+`codes: list[CodelistEntry] = list()`\  
 List of codelist entries.
 
 `label: str | None = None`  

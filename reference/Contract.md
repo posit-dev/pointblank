@@ -37,7 +37,7 @@ Either "source" (inbound data) or "target" (outbound data product). This is meta
 `schema: Schema | None = None`  
 A Schema object defining expected column names and types.
 
-`steps: list[Step] = list()`    
+`steps: list[Step] = list()`\  
 A list of Step objects defining validation rules beyond schema checks.
 
 `version: str | None = None`  

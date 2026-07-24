@@ -28,7 +28,7 @@ In a Jupyter or Quarto notebook the report renders automatically as a color-code
 ## Parameters
 
 
-`validations: dict[str, Validate] = dict()`    
+`validations: dict[str, Validate] = dict()`\  
 Reserved for legacy use; not populated by the built-in engine.
 
 `package: SubmissionPackage | None = None`  

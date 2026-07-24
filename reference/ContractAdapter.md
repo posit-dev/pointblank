@@ -48,7 +48,7 @@ Whether this adapter supports exporting to the format.
 Built-in mutable sequence.
 
 
-`file_extensions: list[str] = []`  
+`file_extensions: list[str] = []`\
 
 
 If no argument is given, the constructor creates a new empty list. The argument must be an iterable if specified.

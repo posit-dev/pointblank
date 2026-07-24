@@ -33,10 +33,10 @@ Brief description of the dataset's purpose.
 `dataset_class: str`  
 ADaM dataset class: `"ADSL"`, `"BDS"`, `"ADAE"`, or `"ADTTE"`.
 
-`variables: list[ADaMVariableSpec] = list()`    
+`variables: list[ADaMVariableSpec] = list()`\  
 Ordered list of variable specifications.
 
-`natural_keys: list[str] = list()`    
+`natural_keys: list[str] = list()`\  
 List of variable names that form the natural key.
 
 

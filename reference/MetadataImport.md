@@ -57,13 +57,13 @@ Study identifier (for clinical data).
 `domain: str | None = None`  
 Domain identifier (e.g., `"DM"`, `"AE"` for CDISC).
 
-`variables: list[VariableMetadata] = list()`    
+`variables: list[VariableMetadata] = list()`\  
 List of variable metadata definitions.
 
-`codelists: dict[str, Codelist] = dict()`    
+`codelists: dict[str, Codelist] = dict()`\  
 Named codelists (controlled terminologies).
 
-`missing_value_codes: dict[str, list[MissingValueCode]] = dict()`    
+`missing_value_codes: dict[str, list[MissingValueCode]] = dict()`\  
 Named missing value code definitions.
 
 

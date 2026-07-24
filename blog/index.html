@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -42,10 +45,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-8d5f439641516eb477015a9f2f8dba09.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-bf476c94c8758bc321fd5fd3b984c438.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -120,8 +123,22 @@ ul.task-list li input[type="checkbox"] {
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -209,7 +226,7 @@ window.Quarto = {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="455" data-forks="29"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="457" data-forks="29"></div>
     </span>
   </li>  
 </ul>
@@ -281,7 +298,7 @@ window.Quarto = {
 </thead>
 <tbody class="list">
 
-<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1784767273741" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4708" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
+<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1784933784101" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4708" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Jun 4, 2025</span>
 </td>
@@ -294,7 +311,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1784767270095" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
+<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1784933780903" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Jun 3, 2025</span>
 </td>
@@ -307,7 +324,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1784767273740" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
+<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1784933784100" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">May 20, 2025</span>
 </td>
@@ -320,7 +337,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1784767273741" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
+<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1784933784100" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">May 2, 2025</span>
 </td>
@@ -333,7 +350,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1784767273741" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
+<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1784933784100" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Apr 4, 2025</span>
 </td>

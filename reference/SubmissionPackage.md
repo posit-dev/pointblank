@@ -26,7 +26,7 @@ This is the data-level analog of <a href="MetadataPackage.html#pointblank.Metada
 ## Parameters
 
 
-`datasets: dict[str, Any] = dict()`    
+`datasets: dict[str, Any] = dict()`\  
 A mapping of dataset name (domain code, e.g., `"DM"`, `"AE"`, `"SUPPAE"`, `"ADSL"`) to the dataset itself (a Pandas or Polars DataFrame). Names are matched case-insensitively but conventionally uppercase.
 
 `define: Any = None`  
