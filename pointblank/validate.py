@@ -21113,6 +21113,8 @@ class Validate:
                 continue
 
             # Evaluate the segments expression
+            seg_tuples = []
+
             try:
                 # Get the table for this step, it can either be:
                 # 1. the target table itself
@@ -21158,6 +21160,8 @@ class Validate:
 
             except Exception:  # pragma: no cover
                 validation.eval_error = True
+                expanded_validation_info.append(validation)
+                continue
 
             # For each segmentation resolved, create a new validation step and add it to the list of
             # expanded validation steps
@@ -22650,6 +22654,10 @@ def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
         # Use Narwhals for supported DataFrame types
         data_nw = nw.from_native(data_tbl)
         unique_vals = data_nw.select(nw.col(segments_expr)).unique()
+
+        # LazyFrames must be collected before item indexing
+        if is_narwhals_lazyframe(unique_vals):
+            unique_vals = unique_vals.collect()
 
         # Convert to list of values
         seg_categories = unique_vals[segments_expr].to_list()

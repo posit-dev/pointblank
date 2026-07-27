@@ -211,6 +211,20 @@ def test_segments_with_multiple_seg_groups(tbl_type):
         )
         .interrogate()
     )
+
     assert validation.n_passed(i=1, scalar=True) == 7
     assert validation.n_passed(i=2, scalar=True) == 3
     assert validation.n_passed(i=3, scalar=True) == 2
+
+
+def test_segments_str_lazyframe():
+    df = pl.DataFrame({"x": [1.0, -1.0, 2.0], "region": ["US", "US", "EU"]})
+    validation_lazy = Validate(data=df.lazy()).col_vals_gt("x", 0, segments="region").interrogate()
+    validation_eager = Validate(data=df).col_vals_gt("x", 0, segments="region").interrogate()
+
+    # Both should produce the same number of expanded steps
+    assert len(validation_lazy.validation_info) == len(validation_eager.validation_info)
+
+    # EU: 1 row, 1 passes; US: 2 rows, 1 passes
+    assert validation_lazy.n_passed(i=1, scalar=True) == validation_eager.n_passed(i=1, scalar=True)
+    assert validation_lazy.n_passed(i=2, scalar=True) == validation_eager.n_passed(i=2, scalar=True)
