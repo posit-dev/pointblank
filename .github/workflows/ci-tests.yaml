@@ -39,8 +39,9 @@ jobs:
           PYSPARK_DRIVER_MEMORY: 1g
           PYSPARK_EXECUTOR_MEMORY: 1g
           SPARK_LOCAL_IP: 127.0.0.1
+
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           name: "py${{ matrix.python-version }}"
           token: ${{ secrets.CODECOV_TOKEN }}
