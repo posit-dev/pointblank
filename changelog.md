@@ -3,6 +3,42 @@
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
 
+# v0.26.0
+
+*2026-07-27* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/0.26.0)
+
+Pointblank `v0.26.0` is a major release focused on clinical data standards, data quality measurement, and AI-assisted validation editing. This release introduces comprehensive CDISC conformance validation with a built-in rule engine and bundled controlled terminology, a metadata import/export system supporting SDTM, ADaM, Frictionless, and CSVW formats, and structured missingness handling through a new [MissingSpec](reference/MissingSpec.html#pointblank.MissingSpec) type. Validation steps are now automatically tagged with data quality dimensions and rolled up into health scores, and the new [EditValidation](reference/EditValidation.html#pointblank.EditValidation) class lets you modify existing validation plans through interaction with an LLM.
+
+
+#### New Features
+
+- **Data quality dimensions and health scoring** -- Every validation step is now tagged with a data quality dimension (Completeness, Validity, Uniqueness, Consistency, Timeliness, or Volume) inferred automatically from the assertion type. Dimensions are overridable per step via `dimension=` or remappable globally via `pb.config(dimension_map=...)`. New methods [get_dimension_scores()](reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores), [get_health_score()](reference/Validate.get_health_score.html#pointblank.Validate.get_health_score), [get_scorecard()](reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard), and [get_validation_summary()](reference/get_validation_summary.html#pointblank.get_validation_summary) expose test-unit-weighted scores, with [assert_dimension_scores()](reference/Validate.assert_dimension_scores.html#pointblank.Validate.assert_dimension_scores) available to fail a run when a dimension falls below a threshold. The validation report shows color-coded dimension badges on each step number with a health-score summary in the footer. ([\#409](https://github.com/posit-dev/pointblank/issues/409))
+
+- **CDISC submission conformance** -- A new conformance validation framework provides a rule engine, bundled SDTMIG 3.4 rules with SDTM controlled terminology, and public APIs for validating study submission packages. Includes [ConformanceReport](reference/ConformanceReport.html#pointblank.ConformanceReport) with JSON and Excel export, [findings_df()](reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df) and [get_findings_table()](reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table) for detailed inspection, and integration with the CDISC CORE engine. ([\#413](https://github.com/posit-dev/pointblank/issues/413))
+
+- **Metadata standards** -- New metadata import, export, and validation workflows for clinical data standards. The [import_metadata()](reference/import_metadata.html#pointblank.import_metadata) function reads Frictionless Table Schema, CSVW, CDISC Define-XML, CDISC Controlled Terminology, and SPSS/SAS/Stata files into a unified [MetadataImport](reference/MetadataImport.html#pointblank.MetadataImport) object. Built-in SDTM and ADaM templates enable domain-level structure validation with [validate_sdtm()](reference/validate_sdtm.html#pointblank.validate_sdtm) and [validate_adam()](reference/validate_adam.html#pointblank.validate_adam). Metadata can be exported back to Frictionless format and converted to Pointblank schemas. ([\#403](https://github.com/posit-dev/pointblank/issues/403))
+
+- **Schema enforcement API** -- A contract import/export system with a modular adapter architecture. [import_contract()](reference/import_contract.html#pointblank.import_contract) and [export_contract()](reference/export_contract.html#pointblank.export_contract) translate between external schema formats (JSON Schema, Frictionless Table Schema) and Pointblank validations or contracts. Custom adapters can be registered via the `[@register](https://github.com/register)_adapter` decorator. ([\#402](https://github.com/posit-dev/pointblank/issues/402))
+
+- **Structured missingness** -- A new [MissingSpec](reference/MissingSpec.html#pointblank.MissingSpec) type maps sentinel values to reasons, and a `missing=` parameter on `col_vals_*()` methods excludes coded values from checks. Four dedicated validation steps are added: [col_pct_missing()](reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing), [col_missing_coded()](reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded), [col_missing_only_coded()](reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded), and [col_missing_consistent()](reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent). ([\#404](https://github.com/posit-dev/pointblank/issues/404))
+
+- **AI validation editor** -- The new [EditValidation](reference/EditValidation.html#pointblank.EditValidation) class lets you modify an existing validation plan from a natural-language instruction, with [diff()](reference/EditValidation.html#pointblank.EditValidation.diff), [changed_steps()](reference/EditValidation.html#pointblank.EditValidation.changed_steps), [preview()](reference/preview.html#pointblank.preview), and [accept()](reference/EditValidation.html#pointblank.EditValidation.accept) methods for reviewing changes. Plan serialization via [Validate.to_code()](reference/Validate.to_code.html#pointblank.Validate.to_code) and [Validate.to_yaml()](reference/Validate.to_yaml.html#pointblank.Validate.to_yaml) is fully round-trippable. Also adds [Validate.suggest_improvements()](reference/Validate.suggest_improvements.html#pointblank.Validate.suggest_improvements), [Validate.from_prompt()](reference/Validate.from_prompt.html#pointblank.Validate.from_prompt), `Validate.from_plans()`, a syntax-lint guardrail with auto-reprompt, and a `pb edit` CLI command. ([\#408](https://github.com/posit-dev/pointblank/issues/408))
+
+- **[float_field()](reference/float_field.html#pointblank.float_field) `precision=` parameter** -- Generated float values can now be rounded to a specified number of decimal places, useful for prices, scores, and other fields where full floating-point precision is not desired. ([\#412](https://github.com/posit-dev/pointblank/issues/412))
+
+
+#### Bug Fixes
+
+- Per-row validation checks on Polars LazyFrames are no longer 8-11× slower than v0.24.0. The result-tallying code now computes row, pass, fail, and null counts in a single aggregation instead of issuing three to four separate `.collect()` calls that re-executed the entire lazy plan. ([\#407](https://github.com/posit-dev/pointblank/issues/407))
+
+- Segmented validation on Polars LazyFrames no longer raises an `UnboundLocalError` for `seg_tuples()`. Segment expressions now work consistently for both eager and lazy DataFrames. ([\#414](https://github.com/posit-dev/pointblank/issues/414))
+
+
+#### Documentation
+
+- CDISC validation user guide examples are now fully executable against sample metadata documents bundled with the package via the new `load_metadata_example()` function. ([\#406](https://github.com/posit-dev/pointblank/issues/406))
+
+
 # v0.25.0
 
 *2026-06-12* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.25.0)
@@ -909,35 +945,3 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - [<span class="citation" data-cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) made their first contribution in https://github.com/posit-dev/pointblank/pull/67
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.0…v0.6.1](https://github.com/posit-dev/pointblank/compare/v0.6.0...v0.6.1)
-
-
-# v0.6.0
-
-*2025-02-18* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.6.0)
-
-
-## Features
-
-- Added the experimental [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) class for drafting a validation plan based on a provided dataset by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/60, https://github.com/posit-dev/pointblank/pull/50)
-- Added the experimental [DataScan](reference/DataScan.html#pointblank.DataScan) class, which creates a succinct summary of any supported table by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/59
-- Added the [missing_vals_tbl()](reference/missing_vals_tbl.html#pointblank.missing_vals_tbl) function for providing an HTML summary of missing values in any supported table by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/53
-- Added the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method for [Validate](reference/Validate.html#pointblank.Validate) as a convenience for test suites by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/64
-- The `nycflights` dataset is now available in [load_dataset()](reference/load_dataset.html#pointblank.load_dataset) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/54
-
-
-## Fixes and Documentation
-
-- Integer and decimal values are now better formatted in HTML displays by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/55
-- Fixed usage of the Ibis `head()` method call (changed in recent versions of Ibis) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/52
-- Revised appearance of step reports for validations based on checks of column values by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/49
-- Improved the documentation of the [Schema](reference/Schema.html#pointblank.Schema) class by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/61
-- Added interlinks throughout the Reference API pages by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/65
-- Fixed a typo in the `README.md` file by [<span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) in https://github.com/posit-dev/pointblank/pull/56
-
-
-## New Contributors
-
-- [<span class="citation" data-cites="gregorywaynepower">@gregorywaynepower</span>](https://github.com/gregorywaynepower) made their first contribution in https://github.com/posit-dev/pointblank/pull/56
-- [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) made their first contribution in https://github.com/posit-dev/pointblank/pull/64
-
-**Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.5.0…v0.6.0](https://github.com/posit-dev/pointblank/compare/v0.5.0...v0.6.0)

@@ -4159,21 +4159,21 @@
     "href": "citation.html#bibtex",
     "title": "Authors and Citation",
     "section": "BibTeX",
-    "text": "BibTeX\n@Manual{,\n  title = {Pointblank: data validation toolkit for assessing and monitoring data quality.},\n  author = {Richard Iannone},\n  year = {2026},\n  note = {Python package version 0.25.0},\n  url = {https://posit-dev.github.io/pointblank/},\n}"
+    "text": "BibTeX\n@Manual{,\n  title = {Pointblank: data validation toolkit for assessing and monitoring data quality.},\n  author = {Richard Iannone},\n  year = {2026},\n  note = {Python package version 0.26.0},\n  url = {https://posit-dev.github.io/pointblank/},\n}"
   },
   {
     "objectID": "citation.html#apa",
     "href": "citation.html#apa",
     "title": "Authors and Citation",
     "section": "APA",
-    "text": "APA\nIannone, R. (2026). Pointblank: data validation toolkit for assessing and monitoring data quality. (Version 0.25.0) [Computer software]. https://posit-dev.github.io/pointblank/"
+    "text": "APA\nIannone, R. (2026). Pointblank: data validation toolkit for assessing and monitoring data quality. (Version 0.26.0) [Computer software]. https://posit-dev.github.io/pointblank/"
   },
   {
     "objectID": "citation.html#ris",
     "href": "citation.html#ris",
     "title": "Authors and Citation",
     "section": "RIS",
-    "text": "RIS\nTY  - COMP\nTI  - Pointblank: data validation toolkit for assessing and monitoring data quality.\nAU  - Iannone, Richard\nPY  - 2026\nVL  - 0.25.0\nUR  - https://posit-dev.github.io/pointblank/\nAB  - Validate data in Polars and Pandas DataFrames and database tables. Validation pipelines can be made using easily-readable, consecutive validation steps. Upon execution of the validation plan, several reporting options are available. User-defined thresholds for failure rates allow for the determination of appropriate reporting actions.\nER  -"
+    "text": "RIS\nTY  - COMP\nTI  - Pointblank: data validation toolkit for assessing and monitoring data quality.\nAU  - Iannone, Richard\nPY  - 2026\nVL  - 0.26.0\nUR  - https://posit-dev.github.io/pointblank/\nAB  - Validate data in Polars and Pandas DataFrames and database tables. Validation pipelines can be made using easily-readable, consecutive validation steps. Upon execution of the validation plan, several reporting options are available. User-defined thresholds for failure rates allow for the determination of appropriate reporting actions.\nER  -"
   },
   {
     "objectID": "blog/validation-libs-2025/index.html",
@@ -4344,8 +4344,8 @@
     "text": "This changelog is generated automatically from GitHub Releases."
   },
   {
-    "objectID": "changelog.html#new-features-1",
-    "href": "changelog.html#new-features-1",
+    "objectID": "changelog.html#new-features-2",
+    "href": "changelog.html#new-features-2",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the get_dataframe_report() method to Validate for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). (@Meghansaha, #341)\nAdded OpenTelemetry (OTel) integration for exporting validation results as metrics, traces, and logs. Available as an optional dependency via the otel extra. (#383)\nAdded Azure OpenAI as a model provider for both Validate.prompt() and DraftValidation. (@howardbaik, #385, #387)"
@@ -4379,15 +4379,15 @@
     "text": "Fixes:\n\nAudit the performance of lazy transformations by @tylerriccio33 in https://github.com/posit-dev/pointblank/pull/373\nAggregation and Reference Column Hardening by @tylerriccio33 in https://github.com/posit-dev/pointblank/pull/372\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.22.0…v0.23.0"
   },
   {
-    "objectID": "changelog.html#new-features-2",
-    "href": "changelog.html#new-features-2",
+    "objectID": "changelog.html#new-features-3",
+    "href": "changelog.html#new-features-3",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nExpanded generate_dataset() country support with 29 new countries (EC, PA, SA, UA, AM, AZ, BO, CM, DO, GE, GT, HN, IL, JM, JO, KH, KZ, LB, MD, MM, MZ, NP, PY, RS, RW, SV, TZ, UY, UZ), bringing the total to 100 supported countries, along with expanded street lists and normalized industry names across existing countries. (#370, #371)\nAdded profile_fields() as a composite helper that creates a dictionary of person-profile StringField objects for direct unpacking into a Schema(). Supports three tiers (\"minimal\", \"standard\", \"full\"), name splitting, column include/exclude, and a prefix= parameter for namespacing. (#367)\nSignificantly expanded YAML workflow support with governance metadata (owner, consumers, version), final_actions and reference top-level keys, aggregate validation methods (col_sum_gt, col_avg_le, etc.), col_pct_null, data_freshness, shortcut syntax for the active parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. (#369)"
   },
   {
-    "objectID": "changelog.html#bug-fixes-1",
-    "href": "changelog.html#bug-fixes-1",
+    "objectID": "changelog.html#bug-fixes-2",
+    "href": "changelog.html#bug-fixes-2",
     "title": "Changelog",
     "section": "Bug Fixes",
     "text": "Bug Fixes\n\nFixed preview() failing on tables with duration (timedelta) columns by casting them to strings before display. (#368)"
@@ -4400,8 +4400,8 @@
     "text": "Docs\n\nAdded YAML reference and validation workflow guides covering governance metadata and aggregate methods. (#369)\nUpdated data generation documentation with profile_fields() usage and 100-country support. (#367, #370, #371)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.21.0…v0.22.0"
   },
   {
-    "objectID": "changelog.html#new-features-3",
-    "href": "changelog.html#new-features-3",
+    "objectID": "changelog.html#new-features-4",
+    "href": "changelog.html#new-features-4",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nSignificantly enhanced generate_dataset() with locale mixing (country= now accepts lists or weighted dicts), frequency-weighted sampling via a 4-tier system, a user_agent preset with country-weighted browser selection, presets for hash digests (md5, sha1, sha256), barcodes (ean8, ean13), date strings (date_between, date_range, future_date, past_date), and ISO 3166-1 country codes (country_code_2, country_code_3), country-specific license plate formats, industry-coherent person-company pairing, a generate_dataset pytest fixture with automatic per-test seeding, and expanded country support (bringing the total to 71). (#352, #354, #355, #358, #360, #361, #362, #363, #364, #365, #366)\nAdded expressions support for the active= parameter to provide for more flexible and dynamic validation workflows. (#349)"
@@ -4414,15 +4414,15 @@
     "text": "Docs\n\nAdded validation report notes output display in documentation examples. (#350)\nImproved docstrings for generate_dataset() and all *_field() functions. (#353)\nFixed broken links in quickstart.qmd by removing incorrect path prefixes. (@Meghansaha, #357)\nUpdated data generation documentation with new presets and features. (#359)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.20.0…v0.21.0"
   },
   {
-    "objectID": "changelog.html#new-features-4",
-    "href": "changelog.html#new-features-4",
+    "objectID": "changelog.html#new-features-5",
+    "href": "changelog.html#new-features-5",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the generate_dataset() function for creating realistic synthetic test data from Schema definitions, with a suite of field helper functions (int_field(), string_field(), date_field(), name_field(), etc.) and support for 50 country locales via the country= parameter. (#348)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.19.0…v0.20.0"
   },
   {
-    "objectID": "changelog.html#new-features-5",
-    "href": "changelog.html#new-features-5",
+    "objectID": "changelog.html#new-features-6",
+    "href": "changelog.html#new-features-6",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nWe can now specify owner, consumers, and version metadata for data validations within the Validate class. (#344)\nThe new data_freshness() validation method has been added for easily checking the freshness of data. (#345)"
@@ -4435,8 +4435,8 @@
     "text": "Fixes\n\nAdded the .step_report() capability for the aggregate validation methods (e.g., col_sum_gt(), col_sd_lt(), etc.). (#343)\nUpdated SVG icons for all of the aggregate validation methods. (#346)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.18.0…v0.19.0"
   },
   {
-    "objectID": "changelog.html#new-features-6",
-    "href": "changelog.html#new-features-6",
+    "objectID": "changelog.html#new-features-7",
+    "href": "changelog.html#new-features-7",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded several validation methods that work on aggregates of column values (e.g.,col_sum_gt(), col_sd_lt(), etc.). (@tylerriccio33, #332)"
@@ -4456,8 +4456,8 @@
     "text": "Docs\n\nUpdated the reference API with aggregate check methods. (#340)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.17.0…v0.18.0"
   },
   {
-    "objectID": "changelog.html#new-features-7",
-    "href": "changelog.html#new-features-7",
+    "objectID": "changelog.html#new-features-8",
+    "href": "changelog.html#new-features-8",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAll col_schema_match() validation steps are now accompanied by notes that describe the results. (#325)\nNotes appear in validation reports notes when columns are not found or none are resolved by use of column selectors. (#326)\nValidation reports now have informative notes for steps that use the pre= parameter. (#328)\nNew options are available (in get_tabular_report() and globally in config()) for enabling/disabling validation report footer sections. (#327)\nAdded the test-core target for running core tests (large time savings compared to running all tests). (#331)\nNew validation method added, col_pct_null(), for checking the percentage of Null values in a column. (#290, @tylerriccio33)"
@@ -4477,8 +4477,8 @@
     "text": "New Contributors\n\n@dpprdan made their first contribution in https://github.com/posit-dev/pointblank/pull/329\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.16.0…v0.17.0"
   },
   {
-    "objectID": "changelog.html#new-features-8",
-    "href": "changelog.html#new-features-8",
+    "objectID": "changelog.html#new-features-9",
+    "href": "changelog.html#new-features-9",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nUse of local thresholds settings will now produce notes at the bottom of the validation report table. (#318)\nAdded the print_database_tables() function for printing a list of tables in a database connection. (#322, @Meghansaha)\nAdded YAML support for several recently added validation methods. (#312)\nThere are now report translations for all official EU languages. (#314)"
@@ -4505,8 +4505,8 @@
     "text": "New Contributors\n\n@Meghansaha made their first contribution in https://github.com/posit-dev/pointblank/pull/316\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.15.0…v0.16.0"
   },
   {
-    "objectID": "changelog.html#new-features-9",
-    "href": "changelog.html#new-features-9",
+    "objectID": "changelog.html#new-features-10",
+    "href": "changelog.html#new-features-10",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nSeveral new validation methods were incorporated: col_vals_within_spec(), col_vals_increasing(), col_vals_decreasing(), and tbl_match(). (#304, #305, #306)\nThe option to ignore SSL verification was added to the DraftValidation class via the new verify_ssl= parameter. (#302)\nAdded the (internal for now) ‘notes’ functionality for validation step, which will allow for useful information in individual validation steps to be available post-interrogation. (#303)"
@@ -4526,8 +4526,8 @@
     "text": "Docs\n\nAdded a User Guide page on validation reports. (#300)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.14.0…v0.15.0"
   },
   {
-    "objectID": "changelog.html#new-features-10",
-    "href": "changelog.html#new-features-10",
+    "objectID": "changelog.html#new-features-11",
+    "href": "changelog.html#new-features-11",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the .prompt() validation method to enable data validation using LLMs, evaluating data in rows against natural language descriptions instead of programmatic rules. (#287)\nThe new write_file() and read_file() functions allow for writing/reading validation objects to and from disk. (#291)\nMore translation languages added (\"id\", \"uk\", \"he\", \"th\", and \"fa\"). (#293)"
@@ -4554,8 +4554,8 @@
     "text": "Chores\n\nAdded many tests to improve code coverage. (#294, #298)\nNew tests and documentation now available for validations involving datetime + timezone comparisons. (#289)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.13.4…v0.14.0"
   },
   {
-    "objectID": "changelog.html#new-features-11",
-    "href": "changelog.html#new-features-11",
+    "objectID": "changelog.html#new-features-12",
+    "href": "changelog.html#new-features-12",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdd Enum support to col_vals_in_set() and col_vals_not_in_set(). (#280)\nThe col_vals_regex() validation method now has the inverse= parameter to enable negative regex matching. (#282)"
@@ -4568,8 +4568,8 @@
     "text": "Fixes\n\nThe usage of pre= is now better isolated to the steps using it. (#283)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.13.3…v0.13.4"
   },
   {
-    "objectID": "changelog.html#new-features-12",
-    "href": "changelog.html#new-features-12",
+    "objectID": "changelog.html#new-features-13",
+    "href": "changelog.html#new-features-13",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the namespaces= parameter to yaml_interrogate() to facilitate authoring of custom actions. (@mark-druffel, #277)"
@@ -4589,8 +4589,8 @@
     "text": "New Contributors\n\n@mark-druffel made their first contribution in https://github.com/posit-dev/pointblank/pull/277\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.13.2…v0.13.3"
   },
   {
-    "objectID": "changelog.html#new-features-13",
-    "href": "changelog.html#new-features-13",
+    "objectID": "changelog.html#new-features-14",
+    "href": "changelog.html#new-features-14",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nString-based comparisons are now possible in the col_vals_eq() and col_vals_ne() validation methods. (#272)"
@@ -4617,8 +4617,8 @@
     "text": "Fixes\n\nSeveral MCP server issues have been fixed. (#265)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.13.0…v0.13.1"
   },
   {
-    "objectID": "changelog.html#new-features-14",
-    "href": "changelog.html#new-features-14",
+    "objectID": "changelog.html#new-features-15",
+    "href": "changelog.html#new-features-15",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nIncorporated a Model Context Protocol (MCP) server implementation. (#239, #264, @pipaber)"
@@ -4645,22 +4645,22 @@
     "text": "New Contributors\n\n@pipaber made their first contribution in https://github.com/posit-dev/pointblank/pull/239\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.12.2…v0.13.0"
   },
   {
-    "objectID": "changelog.html#new-features-15",
-    "href": "changelog.html#new-features-15",
+    "objectID": "changelog.html#new-features-16",
+    "href": "changelog.html#new-features-16",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the set_tbl() method and also the set_tbl= parameter to yaml_interrogate(). (#260)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.12.1…v0.12.2"
   },
   {
-    "objectID": "changelog.html#new-features-16",
-    "href": "changelog.html#new-features-16",
+    "objectID": "changelog.html#new-features-17",
+    "href": "changelog.html#new-features-17",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nPointblank now internally handles all Ibis tables using Narwhals. (#257)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.12.0…v0.12.1"
   },
   {
-    "objectID": "changelog.html#new-features-17",
-    "href": "changelog.html#new-features-17",
+    "objectID": "changelog.html#new-features-18",
+    "href": "changelog.html#new-features-18",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nThe segmentation feature was expanded by way of the new seg_group() helper function. (#243)\nYou can now validate Spark DataFrames without using Ibis (we now internally process those using Narwhals). (#256)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.6…v0.12.0"
@@ -4687,15 +4687,15 @@
     "text": "New Contributors\n\n@MarcoGorelli made their first contribution in https://github.com/posit-dev/pointblank/pull/251\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.5…v0.11.6"
   },
   {
-    "objectID": "changelog.html#new-features-18",
-    "href": "changelog.html#new-features-18",
+    "objectID": "changelog.html#new-features-19",
+    "href": "changelog.html#new-features-19",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nIt’s now possible to define YAML configuration files for validation workflows and run the YAML validations through yaml_interrogate() or in the Pointblank CLI via pb run (#247, #248)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.3…v0.11.4"
   },
   {
-    "objectID": "changelog.html#new-features-19",
-    "href": "changelog.html#new-features-19",
+    "objectID": "changelog.html#new-features-20",
+    "href": "changelog.html#new-features-20",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nThe CLI has the new pb pl command, allowing you to run Polars at the command line. (#246)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.2…v0.11.3"
@@ -4708,15 +4708,15 @@
     "text": "Fixes\n\nThe display of the CLI’s pb run output is much improved and more closely follows the tabular HTML output of the Python API. (#240)\nFor the CLI’s pb validate and pb run commands, the extract limit is now correctly applied to written CSVs (while displayed extracts will always have a limit of 10). (#242)"
   },
   {
-    "objectID": "changelog.html#documentation",
-    "href": "changelog.html#documentation",
+    "objectID": "changelog.html#documentation-1",
+    "href": "changelog.html#documentation-1",
     "title": "Changelog",
     "section": "Documentation",
     "text": "Documentation\n\nImproved the CLI articles in the User Guide. (#236)\nUpdated the CLI demonstration gif for the project website. (#241)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.1…v0.11.2"
   },
   {
-    "objectID": "changelog.html#new-features-20",
-    "href": "changelog.html#new-features-20",
+    "objectID": "changelog.html#new-features-21",
+    "href": "changelog.html#new-features-21",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nHave consistent input ingestion for all classes/functions with a data= parameter. (#223)\nEnable data to be obtained via GitHub URLs. (#224)\nAllow CLI’s pb validate to perform multiple validations. (#231)\nFor CLI’s pb validate allow --column to use column index. (#233)"
@@ -4729,22 +4729,22 @@
     "text": "Fixes\n\nUse _process_data() to centralize data ingest functionality. (#225, #226)\nImprove display of tables in CLI. (#227)\nSimplify use of extracts in CLI. (#228)\nRework pb validate to primarily be a validation script runner. (#229)\nMake CLI table styling consistent across all commands. (#234)\nImprove messages with pb validate &lt;data&gt; default and add --list-checks option. (#230)"
   },
   {
-    "objectID": "changelog.html#documentation-1",
-    "href": "changelog.html#documentation-1",
+    "objectID": "changelog.html#documentation-2",
+    "href": "changelog.html#documentation-2",
     "title": "Changelog",
     "section": "Documentation",
     "text": "Documentation\n\nUpdate VHS-based terminal recordings. (#232)\nCreate two new CLI utility articles. (#235)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.11.0…v0.11.1"
   },
   {
-    "objectID": "changelog.html#new-features-21",
-    "href": "changelog.html#new-features-21",
+    "objectID": "changelog.html#new-features-22",
+    "href": "changelog.html#new-features-22",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nThe pb CLI utility has been added to enable: (1) quick data quality checks, (2) exploration of data at the command line, and (3) easy integration with shell scripts and automation workflows. (#221)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.10.0…v0.11.0"
   },
   {
-    "objectID": "changelog.html#new-features-22",
-    "href": "changelog.html#new-features-22",
+    "objectID": "changelog.html#new-features-23",
+    "href": "changelog.html#new-features-23",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nIt’s now possible to validate Polars LazyFrames. (#200)\nPaths to CSV and Parquet files can now be used as inputs for Validate and preview(). (#213, #214, #217)\nThe get_data_path() function was added so that paths to internal CSV and Parquet example datasets can be accessed. (#215)\nData connection strings can be used directly with Validate to connect to DB tables via Ibis. (#216)"
@@ -4757,8 +4757,8 @@
     "text": "Fixes\n\nThe DataScan class was refactored to expose data and statistics consistently. (@tylerriccio33, #94)\nPass/fail result counting during interrogation is now more computationally efficient. (#203)\nValidation steps using col_vals_expr() can now correctly return data extracts (and produce a CSV button in the validation report table). (@zilto, #197)\nA dependency on Pandas during the rendering validation report tables was eliminated. (#220)\nAn unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. (@matt-humphrey, #218)"
   },
   {
-    "objectID": "changelog.html#documentation-2",
-    "href": "changelog.html#documentation-2",
+    "objectID": "changelog.html#documentation-3",
+    "href": "changelog.html#documentation-3",
     "title": "Changelog",
     "section": "Documentation",
     "text": "Documentation\n\nThe project website’s API reference underwent several layout and typesetting changes for the better. (#204, #205, #208, #209)\nTerminology throughout the documentation was improved so that users can better distinguish column- and row-based validation methods. (#199)\nA few more Pointblank demos were added to the project website’s Examples page. (#210)\nSeveral posts were added to the Pointblog. (#177, #202)\nImproved the interlinking in the User Guide thanks to new functionality in quartodoc. (#191, #212)"
@@ -4799,50 +4799,50 @@
     "text": "What’s Changed\n\nAdded the specially() validation method, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/172\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.9.1…v0.9.2"
   },
   {
-    "objectID": "changelog.html#new-features-23",
-    "href": "changelog.html#new-features-23",
-    "title": "Changelog",
-    "section": "New Features",
-    "text": "New Features\n\nAdded the rows_complete() validation method, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/171\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.9.0…v0.9.1"
-  },
-  {
     "objectID": "changelog.html#new-features-24",
     "href": "changelog.html#new-features-24",
     "title": "Changelog",
     "section": "New Features",
-    "text": "New Features\n\nThere’s now support for data segmentation within a wide variety of validation methods (with the new segments= argument), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/170\nImplemented parallelization of tests to decrease the overall duration of tests, by @tylerriccio33 in https://github.com/posit-dev/pointblank/pull/165\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.7…v0.9.0"
+    "text": "New Features\n\nAdded the rows_complete() validation method, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/171\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.9.0…v0.9.1"
   },
   {
     "objectID": "changelog.html#new-features-25",
     "href": "changelog.html#new-features-25",
     "title": "Changelog",
     "section": "New Features",
-    "text": "New Features\n\nAllow None in col_vals_in_set() by @tylerriccio33, https://github.com/posit-dev/pointblank/pull/162\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.6…v0.8.7"
+    "text": "New Features\n\nThere’s now support for data segmentation within a wide variety of validation methods (with the new segments= argument), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/170\nImplemented parallelization of tests to decrease the overall duration of tests, by @tylerriccio33 in https://github.com/posit-dev/pointblank/pull/165\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.7…v0.9.0"
   },
   {
     "objectID": "changelog.html#new-features-26",
     "href": "changelog.html#new-features-26",
     "title": "Changelog",
     "section": "New Features",
-    "text": "New Features\n\nAdded the conjointly() validation method, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.5…v0.8.6"
+    "text": "New Features\n\nAllow None in col_vals_in_set() by @tylerriccio33, https://github.com/posit-dev/pointblank/pull/162\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.6…v0.8.7"
   },
   {
     "objectID": "changelog.html#new-features-27",
     "href": "changelog.html#new-features-27",
     "title": "Changelog",
     "section": "New Features",
-    "text": "New Features\n\nAdded step report functionality for rows_distinct() validation steps, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/157\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.4…v0.8.5"
+    "text": "New Features\n\nAdded the conjointly() validation method, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.5…v0.8.6"
   },
   {
     "objectID": "changelog.html#new-features-28",
     "href": "changelog.html#new-features-28",
     "title": "Changelog",
     "section": "New Features",
-    "text": "New Features\n\nAll step reports are now translated according to the Validate(lang=) value, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/155\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.3…v0.8.4"
+    "text": "New Features\n\nAdded step report functionality for rows_distinct() validation steps, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/157\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.4…v0.8.5"
   },
   {
     "objectID": "changelog.html#new-features-29",
     "href": "changelog.html#new-features-29",
+    "title": "Changelog",
+    "section": "New Features",
+    "text": "New Features\n\nAll step reports are now translated according to the Validate(lang=) value, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/155\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.3…v0.8.4"
+  },
+  {
+    "objectID": "changelog.html#new-features-30",
+    "href": "changelog.html#new-features-30",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.2…v0.8.3"
@@ -4862,8 +4862,8 @@
     "text": "New Features and Fixes\n\nAdded the ability to define final actions for validation (post interrogation), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/146\nRefined translations for the zh-Hant lang, by @jrycw in https://github.com/posit-dev/pointblank/pull/143\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.8.0…v0.8.1"
   },
   {
-    "objectID": "changelog.html#new-features-30",
-    "href": "changelog.html#new-features-30",
+    "objectID": "changelog.html#new-features-31",
+    "href": "changelog.html#new-features-31",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded highest_level= and default= parameters to the Actions class, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)\nThe brief= text now appears in the validation report table, plus we enabled more templating features for brief=, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/127\nAdd the global setting option for brief= in Validate, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/128\nWe now allow for flexible validations using dates or datetimes, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/134, https://github.com/posit-dev/pointblank/pull/135, https://github.com/posit-dev/pointblank/pull/136)\nThe lang= value in Validate now translates the validation report table to lang=’s spoken language, and several more language translations were added, by @rich-iannone (https://github.com/posit-dev/pointblank/pull/131, https://github.com/posit-dev/pointblank/pull/138, https://github.com/posit-dev/pointblank/pull/139)\nWe can now better customize the header in step reports through .get_step_report(header=...), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/142"
@@ -4876,8 +4876,8 @@
     "text": "Fixes and Documentation\n\nThere’s now a configurable limit (with set default) on extract rows (no matter which scheme was used for their collection), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/130\nRenamed internal references to threshold levels, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/140\nEnhanced the docs for Validate and the validation methods, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/137\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.7.3…v0.8.0"
   },
   {
-    "objectID": "changelog.html#new-features-31",
-    "href": "changelog.html#new-features-31",
+    "objectID": "changelog.html#new-features-32",
+    "href": "changelog.html#new-features-32",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the limit= parameter to get_step_report(), by @rich-iannone in https://github.com/posit-dev/pointblank/pull/115\nThe new min_tbl_width= arg in preview() can improve the display of narrow preview tables by default, and, allows for customization, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/117\nAdded the get_action_metadata() function to help users make more powerful Actions callables, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/118\nWe now include failure text in the _ValidationInfo object after interrogation, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/119\nBasic customization of the header in get_step_report() is now possible, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/120\nAdded the ability to select a subset of columns in row-based step reports, by @rich-iannone in https://github.com/posit-dev/pointblank/pull/123\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.7.2…v0.7.3"
@@ -4946,8 +4946,8 @@
     "text": "Breaking Changes\n\nthresholds level names have been renamed to better align with standard log levels by @rich-iannone in https://github.com/posit-dev/pointblank/pull/69"
   },
   {
-    "objectID": "changelog.html#new-features-32",
-    "href": "changelog.html#new-features-32",
+    "objectID": "changelog.html#new-features-33",
+    "href": "changelog.html#new-features-33",
     "title": "Changelog",
     "section": "New Features",
     "text": "New Features\n\nAdded the ability to execute actions when exceeding threshold levels by @rich-iannone in https://github.com/posit-dev/pointblank/pull/66\nAdded AWS Bedrock support to DraftValidation by @kmasiello in https://github.com/posit-dev/pointblank/pull/67"
@@ -4965,27 +4965,6 @@
     "title": "Changelog",
     "section": "New Contributors",
     "text": "New Contributors\n\n@kmasiello made their first contribution in https://github.com/posit-dev/pointblank/pull/67\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.6.0…v0.6.1"
-  },
-  {
-    "objectID": "changelog.html#features-1",
-    "href": "changelog.html#features-1",
-    "title": "Changelog",
-    "section": "Features",
-    "text": "Features\n\nAdded the experimental DraftValidation class for drafting a validation plan based on a provided dataset by @rich-iannone (https://github.com/posit-dev/pointblank/pull/60, https://github.com/posit-dev/pointblank/pull/50)\nAdded the experimental DataScan class, which creates a succinct summary of any supported table by @rich-iannone in https://github.com/posit-dev/pointblank/pull/59\nAdded the missing_vals_tbl() function for providing an HTML summary of missing values in any supported table by @rich-iannone in https://github.com/posit-dev/pointblank/pull/53\nAdded the assert_passing() method for Validate as a convenience for test suites by @tylerriccio33 in https://github.com/posit-dev/pointblank/pull/64\nThe nycflights dataset is now available in load_dataset() by @rich-iannone in https://github.com/posit-dev/pointblank/pull/54"
-  },
-  {
-    "objectID": "changelog.html#fixes-and-documentation-1",
-    "href": "changelog.html#fixes-and-documentation-1",
-    "title": "Changelog",
-    "section": "Fixes and Documentation",
-    "text": "Fixes and Documentation\n\nInteger and decimal values are now better formatted in HTML displays by @rich-iannone in https://github.com/posit-dev/pointblank/pull/55\nFixed usage of the Ibis head() method call (changed in recent versions of Ibis) by @rich-iannone in https://github.com/posit-dev/pointblank/pull/52\nRevised appearance of step reports for validations based on checks of column values by @rich-iannone in https://github.com/posit-dev/pointblank/pull/49\nImproved the documentation of the Schema class by @rich-iannone in https://github.com/posit-dev/pointblank/pull/61\nAdded interlinks throughout the Reference API pages by @rich-iannone in https://github.com/posit-dev/pointblank/pull/65\nFixed a typo in the README.md file by @gregorywaynepower in https://github.com/posit-dev/pointblank/pull/56"
-  },
-  {
-    "objectID": "changelog.html#new-contributors-11",
-    "href": "changelog.html#new-contributors-11",
-    "title": "Changelog",
-    "section": "New Contributors",
-    "text": "New Contributors\n\n@gregorywaynepower made their first contribution in https://github.com/posit-dev/pointblank/pull/56\n@tylerriccio33 made their first contribution in https://github.com/posit-dev/pointblank/pull/64\n\nFull Changelog: https://github.com/posit-dev/pointblank/compare/v0.5.0…v0.6.0"
   },
   {
     "objectID": "code-of-conduct.html",
@@ -5216,7 +5195,7 @@
     "href": "package-info.html",
     "title": "Package Info",
     "section": "",
-    "text": "Package\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\ncommonmark\n&gt;=0.9.1\n2026-05-28\n\n\n\nimportlib-metadata\n—\n2026-03-20\n\n\n\ngreat_tables\n&gt;=0.22.0\n2026-06-12\n\n\n\nnarwhals\n&gt;=2.0.1\n2026-07-13\n\n\n\ntyping_extensions\n&gt;=3.10.0.0\n2026-07-02\n\n\n\nrequests\n&gt;=2.31.0\n2026-05-14\n\n\n\nclick\n&gt;=8.0.0\n2026-06-24\n\n\n\nrich\n&gt;=13.0.0\n2026-04-12\n\n\n\npyyaml\n&gt;=6.0.0\n2025-09-25"
+    "text": "Package\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\ncommonmark\n&gt;=0.9.1\n2026-05-28\n\n\n\nimportlib-metadata\n—\n2026-03-20\n\n\n\ngreat_tables\n&gt;=0.22.0\n2026-07-27\n\n\n\nnarwhals\n&gt;=2.0.1\n2026-07-13\n\n\n\ntyping_extensions\n&gt;=3.10.0.0\n2026-07-02\n\n\n\nrequests\n&gt;=2.31.0\n2026-05-14\n\n\n\nclick\n&gt;=8.0.0\n2026-06-24\n\n\n\nrich\n&gt;=13.0.0\n2026-04-12\n\n\n\npyyaml\n&gt;=6.0.0\n2025-09-25"
   },
   {
     "objectID": "package-info.html#bigquery",
@@ -5272,14 +5251,14 @@
     "href": "package-info.html#generate",
     "title": "Package Info",
     "section": "generate",
-    "text": "generate\n\n\n\nPackage\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\nchatlas\n&gt;=0.3.0\n2026-07-08\n\n\n\nanthropic\n&gt;=0.45.2\n2026-07-24\n\n\n\nopenai\n&gt;=1.63.0\n2026-07-27\n\n\n\nhttpx\n&gt;=0.28.0\n2024-12-06\n\n\n\nshiny\n&gt;=1.3.0\n2026-06-01"
+    "text": "generate\n\n\n\nPackage\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\nchatlas\n&gt;=0.3.0\n2026-07-08\n\n\n\nanthropic\n&gt;=0.45.2\n2026-07-28\n\n\n\nopenai\n&gt;=1.63.0\n2026-07-27\n\n\n\nhttpx\n&gt;=0.28.0\n2024-12-06\n\n\n\nshiny\n&gt;=1.3.0\n2026-06-01"
   },
   {
     "objectID": "package-info.html#mcp",
     "href": "package-info.html#mcp",
     "title": "Package Info",
     "section": "mcp",
-    "text": "mcp\n\n\n\nPackage\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\nmcp\n&gt;=1.10.1\n2026-06-26\n\n\n\nfastmcp\n&gt;=2.11.3\n2026-07-27\n\n\n\npytest-asyncio\n&gt;=1.0.0\n2026-05-26"
+    "text": "mcp\n\n\n\nPackage\nVersion Constraint\nLast Published\nPyPI\n\n\n\n\nmcp\n&gt;=1.10.1\n2026-07-28\n\n\n\nfastmcp\n&gt;=2.11.3\n2026-07-27\n\n\n\npytest-asyncio\n&gt;=1.0.0\n2026-05-26"
   },
   {
     "objectID": "package-info.html#mssql",
@@ -6717,7 +6696,7 @@
     "href": "reference/Validate.html#creating-a-validation-plan-and-interrogating",
     "title": "Validate",
     "section": "Creating a validation plan and interrogating",
-    "text": "Creating a validation plan and interrogating\nLet’s walk through a data quality analysis of an extremely small table. It’s actually called \"small_table\" and it’s accessible through the load_dataset() function.\n\nimport pointblank as pb\n\n# Load the `small_table` dataset\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\n# Preview the table\npb.preview(small_table)\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    PolarsRows13Columns8\n  \n\n  \n  date_timeDatetime\n  dateDate\n  aInt64\n  bString\n  cInt64\n  dFloat64\n  eBoolean\n  fString\n\n\n\n  \n    1\n    2016-01-04 11:00:00\n    2016-01-04\n    2\n    1-bcd-345\n    3\n    3423.29\n    True\n    high\n  \n  \n    2\n    2016-01-04 00:32:00\n    2016-01-04\n    3\n    5-egh-163\n    8\n    9999.99\n    True\n    low\n  \n  \n    3\n    2016-01-05 13:32:00\n    2016-01-05\n    6\n    8-kdg-938\n    3\n    2343.23\n    True\n    high\n  \n  \n    4\n    2016-01-06 17:23:00\n    2016-01-06\n    2\n    5-jdo-903\n    None\n    3892.4\n    False\n    mid\n  \n  \n    5\n    2016-01-09 12:36:00\n    2016-01-09\n    8\n    3-ldm-038\n    7\n    283.94\n    True\n    low\n  \n  \n    9\n    2016-01-20 04:30:00\n    2016-01-20\n    3\n    5-bce-642\n    9\n    837.93\n    False\n    high\n  \n  \n    10\n    2016-01-20 04:30:00\n    2016-01-20\n    3\n    5-bce-642\n    9\n    837.93\n    False\n    high\n  \n  \n    11\n    2016-01-26 20:07:00\n    2016-01-26\n    4\n    2-dmx-010\n    7\n    833.98\n    True\n    low\n  \n  \n    12\n    2016-01-28 02:51:00\n    2016-01-28\n    2\n    7-dmx-010\n    8\n    108.34\n    False\n    low\n  \n  \n    13\n    2016-01-30 11:23:00\n    2016-01-30\n    1\n    3-dka-303\n    None\n    2230.09\n    True\n    high\n  \n\n\n\n\n\n\n\nWe ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the ‘warning’, ‘error’, and ‘critical’ states. This can be done by using the Thresholds class.\n\nthresholds = pb.Thresholds(warning=0.10, error=0.25, critical=0.35)\n\nNow, we use the Validate class and give it the thresholds object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in thresholds= will make the reporting a bit more useful. We also need to provide a target table and we’ll use small_table for this.\n\nvalidation = (\n    pb.Validate(\n        data=small_table,\n        tbl_name=\"small_table\",\n        label=\"`Validate` example.\",\n        thresholds=thresholds\n    )\n)\n\nThen, as with any Validate object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the interrogate() method.\n\nvalidation = (\n    validation\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_le(columns=\"c\", value=5)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(columns=\"b\", pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\")\n    .col_exists(columns=[\"date\", \"date_time\"])\n    .interrogate()\n)\n\nThe validation object can be printed as a reporting table.\n\nvalidation\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    `Validate` example.Polarssmall_tableWARNING0.1ERROR0.25CRITICAL0.35\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #FF3300\n    2\n    \n        \n            \n\n    col_vals_le\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_le()\n        \n        \n        \n    c\n    5\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    50.38\n    80.62\n    ●\n    ●\n    ●\n    CSV\n  \n  \n    #4CA64C66\n    3\n    \n        \n            \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_between()\n        \n        \n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        \n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    5\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    date\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    6\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    date_time\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n2026-07-27 23:17:58 UTC&lt; 1 s2026-07-27 23:17:58 UTC\n\n\n\n\n\nThe report could be further customized by using the get_tabular_report() method, which contains options for modifying the display of the table.",
+    "text": "Creating a validation plan and interrogating\nLet’s walk through a data quality analysis of an extremely small table. It’s actually called \"small_table\" and it’s accessible through the load_dataset() function.\n\nimport pointblank as pb\n\n# Load the `small_table` dataset\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\n# Preview the table\npb.preview(small_table)\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    PolarsRows13Columns8\n  \n\n  \n  date_timeDatetime\n  dateDate\n  aInt64\n  bString\n  cInt64\n  dFloat64\n  eBoolean\n  fString\n\n\n\n  \n    1\n    2016-01-04 11:00:00\n    2016-01-04\n    2\n    1-bcd-345\n    3\n    3423.29\n    True\n    high\n  \n  \n    2\n    2016-01-04 00:32:00\n    2016-01-04\n    3\n    5-egh-163\n    8\n    9999.99\n    True\n    low\n  \n  \n    3\n    2016-01-05 13:32:00\n    2016-01-05\n    6\n    8-kdg-938\n    3\n    2343.23\n    True\n    high\n  \n  \n    4\n    2016-01-06 17:23:00\n    2016-01-06\n    2\n    5-jdo-903\n    None\n    3892.4\n    False\n    mid\n  \n  \n    5\n    2016-01-09 12:36:00\n    2016-01-09\n    8\n    3-ldm-038\n    7\n    283.94\n    True\n    low\n  \n  \n    9\n    2016-01-20 04:30:00\n    2016-01-20\n    3\n    5-bce-642\n    9\n    837.93\n    False\n    high\n  \n  \n    10\n    2016-01-20 04:30:00\n    2016-01-20\n    3\n    5-bce-642\n    9\n    837.93\n    False\n    high\n  \n  \n    11\n    2016-01-26 20:07:00\n    2016-01-26\n    4\n    2-dmx-010\n    7\n    833.98\n    True\n    low\n  \n  \n    12\n    2016-01-28 02:51:00\n    2016-01-28\n    2\n    7-dmx-010\n    8\n    108.34\n    False\n    low\n  \n  \n    13\n    2016-01-30 11:23:00\n    2016-01-30\n    1\n    3-dka-303\n    None\n    2230.09\n    True\n    high\n  \n\n\n\n\n\n\n\nWe ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the ‘warning’, ‘error’, and ‘critical’ states. This can be done by using the Thresholds class.\n\nthresholds = pb.Thresholds(warning=0.10, error=0.25, critical=0.35)\n\nNow, we use the Validate class and give it the thresholds object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in thresholds= will make the reporting a bit more useful. We also need to provide a target table and we’ll use small_table for this.\n\nvalidation = (\n    pb.Validate(\n        data=small_table,\n        tbl_name=\"small_table\",\n        label=\"`Validate` example.\",\n        thresholds=thresholds\n    )\n)\n\nThen, as with any Validate object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the interrogate() method.\n\nvalidation = (\n    validation\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_le(columns=\"c\", value=5)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(columns=\"b\", pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\")\n    .col_exists(columns=[\"date\", \"date_time\"])\n    .interrogate()\n)\n\nThe validation object can be printed as a reporting table.\n\nvalidation\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    `Validate` example.Polarssmall_tableWARNING0.1ERROR0.25CRITICAL0.35\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #FF3300\n    2\n    \n        \n            \n\n    col_vals_le\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_le()\n        \n        \n        \n    c\n    5\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    50.38\n    80.62\n    ●\n    ●\n    ●\n    CSV\n  \n  \n    #4CA64C66\n    3\n    \n        \n            \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_between()\n        \n        \n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        \n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    5\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    date\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    6\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    date_time\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n2026-07-28 17:02:42 UTC&lt; 1 s2026-07-28 17:02:42 UTC\n\n\n\n\n\nThe report could be further customized by using the get_tabular_report() method, which contains options for modifying the display of the table.",
     "crumbs": [
       "API Reference",
       "Validate",
@@ -6729,7 +6708,7 @@
     "href": "reference/Validate.html#adding-briefs",
     "title": "Validate",
     "section": "Adding briefs",
-    "text": "Adding briefs\nBriefs are short descriptions of the validation steps. While they can be set for each step individually, they can also be set globally. The global setting is done by using the brief= argument in Validate. The global setting can be as simple as True to have automatically-generated briefs for each step. Alternatively, we can use templating elements like \"{step}\" (to insert the step number) or \"{auto}\" (to include an automatically generated brief). Here’s an example of a global setting for briefs:\n\nvalidation_2 = (\n    pb.Validate(\n        data=pb.load_dataset(),\n        tbl_name=\"small_table\",\n        label=\"Validation example with briefs\",\n        brief=\"Step {step}: {auto}\",\n    )\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(\n        columns=\"b\",\n        pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\",\n        brief=\"Regex check for column {col}\"\n    )\n    .interrogate()\n)\n\nvalidation_2\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    Validation example with briefsPolarssmall_table\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        Step 1: Expect that values in d should be &gt; 100.\n\n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    2\n    \n        \n            \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_between()\n        \n        Step 2: Expect that values in c should be between 3 and 10.\n\n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        Regex check for column b\n\n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-27 23:17:58 UTC&lt; 1 s2026-07-27 23:17:58 UTC\n\n\n\n\n\nWe see the text of the briefs appear in the STEP column of the reporting table. Furthermore, the global brief’s template (\"Step {step}: {auto}\") is applied to all steps except for the final step, where the step-level brief= argument provided an override.\nIf you should want to cancel the globally-defined brief for one or more validation steps, you can set brief=False in those particular steps.",
+    "text": "Adding briefs\nBriefs are short descriptions of the validation steps. While they can be set for each step individually, they can also be set globally. The global setting is done by using the brief= argument in Validate. The global setting can be as simple as True to have automatically-generated briefs for each step. Alternatively, we can use templating elements like \"{step}\" (to insert the step number) or \"{auto}\" (to include an automatically generated brief). Here’s an example of a global setting for briefs:\n\nvalidation_2 = (\n    pb.Validate(\n        data=pb.load_dataset(),\n        tbl_name=\"small_table\",\n        label=\"Validation example with briefs\",\n        brief=\"Step {step}: {auto}\",\n    )\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(\n        columns=\"b\",\n        pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\",\n        brief=\"Regex check for column {col}\"\n    )\n    .interrogate()\n)\n\nvalidation_2\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    Validation example with briefsPolarssmall_table\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        Step 1: Expect that values in d should be &gt; 100.\n\n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    2\n    \n        \n            \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_between()\n        \n        Step 2: Expect that values in c should be between 3 and 10.\n\n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        Regex check for column b\n\n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-28 17:02:42 UTC&lt; 1 s2026-07-28 17:02:42 UTC\n\n\n\n\n\nWe see the text of the briefs appear in the STEP column of the reporting table. Furthermore, the global brief’s template (\"Step {step}: {auto}\") is applied to all steps except for the final step, where the step-level brief= argument provided an override.\nIf you should want to cancel the globally-defined brief for one or more validation steps, you can set brief=False in those particular steps.",
     "crumbs": [
       "API Reference",
       "Validate",
@@ -6753,7 +6732,7 @@
     "href": "reference/Validate.html#working-with-csv-files",
     "title": "Validate",
     "section": "Working with CSV Files",
-    "text": "Working with CSV Files\nThe Validate class can directly accept CSV file paths, making it easy to validate data stored in CSV files without manual loading:\n\n# Get a path to a CSV file from the package data\ncsv_path = pb.get_data_path(\"global_sales\", \"csv\")\n\nvalidation_3 = (\n    pb.Validate(\n        data=csv_path,\n        label=\"CSV validation example\"\n    )\n    .col_exists([\"customer_id\", \"product_id\", \"revenue\"])\n    .col_vals_not_null([\"customer_id\", \"product_id\"])\n    .col_vals_gt(columns=\"revenue\", value=0)\n    .interrogate()\n)\n\nvalidation_3\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    CSV validation examplePolars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    customer_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    product_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    revenue\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    4\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    customer_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    49.7K0.99\n    3340.01\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C66\n    5\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    product_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    49.7K0.99\n    3350.01\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    6\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    50.0K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-27 23:17:59 UTC&lt; 1 s2026-07-27 23:17:59 UTC\n\n\n\n\n\nYou can also use a Path object to specify the CSV file. Here’s an example of how to do that:\n\nfrom pathlib import Path\n\ncsv_file = Path(pb.get_data_path(\"game_revenue\", \"csv\"))\n\nvalidation_4 = (\n    pb.Validate(data=csv_file, label=\"Game Revenue Validation\")\n    .col_exists([\"player_id\", \"session_id\", \"item_name\"])\n    .col_vals_regex(\n        columns=\"session_id\",\n        pattern=r\"[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\"\n    )\n    .col_vals_gt(columns=\"item_revenue\", value=0, na_pass=True)\n    .interrogate()\n)\n\nvalidation_4\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    Game Revenue ValidationPolars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    player_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    session_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    item_name\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    4\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        \n        \n    session_id\n    [A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    00.00\n    20001.00\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    5\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    item_revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    20001.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-27 23:17:59 UTC&lt; 1 s2026-07-27 23:17:59 UTC\n\n\n\n\n\nThe CSV loading is automatic, so when a string or Path with a .csv extension is provided, Pointblank will automatically load the file using the best available DataFrame library (Polars preferred, Pandas as fallback). The loaded data can then be used with all validation methods just like any other supported table type.",
+    "text": "Working with CSV Files\nThe Validate class can directly accept CSV file paths, making it easy to validate data stored in CSV files without manual loading:\n\n# Get a path to a CSV file from the package data\ncsv_path = pb.get_data_path(\"global_sales\", \"csv\")\n\nvalidation_3 = (\n    pb.Validate(\n        data=csv_path,\n        label=\"CSV validation example\"\n    )\n    .col_exists([\"customer_id\", \"product_id\", \"revenue\"])\n    .col_vals_not_null([\"customer_id\", \"product_id\"])\n    .col_vals_gt(columns=\"revenue\", value=0)\n    .interrogate()\n)\n\nvalidation_3\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    CSV validation examplePolars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    customer_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    product_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    revenue\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    4\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    customer_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    49.7K0.99\n    3340.01\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C66\n    5\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    product_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    49.7K0.99\n    3350.01\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    6\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    50.0K\n    50.0K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-28 17:02:42 UTC&lt; 1 s2026-07-28 17:02:42 UTC\n\n\n\n\n\nYou can also use a Path object to specify the CSV file. Here’s an example of how to do that:\n\nfrom pathlib import Path\n\ncsv_file = Path(pb.get_data_path(\"game_revenue\", \"csv\"))\n\nvalidation_4 = (\n    pb.Validate(data=csv_file, label=\"Game Revenue Validation\")\n    .col_exists([\"player_id\", \"session_id\", \"item_name\"])\n    .col_vals_regex(\n        columns=\"session_id\",\n        pattern=r\"[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\"\n    )\n    .col_vals_gt(columns=\"item_revenue\", value=0, na_pass=True)\n    .interrogate()\n)\n\nvalidation_4\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    Game Revenue ValidationPolars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    player_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    session_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    item_name\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    4\n    \n        \n            \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n        \n            col_vals_regex()\n        \n        \n        \n    session_id\n    [A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    00.00\n    20001.00\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    5\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    item_revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    20001.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-28 17:02:43 UTC&lt; 1 s2026-07-28 17:02:43 UTC\n\n\n\n\n\nThe CSV loading is automatic, so when a string or Path with a .csv extension is provided, Pointblank will automatically load the file using the best available DataFrame library (Polars preferred, Pandas as fallback). The loaded data can then be used with all validation methods just like any other supported table type.",
     "crumbs": [
       "API Reference",
       "Validate",
@@ -6765,7 +6744,7 @@
     "href": "reference/Validate.html#working-with-parquet-files",
     "title": "Validate",
     "section": "Working with Parquet Files",
-    "text": "Working with Parquet Files\nThe Validate class can directly accept Parquet files and datasets in various formats. The following examples illustrate how to validate Parquet files:\n\n# Single Parquet file from package data\nparquet_path = pb.get_data_path(\"nycflights\", \"parquet\")\n\nvalidation_5 = (\n    pb.Validate(\n        data=parquet_path,\n        tbl_name=\"NYC Flights Data\"\n    )\n    .col_vals_not_null([\"carrier\", \"origin\", \"dest\"])\n    .col_vals_gt(columns=\"distance\", value=0)\n    .interrogate()\n)\n\nvalidation_5\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2026-07-27|23:18:00PolarsNYC Flights Data\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    carrier\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    origin\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    dest\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    distance\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-27 23:18:00 UTC&lt; 1 s2026-07-27 23:18:00 UTC\n\n\n\n\n\nYou can also use glob patterns and directories. Here are some examples for how to:\n\nload multiple Parquet files\nload a Parquet-containing directory\nload a partitioned Parquet dataset\n\n# Multiple Parquet files with glob patterns\nvalidation_6 = pb.Validate(data=\"data/sales_*.parquet\")\n\n# Directory containing Parquet files\nvalidation_7 = pb.Validate(data=\"parquet_data/\")\n\n# Partitioned Parquet dataset\nvalidation_8 = (\n    pb.Validate(data=\"sales_data/\")  # Contains year=2023/quarter=Q1/region=US/sales.parquet\n    .col_exists([\"transaction_id\", \"amount\", \"year\", \"quarter\", \"region\"])\n    .interrogate()\n)\nWhen you point to a directory that contains a partitioned Parquet dataset (with subdirectories like year=2023/quarter=Q1/region=US/), Pointblank will automatically:\n\ndiscover all Parquet files recursively\nextract partition column values from directory paths\nadd partition columns to the final DataFrame\ncombine all partitions into a single table for validation\n\nBoth Polars and Pandas handle partitioned datasets natively, so this works seamlessly with either DataFrame library. The loading preference is Polars first, then Pandas as a fallback.",
+    "text": "Working with Parquet Files\nThe Validate class can directly accept Parquet files and datasets in various formats. The following examples illustrate how to validate Parquet files:\n\n# Single Parquet file from package data\nparquet_path = pb.get_data_path(\"nycflights\", \"parquet\")\n\nvalidation_5 = (\n    pb.Validate(\n        data=parquet_path,\n        tbl_name=\"NYC Flights Data\"\n    )\n    .col_vals_not_null([\"carrier\", \"origin\", \"dest\"])\n    .col_vals_gt(columns=\"distance\", value=0)\n    .interrogate()\n)\n\nvalidation_5\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2026-07-28|17:02:43PolarsNYC Flights Data\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    carrier\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    origin\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_vals_not_null\n    \n        \n            \n            \n            \n            \n        \n    \n\n        \n        \n            col_vals_not_null()\n        \n        \n        \n    dest\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    distance\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    337K\n    337K1.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-28 17:02:43 UTC&lt; 1 s2026-07-28 17:02:43 UTC\n\n\n\n\n\nYou can also use glob patterns and directories. Here are some examples for how to:\n\nload multiple Parquet files\nload a Parquet-containing directory\nload a partitioned Parquet dataset\n\n# Multiple Parquet files with glob patterns\nvalidation_6 = pb.Validate(data=\"data/sales_*.parquet\")\n\n# Directory containing Parquet files\nvalidation_7 = pb.Validate(data=\"parquet_data/\")\n\n# Partitioned Parquet dataset\nvalidation_8 = (\n    pb.Validate(data=\"sales_data/\")  # Contains year=2023/quarter=Q1/region=US/sales.parquet\n    .col_exists([\"transaction_id\", \"amount\", \"year\", \"quarter\", \"region\"])\n    .interrogate()\n)\nWhen you point to a directory that contains a partitioned Parquet dataset (with subdirectories like year=2023/quarter=Q1/region=US/), Pointblank will automatically:\n\ndiscover all Parquet files recursively\nextract partition column values from directory paths\nadd partition columns to the final DataFrame\ncombine all partitions into a single table for validation\n\nBoth Polars and Pandas handle partitioned datasets natively, so this works seamlessly with either DataFrame library. The loading preference is Polars first, then Pandas as a fallback.",
     "crumbs": [
       "API Reference",
       "Validate",
@@ -6777,7 +6756,7 @@
     "href": "reference/Validate.html#working-with-database-connection-strings",
     "title": "Validate",
     "section": "Working with Database Connection Strings",
-    "text": "Working with Database Connection Strings\nThe Validate class supports database connection strings for direct validation of database tables. Connection strings must specify a table using the ::table_name suffix:\n\n# Get path to a DuckDB database file from package data\nduckdb_path = pb.get_data_path(\"game_revenue\", \"duckdb\")\n\nvalidation_9 = (\n    pb.Validate(\n        data=f\"duckdb:///{duckdb_path}::game_revenue\",\n        label=\"DuckDB Game Revenue Validation\"\n    )\n    .col_exists([\"player_id\", \"session_id\", \"item_revenue\"])\n    .col_vals_gt(columns=\"item_revenue\", value=0)\n    .interrogate()\n)\n\nvalidation_9\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    DuckDB Game Revenue ValidationDuckDB\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    player_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    session_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    item_revenue\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    item_revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    20001.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-27 23:18:00 UTC&lt; 1 s2026-07-27 23:18:00 UTC\n\n\n\n\n\nFor comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the connect_to_table() function. This function handles all the connection logic and provides helpful error messages when table specifications are missing or backend dependencies are not installed.",
+    "text": "Working with Database Connection Strings\nThe Validate class supports database connection strings for direct validation of database tables. Connection strings must specify a table using the ::table_name suffix:\n\n# Get path to a DuckDB database file from package data\nduckdb_path = pb.get_data_path(\"game_revenue\", \"duckdb\")\n\nvalidation_9 = (\n    pb.Validate(\n        data=f\"duckdb:///{duckdb_path}::game_revenue\",\n        label=\"DuckDB Game Revenue Validation\"\n    )\n    .col_exists([\"player_id\", \"session_id\", \"item_revenue\"])\n    .col_vals_gt(columns=\"item_revenue\", value=0)\n    .interrogate()\n)\n\nvalidation_9\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    DuckDB Game Revenue ValidationDuckDB\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  E\n  C\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    player_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    2\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    session_id\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    3\n    \n        \n            \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n        \n            col_exists()\n        \n        \n        \n    item_revenue\n    —\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n            \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n        \n            col_vals_gt()\n        \n        \n        \n    item_revenue\n    0\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    2000\n    20001.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n2026-07-28 17:02:44 UTC&lt; 1 s2026-07-28 17:02:44 UTC\n\n\n\n\n\nFor comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the connect_to_table() function. This function handles all the connection logic and provides helpful error messages when table specifications are missing or backend dependencies are not installed.",
     "crumbs": [
       "API Reference",
       "Validate",
