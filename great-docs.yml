@@ -112,6 +112,29 @@ exclude:
   - config
   - assistant.MODEL_PROVIDERS
 
+# Agent Skills
+# ------------
+# Multiple named skills for the documentation site. Each entry maps
+# a human-readable name to a SKILL.md file path. All skills appear
+# on the Skills page with a switcher bar and are placed in
+# .well-known/agent-skills/ for auto-discovery.
+skill:
+  skills:
+    - name: pointblank
+      file: skills/pointblank/SKILL.md
+    - name: write-validation
+      file: skills/write-validation/SKILL.md
+    - name: validate-yaml
+      file: skills/validate-yaml/SKILL.md
+    - name: draft-validation
+      file: skills/draft-validation/SKILL.md
+    - name: define-contracts
+      file: skills/define-contracts/SKILL.md
+    - name: scan-and-profile
+      file: skills/scan-and-profile/SKILL.md
+    - name: generate-data
+      file: skills/generate-data/SKILL.md
+
 # API Reference Structure
 # Organized to match the current quartodoc sections
 reference:
