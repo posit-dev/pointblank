@@ -185,10 +185,12 @@ def _create_chat_instance(
     elif provider == "bedrock":  # pragma: no cover
         from chatlas import ChatBedrockAnthropic
 
+        # ChatBedrockAnthropic creates both a sync and async client internally,
+        # so we cannot pass a single http_client instance. Omit it and let
+        # the Bedrock client manage its own HTTP stack.
         chat = ChatBedrockAnthropic(
             model=model_name,
             system_prompt=system_prompt,
-            kwargs={"http_client": http_client},
         )
 
     elif provider == "azure-openai":  # pragma: no cover
