@@ -79,15 +79,19 @@ mcp:
 changelog:
   enabled: true
 
+# Navbar Order
+navbar_order:
+  - User Guide
+  - Reference
+  - Demos
+  - Changelog
+
 # Custom Sections
 sections:
   - title: Demos
     dir: examples
     index: true
     index_columns: 2
-  - title: Blog
-    dir: blog
-    type: blog
 
 # Author Information
 authors:
