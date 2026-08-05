@@ -1,7 +1,7 @@
 # MCP Reference
 
 
-<span class="mcp-tile-label">Tools19</span> <span class="mcp-tile-label">Resources0</span> <span class="mcp-tile-label">Templates0</span> <span class="mcp-tile-label">Prompts0</span> <span class="mcp-tile-label">Instructions✗</span> <span class="mcp-tile-label">Completions✗</span>
+<span class="mcp-tile-label">Tools19</span> <span class="mcp-tile-label">Resources0</span> <span class="mcp-tile-label">Templates0</span> <span class="mcp-tile-label">Prompts5</span> <span class="mcp-tile-label">Instructions✗</span> <span class="mcp-tile-label">Completions✗</span>
 
 
 ## Data Management
@@ -77,3 +77,21 @@ Get comprehensive server health and status information.
 
 [get_pointblank_api_reference](../../reference/mcp/get_pointblank_api_reference.md)  
 Get API reference for Pointblank validation methods and common patterns.
+
+
+## Prompts
+
+[prompt_load_dataframe](../../reference/mcp/prompt_prompt_load_dataframe.md)  
+Prompt to load a DataFrame from a file into the server's context for validation.
+
+[prompt_create_validator](../../reference/mcp/prompt_prompt_create_validator.md)  
+Prompt to create a Pointblank Validator for a loaded DataFrame.
+
+[prompt_add_validation_step_example](../../reference/mcp/prompt_prompt_add_validation_step_example.md)  
+Prompt to add a validation step to a Pointblank Validator.
+
+[prompt_get_validation_step_output](../../reference/mcp/prompt_prompt_get_validation_step_output.md)  
+Prompt to get validation output by specifying either a step index or a sundered type.
+
+[prompt_interrogate_validator](../../reference/mcp/prompt_prompt_interrogate_validator.md)  
+Prompt to run validations and generate reports with Python code.

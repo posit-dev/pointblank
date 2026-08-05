@@ -40,7 +40,7 @@ The lower bound of the range. This can be a single value or a single column name
 `right: float | int | Column`  
 The upper bound of the range. This can be a single value or a single column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison for this bound. See the *What Can Be Used in `left=` and `right=`?* section for details on this.
 
-`inclusive: tuple[bool, bool] = (True, True)`\  
+`inclusive: tuple[bool, bool] = (True, True)`  
 A tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the `left=` and `right=` values, respectively. By default, both values are `True`.
 
 `na_pass: bool = ``False`  
@@ -190,6 +190,11 @@ pb.preview(tbl)
  #pb_preview_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_preview_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: solid; border-left-width: 1px; border-left-color: #E9E9E9; border-right-style: solid; border-right-width: 1px; border-right-color: #E9E9E9; vertical-align: middle; overflow-x: hidden; }
  #pb_preview_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_preview_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_preview_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_preview_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_preview_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_preview_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_preview_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_preview_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_preview_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -332,6 +337,11 @@ validation
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -461,6 +471,11 @@ validation
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
