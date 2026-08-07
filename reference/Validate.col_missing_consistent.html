@@ -202,6 +202,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -209,7 +213,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1441,7 +1445,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>The <a href="Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link gdls-code">col_missing_consistent()</a> method checks that, across a set of related columns, the “missing for a specific reason” status is <em>consistent</em>: for each row, either <em>none</em> of the columns are missing for <code>when_reason=</code>, or <em>all</em> of them are. This is useful for structured survey or clinical data where a skip pattern should propagate across related fields — for example, if a question wasn’t asked (<code>"not_asked"</code>) then all of its dependent fields should also be coded <code>"not_asked"</code>.</p>
-<p>A value is considered “missing for the reason” when it is one of the sentinel values mapped to <code>when_reason=</code> in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec’s <a href="MissingSpec.html#pointblank.MissingSpec.null_reason" class="gdls-link gdls-code">null_reason</a> and <code>null_is_missing=True</code>, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some — but not all — of the columns are missing for the given reason.</p>
+<p>A value is considered “missing for the reason” when it is one of the sentinel values mapped to <code>when_reason=</code> in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec’s <code>null_reason</code> and <code>null_is_missing=True</code>, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some — but not all — of the columns are missing for the given reason.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters">Parameters</h2>

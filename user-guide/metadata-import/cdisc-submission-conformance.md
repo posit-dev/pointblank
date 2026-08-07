@@ -3918,7 +3918,7 @@ The CDISC CORE engine runs the full authoritative conformance rule set and produ
 
 CORE can be obtained in three ways depending on your environment. The standalone executable is easiest for local use, Docker is preferred in containerized CI pipelines, and the repo checkout is useful when you need a specific unreleased version or want to inspect the rule definitions directly.
 
-**Option 1: Standalone executable.** Download the pre-built binary from the [CDISC CORE releases page](https://github.com/cdisc-org/cdisc-rules-engine/releases). Place it somewhere on your `PATH` under the name [core](../../reference/SDTMVariableSpec.md#pointblank.SDTMVariableSpec.core):
+**Option 1: Standalone executable.** Download the pre-built binary from the [CDISC CORE releases page](https://github.com/cdisc-org/cdisc-rules-engine/releases). Place it somewhere on your `PATH` under the name `core`:
 
 ``` bash
 chmod +x core
@@ -3959,7 +3959,7 @@ Pointblank discovers CORE through three mechanisms, tried in order:
 
 1.  An explicit `core=` argument to [validate_cdisc_submission()](../../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) or `validate_conformance(engine="core")`.
 2.  The `POINTBLANK_CDISC_CORE` environment variable (e.g., `export POINTBLANK_CDISC_CORE="python /path/to/core.py"`).
-3.  A [core](../../reference/SDTMVariableSpec.md#pointblank.SDTMVariableSpec.core) or `cdisc-rules-engine` executable on `PATH`.
+3.  A `core` or `cdisc-rules-engine` executable on `PATH`.
 
 The environment variable approach is convenient for CI systems where the CORE path differs between machines, while the explicit argument is useful in notebooks where you want the path to be self-documenting.
 

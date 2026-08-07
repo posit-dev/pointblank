@@ -505,7 +505,7 @@ pb.EditValidation.from_plans(before, after).review()
 Two guardrails keep the flow from handing you broken code.
 
 - **Syntax and lint check.** The revised code is parsed with `ast.parse()` and checked for validation-method typos before it's returned. <a href="../../reference/EditValidation.html#pointblank.EditValidation.validate_syntax" class="gdls-link"><code>validate_syntax()</code></a> reports whether the current revision passes.
-- **Automatic re-prompt.** If the check fails, the model is automatically re-prompted with the error message to correct itself, up to [max_reprompts](../../reference/EditValidation.md#pointblank.EditValidation.max_reprompts) times (default `1`). If the code still doesn't pass, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.
+- **Automatic re-prompt.** If the check fails, the model is automatically re-prompted with the error message to correct itself, up to `max_reprompts` times (default `1`). If the code still doesn't pass, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.
 
 These same guardrails are also applied to [`DraftValidation`](../../user-guide/advanced-validation/draft-validation.md).
 

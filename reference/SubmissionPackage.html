@@ -199,6 +199,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -206,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1863,7 +1867,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 <li><strong>RELREC</strong> — each relationship record’s <code>RDOMAIN</code> is present and <code>USUBJID</code> exists in DM.</li>
 <li><strong>ADaM ⇄ SDTM traceability</strong> — <code>ADSL.USUBJID ⊆ DM.USUBJID</code>, and every other ADaM dataset’s <code>USUBJID ⊆ ADSL.USUBJID</code>.</li>
 </ul></li>
-<li><strong><code>"core"</code></strong> — hands the package to the external CDISC CORE engine (<code>cdisc-rules-engine</code>), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form <a href="ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Requires an installed CORE executable (see <a href="SDTMVariableSpec.html#pointblank.SDTMVariableSpec.core" class="gdls-link gdls-code">core</a>).</li>
+<li><strong><code>"core"</code></strong> — hands the package to the external CDISC CORE engine (<code>cdisc-rules-engine</code>), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form <a href="ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Requires an installed CORE executable (see <code>core</code>).</li>
 </ul>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
@@ -1892,11 +1896,11 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Override the CDISC standard sent to CORE. Defaults to the package’s <a href="SubmissionPackage.html#pointblank.SubmissionPackage.standard" class="gdls-link gdls-code">standard</a> (e.g., <code>"sdtmig"</code>).</p>
+<p>(CORE only.) Override the CDISC standard sent to CORE. Defaults to the package’s <code>standard</code> (e.g., <code>"sdtmig"</code>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Override the standard version. Defaults to the package’s <a href="SubmissionPackage.html#pointblank.SubmissionPackage.standard_version" class="gdls-link gdls-code">standard_version</a> (e.g., <code>"3.4"</code>, sent to CORE hyphenated).</p>
+<p>(CORE only.) Override the standard version. Defaults to the package’s <code>standard_version</code> (e.g., <code>"3.4"</code>, sent to CORE hyphenated).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">controlled_terminology</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Sequence[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>

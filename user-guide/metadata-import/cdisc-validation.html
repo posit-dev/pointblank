@@ -177,6 +177,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -184,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1411,7 +1415,7 @@ Race: ['WHITE', 'BLACK OR AFRICAN AMERICAN', 'ASIAN', 'AMERICAN INDIAN OR ALASKA
   Extensible: False</code></pre>
 </div>
 </div>
-<p>The <a href="../../reference/Codelist.html#pointblank.Codelist.extensible" class="gdls-link gdls-code">extensible</a> flag records an important distinction. Non-extensible codelists require strict adherence: any value not in the codelist is a conformance issue. Extensible codelists permit sponsor-defined additions, so a value outside the published set is not necessarily an error.</p>
+<p>The <code>extensible</code> flag records an important distinction. Non-extensible codelists require strict adherence: any value not in the codelist is a conformance issue. Extensible codelists permit sponsor-defined additions, so a value outside the published set is not necessarily an error.</p>
 <p>Pointblank currently generates the same <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> check for both kinds of codelist. For extensible codelists you will typically want to relax that step to reflect that additions are allowed, for example by attaching a warning-level threshold to the step rather than treating every out-of-set value as a hard failure.</p>
 </section>
 </section>

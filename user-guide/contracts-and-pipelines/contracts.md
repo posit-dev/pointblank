@@ -823,7 +823,7 @@ print(production_contract)
 
 ## Direction
 
-The [direction](../../reference/Contract.md#pointblank.Contract.direction) parameter is metadata that signals where in a pipeline this contract applies:
+The `direction` parameter is metadata that signals where in a pipeline this contract applies:
 
 - `"source"`: for inbound/raw data arriving from upstream
 - `"target"`: for outbound data leaving your transform
@@ -833,7 +833,7 @@ Direction doesn't change validation behavior, but it's used in pipeline reports 
 
 ## Violation Handling
 
-The [on_violation](../../reference/Contract.md#pointblank.Contract.on_violation) parameter controls what happens when validation fails (used by the [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) class, covered in the next guide page):
+The `on_violation` parameter controls what happens when validation fails (used by the [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) class, covered in the next guide page):
 
 - `"warn"` (default): issue a Python `UserWarning`
 - `"raise"`: raise a `RuntimeError` (halts execution)

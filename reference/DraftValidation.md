@@ -80,7 +80,7 @@ There's no need to have the `python-dotenv` package installed when using `.env` 
 
 By default, SSL certificate verification is enabled for all requests to LLM providers. However, in certain network environments (such as corporate networks with self-signed certificates or firewall proxies), you may encounter SSL certificate verification errors.
 
-To disable SSL verification, set the [verify_ssl](EditValidation.md#pointblank.EditValidation.verify_ssl) parameter to `False`:
+To disable SSL verification, set the `verify_ssl` parameter to `False`:
 
 ``` python
 import pointblank as pb

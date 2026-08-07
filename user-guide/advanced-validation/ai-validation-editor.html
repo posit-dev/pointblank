@@ -177,6 +177,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -184,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1143,7 +1147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Two guardrails keep the flow from handing you broken code.</p>
 <ul>
 <li><strong>Syntax and lint check.</strong> The revised code is parsed with <code>ast.parse()</code> and checked for validation-method typos before it’s returned. <a href="../../reference/EditValidation.html#pointblank.EditValidation.validate_syntax" class="gdls-link"><code>validate_syntax()</code></a> reports whether the current revision passes.</li>
-<li><strong>Automatic re-prompt.</strong> If the check fails, the model is automatically re-prompted with the error message to correct itself, up to <a href="../../reference/EditValidation.html#pointblank.EditValidation.max_reprompts" class="gdls-link gdls-code">max_reprompts</a> times (default <code>1</code>). If the code still doesn’t pass, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.</li>
+<li><strong>Automatic re-prompt.</strong> If the check fails, the model is automatically re-prompted with the error message to correct itself, up to <code>max_reprompts</code> times (default <code>1</code>). If the code still doesn’t pass, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.</li>
 </ul>
 <p>These same guardrails are also applied to <a href="../../user-guide/advanced-validation/draft-validation.html"><code>DraftValidation</code></a>.</p>
 </section>

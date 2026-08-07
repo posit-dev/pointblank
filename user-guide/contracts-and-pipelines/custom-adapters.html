@@ -177,6 +177,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -184,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -692,22 +696,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.format_name" class="gdls-link gdls-code">format_name</a></td>
+<td><code>format_name</code></td>
 <td><code>str</code></td>
 <td>Short identifier (e.g., <code>"json_schema"</code>, <code>"my_format"</code>)</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.file_extensions" class="gdls-link gdls-code">file_extensions</a></td>
+<td><code>file_extensions</code></td>
 <td><code>list[str]</code></td>
 <td>File extensions for auto-detection (e.g., <code>[".schema.json"]</code>)</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_import" class="gdls-link gdls-code">supports_import</a></td>
+<td><code>supports_import</code></td>
 <td><code>bool</code></td>
 <td>Whether <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> is implemented</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_export" class="gdls-link gdls-code">supports_export</a></td>
+<td><code>supports_export</code></td>
 <td><code>bool</code></td>
 <td>Whether <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> is implemented</td>
 </tr>
@@ -729,12 +733,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><code>import_contract(source, **kwargs)</code></td>
-<td>If <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_import" class="gdls-link gdls-code">supports_import</a></td>
+<td>If <code>supports_import</code></td>
 <td>Parses source, returns <a href="../../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a></td>
 </tr>
 <tr class="odd">
 <td><code>export_contract(obj, destination, **kwargs)</code></td>
-<td>If <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.supports_export" class="gdls-link gdls-code">supports_export</a></td>
+<td>If <code>supports_export</code></td>
 <td>Exports to the format</td>
 </tr>
 </tbody>
@@ -907,7 +911,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   Coverage: 100%</code></pre>
 </div>
 </div>
-<p>The summary shows four columns detected and five constraints mapped (two <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata.required" class="gdls-link gdls-code">required</a> fields, one <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata.unique" class="gdls-link gdls-code">unique</a> field, one <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a> check, and one <code>min</code> bound). All constraints were successfully translated, giving 100% coverage.</p>
+<p>The summary shows four columns detected and five constraints mapped (two <code>required</code> fields, one <code>unique</code> field, one <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a> check, and one <code>min</code> bound). All constraints were successfully translated, giving 100% coverage.</p>
 <div id="7b24c54f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate some data</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>events <span class="op">=</span> pl.DataFrame(</span>

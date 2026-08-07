@@ -24,7 +24,7 @@ Validate.col_missing_consistent(
 
 The [col_missing_consistent()](Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent) method checks that, across a set of related columns, the "missing for a specific reason" status is *consistent*: for each row, either *none* of the columns are missing for `when_reason=`, or *all* of them are. This is useful for structured survey or clinical data where a skip pattern should propagate across related fields -- for example, if a question wasn't asked (`"not_asked"`) then all of its dependent fields should also be coded `"not_asked"`.
 
-A value is considered "missing for the reason" when it is one of the sentinel values mapped to `when_reason=` in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec's [null_reason](MissingSpec.md#pointblank.MissingSpec.null_reason) and `null_is_missing=True`, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some -- but not all -- of the columns are missing for the given reason.
+A value is considered "missing for the reason" when it is one of the sentinel values mapped to `when_reason=` in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec's `null_reason` and `null_is_missing=True`, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some -- but not all -- of the columns are missing for the given reason.
 
 
 ## Parameters

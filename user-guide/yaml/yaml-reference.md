@@ -192,7 +192,7 @@ Template variables available for action strings:
 
 ## Structured Missingness ([missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs))
 
-The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, [null_is_missing](../../reference/MissingSpec.md#pointblank.MissingSpec.null_is_missing), and [null_reason](../../reference/MissingSpec.md#pointblank.MissingSpec.null_reason):
+The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, `null_is_missing`, and `null_reason`:
 
 ``` yaml
 missing_specs:

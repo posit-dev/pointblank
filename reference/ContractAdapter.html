@@ -199,6 +199,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -206,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -220,7 +224,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">file_extensions</span></h1>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">detect()</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1385,13 +1389,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
-  <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a>
-  <ul class="collapse">
-  <li><a href="#file_extensions" id="toc-file_extensions" class="nav-link" data-scroll-target="#file_extensions"><span class="doc-object-name doc-attribute doc-label doc-label-constant">file_extensions</span></a></li>
-  <li><a href="#format_name" id="toc-format_name" class="nav-link" data-scroll-target="#format_name"><span class="doc-object-name doc-attribute doc-label doc-label-constant">format_name</span></a></li>
-  <li><a href="#supports_export" id="toc-supports_export" class="nav-link" data-scroll-target="#supports_export"><span class="doc-object-name doc-attribute doc-label doc-label-constant">supports_export</span></a></li>
-  <li><a href="#supports_import" id="toc-supports_import" class="nav-link" data-scroll-target="#supports_import"><span class="doc-object-name doc-attribute doc-label doc-label-constant">supports_import</span></a></li>
-  </ul></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#detect" id="toc-detect" class="nav-link" data-scroll-target="#detect"><span class="doc-object-name doc-function doc-label doc-label-method">detect()</span></a></li>
@@ -1458,108 +1455,6 @@ Whether this adapter supports exporting to the format.
 </dd>
 </dl>
 </div>
-</section>
-<section id="attributes-1" class="level2 doc-attributes">
-<h2 class="doc-attributes">Attributes</h2>
-<table class="gd-summary-table">
-<thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="#file_extensions" class="doc-attribute doc-label doc-label-constant">file_extensions</a>
-</td>
-<td>
-Built-in mutable sequence.
-</td>
-</tr>
-<tr>
-<td>
-<a href="#format_name" class="doc-attribute doc-label doc-label-constant">format_name</a>
-</td>
-<td>
-str(object=’’) -&gt; str
-</td>
-</tr>
-<tr>
-<td>
-<a href="#supports_export" class="doc-attribute doc-label doc-label-constant">supports_export</a>
-</td>
-<td>
-bool(x) -&gt; bool
-</td>
-</tr>
-<tr>
-<td>
-<a href="#supports_import" class="doc-attribute doc-label doc-label-constant">supports_import</a>
-</td>
-<td>
-bool(x) -&gt; bool
-</td>
-</tr>
-</tbody>
-</table>
-<hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
-<section id="file_extensions" class="level3">
-<h4 class="anchored" data-anchor-id="file_extensions"><span class="doc-object-name doc-attribute doc-label doc-label-constant">file_extensions</span></h4>
-<div class="doc-subject">
-<p>Built-in mutable sequence.</p>
-</div>
-<div class="doc-signature doc-attribute">
-<p><code><span class="doc-parameter-name">file_extensions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">[]</span></code></p>
-</div>
-<div class="doc-text">
-<p>If no argument is given, the constructor creates a new empty list. The argument must be an iterable if specified.</p>
-</div>
-</section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
-<section id="format_name" class="level3">
-<h4 class="anchored" data-anchor-id="format_name"><span class="doc-object-name doc-attribute doc-label doc-label-constant">format_name</span></h4>
-<div class="doc-subject">
-<p>str(object=’’) -&gt; str</p>
-</div>
-<div class="doc-signature doc-attribute">
-<p><code><span class="doc-parameter-name">format_name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">""</span></span></code></p>
-</div>
-<div class="doc-text">
-<p>str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or errors is specified, then the object must expose a data buffer that will be decoded using the given encoding and error handler. Otherwise, returns the result of object.__str__() (if defined) or repr(object). encoding defaults to sys.getdefaultencoding(). errors defaults to ‘strict’.</p>
-</div>
-</section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
-<section id="supports_export" class="level3">
-<h4 class="anchored" data-anchor-id="supports_export"><span class="doc-object-name doc-attribute doc-label doc-label-constant">supports_export</span></h4>
-<div class="doc-subject">
-<p>bool(x) -&gt; bool</p>
-</div>
-<div class="doc-signature doc-attribute">
-<p><code><span class="doc-parameter-name">supports_export</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></p>
-</div>
-<div class="doc-text">
-<p>Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
-</div>
-</section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
-<section id="supports_import" class="level3">
-<h4 class="anchored" data-anchor-id="supports_import"><span class="doc-object-name doc-attribute doc-label doc-label-constant">supports_import</span></h4>
-<div class="doc-subject">
-<p>bool(x) -&gt; bool</p>
-</div>
-<div class="doc-signature doc-attribute">
-<p><code><span class="doc-parameter-name">supports_import</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></p>
-</div>
-<div class="doc-text">
-<p>Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
-</div>
-</section>
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods">Methods</h2>

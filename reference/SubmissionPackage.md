@@ -331,7 +331,7 @@ Two engines are available:
   - **SUPP- linkage** -- `RDOMAIN` references a present domain, `USUBJID` exists in DM, and `(USUBJID, IDVAR=IDVARVAL)` resolves to a record in the parent domain.
   - **RELREC** -- each relationship record's `RDOMAIN` is present and `USUBJID` exists in DM.
   - **ADaM ⇄ SDTM traceability** -- `ADSL.USUBJID ⊆ DM.USUBJID`, and every other ADaM dataset's `USUBJID ⊆ ADSL.USUBJID`.
-- **`"core"`** -- hands the package to the external CDISC CORE engine (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport). Requires an installed CORE executable (see [core](SDTMVariableSpec.md#pointblank.SDTMVariableSpec.core)).
+- **`"core"`** -- hands the package to the external CDISC CORE engine (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport). Requires an installed CORE executable (see `core`).
 
 
 ##### Parameters
@@ -353,10 +353,10 @@ Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base r
 (Validate-based engine only.) Whether to interrogate (run) the validations before returning.
 
 `standard: str | None = None`  
-(CORE only.) Override the CDISC standard sent to CORE. Defaults to the package's [standard](SubmissionPackage.md#pointblank.SubmissionPackage.standard) (e.g., `"sdtmig"`).
+(CORE only.) Override the CDISC standard sent to CORE. Defaults to the package's `standard` (e.g., `"sdtmig"`).
 
 `version: str | None = None`  
-(CORE only.) Override the standard version. Defaults to the package's [standard_version](SubmissionPackage.md#pointblank.SubmissionPackage.standard_version) (e.g., `"3.4"`, sent to CORE hyphenated).
+(CORE only.) Override the standard version. Defaults to the package's `standard_version` (e.g., `"3.4"`, sent to CORE hyphenated).
 
 `controlled_terminology: str | Sequence[str] | None = None`  
 (CORE only.) CT package name(s) for CORE's `-ct` (e.g., `"sdtmct-2024-03-29"`).

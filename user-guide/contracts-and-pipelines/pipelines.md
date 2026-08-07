@@ -1175,7 +1175,7 @@ print(f"Target validated: {result.target_validation is not None}")
 
 # Violation Handling
 
-When a contract's validation fails, the pipeline needs to *do something* about it. The [on_violation](../../reference/Contract.md#pointblank.Contract.on_violation) parameter on each [Contract](../../reference/Contract.md#pointblank.Contract) controls this behavior. There are three modes, each suited to different stages of your development and deployment lifecycle:
+When a contract's validation fails, the pipeline needs to *do something* about it. The `on_violation` parameter on each [Contract](../../reference/Contract.md#pointblank.Contract) controls this behavior. There are three modes, each suited to different stages of your development and deployment lifecycle:
 
 - **`"warn"`** (default): Issues a Python `UserWarning`. The pipeline continues, and the failure is recorded in the result. Ideal for development and monitoring.
 - **`"raise"`**: Raises a `RuntimeError` immediately. The pipeline halts. Ideal for production gates where invalid data must never proceed.

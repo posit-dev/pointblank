@@ -228,9 +228,9 @@ Pointblank provides helper functions for defining typed columns with constraints
 
 | Function | Description | Key Parameters |
 |----|----|----|
-| [int_field()](../../reference/int_field.md#pointblank.int_field) | Integer columns | `min_val`, `max_val`, `allowed`, [unique](../../reference/VariableMetadata.md#pointblank.VariableMetadata.unique) |
+| [int_field()](../../reference/int_field.md#pointblank.int_field) | Integer columns | `min_val`, `max_val`, `allowed`, `unique` |
 | [float_field()](../../reference/float_field.md#pointblank.float_field) | Float columns | `min_val`, `max_val`, `allowed` |
-| [string_field()](../../reference/string_field.md#pointblank.string_field) | String columns | `preset`, `pattern`, `allowed`, [unique](../../reference/VariableMetadata.md#pointblank.VariableMetadata.unique) |
+| [string_field()](../../reference/string_field.md#pointblank.string_field) | String columns | `preset`, `pattern`, `allowed`, `unique` |
 | [bool_field()](../../reference/bool_field.md#pointblank.bool_field) | Boolean columns | `p_true` (probability of True) |
 | [date_field()](../../reference/date_field.md#pointblank.date_field) | Date columns | `min_val`, `max_val` |
 | [datetime_field()](../../reference/datetime_field.md#pointblank.datetime_field) | Datetime columns | `min_val`, `max_val` |

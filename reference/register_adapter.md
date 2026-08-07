@@ -18,7 +18,7 @@ Can be used as a decorator (with or without arguments) or called directly.
 
 
 `format_name: str | None = None`  
-The format name to register under. If `None`, uses the class's [format_name](ContractAdapter.md#pointblank.ContractAdapter.format_name) attribute.
+The format name to register under. If `None`, uses the class's `format_name` attribute.
 
 
 ## Returns

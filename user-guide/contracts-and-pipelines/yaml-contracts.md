@@ -75,12 +75,12 @@ The table below summarizes every key available inside the `contract:` block. Onl
 | Key | Required | Description |
 |----|----|----|
 | `name` | Yes | Human-readable identifier for this contract |
-| [direction](../../reference/Contract.md#pointblank.Contract.direction) | No | `"source"` (default) or `"target"`: indicates where in a pipeline this contract applies |
+| `direction` | No | `"source"` (default) or `"target"`: indicates where in a pipeline this contract applies |
 | `version` | No | Semantic version string (e.g., `"1.2.0"`) for tracking contract evolution over time |
 | `owner` | No | Team or individual responsible for maintaining this contract |
 | `consumers` | No | List of teams or systems that depend on data conforming to this contract |
 | `description` | No | Longer prose describing the contract's purpose and context |
-| [on_violation](../../reference/Contract.md#pointblank.Contract.on_violation) | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
+| `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
 | `schema` | No | Column name -\> data type mapping; triggers a [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) check |
 | `steps` | No | Ordered list of validation steps to execute |
 | `thresholds` | No | Threshold levels ([warning](../../reference/Validate.warning.md#pointblank.Validate.warning), [error](../../reference/Validate.error.md#pointblank.Validate.error), [critical](../../reference/Validate.critical.md#pointblank.Validate.critical)) as fractions or absolute counts |

@@ -177,6 +177,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -184,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1696,7 +1700,7 @@ col_vals_gt
 </div>
 <section id="direction" class="level2">
 <h2 class="anchored" data-anchor-id="direction">Direction</h2>
-<p>The <a href="../../reference/Contract.html#pointblank.Contract.direction" class="gdls-link gdls-code">direction</a> parameter is metadata that signals where in a pipeline this contract applies:</p>
+<p>The <code>direction</code> parameter is metadata that signals where in a pipeline this contract applies:</p>
 <ul>
 <li><code>"source"</code>: for inbound/raw data arriving from upstream</li>
 <li><code>"target"</code>: for outbound data leaving your transform</li>
@@ -1705,7 +1709,7 @@ col_vals_gt
 </section>
 <section id="violation-handling" class="level2">
 <h2 class="anchored" data-anchor-id="violation-handling">Violation Handling</h2>
-<p>The <a href="../../reference/Contract.html#pointblank.Contract.on_violation" class="gdls-link gdls-code">on_violation</a> parameter controls what happens when validation fails (used by the <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> class, covered in the next guide page):</p>
+<p>The <code>on_violation</code> parameter controls what happens when validation fails (used by the <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> class, covered in the next guide page):</p>
 <ul>
 <li><code>"warn"</code> (default): issue a Python <code>UserWarning</code></li>
 <li><code>"raise"</code>: raise a <code>RuntimeError</code> (halts execution)</li>

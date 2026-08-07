@@ -24,7 +24,7 @@ validate_cdisc_submission(
 ```
 
 
-Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from `source` and runs <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with `engine="core"`. Requires an installed CORE executable (see [core](SDTMVariableSpec.md#pointblank.SDTMVariableSpec.core)).
+Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from `source` and runs <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with `engine="core"`. Requires an installed CORE executable (see `core`).
 
 
 ## Parameters
@@ -34,7 +34,7 @@ Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.Sub
 The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON, with an optional `define.xml`), a mapping of dataset name to DataFrame, or an already-built [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage).
 
 `standard: str | None = None`  
-The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's [standard](SubmissionPackage.md#pointblank.SubmissionPackage.standard) when `source` is a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage)).
+The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's `standard` when `source` is a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage)).
 
 `version: str | None = None`  
 The standard version (e.g., `"3.4"`). Defaults to `"3.4"` (or the package's value).

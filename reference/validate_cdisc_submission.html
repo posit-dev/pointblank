@@ -199,6 +199,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Demos</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
@@ -206,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="476" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -1436,7 +1440,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from <code>source</code> and runs <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with <code>engine="core"</code>. Requires an installed CORE executable (see <a href="SDTMVariableSpec.html#pointblank.SDTMVariableSpec.core" class="gdls-link gdls-code">core</a>).</p>
+<p>Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from <code>source</code> and runs <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with <code>engine="core"</code>. Requires an installed CORE executable (see <code>core</code>).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters">Parameters</h2>
@@ -1448,7 +1452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The CDISC standard (e.g., <code>"sdtmig"</code>). Defaults to <code>"sdtmig"</code> (or the package’s <a href="SubmissionPackage.html#pointblank.SubmissionPackage.standard" class="gdls-link gdls-code">standard</a> when <code>source</code> is a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>).</p>
+<p>The CDISC standard (e.g., <code>"sdtmig"</code>). Defaults to <code>"sdtmig"</code> (or the package’s <code>standard</code> when <code>source</code> is a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>

@@ -32,7 +32,7 @@ A dictionary mapping sentinel values to reason labels. Keys are the actual value
 Optional grouping of reasons into categories (e.g., an `"item_nonresponse"` category that groups `"refused"` and `"dont_know"`). Useful for aggregate reporting and for checking missingness rates by category. Each value is a list of reason labels that appear in `reasons`. Default is `None`.
 
 `null_is_missing: bool = ``True`  
-Whether actual null/`None`/`NaN` values should also be treated as missing (with reason given by [null_reason](MissingSpec.md#pointblank.MissingSpec.null_reason)). Default is `True`.
+Whether actual null/`None`/`NaN` values should also be treated as missing (with reason given by `null_reason`). Default is `True`.
 
 `null_reason: str = ``"unknown"`  
 The reason label assigned to actual null values when `null_is_missing=True`. Default is `"unknown"`.
@@ -385,7 +385,7 @@ A value from the data.
 
 
 `str | None`  
-The reason label if `value` is a declared sentinel value, [null_reason](MissingSpec.md#pointblank.MissingSpec.null_reason) if `value` is `None` and `null_is_missing=True`, or `None` if the value is not considered missing.
+The reason label if `value` is a declared sentinel value, `null_reason` if `value` is `None` and `null_is_missing=True`, or `None` if the value is not considered missing.
 
 
 ------------------------------------------------------------------------
@@ -408,7 +408,7 @@ reasons_list()
 
 
 `list[str]`  
-The distinct reason labels (in first-seen order), including [null_reason](MissingSpec.md#pointblank.MissingSpec.null_reason) when `null_is_missing=True`.
+The distinct reason labels (in first-seen order), including `null_reason` when `null_is_missing=True`.
 
 
 ------------------------------------------------------------------------

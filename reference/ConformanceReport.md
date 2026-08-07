@@ -435,7 +435,7 @@ summary()
 `dict`  
 For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed) (failing test units), and [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed).
 
-For a **CORE** report, a single dict with keys [standard](SubmissionPackage.md#pointblank.SubmissionPackage.standard), `version`, `engine_version`, `n_rules`, `status_counts` (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed).
+For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, `status_counts` (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed).
 
 
 ------------------------------------------------------------------------
