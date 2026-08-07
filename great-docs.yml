@@ -84,6 +84,7 @@ navbar_order:
   - User Guide
   - Reference
   - Demos
+  - Blog
   - Changelog
 
 # Custom Sections
@@ -92,6 +93,9 @@ sections:
     dir: examples
     index: true
     index_columns: 2
+  - title: Blog
+    dir: blog
+    type: blog
 
 # Author Information
 authors:
