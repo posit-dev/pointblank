@@ -148,7 +148,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="480" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="478" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -169,24 +169,24 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#planned-near-term" id="toc-planned-near-term" class="nav-link active" data-scroll-target="#planned-near-term">Planned — Near Term</a>
   <ul class="collapse">
+  <li><a href="#contract-adapter-fixes-additions" id="toc-contract-adapter-fixes-additions" class="nav-link" data-scroll-target="#contract-adapter-fixes-additions">Contract Adapter Fixes &amp; Additions</a></li>
+  <li><a href="#foreign-key-referential-integrity-checks" id="toc-foreign-key-referential-integrity-checks" class="nav-link" data-scroll-target="#foreign-key-referential-integrity-checks">Foreign-Key / Referential-Integrity Checks</a></li>
+  <li><a href="#data-profiling-drift-detection" id="toc-data-profiling-drift-detection" class="nav-link" data-scroll-target="#data-profiling-drift-detection">Data Profiling &amp; Drift Detection</a></li>
   <li><a href="#schema-export" id="toc-schema-export" class="nav-link" data-scroll-target="#schema-export">Schema Export</a></li>
-  <li><a href="#validation-registry" id="toc-validation-registry" class="nav-link" data-scroll-target="#validation-registry">Validation Registry</a></li>
   <li><a href="#rich-notification-ecosystem" id="toc-rich-notification-ecosystem" class="nav-link" data-scroll-target="#rich-notification-ecosystem">Rich Notification Ecosystem</a></li>
+  <li><a href="#pipeline-integration-adapter" id="toc-pipeline-integration-adapter" class="nav-link" data-scroll-target="#pipeline-integration-adapter">Pipeline Integration Adapter</a></li>
+  <li><a href="#validation-registry" id="toc-validation-registry" class="nav-link" data-scroll-target="#validation-registry">Validation Registry</a></li>
   <li><a href="#semantic-validation-enhancements" id="toc-semantic-validation-enhancements" class="nav-link" data-scroll-target="#semantic-validation-enhancements">Semantic Validation Enhancements</a></li>
   <li><a href="#test-data-generation-enhancements" id="toc-test-data-generation-enhancements" class="nav-link" data-scroll-target="#test-data-generation-enhancements">Test Data Generation Enhancements</a></li>
   </ul></li>
   <li><a href="#planned-medium-term" id="toc-planned-medium-term" class="nav-link" data-scroll-target="#planned-medium-term">Planned — Medium Term</a>
   <ul class="collapse">
-  <li><a href="#intelligent-validation-recommendations" id="toc-intelligent-validation-recommendations" class="nav-link" data-scroll-target="#intelligent-validation-recommendations">Intelligent Validation Recommendations</a></li>
   <li><a href="#ai-powered-data-documentation" id="toc-ai-powered-data-documentation" class="nav-link" data-scroll-target="#ai-powered-data-documentation">AI-Powered Data Documentation</a></li>
-  <li><a href="#natural-language-validation-queries" id="toc-natural-language-validation-queries" class="nav-link" data-scroll-target="#natural-language-validation-queries">Natural Language Validation Queries</a></li>
-  <li><a href="#pipeline-integration-framework" id="toc-pipeline-integration-framework" class="nav-link" data-scroll-target="#pipeline-integration-framework">Pipeline Integration Framework</a></li>
+  <li><a href="#full-pipeline-integration-framework" id="toc-full-pipeline-integration-framework" class="nav-link" data-scroll-target="#full-pipeline-integration-framework">Full Pipeline Integration Framework</a></li>
   <li><a href="#data-observability-dashboard" id="toc-data-observability-dashboard" class="nav-link" data-scroll-target="#data-observability-dashboard">Data Observability Dashboard</a></li>
-  <li><a href="#data-profiling-drift-detection" id="toc-data-profiling-drift-detection" class="nav-link" data-scroll-target="#data-profiling-drift-detection">Data Profiling &amp; Drift Detection</a></li>
   </ul></li>
   <li><a href="#planned-long-term" id="toc-planned-long-term" class="nav-link" data-scroll-target="#planned-long-term">Planned — Long Term</a>
   <ul class="collapse">
-  <li><a href="#multi-table-cross-dataset-validation" id="toc-multi-table-cross-dataset-validation" class="nav-link" data-scroll-target="#multi-table-cross-dataset-validation">Multi-Table &amp; Cross-Dataset Validation</a></li>
   <li><a href="#vs-code-extension" id="toc-vs-code-extension" class="nav-link" data-scroll-target="#vs-code-extension">VS Code Extension</a></li>
   <li><a href="#jupyternotebook-magic-commands" id="toc-jupyternotebook-magic-commands" class="nav-link" data-scroll-target="#jupyternotebook-magic-commands">Jupyter/Notebook Magic Commands</a></li>
   <li><a href="#schema-inference-serialization" id="toc-schema-inference-serialization" class="nav-link" data-scroll-target="#schema-inference-serialization">Schema Inference &amp; Serialization</a></li>
@@ -223,6 +223,37 @@ ul.task-list li input[type="checkbox"] {
 <section id="planned-near-term" class="level1">
 <h1>Planned — Near Term</h1>
 <p>High-priority features that build on existing infrastructure.</p>
+<section id="contract-adapter-fixes-additions" class="level2">
+<h2 class="anchored" data-anchor-id="contract-adapter-fixes-additions">Contract Adapter Fixes &amp; Additions</h2>
+<p>Fill gaps in the contract adapter system (currently only <code>json_schema</code> and <code>frictionless</code> are registered; other advertised formats like <code>dbt</code> raise errors).</p>
+<ul>
+<li>Implement a <strong>dbt <code>schema.yml</code></strong> adapter</li>
+<li>Implement an <strong>ODCS (Open Data Contract Standard)</strong> adapter</li>
+<li>Correct docstrings and examples to match the set of actually-registered adapters</li>
+</ul>
+</section>
+<section id="foreign-key-referential-integrity-checks" class="level2">
+<h2 class="anchored" data-anchor-id="foreign-key-referential-integrity-checks">Foreign-Key / Referential-Integrity Checks</h2>
+<p>Expose a general-purpose referential-integrity validation (partial logic already exists in the CDISC conformance engine).</p>
+<ul>
+<li><code>pb.ValidateRelationships</code> or equivalent API for multi-table FK checks</li>
+<li>Foreign key validation between related tables</li>
+<li>Referential integrity checks (orphan detection, cardinality)</li>
+<li>Cross-table aggregate validations</li>
+</ul>
+</section>
+<section id="data-profiling-drift-detection" class="level2">
+<h2 class="anchored" data-anchor-id="data-profiling-drift-detection">Data Profiling &amp; Drift Detection</h2>
+<p>Expand <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.</p>
+<ul>
+<li><code>pb.DataProfile</code> class for comprehensive profiling</li>
+<li>Profile persistence and comparison</li>
+<li>Statistical drift detection (KS test, PSI, etc.)</li>
+<li>Schema drift detection</li>
+<li>Distribution visualization</li>
+<li>Automatic validation generation from drift</li>
+</ul>
+</section>
 <section id="schema-export" class="level2">
 <h2 class="anchored" data-anchor-id="schema-export">Schema Export</h2>
 <p>Export validation rules and schemas to standard interchange formats.</p>
@@ -230,6 +261,26 @@ ul.task-list li input[type="checkbox"] {
 <li><code>.to_json_schema()</code> method on <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for JSON Schema output</li>
 <li><code>.to_documentation()</code> for auto-generated data documentation (Markdown, HTML)</li>
 <li>Round-trip compatibility with YAML validation configs</li>
+</ul>
+</section>
+<section id="rich-notification-ecosystem" class="level2">
+<h2 class="anchored" data-anchor-id="rich-notification-ecosystem">Rich Notification Ecosystem</h2>
+<p>Expand alerting beyond Slack to additional platforms.</p>
+<ul>
+<li><code>send_email()</code> — SMTP email notifications</li>
+<li><code>trigger_webhook()</code> — Generic webhook support</li>
+<li><code>send_pagerduty()</code> — PagerDuty incident creation</li>
+<li><code>send_discord()</code> — Discord webhooks</li>
+<li><code>send_to_datadog()</code> — Datadog events/metrics</li>
+<li><code>send_to_opsgenie()</code> — Opsgenie alerts</li>
+</ul>
+</section>
+<section id="pipeline-integration-adapter" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline-integration-adapter">Pipeline Integration Adapter</h2>
+<p>A concrete orchestrator integration to complement the Data-Engineering playbook.</p>
+<ul>
+<li>Dagster asset-check adapter</li>
+<li>dbt test adapter</li>
 </ul>
 </section>
 <section id="validation-registry" class="level2">
@@ -240,18 +291,6 @@ ul.task-list li input[type="checkbox"] {
 <li>Named validation lookup across teams</li>
 <li>Version tracking for validation definitions</li>
 <li>Integration with YAML-based validation configs</li>
-</ul>
-</section>
-<section id="rich-notification-ecosystem" class="level2">
-<h2 class="anchored" data-anchor-id="rich-notification-ecosystem">Rich Notification Ecosystem</h2>
-<p>Expand alerting beyond Slack to additional platforms.</p>
-<ul>
-<li><code>send_email()</code> — SMTP email notifications</li>
-<li><code>send_pagerduty()</code> — PagerDuty incident creation</li>
-<li><code>send_discord()</code> — Discord webhooks</li>
-<li><code>send_to_datadog()</code> — Datadog events/metrics</li>
-<li><code>send_to_opsgenie()</code> — Opsgenie alerts</li>
-<li><code>trigger_webhook()</code> — Generic webhook support</li>
 </ul>
 </section>
 <section id="semantic-validation-enhancements" class="level2">
@@ -280,16 +319,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="planned-medium-term" class="level1">
 <h1>Planned — Medium Term</h1>
 <p>Features that expand Pointblank’s scope into new domains.</p>
-<section id="intelligent-validation-recommendations" class="level2">
-<h2 class="anchored" data-anchor-id="intelligent-validation-recommendations">Intelligent Validation Recommendations</h2>
-<p>AI-powered suggestions for improving existing validations.</p>
-<ul>
-<li>Post-hoc validation improvement suggestions via <code>.suggest_improvements()</code></li>
-<li>Automatic detection of uncovered columns</li>
-<li>Correlation-based rule suggestions</li>
-<li>Anomaly-based threshold recommendations</li>
-</ul>
-</section>
 <section id="ai-powered-data-documentation" class="level2">
 <h2 class="anchored" data-anchor-id="ai-powered-data-documentation">AI-Powered Data Documentation</h2>
 <p>Auto-generate data dictionaries and documentation from data and validations.</p>
@@ -301,24 +330,12 @@ ul.task-list li input[type="checkbox"] {
 <li>Incremental documentation updates</li>
 </ul>
 </section>
-<section id="natural-language-validation-queries" class="level2">
-<h2 class="anchored" data-anchor-id="natural-language-validation-queries">Natural Language Validation Queries</h2>
-<p>Define validations using plain English descriptions.</p>
-<ul>
-<li><code>.from_prompt()</code> method for NL-to-validation conversion</li>
-<li>Interactive clarification for ambiguous requests</li>
-<li>Learning from corrections to improve suggestions</li>
-<li>Support for domain-specific terminology</li>
-</ul>
-</section>
-<section id="pipeline-integration-framework" class="level2">
-<h2 class="anchored" data-anchor-id="pipeline-integration-framework">Pipeline Integration Framework</h2>
-<p>First-class integration with data orchestration tools.</p>
+<section id="full-pipeline-integration-framework" class="level2">
+<h2 class="anchored" data-anchor-id="full-pipeline-integration-framework">Full Pipeline Integration Framework</h2>
+<p>First-class integration with additional data orchestration tools.</p>
 <ul>
 <li>Apache Airflow operators</li>
 <li>Prefect tasks and flows</li>
-<li>Dagster asset checks</li>
-<li>dbt test adapter</li>
 <li>Luigi tasks</li>
 <li>Kedro hooks</li>
 </ul>
@@ -333,36 +350,12 @@ ul.task-list li input[type="checkbox"] {
 <li>Alerting rules based on metric trends</li>
 <li>Exportable quality scorecards</li>
 </ul>
-</section>
-<section id="data-profiling-drift-detection" class="level2">
-<h2 class="anchored" data-anchor-id="data-profiling-drift-detection">Data Profiling &amp; Drift Detection</h2>
-<p>Expand <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection.</p>
-<ul>
-<li><code>pb.DataProfile</code> class for comprehensive profiling</li>
-<li>Profile persistence and comparison</li>
-<li>Statistical drift detection (KS test, PSI, etc.)</li>
-<li>Schema drift detection</li>
-<li>Distribution visualization</li>
-<li>Automatic validation generation from drift</li>
-</ul>
 <hr>
 </section>
 </section>
 <section id="planned-long-term" class="level1">
 <h1>Planned — Long Term</h1>
 <p>Larger efforts for future milestones.</p>
-<section id="multi-table-cross-dataset-validation" class="level2">
-<h2 class="anchored" data-anchor-id="multi-table-cross-dataset-validation">Multi-Table &amp; Cross-Dataset Validation</h2>
-<p>Validate relationships across tables and datasets.</p>
-<ul>
-<li><code>pb.ValidateRelationships</code> for multi-table validation</li>
-<li>Foreign key validation</li>
-<li>Referential integrity checks</li>
-<li>Cross-table aggregate validations</li>
-<li>Entity resolution checks</li>
-<li>Join quality validation</li>
-</ul>
-</section>
 <section id="vs-code-extension" class="level2">
 <h2 class="anchored" data-anchor-id="vs-code-extension">VS Code Extension</h2>
 <p>Bring Pointblank directly into the IDE.</p>

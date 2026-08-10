@@ -6,6 +6,37 @@
 High-priority features that build on existing infrastructure.
 
 
+## Contract Adapter Fixes & Additions
+
+Fill gaps in the contract adapter system (currently only `json_schema` and `frictionless` are registered; other advertised formats like `dbt` raise errors).
+
+- Implement a **dbt `schema.yml`** adapter
+- Implement an **ODCS (Open Data Contract Standard)** adapter
+- Correct docstrings and examples to match the set of actually-registered adapters
+
+
+## Foreign-Key / Referential-Integrity Checks
+
+Expose a general-purpose referential-integrity validation (partial logic already exists in the CDISC conformance engine).
+
+- `pb.ValidateRelationships` or equivalent API for multi-table FK checks
+- Foreign key validation between related tables
+- Referential integrity checks (orphan detection, cardinality)
+- Cross-table aggregate validations
+
+
+## Data Profiling & Drift Detection
+
+Expand [DataScan](reference/DataScan.html#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
+
+- `pb.DataProfile` class for comprehensive profiling
+- Profile persistence and comparison
+- Statistical drift detection (KS test, PSI, etc.)
+- Schema drift detection
+- Distribution visualization
+- Automatic validation generation from drift
+
+
 ## Schema Export
 
 Export validation rules and schemas to standard interchange formats.
@@ -13,6 +44,26 @@ Export validation rules and schemas to standard interchange formats.
 - `.to_json_schema()` method on [Validate](reference/Validate.html#pointblank.Validate) for JSON Schema output
 - `.to_documentation()` for auto-generated data documentation (Markdown, HTML)
 - Round-trip compatibility with YAML validation configs
+
+
+## Rich Notification Ecosystem
+
+Expand alerting beyond Slack to additional platforms.
+
+- `send_email()` -- SMTP email notifications
+- `trigger_webhook()` -- Generic webhook support
+- `send_pagerduty()` -- PagerDuty incident creation
+- `send_discord()` -- Discord webhooks
+- `send_to_datadog()` -- Datadog events/metrics
+- `send_to_opsgenie()` -- Opsgenie alerts
+
+
+## Pipeline Integration Adapter
+
+A concrete orchestrator integration to complement the Data-Engineering playbook.
+
+- Dagster asset-check adapter
+- dbt test adapter
 
 
 ## Validation Registry
@@ -23,18 +74,6 @@ Organizational catalog for sharing and discovering validation definitions.
 - Named validation lookup across teams
 - Version tracking for validation definitions
 - Integration with YAML-based validation configs
-
-
-## Rich Notification Ecosystem
-
-Expand alerting beyond Slack to additional platforms.
-
-- `send_email()` -- SMTP email notifications
-- `send_pagerduty()` -- PagerDuty incident creation
-- `send_discord()` -- Discord webhooks
-- `send_to_datadog()` -- Datadog events/metrics
-- `send_to_opsgenie()` -- Opsgenie alerts
-- `trigger_webhook()` -- Generic webhook support
 
 
 ## Semantic Validation Enhancements
@@ -65,16 +104,6 @@ Extend the existing [generate_dataset()](reference/generate_dataset.html#pointbl
 Features that expand Pointblank's scope into new domains.
 
 
-## Intelligent Validation Recommendations
-
-AI-powered suggestions for improving existing validations.
-
-- Post-hoc validation improvement suggestions via `.suggest_improvements()`
-- Automatic detection of uncovered columns
-- Correlation-based rule suggestions
-- Anomaly-based threshold recommendations
-
-
 ## AI-Powered Data Documentation
 
 Auto-generate data dictionaries and documentation from data and validations.
@@ -86,24 +115,12 @@ Auto-generate data dictionaries and documentation from data and validations.
 - Incremental documentation updates
 
 
-## Natural Language Validation Queries
+## Full Pipeline Integration Framework
 
-Define validations using plain English descriptions.
-
-- `.from_prompt()` method for NL-to-validation conversion
-- Interactive clarification for ambiguous requests
-- Learning from corrections to improve suggestions
-- Support for domain-specific terminology
-
-
-## Pipeline Integration Framework
-
-First-class integration with data orchestration tools.
+First-class integration with additional data orchestration tools.
 
 - Apache Airflow operators
 - Prefect tasks and flows
-- Dagster asset checks
-- dbt test adapter
 - Luigi tasks
 - Kedro hooks
 
@@ -118,36 +135,12 @@ Local web dashboard for monitoring data quality over time.
 - Alerting rules based on metric trends
 - Exportable quality scorecards
 
-
-## Data Profiling & Drift Detection
-
-Expand [DataScan](reference/DataScan.html#pointblank.DataScan) into comprehensive profiling with drift detection.
-
-- `pb.DataProfile` class for comprehensive profiling
-- Profile persistence and comparison
-- Statistical drift detection (KS test, PSI, etc.)
-- Schema drift detection
-- Distribution visualization
-- Automatic validation generation from drift
-
 ------------------------------------------------------------------------
 
 
 # Planned -- Long Term
 
 Larger efforts for future milestones.
-
-
-## Multi-Table & Cross-Dataset Validation
-
-Validate relationships across tables and datasets.
-
-- `pb.ValidateRelationships` for multi-table validation
-- Foreign key validation
-- Referential integrity checks
-- Cross-table aggregate validations
-- Entity resolution checks
-- Join quality validation
 
 
 ## VS Code Extension
