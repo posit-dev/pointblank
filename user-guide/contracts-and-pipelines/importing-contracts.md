@@ -1,6 +1,6 @@
 # Importing External Schemas
 
-Many teams already have data schemas defined in other tools: JSON Schema files for API validation, Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or Pandera/Pydantic models in application code. Rather than manually rewriting these specifications as Pointblank validation steps, you can **import** them directly.
+Many teams already have data schemas defined in other tools: JSON Schema files for API validation, Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or ODCS data contracts for cross-team governance. Rather than manually rewriting these specifications as Pointblank validation steps, you can **import** them directly.
 
 The [import_contract()](../../reference/import_contract.md#pointblank.import_contract) function reads an external schema definition and produces a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) object containing everything Pointblank needs to validate data: column types, constraints, and mapped validation steps. From there you can create a [Validate](../../reference/Validate.md#pointblank.Validate) workflow, a [Contract](../../reference/Contract.md#pointblank.Contract) object, generate equivalent Python code, or produce a YAML definition, all with a single function call.
 
@@ -80,6 +80,11 @@ result.to_validate(data=users).interrogate()
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -116,7 +121,7 @@ result.to_validate(data=users).interrogate()
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:53</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:27</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -340,6 +345,11 @@ tr { background-color: transparent; }
 #pb_step_tbl .gt_from_md> :last-child { margin-bottom: 0; }
 #pb_step_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
 #pb_step_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_indent_1 { text-indent: 5px; }
+#pb_step_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+#pb_step_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+#pb_step_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+#pb_step_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
 #pb_step_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
 #pb_step_tbl .gt_row_group_first td { border-top-width: 2px; }
 #pb_step_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -548,7 +558,7 @@ The `coverage` metric tells you what fraction of the source constraints were suc
 
 # Supported Formats
 
-Pointblank ships with adapters for the two most universal tabular schema formats. Additional adapters (dbt, Pydantic, Pandera) are planned for future releases.
+Pointblank ships with adapters for four widely-used schema and contract formats.
 
 
 ``` python
@@ -556,12 +566,20 @@ pb.list_adapters()
 ```
 
 
-    {'frictionless': {'class': 'FrictionlessAdapter',
+    {'dbt': {'class': 'DbtAdapter',
+      'file_extensions': ['.yml', '.yaml'],
+      'supports_import': True,
+      'supports_export': True},
+     'frictionless': {'class': 'FrictionlessAdapter',
       'file_extensions': ['.resource.json', '.datapackage.json'],
       'supports_import': True,
       'supports_export': True},
      'json_schema': {'class': 'JSONSchemaAdapter',
       'file_extensions': ['.schema.json'],
+      'supports_import': True,
+      'supports_export': True},
+     'odcs': {'class': 'ODCSAdapter',
+      'file_extensions': ['.odcs.yml', '.odcs.yaml', '.odcs.json'],
       'supports_import': True,
       'supports_export': True}}
 
@@ -722,6 +740,196 @@ print(f"Constraints: {len(orders_import.constraints)}")
 The `resource=` parameter accepts either a string (the resource name) or an integer (the resource index). When omitted, the first resource in the package is used. This makes it straightforward to work with multi-table data packages where each table has its own schema definition.
 
 
+## dbt `schema.yml`
+
+[dbt](https://www.getdbt.com/) (data build tool) is the standard for transformation workflows in modern analytics stacks. dbt models declare column-level tests in `schema.yml` files, and Pointblank can import these definitions directly.
+
+**Constraint mapping:**
+
+| dbt Feature | Pointblank Method |
+|----|----|
+| `data_type` | Schema dtype check |
+| `not_null` test | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
+| `unique` test | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
+| `accepted_values` test | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
+| `relationships` test | Warning (cross-table not yet supported) |
+
+Both the newer `data_tests` key (dbt v1.8+) and the legacy `tests` key are supported.
+
+**Importing from a dict:**
+
+
+``` python
+dbt_schema = {
+    "version": 2,
+    "models": [
+        {
+            "name": "orders",
+            "description": "Cleaned order data",
+            "columns": [
+                {
+                    "name": "order_id",
+                    "data_type": "integer",
+                    "data_tests": ["not_null", "unique"],
+                },
+                {
+                    "name": "status",
+                    "data_type": "string",
+                    "data_tests": [
+                        {"accepted_values": {"values": ["pending", "shipped", "delivered"]}}
+                    ],
+                },
+                {
+                    "name": "amount",
+                    "data_type": "float",
+                },
+            ],
+        }
+    ],
+}
+
+result = pb.import_contract(dbt_schema, format="dbt")
+print(result.summary())
+```
+
+
+    Contract Import Summary
+      Format: dbt
+      Columns detected: 3
+      Constraints mapped: 3
+      Coverage: 100%
+
+
+**Importing from a file:**
+
+``` python
+# File-based import (auto-detects .yml / .yaml with dbt structure)
+result = pb.import_contract("models/schema.yml", format="dbt")
+```
+
+**Selecting a specific model:**
+
+When a `schema.yml` file contains multiple models, use the `model=` parameter to pick one:
+
+
+``` python
+multi_model = {
+    "version": 2,
+    "models": [
+        {"name": "users", "columns": [{"name": "id", "data_tests": ["not_null"]}]},
+        {"name": "orders", "columns": [{"name": "order_id", "data_tests": ["not_null", "unique"]}]},
+    ],
+}
+
+result = pb.import_contract(multi_model, format="dbt", model="orders")
+print(f"Imported model: {result.metadata.get('title')}")
+print(f"Constraints: {len(result.constraints)}")
+```
+
+
+    Imported model: orders
+    Constraints: 2
+
+
+dbt sources are also supported. When a file contains `sources` with `tables`, each table is treated as a model candidate:
+
+``` python
+result = pb.import_contract("sources.yml", format="dbt", model="raw_events")
+```
+
+
+## ODCS (Open Data Contract Standard)
+
+The [Open Data Contract Standard](https://github.com/bitol-io/open-data-contract-standard) (ODCS) is a vendor-neutral format for defining data contracts between producers and consumers. Pointblank supports both ODCS v2.x and v3.x documents.
+
+**Constraint mapping:**
+
+| ODCS Feature | Pointblank Method |
+|----|----|
+| `logicalType` | Schema dtype check |
+| `isNullable: false` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
+| `isUnique: true` | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
+| `isPrimaryKey: true` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) + [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
+| `enum` / [values](../../reference/MetadataPackage.md#pointblank.MetadataPackage.values) | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
+| `pattern` | [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) |
+| `minimum` / `maximum` | [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) / [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) |
+| `minLength` / `maxLength` | Warning (no direct equivalent) |
+| Custom checks / SodaCL | Warning (no automatic mapping) |
+
+**Importing an ODCS v3 contract:**
+
+
+``` python
+odcs_contract = {
+    "kind": "DataContract",
+    "apiVersion": "v3.0.0",
+    "info": {
+        "title": "Customer Data",
+        "description": "Contract for customer records",
+    },
+    "dataset": [
+        {
+            "table": "customers",
+            "columns": [
+                {
+                    "column": "customer_id",
+                    "logicalType": "integer",
+                    "isNullable": False,
+                    "isUnique": True,
+                },
+                {
+                    "column": "email",
+                    "logicalType": "string",
+                    "isNullable": False,
+                    "pattern": r"^[^@]+@[^@]+\.[^@]+$",
+                },
+                {
+                    "column": "tier",
+                    "logicalType": "string",
+                    "enum": ["free", "pro", "enterprise"],
+                },
+                {
+                    "column": "lifetime_value",
+                    "logicalType": "float",
+                    "minimum": 0,
+                },
+            ],
+        }
+    ],
+}
+
+result = pb.import_contract(odcs_contract, format="odcs")
+print(result.summary())
+```
+
+
+    Contract Import Summary
+      Format: odcs
+      Format version: v3.0.0
+      Columns detected: 4
+      Constraints mapped: 6
+      Coverage: 100%
+
+
+**Selecting a specific table:**
+
+For contracts with multiple dataset tables, use `table=`:
+
+``` python
+result = pb.import_contract("contract.odcs.yml", format="odcs", table="orders")
+```
+
+**Importing from a file:**
+
+``` python
+# YAML files
+result = pb.import_contract("contracts/customer_data.odcs.yml", format="odcs")
+
+# JSON files
+result = pb.import_contract("contracts/customer_data.odcs.json", format="odcs")
+```
+
+
 # Output Options
 
 Once you have a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport), you can use it in several ways depending on your workflow.
@@ -787,6 +995,11 @@ imported.to_validate(data=weather_data).interrogate()
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -823,7 +1036,7 @@ imported.to_validate(data=weather_data).interrogate()
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:53</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:28</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -1070,6 +1283,11 @@ tr { background-color: transparent; }
 #pb_step_tbl .gt_from_md> :last-child { margin-bottom: 0; }
 #pb_step_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
 #pb_step_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_indent_1 { text-indent: 5px; }
+#pb_step_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+#pb_step_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+#pb_step_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+#pb_step_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
 #pb_step_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
 #pb_step_tbl .gt_row_group_first td { border-top-width: 2px; }
 #pb_step_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -1348,13 +1566,57 @@ table_schema
       {'name': 'station_id', 'type': 'string', 'constraints': {'required': True}}]}
 
 
-Each format produces the output structure that is native to that standard. JSON Schema export creates a valid `$schema`-annotated document with `properties`, `type`, and `required` fields. Frictionless export creates a Table Schema with `fields` and `constraints` entries. Both formats can be fed directly into tools that consume those standards, such as form validators, data catalogs, or documentation generators.
+``` python
+# Export to dbt schema.yml
+dbt_doc = pb.export_contract(contract, format="dbt")
+dbt_doc
+```
+
+
+    {'version': 2,
+     'models': [{'name': 'sensor_data',
+       'columns': [{'name': 'temperature',
+         'data_type': 'float',
+         'data_tests': ['not_null']},
+        {'name': 'humidity', 'data_type': 'float', 'data_tests': ['not_null']},
+        {'name': 'station_id',
+         'data_type': 'string',
+         'data_tests': ['not_null']}]}]}
+
+
+``` python
+# Export to ODCS
+odcs_doc = pb.export_contract(contract, format="odcs")
+odcs_doc
+```
+
+
+    {'kind': 'DataContract',
+     'apiVersion': 'v3.0.0',
+     'info': {'title': 'sensor_data'},
+     'dataset': [{'table': 'sensor_data',
+       'columns': [{'column': 'temperature',
+         'logicalType': 'number',
+         'minimum': -50,
+         'maximum': 60,
+         'isNullable': False},
+        {'column': 'humidity',
+         'logicalType': 'number',
+         'minimum': 0,
+         'maximum': 100,
+         'isNullable': False},
+        {'column': 'station_id', 'logicalType': 'string', 'isNullable': False}]}]}
+
+
+Each format produces the output structure that is native to that standard. JSON Schema export creates a valid `$schema`-annotated document with `properties`, `type`, and `required` fields. Frictionless export creates a Table Schema with `fields` and `constraints` entries. dbt export creates a `version: 2` document with models and column-level `data_tests`. ODCS export creates a `kind: DataContract` document with typed columns and constraint properties. All formats can be fed directly into tools that consume those standards.
 
 You can also write directly to a file:
 
 ``` python
 pb.export_contract(contract, "output/sensor_data.schema.json", format="json_schema")
 pb.export_contract(contract, "output/sensor_data.resource.json", format="frictionless")
+pb.export_contract(contract, "output/schema.yml", format="dbt")
+pb.export_contract(contract, "output/sensor_data.odcs.yml", format="odcs")
 ```
 
 When a `destination` path is provided, the output is written to that file (creating parent directories as needed) and also returned from the function. This makes it convenient to both persist the output and inspect it in the same call.
@@ -1409,14 +1671,27 @@ print(f"Detected: {result.source_format}")
 # Frictionless: detected by presence of "fields" list
 result = pb.import_contract({"fields": [{"name": "x", "type": "integer"}]})
 print(f"Detected: {result.source_format}")
+
+# dbt: detected by "models" or "sources" key
+result = pb.import_contract({"version": 2, "models": [{"name": "t", "columns": []}]})
+print(f"Detected: {result.source_format}")
+
+# ODCS: detected by "kind": "DataContract"
+result = pb.import_contract({
+    "kind": "DataContract", "apiVersion": "v3.0.0", "info": {"title": "x"},
+    "dataset": [{"table": "t", "columns": []}],
+})
+print(f"Detected: {result.source_format}")
 ```
 
 
     Detected: json_schema
     Detected: frictionless
+    Detected: dbt
+    Detected: odcs
 
 
-For file-based imports, the extension is also used for detection (`.schema.json` maps to JSON Schema, `.resource.json` or `.datapackage.json` maps to Frictionless). Auto-detection is a convenience feature that works well for common cases. When working with ambiguous files or dict inputs that could match multiple formats, it is best to specify `format=` explicitly to avoid any possibility of misdetection.
+For file-based imports, the extension is also used for detection (`.schema.json` maps to JSON Schema, `.resource.json` or `.datapackage.json` maps to Frictionless, `.odcs.yml` or `.odcs.json` maps to ODCS). Note that `.yml` and `.yaml` extensions are shared between dbt and ODCS, so for YAML files without a distinguishing extension, auto-detection falls through to content-based inspection. When working with ambiguous files or dict inputs that could match multiple formats, it is best to specify `format=` explicitly to avoid any possibility of misdetection.
 
 
 # Combining Imports with Extra Checks
@@ -1471,6 +1746,11 @@ validation
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -1507,7 +1787,7 @@ validation
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-07-22|23:23:53</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:28</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">enriched_check</span>
 
@@ -1604,7 +1884,7 @@ col_vals_not_null()
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">4</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Ym94PSIwIDAgNjcgNjciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+Y29sX3ZhbHNfd2l0aGluX3NwZWM8L3RpdGxlPgogICAgPGcgaWQ9Ikljb25zIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iY29sX3ZhbHNfd2l0aGluX3NwZWMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAwLjUxNzI0MSkiPgogICAgICAgICAgICA8cGF0aCBkPSJNNTYuNzEyMjM0LDEgQzU5LjE5NzUxNTMsMSA2MS40NDc1MTUzLDIuMDA3MzU5MzEgNjMuMDc2MTk1LDMuNjM2MDM4OTcgQzY0LjcwNDg3NDcsNS4yNjQ3MTg2MyA2NS43MTIyMzQsNy41MTQ3MTg2MyA2NS43MTIyMzQsMTAgTDY1LjcxMjIzNCwxMCBMNjUuNzEyMjM0LDY1IEwxMC43MTIyMzQsNjUgQzguMjI2OTUyNTksNjUgNS45NzY5NTI1OSw2My45OTI2NDA3IDQuMzQ4MjcyOTQsNjIuMzYzOTYxIEMyLjcxOTU5MzI4LDYwLjczNTI4MTQgMS43MTIyMzM5Nyw1OC40ODUyODE0IDEuNzEyMjMzOTcsNTYgTDEuNzEyMjMzOTcsNTYgTDEuNzEyMjMzOTcsMTAgQzEuNzEyMjMzOTcsNy41MTQ3MTg2MyAyLjcxOTU5MzI4LDUuMjY0NzE4NjMgNC4zNDgyNzI5NCwzLjYzNjAzODk3IEM1Ljk3Njk1MjU5LDIuMDA3MzU5MzEgOC4yMjY5NTI1OSwxIDEwLjcxMjIzNCwxIEwxMC43MTIyMzQsMSBaIiBpZD0icmVjdGFuZ2xlIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0iI0ZGRkZGRiIgLz4KICAgICAgICAgICAgPGcgaWQ9Imdsb2JlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5LjcxMjIzNCwgOS4wMDAwMDApIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iPgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTI0LDAuOTE5OTIxOSBDMTEuMjY1MTEzLDAuOTE5OTIxOSAwLjkxOTkyMTksMTEuMjY1MTEzIDAuOTE5OTIxOSwyNCBDMC45MTk5MjE5LDM2LjczNDg4NyAxMS4yNjUxMTMsNDcuMDgwMDc4IDI0LDQ3LjA4MDA3OCBDMzYuNzM0ODg3LDQ3LjA4MDA3OCA0Ny4wODAwNzgsMzYuNzM0ODg3IDQ3LjA4MDA3OCwyNCBDNDcuMDgwMDc4LDExLjI2NTExMyAzNi43MzQ4ODcsMC45MTk5MjE5IDI0LDAuOTE5OTIxOSBaIE0yMywzLjAzNzEwOTQgTDIzLDEyLjk3MDcwMyBDMjAuNDMyNTEsMTIuOTEwMTEgMTcuOTkxNDQ1LDEyLjYyMzAyMiAxNS43NDAyMzQsMTIuMTUyMzQ0IEMxNi4xMzY2MjcsMTAuOTUxNSAxNi41ODcxMDMsOS44MzU1NTkgMTcuMDg3ODkxLDguODMzOTg0NCBDMTguNzQwODI1LDUuNTI4MTE1NiAyMC44MzcyODYsMy41MTYwNDk4IDIzLDMuMDM3MTA5NCBaIE0yNSwzLjAzNzEwOTQgQzI3LjE2MjcxNCwzLjUxNjA0OTggMjkuMjU5MTc1LDUuNTI4MTE1NiAzMC45MTIxMDksOC44MzM5ODQ0IEMzMS40MTQ0OTYsOS44Mzg3NTcgMzEuODY2Mzc5LDEwLjk1ODgwNiAzMi4yNjM2NzIsMTIuMTY0MDYyIEMzMC4wMTUyNjksMTIuNjMwMDM3IDI3LjU3MDksMTIuOTExMzc3IDI1LDEyLjk3MDcwMyBMMjUsMy4wMzcxMDk0IFogTTE4LjE3MTg3NSwzLjc0MDIzNDQgQzE3LjA4NjQ4MSw0Ljg3NzI4NDUgMTYuMTE4NjM3LDYuMjk5ODM0NCAxNS4yOTg4MjgsNy45Mzk0NTMxIEMxNC43Mjc1MDIsOS4wODIxMDYgMTQuMjI2MzY2LDEwLjM0MjcxIDEzLjc4OTA2MiwxMS42ODc1IEMxMS44MjU5MzYsMTEuMTU4Mjc5IDEwLjA1MDU4NywxMC40OTIzNjEgOC41MTc1NzgxLDkuNzE4NzUgQzExLjA5NzUwMSw2LjkyMjcxNTEgMTQuNDExMDczLDQuODE4MDEwOSAxOC4xNzE4NzUsMy43NDAyMzQ0IFogTTI5LjgyODEyNSwzLjc0MDIzNDQgQzMzLjU4NTI4OSw0LjgxNjk2ODEgMzYuODk1NzM3LDYuOTE4OTYzNiAzOS40NzQ2MDksOS43MTA5MzggQzM3Ljk2NDI1LDEwLjQ5ODY2OCAzNi4xOTA4NjgsMTEuMTcyMDk4IDM0LjIxNjc5NywxMS43MDMxMjUgQzMzLjc3ODM1MywxMC4zNTI0MDkgMzMuMjc0NzEyLDkuMDg2NTM0IDMyLjcwMTE3Miw3LjkzOTQ1MzEgQzMxLjg4MTM2Myw2LjI5OTgzNDQgMzAuOTEzNTE5LDQuODc3Mjg0NSAyOS44MjgxMjUsMy43NDAyMzQ0IFogTTQwLjc4MzIwMywxMS4yNzM0MzggQzQzLjI4MDMxOSwxNC41NjMyNTQgNDQuODQ5NTkxLDE4LjU5NjU0NCA0NS4wNTQ2ODgsMjMgTDM2LjAxMzY3MiwyMyBDMzUuOTQwNjg2LDE5LjY0MjY5NyAzNS41MTE1ODEsMTYuNDcyODQzIDM0Ljc3NzM0NCwxMy42MzI4MTIgQzM3LjAyMTE2MiwxMy4wMjU3ODggMzkuMDQzNTY0LDEyLjIzMDM1NyA0MC43ODMyMDMsMTEuMjczNDM4IFogTTcuMjA1MDc4MSwxMS4yODkwNjIgQzguOTYzNTM2MiwxMi4yMjI3NTIgMTAuOTg5MzAxLDEzLjAwODc5IDEzLjIyNjU2MiwxMy42MTUyMzQgQzEyLjQ4OTYzMywxNi40NTk2NzEgMTIuMDU5NDYyLDE5LjYzNTkwNCAxMS45ODYzMjgsMjMgTDIuOTQ1MzEyNSwyMyBDMy4xNTAwODU2LDE4LjYwMzQ4NSA0LjcxNDg3MjcsMTQuNTc2MDc4IDcuMjA1MDc4MSwxMS4yODkwNjIgWiBNMTUuMTc1NzgxLDE0LjA4NTkzOCBDMTcuNjA4MTI0LDE0LjYwMzQ3OSAyMC4yMzcxNDUsMTQuOTExNjkyIDIzLDE0Ljk3MjY1NiBMMjMsMjMgTDEzLjk4NjMyOCwyMyBDMTQuMDYwNzI1LDE5Ljc4NzM2OSAxNC40ODA3NDMsMTYuNzYyMjcxIDE1LjE3NTc4MSwxNC4wODU5MzggWiBNMzIuODI4MTI1LDE0LjA5OTYwOSBDMzMuNTIxMDg4LDE2Ljc3MjYgMzMuOTM5NDAxLDE5Ljc5Mjc5NiAzNC4wMTM2NzIsMjMgTDI1LDIzIEwyNSwxNC45NzI2NTYgQzI3Ljc2NDQ1NywxNC45MTMzOTMgMzAuMzk2NDc3LDE0LjYxMjI3MSAzMi44MjgxMjUsMTQuMDk5NjA5IFogTTIuOTQ1MzEyNSwyNSBMMTEuOTg2MzI4LDI1IEMxMi4wNTkzMTQsMjguMzU3MzAzIDEyLjQ4ODQxOSwzMS41MjcxNTYgMTMuMjIyNjU2LDM0LjM2NzE4OCBDMTAuOTc4ODM4LDM0Ljk3NDIxMiA4Ljk1NjQzNjMsMzUuNzY5NjQzIDcuMjE2Nzk2OSwzNi43MjY1NjIgQzQuNzE5NjgwNiwzMy40MzY3NDYgMy4xNTA0MDg4LDI5LjQwMzQ1NiAyLjk0NTMxMjUsMjUgWiBNMTMuOTg2MzI4LDI1IEwyMywyNSBMMjMsMzMuMDI3MzQ0IEMyMC4yMzU1NDMsMzMuMDg2NjA3IDE3LjYwMzUyMywzMy4zODc3MjkgMTUuMTcxODc1LDMzLjkwMDM5MSBDMTQuNDc4OTEyLDMxLjIyNzQgMTQuMDYwNTk5LDI4LjIwNzIwNCAxMy45ODYzMjgsMjUgWiBNMjUsMjUgTDM0LjAxMzY3MiwyNSBDMzMuOTM5Mjc1LDI4LjIxMjYzMSAzMy41MTkyNTcsMzEuMjM3NzI5IDMyLjgyNDIxOSwzMy45MTQwNjIgQzMwLjM5MTg3NiwzMy4zOTY1MjEgMjcuNzYyODU1LDMzLjA4ODMwOCAyNSwzMy4wMjczNDQgTDI1LDI1IFogTTM2LjAxMzY3MiwyNSBMNDUuMDU0Njg4LDI1IEM0NC44NDk5MTQsMjkuMzk2NTE1IDQzLjI4NTEyNywzMy40MjM5MjIgNDAuNzk0OTIyLDM2LjcxMDkzOCBDMzkuMDM2NDY0LDM1Ljc3NzI0OCAzNy4wMTA2OTksMzQuOTkxMjEgMzQuNzczNDM4LDM0LjM4NDc2NiBDMzUuNTEwMzY3LDMxLjU0MDMyOSAzNS45NDA1MzgsMjguMzY0MDk2IDM2LjAxMzY3MiwyNSBaIE0yMywzNS4wMjkyOTcgTDIzLDQ0Ljk2Mjg5MSBDMjAuODM3Mjg2LDQ0LjQ4Mzk1IDE4Ljc0MDgyNSw0Mi40NzE4ODQgMTcuMDg3ODkxLDM5LjE2NjAxNiBDMTYuNTg1NTA0LDM4LjE2MTI0MyAxNi4xMzM2MjEsMzcuMDQxMTk0IDE1LjczNjMyOCwzNS44MzU5MzggQzE3Ljk4NDczMSwzNS4zNjk5NjMgMjAuNDI5MSwzNS4wODg2MjMgMjMsMzUuMDI5Mjk3IFogTTI1LDM1LjAyOTI5NyBDMjcuNTY3NDksMzUuMDg5ODkgMzAuMDA4NTU1LDM1LjM3Njk3OCAzMi4yNTk3NjYsMzUuODQ3NjU2IEMzMS44NjMzNzMsMzcuMDQ4NSAzMS40MTI4OTcsMzguMTY0NDQgMzAuOTEyMTA5LDM5LjE2NjAxNiBDMjkuMjU5MTc1LDQyLjQ3MTg4NCAyNy4xNjI3MTQsNDQuNDgzOTUgMjUsNDQuOTYyODkxIEwyNSwzNS4wMjkyOTcgWiBNMTMuNzgzMjAzLDM2LjI5Njg3NSBDMTQuMjIxNjQ3LDM3LjY0NzU5MSAxNC43MjUyODgsMzguOTEzNDY2IDE1LjI5ODgyOCw0MC4wNjA1NDcgQzE2LjExODYzNyw0MS43MDAxNjYgMTcuMDg2NDgxLDQzLjEyMjcxNiAxOC4xNzE4NzUsNDQuMjU5NzY2IEMxNC40MTQ3MTEsNDMuMTgzMDMyIDExLjEwNDI2Myw0MS4wODEwMzYgOC41MjUzOTA2LDM4LjI4OTA2MiBDMTAuMDM1NzUsMzcuNTAxMzMyIDExLjgwOTEzMiwzNi44Mjc5MDIgMTMuNzgzMjAzLDM2LjI5Njg3NSBaIE0zNC4yMTA5MzgsMzYuMzEyNSBDMzYuMTc0MDY0LDM2Ljg0MTcyMSAzNy45NDk0MTMsMzcuNTA3NjM5IDM5LjQ4MjQyMiwzOC4yODEyNSBDMzYuOTAyNDk5LDQxLjA3NzI4NSAzMy41ODg5MjcsNDMuMTgxOTg5IDI5LjgyODEyNSw0NC4yNTk3NjYgQzMwLjkxMzUxOSw0My4xMjI3MTYgMzEuODgxMzYzLDQxLjcwMDE2NiAzMi43MDExNzIsNDAuMDYwNTQ3IEMzMy4yNzI0OTgsMzguOTE3ODk0IDMzLjc3MzYzNCwzNy42NTcyOSAzNC4yMTA5MzgsMzYuMzEyNSBaIiBpZD0iU2hhcGUiIC8+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
+MDkzOCBDMzkuMDM2NDY0LDM1Ljc3NzI0OCAzNy4wMTA2OTksMzQuOTkxMjEgMzQuNzczNDM4LDM0LjM4NDc2NiBDMzUuNTEwMzY3LDMxLjU0MDMyOSAzNS45NDA1MzgsMjguMzY0MDk2IDM2LjAxMzY3MiwyNSBaIE0yMywzNS4wMjkyOTcgTDIzLDQ0Ljk2Mjg5MSBDMjAuODM3Mjg2LDQ0LjQ4Mzk1IDE4Ljc0MDgyNSw0Mi40NzE4ODQgMTcuMDg3ODkxLDM5LjE2NjAxNiBDMTYuNTg1NTA0LDM4LjE2MTI0MyAxNi4xMzM2MjEsMzcuMDQxMTk0IDE1LjczNjMyOCwzNS44MzU5MzggQzE3Ljk4NDczMSwzNS4zNjk5NjMgMjAuNDI5MSwzNS4wODg2MjMgMjMsMzUuMDI5Mjk3IFogTTI1LDM1LjAyOTI5NyBDMjcuNTY3NDksMzUuMDg5ODkgMzAuMDA4NTU1LDM1LjM3Njk3OCAzMi4yNTk3NjYsMzUuODQ3NjU2IEMzMS44NjMzNzMsMzcuMDQ4NSAzMS40MTI4OTcsMzguMTY0NDQgMzAuOTEyMTA5LDM5LjE2NjAxNiBDMjkuMjU5MTc1LDQyLjQ3MTg4NCAyNy4xNjI3MTQsNDQuNDgzOTUgMjUsNDQuOTYyODkxIEwyNSwzNS4wMjkyOTcgWiBNMTMuNzgzMjAzLDM2LjI5Njg3NSBDMTQuMjIxNjQ3LDM3LjY0NzU5MSAxNC43MjUyODgsMzguOTEzNDY2IDE1LjI5ODgyOCw0MC4wNjA1NDcgQzE2LjExODYzNyw0MS43MDAxNjYgMTcuMDg2NDgxLDQzLjEyMjcxNiAxOC4xNzE4NzUsNDQuMjU5NzY2IEMxNC40MTQ3MTEsNDMuMTgzMDMyIDExLjEwNDI2Myw0MS4wODEwMzYgOC41MjUzOTA2LDM4LjI4OTA2MiBDMTAuMDM1NzUsMzcuNTAxMzMyIDExLjgwOTEzMiwzNi44Mjc5MDIgMTMuNzgzMjAzLDM2LjI5Njg3NSBaIE0zNC4yMTA5MzgsMzYuMzEyNSBDMzYuMTc0MDY0LDM2Ljg0MTcyMSAzNy45NDk0MTMsMzcuNTA3NjM5IDM5LjQ4MjQyMiwzOC4yODEyNSBDMzYuOTAyNDk5LDQxLjA3NzI4NSAzMy41ODg5MjcsNDMuMTgxOTg5IDI5LjgyODEyNSw0NC4yNTk3NjYgQzMwLjkxMzUxOSw0My4xMjI3MTYgMzEuODgxMzYzLDQxLjcwMDE2NiAzMi43MDExNzIsNDAuMDYwNTQ3IEMzMy4yNzI0OTgsMzguOTE3ODk0IDMzLjc3MzYzNCwzNy42NTcyOSAzNC4yMTA5MzgsMzYuMzEyNSBaIiBpZD0iU2hhcGUiIC8+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
 
 col_vals_within_spec()
 
@@ -1634,7 +1914,7 @@ col_vals_ge()
 </div></td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">age</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">0</td>
-LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjVweCIgaGVpZ2h0PSIyNXB4IiB2aWV3Ym94PSIwIDAgMjUgMjUiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgc3R5bGU9InZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Ij4KICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTAwMDAwLCAwLjU3MDE0NykiPgogICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiB4PSIwLjEyNTEzMjUwNiIgeT0iMCIgd2lkdGg9IjIzLjc0OTczNSIgaGVpZ2h0PSIyMy43ODk0NzM3IiAvPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44MDM3NTA0Niw4LjE4MTk0NzM2IEMzLjc3MTkxODMyLDguMTgxOTQ3MzYgMi4xMTg3NTA0Niw5LjgzNDk1MzI4IDIuMTE4NzUwNDYsMTEuODY2OTQ3NCBDMi4xMTg3NTA0NiwxMy44OTg5NDE0IDMuNzcxOTE4MzIsMTUuNTUxOTQ3NCA1LjgwMzc1MDQ2LDE1LjU1MTk0NzQgQzcuODM1NTgyNiwxNS41NTE5NDc0IDkuNDg4NzUwNDYsMTMuODk4OTQxNCA5LjQ4ODc1MDQ2LDExLjg2Njk0NzQgQzkuNDg4NzUwNDYsOS44MzQ5NTMyOCA3LjgzNTUyODYzLDguMTgxOTQ3MzYgNS44MDM3NTA0Niw4LjE4MTk0NzM2IFogTTUuODAzNzUwNDYsMTQuODE0OTE1IEM0LjE3ODIxOTk3LDE0LjgxNDkxNSAyLjg1NTc4Mjg1LDEzLjQ5MjQ3NzggMi44NTU3ODI4NSwxMS44NjY5NDc0IEMyLjg1NTc4Mjg1LDEwLjI0MTQxNjkgNC4xNzgyMTk5Nyw4LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3"><span style="color:#4CA64C;">✓</span></td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px">5</td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">5<br />
@@ -1777,6 +2057,11 @@ tr { background-color: transparent; }
 #pb_step_tbl .gt_from_md> :last-child { margin-bottom: 0; }
 #pb_step_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
 #pb_step_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+#pb_step_tbl .gt_indent_1 { text-indent: 5px; }
+#pb_step_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+#pb_step_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+#pb_step_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+#pb_step_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
 #pb_step_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
 #pb_step_tbl .gt_row_group_first td { border-top-width: 2px; }
 #pb_step_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -1938,6 +2223,36 @@ validation = result.to_validate(data=observations_df).interrogate()
 Frictionless Data Packages are common in open data portals, government datasets, and academic research repositories. By importing their Table Schemas directly, you can validate downloaded data against its declared structure without needing to manually inspect the descriptor file and rewrite each constraint. This is especially valuable when working with unfamiliar datasets where the schema descriptor is your primary documentation of what the data should contain.
 
 
+## Coming from dbt
+
+If your analytics team maintains dbt models with schema tests:
+
+``` python
+# Import the tests from your dbt schema.yml
+result = pb.import_contract("models/schema.yml", format="dbt", model="orders")
+
+# Now validate source data before it reaches dbt
+validation = result.to_validate(data=raw_orders_df).interrogate()
+```
+
+This is really valuable for "shift-left" validation: catching data quality issues in raw source data before it enters the dbt transformation pipeline. Your dbt schema tests define what the transformed data should look like. Importing those same rules into Pointblank lets you apply them at the ingestion boundary.
+
+
+## Coming from ODCS
+
+If your organization uses the Open Data Contract Standard for cross-team data governance:
+
+``` python
+# Import a data contract
+result = pb.import_contract("contracts/customer_data.odcs.yml", format="odcs")
+
+# Validate data against the contract
+validation = result.to_validate(data=customer_df).interrogate()
+```
+
+ODCS contracts are increasingly used in data mesh architectures where domain teams publish contracts for their data products. Importing these contracts into Pointblank lets consumers validate incoming data against the producer's declared contract, without needing to manually rewrite the constraints.
+
+
 ## Generating a Starting Point
 
 Even if you don't plan to keep using the external format, importing is a great way to bootstrap a Pointblank contract:
@@ -1964,4 +2279,4 @@ The contract import/export system lets you bridge the gap between external schem
 - Use `pb.export_contract()` to write Pointblank contracts back to external formats for sharing with other tools
 - Combine imports with additional Pointblank-specific checks for the most thorough validation coverage
 
-Whether you are migrating from another validation tool, bootstrapping contracts from existing schemas, or maintaining interoperability with external systems, the adapter framework gives you a clean path between external specifications and Pointblank's validation engine. As new adapters are added in future releases, the same [import_contract()](../../reference/import_contract.md#pointblank.import_contract) interface will continue to work, so any code you write today will gain new format support automatically.
+Whether you are migrating from another validation tool, bootstrapping contracts from existing schemas, or maintaining interoperability with external systems, the adapter framework gives you a clean path between external specifications and Pointblank's validation engine. The four built-in adapters (JSON Schema, Frictionless, dbt, and ODCS) cover the most common schema formats in the data ecosystem. And if you need to support a proprietary format, the custom adapter system (covered in the next section) makes it straightforward to extend the framework.

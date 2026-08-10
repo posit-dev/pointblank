@@ -1422,7 +1422,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L70" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L68" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">import_contract</span>(
@@ -1433,7 +1433,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 )</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Reads an external schema definition (JSON Schema, Frictionless Table Schema, dbt schema.yml, Pandera schema, Pydantic model, etc.) and produces a <a href="ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a> with validation steps mapped to Pointblank methods.</p>
+<p>Reads an external schema definition and produces a <a href="ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a> with validation steps mapped to Pointblank methods. Use <code>pb.list_adapters()</code> to see all registered formats.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters">Parameters</h2>
@@ -1441,11 +1441,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The source to import from. Can be: (1) a file path (str) to a schema/contract file, (2) a Python dict with schema content already loaded, or (3) a Python object (e.g., a Pandera <code>DataFrameSchema</code> or Pydantic model class).</p>
+The source to import from. Can be: (1) a file path (str) to a schema/contract file, or
+<ol start="2" type="1">
+<li>a Python dict with schema content already loaded.</li>
+</ol>
 </dd>
 <dt><code><span class="doc-parameter-name">format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The format identifier (e.g., <code>"json_schema"</code>, <code>"frictionless"</code>, <code>"dbt"</code>, etc.). If <code>None</code>, the format is auto-detected from file extension or content.</p>
+<p>The format identifier (e.g., <code>"json_schema"</code>, <code>"frictionless"</code>, <code>"dbt"</code>, <code>"odcs"</code>). If <code>None</code>, the format is auto-detected from file extension or content.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>

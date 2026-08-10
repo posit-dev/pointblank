@@ -27,7 +27,7 @@ A [Validate](Validate.md#pointblank.Validate) or [Contract](Contract.md#pointbla
 Optional file path to write the output. If None, the result is returned without writing to disk.
 
 `format: str`  
-The target format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, etc.).
+The target format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"`).
 
 `**kwargs: Any`  
 Format-specific options passed to the adapter.

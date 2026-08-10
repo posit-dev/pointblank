@@ -16,17 +16,19 @@ import_contract(
 ```
 
 
-Reads an external schema definition (JSON Schema, Frictionless Table Schema, dbt schema.yml, Pandera schema, Pydantic model, etc.) and produces a [ContractImport](ContractImport.md#pointblank.ContractImport) with validation steps mapped to Pointblank methods.
+Reads an external schema definition and produces a [ContractImport](ContractImport.md#pointblank.ContractImport) with validation steps mapped to Pointblank methods. Use `pb.list_adapters()` to see all registered formats.
 
 
 ## Parameters
 
 
 `source: Any`  
-The source to import from. Can be: (1) a file path (str) to a schema/contract file, (2) a Python dict with schema content already loaded, or (3) a Python object (e.g., a Pandera `DataFrameSchema` or Pydantic model class).
+The source to import from. Can be: (1) a file path (str) to a schema/contract file, or
+
+2.  a Python dict with schema content already loaded.
 
 `format: str | None = None`  
-The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, etc.). If `None`, the format is auto-detected from file extension or content.
+The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"`). If `None`, the format is auto-detected from file extension or content.
 
 `**kwargs: Any`  
 Format-specific options passed to the adapter.
