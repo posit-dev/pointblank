@@ -17,7 +17,8 @@ isn't covered by the built-in adapters, you can write a **custom adapter** and r
 the framework.
 
 Once registered, your custom adapter works seamlessly with `import_contract()` and
-`export_contract()`, the same API surface your team already uses for JSON Schema and Frictionless.
+`export_contract()`, the same API surface your team already uses for JSON Schema, Frictionless, dbt,
+and ODCS.
 
 ## The Adapter Architecture
 
