@@ -814,7 +814,9 @@ class TestDbtImport:
 
     def test_import_relationship_warning(self, dbt_schema_legacy_tests):
         result = import_contract(dbt_schema_legacy_tests, format="dbt")
-        assert any("relationship" in w.lower() or "cross-table" in w.lower() for w in result.warnings)
+        assert any(
+            "relationship" in w.lower() or "cross-table" in w.lower() for w in result.warnings
+        )
         assert result.coverage < 1.0
 
     def test_import_from_sources(self, dbt_sources_dict):
@@ -928,7 +930,11 @@ class TestDbtRoundTrip:
                 {
                     "name": "users",
                     "columns": [
-                        {"name": "id", "data_type": "integer", "data_tests": ["not_null", "unique"]},
+                        {
+                            "name": "id",
+                            "data_type": "integer",
+                            "data_tests": ["not_null", "unique"],
+                        },
                         {
                             "name": "status",
                             "data_type": "string",
@@ -1232,7 +1238,12 @@ class TestODCSRoundTrip:
                 {
                     "table": "users",
                     "columns": [
-                        {"column": "id", "logicalType": "integer", "isNullable": False, "isUnique": True},
+                        {
+                            "column": "id",
+                            "logicalType": "integer",
+                            "isNullable": False,
+                            "isUnique": True,
+                        },
                         {"column": "age", "logicalType": "integer", "minimum": 0, "maximum": 150},
                         {"column": "status", "logicalType": "string", "enum": ["a", "b"]},
                     ],
