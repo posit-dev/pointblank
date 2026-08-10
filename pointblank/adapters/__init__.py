@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import pointblank.adapters._frictionless  # noqa: F401
-
 # Import adapter modules to trigger registration via @register_adapter
+import pointblank.adapters._dbt  # noqa: F401
+import pointblank.adapters._frictionless  # noqa: F401
 import pointblank.adapters._json_schema  # noqa: F401
+import pointblank.adapters._odcs  # noqa: F401
 from pointblank.adapters._api import export_contract, import_contract
 from pointblank.adapters._base import ContractAdapter, ContractImport, MappedConstraint
 from pointblank.adapters._registry import (
