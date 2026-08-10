@@ -12,15 +12,6 @@ Export validation rules and schemas to standard interchange formats.
 - `.to_documentation()` for auto-generated data documentation (Markdown, HTML)
 - Round-trip compatibility with YAML validation configs
 
-### Validation Registry
-
-Organizational catalog for sharing and discovering validation definitions.
-
-- `pb.ValidationRegistry` for storing and retrieving validations
-- Named validation lookup across teams
-- Version tracking for validation definitions
-- Integration with YAML-based validation configs
-
 ### Rich Notification Ecosystem
 
 Expand alerting beyond Slack to additional platforms.
