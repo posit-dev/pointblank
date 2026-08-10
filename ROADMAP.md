@@ -48,15 +48,6 @@ Extend the existing `generate_dataset()` capabilities.
 
 Features that expand Pointblank's scope into new domains.
 
-### Intelligent Validation Recommendations
-
-AI-powered suggestions for improving existing validations.
-
-- Post-hoc validation improvement suggestions via `.suggest_improvements()`
-- Automatic detection of uncovered columns
-- Correlation-based rule suggestions
-- Anomaly-based threshold recommendations
-
 ### AI-Powered Data Documentation
 
 Auto-generate data dictionaries and documentation from data and validations.
@@ -68,13 +59,6 @@ Auto-generate data dictionaries and documentation from data and validations.
 - Incremental documentation updates
 
 ### Natural Language Validation Queries
-
-Define validations using plain English descriptions.
-
-- `.from_prompt()` method for NL-to-validation conversion
-- Interactive clarification for ambiguous requests
-- Learning from corrections to improve suggestions
-- Support for domain-specific terminology
 
 ### Pipeline Integration Framework
 
