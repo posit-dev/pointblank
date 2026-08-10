@@ -98,17 +98,6 @@ Expand `DataScan` into comprehensive profiling with drift detection.
 
 Larger efforts for future milestones.
 
-### Multi-Table & Cross-Dataset Validation
-
-Validate relationships across tables and datasets.
-
-- `pb.ValidateRelationships` for multi-table validation
-- Foreign key validation
-- Referential integrity checks
-- Cross-table aggregate validations
-- Entity resolution checks
-- Join quality validation
-
 ### VS Code Extension
 
 Bring Pointblank directly into the IDE.
