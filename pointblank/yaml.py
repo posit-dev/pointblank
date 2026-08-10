@@ -266,6 +266,7 @@ class YAMLValidator:
         "col_vals_outside": "col_vals_outside",
         "col_vals_regex": "col_vals_regex",
         "col_vals_in_set": "col_vals_in_set",
+        "col_vals_in_table": "col_vals_in_table",
         "col_vals_not_in_set": "col_vals_not_in_set",
         "col_vals_not_null": "col_vals_not_null",
         "col_vals_null": "col_vals_null",
