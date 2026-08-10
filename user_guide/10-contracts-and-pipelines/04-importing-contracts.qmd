@@ -12,8 +12,8 @@ pb.config(report_incl_footer_timings=False)
 ```
 
 Many teams already have data schemas defined in other tools: JSON Schema files for API validation,
-Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or
-Pandera/Pydantic models in application code. Rather than manually rewriting these specifications as
+Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or ODCS
+data contracts for cross-team governance. Rather than manually rewriting these specifications as
 Pointblank validation steps, you can **import** them directly.
 
 The `import_contract()` function reads an external schema definition and produces a `ContractImport`
@@ -148,8 +148,7 @@ parts might need manual attention.
 
 ## Supported Formats
 
-Pointblank ships with adapters for the two most universal tabular schema formats. Additional
-adapters (dbt, Pydantic, Pandera) are planned for future releases.
+Pointblank ships with adapters for four widely-used schema and contract formats.
 
 ```{python}
 pb.list_adapters()
@@ -298,6 +297,174 @@ The `resource=` parameter accepts either a string (the resource name) or an inte
 index). When omitted, the first resource in the package is used. This makes it straightforward to
 work with multi-table data packages where each table has its own schema definition.
 
+### dbt `schema.yml`
+
+[dbt](https://www.getdbt.com/) (data build tool) is the standard for transformation workflows in
+modern analytics stacks. dbt models declare column-level tests in `schema.yml` files, and Pointblank
+can import these definitions directly.
+
+**Constraint mapping:**
+
+| dbt Feature | Pointblank Method |
+|---|---|
+| `data_type` | Schema dtype check |
+| `not_null` test | `col_vals_not_null()` |
+| `unique` test | `rows_distinct()` |
+| `accepted_values` test | `col_vals_in_set()` |
+| `relationships` test | Warning (cross-table not yet supported) |
+
+Both the newer `data_tests` key (dbt v1.8+) and the legacy `tests` key are supported.
+
+**Importing from a dict:**
+
+```{python}
+dbt_schema = {
+    "version": 2,
+    "models": [
+        {
+            "name": "orders",
+            "description": "Cleaned order data",
+            "columns": [
+                {
+                    "name": "order_id",
+                    "data_type": "integer",
+                    "data_tests": ["not_null", "unique"],
+                },
+                {
+                    "name": "status",
+                    "data_type": "string",
+                    "data_tests": [
+                        {"accepted_values": {"values": ["pending", "shipped", "delivered"]}}
+                    ],
+                },
+                {
+                    "name": "amount",
+                    "data_type": "float",
+                },
+            ],
+        }
+    ],
+}
+
+result = pb.import_contract(dbt_schema, format="dbt")
+print(result.summary())
+```
+
+**Importing from a file:**
+
+```python
+# File-based import (auto-detects .yml / .yaml with dbt structure)
+result = pb.import_contract("models/schema.yml", format="dbt")
+```
+
+**Selecting a specific model:**
+
+When a `schema.yml` file contains multiple models, use the `model=` parameter to pick one:
+
+```{python}
+multi_model = {
+    "version": 2,
+    "models": [
+        {"name": "users", "columns": [{"name": "id", "data_tests": ["not_null"]}]},
+        {"name": "orders", "columns": [{"name": "order_id", "data_tests": ["not_null", "unique"]}]},
+    ],
+}
+
+result = pb.import_contract(multi_model, format="dbt", model="orders")
+print(f"Imported model: {result.metadata.get('title')}")
+print(f"Constraints: {len(result.constraints)}")
+```
+
+dbt sources are also supported. When a file contains `sources` with `tables`, each table is treated
+as a model candidate:
+
+```python
+result = pb.import_contract("sources.yml", format="dbt", model="raw_events")
+```
+
+### ODCS (Open Data Contract Standard)
+
+The [Open Data Contract Standard](https://github.com/bitol-io/open-data-contract-standard) (ODCS)
+is a vendor-neutral format for defining data contracts between producers and consumers. Pointblank
+supports both ODCS v2.x and v3.x documents.
+
+**Constraint mapping:**
+
+| ODCS Feature | Pointblank Method |
+|---|---|
+| `logicalType` | Schema dtype check |
+| `isNullable: false` | `col_vals_not_null()` |
+| `isUnique: true` | `rows_distinct()` |
+| `isPrimaryKey: true` | `col_vals_not_null()` + `rows_distinct()` |
+| `enum` / `values` | `col_vals_in_set()` |
+| `pattern` | `col_vals_regex()` |
+| `minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
+| `minLength` / `maxLength` | Warning (no direct equivalent) |
+| Custom checks / SodaCL | Warning (no automatic mapping) |
+
+**Importing an ODCS v3 contract:**
+
+```{python}
+odcs_contract = {
+    "kind": "DataContract",
+    "apiVersion": "v3.0.0",
+    "info": {
+        "title": "Customer Data",
+        "description": "Contract for customer records",
+    },
+    "dataset": [
+        {
+            "table": "customers",
+            "columns": [
+                {
+                    "column": "customer_id",
+                    "logicalType": "integer",
+                    "isNullable": False,
+                    "isUnique": True,
+                },
+                {
+                    "column": "email",
+                    "logicalType": "string",
+                    "isNullable": False,
+                    "pattern": r"^[^@]+@[^@]+\.[^@]+$",
+                },
+                {
+                    "column": "tier",
+                    "logicalType": "string",
+                    "enum": ["free", "pro", "enterprise"],
+                },
+                {
+                    "column": "lifetime_value",
+                    "logicalType": "float",
+                    "minimum": 0,
+                },
+            ],
+        }
+    ],
+}
+
+result = pb.import_contract(odcs_contract, format="odcs")
+print(result.summary())
+```
+
+**Selecting a specific table:**
+
+For contracts with multiple dataset tables, use `table=`:
+
+```python
+result = pb.import_contract("contract.odcs.yml", format="odcs", table="orders")
+```
+
+**Importing from a file:**
+
+```python
+# YAML files
+result = pb.import_contract("contracts/customer_data.odcs.yml", format="odcs")
+
+# JSON files
+result = pb.import_contract("contracts/customer_data.odcs.json", format="odcs")
+```
+
 ## Output Options
 
 Once you have a `ContractImport`, you can use it in several ways depending on your workflow.
@@ -433,17 +600,32 @@ table_schema = pb.export_contract(contract, format="frictionless")
 table_schema
 ```
 
+```{python}
+# Export to dbt schema.yml
+dbt_doc = pb.export_contract(contract, format="dbt")
+dbt_doc
+```
+
+```{python}
+# Export to ODCS
+odcs_doc = pb.export_contract(contract, format="odcs")
+odcs_doc
+```
+
 Each format produces the output structure that is native to that standard. JSON Schema export
 creates a valid `$schema`-annotated document with `properties`, `type`, and `required` fields.
-Frictionless export creates a Table Schema with `fields` and `constraints` entries. Both formats
-can be fed directly into tools that consume those standards, such as form validators, data catalogs,
-or documentation generators.
+Frictionless export creates a Table Schema with `fields` and `constraints` entries. dbt export
+creates a `version: 2` document with models and column-level `data_tests`. ODCS export creates a
+`kind: DataContract` document with typed columns and constraint properties. All formats can be fed
+directly into tools that consume those standards.
 
 You can also write directly to a file:
 
 ```python
 pb.export_contract(contract, "output/sensor_data.schema.json", format="json_schema")
 pb.export_contract(contract, "output/sensor_data.resource.json", format="frictionless")
+pb.export_contract(contract, "output/schema.yml", format="dbt")
+pb.export_contract(contract, "output/sensor_data.odcs.yml", format="odcs")
 ```
 
 When a `destination` path is provided, the output is written to that file (creating parent
@@ -497,13 +679,25 @@ print(f"Detected: {result.source_format}")
 # Frictionless: detected by presence of "fields" list
 result = pb.import_contract({"fields": [{"name": "x", "type": "integer"}]})
 print(f"Detected: {result.source_format}")
+
+# dbt: detected by "models" or "sources" key
+result = pb.import_contract({"version": 2, "models": [{"name": "t", "columns": []}]})
+print(f"Detected: {result.source_format}")
+
+# ODCS: detected by "kind": "DataContract"
+result = pb.import_contract({
+    "kind": "DataContract", "apiVersion": "v3.0.0", "info": {"title": "x"},
+    "dataset": [{"table": "t", "columns": []}],
+})
+print(f"Detected: {result.source_format}")
 ```
 
 For file-based imports, the extension is also used for detection (`.schema.json` maps to JSON
-Schema, `.resource.json` or `.datapackage.json` maps to Frictionless). Auto-detection is a
-convenience feature that works well for common cases. When working with ambiguous files or dict
-inputs that could match multiple formats, it is best to specify `format=` explicitly to avoid
-any possibility of misdetection.
+Schema, `.resource.json` or `.datapackage.json` maps to Frictionless, `.odcs.yml` or `.odcs.json`
+maps to ODCS). Note that `.yml` and `.yaml` extensions are shared between dbt and ODCS, so for YAML
+files without a distinguishing extension, auto-detection falls through to content-based inspection.
+When working with ambiguous files or dict inputs that could match multiple formats, it is best to
+specify `format=` explicitly to avoid any possibility of misdetection.
 
 ## Combining Imports with Extra Checks
 
@@ -526,9 +720,9 @@ validation
 
 This pattern works well when the external schema covers structural and type constraints, but your
 team has additional business rules that only make sense in the Pointblank context. The imported
-constraints form the foundation, and your additional `.col_vals_*()` or `.rows_*()` calls layer
-on top. Because `.to_validate()` returns a standard `Validate` object, you have full access to
-the entire Pointblank API for adding checks, setting thresholds, or attaching actions.
+constraints form the foundation, and your additional `.col_vals_*()` or `.rows_*()` calls layer on
+top. Because `.to_validate()` returns a standard `Validate` object, you have full access to the
+entire Pointblank API for adding checks, setting thresholds, or attaching actions.
 
 ## Migration from Other Tools
 
@@ -570,6 +764,39 @@ against its declared structure without needing to manually inspect the descripto
 each constraint. This is especially valuable when working with unfamiliar datasets where the schema
 descriptor is your primary documentation of what the data should contain.
 
+### Coming from dbt
+
+If your analytics team maintains dbt models with schema tests:
+
+```python
+# Import the tests from your dbt schema.yml
+result = pb.import_contract("models/schema.yml", format="dbt", model="orders")
+
+# Now validate source data before it reaches dbt
+validation = result.to_validate(data=raw_orders_df).interrogate()
+```
+
+This is really valuable for "shift-left" validation: catching data quality issues in raw source data
+before it enters the dbt transformation pipeline. Your dbt schema tests define what the transformed
+data should look like. Importing those same rules into Pointblank lets you apply them at the
+ingestion boundary.
+
+### Coming from ODCS
+
+If your organization uses the Open Data Contract Standard for cross-team data governance:
+
+```python
+# Import a data contract
+result = pb.import_contract("contracts/customer_data.odcs.yml", format="odcs")
+
+# Validate data against the contract
+validation = result.to_validate(data=customer_df).interrogate()
+```
+
+ODCS contracts are increasingly used in data mesh architectures where domain teams publish contracts
+for their data products. Importing these contracts into Pointblank lets consumers validate incoming
+data against the producer's declared contract, without needing to manually rewrite the constraints.
+
 ### Generating a Starting Point
 
 Even if you don't plan to keep using the external format, importing is a great way to bootstrap
@@ -607,6 +834,7 @@ whenever you need runtime validation. The key points to remember:
 
 Whether you are migrating from another validation tool, bootstrapping contracts from existing
 schemas, or maintaining interoperability with external systems, the adapter framework gives you a
-clean path between external specifications and Pointblank's validation engine. As new adapters are
-added in future releases, the same `import_contract()` interface will continue to work, so any code
-you write today will gain new format support automatically.
+clean path between external specifications and Pointblank's validation engine. The four built-in
+adapters (JSON Schema, Frictionless, dbt, and ODCS) cover the most common schema formats in the data
+ecosystem. And if you need to support a proprietary format, the custom adapter system (covered in
+the next section) makes it straightforward to extend the framework.

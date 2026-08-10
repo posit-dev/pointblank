@@ -125,6 +125,8 @@ class TestRegistry:
         adapters = list_adapters()
         assert "json_schema" in adapters
         assert "frictionless" in adapters
+        assert "dbt" in adapters
+        assert "odcs" in adapters
 
     def test_get_adapter_json_schema(self):
         adapter = get_adapter("json_schema")
@@ -652,6 +654,606 @@ class TestRoundTrip:
         contract = imported.to_contract(name="roundtrip_test")
         exported = export_contract(contract, format="frictionless")
         reimported = import_contract(exported, format="frictionless")
+
+        def _hashable_kwargs(kwargs):
+            items = []
+            for k, v in sorted(kwargs.items()):
+                items.append((k, tuple(v) if isinstance(v, list) else v))
+            return tuple(items)
+
+        original_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in imported.constraints}
+        roundtrip_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in reimported.constraints}
+        assert original_methods == roundtrip_methods
+
+
+# ── dbt adapter fixtures ─────────────────────────────────────────────────────
+
+
+@pytest.fixture
+def dbt_schema_dict():
+    """A dbt schema.yml document as a dict."""
+    return {
+        "version": 2,
+        "models": [
+            {
+                "name": "users",
+                "description": "User accounts table",
+                "columns": [
+                    {
+                        "name": "id",
+                        "data_type": "integer",
+                        "data_tests": ["not_null", "unique"],
+                    },
+                    {
+                        "name": "name",
+                        "data_type": "varchar",
+                        "data_tests": ["not_null"],
+                    },
+                    {
+                        "name": "age",
+                        "data_type": "integer",
+                    },
+                    {
+                        "name": "status",
+                        "data_type": "string",
+                        "data_tests": [
+                            {"accepted_values": {"values": ["active", "inactive", "pending"]}}
+                        ],
+                    },
+                    {
+                        "name": "email",
+                        "data_type": "varchar(256)",
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def dbt_schema_legacy_tests():
+    """A dbt schema.yml using the legacy 'tests' key."""
+    return {
+        "version": 2,
+        "models": [
+            {
+                "name": "orders",
+                "columns": [
+                    {
+                        "name": "order_id",
+                        "data_type": "integer",
+                        "tests": ["not_null", "unique"],
+                    },
+                    {
+                        "name": "user_id",
+                        "data_type": "integer",
+                        "tests": [
+                            {"relationships": {"to": "ref('users')", "field": "id"}},
+                        ],
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def dbt_sources_dict():
+    """A dbt schema.yml with sources instead of models."""
+    return {
+        "version": 2,
+        "sources": [
+            {
+                "name": "raw",
+                "tables": [
+                    {
+                        "name": "events",
+                        "columns": [
+                            {
+                                "name": "event_id",
+                                "data_type": "bigint",
+                                "data_tests": ["not_null", "unique"],
+                            },
+                            {
+                                "name": "event_type",
+                                "data_type": "string",
+                                "data_tests": [
+                                    {"accepted_values": {"values": ["click", "view", "purchase"]}}
+                                ],
+                            },
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+class TestDbtImport:
+    def test_import_from_dict(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict, format="dbt")
+
+        assert result.source_format == "dbt"
+        assert len(result.columns) == 5
+        assert result.metadata.get("title") == "users"
+        assert result.metadata.get("description") == "User accounts table"
+
+    def test_import_column_types(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict, format="dbt")
+        col_map = dict(result.columns)
+        assert col_map["id"] == "Int64"
+        assert col_map["name"] == "String"
+        assert col_map["age"] == "Int64"
+        assert col_map["status"] == "String"
+        assert col_map["email"] == "String"  # varchar(256) -> String
+
+    def test_import_not_null(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict, format="dbt")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_not_null", {"columns": "id"}) in methods
+        assert ("col_vals_not_null", {"columns": "name"}) in methods
+
+    def test_import_unique(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict, format="dbt")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("rows_distinct", {"columns_subset": "id"}) in methods
+
+    def test_import_accepted_values(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict, format="dbt")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert (
+            "col_vals_in_set",
+            {"columns": "status", "set": ["active", "inactive", "pending"]},
+        ) in methods
+
+    def test_import_legacy_tests_key(self, dbt_schema_legacy_tests):
+        result = import_contract(dbt_schema_legacy_tests, format="dbt")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_not_null", {"columns": "order_id"}) in methods
+        assert ("rows_distinct", {"columns_subset": "order_id"}) in methods
+
+    def test_import_relationship_warning(self, dbt_schema_legacy_tests):
+        result = import_contract(dbt_schema_legacy_tests, format="dbt")
+        assert any(
+            "relationship" in w.lower() or "cross-table" in w.lower() for w in result.warnings
+        )
+        assert result.coverage < 1.0
+
+    def test_import_from_sources(self, dbt_sources_dict):
+        result = import_contract(dbt_sources_dict, format="dbt")
+        assert result.source_format == "dbt"
+        assert len(result.columns) == 2
+        col_map = dict(result.columns)
+        assert col_map["event_id"] == "Int64"
+
+    def test_import_specific_model(self):
+        doc = {
+            "version": 2,
+            "models": [
+                {"name": "first", "columns": [{"name": "a"}]},
+                {"name": "second", "columns": [{"name": "b"}, {"name": "c"}]},
+            ],
+        }
+        result = import_contract(doc, format="dbt", model="second")
+        assert len(result.columns) == 2
+        col_names = [name for name, _ in result.columns]
+        assert "b" in col_names
+
+    def test_import_model_not_found(self, dbt_schema_dict):
+        with pytest.raises(ValueError, match="not found"):
+            import_contract(dbt_schema_dict, format="dbt", model="nonexistent")
+
+    def test_import_from_file(self, dbt_schema_dict):
+        import yaml as _yaml
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
+            _yaml.dump(dbt_schema_dict, f)
+            f.flush()
+            result = import_contract(f.name, format="dbt")
+
+        assert result.source_format == "dbt"
+        assert result.source_path == f.name
+
+    def test_import_file_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            import_contract("/nonexistent/schema.yml", format="dbt")
+
+    def test_import_invalid_type(self):
+        with pytest.raises(TypeError, match="must be a file path"):
+            import_contract(12345, format="dbt")
+
+    def test_auto_detect_dbt(self, dbt_schema_dict):
+        result = import_contract(dbt_schema_dict)
+        assert result.source_format == "dbt"
+
+    def test_to_validate_end_to_end(self, dbt_schema_dict, simple_df):
+        result = import_contract(dbt_schema_dict, format="dbt")
+        validation = result.to_validate(data=simple_df)
+        validation.interrogate()
+
+    def test_no_models_or_sources_raises(self):
+        with pytest.raises(ValueError, match="No models or source tables"):
+            import_contract({"version": 2}, format="dbt")
+
+
+class TestDbtExport:
+    def test_export_from_contract(self):
+        contract = pb.Contract(
+            name="test_model",
+            description="A test model",
+            schema=pb.Schema(id="Int64", name="String", age="Int64"),
+            steps=[
+                pb.Step("col_vals_not_null", columns="id"),
+                pb.Step("rows_distinct", columns="id"),
+                pb.Step("col_vals_in_set", columns="name", set=["Alice", "Bob"]),
+            ],
+        )
+        result = export_contract(contract, format="dbt")
+
+        assert result["version"] == 2
+        assert len(result["models"]) == 1
+        model = result["models"][0]
+        assert model["name"] == "test_model"
+        assert model["description"] == "A test model"
+
+        col_map = {c["name"]: c for c in model["columns"]}
+        assert "not_null" in col_map["id"]["data_tests"]
+        assert "unique" in col_map["id"]["data_tests"]
+        assert col_map["id"]["data_type"] == "integer"
+
+    def test_export_to_file(self):
+        import yaml as _yaml
+
+        contract = pb.Contract(
+            name="file_test",
+            schema=pb.Schema(x="Int64"),
+            steps=[],
+        )
+        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as f:
+            export_contract(contract, f.name, format="dbt")
+
+        with open(f.name) as fh:
+            data = _yaml.safe_load(fh)
+        assert data["version"] == 2
+        assert data["models"][0]["name"] == "file_test"
+
+    def test_export_invalid_type_raises(self):
+        with pytest.raises(TypeError, match="Expected a Validate or Contract"):
+            export_contract("not a contract", format="dbt")
+
+
+class TestDbtRoundTrip:
+    def test_dbt_roundtrip(self):
+        original = {
+            "version": 2,
+            "models": [
+                {
+                    "name": "users",
+                    "columns": [
+                        {
+                            "name": "id",
+                            "data_type": "integer",
+                            "data_tests": ["not_null", "unique"],
+                        },
+                        {
+                            "name": "status",
+                            "data_type": "string",
+                            "data_tests": [{"accepted_values": {"values": ["a", "b"]}}],
+                        },
+                    ],
+                }
+            ],
+        }
+        imported = import_contract(original, format="dbt")
+        contract = imported.to_contract(name="roundtrip")
+        exported = export_contract(contract, format="dbt")
+        reimported = import_contract(exported, format="dbt")
+
+        def _hashable_kwargs(kwargs):
+            items = []
+            for k, v in sorted(kwargs.items()):
+                items.append((k, tuple(v) if isinstance(v, list) else v))
+            return tuple(items)
+
+        original_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in imported.constraints}
+        roundtrip_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in reimported.constraints}
+        assert original_methods == roundtrip_methods
+
+
+# ── ODCS adapter fixtures ────────────────────────────────────────────────────
+
+
+@pytest.fixture
+def odcs_v3_dict():
+    """An ODCS v3 data contract as a dict."""
+    return {
+        "kind": "DataContract",
+        "apiVersion": "v3.0.0",
+        "info": {
+            "title": "User Accounts",
+            "description": "Contract for user account data",
+        },
+        "dataset": [
+            {
+                "table": "users",
+                "columns": [
+                    {
+                        "column": "id",
+                        "logicalType": "integer",
+                        "isNullable": False,
+                        "isUnique": True,
+                    },
+                    {
+                        "column": "name",
+                        "logicalType": "string",
+                        "isNullable": False,
+                    },
+                    {
+                        "column": "age",
+                        "logicalType": "integer",
+                        "minimum": 0,
+                        "maximum": 150,
+                    },
+                    {
+                        "column": "status",
+                        "logicalType": "string",
+                        "enum": ["active", "inactive", "pending"],
+                    },
+                    {
+                        "column": "email",
+                        "logicalType": "string",
+                        "pattern": r"^[^@]+@[^@]+\.[^@]+$",
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def odcs_v2_dict():
+    """An ODCS v2-style data contract as a dict."""
+    return {
+        "kind": "DataContract",
+        "apiVersion": "v2.2.2",
+        "datasetName": "orders",
+        "description": "Order data contract",
+        "dataset": [
+            {
+                "table": "orders",
+                "columns": [
+                    {
+                        "column": "order_id",
+                        "logicalType": "integer",
+                        "isNullable": False,
+                        "isPrimaryKey": True,
+                    },
+                    {
+                        "column": "amount",
+                        "logicalType": "float",
+                        "minimum": 0,
+                    },
+                ],
+            }
+        ],
+    }
+
+
+class TestODCSImport:
+    def test_import_from_dict_v3(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+
+        assert result.source_format == "odcs"
+        assert result.source_version == "v3.0.0"
+        assert len(result.columns) == 5
+        assert result.metadata.get("title") == "User Accounts"
+        assert result.metadata.get("description") == "Contract for user account data"
+
+    def test_import_column_types(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        col_map = dict(result.columns)
+        assert col_map["id"] == "Int64"
+        assert col_map["name"] == "String"
+        assert col_map["age"] == "Int64"
+        assert col_map["status"] == "String"
+        assert col_map["email"] == "String"
+
+    def test_import_not_null(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_not_null", {"columns": "id"}) in methods
+        assert ("col_vals_not_null", {"columns": "name"}) in methods
+
+    def test_import_unique(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("rows_distinct", {"columns_subset": "id"}) in methods
+
+    def test_import_min_max(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_ge", {"columns": "age", "value": 0}) in methods
+        assert ("col_vals_le", {"columns": "age", "value": 150}) in methods
+
+    def test_import_enum(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert (
+            "col_vals_in_set",
+            {"columns": "status", "set": ["active", "inactive", "pending"]},
+        ) in methods
+
+    def test_import_pattern(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert (
+            "col_vals_regex",
+            {"columns": "email", "pattern": r"^[^@]+@[^@]+\.[^@]+$"},
+        ) in methods
+
+    def test_import_v2(self, odcs_v2_dict):
+        result = import_contract(odcs_v2_dict, format="odcs")
+        assert result.source_format == "odcs"
+        assert result.source_version == "v2.2.2"
+        assert result.metadata.get("title") == "orders"
+
+    def test_import_primary_key(self, odcs_v2_dict):
+        result = import_contract(odcs_v2_dict, format="odcs")
+        methods = [(c.method, c.kwargs) for c in result.constraints]
+        assert ("col_vals_not_null", {"columns": "order_id"}) in methods
+        assert ("rows_distinct", {"columns_subset": "order_id"}) in methods
+
+    def test_import_specific_table(self):
+        doc = {
+            "kind": "DataContract",
+            "apiVersion": "v3.0.0",
+            "info": {"title": "Multi"},
+            "dataset": [
+                {"table": "first", "columns": [{"column": "a", "logicalType": "string"}]},
+                {"table": "second", "columns": [{"column": "b"}, {"column": "c"}]},
+            ],
+        }
+        result = import_contract(doc, format="odcs", table="second")
+        assert len(result.columns) == 2
+
+    def test_import_table_not_found(self, odcs_v3_dict):
+        with pytest.raises(ValueError, match="not found"):
+            import_contract(odcs_v3_dict, format="odcs", table="nonexistent")
+
+    def test_import_from_file_yaml(self, odcs_v3_dict):
+        import yaml as _yaml
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".odcs.yml", delete=False) as f:
+            _yaml.dump(odcs_v3_dict, f)
+            f.flush()
+            result = import_contract(f.name, format="odcs")
+
+        assert result.source_format == "odcs"
+        assert result.source_path == f.name
+
+    def test_import_from_file_json(self, odcs_v3_dict):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".odcs.json", delete=False) as f:
+            json.dump(odcs_v3_dict, f)
+            f.flush()
+            result = import_contract(f.name, format="odcs")
+
+        assert result.source_format == "odcs"
+
+    def test_import_file_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            import_contract("/nonexistent/contract.odcs.yml", format="odcs")
+
+    def test_import_invalid_type(self):
+        with pytest.raises(TypeError, match="must be a file path"):
+            import_contract(12345, format="odcs")
+
+    def test_auto_detect_odcs(self, odcs_v3_dict):
+        result = import_contract(odcs_v3_dict)
+        assert result.source_format == "odcs"
+
+    def test_to_validate_end_to_end(self, odcs_v3_dict, simple_df):
+        result = import_contract(odcs_v3_dict, format="odcs")
+        validation = result.to_validate(data=simple_df)
+        validation.interrogate()
+
+    def test_no_dataset_raises(self):
+        with pytest.raises(ValueError, match="No 'dataset' section"):
+            import_contract({"kind": "DataContract", "apiVersion": "v3.0.0"}, format="odcs")
+
+    def test_minlength_warning(self):
+        doc = {
+            "kind": "DataContract",
+            "apiVersion": "v3.0.0",
+            "info": {"title": "test"},
+            "dataset": [
+                {
+                    "table": "t",
+                    "columns": [{"column": "name", "logicalType": "string", "minLength": 1}],
+                }
+            ],
+        }
+        result = import_contract(doc, format="odcs")
+        assert any("minLength" in w for w in result.warnings)
+        assert result.coverage < 1.0
+
+
+class TestODCSExport:
+    def test_export_from_contract(self):
+        contract = pb.Contract(
+            name="test_contract",
+            description="A test contract",
+            schema=pb.Schema(id="Int64", name="String", age="Int64"),
+            steps=[
+                pb.Step("col_vals_not_null", columns="id"),
+                pb.Step("rows_distinct", columns="id"),
+                pb.Step("col_vals_ge", columns="age", value=0),
+            ],
+        )
+        result = export_contract(contract, format="odcs")
+
+        assert result["kind"] == "DataContract"
+        assert result["apiVersion"] == "v3.0.0"
+        assert result["info"]["title"] == "test_contract"
+        assert result["info"]["description"] == "A test contract"
+
+        table = result["dataset"][0]
+        col_map = {c["column"]: c for c in table["columns"]}
+        assert col_map["id"]["isNullable"] is False
+        assert col_map["id"]["isUnique"] is True
+        assert col_map["id"]["logicalType"] == "integer"
+        assert col_map["age"]["minimum"] == 0
+
+    def test_export_to_file_yaml(self):
+        import yaml as _yaml
+
+        contract = pb.Contract(name="file_test", schema=pb.Schema(x="Int64"), steps=[])
+        with tempfile.NamedTemporaryFile(suffix=".odcs.yml", delete=False) as f:
+            export_contract(contract, f.name, format="odcs")
+
+        with open(f.name) as fh:
+            data = _yaml.safe_load(fh)
+        assert data["kind"] == "DataContract"
+
+    def test_export_to_file_json(self):
+        contract = pb.Contract(name="file_test", schema=pb.Schema(x="Int64"), steps=[])
+        with tempfile.NamedTemporaryFile(suffix=".odcs.json", delete=False) as f:
+            export_contract(contract, f.name, format="odcs")
+
+        with open(f.name) as fh:
+            data = json.load(fh)
+        assert data["kind"] == "DataContract"
+
+    def test_export_invalid_type_raises(self):
+        with pytest.raises(TypeError, match="Expected a Validate or Contract"):
+            export_contract("not a contract", format="odcs")
+
+
+class TestODCSRoundTrip:
+    def test_odcs_roundtrip(self):
+        original = {
+            "kind": "DataContract",
+            "apiVersion": "v3.0.0",
+            "info": {"title": "test"},
+            "dataset": [
+                {
+                    "table": "users",
+                    "columns": [
+                        {
+                            "column": "id",
+                            "logicalType": "integer",
+                            "isNullable": False,
+                            "isUnique": True,
+                        },
+                        {"column": "age", "logicalType": "integer", "minimum": 0, "maximum": 150},
+                        {"column": "status", "logicalType": "string", "enum": ["a", "b"]},
+                    ],
+                }
+            ],
+        }
+        imported = import_contract(original, format="odcs")
+        contract = imported.to_contract(name="roundtrip")
+        exported = export_contract(contract, format="odcs")
+        reimported = import_contract(exported, format="odcs")
 
         def _hashable_kwargs(kwargs):
             items = []
