@@ -104,6 +104,9 @@ that values fall within or outside specific ranges
 - **Set membership checks** ([`Validate.col_vals_in_set()`](`Validate.col_vals_in_set`), [`Validate.col_vals_not_in_set()`](`Validate.col_vals_not_in_set`)) for
 validating values against predefined sets
 
+- **Referential integrity checks** ([`Validate.col_vals_in_table()`](`Validate.col_vals_in_table`)) for verifying that
+column values (or composite keys) exist in a reference table
+
 - **Null value checks** ([`Validate.col_vals_null()`](`Validate.col_vals_null`), [`Validate.col_vals_not_null()`](`Validate.col_vals_not_null`)) for testing
 presence or absence of null values
 
@@ -364,6 +367,93 @@ validation
 `pb.MissingSpec.from_spss()`), and importing metadata from SPSS/Stata/SAS files can auto-generate
 specs via [`MetadataImport.missing_specs()`](`pointblank.MetadataImport`). For a fuller treatment of
 structured-missingness *reporting*, see the *Missing Values Reporting* article.
+
+### Referential Integrity with `col_vals_in_table()`
+
+When your data spans multiple tables, you often need to verify that foreign key values in one table
+actually exist in another. The [`col_vals_in_table()`](`Validate.col_vals_in_table`) method handles
+this directly, checking each row's value (or composite key) against a reference table.
+
+```{python}
+import polars as pl
+
+customers = pl.DataFrame({"id": [1, 2, 3, 4, 5]})
+
+orders = pl.DataFrame({
+    "order_id": [101, 102, 103, 104],
+    "customer_id": [1, 2, 3, 99],
+})
+
+(
+    pb.Validate(data=orders)
+    .col_vals_in_table(
+        columns="customer_id",
+        ref_table=customers,
+        ref_column="id",
+    )
+    .interrogate()
+)
+```
+
+The last row fails because `customer_id=99` does not exist in the customers table. Each row is a
+test unit, so failing rows are extractable via `get_data_extracts()` just like any other
+column-level validation.
+
+Composite foreign keys are also supported. Supply lists of column names to check multi-column
+references:
+
+```{python}
+catalog = pl.DataFrame({
+    "region": ["US", "US", "EU"],
+    "sku": ["A1", "B2", "A1"],
+})
+
+line_items = pl.DataFrame({
+    "region": ["US", "EU", "US"],
+    "sku": ["A1", "A1", "C3"],
+})
+
+(
+    pb.Validate(data=line_items)
+    .col_vals_in_table(
+        columns=["region", "sku"],
+        ref_table=catalog,
+        ref_column=["region", "sku"],
+    )
+    .interrogate()
+)
+```
+
+The third row fails because the combination `("US", "C3")` does not appear in the catalog.
+
+Cross-backend matching is fully supported: the reference table can come from a different backend
+(e.g., a Polars DataFrame checked against a DuckDB table, or a Pandas DataFrame checked against a
+Polars table). The lighter table is automatically materialized to match the heavier table's backend
+before comparison, so you can validate referential integrity across heterogeneous data sources
+without any manual conversion.
+
+The `ref_table=` parameter also accepts a callable, which is useful when the reference data should
+be loaded fresh at interrogation time:
+
+```{python}
+def load_valid_skus():
+    return pl.DataFrame({"sku": ["A1", "B2", "C3"]})
+
+items = pl.DataFrame({"sku": ["A1", "B2", "D4"]})
+
+(
+    pb.Validate(data=items)
+    .col_vals_in_table(
+        columns="sku",
+        ref_table=load_valid_skus,
+        ref_column="sku",
+    )
+    .interrogate()
+)
+```
+
+By default, null key values are treated as failing (not found in the reference). Set `na_pass=True`
+if null foreign keys are acceptable in your schema (e.g., optional relationships).
 
 ## 2. Row-based Validations
 
@@ -839,13 +929,24 @@ Python, making it a powerful tool for custom data quality checks.
 
 ### Cross-Dataset Referential Integrity
 
+:::{.callout-tip}
+For straightforward foreign key checks (single-column or composite-key lookups), use the built-in
+[`col_vals_in_table()`](`Validate.col_vals_in_table`) method described earlier in this article. It
+gives you row-level pass/fail results, data extracts, and cross-backend support out of the box.
+
+The `specially()` approach shown below is still valuable for more advanced cross-dataset logic:
+conditional existence rules, cardinality constraints, and composite keys with business-logic
+predicates that go beyond simple key matching.
+:::
+
 One powerful use case for `specially()` is validating relationships between multiple datasets. This
-is particularly valuable for checking foreign key constraints, conditional existence rules, and
-cardinality relationships that span multiple tables.
+is particularly valuable for conditional existence rules and cardinality relationships that span
+multiple tables.
 
 #### Foreign Key Validation
 
-Verify that all keys in one dataset exist in another:
+Verify that all keys in one dataset exist in another (this is equivalent to using
+`col_vals_in_table()` but shown here for completeness):
 
 ```{python}
 # Create related datasets: Orders and OrderDetails
@@ -1043,7 +1144,9 @@ multiple related tables.
 
 The `specially()` method is ideal for:
 
-- cross-dataset validations: foreign keys, referential integrity, conditional existence
+- advanced cross-dataset validations: conditional existence, cardinality constraints, and business-logic
+  predicates that go beyond simple key matching (for standard foreign key checks, use
+  [`col_vals_in_table()`](`Validate.col_vals_in_table`))
 - complex business rules: multi-column checks, conditional logic, domain-specific constraints
 - custom statistical tests: validations requiring calculations not covered by built-in methods
 - SQL-style checks: converting complex SQL queries into validation steps
@@ -1056,8 +1159,8 @@ requirements.
 ## Conclusion
 
 In this article, we've explored the various types of validation methods that Pointblank offers for
-ensuring data quality. These methods provide a framework for validating column values, checking row
-properties, verifying table structures, using AI for complex semantic validations, and validating
-aggregate statistics across columns. By combining these validation methods into comprehensive plans,
-you can systematically test your data against business rules and quality expectations. And this all
-helps to ensure your data remains reliable and trustworthy.
+ensuring data quality. These methods provide a framework for validating column values, checking
+referential integrity across tables, verifying table structures, using AI for complex semantic
+validations, and validating aggregate statistics across columns. By combining these validation
+methods into comprehensive plans, you can systematically test your data against business rules and
+quality expectations. And this all helps to ensure your data remains reliable and trustworthy.
