@@ -9,7 +9,7 @@ bread-crumbs: true
 ```{python}
 #| echo: false
 #| output: false
-import pointblank as pb
+import os
 ```
 
 While previewing a table with `preview()` is undoubtedly a good thing to do, sometimes you need
@@ -100,3 +100,110 @@ left of the column names) are:
 One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`,
 `False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of
 `True` and `False` values (under `UQ`).
+
+## Using `DataScan` Directly
+
+The `col_summary_tbl()` function is a convenience wrapper around the
+[`DataScan`](`pointblank.DataScan`) class. When you need more than a visual report (for example, to
+save the profile for later comparison), you can work with `DataScan` directly:
+
+```{python}
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+scan = pb.DataScan(data=small_table, tbl_name="small_table")
+```
+
+The `DataScan` object computes the same column-level statistics shown in the summary table. You can
+access the profile as a dictionary with `to_dict()`, export it as JSON with `to_json()`, or render
+the same tabular report with `get_tabular_report()`.
+
+## Saving and Loading Profiles
+
+A `DataScan` profile can be saved to disk and loaded back later. This is useful for establishing
+baselines that you compare against in the future.
+
+```{python}
+# Save the profile to a JSON file
+scan.save_to_json("small_table_profile.json")
+
+# Later, load it back without needing the original data
+loaded = pb.DataScan.load_from_json("small_table_profile.json")
+```
+
+```{python}
+#| echo: false
+#| output: false
+os.remove("small_table_profile.json")
+```
+
+The `from_json()` classmethod works with JSON strings directly, and `from_dict()` accepts the
+dictionary format produced by `to_dict()`. All three approaches produce a fully restored `DataScan`
+that retains the column names, types, statistics, and sample data from the original scan.
+
+## Comparing Profiles for Drift
+
+When your data changes over time, you can compare two `DataScan` profiles to detect drift. The
+`compare()` method identifies schema changes (columns added, removed, or with changed types) and
+statistical shifts in common columns.
+
+```{python}
+import polars as pl
+
+# Simulate two versions of a dataset
+orders_v1 = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5],
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0],
+    "status": ["paid", "paid", "refund", "paid", "paid"],
+})
+
+orders_v2 = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5, 6, 7, 8],
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 150.0, 200.0, 175.0],
+    "status": ["paid", "paid", "refund", "paid", "paid", "paid", "paid", "paid"],
+    "region": ["US", "EU", "US", "EU", "US", "US", "EU", "EU"],
+})
+
+baseline = pb.DataScan(data=orders_v1, tbl_name="orders_v1")
+current = pb.DataScan(data=orders_v2, tbl_name="orders_v2")
+
+diff = current.compare(baseline)
+```
+
+The returned [`DataScanDiff`](`pointblank.DataScanDiff`) object provides programmatic access to the
+changes:
+
+```{python}
+print("Has changes:", diff.has_changes)
+print("Columns added:", diff.columns_added)
+print("Row count (baseline vs current):", diff.row_count_diff)
+```
+
+You can also get the full comparison as a dictionary with `to_dict()`, or view it as a styled
+report:
+
+```{python}
+diff.get_tabular_report()
+```
+
+The report shows each column's status (OK, Added, Removed, Stats Changed, or Type Changed) along
+with any statistics that shifted between the baseline and current profiles. This makes it
+straightforward to spot when your data's shape or distribution has changed in ways that might affect
+downstream analyses or validation rules.
+
+A typical workflow is to save a baseline profile after your initial data quality checks pass, then
+compare new data against that baseline on each pipeline run:
+
+```python
+# On the first run: establish the baseline
+baseline = pb.DataScan(data=production_table, tbl_name="orders")
+baseline.save_to_json("orders_baseline.json")
+
+# On subsequent runs: compare against the baseline
+baseline = pb.DataScan.load_from_json("orders_baseline.json")
+current = pb.DataScan(data=production_table, tbl_name="orders")
+diff = current.compare(baseline)
+
+if diff.has_changes:
+    print("Data drift detected!")
+    print(diff.to_dict())
+```
