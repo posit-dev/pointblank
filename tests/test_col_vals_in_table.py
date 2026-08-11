@@ -385,10 +385,12 @@ def test_multiple_in_table_steps():
     customers = pl.DataFrame({"id": [1, 2, 3]})
     products = pl.DataFrame({"sku": ["A", "B", "C"]})
 
-    orders = pl.DataFrame({
-        "customer_id": [1, 2, 99],
-        "product_sku": ["A", "B", "D"],
-    })
+    orders = pl.DataFrame(
+        {
+            "customer_id": [1, 2, 99],
+            "product_sku": ["A", "B", "D"],
+        }
+    )
 
     v = (
         pb.Validate(data=orders)
