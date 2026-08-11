@@ -224,6 +224,7 @@ reference:
         - Validate.col_vals_not_null
         - Validate.col_vals_regex
         - Validate.col_vals_within_spec
+        - Validate.col_vals_in_table
         - Validate.col_vals_expr
         - Validate.col_exists
         - Validate.col_pct_null
@@ -298,6 +299,7 @@ reference:
         - Validate.get_dataframe_report
         - Validate.to_code
         - Validate.to_yaml
+        - Validate.to_json_schema
         - Validate.suggest_improvements
         - Validate.from_prompt
         - Validate.get_sundered_data
@@ -326,6 +328,7 @@ reference:
         `missing_vals_tbl()` for missing value analysis.
       contents:
         - DataScan
+        - DataScanDiff
         - preview
         - col_summary_tbl
         - missing_vals_tbl
