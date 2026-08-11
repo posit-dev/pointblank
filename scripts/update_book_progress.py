@@ -53,9 +53,7 @@ def clone_or_pull(dest: Path) -> None:
     if (dest / ".git").exists():
         subprocess.run(["git", "-C", str(dest), "pull", "-q"], check=True)
     else:
-        subprocess.run(
-            ["git", "clone", "-q", "--depth=1", BOOK_REPO, str(dest)], check=True
-        )
+        subprocess.run(["git", "clone", "-q", "--depth=1", BOOK_REPO, str(dest)], check=True)
 
 
 def content_chars(path: Path) -> int:
@@ -109,9 +107,7 @@ def progress_bar(chars: int) -> str:
 
 
 def build_progress_md(book_dir: Path) -> str:
-    quarto_cfg = yaml.safe_load(
-        (book_dir / "_quarto.yml").read_text(encoding="utf-8")
-    )
+    quarto_cfg = yaml.safe_load((book_dir / "_quarto.yml").read_text(encoding="utf-8"))
 
     chapters_cfg = quarto_cfg["book"]["chapters"]
 
@@ -139,16 +135,13 @@ def build_progress_md(book_dir: Path) -> str:
 
         lines.append("")
 
-    total_chars = sum(
-        content_chars(book_dir / f) for f in all_files if (book_dir / f).exists()
-    )
+    total_chars = sum(content_chars(book_dir / f) for f in all_files if (book_dir / f).exists())
     total_possible = len(all_files) * TARGET_CHARS
     overall_pct = min(int(total_chars / total_possible * 100), 100)
 
-    written = len([
-        f for f in all_files
-        if (book_dir / f).exists() and content_chars(book_dir / f) >= 1000
-    ])
+    written = len(
+        [f for f in all_files if (book_dir / f).exists() and content_chars(book_dir / f) >= 1000]
+    )
 
     header = (
         f"Overall: **{overall_pct}%** complete "
