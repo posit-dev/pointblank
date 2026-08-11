@@ -32,7 +32,7 @@ from pointblank.column import (
     starts_with,
 )
 from pointblank.contract import Contract, Step
-from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank.datascan import DataScan, DataScanDiff, col_summary_tbl
 from pointblank.draft import DraftValidation
 from pointblank.edit import EditValidation
 from pointblank.field import (
@@ -126,6 +126,7 @@ __all__ = [
     "Pipeline",
     "PipelineResult",
     "DataScan",
+    "DataScanDiff",
     "DraftValidation",
     "EditValidation",
     "MissingSpec",
