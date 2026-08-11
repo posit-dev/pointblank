@@ -18341,6 +18341,127 @@ class Validate:
 
         return yaml_str
 
+    def to_json_schema(self, path: str | Path | None = None) -> dict[str, Any]:
+        """
+        Export this validation plan as a JSON Schema document.
+
+        The `to_json_schema()` method walks the validation steps and maps each one to its closest
+        JSON Schema equivalent. This lets you share your validation rules as a portable,
+        language-neutral schema that tools across many ecosystems can consume.
+
+        When the `Validate` object has data attached, the schema is enriched with column type
+        information inferred from the data (e.g., `"type": "integer"` for Int64 columns).
+
+        Parameters
+        ----------
+        path
+            An optional file path. If provided, the JSON Schema is written to this file (parent
+            directories are created as needed) in addition to being returned.
+
+        Returns
+        -------
+        dict[str, Any]
+            The JSON Schema document as a dictionary. This is a valid JSON Schema that can be
+            serialized with `json.dumps()` or consumed by any JSON Schema validator.
+
+        Supported Mappings
+        ------------------
+        The following validation methods have direct JSON Schema equivalents:
+
+        | Pointblank method | JSON Schema keyword |
+        |---|---|
+        | `col_vals_not_null()` | `required` |
+        | `col_vals_gt()` | `exclusiveMinimum` |
+        | `col_vals_ge()` | `minimum` |
+        | `col_vals_lt()` | `exclusiveMaximum` |
+        | `col_vals_le()` | `maximum` |
+        | `col_vals_eq()` | `const` |
+        | `col_vals_in_set()` | `enum` |
+        | `col_vals_between()` | `minimum` + `maximum` |
+        | `col_vals_regex()` | `pattern`  |
+        | `col_vals_within_spec()` | `format` |
+
+        Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`,
+        `col_vals_outside()`) are silently skipped.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=df)
+            .col_vals_gt(columns="age", value=0)
+            .col_vals_not_null(columns="name")
+            .col_vals_in_set(columns="status", set=["active", "inactive"])
+        )
+
+        schema = validation.to_json_schema()
+        # {'$schema': 'https://json-schema.org/draft/2020-12/schema',
+        #  'type': 'object',
+        #  'properties': {
+        #      'age': {'exclusiveMinimum': 0, 'type': 'integer'},
+        #      'name': {'type': 'string'},
+        #      'status': {'enum': ['active', 'inactive'], 'type': 'string'}
+        #  },
+        #  'required': ['name']}
+
+        # Write to a file
+        validation.to_json_schema("output.schema.json")
+        ```
+        """
+        from pointblank.adapters._api import export_contract
+
+        destination = str(path) if path is not None else None
+        schema_doc = export_contract(self, destination=destination, format="json_schema")
+
+        # Enrich with column type information from the data when available
+        if self.data is not None and "properties" in schema_doc:
+            self._enrich_schema_types(schema_doc)
+
+        # Write the enriched version if a path was given and we enriched it
+        if path is not None and self.data is not None:
+            import json
+
+            out_path = Path(path)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_path, "w") as f:
+                json.dump(schema_doc, f, indent=2)
+
+        return schema_doc
+
+    def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None:
+        """Add JSON Schema ``type`` fields inferred from the data's column types."""
+        try:
+            nw_frame = nw.from_native(self.data)
+            col_schema = nw_frame.collect_schema()
+        except Exception:
+            return
+
+        type_map = {
+            "int": "integer",
+            "float": "number",
+            "double": "number",
+            "decimal": "number",
+            "str": "string",
+            "utf8": "string",
+            "object": "string",
+            "bool": "boolean",
+        }
+
+        properties = schema_doc.get("properties", {})
+        for col_name, dtype in col_schema.items():
+            if col_name not in properties:
+                continue
+            if "type" in properties[col_name]:
+                continue
+
+            dtype_lower = str(dtype).lower()
+            for key, json_type in type_map.items():
+                if key in dtype_lower:
+                    properties[col_name]["type"] = json_type
+                    break
+
     def _covered_columns(self) -> set[str]:
         """Return the set of simple column names referenced by this plan's steps."""
         covered: set[str] = set()
