@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+from dataclasses import dataclass
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, cast
 
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
     from pointblank.scan_profile_stats import StatGroup
 
 
-__all__ = ["DataScan", "col_summary_tbl"]
+__all__ = ["DataScan", "DataScanDiff", "col_summary_tbl"]
 
 
 class DataScan:
@@ -487,15 +488,459 @@ class DataScan:
             label_map[target_col] = matching_stat.label
         return label_map
 
-    def to_json(self) -> str:
-        prof_dict = self.profile.as_dataframe(strict=False).to_dict(as_series=False)
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Export the profile as a structured dictionary.
 
-        return json.dumps(prof_dict, indent=4, default=str)
+        The returned dictionary contains metadata (table name, row count, column list) plus
+        per-column profile entries with their data type, statistics, and sample data. This format is
+        designed for round-trip persistence: save it with `to_json()` / `save_to_json()` and restore
+        with `from_dict()` / `from_json()` / `load_from_json()`.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with keys `"metadata"` and `"columns"`.
+        """
+        columns_out: list[dict[str, Any]] = []
+        for prof in self.profile.column_profiles:
+            stat_dict: dict[str, Any] = {}
+            for stat in prof.statistics:
+                stat_dict[stat.name] = stat.val
+
+            columns_out.append(
+                {
+                    "colname": prof.colname,
+                    "coltype": prof.coltype,
+                    "sample_data": list(prof.sample_data),
+                    "statistics": stat_dict,
+                }
+            )
+
+        return {
+            "metadata": {
+                "table_name": self.profile.table_name,
+                "row_count": self.profile.row_count,
+                "columns": self.profile.columns,
+            },
+            "columns": columns_out,
+        }
+
+    def to_json(self) -> str:
+        """
+        Export the profile as a JSON string.
+
+        The JSON is structured for round-trip persistence. Use `from_json()` or `load_from_json()`
+        to restore a `DataScan` from the output.
+
+        Returns
+        -------
+        str
+            A JSON string representing the profile.
+        """
+        return json.dumps(self.to_dict(), indent=4, default=str)
 
     def save_to_json(self, output_file: str) -> None:
-        json_string: str = self.to_json()
+        """
+        Save the profile to a JSON file.
+
+        Parameters
+        ----------
+        output_file
+            The path to the output JSON file.
+        """
         with open(output_file, "w") as f:
-            json.dump(json_string, f, indent=4)
+            f.write(self.to_json())
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> DataScan:
+        """
+        Restore a `DataScan` from a dictionary produced by `to_dict()`.
+
+        This reconstructs the profile without needing the original data.
+
+        Parameters
+        ----------
+        d
+            A dictionary with `"metadata"` and `"columns"` keys, as produced by `to_dict()`.
+
+        Returns
+        -------
+        DataScan
+            A restored `DataScan` instance.
+        """
+        meta = d["metadata"]
+        col_entries = d["columns"]
+
+        obj = cls.__new__(cls)
+        obj.nw_data = None  # type: ignore[assignment]
+        obj.tbl_name = meta.get("table_name")
+
+        profile = _DataProfile.__new__(_DataProfile)
+        profile.table_name = meta.get("table_name")
+        profile.row_count = meta["row_count"]
+        profile.columns = meta["columns"]
+        profile.implementation = nw.Implementation.POLARS
+        profile.column_profiles = []
+
+        stat_class_map: dict[str, type] = {
+            stat_cls.name: stat_cls for stat_cls in COLUMN_ORDER_REGISTRY
+        }
+
+        for col_entry in col_entries:
+            col_prof = ColumnProfile(
+                colname=col_entry["colname"],
+                coltype=col_entry["coltype"],
+            )
+            col_prof.sample_data = col_entry.get("sample_data", [])
+
+            for stat_name, stat_val in col_entry.get("statistics", {}).items():
+                stat_cls = stat_class_map.get(stat_name)
+                if stat_cls is not None:
+                    col_prof.statistics.append(stat_cls(stat_val))
+
+            _assign_type_from_coltype(col_prof)
+            profile.column_profiles.append(col_prof)
+
+        obj.profile = profile
+        return obj
+
+    @classmethod
+    def from_json(cls, json_string: str) -> DataScan:
+        """
+        Restore a `DataScan` from a JSON string produced by `to_json()`.
+
+        Parameters
+        ----------
+        json_string
+            A JSON string as produced by `to_json()`.
+
+        Returns
+        -------
+        DataScan
+            A restored `DataScan` instance.
+        """
+        return cls.from_dict(json.loads(json_string))
+
+    @classmethod
+    def load_from_json(cls, input_file: str) -> DataScan:
+        """
+        Load a `DataScan` from a JSON file produced by `save_to_json()`.
+
+        Parameters
+        ----------
+        input_file
+            The path to the JSON file.
+
+        Returns
+        -------
+        DataScan
+            A restored `DataScan` instance.
+        """
+        with open(input_file) as f:
+            return cls.from_json(f.read())
+
+    def compare(self, baseline: DataScan) -> DataScanDiff:
+        """
+        Compare this scan against a baseline and return the differences.
+
+        The comparison covers schema changes (columns added, removed, or with changed types) and
+        statistical drift for columns present in both scans. The returned `DataScanDiff` object
+        provides programmatic access to the results and a tabular report via `get_tabular_report()`.
+
+        Parameters
+        ----------
+        baseline
+            The baseline `DataScan` to compare against (typically the older scan).
+
+        Returns
+        -------
+        DataScanDiff
+            An object describing the differences between the two scans.
+        """
+        return DataScanDiff(current=self, baseline=baseline)
+
+
+def _assign_type_from_coltype(prof: ColumnProfile) -> None:
+    coltype_lower = prof.coltype.lower()
+    for type_enum in _TypeMap:
+        if any(ind in coltype_lower for ind in type_enum.value):
+            prof.__class__ = _TypeMap.fetch_prof_map()[type_enum]
+            return
+
+
+@dataclass
+class _ColumnDiff:
+    colname: str
+    coltype_baseline: str | None
+    coltype_current: str | None
+    status: str
+    stat_diffs: dict[str, tuple[Any, Any]]
+
+
+class DataScanDiff:
+    """
+    The result of comparing two `DataScan` profiles.
+
+    Created by calling `DataScan.compare()`. Provides programmatic access to schema changes and
+    per-column statistical drift, plus a tabular report via `get_tabular_report()`.
+
+    Attributes
+    ----------
+    columns_added
+        Column names present in the current scan but not the baseline.
+    columns_removed
+        Column names present in the baseline but not the current scan.
+    columns_type_changed
+        Column names whose data type changed between baseline and current.
+    column_diffs
+        Per-column diff details for all columns that appear in either scan.
+    """
+
+    def __init__(self, current: DataScan, baseline: DataScan) -> None:
+        self._current = current
+        self._baseline = baseline
+
+        cur_profiles = {p.colname: p for p in current.profile.column_profiles}
+        base_profiles = {p.colname: p for p in baseline.profile.column_profiles}
+
+        cur_names = set(cur_profiles.keys())
+        base_names = set(base_profiles.keys())
+
+        self.columns_added: list[str] = sorted(cur_names - base_names)
+        self.columns_removed: list[str] = sorted(base_names - cur_names)
+
+        self.columns_type_changed: list[str] = []
+        self.column_diffs: list[_ColumnDiff] = []
+
+        all_col_names = list(dict.fromkeys(list(base_profiles.keys()) + list(cur_profiles.keys())))
+
+        for col_name in all_col_names:
+            base_prof = base_profiles.get(col_name)
+            cur_prof = cur_profiles.get(col_name)
+
+            if base_prof is None:
+                self.column_diffs.append(
+                    _ColumnDiff(
+                        colname=col_name,
+                        coltype_baseline=None,
+                        coltype_current=cur_prof.coltype if cur_prof else None,
+                        status="added",
+                        stat_diffs={},
+                    )
+                )
+                continue
+
+            if cur_prof is None:
+                self.column_diffs.append(
+                    _ColumnDiff(
+                        colname=col_name,
+                        coltype_baseline=base_prof.coltype,
+                        coltype_current=None,
+                        status="removed",
+                        stat_diffs={},
+                    )
+                )
+                continue
+
+            type_changed = base_prof.coltype != cur_prof.coltype
+            if type_changed:
+                self.columns_type_changed.append(col_name)
+
+            base_stats = {s.name: s.val for s in base_prof.statistics}
+            cur_stats = {s.name: s.val for s in cur_prof.statistics}
+            all_stat_names = list(dict.fromkeys(list(base_stats.keys()) + list(cur_stats.keys())))
+
+            stat_diffs: dict[str, tuple[Any, Any]] = {}
+            for stat_name in all_stat_names:
+                base_val = base_stats.get(stat_name)
+                cur_val = cur_stats.get(stat_name)
+                if base_val != cur_val:
+                    stat_diffs[stat_name] = (base_val, cur_val)
+
+            status = "type_changed" if type_changed else ("changed" if stat_diffs else "unchanged")
+            self.column_diffs.append(
+                _ColumnDiff(
+                    colname=col_name,
+                    coltype_baseline=base_prof.coltype,
+                    coltype_current=cur_prof.coltype,
+                    status=status,
+                    stat_diffs=stat_diffs,
+                )
+            )
+
+    @property
+    def has_changes(self) -> bool:
+        """Return ``True`` if any schema or statistical changes were detected."""
+        return bool(
+            self.columns_added
+            or self.columns_removed
+            or self.columns_type_changed
+            or any(d.stat_diffs for d in self.column_diffs)
+        )
+
+    @property
+    def row_count_diff(self) -> tuple[int, int]:
+        """Return `(baseline_row_count, current_row_count)`."""
+        return (self._baseline.profile.row_count, self._current.profile.row_count)
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Export the comparison results as a dictionary.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with schema changes, row count diff, and per-column stat diffs.
+        """
+        return {
+            "row_count": {
+                "baseline": self._baseline.profile.row_count,
+                "current": self._current.profile.row_count,
+            },
+            "columns_added": self.columns_added,
+            "columns_removed": self.columns_removed,
+            "columns_type_changed": [
+                {
+                    "column": d.colname,
+                    "baseline_type": d.coltype_baseline,
+                    "current_type": d.coltype_current,
+                }
+                for d in self.column_diffs
+                if d.status == "type_changed"
+            ],
+            "stat_diffs": {
+                d.colname: {
+                    stat_name: {"baseline": bv, "current": cv}
+                    for stat_name, (bv, cv) in d.stat_diffs.items()
+                }
+                for d in self.column_diffs
+                if d.stat_diffs
+            },
+        }
+
+    def get_tabular_report(self) -> GT:
+        """
+        Generate a GT table summarizing the differences between the two scans.
+
+        Returns
+        -------
+        GT
+            A styled Great Tables report showing schema and statistical drift.
+        """
+        import polars as pl
+
+        rows: list[dict[str, Any]] = []
+
+        for diff in self.column_diffs:
+            if diff.status == "added":
+                rows.append(
+                    {
+                        "column": diff.colname,
+                        "status": "Added",
+                        "type_baseline": "",
+                        "type_current": diff.coltype_current or "",
+                        "stat_changes": "",
+                    }
+                )
+            elif diff.status == "removed":
+                rows.append(
+                    {
+                        "column": diff.colname,
+                        "status": "Removed",
+                        "type_baseline": diff.coltype_baseline or "",
+                        "type_current": "",
+                        "stat_changes": "",
+                    }
+                )
+            else:
+                status = "Type Changed" if diff.status == "type_changed" else "OK"
+                if diff.stat_diffs:
+                    status = (
+                        "Type + Stats Changed" if diff.status == "type_changed" else "Stats Changed"
+                    )
+
+                change_parts: list[str] = []
+                for stat_name, (bv, cv) in diff.stat_diffs.items():
+                    if stat_name == "freqs":
+                        continue
+                    bv_str = _format_stat_value(bv)
+                    cv_str = _format_stat_value(cv)
+                    change_parts.append(f"{stat_name}: {bv_str} -> {cv_str}")
+
+                rows.append(
+                    {
+                        "column": diff.colname,
+                        "status": status,
+                        "type_baseline": diff.coltype_baseline or "",
+                        "type_current": diff.coltype_current or "",
+                        "stat_changes": "; ".join(change_parts),
+                    }
+                )
+
+        if not rows:
+            rows.append(
+                {
+                    "column": "(no columns)",
+                    "status": "OK",
+                    "type_baseline": "",
+                    "type_current": "",
+                    "stat_changes": "",
+                }
+            )
+
+        df = pl.DataFrame(rows)
+
+        base_rc, cur_rc = self.row_count_diff
+        rc_note = f"Row count: {base_rc:,} (baseline) vs {cur_rc:,} (current)"
+
+        base_name = self._baseline.tbl_name or "baseline"
+        cur_name = self._current.tbl_name or "current"
+
+        gt_tbl = (
+            GT(df)
+            .tab_header(
+                title=html(f"Profile Comparison: {base_name} vs {cur_name}"),
+                subtitle=html(rc_note),
+            )
+            .cols_label(
+                column="Column",
+                status="Status",
+                type_baseline="Type (Baseline)",
+                type_current="Type (Current)",
+                stat_changes="Changed Statistics",
+            )
+            .opt_table_font(font=google_font("IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .tab_style(
+                style=style.text(font=google_font("IBM Plex Mono")),
+                locations=loc.body(),
+            )
+            .tab_style(
+                style=style.text(size="11px"),
+                locations=loc.body(columns="stat_changes"),
+            )
+        )
+
+        return gt_tbl
+
+    def __repr__(self) -> str:
+        n_changed = sum(1 for d in self.column_diffs if d.status != "unchanged")
+        return (
+            f"DataScanDiff("
+            f"added={len(self.columns_added)}, "
+            f"removed={len(self.columns_removed)}, "
+            f"type_changed={len(self.columns_type_changed)}, "
+            f"stat_changed={n_changed - len(self.columns_added) - len(self.columns_removed)})"
+        )
+
+
+def _format_stat_value(val: Any) -> str:
+    if val is None:
+        return "-"
+    if isinstance(val, float):
+        return f"{val:.4g}"
+    return str(val)
 
 
 def col_summary_tbl(data: Any, tbl_name: str | None = None) -> GT:
