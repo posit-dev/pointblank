@@ -724,7 +724,7 @@ The sundering procedure relies on row-level validation types to be used. This ma
 - <a href="../../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>Validate.col_vals_outside()</code></a>
 - <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>Validate.col_vals_in_set()</code></a>
 - <a href="../../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>Validate.col_vals_not_in_set()</code></a>
-- [`Validate.col_vals_in_table()`](%60Validate.col_vals_in_table%60)
+- <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link"><code>Validate.col_vals_in_table()</code></a>
 - <a href="../../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>Validate.col_vals_null()</code></a>
 - <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>Validate.col_vals_not_null()</code></a>
 - <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>Validate.col_vals_regex()</code></a>

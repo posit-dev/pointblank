@@ -11,7 +11,7 @@ DataScan.compare(baseline)
 ```
 
 
-The comparison covers schema changes (columns added, removed, or with changed types) and statistical drift for columns present in both scans. The returned `DataScanDiff` object provides programmatic access to the results and a tabular report via [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
+The comparison covers schema changes (columns added, removed, or with changed types) and statistical drift for columns present in both scans. The returned [DataScanDiff](DataScanDiff.md#pointblank.DataScanDiff) object provides programmatic access to the results and a tabular report via [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
 
 
 ## Parameters

@@ -577,6 +577,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#round-tripping-a-plan" id="toc-round-tripping-a-plan" class="nav-link" data-scroll-target="#round-tripping-a-plan">Round-Tripping a Plan</a></li>
   <li><a href="#fidelity-and-limitations" id="toc-fidelity-and-limitations" class="nav-link" data-scroll-target="#fidelity-and-limitations">Fidelity and Limitations</a></li>
   <li><a href="#when-to-use-serialization" id="toc-when-to-use-serialization" class="nav-link" data-scroll-target="#when-to-use-serialization">When to Use Serialization</a></li>
+  <li><a href="#exporting-a-plan-as-json-schema" id="toc-exporting-a-plan-as-json-schema" class="nav-link" data-scroll-target="#exporting-a-plan-as-json-schema">Exporting a Plan as JSON Schema</a>
+  <ul class="collapse">
+  <li><a href="#writing-to-a-file" id="toc-writing-to-a-file" class="nav-link" data-scroll-target="#writing-to-a-file">Writing to a File</a></li>
+  <li><a href="#relationship-to-export_contract" id="toc-relationship-to-export_contract" class="nav-link" data-scroll-target="#relationship-to-export_contract">Relationship to <code>export_contract()</code></a></li>
+  </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
@@ -603,17 +608,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>A validation plan you build in Python isn’t locked inside the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object. Pointblank can render an in-memory plan back into canonical source, either as a Python method chain or as a YAML configuration. This is the inverse of writing a plan by hand: you hand it a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object and it gives you the code that recreates it.</p>
-<p>Two methods do this:</p>
+<p>A validation plan you build in Python isn’t locked inside the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object. Pointblank can render an in-memory plan back into canonical source, either as a Python method chain, a YAML configuration, or a language-neutral JSON Schema document. This is the inverse of writing a plan by hand: you hand it a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object and it gives you a portable representation.</p>
+<p>Three methods do this:</p>
 <ul>
 <li><a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a> produces the <code>pb.Validate(...).col_vals_*()...</code> chain as a string</li>
 <li><a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>Validate.to_yaml()</code></a> produces a <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>-compatible YAML document</li>
+<li><a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>Validate.to_json_schema()</code></a> produces a <a href="https://json-schema.org/">JSON Schema</a> document</li>
 </ul>
-<p>Both are ordinary, deterministic utilities: no network access, no API keys, no LLM. They’re useful on their own for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. They’re also the foundation for the <a href="../../user-guide/advanced-validation/ai-validation-editor.html">AI Validation Editor</a>, which sends the current plan to a model as editable code.</p>
+<p>The first two are ordinary, deterministic utilities that round-trip through Pointblank itself. <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link gdls-code">to_json_schema()</a> produces a standard that tools in many ecosystems can consume. All three are useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. <a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link gdls-code">to_code()</a> and <a href="../../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link gdls-code">to_yaml()</a> are also the foundation for the <a href="../../user-guide/advanced-validation/ai-validation-editor.html">AI Validation Editor</a>, which sends the current plan to a model as editable code.</p>
 <section id="rendering-a-plan-as-python-code" class="level1">
 <h1>Rendering a Plan as Python Code</h1>
 <p>Given any validation plan, <a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a> returns a self-contained block of Python that reproduces it:</p>
-<div id="108f84d2" class="cell" data-execution_count="1">
+<div id="0048f3e4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -664,7 +670,7 @@ validation</code></pre>
 <section id="rendering-a-plan-as-yaml" class="level1">
 <h1>Rendering a Plan as YAML</h1>
 <p><a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>to_yaml()</code></a> renders the same plan using the schema consumed by <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>:</p>
-<div id="63768fa9" class="cell" data-execution_count="2">
+<div id="6e5cc26a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(validation.to_yaml())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tbl: small_table
@@ -700,7 +706,7 @@ steps:
 <section id="round-tripping-a-plan" class="level1">
 <h1>Round-Tripping a Plan</h1>
 <p>Because <a href="../../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link gdls-code">to_yaml()</a> emits a <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>-compatible document, a plan round-trips through YAML. Here we serialize a plan, then rebuild and run it with <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>:</p>
-<div id="ef83647a" class="cell" data-execution_count="3">
+<div id="967619cc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>yaml_str <span class="op">=</span> validation.to_yaml()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>rebuilt <span class="op">=</span> pb.yaml_interrogate(yaml_str)</span>
@@ -738,6 +744,11 @@ steps:
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -1070,7 +1081,7 @@ steps:
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:23:41 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:23:41 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-08-11 13:57:39 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-08-11 13:57:39 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
@@ -1088,7 +1099,7 @@ steps:
 <li>the expressions used by <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a>, <a href="../../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a>, and <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link"><code>specially()</code></a></li>
 </ul>
 <p>For these, Pointblank emits a clearly-marked placeholder so the generated code still parses and runs, and raises a warning describing what was lost. The following plan uses a <code>pre=</code> callable that can’t be serialized:</p>
-<div id="b052f923" class="cell" data-execution_count="4">
+<div id="48f08663" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>flagged <span class="op">=</span> pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>)).col_vals_gt(</span>
@@ -1117,9 +1128,127 @@ steps:
 <li><strong>Migrating between formats.</strong> Move a plan from Python to YAML (or, via <a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link"><code>yaml_to_python()</code></a>, from YAML to Python) to fit it into a configuration-driven workflow.</li>
 </ul>
 </section>
+<section id="exporting-a-plan-as-json-schema" class="level1">
+<h1>Exporting a Plan as JSON Schema</h1>
+<p>While <a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link gdls-code">to_code()</a> and <a href="../../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link gdls-code">to_yaml()</a> reproduce your plan as Pointblank-specific source, <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>to_json_schema()</code></a> converts your validation rules into a <a href="https://json-schema.org/">JSON Schema</a> document. JSON Schema is a widely adopted, language-neutral standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go, and many other ecosystems.</p>
+<div id="6d4ff6cb" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"date_time"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"f"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"low"</span>, <span class="st">"mid"</span>, <span class="st">"high"</span>])</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="st">"^[0-9]-[a-z]</span><span class="sc">{3}</span><span class="st">-[0-9]</span><span class="sc">{3}</span><span class="st">$"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> validation.to_json_schema()</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(schema, indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "d": {
+      "exclusiveMinimum": 100,
+      "type": "number"
+    },
+    "date_time": {},
+    "f": {
+      "enum": [
+        "low",
+        "mid",
+        "high"
+      ],
+      "type": "string"
+    },
+    "b": {
+      "pattern": "^[0-9]-[a-z]{3}-[0-9]{3}$",
+      "type": "string"
+    },
+    "a": {
+      "minimum": 1,
+      "maximum": 8,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "date_time"
+  ]
+}</code></pre>
+</div>
+</div>
+<p>Each validation method is mapped to its closest JSON Schema keyword:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Pointblank method</th>
+<th>JSON Schema keyword</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>required</code></td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a></td>
+<td><code>exclusiveMinimum</code></td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a></td>
+<td><code>minimum</code></td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a></td>
+<td><code>exclusiveMaximum</code></td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>maximum</code></td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a></td>
+<td><code>const</code></td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a></td>
+<td><code>minimum</code> + <code>maximum</code></td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>enum</code></td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>pattern</code></td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a></td>
+<td><code>format</code></td>
+</tr>
+</tbody>
+</table>
+<p>When the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object has data attached, the schema is automatically enriched with column type information (<code>"type": "integer"</code>, <code>"type": "string"</code>, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>, <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>) are silently skipped.</p>
+<section id="writing-to-a-file" class="level2">
+<h2 class="anchored" data-anchor-id="writing-to-a-file">Writing to a File</h2>
+<p>Pass a <code>path=</code> argument to write the JSON Schema to disk. Parent directories are created automatically:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation.to_json_schema(path<span class="op">=</span><span class="st">"schemas/small_table.schema.json"</span>)</span></code></pre></div>
+<p>This is useful for checking schemas into version control or feeding them into downstream tooling that consumes JSON Schema files.</p>
+</section>
+<section id="relationship-to-export_contract" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-to-export_contract">Relationship to <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></h2>
+<p>Under the hood, <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link gdls-code">to_json_schema()</a> delegates to the <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a> function with <code>format="json_schema"</code>. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> object rather than a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object), use <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> directly. See the <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html">Importing and Exporting Contracts</a> guide for the full story on contract adapters.</p>
+</section>
+</section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p><a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a> and <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>to_yaml()</code></a> turn a live validation plan back into portable source. They’re deterministic, require no external services, and round-trip through execution and <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> respectively. Beyond sharing and persistence, they provide the reviewable, diffable representation that powers the <a href="../../user-guide/advanced-validation/ai-validation-editor.html">AI Validation Editor</a> covered in the next section.</p>
+<p><a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>to_yaml()</code></a>, and <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>to_json_schema()</code></a> turn a live validation plan back into portable source. The first two are deterministic, Pointblank-specific formats that round-trip through execution and <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> respectively. The third produces a language-neutral JSON Schema that any JSON-Schema-aware tool can consume. Beyond sharing and persistence, these representations provide the reviewable, diffable record that powers the <a href="../../user-guide/advanced-validation/ai-validation-editor.html">AI Validation Editor</a> covered in the next section.</p>
 
 
 </section>

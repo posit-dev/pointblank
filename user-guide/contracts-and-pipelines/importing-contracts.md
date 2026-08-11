@@ -121,7 +121,7 @@ result.to_validate(data=users).interrogate()
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:27</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-11|13:57:45</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -1036,7 +1036,7 @@ imported.to_validate(data=weather_data).interrogate()
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:28</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-11|13:57:46</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -1621,6 +1621,10 @@ pb.export_contract(contract, "output/sensor_data.odcs.yml", format="odcs")
 
 When a `destination` path is provided, the output is written to that file (creating parent directories as needed) and also returned from the function. This makes it convenient to both persist the output and inspect it in the same call.
 
+> **Tip: Shortcut for JSON Schema**
+>
+> If you're working with a [Validate](../../reference/Validate.md#pointblank.Validate) object and want JSON Schema output specifically, you can use the <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>to_json_schema()</code></a> convenience method directly on the [Validate](../../reference/Validate.md#pointblank.Validate) object. It delegates to [export_contract()](../../reference/export_contract.md#pointblank.export_contract) and additionally enriches the schema with column type information inferred from the data. See the [Serializing Validation Plans](../../user-guide/advanced-validation/plan-serialization.md#exporting-a-plan-as-json-schema) guide for details.
+
 
 # Round-Trip Fidelity
 
@@ -1787,7 +1791,7 @@ validation
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-10|16:45:28</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-08-11|13:57:46</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">enriched_check</span>
 
@@ -1884,7 +1888,7 @@ col_vals_not_null()
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">4</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-MDkzOCBDMzkuMDM2NDY0LDM1Ljc3NzI0OCAzNy4wMTA2OTksMzQuOTkxMjEgMzQuNzczNDM4LDM0LjM4NDc2NiBDMzUuNTEwMzY3LDMxLjU0MDMyOSAzNS45NDA1MzgsMjguMzY0MDk2IDM2LjAxMzY3MiwyNSBaIE0yMywzNS4wMjkyOTcgTDIzLDQ0Ljk2Mjg5MSBDMjAuODM3Mjg2LDQ0LjQ4Mzk1IDE4Ljc0MDgyNSw0Mi40NzE4ODQgMTcuMDg3ODkxLDM5LjE2NjAxNiBDMTYuNTg1NTA0LDM4LjE2MTI0MyAxNi4xMzM2MjEsMzcuMDQxMTk0IDE1LjczNjMyOCwzNS44MzU5MzggQzE3Ljk4NDczMSwzNS4zNjk5NjMgMjAuNDI5MSwzNS4wODg2MjMgMjMsMzUuMDI5Mjk3IFogTTI1LDM1LjAyOTI5NyBDMjcuNTY3NDksMzUuMDg5ODkgMzAuMDA4NTU1LDM1LjM3Njk3OCAzMi4yNTk3NjYsMzUuODQ3NjU2IEMzMS44NjMzNzMsMzcuMDQ4NSAzMS40MTI4OTcsMzguMTY0NDQgMzAuOTEyMTA5LDM5LjE2NjAxNiBDMjkuMjU5MTc1LDQyLjQ3MTg4NCAyNy4xNjI3MTQsNDQuNDgzOTUgMjUsNDQuOTYyODkxIEwyNSwzNS4wMjkyOTcgWiBNMTMuNzgzMjAzLDM2LjI5Njg3NSBDMTQuMjIxNjQ3LDM3LjY0NzU5MSAxNC43MjUyODgsMzguOTEzNDY2IDE1LjI5ODgyOCw0MC4wNjA1NDcgQzE2LjExODYzNyw0MS43MDAxNjYgMTcuMDg2NDgxLDQzLjEyMjcxNiAxOC4xNzE4NzUsNDQuMjU5NzY2IEMxNC40MTQ3MTEsNDMuMTgzMDMyIDExLjEwNDI2Myw0MS4wODEwMzYgOC41MjUzOTA2LDM4LjI4OTA2MiBDMTAuMDM1NzUsMzcuNTAxMzMyIDExLjgwOTEzMiwzNi44Mjc5MDIgMTMuNzgzMjAzLDM2LjI5Njg3NSBaIE0zNC4yMTA5MzgsMzYuMzEyNSBDMzYuMTc0MDY0LDM2Ljg0MTcyMSAzNy45NDk0MTMsMzcuNTA3NjM5IDM5LjQ4MjQyMiwzOC4yODEyNSBDMzYuOTAyNDk5LDQxLjA3NzI4NSAzMy41ODg5MjcsNDMuMTgxOTg5IDI5LjgyODEyNSw0NC4yNTk3NjYgQzMwLjkxMzUxOSw0My4xMjI3MTYgMzEuODgxMzYzLDQxLjcwMDE2NiAzMi43MDExNzIsNDAuMDYwNTQ3IEMzMy4yNzI0OTgsMzguOTE3ODk0IDMzLjc3MzYzNCwzNy42NTcyOSAzNC4yMTA5MzgsMzYuMzEyNSBaIiBpZD0iU2hhcGUiIC8+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
+M2NzIsMjMgTDI1LDIzIEwyNSwxNC45NzI2NTYgQzI3Ljc2NDQ1NywxNC45MTMzOTMgMzAuMzk2NDc3LDE0LjYxMjI3MSAzMi44MjgxMjUsMTQuMDk5NjA5IFogTTIuOTQ1MzEyNSwyNSBMMTEuOTg2MzI4LDI1IEMxMi4wNTkzMTQsMjguMzU3MzAzIDEyLjQ4ODQxOSwzMS41MjcxNTYgMTMuMjIyNjU2LDM0LjM2NzE4OCBDMTAuOTc4ODM4LDM0Ljk3NDIxMiA4Ljk1NjQzNjMsMzUuNzY5NjQzIDcuMjE2Nzk2OSwzNi43MjY1NjIgQzQuNzE5NjgwNiwzMy40MzY3NDYgMy4xNTA0MDg4LDI5LjQwMzQ1NiAyLjk0NTMxMjUsMjUgWiBNMTMuOTg2MzI4LDI1IEwyMywyNSBMMjMsMzMuMDI3MzQ0IEMyMC4yMzU1NDMsMzMuMDg2NjA3IDE3LjYwMzUyMywzMy4zODc3MjkgMTUuMTcxODc1LDMzLjkwMDM5MSBDMTQuNDc4OTEyLDMxLjIyNzQgMTQuMDYwNTk5LDI4LjIwNzIwNCAxMy45ODYzMjgsMjUgWiBNMjUsMjUgTDM0LjAxMzY3MiwyNSBDMzMuOTM5Mjc1LDI4LjIxMjYzMSAzMy41MTkyNTcsMzEuMjM3NzI5IDMyLjgyNDIxOSwzMy45MTQwNjIgQzMwLjM5MTg3NiwzMy4zOTY1MjEgMjcuNzYyODU1LDMzLjA4ODMwOCAyNSwzMy4wMjczNDQgTDI1LDI1IFogTTM2LjAxMzY3MiwyNSBMNDUuMDU0Njg4LDI1IEM0NC44NDk5MTQsMjkuMzk2NTE1IDQzLjI4NTEyNywzMy40MjM5MjIgNDAuNzk0OTIyLDM2LjcxMDkzOCBDMzkuMDM2NDY0LDM1Ljc3NzI0OCAzNy4wMTA2OTksMzQuOTkxMjEgMzQuNzczNDM4LDM0LjM4NDc2NiBDMzUuNTEwMzY3LDMxLjU0MDMyOSAzNS45NDA1MzgsMjguMzY0MDk2IDM2LjAxMzY3MiwyNSBaIE0yMywzNS4wMjkyOTcgTDIzLDQ0Ljk2Mjg5MSBDMjAuODM3Mjg2LDQ0LjQ4Mzk1IDE4Ljc0MDgyNSw0Mi40NzE4ODQgMTcuMDg3ODkxLDM5LjE2NjAxNiBDMTYuNTg1NTA0LDM4LjE2MTI0MyAxNi4xMzM2MjEsMzcuMDQxMTk0IDE1LjczNjMyOCwzNS44MzU5MzggQzE3Ljk4NDczMSwzNS4zNjk5NjMgMjAuNDI5MSwzNS4wODg2MjMgMjMsMzUuMDI5Mjk3IFogTTI1LDM1LjAyOTI5NyBDMjcuNTY3NDksMzUuMDg5ODkgMzAuMDA4NTU1LDM1LjM3Njk3OCAzMi4yNTk3NjYsMzUuODQ3NjU2IEMzMS44NjMzNzMsMzcuMDQ4NSAzMS40MTI4OTcsMzguMTY0NDQgMzAuOTEyMTA5LDM5LjE2NjAxNiBDMjkuMjU5MTc1LDQyLjQ3MTg4NCAyNy4xNjI3MTQsNDQuNDgzOTUgMjUsNDQuOTYyODkxIEwyNSwzNS4wMjkyOTcgWiBNMTMuNzgzMjAzLDM2LjI5Njg3NSBDMTQuMjIxNjQ3LDM3LjY0NzU5MSAxNC43MjUyODgsMzguOTEzNDY2IDE1LjI5ODgyOCw0MC4wNjA1NDcgQzE2LjExODYzNyw0MS43MDAxNjYgMTcuMDg2NDgxLDQzLjEyMjcxNiAxOC4xNzE4NzUsNDQuMjU5NzY2IEMxNC40MTQ3MTEsNDMuMTgzMDMyIDExLjEwNDI2Myw0MS4wODEwMzYgOC41MjUzOTA2LDM4LjI4OTA2MiBDMTAuMDM1NzUsMzcuNTAxMzMyIDExLjgwOTEzMiwzNi44Mjc5MDIgMTMuNzgzMjAzLDM2LjI5Njg3NSBaIE0zNC4yMTA5MzgsMzYuMzEyNSBDMzYuMTc0MDY0LDM2Ljg0MTcyMSAzNy45NDk0MTMsMzcuNTA3NjM5IDM5LjQ4MjQyMiwzOC4yODEyNSBDMzYuOTAyNDk5LDQxLjA3NzI4NSAzMy41ODg5MjcsNDMuMTgxOTg5IDI5LjgyODEyNSw0NC4yNTk3NjYgQzMwLjkxMzUxOSw0My4xMjI3MTYgMzEuODgxMzYzLDQxLjcwMDE2NiAzMi43MDExNzIsNDAuMDYwNTQ3IEMzMy4yNzI0OTgsMzguOTE3ODk0IDMzLjc3MzYzNCwzNy42NTcyOSAzNC4yMTA5MzgsMzYuMzEyNSBaIiBpZD0iU2hhcGUiIC8+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
 
 col_vals_within_spec()
 

@@ -59,6 +59,7 @@
 - [Validate.col_vals_not_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html)
 - [Validate.col_vals_regex](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html)
 - [Validate.col_vals_within_spec](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_within_spec.html)
+- [Validate.col_vals_in_table](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_table.html)
 - [Validate.col_vals_expr](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
 - [Validate.col_exists](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
 - [Validate.col_pct_null](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_null.html)
@@ -129,6 +130,7 @@
 - [Validate.get_dataframe_report](https://posit-dev.github.io/pointblank/reference/Validate.get_dataframe_report.html)
 - [Validate.to_code](https://posit-dev.github.io/pointblank/reference/Validate.to_code.html)
 - [Validate.to_yaml](https://posit-dev.github.io/pointblank/reference/Validate.to_yaml.html)
+- [Validate.to_json_schema](https://posit-dev.github.io/pointblank/reference/Validate.to_json_schema.html)
 - [Validate.suggest_improvements](https://posit-dev.github.io/pointblank/reference/Validate.suggest_improvements.html)
 - [Validate.from_prompt](https://posit-dev.github.io/pointblank/reference/Validate.from_prompt.html)
 - [Validate.get_sundered_data](https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html)
@@ -155,6 +157,7 @@
 
 
 - [DataScan](https://posit-dev.github.io/pointblank/reference/DataScan.html): Get a summary of a dataset
+- [DataScanDiff](https://posit-dev.github.io/pointblank/reference/DataScanDiff.html): The result of comparing two `DataScan` profiles
 - [preview](https://posit-dev.github.io/pointblank/reference/preview.html): Display a table preview that shows some rows from the top, some from the bottom
 - [col_summary_tbl](https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html): Generate a column-level summary table of a dataset
 - [missing_vals_tbl](https://posit-dev.github.io/pointblank/reference/missing_vals_tbl.html): Display a table that shows the missing values in the input table

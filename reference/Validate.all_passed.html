@@ -478,6 +478,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_in_table.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_in_table</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.col_vals_expr.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validate.col_vals_expr</span></a>
   </div>
@@ -810,6 +816,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_json_schema.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.to_json_schema</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Validate.suggest_improvements.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validate.suggest_improvements</span></a>
   </div>
@@ -940,6 +952,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/DataScan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">DataScan</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScanDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScanDiff</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1505,7 +1523,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <a href="Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed()</a> method is used to determine if all validation steps passed perfectly.</p>
-<div id="ef11d7b5" class="cell" data-execution_count="1">
+<div id="357d25e0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

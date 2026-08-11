@@ -1,13 +1,14 @@
 # Serializing Validation Plans
 
-A validation plan you build in Python isn't locked inside the [Validate](../../reference/Validate.md#pointblank.Validate) object. Pointblank can render an in-memory plan back into canonical source, either as a Python method chain or as a YAML configuration. This is the inverse of writing a plan by hand: you hand it a [Validate](../../reference/Validate.md#pointblank.Validate) object and it gives you the code that recreates it.
+A validation plan you build in Python isn't locked inside the [Validate](../../reference/Validate.md#pointblank.Validate) object. Pointblank can render an in-memory plan back into canonical source, either as a Python method chain, a YAML configuration, or a language-neutral JSON Schema document. This is the inverse of writing a plan by hand: you hand it a [Validate](../../reference/Validate.md#pointblank.Validate) object and it gives you a portable representation.
 
-Two methods do this:
+Three methods do this:
 
 - <a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a> produces the `pb.Validate(...).col_vals_*()...` chain as a string
 - <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>Validate.to_yaml()</code></a> produces a <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>-compatible YAML document
+- <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>Validate.to_json_schema()</code></a> produces a [JSON Schema](https://json-schema.org/) document
 
-Both are ordinary, deterministic utilities: no network access, no API keys, no LLM. They're useful on their own for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. They're also the foundation for the [AI Validation Editor](../../user-guide/advanced-validation/ai-validation-editor.md), which sends the current plan to a model as editable code.
+The first two are ordinary, deterministic utilities that round-trip through Pointblank itself. [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) produces a standard that tools in many ecosystems can consume. All three are useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. [to_code()](../../reference/Validate.to_code.md#pointblank.Validate.to_code) and [to_yaml()](../../reference/Contract.md#pointblank.Contract.to_yaml) are also the foundation for the [AI Validation Editor](../../user-guide/advanced-validation/ai-validation-editor.md), which sends the current plan to a model as editable code.
 
 
 # Rendering a Plan as Python Code
@@ -154,6 +155,11 @@ rebuilt
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -333,7 +339,7 @@ rows_distinct()
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">6</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-1NzApIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjIuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjIuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjUuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjUuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNy4wOTMxODYzLC0yLjk4NTMzMDY1IEMyNi44ODM2NjI1LC0yLjk4NTMzMDY1IDI1LjcxMjIzNCwtMi45MzUzMzA2NSAyNS43MTIyMzQsLTEuNjUxOTk3MzEgTDI1LjcxMjIzNCwzNy42ODEzMzYgQzI1LjcxMjIzNCwzOC45NjQ2Njk0IDI2Ljg4MzY2MjUsMzkuMDE0NjY5NCAyNy4wOTMxODYzLDM5LjAxNDY2OTQgTDI5LjY2NDYxNDksMzkuMDE0NjY5NCBMMjkuNjY0NjE0OSwtMi45ODUzMzA2NSBMMjcuMDkzMTg2MywtMi45ODUzMzA2NSBaIE0zNS42NzIxNzcxLC0yLjk4NTMzMDY1IEwzNS42NzIxNzcxLDM5LjAxNDY2OTQgTDMxLjc1MjI5MDgsMzkuMDE0NjY5NCBMMzEuNzUyMjkwOCwzOS4wMTQ2Njk0IEwzMS43NTIyOTA4LC0yLjk4NTMzMDY1IEwzMS43NTIyOTA4LC0yLjk4NTMzMDY1IEwzNS42NzIxNzcxLC0yLjk4NTMzMDY1IFogTTQwLjM2NTYxNDksLTIuOTg0OTA5NiBDNDAuNjQ0ODc4NiwtMi45NzgyMzY5OCA0MS43MTIyMzQsLTIuODc2OTk3MzEgNDEuNzEyMjM0LC0xLjY1MTk5NzMxIEw0MS43MTIyMzQsLTEuNjUxOTk3MzEgTDQxLjcxMjIzNCwzNy42ODEzMzYgQzQxLjcxMjIzNCwzOC45NjQ2Njk0IDQwLjU0MDgwNTQsMzkuMDE0NjY5NCA0MC4zMzEyODE2LDM5LjAxNDY2OTQgTDQwLjMzMTI4MTYsMzkuMDE0NjY5NCBMMzcuNzU5ODUzLDM5LjAxNDY2OTQgTDM3Ljc1OTg1MywtMi45ODUzMzA2NSBaIiBpZD0icm93c19vbmUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzMuNzEyMjM0LCAxOC4wMTQ2NjkpIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTMzLjcxMjIzNCwgLTE4LjAxNDY2OSkgIiAvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
+LDY5LjQ4NTMzMDYgTDMyLjI2NDUyODYsNjkuNDg1MzMwNiBMMzIuMjY0NTI4NiwyOC40ODUzMzA2IEwzNS4xNTk5MzkzLDI4LjQ4NTMzMDYgWiBNNDAuMzU5MzQ3NSwyOC40ODU3NTA3IEM0MC40NzMzOTUzLDI4LjQ4ODcyOCA0MC43NjY4MiwyOC41MDQ4MTQ2IDQwLjk4NTM1NTIsMjguNjk0OTQ1MSBDNDEuMTAwODIxNSwyOC43OTU0MDM0IDQxLjE4MTk5OTksMjguOTUxMzY4NCA0MS4yMDUxNzc2LDI5LjE3NDgzMiBMNDEuMjA1MTc3NiwyOS4xNzQ4MzIgTDQxLjIxMjIzNCw2OC42NTE5OTczIEM0MS4yMTIyMzQsNjguOTMwOTgzMyA0MS4xMzg1Mjc3LDY5LjEyNTgzNjkgNDEuMDEzMjgwMyw2OS4yNDk4MDk0IEM0MC43OTQzMDc0LDY5LjQ2NjU1MzUgNDAuNDc4MDQ3LDY5LjQ4MTg3ODcgNDAuMzU5NDEzOSw2OS40ODQ5MTA2IEw0MC4zNTk0MTM5LDY5LjQ4NDkxMDYgTDM4LjI1OTg1Myw2OS40ODUyNDk4IEwzOC4yNTk4NTMsMjguNDg1NDExNCBaIiBpZD0icm93c190d28iIHN0cm9rZT0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMy43MTIyMzQsIDQ4Ljk4NTMzMSkgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMzMuNzEyMjM0LCAtNDguOTg1MzMxKSAiIC8+CiAgICAgICAgICAgIDxnIGlkPSJ2ZXJ0aWNhbF9lcXVhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzAuMDAwMDAwLCAyOS4zODA1NzApIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjIuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjIuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjUuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjUuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNy4wOTMxODYzLC0yLjk4NTMzMDY1IEMyNi44ODM2NjI1LC0yLjk4NTMzMDY1IDI1LjcxMjIzNCwtMi45MzUzMzA2NSAyNS43MTIyMzQsLTEuNjUxOTk3MzEgTDI1LjcxMjIzNCwzNy42ODEzMzYgQzI1LjcxMjIzNCwzOC45NjQ2Njk0IDI2Ljg4MzY2MjUsMzkuMDE0NjY5NCAyNy4wOTMxODYzLDM5LjAxNDY2OTQgTDI5LjY2NDYxNDksMzkuMDE0NjY5NCBMMjkuNjY0NjE0OSwtMi45ODUzMzA2NSBMMjcuMDkzMTg2MywtMi45ODUzMzA2NSBaIE0zNS42NzIxNzcxLC0yLjk4NTMzMDY1IEwzNS42NzIxNzcxLDM5LjAxNDY2OTQgTDMxLjc1MjI5MDgsMzkuMDE0NjY5NCBMMzEuNzUyMjkwOCwzOS4wMTQ2Njk0IEwzMS43NTIyOTA4LC0yLjk4NTMzMDY1IEwzMS43NTIyOTA4LC0yLjk4NTMzMDY1IEwzNS42NzIxNzcxLC0yLjk4NTMzMDY1IFogTTQwLjM2NTYxNDksLTIuOTg0OTA5NiBDNDAuNjQ0ODc4NiwtMi45NzgyMzY5OCA0MS43MTIyMzQsLTIuODc2OTk3MzEgNDEuNzEyMjM0LC0xLjY1MTk5NzMxIEw0MS43MTIyMzQsLTEuNjUxOTk3MzEgTDQxLjcxMjIzNCwzNy42ODEzMzYgQzQxLjcxMjIzNCwzOC45NjQ2Njk0IDQwLjU0MDgwNTQsMzkuMDE0NjY5NCA0MC4zMzEyODE2LDM5LjAxNDY2OTQgTDQwLjMzMTI4MTYsMzkuMDE0NjY5NCBMMzcuNzU5ODUzLDM5LjAxNDY2OTQgTDM3Ljc1OTg1MywtMi45ODUzMzA2NSBaIiBpZD0icm93c19vbmUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzMuNzEyMjM0LCAxOC4wMTQ2NjkpIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTMzLjcxMjIzNCwgLTE4LjAxNDY2OSkgIiAvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
 
 row_count_match()
 
@@ -356,7 +362,7 @@ row_count_match()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:23:41 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-07-22 23:23:41 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-08-11 13:57:39 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-08-11 13:57:39 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -411,6 +417,99 @@ Rendering a plan back to source is helpful whenever you want the plan to leave t
 - **Migrating between formats.** Move a plan from Python to YAML (or, via <a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link"><code>yaml_to_python()</code></a>, from YAML to Python) to fit it into a configuration-driven workflow.
 
 
+# Exporting a Plan as JSON Schema
+
+While [to_code()](../../reference/Validate.to_code.md#pointblank.Validate.to_code) and [to_yaml()](../../reference/Contract.md#pointblank.Contract.to_yaml) reproduce your plan as Pointblank-specific source, <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>to_json_schema()</code></a> converts your validation rules into a [JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted, language-neutral standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go, and many other ecosystems.
+
+
+``` python
+import json
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+    )
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_not_null(columns="date_time")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern="^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .col_vals_between(columns="a", left=1, right=8)
+)
+
+schema = validation.to_json_schema()
+
+print(json.dumps(schema, indent=2))
+```
+
+
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "d": {
+          "exclusiveMinimum": 100,
+          "type": "number"
+        },
+        "date_time": {},
+        "f": {
+          "enum": [
+            "low",
+            "mid",
+            "high"
+          ],
+          "type": "string"
+        },
+        "b": {
+          "pattern": "^[0-9]-[a-z]{3}-[0-9]{3}$",
+          "type": "string"
+        },
+        "a": {
+          "minimum": 1,
+          "maximum": 8,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "date_time"
+      ]
+    }
+
+
+Each validation method is mapped to its closest JSON Schema keyword:
+
+| Pointblank method | JSON Schema keyword |
+|----|----|
+| [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) | `required` |
+| [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) | `exclusiveMinimum` |
+| [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) | `minimum` |
+| [col_vals_lt()](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt) | `exclusiveMaximum` |
+| [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) | `maximum` |
+| [col_vals_eq()](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) | `const` |
+| [col_vals_between()](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) | `minimum` + `maximum` |
+| [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) | `enum` |
+| [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) | `pattern` |
+| [col_vals_within_spec()](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) | `format` |
+
+When the [Validate](../../reference/Validate.md#pointblank.Validate) object has data attached, the schema is automatically enriched with column type information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)) are silently skipped.
+
+
+## Writing to a File
+
+Pass a `path=` argument to write the JSON Schema to disk. Parent directories are created automatically:
+
+``` python
+validation.to_json_schema(path="schemas/small_table.schema.json")
+```
+
+This is useful for checking schemas into version control or feeding them into downstream tooling that consumes JSON Schema files.
+
+
+## Relationship to [export_contract()](../../reference/export_contract.md#pointblank.export_contract)
+
+Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a> function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use [export_contract()](../../reference/export_contract.md#pointblank.export_contract) directly. See the [Importing and Exporting Contracts](../../user-guide/contracts-and-pipelines/importing-contracts.md) guide for the full story on contract adapters.
+
+
 # Conclusion
 
-<a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a> and <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>to_yaml()</code></a> turn a live validation plan back into portable source. They're deterministic, require no external services, and round-trip through execution and <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> respectively. Beyond sharing and persistence, they provide the reviewable, diffable representation that powers the [AI Validation Editor](../../user-guide/advanced-validation/ai-validation-editor.md) covered in the next section.
+<a href="../../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link"><code>to_yaml()</code></a>, and <a href="../../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="gdls-link"><code>to_json_schema()</code></a> turn a live validation plan back into portable source. The first two are deterministic, Pointblank-specific formats that round-trip through execution and <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> respectively. The third produces a language-neutral JSON Schema that any JSON-Schema-aware tool can consume. Beyond sharing and persistence, these representations provide the reviewable, diffable record that powers the [AI Validation Editor](../../user-guide/advanced-validation/ai-validation-editor.md) covered in the next section.

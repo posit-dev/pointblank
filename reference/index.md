@@ -130,6 +130,9 @@ Validate whether column values match a regular expression pattern.
 [Validate.col_vals_within_spec()](Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec)  
 Validate whether column values fit within a specification.
 
+[Validate.col_vals_in_table()](Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)  
+Validate that column values exist in a reference table (referential integrity).
+
 [Validate.col_vals_expr()](Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)  
 Validate column values using a custom expression.
 
@@ -308,6 +311,9 @@ Render this validation plan as canonical Pointblank Python code.
 [Validate.to_yaml()](Validate.to_yaml.md#pointblank.Validate.to_yaml)  
 Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
 
+[Validate.to_json_schema()](Validate.to_json_schema.md#pointblank.Validate.to_json_schema)  
+Export this validation plan as a JSON Schema document.
+
 [Validate.suggest_improvements()](Validate.suggest_improvements.md#pointblank.Validate.suggest_improvements)  
 Propose AI-generated improvements to this validation plan.
 
@@ -377,6 +383,9 @@ Functions for getting to grips with a new data table. Use `DataScan` for a quick
 
 [DataScan](DataScan.md#pointblank.DataScan)  
 Get a summary of a dataset.
+
+[DataScanDiff](DataScanDiff.md#pointblank.DataScanDiff)  
+The result of comparing two `DataScan` profiles.
 
 [preview()](preview.md#pointblank.preview)  
 Display a table preview that shows some rows from the top, some from the bottom.
