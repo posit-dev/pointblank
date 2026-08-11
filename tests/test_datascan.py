@@ -550,8 +550,9 @@ def test_datascan_save_to_json(tmp_path):
 
     with open(output_file) as f:
         content = json.load(f)
-        # The saved content should be a JSON string (due to json.dump with a string)
-        assert isinstance(content, str)
+        assert isinstance(content, dict)
+        assert "metadata" in content
+        assert "columns" in content
 
 
 def test_typemap_fetch_icon_with_unknown_type():
