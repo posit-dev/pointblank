@@ -80,10 +80,10 @@ from pointblank._interrogation import (
     interrogate_isin,
     interrogate_le,
     interrogate_lt,
-    interrogate_ne,
     interrogate_missing_coded,
     interrogate_missing_consistent,
     interrogate_missing_only_coded,
+    interrogate_ne,
     interrogate_not_null,
     interrogate_notin,
     interrogate_null,
@@ -94,7 +94,6 @@ from pointblank._interrogation import (
     rows_complete,
 )
 from pointblank._typing import SegmentSpec
-from pointblank.missing import MissingSpec
 from pointblank._utils import (
     _check_any_df_lib,
     _check_invalid_fields,
@@ -131,6 +130,7 @@ from pointblank.column import (
     ReferenceColumn,
     col,
 )
+from pointblank.missing import MissingSpec
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -14206,6 +14206,181 @@ class Validate:
 
         return self
 
+    def col_vals_in_table(
+        self,
+        columns: str | list[str],
+        ref_table: Any,
+        ref_column: str | list[str],
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that column values exist in a reference table (referential integrity).
+
+        The `col_vals_in_table()` validation method checks whether each value (or composite key) in
+        the specified column(s) of this table exists in the corresponding column(s) of a reference
+        table. This is a referential integrity check: it catches orphaned foreign keys, broken
+        references, and values that fall outside a controlled vocabulary maintained in another
+        table.
+
+        Each row is a test unit. Rows whose key values are found in the reference table pass. Rows
+        with orphaned values fail. Failing rows are extractable via `get_data_extracts()` just like
+        any other column-level validation.
+
+        Cross-backend matching is supported: the reference table can be from a different backend
+        (e.g., a Polars DataFrame checked against a DuckDB table, or a MySQL table checked against a
+        SQLite table). The lighter table is automatically materialized to match the heavier table's
+        backend before comparison.
+
+        Parameters
+        ----------
+        columns
+            The column (or list of columns for composite keys) in this table that should reference
+            the other table. For composite keys, supply a list of column names.
+        ref_table
+            The reference table containing the valid values. Can be a DataFrame, database table, or
+            a callable that returns one (resolved at interrogation time).
+        ref_column
+            The column (or list of columns for composite keys) in the reference table to check
+            against. Must have the same length as ``columns``.
+        na_pass
+            If `True`, rows where the key column(s) are null will pass. If `False` (default), null
+            key values are treated as failing (not found in reference).
+        pre
+            An optional preprocessing function to apply to the data table before validation.
+        thresholds
+            Failure-condition thresholds for this step (overrides global thresholds).
+        actions
+            Actions to take when thresholds are exceeded.
+        brief
+            A brief description for this validation step.
+        active
+            Whether this step is active (can be a bool or callable returning bool).
+        dimension
+            The data quality dimension tag for this step.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with this step added (for method chaining).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Check that every `customer_id` in orders exists in the customers table:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        customers = pl.DataFrame({"id": [1, 2, 3, 4, 5]})
+        orders = pl.DataFrame({
+            "order_id": [101, 102, 103, 104],
+            "customer_id": [1, 2, 3, 99],
+        })
+
+        validation = (
+            pb.Validate(data=orders)
+            .col_vals_in_table(
+                columns="customer_id",
+                ref_table=customers,
+                ref_column="id",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The last row fails because `customer_id=99` does not exist in the customers table.
+
+        Composite foreign keys are also supported:
+
+        ```{python}
+        catalog = pl.DataFrame({
+            "region": ["US", "US", "EU"],
+            "sku": ["A1", "B2", "A1"],
+        })
+
+        orders = pl.DataFrame({
+            "region": ["US", "EU", "US"],
+            "sku": ["A1", "A1", "C3"],
+        })
+
+        validation = (
+            pb.Validate(data=orders)
+            .col_vals_in_table(
+                columns=["region", "sku"],
+                ref_table=catalog,
+                ref_column=["region", "sku"],
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Validate columns/ref_column length agreement
+        cols = [columns] if isinstance(columns, str) else list(columns)
+        ref_cols = [ref_column] if isinstance(ref_column, str) else list(ref_column)
+        if len(cols) != len(ref_cols):
+            raise ValueError(
+                f"columns and ref_column must have the same length, "
+                f"got {len(cols)} and {len(ref_cols)}."
+            )
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package ref_table, ref_column, and target columns into values dict
+        values = {
+            "ref_table": ref_table,
+            "ref_column": ref_column,
+            "columns": columns,
+        }
+
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Store the column(s) for display; for composite keys store the first column
+        # (the full list is in values for the interrogation function)
+        display_column = columns if isinstance(columns, str) else columns[0]
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=display_column,
+            values=values,
+            na_pass=na_pass,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
     def tbl_match(
         self,
         tbl_compare: Any,
@@ -16028,6 +16203,24 @@ class Validate:
 
                         results_tbl = None
 
+                    elif assertion_type == "col_vals_in_table":
+                        from pointblank._interrogation import interrogate_in_table
+
+                        ref_table = value["ref_table"]
+                        ref_column = value["ref_column"]
+                        in_table_columns = value["columns"]
+
+                        if callable(ref_table):
+                            ref_table = ref_table()
+
+                        results_tbl = interrogate_in_table(
+                            tbl=data_tbl_step,
+                            columns=in_table_columns,
+                            ref_tbl=ref_table,
+                            ref_columns=ref_column,
+                            na_pass=na_pass,
+                        )
+
                     elif assertion_type == "conjointly":
                         results_tbl = conjointly_validation(
                             data_tbl=data_tbl_step,
@@ -16248,9 +16441,9 @@ class Validate:
                 validation.n_passed = n_passed
                 validation.n_failed = n_failed
 
-                # Solely for the col_vals_in_set assertion type, any Null values in the
-                # `pb_is_good_` column are counted as failing test units
-                if assertion_type == "col_vals_in_set":
+                # For set-membership checks, any Null values in the `pb_is_good_` column
+                # are counted as failing test units
+                if assertion_type in ("col_vals_in_set", "col_vals_in_table"):
                     validation.n_failed += n_null
 
                 # For column-value validations, the number of test units is the number of rows

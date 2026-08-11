@@ -2057,6 +2057,89 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     return result_tbl.to_native()
 
 
+def interrogate_in_table(
+    tbl: IntoFrame,
+    columns: str | list[str],
+    ref_tbl: IntoFrame,
+    ref_columns: str | list[str],
+    na_pass: bool,
+) -> Any:
+    """Referential integrity interrogation.
+
+    Checks that each value (or composite key) in the target column(s) exists in the reference
+    table's column(s). Returns the table with a `pb_is_good_` boolean column.
+
+    Heterogeneous backends (e.g. MySQL table + Polars DataFrame) are handled via
+    `_coerce_to_common_backend()`, which materializes the lighter side to match the heavier side's
+    backend before comparison.
+    """
+    # Coerce both tables to the same backend
+    tbl, ref_tbl = _coerce_to_common_backend(tbl, ref_tbl)
+
+    nw_tbl = nw.from_native(tbl)
+    nw_ref = nw.from_native(ref_tbl)
+
+    # Normalize to lists
+    single_col = isinstance(columns, str)
+    if isinstance(columns, str):
+        columns = [columns]
+    if isinstance(ref_columns, str):
+        ref_columns = [ref_columns]
+
+    if len(columns) != len(ref_columns):
+        raise ValueError(
+            f"columns and ref_column must have the same length, "
+            f"got {len(columns)} and {len(ref_columns)}."
+        )
+
+    if single_col:
+        # Single-column path: extract distinct ref values, use is_in()
+        col_name = columns[0]
+        ref_col_name = ref_columns[0]
+
+        ref_unique = nw_ref.select(nw.col(ref_col_name)).unique()
+        if isinstance(ref_unique, nw.LazyFrame):
+            ref_unique = ref_unique.collect()
+        ref_values = ref_unique.get_column(ref_col_name).to_list()
+        ref_values_clean = [v for v in ref_values if v is not None]
+
+        expr: nw.Expr = nw.col(col_name).is_in(ref_values_clean)
+        if na_pass:
+            expr = expr | nw.col(col_name).is_null()
+
+        result_tbl = nw_tbl.with_columns(pb_is_good_=expr)
+        return result_tbl.to_native()
+
+    # Composite-key path: left-join with distinct ref keys + marker
+    ref_keys = nw_ref.select(ref_columns).unique()
+    if isinstance(ref_keys, nw.LazyFrame):
+        ref_keys = ref_keys.collect()
+
+    # Rename ref columns to match target columns (required for join)
+    rename_map = {src: tgt for src, tgt in zip(ref_columns, columns) if src != tgt}
+    if rename_map:
+        ref_keys = ref_keys.rename(rename_map)
+
+    ref_keys = ref_keys.with_columns(nw.lit(True).alias("__pb_ref_matched__"))
+
+    # Materialize lazy main table for the join
+    if isinstance(nw_tbl, nw.LazyFrame):
+        nw_tbl = nw_tbl.collect()
+
+    joined = nw_tbl.join(ref_keys, on=columns, how="left")
+    matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False)
+
+    if na_pass:
+        all_null = nw.all_horizontal(*[nw.col(c).is_null() for c in columns], ignore_nulls=False)
+        all_null_series = nw_tbl.select(all_null.alias("__pb_all_null__")).get_column(
+            "__pb_all_null__"
+        )
+        matched_series = matched_series | all_null_series
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=matched_series)
+    return result_tbl.to_native()
+
+
 def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """Not in set interrogation."""
 

@@ -595,6 +595,19 @@ class Validate:
         active: bool | Callable = True,
         dimension: str | None = None,
     ) -> Validate: ...
+    def col_vals_in_table(
+        self,
+        columns: str | list[str],
+        ref_table: Any,
+        ref_column: str | list[str],
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
     def tbl_match(
         self,
         tbl_compare: Any,
