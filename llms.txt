@@ -163,6 +163,19 @@
 - [connect_to_table](https://posit-dev.github.io/pointblank/reference/connect_to_table.html): Connect to a database table using a connection string
 - [print_database_tables](https://posit-dev.github.io/pointblank/reference/print_database_tables.html): List all tables in a database from a connection string
 
+#### DataScan Methods
+> Methods for the DataScan class
+
+- [DataScan.summary_data](https://posit-dev.github.io/pointblank/reference/DataScan.summary_data.html)
+- [DataScan.get_tabular_report](https://posit-dev.github.io/pointblank/reference/DataScan.get_tabular_report.html)
+- [DataScan.to_dict](https://posit-dev.github.io/pointblank/reference/DataScan.to_dict.html)
+- [DataScan.to_json](https://posit-dev.github.io/pointblank/reference/DataScan.to_json.html)
+- [DataScan.save_to_json](https://posit-dev.github.io/pointblank/reference/DataScan.save_to_json.html)
+- [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html)
+- [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html)
+- [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html)
+- [DataScan.compare](https://posit-dev.github.io/pointblank/reference/DataScan.compare.html)
+
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
 

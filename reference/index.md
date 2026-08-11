@@ -400,6 +400,38 @@ Connect to a database table using a connection string.
 List all tables in a database from a connection string.
 
 
+## DataScan Methods
+
+
+Methods for the DataScan class
+
+
+[DataScan.summary_data](DataScan.summary_data.md#pointblank.DataScan.summary_data)  
+
+[DataScan.get_tabular_report()](DataScan.get_tabular_report.md#pointblank.DataScan.get_tabular_report)  
+
+[DataScan.to_dict()](DataScan.to_dict.md#pointblank.DataScan.to_dict)  
+Export the profile as a structured dictionary.
+
+[DataScan.to_json()](DataScan.to_json.md#pointblank.DataScan.to_json)  
+Export the profile as a JSON string.
+
+[DataScan.save_to_json()](DataScan.save_to_json.md#pointblank.DataScan.save_to_json)  
+Save the profile to a JSON file.
+
+[DataScan.from_dict()](DataScan.from_dict.md#pointblank.DataScan.from_dict)  
+Restore a `DataScan` from a dictionary produced by `to_dict()`.
+
+[DataScan.from_json()](DataScan.from_json.md#pointblank.DataScan.from_json)  
+Restore a `DataScan` from a JSON string produced by `to_json()`.
+
+[DataScan.load_from_json()](DataScan.load_from_json.md#pointblank.DataScan.load_from_json)  
+Load a `DataScan` from a JSON file produced by `save_to_json()`.
+
+[DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
+Compare this scan against a baseline and return the differences.
+
+
 ## Table Pre-checks
 
 

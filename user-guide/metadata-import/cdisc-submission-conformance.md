@@ -4203,7 +4203,7 @@ Both built-in and CORE reports can be exported for archiving, sharing with a bio
 
 ## JSON
 
-[to_json()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.to_json) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
+[to_json()](../../reference/DataScan.to_json.md#pointblank.DataScan.to_json) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 
 ``` python

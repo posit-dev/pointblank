@@ -577,6 +577,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#numeric-data" id="toc-numeric-data" class="nav-link" data-scroll-target="#numeric-data">Numeric Data</a></li>
   <li><a href="#string-data" id="toc-string-data" class="nav-link" data-scroll-target="#string-data">String Data</a></li>
   <li><a href="#datedatetime-data-and-boolean-data" id="toc-datedatetime-data-and-boolean-data" class="nav-link" data-scroll-target="#datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</a></li>
+  <li><a href="#using-datascan-directly" id="toc-using-datascan-directly" class="nav-link" data-scroll-target="#using-datascan-directly">Using <code>DataScan</code> Directly</a></li>
+  <li><a href="#saving-and-loading-profiles" id="toc-saving-and-loading-profiles" class="nav-link" data-scroll-target="#saving-and-loading-profiles">Saving and Loading Profiles</a></li>
+  <li><a href="#comparing-profiles-for-drift" id="toc-comparing-profiles-for-drift" class="nav-link" data-scroll-target="#comparing-profiles-for-drift">Comparing Profiles for Drift</a></li>
   </ul>
 </nav>
     </div>
@@ -607,71 +610,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="trying-out-col_summary_tbl" class="level1">
 <h1>Trying out <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a></h1>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="711d0936" class="cell" data-execution_count="2">
+<div id="be97544d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(small_table)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="ndyzxrwyhd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="zdcnspzfxo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#ndyzxrwyhd table {
+#zdcnspzfxo table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#ndyzxrwyhd thead, tbody, tfoot, tr, td, th { border-style: none; }
+#zdcnspzfxo thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#ndyzxrwyhd p { margin: 0; padding: 0; }
- #ndyzxrwyhd .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #ndyzxrwyhd .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #ndyzxrwyhd .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #ndyzxrwyhd .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #ndyzxrwyhd .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ndyzxrwyhd .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ndyzxrwyhd .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ndyzxrwyhd .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #ndyzxrwyhd .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #ndyzxrwyhd .gt_column_spanner_outer:first-child { padding-left: 0; }
- #ndyzxrwyhd .gt_column_spanner_outer:last-child { padding-right: 0; }
- #ndyzxrwyhd .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #ndyzxrwyhd .gt_spanner_row { border-bottom-style: hidden; }
- #ndyzxrwyhd .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #ndyzxrwyhd .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #ndyzxrwyhd .gt_from_md> :first-child { margin-top: 0; }
- #ndyzxrwyhd .gt_from_md> :last-child { margin-bottom: 0; }
- #ndyzxrwyhd .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #ndyzxrwyhd .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #ndyzxrwyhd .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #ndyzxrwyhd .gt_row_group_first td { border-top-width: 2px; }
- #ndyzxrwyhd .gt_row_group_first th { border-top-width: 2px; }
- #ndyzxrwyhd .gt_striped { color: #333333; background-color: #F4F4F4; }
- #ndyzxrwyhd .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ndyzxrwyhd .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #ndyzxrwyhd .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #ndyzxrwyhd .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ndyzxrwyhd .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #ndyzxrwyhd .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #ndyzxrwyhd .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #ndyzxrwyhd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ndyzxrwyhd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #ndyzxrwyhd .gt_left { text-align: left; }
- #ndyzxrwyhd .gt_center { text-align: center; }
- #ndyzxrwyhd .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #ndyzxrwyhd .gt_font_normal { font-weight: normal; }
- #ndyzxrwyhd .gt_font_bold { font-weight: bold; }
- #ndyzxrwyhd .gt_font_italic { font-style: italic; }
- #ndyzxrwyhd .gt_super { font-size: 65%; }
- #ndyzxrwyhd .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ndyzxrwyhd .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #ndyzxrwyhd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ndyzxrwyhd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #ndyzxrwyhd .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #ndyzxrwyhd .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#zdcnspzfxo p { margin: 0; padding: 0; }
+ #zdcnspzfxo .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #zdcnspzfxo .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #zdcnspzfxo .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #zdcnspzfxo .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #zdcnspzfxo .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #zdcnspzfxo .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #zdcnspzfxo .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #zdcnspzfxo .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #zdcnspzfxo .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #zdcnspzfxo .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #zdcnspzfxo .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #zdcnspzfxo .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #zdcnspzfxo .gt_spanner_row { border-bottom-style: hidden; }
+ #zdcnspzfxo .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #zdcnspzfxo .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #zdcnspzfxo .gt_from_md> :first-child { margin-top: 0; }
+ #zdcnspzfxo .gt_from_md> :last-child { margin-bottom: 0; }
+ #zdcnspzfxo .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #zdcnspzfxo .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #zdcnspzfxo .gt_indent_1 { text-indent: 5px; }
+ #zdcnspzfxo .gt_indent_2 { text-indent: calc(5px * 2); }
+ #zdcnspzfxo .gt_indent_3 { text-indent: calc(5px * 3); }
+ #zdcnspzfxo .gt_indent_4 { text-indent: calc(5px * 4); }
+ #zdcnspzfxo .gt_indent_5 { text-indent: calc(5px * 5); }
+ #zdcnspzfxo .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #zdcnspzfxo .gt_row_group_first td { border-top-width: 2px; }
+ #zdcnspzfxo .gt_row_group_first th { border-top-width: 2px; }
+ #zdcnspzfxo .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #zdcnspzfxo .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #zdcnspzfxo .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #zdcnspzfxo .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #zdcnspzfxo .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #zdcnspzfxo .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #zdcnspzfxo .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #zdcnspzfxo .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #zdcnspzfxo .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #zdcnspzfxo .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #zdcnspzfxo .gt_left { text-align: left; }
+ #zdcnspzfxo .gt_center { text-align: center; }
+ #zdcnspzfxo .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #zdcnspzfxo .gt_font_normal { font-weight: normal; }
+ #zdcnspzfxo .gt_font_bold { font-weight: bold; }
+ #zdcnspzfxo .gt_font_italic { font-style: italic; }
+ #zdcnspzfxo .gt_super { font-size: 65%; }
+ #zdcnspzfxo .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #zdcnspzfxo .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #zdcnspzfxo .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #zdcnspzfxo .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #zdcnspzfxo .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #zdcnspzfxo .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -966,6 +974,201 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>the minimum and maximum dates/datetimes</li>
 </ol>
 <p>One column, <code>e</code>, is of the <code>Boolean</code> type. Because columns of this type could only have <code>True</code>, <code>False</code>, or missing values, we provide summary data for missingness (under <code>NA</code>) and proportions of <code>True</code> and <code>False</code> values (under <code>UQ</code>).</p>
+</section>
+<section id="using-datascan-directly" class="level1">
+<h1>Using <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> Directly</h1>
+<p>The <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function is a convenience wrapper around the <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> class. When you need more than a visual report (for example, to save the profile for later comparison), you can work with <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> directly:</p>
+<div id="300dd91d" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>scan <span class="op">=</span> pb.DataScan(data<span class="op">=</span>small_table, tbl_name<span class="op">=</span><span class="st">"small_table"</span>)</span></code></pre></div>
+</div>
+<p>The <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> object computes the same column-level statistics shown in the summary table. You can access the profile as a dictionary with <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>, export it as JSON with <a href="../../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link gdls-code">to_json()</a>, or render the same tabular report with <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>.</p>
+</section>
+<section id="saving-and-loading-profiles" class="level1">
+<h1>Saving and Loading Profiles</h1>
+<p>A <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profile can be saved to disk and loaded back later. This is useful for establishing baselines that you compare against in the future.</p>
+<div id="5bef75ca" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the profile to a JSON file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>scan.save_to_json(<span class="st">"small_table_profile.json"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Later, load it back without needing the original data</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>loaded <span class="op">=</span> pb.DataScan.load_from_json(<span class="st">"small_table_profile.json"</span>)</span></code></pre></div>
+</div>
+<p>The <a href="../../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link gdls-code">from_json()</a> classmethod works with JSON strings directly, and <a href="../../reference/Step.html#pointblank.Step.from_dict" class="gdls-link gdls-code">from_dict()</a> accepts the dictionary format produced by <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>. All three approaches produce a fully restored <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> that retains the column names, types, statistics, and sample data from the original scan.</p>
+</section>
+<section id="comparing-profiles-for-drift" class="level1">
+<h1>Comparing Profiles for Drift</h1>
+<p>When your data changes over time, you can compare two <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profiles to detect drift. The <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">compare()</a> method identifies schema changes (columns added, removed, or with changed types) and statistical shifts in common columns.</p>
+<div id="0ea994d8" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate two versions of a dataset</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>orders_v1 <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">25.0</span>, <span class="fl">15.0</span>, <span class="fl">30.0</span>, <span class="fl">20.0</span>],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"status"</span>: [<span class="st">"paid"</span>, <span class="st">"paid"</span>, <span class="st">"refund"</span>, <span class="st">"paid"</span>, <span class="st">"paid"</span>],</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>orders_v2 <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>],</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">25.0</span>, <span class="fl">15.0</span>, <span class="fl">30.0</span>, <span class="fl">20.0</span>, <span class="fl">150.0</span>, <span class="fl">200.0</span>, <span class="fl">175.0</span>],</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"status"</span>: [<span class="st">"paid"</span>, <span class="st">"paid"</span>, <span class="st">"refund"</span>, <span class="st">"paid"</span>, <span class="st">"paid"</span>, <span class="st">"paid"</span>, <span class="st">"paid"</span>, <span class="st">"paid"</span>],</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"region"</span>: [<span class="st">"US"</span>, <span class="st">"EU"</span>, <span class="st">"US"</span>, <span class="st">"EU"</span>, <span class="st">"US"</span>, <span class="st">"US"</span>, <span class="st">"EU"</span>, <span class="st">"EU"</span>],</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan(data<span class="op">=</span>orders_v1, tbl_name<span class="op">=</span><span class="st">"orders_v1"</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pb.DataScan(data<span class="op">=</span>orders_v2, tbl_name<span class="op">=</span><span class="st">"orders_v2"</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span></code></pre></div>
+</div>
+<p>The returned <a href="`pointblank.DataScanDiff`"><code>DataScanDiff</code></a> object provides programmatic access to the changes:</p>
+<div id="29ffb992" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Has changes:"</span>, diff.has_changes)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns added:"</span>, diff.columns_added)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Row count (baseline vs current):"</span>, diff.row_count_diff)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Has changes: True
+Columns added: ['region']
+Row count (baseline vs current): (5, 8)</code></pre>
+</div>
+</div>
+<p>You can also get the full comparison as a dictionary with <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>, or view it as a styled report:</p>
+<div id="abad3a92" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="sphqxlwohy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#sphqxlwohy table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#sphqxlwohy thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#sphqxlwohy p { margin: 0; padding: 0; }
+ #sphqxlwohy .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #sphqxlwohy .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #sphqxlwohy .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #sphqxlwohy .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #sphqxlwohy .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #sphqxlwohy .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #sphqxlwohy .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #sphqxlwohy .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #sphqxlwohy .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #sphqxlwohy .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #sphqxlwohy .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #sphqxlwohy .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #sphqxlwohy .gt_spanner_row { border-bottom-style: hidden; }
+ #sphqxlwohy .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #sphqxlwohy .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #sphqxlwohy .gt_from_md> :first-child { margin-top: 0; }
+ #sphqxlwohy .gt_from_md> :last-child { margin-bottom: 0; }
+ #sphqxlwohy .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #sphqxlwohy .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #sphqxlwohy .gt_indent_1 { text-indent: 5px; }
+ #sphqxlwohy .gt_indent_2 { text-indent: calc(5px * 2); }
+ #sphqxlwohy .gt_indent_3 { text-indent: calc(5px * 3); }
+ #sphqxlwohy .gt_indent_4 { text-indent: calc(5px * 4); }
+ #sphqxlwohy .gt_indent_5 { text-indent: calc(5px * 5); }
+ #sphqxlwohy .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #sphqxlwohy .gt_row_group_first td { border-top-width: 2px; }
+ #sphqxlwohy .gt_row_group_first th { border-top-width: 2px; }
+ #sphqxlwohy .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #sphqxlwohy .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #sphqxlwohy .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #sphqxlwohy .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #sphqxlwohy .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #sphqxlwohy .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #sphqxlwohy .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #sphqxlwohy .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #sphqxlwohy .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #sphqxlwohy .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #sphqxlwohy .gt_left { text-align: left; }
+ #sphqxlwohy .gt_center { text-align: center; }
+ #sphqxlwohy .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #sphqxlwohy .gt_font_normal { font-weight: normal; }
+ #sphqxlwohy .gt_font_bold { font-weight: bold; }
+ #sphqxlwohy .gt_font_italic { font-style: italic; }
+ #sphqxlwohy .gt_super { font-size: 65%; }
+ #sphqxlwohy .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #sphqxlwohy .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #sphqxlwohy .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #sphqxlwohy .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #sphqxlwohy .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #sphqxlwohy .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="5" class="gt_heading gt_title gt_font_normal">Profile Comparison: orders_v1 vs orders_v2</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Row count: 5 (baseline) vs 8 (current)</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="column">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="status">Status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_baseline">Type (Baseline)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_current">Type (Current)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="stat_changes">Changed Statistics</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">order_id</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8; mean: 3 -&gt; 4.5; median: 3 -&gt; 4.5; std: 1.581 -&gt; 2.449; max: 5 -&gt; 8; p05: 1.02 -&gt; 1.035; q_1: 2 -&gt; 2.75; q_3: 4 -&gt; 6.25; p95: 4.8 -&gt; 7.65; iqr: 2 -&gt; 3.5</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">amount</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8; mean: 20 -&gt; 78.12; median: 20 -&gt; 27.5; std: 7.906 -&gt; 81.54; max: 30 -&gt; 200; p05: 10.1 -&gt; 10.18; q_1: 15 -&gt; 18.75; q_3: 25 -&gt; 156.2; p95: 29 -&gt; 191.2; iqr: 10 -&gt; 137.5</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">status</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">mean: 4.4 -&gt; 4.25; std: 0.8944 -&gt; 0.7071; p95: 5.6 -&gt; 5.3</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">region</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Added</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left"></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The report shows each column’s status (OK, Added, Removed, Stats Changed, or Type Changed) along with any statistics that shifted between the baseline and current profiles. This makes it straightforward to spot when your data’s shape or distribution has changed in ways that might affect downstream analyses or validation rules.</p>
+<p>A typical workflow is to save a baseline profile after your initial data quality checks pass, then compare new data against that baseline on each pipeline run:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On the first run: establish the baseline</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>baseline.save_to_json(<span class="st">"orders_baseline.json"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On subsequent runs: compare against the baseline</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan.load_from_json(<span class="st">"orders_baseline.json"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> diff.has_changes:</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Data drift detected!"</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(diff.to_dict())</span></code></pre></div>
 
 
 </section>
