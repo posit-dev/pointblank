@@ -54,19 +54,19 @@ validation.assert_passing()
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_13443/2424908189.py in ?()
+    Cell In[1], line 20
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 
          19 # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
     ---> 20 validation.assert_passing()
 
-    ~/py_projects/pointblank/pointblank/validate.py in ?(self)
-      16711             ]
-      16712             msg = "The following assertions failed:\n" + "\n".join(
-      16713                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-      16714             )
-    > 16715             raise AssertionError(msg)
+    File ~/work/pointblank/pointblank/pointblank/validate.py:16908, in Validate.assert_passing(self)
+      16904             ]
+      16905             msg = "The following assertions failed:\n" + "\n".join(
+      16906                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+      16907             )
+    > 16908             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.

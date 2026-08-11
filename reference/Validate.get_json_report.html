@@ -1423,7 +1423,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18677-L18844" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18870-L19037" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_json_report</span>(
@@ -1490,7 +1490,7 @@ A JSON-formatted string representing the validation report, with each validation
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
-<div id="66618992" class="cell" data-execution_count="1">
+<div id="acf4d22b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1538,8 +1538,8 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-07-22T23:20:31.137+00:00",
-        "proc_duration_s": 0.002339
+        "time_processed": "2026-08-11T03:54:13.048+00:00",
+        "proc_duration_s": 0.008153
     },
     {
         "i": 2,
@@ -1565,14 +1565,14 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-07-22T23:20:31.139+00:00",
-        "proc_duration_s": 0.001275
+        "time_processed": "2026-08-11T03:54:13.051+00:00",
+        "proc_duration_s": 0.003079
     }
 ]</code></pre>
 </div>
 </div>
 <p>You can also customize which fields to include:</p>
-<div id="3f6cc6a8" class="cell" data-execution_count="2">
+<div id="b12777ea" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1598,7 +1598,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>Or which fields to exclude:</p>
-<div id="cdd54046" class="cell" data-execution_count="3">
+<div id="8db7c5c7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
@@ -1644,7 +1644,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>The JSON output can be further processed or analyzed programmatically:</p>
-<div id="a835ae85" class="cell" data-execution_count="4">
+<div id="1d17a5f7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>
