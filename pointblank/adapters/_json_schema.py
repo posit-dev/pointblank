@@ -426,6 +426,13 @@ def _apply_step_to_properties(
                 if pb_spec == spec:
                     properties[col]["format"] = json_fmt
                     break
+        elif method == "col_vals_between":
+            left = kwargs.get("left")
+            right = kwargs.get("right")
+            if left is not None:
+                properties[col]["minimum"] = left
+            if right is not None:
+                properties[col]["maximum"] = right
         elif method == "col_vals_eq":
             properties[col]["const"] = kwargs.get("value")
 
@@ -437,19 +444,32 @@ def _extract_step_kwargs_from_info(step_info: Any) -> dict[str, Any]:
     if hasattr(step_info, "column") and step_info.column:
         kwargs["columns"] = step_info.column
 
+    assertion_type = getattr(step_info, "assertion_type", "")
+
     if hasattr(step_info, "values") and step_info.values is not None:
         val = step_info.values
-        if isinstance(val, (list, tuple)):
+        if isinstance(val, dict):
+            if "pattern" in val:
+                kwargs["pattern"] = val["pattern"]
+            if "left" in val and "right" in val:
+                kwargs["left"] = val["left"]
+                kwargs["right"] = val["right"]
+        elif isinstance(val, (list, tuple)) and assertion_type in (
+            "col_vals_between",
+            "col_vals_outside",
+        ):
+            if len(val) >= 2:
+                kwargs["left"] = val[0]
+                kwargs["right"] = val[1]
+        elif isinstance(val, (list, tuple)):
             kwargs["set"] = list(val)
         else:
             kwargs["value"] = val
 
-    # Check val_info for pattern/spec
+    # Check val_info for spec
     if hasattr(step_info, "val_info") and step_info.val_info:
         val_info = step_info.val_info
         if isinstance(val_info, dict):
-            if "pattern" in val_info:
-                kwargs["pattern"] = val_info["pattern"]
             if "spec" in val_info:
                 kwargs["spec"] = val_info["spec"]
 
