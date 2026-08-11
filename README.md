@@ -1,7 +1,71 @@
 > [!TIP]
-> **📺 Featured Talk: ['Making Things Nice in Python'](https://www.youtube.com/watch?v=J6e2BKjHyPg)**
->
-> Discover how Pointblank and Great Tables (used in this library) prioritize user experience in Python package design. I go over why convenient options, extensive documentation, and thoughtful API decisions is better for everyone (even when they challenge conventional Python patterns/practices).
+> **📖 [Pointblank: The Complete Guide](https://rich-iannone.github.io/pointblank-the-complete-guide/)** — A comprehensive, free book on data validation with Pointblank is being written! Follow along and learn everything from first steps to advanced validation patterns, AI-assisted workflows, and industry playbooks.
+
+<details>
+<summary>📊 Book chapter progress</summary>
+<br>
+
+<!-- BOOK_PROGRESS_BEGIN -->
+Overall: **2%** complete &mdash; 3 of 37 chapters have content
+
+**Foundations**<br>
+Intro: `█░░░░░░░░░░░░░░` 8%<br>
+Getting Started: `█████░░░░░░░░░░` 30%<br>
+Inspecting Data: `█████████░░░░░░` 62%<br>
+Validation Workflow: `░░░░░░░░░░░░░░░` 2%<br>
+Analysis Loop: `█░░░░░░░░░░░░░░` 4%<br>
+
+**Building Validation Plans**<br>
+Column Validations: `░░░░░░░░░░░░░░░` 0%<br>
+Aggregate Validations: `░░░░░░░░░░░░░░░` 0%<br>
+Row Validations: `░░░░░░░░░░░░░░░` 0%<br>
+Table Validations: `░░░░░░░░░░░░░░░` 0%<br>
+Missing Data: `░░░░░░░░░░░░░░░` 0%<br>
+Segmented Validation: `░░░░░░░░░░░░░░░` 0%<br>
+Advanced Validation: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Responding to Results**<br>
+Thresholds & Actions: `░░░░░░░░░░░░░░░` 0%<br>
+Reports & Extracts: `░░░░░░░░░░░░░░░` 0%<br>
+Quality Scoring: `░░░░░░░░░░░░░░░` 0%<br>
+Notifications & Observability: `░░░░░░░░░░░░░░░` 0%<br>
+
+**AI-Assisted Validation**<br>
+Semantic Validation: `░░░░░░░░░░░░░░░` 0%<br>
+AI Authoring: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Data Sources, Interfaces & Automation**<br>
+Data Sources: `░░░░░░░░░░░░░░░` 0%<br>
+YAML Workflows: `░░░░░░░░░░░░░░░` 0%<br>
+Command Line: `░░░░░░░░░░░░░░░` 0%<br>
+MCP Server: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Data Contracts & Pipelines**<br>
+Data Contracts: `░░░░░░░░░░░░░░░` 0%<br>
+Pipelines: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Test Data Generation**<br>
+Test Data Generation: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Clinical & Regulated Data**<br>
+Clinical & CDISC: `░░░░░░░░░░░░░░░` 0%<br>
+CDISC Conformance: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Industry Playbooks**<br>
+Financial: `░░░░░░░░░░░░░░░` 0%<br>
+Ecommerce: `░░░░░░░░░░░░░░░` 0%<br>
+Data Engineering: `░░░░░░░░░░░░░░░` 0%<br>
+Healthcare: `░░░░░░░░░░░░░░░` 0%<br>
+Real-World Evidence: `░░░░░░░░░░░░░░░` 0%<br>
+ML Monitoring: `░░░░░░░░░░░░░░░` 0%<br>
+IoT Sensors: `░░░░░░░░░░░░░░░` 0%<br>
+Insurance: `░░░░░░░░░░░░░░░` 0%<br>
+Public Sector: `░░░░░░░░░░░░░░░` 0%<br>
+Marketing: `░░░░░░░░░░░░░░░` 0%<br>
+
+<!-- BOOK_PROGRESS_END -->
+
+</details>
 
 <div align="center">
 
