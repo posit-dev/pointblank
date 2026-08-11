@@ -632,11 +632,21 @@ When a `destination` path is provided, the output is written to that file (creat
 directories as needed) and also returned from the function. This makes it convenient to both
 persist the output and inspect it in the same call.
 
+::: {.callout-tip}
+## Shortcut for JSON Schema
+
+If you're working with a `Validate` object and want JSON Schema output specifically, you can use the
+[`to_json_schema()`](`Validate.to_json_schema`) convenience method directly on the `Validate`
+object. It delegates to `export_contract()` and additionally enriches the schema with column type
+information inferred from the data. See the
+[Serializing Validation Plans](../02-advanced-validation/05-plan-serialization.qmd#exporting-a-plan-as-json-schema)
+guide for details.
+:::
+
 ## Round-Trip Fidelity
 
-Importing a schema and then exporting it back should produce an equivalent result. This is
-important for workflows where you maintain schemas in an external format but want to validate with
-Pointblank:
+Importing a schema and then exporting it back should produce an equivalent result. This is important
+for workflows where you maintain schemas in an external format but want to validate with Pointblank:
 
 ```{python}
 # Start with a JSON Schema
