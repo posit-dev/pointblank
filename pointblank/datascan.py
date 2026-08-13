@@ -834,9 +834,7 @@ def _get_col_profile(scan: DataScan, colname: str) -> ColumnProfile:
 
 def _is_numeric_coltype(coltype: str) -> bool:
     coltype_lower = coltype.lower()
-    return any(
-        ind in coltype_lower for ind in ("int", "float", "double", "decimal", "numeric")
-    )
+    return any(ind in coltype_lower for ind in ("int", "float", "double", "decimal", "numeric"))
 
 
 @dataclass
@@ -1016,9 +1014,7 @@ class DataScanDiff:
                 if d.stat_diffs
             },
             "drift_scores": {
-                d.colname: d.drift_scores
-                for d in self.column_diffs
-                if d.drift_scores
+                d.colname: d.drift_scores for d in self.column_diffs if d.drift_scores
             },
         }
 
@@ -1137,9 +1133,7 @@ class DataScanDiff:
                 style=style.text(font=google_font("IBM Plex Mono"), size="11px"),
                 locations=loc.body(),
             )
-            .fmt_markdown(
-                columns=["stat_changes"] + (["drift"] if has_any_drift else [])
-            )
+            .fmt_markdown(columns=["stat_changes"] + (["drift"] if has_any_drift else []))
         )
 
         return gt_tbl
