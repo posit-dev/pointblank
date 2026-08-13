@@ -846,6 +846,7 @@ class _ColumnDiff:
     coltype_current: str | None
     status: str
     stat_diffs: dict[str, tuple[Any, Any]]
+    drift_scores: dict[str, Any]
 
 
 class DataScanDiff:
@@ -897,6 +898,7 @@ class DataScanDiff:
                         coltype_current=cur_prof.coltype if cur_prof else None,
                         status="added",
                         stat_diffs={},
+                        drift_scores={},
                     )
                 )
                 continue
@@ -909,6 +911,7 @@ class DataScanDiff:
                         coltype_current=None,
                         status="removed",
                         stat_diffs={},
+                        drift_scores={},
                     )
                 )
                 continue
@@ -928,7 +931,31 @@ class DataScanDiff:
                 if base_val != cur_val:
                     stat_diffs[stat_name] = (base_val, cur_val)
 
+            drift_scores: dict[str, Any] = {}
+            if not type_changed:
+                coltype = cur_prof.coltype
+                if _is_numeric_coltype(coltype):
+                    base_vals = _extract_numeric_values(baseline, col_name)
+                    cur_vals = _extract_numeric_values(current, col_name)
+                    if base_vals is not None and cur_vals is not None:
+                        psi = _compute_psi_numeric(base_vals, cur_vals)
+                        if psi is not None and psi > 0.0:
+                            drift_scores["psi"] = round(psi, 6)
+                        ks = _compute_ks_statistic(base_vals, cur_vals)
+                        if ks is not None and ks["statistic"] > 0.0:
+                            drift_scores["ks_statistic"] = ks["statistic"]
+                            drift_scores["ks_p_value"] = ks["p_value"]
+                else:
+                    base_freqs = _extract_categorical_freqs(baseline, col_name)
+                    cur_freqs = _extract_categorical_freqs(current, col_name)
+                    if base_freqs is not None and cur_freqs is not None:
+                        psi = _compute_psi_categorical(base_freqs, cur_freqs)
+                        if psi is not None and psi > 0.0:
+                            drift_scores["psi"] = round(psi, 6)
+
             status = "type_changed" if type_changed else ("changed" if stat_diffs else "unchanged")
+            if drift_scores and status == "unchanged":
+                status = "changed"
             self.column_diffs.append(
                 _ColumnDiff(
                     colname=col_name,
@@ -936,6 +963,7 @@ class DataScanDiff:
                     coltype_current=cur_prof.coltype,
                     status=status,
                     stat_diffs=stat_diffs,
+                    drift_scores=drift_scores,
                 )
             )
 
@@ -946,7 +974,7 @@ class DataScanDiff:
             self.columns_added
             or self.columns_removed
             or self.columns_type_changed
-            or any(d.stat_diffs for d in self.column_diffs)
+            or any(d.stat_diffs or d.drift_scores for d in self.column_diffs)
         )
 
     @property
@@ -987,6 +1015,11 @@ class DataScanDiff:
                 for d in self.column_diffs
                 if d.stat_diffs
             },
+            "drift_scores": {
+                d.colname: d.drift_scores
+                for d in self.column_diffs
+                if d.drift_scores
+            },
         }
 
     def get_tabular_report(self) -> GT:
@@ -1001,28 +1034,43 @@ class DataScanDiff:
         import polars as pl
 
         rows: list[dict[str, Any]] = []
+        has_any_drift = any(d.drift_scores for d in self.column_diffs)
 
         for diff in self.column_diffs:
+            drift_str = ""
+            if diff.drift_scores:
+                drift_parts: list[str] = []
+                if "psi" in diff.drift_scores:
+                    drift_parts.append(f"PSI: {diff.drift_scores['psi']:.4f}")
+                if "ks_statistic" in diff.drift_scores:
+                    drift_parts.append(
+                        f"KS: {diff.drift_scores['ks_statistic']:.4f} "
+                        f"(p={diff.drift_scores['ks_p_value']:.4f})"
+                    )
+                drift_str = "<br>".join(drift_parts)
+
             if diff.status == "added":
-                rows.append(
-                    {
-                        "column": diff.colname,
-                        "status": "Added",
-                        "type_baseline": "",
-                        "type_current": diff.coltype_current or "",
-                        "stat_changes": "",
-                    }
-                )
+                row: dict[str, Any] = {
+                    "column": diff.colname,
+                    "status": "Added",
+                    "type_baseline": "",
+                    "type_current": diff.coltype_current or "",
+                    "stat_changes": "",
+                }
+                if has_any_drift:
+                    row["drift"] = ""
+                rows.append(row)
             elif diff.status == "removed":
-                rows.append(
-                    {
-                        "column": diff.colname,
-                        "status": "Removed",
-                        "type_baseline": diff.coltype_baseline or "",
-                        "type_current": "",
-                        "stat_changes": "",
-                    }
-                )
+                row = {
+                    "column": diff.colname,
+                    "status": "Removed",
+                    "type_baseline": diff.coltype_baseline or "",
+                    "type_current": "",
+                    "stat_changes": "",
+                }
+                if has_any_drift:
+                    row["drift"] = ""
+                rows.append(row)
             else:
                 status = "Type Changed" if diff.status == "type_changed" else "OK"
                 if diff.stat_diffs:
@@ -1038,26 +1086,28 @@ class DataScanDiff:
                     cv_str = _format_stat_value(cv)
                     change_parts.append(f"{stat_name}: {bv_str} -> {cv_str}")
 
-                rows.append(
-                    {
-                        "column": diff.colname,
-                        "status": status,
-                        "type_baseline": diff.coltype_baseline or "",
-                        "type_current": diff.coltype_current or "",
-                        "stat_changes": "; ".join(change_parts),
-                    }
-                )
+                row = {
+                    "column": diff.colname,
+                    "status": status,
+                    "type_baseline": diff.coltype_baseline or "",
+                    "type_current": diff.coltype_current or "",
+                    "stat_changes": "<br>".join(change_parts),
+                }
+                if has_any_drift:
+                    row["drift"] = drift_str
+                rows.append(row)
 
         if not rows:
-            rows.append(
-                {
-                    "column": "(no columns)",
-                    "status": "OK",
-                    "type_baseline": "",
-                    "type_current": "",
-                    "stat_changes": "",
-                }
-            )
+            row = {
+                "column": "(no columns)",
+                "status": "OK",
+                "type_baseline": "",
+                "type_current": "",
+                "stat_changes": "",
+            }
+            if has_any_drift:
+                row["drift"] = ""
+            rows.append(row)
 
         df = pl.DataFrame(rows)
 
@@ -1079,16 +1129,16 @@ class DataScanDiff:
                 type_baseline="Type (Baseline)",
                 type_current="Type (Current)",
                 stat_changes="Changed Statistics",
+                **({"drift": "Drift Scores"} if has_any_drift else {}),
             )
             .opt_table_font(font=google_font("IBM Plex Sans"))
             .opt_align_table_header(align="left")
             .tab_style(
-                style=style.text(font=google_font("IBM Plex Mono")),
+                style=style.text(font=google_font("IBM Plex Mono"), size="11px"),
                 locations=loc.body(),
             )
-            .tab_style(
-                style=style.text(size="11px"),
-                locations=loc.body(columns="stat_changes"),
+            .fmt_markdown(
+                columns=["stat_changes"] + (["drift"] if has_any_drift else [])
             )
         )
 
