@@ -692,6 +692,35 @@ def _compute_psi_numeric(
     if len(edges) < 3:
         return None
 
+    def _bin_counts(vals: list[float], bin_edges: list[float]) -> list[int]:
+        counts = [0] * (len(bin_edges) - 1)
+        for v in vals:
+            for j in range(len(bin_edges) - 1):
+                if bin_edges[j] <= v < bin_edges[j + 1]:
+                    counts[j] += 1
+                    break
+            else:
+                counts[-1] += 1
+        return counts
+
+    base_counts = _bin_counts(baseline_vals, edges)
+    cur_counts = _bin_counts(current_vals, edges)
+
+    total_base = sum(base_counts)
+    total_cur = sum(cur_counts)
+    if total_base == 0 or total_cur == 0:
+        return None
+
+    eps = 1e-4
+    psi = 0.0
+    for bc, cc in zip(base_counts, cur_counts):
+        p = max(bc / total_base, eps)
+        q = max(cc / total_cur, eps)
+        psi += (q - p) * math.log(q / p)
+
+    return psi
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
