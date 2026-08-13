@@ -804,6 +804,27 @@ def _extract_numeric_values(scan: DataScan, colname: str) -> list[float] | None:
         return None
 
 
+def _extract_categorical_freqs(scan: DataScan, colname: str) -> dict[str, int] | None:
+    """Extract value frequency counts from a scan's raw data."""
+    if scan.nw_data is None:
+        stats = {s.name: s.val for s in _get_col_profile(scan, colname).statistics}
+        freqs = stats.get("freqs")
+        if isinstance(freqs, dict):
+            return freqs
+        return None
+
+    try:
+        col = scan.nw_data.get_column(colname).drop_nulls()
+        vals = col.to_list()
+        freqs: dict[str, int] = {}
+        for v in vals:
+            key = str(v)
+            freqs[key] = freqs.get(key, 0) + 1
+        return freqs
+    except Exception:
+        return None
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
