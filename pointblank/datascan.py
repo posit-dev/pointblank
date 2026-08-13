@@ -825,6 +825,20 @@ def _extract_categorical_freqs(scan: DataScan, colname: str) -> dict[str, int] |
         return None
 
 
+def _get_col_profile(scan: DataScan, colname: str) -> ColumnProfile:
+    for p in scan.profile.column_profiles:
+        if p.colname == colname:
+            return p
+    raise KeyError(colname)
+
+
+def _is_numeric_coltype(coltype: str) -> bool:
+    coltype_lower = coltype.lower()
+    return any(
+        ind in coltype_lower for ind in ("int", "float", "double", "decimal", "numeric")
+    )
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
