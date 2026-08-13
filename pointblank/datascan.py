@@ -791,6 +791,19 @@ def _compute_ks_statistic(
     return {"statistic": round(max_diff, 6), "p_value": round(p_value, 6)}
 
 
+def _extract_numeric_values(scan: DataScan, colname: str) -> list[float] | None:
+    """Extract non-null numeric values from a scan's raw data."""
+    if scan.nw_data is None:
+        return None
+
+    try:
+        col = scan.nw_data.get_column(colname)
+        vals = col.drop_nulls().to_list()
+        return [float(v) for v in vals if v is not None]
+    except Exception:
+        return None
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
