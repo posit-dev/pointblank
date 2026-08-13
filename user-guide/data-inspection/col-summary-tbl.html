@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-67a0ef9aa61b89fd655bf4e62ec923d0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -188,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="478" data-forks="30"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="479" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -579,7 +579,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#datedatetime-data-and-boolean-data" id="toc-datedatetime-data-and-boolean-data" class="nav-link" data-scroll-target="#datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</a></li>
   <li><a href="#using-datascan-directly" id="toc-using-datascan-directly" class="nav-link" data-scroll-target="#using-datascan-directly">Using <code>DataScan</code> Directly</a></li>
   <li><a href="#saving-and-loading-profiles" id="toc-saving-and-loading-profiles" class="nav-link" data-scroll-target="#saving-and-loading-profiles">Saving and Loading Profiles</a></li>
-  <li><a href="#comparing-profiles-for-drift" id="toc-comparing-profiles-for-drift" class="nav-link" data-scroll-target="#comparing-profiles-for-drift">Comparing Profiles for Drift</a></li>
+  <li><a href="#comparing-profiles-for-drift" id="toc-comparing-profiles-for-drift" class="nav-link" data-scroll-target="#comparing-profiles-for-drift">Comparing Profiles for Drift</a>
+  <ul class="collapse">
+  <li><a href="#statistical-drift-measures" id="toc-statistical-drift-measures" class="nav-link" data-scroll-target="#statistical-drift-measures">Statistical Drift Measures</a></li>
+  <li><a href="#a-typical-workflow" id="toc-a-typical-workflow" class="nav-link" data-scroll-target="#a-typical-workflow">A Typical Workflow</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -610,76 +615,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="trying-out-col_summary_tbl" class="level1">
 <h1>Trying out <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a></h1>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="ffffefa3" class="cell" data-execution_count="2">
+<div id="79c47af7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(small_table)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="sxqqnakysh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="nlgoetrcnj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#sxqqnakysh table {
+#nlgoetrcnj table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#sxqqnakysh thead, tbody, tfoot, tr, td, th { border-style: none; }
+#nlgoetrcnj thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#sxqqnakysh p { margin: 0; padding: 0; }
- #sxqqnakysh .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #sxqqnakysh .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #sxqqnakysh .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #sxqqnakysh .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #sxqqnakysh .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #sxqqnakysh .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #sxqqnakysh .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #sxqqnakysh .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #sxqqnakysh .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #sxqqnakysh .gt_column_spanner_outer:first-child { padding-left: 0; }
- #sxqqnakysh .gt_column_spanner_outer:last-child { padding-right: 0; }
- #sxqqnakysh .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #sxqqnakysh .gt_spanner_row { border-bottom-style: hidden; }
- #sxqqnakysh .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #sxqqnakysh .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #sxqqnakysh .gt_from_md> :first-child { margin-top: 0; }
- #sxqqnakysh .gt_from_md> :last-child { margin-bottom: 0; }
- #sxqqnakysh .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #sxqqnakysh .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #sxqqnakysh .gt_indent_1 { text-indent: 5px; }
- #sxqqnakysh .gt_indent_2 { text-indent: calc(5px * 2); }
- #sxqqnakysh .gt_indent_3 { text-indent: calc(5px * 3); }
- #sxqqnakysh .gt_indent_4 { text-indent: calc(5px * 4); }
- #sxqqnakysh .gt_indent_5 { text-indent: calc(5px * 5); }
- #sxqqnakysh .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #sxqqnakysh .gt_row_group_first td { border-top-width: 2px; }
- #sxqqnakysh .gt_row_group_first th { border-top-width: 2px; }
- #sxqqnakysh .gt_striped { color: #333333; background-color: #F4F4F4; }
- #sxqqnakysh .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #sxqqnakysh .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #sxqqnakysh .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #sxqqnakysh .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #sxqqnakysh .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #sxqqnakysh .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #sxqqnakysh .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #sxqqnakysh .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #sxqqnakysh .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #sxqqnakysh .gt_left { text-align: left; }
- #sxqqnakysh .gt_center { text-align: center; }
- #sxqqnakysh .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #sxqqnakysh .gt_font_normal { font-weight: normal; }
- #sxqqnakysh .gt_font_bold { font-weight: bold; }
- #sxqqnakysh .gt_font_italic { font-style: italic; }
- #sxqqnakysh .gt_super { font-size: 65%; }
- #sxqqnakysh .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #sxqqnakysh .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #sxqqnakysh .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #sxqqnakysh .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #sxqqnakysh .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #sxqqnakysh .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#nlgoetrcnj p { margin: 0; padding: 0; }
+ #nlgoetrcnj .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #nlgoetrcnj .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #nlgoetrcnj .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #nlgoetrcnj .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #nlgoetrcnj .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #nlgoetrcnj .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #nlgoetrcnj .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #nlgoetrcnj .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #nlgoetrcnj .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #nlgoetrcnj .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #nlgoetrcnj .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #nlgoetrcnj .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #nlgoetrcnj .gt_spanner_row { border-bottom-style: hidden; }
+ #nlgoetrcnj .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #nlgoetrcnj .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #nlgoetrcnj .gt_from_md> :first-child { margin-top: 0; }
+ #nlgoetrcnj .gt_from_md> :last-child { margin-bottom: 0; }
+ #nlgoetrcnj .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #nlgoetrcnj .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #nlgoetrcnj .gt_indent_1 { text-indent: 5px; }
+ #nlgoetrcnj .gt_indent_2 { text-indent: calc(5px * 2); }
+ #nlgoetrcnj .gt_indent_3 { text-indent: calc(5px * 3); }
+ #nlgoetrcnj .gt_indent_4 { text-indent: calc(5px * 4); }
+ #nlgoetrcnj .gt_indent_5 { text-indent: calc(5px * 5); }
+ #nlgoetrcnj .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #nlgoetrcnj .gt_row_group_first td { border-top-width: 2px; }
+ #nlgoetrcnj .gt_row_group_first th { border-top-width: 2px; }
+ #nlgoetrcnj .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #nlgoetrcnj .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #nlgoetrcnj .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #nlgoetrcnj .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #nlgoetrcnj .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #nlgoetrcnj .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #nlgoetrcnj .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #nlgoetrcnj .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #nlgoetrcnj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #nlgoetrcnj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #nlgoetrcnj .gt_left { text-align: left; }
+ #nlgoetrcnj .gt_center { text-align: center; }
+ #nlgoetrcnj .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #nlgoetrcnj .gt_font_normal { font-weight: normal; }
+ #nlgoetrcnj .gt_font_bold { font-weight: bold; }
+ #nlgoetrcnj .gt_font_italic { font-style: italic; }
+ #nlgoetrcnj .gt_super { font-size: 65%; }
+ #nlgoetrcnj .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #nlgoetrcnj .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #nlgoetrcnj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #nlgoetrcnj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #nlgoetrcnj .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #nlgoetrcnj .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -978,7 +983,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-datascan-directly" class="level1">
 <h1>Using <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> Directly</h1>
 <p>The <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function is a convenience wrapper around the <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> class. When you need more than a visual report (for example, to save the profile for later comparison), you can work with <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> directly:</p>
-<div id="17967744" class="cell" data-execution_count="3">
+<div id="f50f8e73" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>scan <span class="op">=</span> pb.DataScan(data<span class="op">=</span>small_table, tbl_name<span class="op">=</span><span class="st">"small_table"</span>)</span></code></pre></div>
@@ -988,7 +993,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="saving-and-loading-profiles" class="level1">
 <h1>Saving and Loading Profiles</h1>
 <p>A <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profile can be saved to disk and loaded back later. This is useful for establishing baselines that you compare against in the future.</p>
-<div id="a037ed84" class="cell" data-execution_count="4">
+<div id="4f2a9073" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the profile to a JSON file</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>scan.save_to_json(<span class="st">"small_table_profile.json"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1000,7 +1005,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="comparing-profiles-for-drift" class="level1">
 <h1>Comparing Profiles for Drift</h1>
 <p>When your data changes over time, you can compare two <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profiles to detect drift. The <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">compare()</a> method identifies schema changes (columns added, removed, or with changed types) and statistical shifts in common columns.</p>
-<div id="eb4620af" class="cell" data-execution_count="6">
+<div id="9c05ac48" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate two versions of a dataset</span></span>
@@ -1023,7 +1028,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span></code></pre></div>
 </div>
 <p>The returned <a href="../../reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link"><code>DataScanDiff</code></a> object provides programmatic access to the changes:</p>
-<div id="23417b0b" class="cell" data-execution_count="7">
+<div id="d21fcd03" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Has changes:"</span>, diff.has_changes)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns added:"</span>, diff.columns_added)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Row count (baseline vs current):"</span>, diff.row_count_diff)</span></code></pre></div>
@@ -1034,82 +1039,82 @@ Row count (baseline vs current): (5, 8)</code></pre>
 </div>
 </div>
 <p>You can also get the full comparison as a dictionary with <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>, or view it as a styled report:</p>
-<div id="9180fc2c" class="cell" data-execution_count="8">
+<div id="e499bc7d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
-<div id="hiatvhkymf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="iuorpcwtjd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#hiatvhkymf table {
+#iuorpcwtjd table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#hiatvhkymf thead, tbody, tfoot, tr, td, th { border-style: none; }
+#iuorpcwtjd thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#hiatvhkymf p { margin: 0; padding: 0; }
- #hiatvhkymf .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #hiatvhkymf .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #hiatvhkymf .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #hiatvhkymf .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #hiatvhkymf .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #hiatvhkymf .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #hiatvhkymf .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #hiatvhkymf .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #hiatvhkymf .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #hiatvhkymf .gt_column_spanner_outer:first-child { padding-left: 0; }
- #hiatvhkymf .gt_column_spanner_outer:last-child { padding-right: 0; }
- #hiatvhkymf .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #hiatvhkymf .gt_spanner_row { border-bottom-style: hidden; }
- #hiatvhkymf .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #hiatvhkymf .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #hiatvhkymf .gt_from_md> :first-child { margin-top: 0; }
- #hiatvhkymf .gt_from_md> :last-child { margin-bottom: 0; }
- #hiatvhkymf .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #hiatvhkymf .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #hiatvhkymf .gt_indent_1 { text-indent: 5px; }
- #hiatvhkymf .gt_indent_2 { text-indent: calc(5px * 2); }
- #hiatvhkymf .gt_indent_3 { text-indent: calc(5px * 3); }
- #hiatvhkymf .gt_indent_4 { text-indent: calc(5px * 4); }
- #hiatvhkymf .gt_indent_5 { text-indent: calc(5px * 5); }
- #hiatvhkymf .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #hiatvhkymf .gt_row_group_first td { border-top-width: 2px; }
- #hiatvhkymf .gt_row_group_first th { border-top-width: 2px; }
- #hiatvhkymf .gt_striped { color: #333333; background-color: #F4F4F4; }
- #hiatvhkymf .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #hiatvhkymf .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #hiatvhkymf .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #hiatvhkymf .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #hiatvhkymf .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #hiatvhkymf .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #hiatvhkymf .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #hiatvhkymf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #hiatvhkymf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #hiatvhkymf .gt_left { text-align: left; }
- #hiatvhkymf .gt_center { text-align: center; }
- #hiatvhkymf .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #hiatvhkymf .gt_font_normal { font-weight: normal; }
- #hiatvhkymf .gt_font_bold { font-weight: bold; }
- #hiatvhkymf .gt_font_italic { font-style: italic; }
- #hiatvhkymf .gt_super { font-size: 65%; }
- #hiatvhkymf .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #hiatvhkymf .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #hiatvhkymf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #hiatvhkymf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #hiatvhkymf .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #hiatvhkymf .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#iuorpcwtjd p { margin: 0; padding: 0; }
+ #iuorpcwtjd .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #iuorpcwtjd .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #iuorpcwtjd .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #iuorpcwtjd .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #iuorpcwtjd .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #iuorpcwtjd .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #iuorpcwtjd .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #iuorpcwtjd .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #iuorpcwtjd .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #iuorpcwtjd .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #iuorpcwtjd .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #iuorpcwtjd .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #iuorpcwtjd .gt_spanner_row { border-bottom-style: hidden; }
+ #iuorpcwtjd .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #iuorpcwtjd .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #iuorpcwtjd .gt_from_md> :first-child { margin-top: 0; }
+ #iuorpcwtjd .gt_from_md> :last-child { margin-bottom: 0; }
+ #iuorpcwtjd .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #iuorpcwtjd .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #iuorpcwtjd .gt_indent_1 { text-indent: 5px; }
+ #iuorpcwtjd .gt_indent_2 { text-indent: calc(5px * 2); }
+ #iuorpcwtjd .gt_indent_3 { text-indent: calc(5px * 3); }
+ #iuorpcwtjd .gt_indent_4 { text-indent: calc(5px * 4); }
+ #iuorpcwtjd .gt_indent_5 { text-indent: calc(5px * 5); }
+ #iuorpcwtjd .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #iuorpcwtjd .gt_row_group_first td { border-top-width: 2px; }
+ #iuorpcwtjd .gt_row_group_first th { border-top-width: 2px; }
+ #iuorpcwtjd .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #iuorpcwtjd .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #iuorpcwtjd .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #iuorpcwtjd .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #iuorpcwtjd .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #iuorpcwtjd .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #iuorpcwtjd .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #iuorpcwtjd .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #iuorpcwtjd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #iuorpcwtjd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #iuorpcwtjd .gt_left { text-align: left; }
+ #iuorpcwtjd .gt_center { text-align: center; }
+ #iuorpcwtjd .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #iuorpcwtjd .gt_font_normal { font-weight: normal; }
+ #iuorpcwtjd .gt_font_bold { font-weight: bold; }
+ #iuorpcwtjd .gt_font_italic { font-style: italic; }
+ #iuorpcwtjd .gt_super { font-size: 65%; }
+ #iuorpcwtjd .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #iuorpcwtjd .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #iuorpcwtjd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #iuorpcwtjd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #iuorpcwtjd .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #iuorpcwtjd .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="5" class="gt_heading gt_title gt_font_normal">Profile Comparison: orders_v1 vs orders_v2</td>
+    <td colspan="6" class="gt_heading gt_title gt_font_normal">Profile Comparison: orders_v1 vs orders_v2</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Row count: 5 (baseline) vs 8 (current)</td>
+    <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Row count: 5 (baseline) vs 8 (current)</td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="column">Column</th>
@@ -1117,36 +1122,41 @@ Row count (baseline vs current): (5, 8)</code></pre>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_baseline">Type (Baseline)</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_current">Type (Current)</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="stat_changes">Changed Statistics</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="drift">Drift Scores</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">order_id</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Int64</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Int64</td>
-    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8; mean: 3 -&gt; 4.5; median: 3 -&gt; 4.5; std: 1.581 -&gt; 2.449; max: 5 -&gt; 8; p05: 1.02 -&gt; 1.035; q_1: 2 -&gt; 2.75; q_3: 4 -&gt; 6.25; p95: 4.8 -&gt; 7.65; iqr: 2 -&gt; 3.5</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">order_id</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8<br>mean: 3 -&gt; 4.5<br>median: 3 -&gt; 4.5<br>std: 1.581 -&gt; 2.449<br>max: 5 -&gt; 8<br>p05: 1.02 -&gt; 1.035<br>q_1: 2 -&gt; 2.75<br>q_3: 4 -&gt; 6.25<br>p95: 4.8 -&gt; 7.65<br>iqr: 2 -&gt; 3.5</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">KS: 0.3750 (p=0.6963)</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">amount</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Float64</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Float64</td>
-    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8; mean: 20 -&gt; 78.12; median: 20 -&gt; 27.5; std: 7.906 -&gt; 81.54; max: 30 -&gt; 200; p05: 10.1 -&gt; 10.18; q_1: 15 -&gt; 18.75; q_3: 25 -&gt; 156.2; p95: 29 -&gt; 191.2; iqr: 10 -&gt; 137.5</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">amount</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">n_unique: 5 -&gt; 8<br>mean: 20 -&gt; 78.12<br>median: 20 -&gt; 27.5<br>std: 7.906 -&gt; 81.54<br>max: 30 -&gt; 200<br>p05: 10.1 -&gt; 10.18<br>q_1: 15 -&gt; 18.75<br>q_3: 25 -&gt; 156.2<br>p95: 29 -&gt; 191.2<br>iqr: 10 -&gt; 137.5</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">KS: 0.3750 (p=0.6963)</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">status</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Stats Changed</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
-    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left">mean: 4.4 -&gt; 4.25; std: 0.8944 -&gt; 0.7071; p95: 5.6 -&gt; 5.3</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">status</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">mean: 4.4 -&gt; 4.25<br>std: 0.8944 -&gt; 0.7071<br>p95: 5.6 -&gt; 5.3</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">PSI: 0.0420</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">region</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">Added</td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"></td>
-    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left">String</td>
-    <td style="font-family: IBM Plex Mono; font-size: 11px;" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">region</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Added</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left"></td>
   </tr>
 </tbody>
 
@@ -1156,19 +1166,176 @@ Row count (baseline vs current): (5, 8)</code></pre>
 </div>
 </div>
 <p>The report shows each column’s status (OK, Added, Removed, Stats Changed, or Type Changed) along with any statistics that shifted between the baseline and current profiles. This makes it straightforward to spot when your data’s shape or distribution has changed in ways that might affect downstream analyses or validation rules.</p>
-<p>A typical workflow is to save a baseline profile after your initial data quality checks pass, then compare new data against that baseline on each pipeline run:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On the first run: establish the baseline</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>baseline.save_to_json(<span class="st">"orders_baseline.json"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On subsequent runs: compare against the baseline</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan.load_from_json(<span class="st">"orders_baseline.json"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> diff.has_changes:</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Data drift detected!"</span>)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(diff.to_dict())</span></code></pre></div>
+<section id="statistical-drift-measures" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-drift-measures">Statistical Drift Measures</h2>
+<p>When both the baseline and current <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> objects have their original data attached (i.e., they haven’t been loaded from disk), the comparison also computes formal drift statistics for each column:</p>
+<ul>
+<li><strong>PSI (Population Stability Index)</strong>: Measures how much a distribution has shifted. Computed for both numeric and categorical columns. Values below 0.1 indicate no meaningful drift, 0.1 to 0.25 suggests moderate drift, and above 0.25 signals a significant population shift.</li>
+<li><strong>KS (Kolmogorov-Smirnov) test</strong>: For numeric columns only, this measures the maximum distance between two empirical CDFs and provides a p-value. A small p-value (e.g., below 0.05) indicates the two distributions are statistically different.</li>
+</ul>
+<p>These scores appear in the <code>drift_scores</code> field of the comparison dictionary and in the “Drift Scores” column of the generated report. Let’s look at a more dramatic drift example to see them in action:</p>
+<div id="03b8eab4" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline: normal revenue range</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>revenue_v1 <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">25.0</span>, <span class="fl">15.0</span>, <span class="fl">30.0</span>, <span class="fl">20.0</span>, <span class="fl">12.0</span>, <span class="fl">18.0</span>, <span class="fl">22.0</span>, <span class="fl">28.0</span>, <span class="fl">35.0</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="fl">14.0</span>, <span class="fl">26.0</span>, <span class="fl">19.0</span>, <span class="fl">31.0</span>, <span class="fl">23.0</span>, <span class="fl">11.0</span>, <span class="fl">17.0</span>, <span class="fl">29.0</span>, <span class="fl">33.0</span>, <span class="fl">21.0</span>],</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"category"</span>: ([<span class="st">"electronics"</span>] <span class="op">*</span> <span class="dv">8</span> <span class="op">+</span> [<span class="st">"clothing"</span>] <span class="op">*</span> <span class="dv">7</span> <span class="op">+</span> [<span class="st">"food"</span>] <span class="op">*</span> <span class="dv">5</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Current: large orders have appeared, category mix shifted</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>revenue_v2 <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">25.0</span>, <span class="fl">15.0</span>, <span class="fl">30.0</span>, <span class="fl">20.0</span>, <span class="fl">150.0</span>, <span class="fl">200.0</span>, <span class="fl">175.0</span>, <span class="fl">180.0</span>, <span class="fl">160.0</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>               <span class="fl">14.0</span>, <span class="fl">26.0</span>, <span class="fl">190.0</span>, <span class="fl">170.0</span>, <span class="fl">165.0</span>, <span class="fl">11.0</span>, <span class="fl">17.0</span>, <span class="fl">155.0</span>, <span class="fl">185.0</span>, <span class="fl">195.0</span>],</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"category"</span>: ([<span class="st">"electronics"</span>] <span class="op">*</span> <span class="dv">12</span> <span class="op">+</span> [<span class="st">"clothing"</span>] <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> [<span class="st">"food"</span>] <span class="op">*</span> <span class="dv">5</span>),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan(data<span class="op">=</span>revenue_v1, tbl_name<span class="op">=</span><span class="st">"revenue_v1"</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pb.DataScan(data<span class="op">=</span>revenue_v2, tbl_name<span class="op">=</span><span class="st">"revenue_v2"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="arwdpcmojf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#arwdpcmojf table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#arwdpcmojf thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#arwdpcmojf p { margin: 0; padding: 0; }
+ #arwdpcmojf .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #arwdpcmojf .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #arwdpcmojf .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #arwdpcmojf .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #arwdpcmojf .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #arwdpcmojf .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #arwdpcmojf .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #arwdpcmojf .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #arwdpcmojf .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #arwdpcmojf .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #arwdpcmojf .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #arwdpcmojf .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #arwdpcmojf .gt_spanner_row { border-bottom-style: hidden; }
+ #arwdpcmojf .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #arwdpcmojf .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #arwdpcmojf .gt_from_md> :first-child { margin-top: 0; }
+ #arwdpcmojf .gt_from_md> :last-child { margin-bottom: 0; }
+ #arwdpcmojf .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #arwdpcmojf .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #arwdpcmojf .gt_indent_1 { text-indent: 5px; }
+ #arwdpcmojf .gt_indent_2 { text-indent: calc(5px * 2); }
+ #arwdpcmojf .gt_indent_3 { text-indent: calc(5px * 3); }
+ #arwdpcmojf .gt_indent_4 { text-indent: calc(5px * 4); }
+ #arwdpcmojf .gt_indent_5 { text-indent: calc(5px * 5); }
+ #arwdpcmojf .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #arwdpcmojf .gt_row_group_first td { border-top-width: 2px; }
+ #arwdpcmojf .gt_row_group_first th { border-top-width: 2px; }
+ #arwdpcmojf .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #arwdpcmojf .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #arwdpcmojf .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #arwdpcmojf .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #arwdpcmojf .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #arwdpcmojf .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #arwdpcmojf .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #arwdpcmojf .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #arwdpcmojf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #arwdpcmojf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #arwdpcmojf .gt_left { text-align: left; }
+ #arwdpcmojf .gt_center { text-align: center; }
+ #arwdpcmojf .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #arwdpcmojf .gt_font_normal { font-weight: normal; }
+ #arwdpcmojf .gt_font_bold { font-weight: bold; }
+ #arwdpcmojf .gt_font_italic { font-style: italic; }
+ #arwdpcmojf .gt_super { font-size: 65%; }
+ #arwdpcmojf .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #arwdpcmojf .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #arwdpcmojf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #arwdpcmojf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #arwdpcmojf .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #arwdpcmojf .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_title gt_font_normal">Profile Comparison: revenue_v1 vs revenue_v2</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Row count: 20 (baseline) vs 20 (current)</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="column">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="status">Status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_baseline">Type (Baseline)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_current">Type (Current)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="stat_changes">Changed Statistics</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="drift">Drift Scores</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">amount</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">mean: 21.95 -&gt; 104.7<br>median: 21.5 -&gt; 152.5<br>std: 7.536 -&gt; 80.83<br>max: 35 -&gt; 200<br>q_1: 16.5 -&gt; 19.25<br>q_3: 28.25 -&gt; 176.2<br>p95: 33.1 -&gt; 195.2<br>iqr: 11.75 -&gt; 157</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">PSI: 2.9414<br>KS: 0.5500 (p=0.0026)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">category</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">mean: 8.2 -&gt; 8.8<br>median: 8 -&gt; 11<br>std: 2.821 -&gt; 3.037</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">PSI: 0.2506</td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The drift scores are also available programmatically through <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>:</p>
+<div id="7e55d608" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>drift <span class="op">=</span> diff.to_dict().get(<span class="st">"drift_scores"</span>, {})</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col_name, scores <span class="kw">in</span> drift.items():</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>col_name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>scores<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>amount: {'psi': 2.941363, 'ks_statistic': 0.55, 'ks_p_value': 0.002571}
+category: {'psi': 0.250553}</code></pre>
+</div>
+</div>
+<p>When a <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> is loaded from a saved JSON file (with no original data attached), drift scores cannot be computed. The comparison still reports schema changes and raw stat differences, but the <code>drift_scores</code> field will be empty. If you need drift scores in a persist-and-compare workflow, keep the original data available when calling <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">compare()</a>.</p>
+</section>
+<section id="a-typical-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="a-typical-workflow">A Typical Workflow</h2>
+<p>In practice, drift detection works best as a two-phase process. First, you establish a baseline profile once your data quality checks pass and save it to disk. Then, on each subsequent pipeline run, you load that baseline and compare it against a fresh scan of the incoming data.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On the first run: establish the baseline</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>baseline.save_to_json(<span class="st">"orders_baseline.json"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On subsequent runs: compare against the baseline</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan.load_from_json(<span class="st">"orders_baseline.json"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pb.DataScan(data<span class="op">=</span>production_table, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> current.compare(baseline)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> diff.has_changes:</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Data drift detected!"</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(diff.to_dict())</span></code></pre></div>
+<p>The key thing to notice is that the baseline is loaded from a saved JSON file, so it won’t have original data attached. This means drift scores (PSI and KS) won’t be computed for the loaded baseline. If you need those scores, keep the baseline data accessible and create a fresh <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from it rather than loading from JSON.</p>
+<p>The <a href="../../reference/DataScanDiff.html#pointblank.DataScanDiff.has_changes" class="gdls-link gdls-code">has_changes</a> property gives you a simple boolean for CI pipelines or alerting. So if anything shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect <code>columns_added</code>, <code>columns_removed</code>, <code>columns_type_changed</code>, and the per-column <code>stat_diffs</code> and <code>drift_scores</code> in the object provided by <a href="../../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a>.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function and the <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class give you two levels of access to column-level profiling. The function is a quick, visual summary you can drop into a notebook to understand a dataset at a glance. The class provides the same statistics in a structured form that you can save, load, and compare over time. When your data evolves, <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">compare()</a> catches schema drift (columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates, and frequency distributions), optionally backed by formal measures like PSI and the KS test. Together, these tools make it straightforward to move from initial data discovery to ongoing data quality monitoring.</p>
 
 
 </section>

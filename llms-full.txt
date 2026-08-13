@@ -32528,8 +32528,63 @@ with any statistics that shifted between the baseline and current profiles. This
 straightforward to spot when your data's shape or distribution has changed in ways that might affect
 downstream analyses or validation rules.
 
-A typical workflow is to save a baseline profile after your initial data quality checks pass, then
-compare new data against that baseline on each pipeline run:
+### Statistical Drift Measures
+
+When both the baseline and current `DataScan` objects have their original data attached (i.e., they
+haven't been loaded from disk), the comparison also computes formal drift statistics for each
+column:
+
+- **PSI (Population Stability Index)**: Measures how much a distribution has shifted. Computed for
+both numeric and categorical columns. Values below 0.1 indicate no meaningful drift, 0.1 to 0.25
+suggests moderate drift, and above 0.25 signals a significant population shift.
+- **KS (Kolmogorov-Smirnov) test**: For numeric columns only, this measures the maximum distance
+between two empirical CDFs and provides a p-value. A small p-value (e.g., below 0.05) indicates the
+two distributions are statistically different.
+
+These scores appear in the `drift_scores` field of the comparison dictionary and in the "Drift
+Scores" column of the generated report. Let's look at a more dramatic drift example to see them in
+action:
+
+```{python}
+# Baseline: normal revenue range
+revenue_v1 = pl.DataFrame({
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 12.0, 18.0, 22.0, 28.0, 35.0,
+               14.0, 26.0, 19.0, 31.0, 23.0, 11.0, 17.0, 29.0, 33.0, 21.0],
+    "category": (["electronics"] * 8 + ["clothing"] * 7 + ["food"] * 5),
+})
+
+# Current: large orders have appeared, category mix shifted
+revenue_v2 = pl.DataFrame({
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 150.0, 200.0, 175.0, 180.0, 160.0,
+               14.0, 26.0, 190.0, 170.0, 165.0, 11.0, 17.0, 155.0, 185.0, 195.0],
+    "category": (["electronics"] * 12 + ["clothing"] * 3 + ["food"] * 5),
+})
+
+baseline = pb.DataScan(data=revenue_v1, tbl_name="revenue_v1")
+current = pb.DataScan(data=revenue_v2, tbl_name="revenue_v2")
+
+diff = current.compare(baseline)
+diff.get_tabular_report()
+```
+
+The drift scores are also available programmatically through `to_dict()`:
+
+```{python}
+drift = diff.to_dict().get("drift_scores", {})
+for col_name, scores in drift.items():
+    print(f"{col_name}: {scores}")
+```
+
+When a `DataScan` is loaded from a saved JSON file (with no original data attached), drift scores
+cannot be computed. The comparison still reports schema changes and raw stat differences, but the
+`drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow,
+keep the original data available when calling `compare()`.
+
+### A Typical Workflow
+
+In practice, drift detection works best as a two-phase process. First, you establish a baseline
+profile once your data quality checks pass and save it to disk. Then, on each subsequent pipeline
+run, you load that baseline and compare it against a fresh scan of the incoming data.
 
 ```python
 # On the first run: establish the baseline
@@ -32545,6 +32600,27 @@ if diff.has_changes:
     print("Data drift detected!")
     print(diff.to_dict())
 ```
+
+The key thing to notice is that the baseline is loaded from a saved JSON file, so it won't have
+original data attached. This means drift scores (PSI and KS) won't be computed for the loaded
+baseline. If you need those scores, keep the baseline data accessible and create a fresh `DataScan`
+from it rather than loading from JSON.
+
+The `has_changes` property gives you a simple boolean for CI pipelines or alerting. So if anything
+shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect
+`columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and
+`drift_scores` in the object provided by `to_dict()`.
+
+## Conclusion
+
+The `col_summary_tbl()` function and the `DataScan` class give you two levels of access to
+column-level profiling. The function is a quick, visual summary you can drop into a notebook to
+understand a dataset at a glance. The class provides the same statistics in a structured form that
+you can save, load, and compare over time. When your data evolves, `compare()` catches schema drift
+(columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates,
+and frequency distributions), optionally backed by formal measures like PSI and the KS test.
+Together, these tools make it straightforward to move from initial data discovery to ongoing data
+quality monitoring.
 
 
 ### Missing Values Reporting
