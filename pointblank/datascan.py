@@ -747,6 +747,50 @@ def _compute_psi_categorical(
     return psi
 
 
+def _compute_ks_statistic(
+    baseline_vals: list[float],
+    current_vals: list[float],
+) -> dict[str, float] | None:
+    """Compute KS statistic and p-value for numeric columns."""
+    if len(baseline_vals) < 2 or len(current_vals) < 2:
+        return None
+
+    try:
+        from scipy.stats import ks_2samp
+
+        stat, p_value = ks_2samp(baseline_vals, current_vals)
+        return {"statistic": round(stat, 6), "p_value": round(p_value, 6)}
+    except ImportError:
+        pass
+
+    sorted_base = sorted(baseline_vals)
+    sorted_cur = sorted(current_vals)
+    all_vals = sorted(set(sorted_base + sorted_cur))
+
+    n_base = len(sorted_base)
+    n_cur = len(sorted_cur)
+    max_diff = 0.0
+
+    base_idx = 0
+    cur_idx = 0
+    for val in all_vals:
+        while base_idx < n_base and sorted_base[base_idx] <= val:
+            base_idx += 1
+        while cur_idx < n_cur and sorted_cur[cur_idx] <= val:
+            cur_idx += 1
+        diff = abs(base_idx / n_base - cur_idx / n_cur)
+        if diff > max_diff:
+            max_diff = diff
+
+    import math
+
+    n_eff = (n_base * n_cur) / (n_base + n_cur)
+    lam = (math.sqrt(n_eff) + 0.12 + 0.11 / math.sqrt(n_eff)) * max_diff
+    p_value = max(0.0, min(1.0, 2.0 * math.exp(-2.0 * lam * lam)))
+
+    return {"statistic": round(max_diff, 6), "p_value": round(p_value, 6)}
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
