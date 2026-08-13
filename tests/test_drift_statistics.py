@@ -247,7 +247,24 @@ def test_boolean_column_drift():
 
 def test_nulls_in_numeric_column():
     base = pl.DataFrame({"x": [1.0, 2.0, None, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0]})
-    cur = pl.DataFrame({"x": [100.0, None, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1100.0, 1200.0]})
+    cur = pl.DataFrame(
+        {
+            "x": [
+                100.0,
+                None,
+                300.0,
+                400.0,
+                500.0,
+                600.0,
+                700.0,
+                800.0,
+                900.0,
+                1000.0,
+                1100.0,
+                1200.0,
+            ]
+        }
+    )
 
     diff = DataScan(data=cur).compare(DataScan(data=base))
     x_diff = next(d for d in diff.column_diffs if d.colname == "x")
@@ -352,16 +369,20 @@ def test_ks_overlapping_distributions():
 
 
 def test_mixed_column_types():
-    base = pl.DataFrame({
-        "num": list(range(20)),
-        "cat": ["a"] * 10 + ["b"] * 10,
-        "flag": [True] * 15 + [False] * 5,
-    })
-    cur = pl.DataFrame({
-        "num": list(range(50, 70)),
-        "cat": ["a"] * 5 + ["b"] * 10 + ["c"] * 5,
-        "flag": [True] * 10 + [False] * 10,
-    })
+    base = pl.DataFrame(
+        {
+            "num": list(range(20)),
+            "cat": ["a"] * 10 + ["b"] * 10,
+            "flag": [True] * 15 + [False] * 5,
+        }
+    )
+    cur = pl.DataFrame(
+        {
+            "num": list(range(50, 70)),
+            "cat": ["a"] * 5 + ["b"] * 10 + ["c"] * 5,
+            "flag": [True] * 10 + [False] * 10,
+        }
+    )
 
     diff = DataScan(data=cur).compare(DataScan(data=base))
 
