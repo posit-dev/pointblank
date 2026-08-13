@@ -721,6 +721,32 @@ def _compute_psi_numeric(
     return psi
 
 
+def _compute_psi_categorical(
+    baseline_freqs: dict[str, int],
+    current_freqs: dict[str, int],
+) -> float | None:
+    """Compute PSI for categorical columns using frequency distributions."""
+    import math
+
+    all_keys = set(baseline_freqs) | set(current_freqs)
+    if not all_keys:
+        return None
+
+    total_base = sum(baseline_freqs.values())
+    total_cur = sum(current_freqs.values())
+    if total_base == 0 or total_cur == 0:
+        return None
+
+    eps = 1e-4
+    psi = 0.0
+    for key in all_keys:
+        p = max(baseline_freqs.get(key, 0) / total_base, eps)
+        q = max(current_freqs.get(key, 0) / total_cur, eps)
+        psi += (q - p) * math.log(q / p)
+
+    return psi
+
+
 @dataclass
 class _ColumnDiff:
     colname: str
