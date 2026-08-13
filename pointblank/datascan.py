@@ -669,6 +669,29 @@ def _assign_type_from_coltype(prof: ColumnProfile) -> None:
             return
 
 
+def _compute_psi_numeric(
+    baseline_vals: list[float],
+    current_vals: list[float],
+    n_bins: int = 10,
+) -> float | None:
+    """Compute PSI for numeric columns using quantile-based binning."""
+    if len(baseline_vals) < n_bins or len(current_vals) < n_bins:
+        return None
+
+    import math
+
+    sorted_base = sorted(baseline_vals)
+    n = len(sorted_base)
+    edges = [sorted_base[0]]
+    for i in range(1, n_bins):
+        idx = int(i * n / n_bins)
+        edges.append(sorted_base[min(idx, n - 1)])
+    edges.append(sorted_base[-1] + 1e-10)
+
+    edges = list(dict.fromkeys(edges))
+    if len(edges) < 3:
+        return None
+
 @dataclass
 class _ColumnDiff:
     colname: str
