@@ -3,6 +3,39 @@
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
 
+# v0.27.0
+
+*2026-08-13* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.27.0)
+
+Pointblank `v0.27.0` brings referential integrity validation, statistical drift detection, and expanded data profiling capabilities. The new [col_vals_in_table()](reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table) validation method enables cross-table foreign key checks, while [DataScan.compare()](reference/DataScan.compare.html#pointblank.DataScan.compare) and the [DataScanDiff](reference/DataScanDiff.html#pointblank.DataScanDiff) class make it possible to detect schema and statistical drift between data profiles over time. Several skills are now packaged with the library for immediate use, contract adapters received important additions and fixes, and the MCP integration has been cleaned up with a leaner dependency footprint.
+
+
+### New Features
+
+- **Referential integrity validation with [col_vals_in_table()](reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table)** -- New validation method that checks whether each value (or composite key) in a column exists in a reference table column. Supports single and multi-column keys, `na_pass`, segmentation, and all standard thresholds and actions, making foreign key-style consistency checks a first-class validation step. ([\#419](https://github.com/posit-dev/pointblank/issues/419))
+
+- **Statistical drift measures via [DataScanDiff](reference/DataScanDiff.html#pointblank.DataScanDiff)** -- `DataScan.compare(baseline)` now returns a [DataScanDiff](reference/DataScanDiff.html#pointblank.DataScanDiff) object that provides programmatic access to schema changes (columns added, removed, or type-changed) and per-column statistical drift metrics -- Population Stability Index (PSI) for numeric and categorical columns, and Kolmogorov-Smirnov statistic for numerics (with a pure-Python fallback when SciPy is unavailable). Results are surfaced via [get_tabular_report()](reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report), which renders a styled Great Tables report with schema and drift columns. ([\#421](https://github.com/posit-dev/pointblank/issues/421))
+
+- **Packaged skills** -- A set of skills is now distributed with the package (e.g., defining contracts, drafting validations, scanning and profiling data, writing validations, and more). ([\#417](https://github.com/posit-dev/pointblank/issues/417))
+
+
+### Enhancements
+
+- **Extended [DataScan](reference/DataScan.html#pointblank.DataScan) class** -- [DataScan](reference/DataScan.html#pointblank.DataScan) can now be serialized and restored without access to the original data. New methods include [to_dict()](reference/Step.html#pointblank.Step.to_dict), [to_json()](reference/DataScan.to_json.html#pointblank.DataScan.to_json), [save_to_json()](reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json), [from_dict()](reference/Step.html#pointblank.Step.from_dict), [from_json()](reference/DataScan.from_json.html#pointblank.DataScan.from_json), and [load_from_json()](reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json) for round-trip persistence of data profiles. Stored scans can then be compared against new scans using [compare()](reference/DataScan.compare.html#pointblank.DataScan.compare) to track drift over time. ([\#420](https://github.com/posit-dev/pointblank/issues/420))
+
+- **Contract adapter additions and fixes** -- The contract adapter system received expanded functionality and correctness fixes across the supported formats (dbt, Frictionless, JSON Schema, ODCS). Adapter import and export coverage was improved, and [ContractImport.to_contract()](reference/ContractImport.html#pointblank.ContractImport.to_contract) and [ContractImport.to_python()](reference/ContractImport.html#pointblank.ContractImport.to_python) output is now more reliable. ([\#418](https://github.com/posit-dev/pointblank/issues/418))
+
+
+### Bug Fixes
+
+- Removed the direct `mcp[cli]` dependency and replaced it with an updated `fastmcp>=2.14.2` pin, resolving installation conflicts in environments that use the MCP optional extra. ([\#416](https://github.com/posit-dev/pointblank/issues/416))
+
+
+### New Contributors
+
+- [<span class="citation" data-cites="FBruzzezi">@FBruzzezi</span>](https://github.com/FBruzzezi) made their first contribution in [\#416](https://github.com/posit-dev/pointblank/issues/416).
+
+
 # v0.26.0
 
 *2026-07-27* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/0.26.0)
@@ -917,31 +950,3 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - Enhanced the [assert_passing()](reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method to indicate which tests failed by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/72
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.1…v0.6.2](https://github.com/posit-dev/pointblank/compare/v0.6.1...v0.6.2)
-
-
-# v0.6.1
-
-*2025-02-20* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.6.1)
-
-
-## Breaking Changes
-
-- thresholds level names have been renamed to better align with standard log levels by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/69
-
-
-## New Features
-
-- Added the ability to execute actions when exceeding threshold levels by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/66
-- Added AWS Bedrock support to [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" data-cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) in https://github.com/posit-dev/pointblank/pull/67
-
-
-## Fixes
-
-- Improved the implementation of [DraftValidation](reference/DraftValidation.html#pointblank.DraftValidation) by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/68
-
-
-## New Contributors
-
-- [<span class="citation" data-cites="kmasiello">@kmasiello</span>](https://github.com/kmasiello) made their first contribution in https://github.com/posit-dev/pointblank/pull/67
-
-**Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.0…v0.6.1](https://github.com/posit-dev/pointblank/compare/v0.6.0...v0.6.1)
