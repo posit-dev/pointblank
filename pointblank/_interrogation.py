@@ -2185,9 +2185,7 @@ def interrogate_regex(
     return result_tbl.to_native()
 
 
-def interrogate_str_len(
-    tbl: IntoFrame, column: str, values: dict, na_pass: bool
-) -> Any:
+def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
     """String length interrogation."""
 
     min_val = values.get("min_val")
@@ -2213,9 +2211,7 @@ def interrogate_str_len(
         )
 
     result_tbl = result_tbl.with_columns(
-        pb_is_good_=(
-            nw.col("pb_is_good_1") | (nw.col("pb_is_good_2") & nw.col("pb_is_good_3"))
-        )
+        pb_is_good_=(nw.col("pb_is_good_1") | (nw.col("pb_is_good_2") & nw.col("pb_is_good_3")))
     ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
 
     return result_tbl.to_native()

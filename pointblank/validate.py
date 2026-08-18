@@ -22816,9 +22816,7 @@ def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool =
     )
 
 
-def _create_text_str_len(
-    lang: str, column: str, values: dict, for_failure: bool = False
-) -> str:
+def _create_text_str_len(lang: str, column: str, values: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
