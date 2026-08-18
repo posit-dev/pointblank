@@ -2185,6 +2185,42 @@ def interrogate_regex(
     return result_tbl.to_native()
 
 
+def interrogate_str_len(
+    tbl: IntoFrame, column: str, values: dict, na_pass: bool
+) -> Any:
+    """String length interrogation."""
+
+    min_val = values.get("min_val")
+    max_val = values.get("max_val")
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+        pb_is_good_2=nw.lit(True),
+        pb_is_good_3=nw.lit(True),
+    )
+
+    if min_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_2=(nw.col(column).str.len_chars() >= min_val).fill_null(False)
+        )
+
+    if max_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_3=(nw.col(column).str.len_chars() <= max_val).fill_null(False)
+        )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=(
+            nw.col("pb_is_good_1") | (nw.col("pb_is_good_2") & nw.col("pb_is_good_3"))
+        )
+    ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
+
+    return result_tbl.to_native()
+
+
 def interrogate_within_spec(
     tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
 ) -> Any:
