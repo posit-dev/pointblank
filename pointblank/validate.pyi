@@ -421,6 +421,21 @@ class Validate:
         active: bool | Callable = True,
         dimension: str | None = None,
     ) -> Validate: ...
+    def col_vals_str_len(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
     def col_vals_expr(
         self,
         expr: Any,
