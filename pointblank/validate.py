@@ -89,6 +89,7 @@ from pointblank._interrogation import (
     interrogate_null,
     interrogate_outside,
     interrogate_regex,
+    interrogate_str_len,
     interrogate_rows_distinct,
     row_count_match,
     rows_complete,
@@ -4370,7 +4371,7 @@ _SERIALIZE_COLUMN_METHODS = (
     | _SERIALIZE_SET_METHODS
     | _SERIALIZE_COLUMN_ONLY_METHODS
     | _SERIALIZE_SEQUENCE_METHODS
-    | {"col_vals_regex", "col_vals_within_spec"}
+    | {"col_vals_regex", "col_vals_within_spec", "col_vals_str_len"}
 )
 
 
@@ -4487,6 +4488,13 @@ def _validation_info_to_step(
         _columns_param()
         values = vi.values or {}
         params["spec"] = values.get("spec", "")
+    elif at == "col_vals_str_len":
+        _columns_param()
+        values = vi.values or {}
+        if values.get("min_val") is not None:
+            params["min_val"] = values["min_val"]
+        if values.get("max_val") is not None:
+            params["max_val"] = values["max_val"]
     elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
         _columns_param()
     elif at in _SERIALIZE_SEQUENCE_METHODS:
@@ -10626,6 +10634,205 @@ class Validate:
 
         return self
 
+    def col_vals_str_len(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the length of string values falls within specified bounds.
+
+        The `col_vals_str_len()` validation method checks whether the character length of string
+        values in a column meets the specified minimum and/or maximum bounds. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        min_val
+            The minimum acceptable string length (inclusive). If `None`, no lower bound is applied.
+            At least one of `min_val=` or `max_val=` must be provided.
+        max_val
+            The maximum acceptable string length (inclusive). If `None`, no upper bound is applied.
+            At least one of `min_val=` or `max_val=` must be provided.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        ValueError
+            If neither `min_val=` nor `max_val=` is provided.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        For the examples here, we'll use a simple Polars DataFrame with a string column (`a`).
+        The table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": ["short", "medium str", "a very long string value", "ok"],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that all values in column `a` have a string length between 2 and 10
+        characters.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_str_len(columns="a", min_val=2, max_val=10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows two failing test units: `"a very long string value"` (24 chars)
+        exceeds `max_val=10`, and `"ok"` (2 chars) passes since bounds are inclusive.
+
+        We can also validate with only a minimum length:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_str_len(columns="a", min_val=3)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        if min_val is None and max_val is None:
+            raise ValueError(
+                "At least one of `min_val=` or `max_val=` must be provided for "
+                "`col_vals_str_len()`."
+            )
+
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=na_pass, param_name="na_pass")
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Package up `min_val=` and `max_val=` into a dictionary for later interrogation
+        values = {"min_val": min_val, "max_val": max_val}
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=values,
+                na_pass=na_pass,
+                missing=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_vals_expr(
         self,
         expr: Any,
@@ -15817,6 +16024,7 @@ class Validate:
                         "col_vals_not_in_set",
                         "col_vals_regex",
                         "col_vals_within_spec",
+                        "col_vals_str_len",
                     ]:
                         # Process table for column validation
                         tbl = _column_test_prep(
@@ -15931,6 +16139,11 @@ class Validate:
                             from pointblank._interrogation import interrogate_within_spec
 
                             results_tbl = interrogate_within_spec(
+                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                            )
+
+                        elif assertion_type == "col_vals_str_len":
+                            results_tbl = interrogate_str_len(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
 
@@ -20062,6 +20275,16 @@ class Validate:
 
                 values_upd.append(str(spec))
 
+            elif assertion_type[i] in ["col_vals_str_len"]:
+                min_v = value.get("min_val")
+                max_v = value.get("max_val")
+                if min_v is not None and max_v is not None:
+                    values_upd.append(f"{min_v}–{max_v}")
+                elif min_v is not None:
+                    values_upd.append(f"≥{min_v}")
+                else:
+                    values_upd.append(f"≤{max_v}")
+
             elif assertion_type[i] in ["prompt"]:  # pragma: no cover
                 # For AI validation, show only the prompt, not the full config
                 if isinstance(value, dict) and "prompt" in value:  # pragma: no cover
@@ -22288,6 +22511,14 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "col_vals_str_len":
+        return _create_text_str_len(
+            lang=lang,
+            column=column,
+            values=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "col_vals_expr":
         return _create_text_expr(
             lang=lang,
@@ -22582,6 +22813,29 @@ def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool =
     return EXPECT_FAIL_TEXT[text_key][lang].format(
         column_text=column_text,
         values_text=pattern_str,
+    )
+
+
+def _create_text_str_len(
+    lang: str, column: str, values: dict, for_failure: bool = False
+) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    min_val = values.get("min_val") if isinstance(values, dict) else None
+    max_val = values.get("max_val") if isinstance(values, dict) else None
+
+    if min_val is not None and max_val is not None:
+        values_text = f"between {min_val} and {max_val} characters"
+    elif min_val is not None:
+        values_text = f"at least {min_val} characters"
+    else:
+        values_text = f"at most {max_val} characters"
+
+    return EXPECT_FAIL_TEXT[f"str_len_{type_}_text"][lang].format(
+        column_text=column_text,
+        values_text=values_text,
     )
 
 
