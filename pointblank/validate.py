@@ -10762,8 +10762,8 @@ class Validate:
         validation
         ```
 
-        The validation table shows two failing test units: `"a very long string value"` (24 chars)
-        exceeds `max_val=10`, and `"ok"` (2 chars) passes since bounds are inclusive.
+        The validation table shows one failing test unit: `"a very long string value"` (24 chars)
+        exceeds `max_val=10`. The value `"ok"` (2 chars) passes since the lower bound is inclusive.
 
         We can also validate with only a minimum length:
 
