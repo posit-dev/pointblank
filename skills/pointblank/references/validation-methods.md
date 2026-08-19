@@ -144,7 +144,7 @@ compares against the reference column.
 ```python
 .prompt(
     prompt="Check if product names are appropriate",
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     columns_subset=["product_name"],
     batch_size=1000,
     max_concurrent=3,

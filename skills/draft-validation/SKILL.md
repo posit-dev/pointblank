@@ -36,7 +36,7 @@ import pointblank as pb
 # Draft a validation plan from data
 draft = pb.DraftValidation(
     data=df,
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
 )
 
 # View the generated code
@@ -76,7 +76,7 @@ Give data to an LLM and get back a validation plan:
 ```python
 draft = pb.DraftValidation(
     data=df,
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     api_key=None,          # uses env var by default
     max_reprompts=1,       # retries on invalid code
 )
@@ -108,7 +108,7 @@ Modify an existing validation plan with natural language:
 edit = pb.EditValidation(
     validation=existing_validation,
     instruction="Add a check that order_id is unique and amount is positive",
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
 )
 
 # From Python code string
@@ -122,7 +122,7 @@ edit = pb.EditValidation(
 edit = pb.EditValidation(
     validation="validation.yaml",
     instruction="Add threshold warnings at 5%",
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
 )
 ```
 
@@ -149,7 +149,7 @@ You can supply data to the edit for context:
 edit = pb.EditValidation(
     validation=existing_validation,
     instruction="Add checks for the new columns",
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     data=updated_df,
 )
 ```
@@ -161,14 +161,14 @@ Chat with an LLM about data validation:
 ```python
 # Browser-based chat (default)
 pb.assistant(
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     data=df,
     tbl_name="orders",
 )
 
 # Terminal-based chat
 pb.assistant(
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     data=df,
     display="terminal",
 )
@@ -187,7 +187,7 @@ All LLM features use the format `"provider:model_name"`:
 
 ```python
 # Anthropic
-model="anthropic:claude-sonnet-4-20250514"
+model="anthropic:claude-sonnet-4-6"
 model="anthropic:claude-haiku-4-5-20251001"
 
 # OpenAI
@@ -222,7 +222,7 @@ Or pass explicitly:
 ```python
 draft = pb.DraftValidation(
     data=df,
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     api_key="sk-...",
 )
 ```

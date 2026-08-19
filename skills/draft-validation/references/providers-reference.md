@@ -9,9 +9,9 @@ Format: `"provider:model_name"`
 ### Anthropic
 
 ```python
-model="anthropic:claude-sonnet-4-20250514"
+model="anthropic:claude-sonnet-4-6"
 model="anthropic:claude-haiku-4-5-20251001"
-model="anthropic:claude-opus-4-20250514"
+model="anthropic:claude-opus-4-8"
 ```
 
 Environment variable: `ANTHROPIC_API_KEY`
@@ -85,7 +85,7 @@ export OPENAI_API_KEY="sk-..."
 ```python
 draft = pb.DraftValidation(
     data=df,
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     api_key="sk-ant-...",
 )
 ```
@@ -97,7 +97,7 @@ For environments with custom certificates:
 ```python
 draft = pb.DraftValidation(
     data=df,
-    model="anthropic:claude-sonnet-4-20250514",
+    model="anthropic:claude-sonnet-4-6",
     verify_ssl=False,
 )
 ```
