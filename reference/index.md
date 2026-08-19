@@ -130,6 +130,9 @@ Validate whether column values match a regular expression pattern.
 [Validate.col_vals_within_spec()](Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec)  
 Validate whether column values fit within a specification.
 
+[Validate.col_vals_str_len()](Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len)  
+Validate whether the length of string values falls within specified bounds.
+
 [Validate.col_vals_in_table()](Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)  
 Validate that column values exist in a reference table (referential integrity).
 
