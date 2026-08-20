@@ -745,3 +745,45 @@ class TestPipelineIntegration:
         pipeline = Pipeline(source=source, target=target)
         result = pipeline.run(data=raw, transform=transform)
         assert result.passed is True
+
+
+# ─── Edge Case Coverage Tests ────────────────────────────────────────────────────
+
+
+class TestPipelineEdgeCases:
+    """Tests for edge-case branches not exercised by main test classes."""
+
+    def test_check_passed_without_all_passed_method(self):
+        """_check_passed falls back to True when validation lacks all_passed."""
+
+        class FakeValidation:
+            pass  # no all_passed method
+
+        result = PipelineResult(source_validation=FakeValidation())  # type: ignore
+        assert result.source_passed is True
+
+    def test_append_validation_summary_exception_path(self):
+        """_append_validation_summary catches exceptions gracefully."""
+        from pointblank.pipeline import _append_validation_summary
+
+        class BrokenValidation:
+            @property
+            def validation_info(self):
+                raise RuntimeError("simulated failure")
+
+        lines: list[str] = []
+        _append_validation_summary(lines, BrokenValidation())  # type: ignore
+        assert any("unable" in line for line in lines)
+
+    def test_run_target_on_violation_raise_caught(self, raw_data, source_contract, transform_fn):
+        """run() catches RuntimeError from target on_violation='raise'."""
+        target = Contract(
+            name="strict_target",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="amount", value=999999)],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=source_contract, target=target)
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+        assert result.target_passed is False
+        assert result.transform_output is not None
