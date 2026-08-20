@@ -1,7 +1,7 @@
 import pytest
 
 import pointblank as pb
-from pointblank.missing import MissingSpec
+from pointblank.missing import MissingSpec, _slugify
 
 
 class TestMissingSpecConstruction:
@@ -222,3 +222,142 @@ class TestMissingSpecFactoryMethods:
         spec = MissingSpec.from_variable_metadata(FakeVar())
         assert spec is not None
         assert spec.reason_for(-99) == "missing_99"
+
+
+class TestSlugify:
+    def test_normal_string(self):
+        assert _slugify("Not Asked") == "not_asked"
+
+    def test_already_snake_case(self):
+        assert _slugify("refused") == "refused"
+
+    def test_special_chars(self):
+        assert _slugify("Don't Know!") == "don_t_know"
+
+    def test_numeric_label(self):
+        assert _slugify(-99) == "99"
+
+    def test_empty_string(self):
+        assert _slugify("") == "missing"
+
+    def test_leading_trailing_separators(self):
+        assert _slugify("  hello world  ") == "hello_world"
+
+
+class TestMissingSpecSentinelValues:
+    def test_returns_keys(self):
+        spec = MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+        assert spec.sentinel_values() == [-99, -98]
+
+    def test_empty_reasons_null_is_missing_true(self):
+        spec = MissingSpec(reasons={})
+        assert spec.sentinel_values() == []
+
+    def test_string_sentinel_values(self):
+        spec = MissingSpec(reasons={"NA": "not_applicable", "UNK": "unknown"})
+        assert spec.sentinel_values() == ["NA", "UNK"]
+
+
+class TestMissingSpecReasonFor:
+    def test_known_value(self):
+        spec = MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+        assert spec.reason_for(-99) == "not_asked"
+        assert spec.reason_for(-98) == "refused"
+
+    def test_none_value_null_is_missing_true(self):
+        spec = MissingSpec(reasons={-99: "not_asked"}, null_reason="unknown")
+        assert spec.reason_for(None) == "unknown"
+
+    def test_none_value_null_is_missing_false(self):
+        spec = MissingSpec(reasons={-99: "not_asked"}, null_is_missing=False)
+        assert spec.reason_for(None) is None
+
+    def test_unknown_value_returns_none(self):
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        assert spec.reason_for(42) is None
+
+
+class TestMissingSpecIsMissing:
+    def test_sentinel_value_is_missing(self):
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        assert spec.is_missing(-99) is True
+
+    def test_non_sentinel_value_not_missing(self):
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        assert spec.is_missing(0) is False
+
+    def test_none_null_is_missing_true(self):
+        spec = MissingSpec(reasons={-99: "not_asked"}, null_is_missing=True)
+        assert spec.is_missing(None) is True
+
+    def test_none_null_is_missing_false(self):
+        spec = MissingSpec(reasons={-99: "not_asked"}, null_is_missing=False)
+        assert spec.is_missing(None) is False
+
+
+class TestMissingSpecValuesForReason:
+    def test_single_match(self):
+        spec = MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+        assert spec.values_for_reason("refused") == [-98]
+
+    def test_multiple_matches(self):
+        spec = MissingSpec(reasons={-99: "not_asked", -98: "not_asked", -97: "refused"})
+        assert spec.values_for_reason("not_asked") == [-99, -98]
+
+    def test_no_match(self):
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        assert spec.values_for_reason("refused") == []
+
+
+class TestMissingSpecValuesForCategory:
+    def test_returns_values_in_category(self):
+        spec = MissingSpec(
+            reasons={-99: "not_asked", -98: "refused", -97: "dont_know"},
+            categories={"item_nonresponse": ["refused", "dont_know"]},
+        )
+        assert set(spec.values_for_category("item_nonresponse")) == {-98, -97}
+
+    def test_unknown_category_returns_empty(self):
+        spec = MissingSpec(
+            reasons={-99: "not_asked"},
+            categories={"design": ["not_asked"]},
+        )
+        assert spec.values_for_category("no_such_category") == []
+
+    def test_no_categories_returns_empty(self):
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        assert spec.values_for_category("design") == []
+
+
+class TestMissingSpecReasonsList:
+    def test_distinct_reasons_include_null_reason(self):
+        spec = MissingSpec(
+            reasons={-99: "not_asked", -98: "refused"},
+            null_is_missing=True,
+            null_reason="unknown",
+        )
+        reasons = spec.reasons_list()
+        assert "not_asked" in reasons
+        assert "refused" in reasons
+        assert "unknown" in reasons
+
+    def test_null_reason_excluded_when_null_not_missing(self):
+        spec = MissingSpec(
+            reasons={-99: "not_asked"},
+            null_is_missing=False,
+        )
+        reasons = spec.reasons_list()
+        assert "unknown" not in reasons
+
+    def test_duplicate_reason_labels_appear_once(self):
+        spec = MissingSpec(
+            reasons={-99: "not_asked", -98: "not_asked"},
+            null_is_missing=False,
+        )
+        assert spec.reasons_list().count("not_asked") == 1
+
+
+class TestMissingSpecValidationEmptyReasons:
+    def test_empty_reasons_with_null_false_raises(self):
+        with pytest.raises(ValueError, match="at least one sentinel value"):
+            MissingSpec(reasons={}, null_is_missing=False)
