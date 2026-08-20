@@ -11,6 +11,56 @@ from fastmcp.exceptions import ToolError
 from pointblank.mcp.server import mcp
 
 
+# ── MCP Prompt function tests ────────────────────────────────────────────────
+
+
+def test_prompt_load_dataframe_returns_tuple():
+    from pointblank.mcp._prompts import prompt_load_dataframe
+    result = prompt_load_dataframe()
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+
+
+def test_prompt_load_dataframe_custom_args():
+    from pointblank.mcp._prompts import prompt_load_dataframe
+    result = prompt_load_dataframe(input_path="data.csv", df_id="my_df")
+    assert isinstance(result, tuple)
+
+
+def test_prompt_create_validator_returns_tuple():
+    from pointblank.mcp._prompts import prompt_create_validator
+    result = prompt_create_validator()
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+
+
+def test_prompt_create_validator_with_thresholds():
+    from pointblank.mcp._prompts import prompt_create_validator
+    result = prompt_create_validator(thresholds_dict_example={"warning": 0.05})
+    assert isinstance(result, tuple)
+
+
+def test_prompt_add_validation_step_example_returns_tuple():
+    from pointblank.mcp._prompts import prompt_add_validation_step_example
+    result = prompt_add_validation_step_example()
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+
+
+def test_prompt_get_validation_step_output_returns_tuple():
+    from pointblank.mcp._prompts import prompt_get_validation_step_output
+    result = prompt_get_validation_step_output()
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+
+
+def test_prompt_interrogate_validator_returns_tuple():
+    from pointblank.mcp._prompts import prompt_interrogate_validator
+    result = prompt_interrogate_validator()
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+
+
 @pytest.fixture(scope="module")
 def mcp_server():
     """Provides the FastMCP server instance."""
