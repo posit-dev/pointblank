@@ -1214,6 +1214,53 @@ def test_adam_templates():
     print("\n✓ ADaM dataset validation test PASSED\n")
 
 
+def test_validate_sdtm_with_study_id():
+    from pointblank.metadata import validate_sdtm
+
+    dm_data = pl.DataFrame(
+        {
+            "STUDYID": ["XYZ001"] * 3,
+            "DOMAIN": ["DM"] * 3,
+            "USUBJID": ["XYZ001-001", "XYZ001-002", "XYZ001-003"],
+            "SUBJID": ["001", "002", "003"],
+            "AGE": [25, 34, 45],
+        }
+    )
+    v = validate_sdtm(data=dm_data, domain="DM", study_id="XYZ001")
+    assert v is not None
+
+
+def test_validate_adam_with_study_id():
+    from pointblank.metadata import validate_adam
+
+    adsl_data = pl.DataFrame(
+        {
+            "STUDYID": ["XYZ001"] * 3,
+            "USUBJID": ["XYZ001-001", "XYZ001-002", "XYZ001-003"],
+            "SUBJID": ["001", "002", "003"],
+            "AGE": [25, 34, 45],
+        }
+    )
+    v = validate_adam(data=adsl_data, dataset="ADSL", study_id="XYZ001")
+    assert v is not None
+
+
+def test_validate_adam_with_traceability_vars():
+    from pointblank.metadata import validate_adam
+
+    adsl_data = pl.DataFrame(
+        {
+            "STUDYID": ["XYZ001"] * 3,
+            "USUBJID": ["XYZ001-001", "XYZ001-002", "XYZ001-003"],
+            "SRCDOM": ["DM", "DM", "DM"],
+            "SRCVAR": ["USUBJID", "USUBJID", "USUBJID"],
+            "SRCSEQ": [1, 2, 3],
+        }
+    )
+    v = validate_adam(data=adsl_data, dataset="ADSL", check_traceability=True)
+    assert v is not None
+
+
 def test_export_frictionless():
     """Test exporting metadata to Frictionless format."""
     import pointblank as pb
