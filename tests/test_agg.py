@@ -3,7 +3,25 @@ from itertools import product
 
 from pointblank import Validate, ref
 import polars as pl
-from pointblank._agg import load_validation_method_grid, is_valid_agg
+import narwhals as nw
+from pointblank._agg import (
+    load_validation_method_grid,
+    is_valid_agg,
+    split_agg_name,
+    resolve_agg_registries,
+    agg_sum,
+    agg_avg,
+    agg_sd,
+    comp_eq,
+    comp_gt,
+    comp_ge,
+    comp_lt,
+    comp_le,
+    _generic_between,
+    register,
+    AGGREGATOR_REGISTRY,
+    COMPARATOR_REGISTRY,
+)
 
 
 @pytest.fixture
@@ -1276,3 +1294,198 @@ def test_agg_with_reference_dataframe_types(
         .interrogate()
     )
     v.assert_passing()
+
+
+# ──────────────────────────────────────────────────────────────────────
+# Direct function tests for _agg.py body lines
+# ──────────────────────────────────────────────────────────────────────
+
+
+def test_split_agg_name_with_col_prefix():
+    assert split_agg_name("col_sum_eq") == ("sum", "eq")
+
+
+def test_split_agg_name_without_col_prefix():
+    assert split_agg_name("sum_gt") == ("sum", "gt")
+
+
+def test_split_agg_name_avg_le():
+    assert split_agg_name("col_avg_le") == ("avg", "le")
+
+
+def test_split_agg_name_sd_ge():
+    assert split_agg_name("col_sd_ge") == ("sd", "ge")
+
+
+def test_resolve_agg_registries_sum_eq():
+    agg, comp = resolve_agg_registries("sum_eq")
+    assert callable(agg)
+    assert callable(comp)
+
+
+def test_resolve_agg_registries_avg_gt():
+    agg, comp = resolve_agg_registries("col_avg_gt")
+    assert callable(agg)
+    assert callable(comp)
+
+
+def test_agg_sum_eager_dataframe():
+    df = nw.from_native(pl.DataFrame({"val": [1, 2, 3]}))
+    result = agg_sum(df.select("val"))
+    assert result == 6
+
+
+def test_agg_sum_lazy_dataframe():
+    ldf = nw.from_native(pl.DataFrame({"val": [1, 2, 3]}).lazy())
+    result = agg_sum(ldf.select("val"))
+    assert result == 6
+
+
+def test_agg_avg_eager_dataframe():
+    df = nw.from_native(pl.DataFrame({"val": [1.0, 2.0, 3.0]}))
+    result = agg_avg(df.select("val"))
+    assert result == 2.0
+
+
+def test_agg_avg_lazy_dataframe():
+    ldf = nw.from_native(pl.DataFrame({"val": [2.0, 4.0, 6.0]}).lazy())
+    result = agg_avg(ldf.select("val"))
+    assert result == 4.0
+
+
+def test_agg_sd_eager_dataframe():
+    df = nw.from_native(pl.DataFrame({"val": [5, 5, 5, 5, 5]}))
+    result = agg_sd(df.select("val"))
+    assert result == 0.0
+
+
+def test_agg_sd_lazy_dataframe():
+    ldf = nw.from_native(pl.DataFrame({"val": [1, 2, 3]}).lazy())
+    result = agg_sd(ldf.select("val"))
+    assert result == pytest.approx(1.0, abs=1e-9)
+
+
+def test_comp_eq_equal_values():
+    assert comp_eq(5.0, 5.0, 5.0) is True
+
+
+def test_comp_eq_between():
+    assert comp_eq(5.0, 4.0, 6.0) is True
+
+
+def test_comp_eq_outside():
+    assert comp_eq(10.0, 4.0, 6.0) is False
+
+
+def test_comp_gt_true():
+    assert comp_gt(5.0, 4.0, None) is True
+
+
+def test_comp_gt_false():
+    assert comp_gt(3.0, 4.0, None) is False
+
+
+def test_comp_ge_equal():
+    assert comp_ge(5.0, 5.0, None) is True
+
+
+def test_comp_ge_greater():
+    assert comp_ge(6.0, 5.0, None) is True
+
+
+def test_comp_ge_less():
+    assert comp_ge(4.0, 5.0, None) is False
+
+
+def test_comp_lt_true():
+    assert comp_lt(3.0, None, 5.0) is True
+
+
+def test_comp_lt_false():
+    assert comp_lt(6.0, None, 5.0) is False
+
+
+def test_comp_le_equal():
+    assert comp_le(5.0, None, 5.0) is True
+
+
+def test_comp_le_less():
+    assert comp_le(4.0, None, 5.0) is True
+
+
+def test_comp_le_greater():
+    assert comp_le(6.0, None, 5.0) is False
+
+
+def test_generic_between_inside():
+    assert _generic_between(5.0, 3.0, 7.0) is True
+
+
+def test_generic_between_at_boundary():
+    assert _generic_between(3.0, 3.0, 7.0) is True
+    assert _generic_between(7.0, 3.0, 7.0) is True
+
+
+def test_generic_between_outside():
+    assert _generic_between(10.0, 3.0, 7.0) is False
+
+
+def test_registries_contain_expected_entries():
+    assert "sum" in AGGREGATOR_REGISTRY
+    assert "avg" in AGGREGATOR_REGISTRY
+    assert "sd" in AGGREGATOR_REGISTRY
+    assert "eq" in COMPARATOR_REGISTRY
+    assert "gt" in COMPARATOR_REGISTRY
+    assert "ge" in COMPARATOR_REGISTRY
+    assert "lt" in COMPARATOR_REGISTRY
+    assert "le" in COMPARATOR_REGISTRY
+
+
+def test_load_validation_method_grid_returns_tuple():
+    grid = load_validation_method_grid()
+    assert isinstance(grid, tuple)
+    assert len(grid) > 0
+    assert all(m.startswith("col_") for m in grid)
+
+
+def test_load_validation_method_grid_all_combinations():
+    grid = load_validation_method_grid()
+    agg_names = list(AGGREGATOR_REGISTRY.keys())
+    comp_names = list(COMPARATOR_REGISTRY.keys())
+    expected_count = len(agg_names) * len(comp_names)
+    assert len(grid) == expected_count
+
+
+def test_is_valid_agg_valid():
+    assert is_valid_agg("col_sum_eq") is True
+    assert is_valid_agg("col_avg_gt") is True
+    assert is_valid_agg("col_sd_le") is True
+
+
+def test_is_valid_agg_invalid():
+    assert is_valid_agg("not_a_real_method") is False
+    assert is_valid_agg("col_fake_eq") is False
+
+
+def test_register_adds_aggregator():
+    initial_count = len(AGGREGATOR_REGISTRY)
+
+    @register
+    def agg_test_fn_xyz(col):
+        return 0.0
+
+    assert "test_fn_xyz" in AGGREGATOR_REGISTRY
+    assert AGGREGATOR_REGISTRY["test_fn_xyz"] is agg_test_fn_xyz
+    del AGGREGATOR_REGISTRY["test_fn_xyz"]
+
+
+def test_register_adds_comparator():
+    initial_count = len(COMPARATOR_REGISTRY)
+
+    @register
+    def comp_test_op_xyz(real, lower, upper):
+        return True
+
+    assert "test_op_xyz" in COMPARATOR_REGISTRY
+    assert COMPARATOR_REGISTRY["test_op_xyz"] is comp_test_op_xyz
+    del COMPARATOR_REGISTRY["test_op_xyz"]
