@@ -54,6 +54,10 @@ class TestGeneratorConfig:
         with pytest.raises(ValueError, match="max_unique_retries must be at least 1"):
             GeneratorConfig(max_unique_retries=0)
 
+    def test_country_dict_with_non_numeric_weight_raises(self):
+        with pytest.raises(ValueError, match="must be a number"):
+            GeneratorConfig(country={"US": "not_a_number"})
+
 
 class TestGenerateColumnInteger:
     """Tests for integer column generation."""
