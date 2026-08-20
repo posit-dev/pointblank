@@ -1750,3 +1750,184 @@ def test_op_define_type_check_unknown_define_type(ct):
     ops = [{"operator": "define_type_check", "params": {"column": "SEX"}}]
     result = apply_operations(df, ops, ct, {}, define_meta=define_meta)
     assert result["_pb_SEX_define_type_ok"].to_list() == [True, True]
+
+
+def test_native_rule_applies_to_domain_empty():
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+
+    rule = NativeRule(
+        core_id="X-001",
+        rule_type="RECORD_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="test",
+        authority="CDISC",
+        domains=[],
+        standards=["sdtmig"],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    assert rule.applies_to_domain("DM") is True
+
+
+def test_native_rule_applies_to_standard_empty():
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+
+    rule = NativeRule(
+        core_id="X-001",
+        rule_type="RECORD_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="test",
+        authority="CDISC",
+        domains=["DM"],
+        standards=[],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    assert rule.applies_to_standard("any") is True
+
+
+def test_engine_with_explicit_ct_packages():
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+
+    available = ControlledTerminology.available()
+    if not available:
+        pytest.skip("No CT packages available")
+    engine = NativeConformanceEngine("sdtmig", "3.4", ct_packages=available)
+    assert engine.ct_packages == available
+
+
+def test_engine_evaluate_unsupported_rule_type():
+    from pointblank.metadata._conformance.engine import NativeConformanceEngine
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+    from pointblank.metadata._conformance.result import STATUS_NOT_SUPPORTED
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["RECORD_CHECK"])
+    rule = NativeRule(
+        core_id="FAKE-001",
+        rule_type="UNSUPPORTED_RULE_TYPE",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="fake",
+        authority="TEST",
+        domains=[],
+        standards=[],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    result = engine._evaluate_rule(rule, {})
+    assert result.status == STATUS_NOT_SUPPORTED
+
+
+def test_engine_partially_executable_missing_dataset():
+    from pointblank.metadata._conformance.engine import NativeConformanceEngine
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+    from pointblank.metadata._conformance.result import STATUS_NOT_APPLICABLE
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["RECORD_CHECK"])
+    rule = NativeRule(
+        core_id="PART-001",
+        rule_type="RECORD_CHECK",
+        executability="Partially Executable",
+        sensitivity="Error",
+        description="needs EX dataset",
+        authority="TEST",
+        domains=["DM"],
+        standards=[],
+        classes=[],
+        datasets=["EX"],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"STUDYID": ["S1"]}))})
+    assert result.status == STATUS_NOT_APPLICABLE
+
+
+def test_engine_evaluate_rule_exception_returns_error_status():
+    from pointblank.metadata._conformance.engine import NativeConformanceEngine
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+    from pointblank.metadata._conformance.result import STATUS_ERROR
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["RECORD_CHECK"])
+    rule = NativeRule(
+        core_id="ERR-001",
+        rule_type="RECORD_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="error rule",
+        authority="TEST",
+        domains=["DM"],
+        standards=[],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    original = engine._record_check
+
+    def _raising(r, ds):
+        raise RuntimeError("simulated failure")
+
+    engine._record_check = _raising
+    try:
+        result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"X": [1]}))})
+        assert result.status == STATUS_ERROR
+    finally:
+        engine._record_check = original
+
+
+def test_engine_dataset_metadata_check_evaluation_error():
+    from pointblank.metadata._conformance.engine import NativeConformanceEngine
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+    from pointblank.metadata._conformance.result import STATUS_PASS
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DATASET_METADATA_CHECK"])
+    rule = NativeRule(
+        core_id="EVAL-001",
+        rule_type="DATASET_METADATA_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="bad conditions",
+        authority="TEST",
+        domains=["DM"],
+        standards=[],
+        classes=[],
+        operations=[],
+        conditions={"all": [{"name": "_pb_NONEXISTENT_col", "operator": "equal_to", "value": True}]},
+        actions={},
+    )
+    result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"X": [1]}))})
+    assert result.status == STATUS_PASS
+
+
+def test_engine_domain_presence_check_prohibited_present():
+    from pointblank.metadata._conformance.engine import NativeConformanceEngine
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+    from pointblank.metadata._conformance.result import STATUS_FAIL
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DOMAIN_PRESENCE_CHECK"])
+    rule = NativeRule(
+        core_id="PRES-001",
+        rule_type="DOMAIN_PRESENCE_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="DM should not be present",
+        authority="TEST",
+        domains=[],
+        standards=[],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={"params": {"required_domains": [], "prohibited_domains": ["DM"]}},
+    )
+    result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"X": [1]}))})
+    assert result.status == STATUS_FAIL
+    assert "Prohibited" in result.message
