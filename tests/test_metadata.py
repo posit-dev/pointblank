@@ -3022,3 +3022,21 @@ class TestLoadMetadataExample:
         import pointblank as pb
 
         assert hasattr(pb, "load_metadata_example")
+
+
+class TestConvertMinValOnly:
+    """Test _metadata_to_validate when variable has only min_val."""
+
+    def test_min_val_only_generates_col_vals_ge(self):
+        import polars as pl
+
+        meta = MetadataImport(
+            source_format="test",
+            variables=[
+                VariableMetadata(name="score", dtype="Int64", min_val=0, max_val=None),
+            ],
+        )
+        df = pl.DataFrame({"score": [10, 20, 30]})
+        validation = meta.to_validate(data=df)
+        step_types = [s.assertion_type for s in validation.validation_info]
+        assert "col_vals_ge" in step_types
