@@ -2,12 +2,21 @@ from __future__ import annotations
 
 from pointblank.scan_profile_stats import (
     Stat,
+    StatGroup,
     MeanStat,
     StdStat,
     MinStat,
     MaxStat,
+    P05Stat,
     Q1Stat,
     MedianStat,
+    Q3Stat,
+    P95Stat,
+    IQRStat,
+    FreqStat,
+    NMissing,
+    NUnique,
+    COLUMN_ORDER_REGISTRY,
 )
 
 
@@ -155,3 +164,125 @@ def test_base_stat_has_eq():
 
     assert "__eq__" in Stat.__dict__
     assert callable(Stat.__eq__)
+
+
+def test_stat_group_members():
+    members = list(StatGroup)
+    assert StatGroup.DESCR in members
+    assert StatGroup.SUMMARY in members
+    assert StatGroup.STRUCTURE in members
+    assert StatGroup.LOGIC in members
+    assert StatGroup.IQR in members
+    assert StatGroup.FREQ in members
+    assert StatGroup.BOUNDS in members
+
+
+def test_stat_fetch_priv_name_mean():
+    assert MeanStat._fetch_priv_name() == "_mean"
+
+
+def test_stat_fetch_priv_name_q1():
+    assert Q1Stat._fetch_priv_name() == "_q_1"
+
+
+def test_stat_fetch_priv_name_q3():
+    assert Q3Stat._fetch_priv_name() == "_q_3"
+
+
+def test_all_stat_subclasses_instantiate():
+    s_mean = MeanStat(val=1.5)
+    assert s_mean.val == 1.5
+    assert s_mean.name == "mean"
+    assert s_mean.group == StatGroup.SUMMARY
+    assert s_mean.label == "Mean"
+
+    s_std = StdStat(val=0.5)
+    assert s_std.name == "std"
+    assert s_std.group == StatGroup.SUMMARY
+    assert s_std.label == "SD"
+
+    s_min = MinStat(val=0.0)
+    assert s_min.name == "min"
+    assert s_min.group == StatGroup.BOUNDS
+
+    s_max = MaxStat(val=100.0)
+    assert s_max.name == "max"
+    assert s_max.group == StatGroup.BOUNDS
+
+    s_p05 = P05Stat(val=1.0)
+    assert s_p05.name == "p05"
+    assert s_p05.group == StatGroup.DESCR
+
+    s_q1 = Q1Stat(val=25.0)
+    assert s_q1.name == "q_1"
+    assert s_q1.group == StatGroup.DESCR
+
+    s_median = MedianStat(val=50.0)
+    assert s_median.name == "median"
+    assert s_median.group == StatGroup.DESCR
+
+    s_q3 = Q3Stat(val=75.0)
+    assert s_q3.name == "q_3"
+    assert s_q3.group == StatGroup.DESCR
+
+    s_p95 = P95Stat(val=95.0)
+    assert s_p95.name == "p95"
+    assert s_p95.group == StatGroup.DESCR
+
+    s_iqr = IQRStat(val=50.0)
+    assert s_iqr.name == "iqr"
+    assert s_iqr.group == StatGroup.IQR
+    assert s_iqr.label == "IQR"
+
+    s_freq = FreqStat(val={"True": 3, "False": 1})
+    assert s_freq.name == "freqs"
+    assert s_freq.group == StatGroup.FREQ
+    assert s_freq.label == "Freq"
+
+    s_nmissing = NMissing(val=5)
+    assert s_nmissing.name == "n_missing"
+    assert s_nmissing.group == StatGroup.STRUCTURE
+    assert s_nmissing.label == "NA"
+
+    s_nunique = NUnique(val=10)
+    assert s_nunique.name == "n_unique"
+    assert s_nunique.group == StatGroup.STRUCTURE
+    assert s_nunique.label == "UQ"
+
+
+def test_column_order_registry_length():
+    assert len(COLUMN_ORDER_REGISTRY) == 13
+
+
+def test_column_order_registry_contains_all_stat_types():
+    names = [s.name for s in COLUMN_ORDER_REGISTRY]
+    assert "n_missing" in names
+    assert "n_unique" in names
+    assert "mean" in names
+    assert "std" in names
+    assert "min" in names
+    assert "p05" in names
+    assert "q_1" in names
+    assert "median" in names
+    assert "q_3" in names
+    assert "p95" in names
+    assert "max" in names
+    assert "freqs" in names
+    assert "iqr" in names
+
+
+def test_stat_expr_attributes_exist():
+    import narwhals as nw
+    assert isinstance(MeanStat.expr, nw.Expr)
+    assert isinstance(StdStat.expr, nw.Expr)
+    assert isinstance(MinStat.expr, nw.Expr)
+    assert isinstance(MaxStat.expr, nw.Expr)
+    assert isinstance(P05Stat.expr, nw.Expr)
+    assert isinstance(Q1Stat.expr, nw.Expr)
+    assert isinstance(MedianStat.expr, nw.Expr)
+    assert isinstance(Q3Stat.expr, nw.Expr)
+    assert isinstance(P95Stat.expr, nw.Expr)
+    assert isinstance(IQRStat.expr, nw.Expr)
+    assert isinstance(FreqStat.expr, nw.Expr)
+    assert isinstance(NMissing.expr, nw.Expr)
+    assert isinstance(NUnique.expr, nw.Expr)
