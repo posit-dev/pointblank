@@ -375,6 +375,18 @@ class TestImportMetadata:
         with pytest.raises(TypeError, match="Expected a file path"):
             import_metadata({"key": "value"})
 
+    def test_cdisc_sdtm_without_domain_raises(self, tmp_path):
+        fake = tmp_path / "dummy.xml"
+        fake.write_text("<ODM/>")
+        with pytest.raises(ValueError, match="domain="):
+            import_metadata(fake, format="cdisc_sdtm")
+
+    def test_cdisc_adam_without_dataset_raises(self, tmp_path):
+        fake = tmp_path / "dummy.xml"
+        fake.write_text("<ODM/>")
+        with pytest.raises(ValueError, match="dataset="):
+            import_metadata(fake, format="cdisc_adam")
+
     def test_missing_pyreadstat(self, tmp_path, monkeypatch):
         """Test that a helpful error is raised when pyreadstat is missing."""
         import importlib
@@ -1471,6 +1483,41 @@ class TestJSONFormatDetection:
         with pytest.raises(ValueError, match="Invalid JSON"):
             _detect_format(filepath)
 
+    def test_json_file_not_found_raises(self, tmp_path):
+        from pointblank.metadata._import import _detect_json_format
+
+        with pytest.raises(FileNotFoundError):
+            _detect_json_format(tmp_path / "missing.json")
+
+    def test_json_array_raises(self, tmp_path):
+        from pointblank.metadata._import import _detect_json_format
+
+        p = tmp_path / "arr.json"
+        p.write_text("[1, 2, 3]")
+        with pytest.raises(ValueError, match="JSON object"):
+            _detect_json_format(p)
+
+    def test_json_url_with_dialect_detected_as_csvw(self, tmp_path):
+        from pointblank.metadata._import import _detect_json_format
+
+        p = tmp_path / "meta.json"
+        p.write_text('{"url": "data.csv", "dialect": {"delimiter": ","}}')
+        assert _detect_json_format(p) == "csvw"
+
+    def test_json_filename_datapackage_heuristic(self, tmp_path):
+        from pointblank.metadata._import import _detect_json_format
+
+        p = tmp_path / "my-datapackage.json"
+        p.write_text('{"title": "something"}')
+        assert _detect_json_format(p) == "frictionless"
+
+    def test_json_filename_csvw_heuristic(self, tmp_path):
+        from pointblank.metadata._import import _detect_json_format
+
+        p = tmp_path / "my-csvw-meta.json"
+        p.write_text('{"title": "something"}')
+        assert _detect_json_format(p) == "csvw"
+
 
 # =============================================================================
 # CDISC Define-XML Tests
@@ -1960,6 +2007,20 @@ class TestXMLFormatDetection:
         filepath = tmp_path / "study_data.xml"
         filepath.write_text(xml)
         assert _detect_format(filepath) == "cdisc_ct"
+
+    def test_xml_file_not_found_raises(self, tmp_path):
+        from pointblank.metadata._import import _detect_xml_format
+
+        with pytest.raises(FileNotFoundError):
+            _detect_xml_format(tmp_path / "missing.xml")
+
+    def test_xml_unknown_namespace_raises(self, tmp_path):
+        from pointblank.metadata._import import _detect_xml_format
+
+        p = tmp_path / "unknown.xml"
+        p.write_text('<?xml version="1.0"?><Root xmlns="http://example.com/schema"/>')
+        with pytest.raises(ValueError, match="Cannot auto-detect XML"):
+            _detect_xml_format(p)
 
 
 class TestCDISCImportMetadataIntegration:
@@ -3065,3 +3126,270 @@ class TestExportMetadataEdgeCases:
         result = export_metadata(meta, format="frictionless")
         field = result["fields"][0]
         assert field.get("format") == "ISO 8601"
+
+
+class TestFrictionlessReaderEdgeCases:
+    def test_file_not_found_raises(self, tmp_path):
+        from pointblank.metadata._readers_frictionless import _read_frictionless_metadata
+
+        with pytest.raises(FileNotFoundError):
+            _read_frictionless_metadata(tmp_path / "nonexistent.json")
+
+    def test_empty_resources_raises(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_frictionless_metadata
+
+        path = tmp_path / "pkg.json"
+        path.write_text(json.dumps({"resources": []}))
+        with pytest.raises(ValueError, match="no resources"):
+            _read_frictionless_metadata(path)
+
+    def test_single_resource_no_schema_fields_raises(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_frictionless_metadata
+
+        path = tmp_path / "pkg.json"
+        path.write_text(json.dumps({"resources": [{"name": "r1", "schema": {}}]}))
+        with pytest.raises(ValueError, match="schema.fields"):
+            _read_frictionless_metadata(path)
+
+    def test_neither_fields_nor_resources_raises(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_frictionless_metadata
+
+        path = tmp_path / "bad.json"
+        path.write_text(json.dumps({"title": "no schema here"}))
+        with pytest.raises(ValueError, match="neither"):
+            _read_frictionless_metadata(path)
+
+    def test_extract_resource_schema_bad_key_type(self):
+        from pointblank.metadata._readers_frictionless import _extract_resource_schema
+
+        resources = [{"name": "r1", "schema": {"fields": []}}]
+        with pytest.raises(TypeError, match="str or int"):
+            _extract_resource_schema(resources, 3.14)
+
+    def test_extract_resource_schema_no_fields_after_extraction(self):
+        from pointblank.metadata._readers_frictionless import _extract_resource_schema
+
+        resources = [{"name": "r1", "schema": {}}]
+        with pytest.raises(ValueError, match="schema.fields"):
+            _extract_resource_schema(resources, 0)
+
+
+class TestCSVWReaderEdgeCases:
+    def test_csvw_file_not_found_raises(self, tmp_path):
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        with pytest.raises(FileNotFoundError):
+            _read_csvw_metadata(tmp_path / "nonexistent.json")
+
+    def test_csvw_invalid_document_raises(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        path = tmp_path / "bad.json"
+        path.write_text(json.dumps({"title": "no tables or tableSchema"}))
+        with pytest.raises(ValueError, match="valid CSVW"):
+            _read_csvw_metadata(path)
+
+    def test_csvw_single_table_in_tables_list(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "tables": [
+                {
+                    "url": "data.csv",
+                    "tableSchema": {"columns": [{"name": "id", "datatype": "integer"}]},
+                }
+            ]
+        }
+        path = tmp_path / "single.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert result is not None
+
+    def test_csvw_table_null_as_string(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "null": "NA",
+            "tableSchema": {
+                "columns": [{"name": "x", "datatype": "integer"}],
+            },
+        }
+        path = tmp_path / "null_str.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert result is not None
+
+    def test_csvw_col_name_as_list(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [{"name": ["x", "x_alias"], "datatype": "integer"}],
+            },
+        }
+        path = tmp_path / "list_name.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert any(v.name == "x" for v in result.variables)
+
+    def test_csvw_col_without_name_skipped(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [
+                    {"datatype": "integer"},
+                    {"name": "y", "datatype": "string"},
+                ],
+            },
+        }
+        path = tmp_path / "no_name.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert len(result.variables) == 1
+        assert result.variables[0].name == "y"
+
+    def test_csvw_virtual_column_skipped(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [
+                    {"name": "real", "datatype": "integer"},
+                    {"name": "virtual_col", "datatype": "integer", "virtual": True},
+                ],
+            },
+        }
+        path = tmp_path / "virtual.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert len(result.variables) == 1
+        assert result.variables[0].name == "real"
+
+    def test_csvw_suppress_output_column_skipped(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [
+                    {"name": "visible", "datatype": "integer"},
+                    {"name": "hidden", "datatype": "integer", "suppressOutput": True},
+                ],
+            },
+        }
+        path = tmp_path / "suppress.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        assert len(result.variables) == 1
+        assert result.variables[0].name == "visible"
+
+    def test_csvw_min_exclusive_max_exclusive(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [
+                    {
+                        "name": "score",
+                        "datatype": {
+                            "base": "decimal",
+                            "minExclusive": 0,
+                            "maxExclusive": 100,
+                        },
+                    }
+                ],
+            },
+        }
+        path = tmp_path / "exclusive.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        var = result.get_variable("score")
+        assert var.min_val == 0.0
+        assert var.max_val == 100.0
+
+    def test_csvw_bad_min_max_values_ignored(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [
+                    {
+                        "name": "x",
+                        "datatype": {"base": "decimal", "minimum": "not_a_number", "maximum": "also_bad"},
+                    }
+                ],
+            },
+        }
+        path = tmp_path / "bad_vals.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        var = result.get_variable("x")
+        assert var.min_val is None
+        assert var.max_val is None
+
+    def test_csvw_title_as_list(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [{"name": "x", "titles": ["X Column", "X"]}],
+            },
+        }
+        path = tmp_path / "title_list.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        var = result.get_variable("x")
+        assert var.label == "X Column"
+
+    def test_csvw_title_as_dict(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [{"name": "x", "titles": {"en": "X Label", "fr": "Étiquette X"}}],
+            },
+        }
+        path = tmp_path / "title_dict.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        var = result.get_variable("x")
+        assert var.label == "X Label"
+
+    def test_csvw_col_null_as_string(self, tmp_path):
+        import json
+        from pointblank.metadata._readers_frictionless import _read_csvw_metadata
+
+        doc = {
+            "url": "data.csv",
+            "tableSchema": {
+                "columns": [{"name": "x", "null": "NA", "datatype": "string"}],
+            },
+        }
+        path = tmp_path / "col_null.json"
+        path.write_text(json.dumps(doc))
+        result = _read_csvw_metadata(path)
+        var = result.get_variable("x")
+        assert var.missing_values == ["NA"]
