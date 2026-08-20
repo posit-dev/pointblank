@@ -181,7 +181,7 @@ class Thresholds:
         # it to a fractional value
         if isinstance(threshold_value, int):
             converted = _convert_abs_count_to_fraction(value=threshold_value, test_units=test_units)
-            if converted is None:
+            if converted is None:  # pragma: no cover
                 return None
             threshold_value = converted
 

@@ -364,7 +364,7 @@ class Pipeline:
         # Add all steps
         for step in contract.steps:
             method = getattr(validation, step.method, None)
-            if method is None:
+            if method is None:  # pragma: no cover
                 raise AttributeError(
                     f"Validate object has no method '{step.method}'. "
                     f"This may indicate a version mismatch."

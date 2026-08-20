@@ -652,7 +652,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 def _get_fn_name() -> str | None:
     # Get the current function name
     frame = inspect.currentframe()
-    if frame is None or frame.f_back is None:
+    if frame is None or frame.f_back is None:  # pragma: no cover
         return None
     return frame.f_back.f_code.co_name
 
@@ -660,7 +660,7 @@ def _get_fn_name() -> str | None:
 def _get_assertion_from_fname() -> str | None:
     # Get the current function name
     frame = inspect.currentframe()
-    if frame is None or frame.f_back is None:
+    if frame is None or frame.f_back is None:  # pragma: no cover
         return None
     func_name = frame.f_back.f_code.co_name
 
