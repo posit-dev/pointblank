@@ -741,3 +741,121 @@ class TestContractEdgeCases:
         )
         result = contract.validate(simple_df)
         assert result.all_passed()
+
+
+# ─── Additional Coverage Tests ───────────────────────────────────────────────────
+
+
+class TestContractToValidateMissingMethod:
+    def test_to_validate_step_method_not_on_validate(self, simple_df):
+        contract = Contract(name="test")
+        bad_step = object.__new__(Step)
+        bad_step.method = "nonexistent_validate_method_xyz"
+        bad_step.kwargs = {}
+        contract.steps = [bad_step]
+        with pytest.raises(AttributeError, match="Validate object has no method"):
+            contract.to_validate(simple_df)
+
+    def test_to_validate_no_schema_no_steps(self, simple_df):
+        contract = Contract(name="empty")
+        v = contract.to_validate(simple_df)
+        assert v is not None
+
+    def test_to_validate_with_schema_only(self):
+        contract = Contract(
+            name="schema_only",
+            schema=pb.Schema(id="Int64"),
+        )
+        df = pl.DataFrame({"id": [1, 2, 3]})
+        v = contract.to_validate(df)
+        assert v is not None
+
+    def test_validate_returns_result_with_all_passed(self, simple_df):
+        contract = Contract(
+            name="check",
+            steps=[Step("col_vals_not_null", columns="id")],
+        )
+        result = contract.validate(simple_df)
+        assert hasattr(result, "all_passed")
+        assert result.all_passed()
+
+
+class TestContractToDictAdditional:
+    def test_to_dict_with_description(self):
+        contract = Contract(name="described", description="A test description")
+        d = contract.to_dict()
+        assert d["description"] == "A test description"
+
+    def test_to_dict_with_consumers_string(self):
+        contract = Contract(name="one_consumer", consumers="ml-team")
+        d = contract.to_dict()
+        assert d["consumers"] == "ml-team"
+
+    def test_to_dict_with_consumers_list(self):
+        contract = Contract(name="multi_consumer", consumers=["a", "b", "c"])
+        d = contract.to_dict()
+        assert d["consumers"] == ["a", "b", "c"]
+
+    def test_to_dict_with_on_violation_log(self):
+        contract = Contract(name="logged", on_violation="log")
+        d = contract.to_dict()
+        assert d["on_violation"] == "log"
+
+    def test_to_dict_with_thresholds(self):
+        contract = Contract(
+            name="thresh",
+            thresholds=pb.Thresholds(warning=0.05, error=0.10),
+        )
+        d = contract.to_dict()
+        assert "thresholds" in d
+        assert d["thresholds"]["warning"] == 0.05
+        assert d["thresholds"]["error"] == 0.10
+
+    def test_to_dict_with_all_optional_fields(self):
+        contract = Contract(
+            name="full",
+            direction="target",
+            version="2.0.0",
+            owner="data-team",
+            consumers=["service-a", "service-b"],
+            description="Comprehensive contract",
+            on_violation="raise",
+            thresholds=pb.Thresholds(warning=0.01),
+        )
+        d = contract.to_dict()
+        assert d["direction"] == "target"
+        assert d["version"] == "2.0.0"
+        assert d["owner"] == "data-team"
+        assert d["consumers"] == ["service-a", "service-b"]
+        assert d["description"] == "Comprehensive contract"
+        assert d["on_violation"] == "raise"
+        assert "thresholds" in d
+
+    def test_to_dict_with_steps(self):
+        contract = Contract(
+            name="with_steps",
+            steps=[
+                Step("col_vals_not_null", columns="id"),
+                Step("col_vals_gt", columns="id", value=0),
+            ],
+        )
+        d = contract.to_dict()
+        assert "steps" in d
+        assert len(d["steps"]) == 2
+
+    def test_repr_shows_step_count(self):
+        contract = Contract(
+            name="counted",
+            steps=[
+                Step("col_vals_not_null", columns="id"),
+                Step("col_vals_gt", columns="id", value=0),
+                Step("col_vals_lt", columns="id", value=100),
+            ],
+        )
+        r = repr(contract)
+        assert "steps=3" in r
+
+    def test_repr_direction_always_present(self):
+        contract = Contract(name="check", direction="target")
+        r = repr(contract)
+        assert "direction='target'" in r
