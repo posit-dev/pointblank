@@ -3040,3 +3040,28 @@ class TestConvertMinValOnly:
         validation = meta.to_validate(data=df)
         step_types = [s.assertion_type for s in validation.validation_info]
         assert "col_vals_ge" in step_types
+
+
+class TestExportMetadataEdgeCases:
+    def test_export_unsupported_format_raises(self):
+        from pointblank.metadata._export import export_metadata
+
+        meta = MetadataImport(
+            source_format="test",
+            variables=[VariableMetadata(name="x", dtype="Int64")],
+        )
+        with pytest.raises(ValueError, match="Unsupported export format"):
+            export_metadata(meta, format="xml")
+
+    def test_export_variable_with_display_format(self):
+        from pointblank.metadata._export import export_metadata
+
+        meta = MetadataImport(
+            source_format="test",
+            variables=[
+                VariableMetadata(name="DTC", dtype="String", display_format="ISO 8601"),
+            ],
+        )
+        result = export_metadata(meta, format="frictionless")
+        field = result["fields"][0]
+        assert field.get("format") == "ISO 8601"
