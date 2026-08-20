@@ -5651,3 +5651,44 @@ def test_roundtrip_step_level_thresholds():
     yaml_result = yaml_interrogate(yaml_content)
     python_result = _exec_yaml_to_python(yaml_content)
     _compare_validation_results(yaml_result, python_result)
+
+
+def test_yaml_interrogate_with_reference():
+    """reference key in build_validation loads data."""
+    yaml_content = """
+    tbl: small_table
+    reference: small_table
+    steps:
+      - col_vals_not_null:
+          columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+
+
+def test_yaml_interrogate_with_final_actions_callable():
+    """final_actions as a Python callable."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - rows_distinct
+    final_actions:
+      python: |
+        lambda: None
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+
+
+def test_yaml_interrogate_with_final_actions_list():
+    """final_actions as a list."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - rows_distinct
+    final_actions:
+      - python: |
+          lambda: None
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
