@@ -1401,3 +1401,35 @@ def test_engine_rule_count_phase3():
     engine = NativeConformanceEngine("sdtmig", "3.4")
     result = engine.run({"DM": _clean_dm()})
     assert len(result.rule_results) == 426
+
+
+def test_ct_repr():
+    """ControlledTerminology.__repr__ returns expected string."""
+    from pointblank.metadata._conformance.ct import ControlledTerminology
+
+    ct = ControlledTerminology({"SEX": {"M", "F"}}, ["2023-12-01"])
+    r = repr(ct)
+    assert "ControlledTerminology" in r
+    assert "packages=" in r
+    assert "n_codelists=" in r
+
+
+def test_ct_available_no_dir(tmp_path, monkeypatch):
+    """ControlledTerminology.available() returns [] when _CT_DIR doesn't exist."""
+    from pointblank.metadata._conformance import ct as ct_module
+
+    monkeypatch.setattr(ct_module, "_CT_DIR", tmp_path / "nonexistent")
+    result = ct_module.ControlledTerminology.available()
+    assert result == []
+
+
+def test_ct_load_default_empty(tmp_path, monkeypatch):
+    """ControlledTerminology.load_default() returns empty CT when no packages available."""
+    from pointblank.metadata._conformance import ct as ct_module
+
+    empty_dir = tmp_path / "ct_empty"
+    empty_dir.mkdir()
+    monkeypatch.setattr(ct_module, "_CT_DIR", empty_dir)
+    ct = ct_module.ControlledTerminology.load_default()
+    assert isinstance(ct, ct_module.ControlledTerminology)
+    assert ct.packages == []
