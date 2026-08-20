@@ -1264,3 +1264,309 @@ class TestODCSRoundTrip:
         original_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in imported.constraints}
         roundtrip_methods = {(c.method, _hashable_kwargs(c.kwargs)) for c in reimported.constraints}
         assert original_methods == roundtrip_methods
+
+
+# ---------------------------------------------------------------------------
+# MappedConstraint.__repr__
+# ---------------------------------------------------------------------------
+
+
+def test_mapped_constraint_repr_no_kwargs():
+    mc = MappedConstraint(method="col_vals_not_null")
+    r = repr(mc)
+    assert "MappedConstraint" in r
+    assert "col_vals_not_null" in r
+
+
+def test_mapped_constraint_repr_with_kwargs():
+    mc = MappedConstraint(method="col_vals_gt", kwargs={"columns": "age", "value": 0})
+    r = repr(mc)
+    assert "col_vals_gt" in r
+    assert "columns=" in r
+    assert "value=" in r
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.__repr__
+# ---------------------------------------------------------------------------
+
+
+def test_contract_import_repr():
+    ci = ContractImport(
+        source_format="test_fmt",
+        columns=[("a", "Int64"), ("b", "String")],
+        constraints=[MappedConstraint("col_vals_not_null", kwargs={"columns": "a"})],
+        coverage=0.75,
+    )
+    r = repr(ci)
+    assert "ContractImport" in r
+    assert "test_fmt" in r
+    assert "2" in r
+    assert "75%" in r
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.summary()
+# ---------------------------------------------------------------------------
+
+
+def test_summary_minimal():
+    ci = ContractImport(source_format="fmt")
+    s = ci.summary()
+    assert "fmt" in s
+    assert "Columns detected: 0" in s
+    assert "Constraints mapped: 0" in s
+
+
+def test_summary_with_source_path_and_version():
+    ci = ContractImport(
+        source_format="fmt",
+        source_path="/some/file.yml",
+        source_version="2.0",
+        columns=[("x", "Int64")],
+    )
+    s = ci.summary()
+    assert "/some/file.yml" in s
+    assert "2.0" in s
+    assert "Columns detected: 1" in s
+
+
+def test_summary_with_warnings():
+    ci = ContractImport(
+        source_format="fmt",
+        warnings=["unknown constraint foo", "another warning"],
+        coverage=0.5,
+    )
+    s = ci.summary()
+    assert "Warnings" in s
+    assert "unknown constraint foo" in s
+    assert "50%" in s
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.to_python()
+# ---------------------------------------------------------------------------
+
+
+def test_to_python_basic():
+    ci = ContractImport(
+        source_format="fmt",
+        columns=[("id", "Int64")],
+        constraints=[MappedConstraint("col_vals_not_null", kwargs={"columns": "id"})],
+    )
+    code = ci.to_python()
+    assert "import pointblank as pb" in code
+    assert "col_schema_match" in code
+    assert "col_vals_not_null" in code
+    assert "interrogate()" in code
+
+
+def test_to_python_no_columns_no_constraints():
+    ci = ContractImport(source_format="fmt")
+    code = ci.to_python()
+    assert "import pointblank as pb" in code
+    assert "col_schema_match" not in code
+    assert "interrogate()" in code
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.to_yaml()
+# ---------------------------------------------------------------------------
+
+
+def test_to_yaml_basic():
+    ci = ContractImport(
+        source_format="fmt",
+        columns=[("age", "Int64")],
+        constraints=[MappedConstraint("col_vals_ge", kwargs={"columns": "age", "value": 0})],
+    )
+    yml = ci.to_yaml()
+    assert "validation" in yml
+    assert "col_schema_match" in yml
+    assert "col_vals_ge" in yml
+
+
+def test_to_yaml_no_typed_columns():
+    ci = ContractImport(
+        source_format="fmt",
+        columns=[("age", None)],
+        constraints=[MappedConstraint("col_vals_not_null", kwargs={"columns": "age"})],
+    )
+    yml = ci.to_yaml()
+    assert "col_schema_match" not in yml
+    assert "col_vals_not_null" in yml
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.to_validate() — unknown method skipped with warning
+# ---------------------------------------------------------------------------
+
+
+def test_to_validate_unknown_method_adds_warning(simple_df):
+    ci = ContractImport(
+        source_format="fmt",
+        constraints=[MappedConstraint("no_such_method_xyz", kwargs={"columns": "id"})],
+    )
+    ci.to_validate(data=simple_df)
+    assert any("no_such_method_xyz" in w for w in ci.warnings)
+
+
+# ---------------------------------------------------------------------------
+# ContractImport.to_contract()
+# ---------------------------------------------------------------------------
+
+
+def test_to_contract_uses_metadata_description():
+    ci = ContractImport(
+        source_format="fmt",
+        columns=[("id", "Int64")],
+        constraints=[MappedConstraint("col_vals_not_null", kwargs={"columns": "id"})],
+        metadata={"description": "My contract description"},
+    )
+    contract = ci.to_contract(name="meta_test")
+    assert contract.description == "My contract description"
+
+
+def test_to_contract_no_typed_columns_no_schema():
+    ci = ContractImport(
+        source_format="fmt",
+        columns=[("id", None)],
+        constraints=[],
+    )
+    contract = ci.to_contract()
+    assert contract.schema is None
+
+
+# ---------------------------------------------------------------------------
+# ContractAdapter class-level attributes
+# ---------------------------------------------------------------------------
+
+
+def test_contract_adapter_defaults():
+    adapter = ContractAdapter()
+    assert adapter.format_name == ""
+    assert adapter.file_extensions == []
+    assert adapter.supports_import is True
+    assert adapter.supports_export is True
+
+
+# ---------------------------------------------------------------------------
+# register_adapter — no format_name raises ValueError
+# ---------------------------------------------------------------------------
+
+
+def test_register_adapter_no_name_raises():
+    with pytest.raises(ValueError, match="must have a `format_name`"):
+
+        @register_adapter()
+        class BadAdapter(ContractAdapter):
+            format_name = ""
+
+
+# ---------------------------------------------------------------------------
+# register_adapter — used without parentheses (class passed directly)
+# ---------------------------------------------------------------------------
+
+
+def test_register_adapter_no_parens():
+    @register_adapter
+    class NoParensAdapter(ContractAdapter):
+        format_name = "_test_no_parens_adapter"
+        file_extensions = [".npa"]
+        supports_export = False
+
+    assert "_test_no_parens_adapter" in _ADAPTER_REGISTRY
+    _ADAPTER_REGISTRY.pop("_test_no_parens_adapter", None)
+
+
+# ---------------------------------------------------------------------------
+# list_adapters() returns expected structure
+# ---------------------------------------------------------------------------
+
+
+def test_list_adapters_returns_known_format():
+    result = list_adapters()
+    assert isinstance(result, dict)
+    assert "odcs" in result
+    entry = result["odcs"]
+    assert "class" in entry
+    assert "file_extensions" in entry
+    assert "supports_import" in entry
+    assert "supports_export" in entry
+
+
+# ---------------------------------------------------------------------------
+# get_adapter — unknown format raises ValueError
+# ---------------------------------------------------------------------------
+
+
+def test_get_adapter_unknown_raises():
+    with pytest.raises(ValueError, match="No adapter registered"):
+        get_adapter("_no_such_format_xyz_")
+
+
+# ---------------------------------------------------------------------------
+# _detect_format — extension loop (file path ending in registered extension)
+# ---------------------------------------------------------------------------
+
+
+def test_detect_format_extension_loop():
+    from pointblank.adapters._registry import _detect_format
+
+    detected = _detect_format("myfile.odcs.json")
+    assert detected == "odcs"
+
+
+# ---------------------------------------------------------------------------
+# import_contract — auto-detect fails raises ValueError
+# ---------------------------------------------------------------------------
+
+
+def test_import_contract_auto_detect_fails():
+    with pytest.raises(ValueError, match="Could not auto-detect format"):
+        import_contract({"completely": "unknown"})
+
+
+# ---------------------------------------------------------------------------
+# import_contract — adapter that does not support import raises ValueError
+# ---------------------------------------------------------------------------
+
+
+def test_import_contract_adapter_no_import_support():
+    @register_adapter("_test_no_import_fmt")
+    class NoImportAdapter(ContractAdapter):
+        format_name = "_test_no_import_fmt"
+        supports_import = False
+
+        @staticmethod
+        def detect(source):
+            return False
+
+    try:
+        with pytest.raises(ValueError, match="does not support import"):
+            import_contract({"x": 1}, format="_test_no_import_fmt")
+    finally:
+        _ADAPTER_REGISTRY.pop("_test_no_import_fmt", None)
+
+
+# ---------------------------------------------------------------------------
+# export_contract — adapter that does not support export raises ValueError
+# ---------------------------------------------------------------------------
+
+
+def test_export_contract_adapter_no_export_support():
+    @register_adapter("_test_no_export_fmt")
+    class NoExportAdapter(ContractAdapter):
+        format_name = "_test_no_export_fmt"
+        supports_export = False
+
+        @staticmethod
+        def detect(source):
+            return False
+
+    contract = pb.Contract(name="x", schema=None, steps=[])
+    try:
+        with pytest.raises(ValueError, match="does not support export"):
+            export_contract(contract, format="_test_no_export_fmt")
+    finally:
+        _ADAPTER_REGISTRY.pop("_test_no_export_fmt", None)
