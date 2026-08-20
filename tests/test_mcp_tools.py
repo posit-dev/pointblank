@@ -485,3 +485,224 @@ async def test_valid_resource_ids_accepted(mcp_server, temp_csv_file):
             "load_dataframe", {"input_path": temp_csv_file, "df_id": "df123ABC"}
         )
         assert not result.is_error
+
+
+# ── Direct unit tests for _utils.py ────────────────────────────────────────────
+
+
+class TestValidateResourceId:
+    def test_valid_id_returned_stripped(self):
+        from pointblank.mcp._utils import validate_resource_id
+        assert validate_resource_id("  my_id  ") == "my_id"
+
+    def test_empty_id_raises(self):
+        from pointblank.mcp._utils import validate_resource_id
+        with pytest.raises(ValueError, match="cannot be empty"):
+            validate_resource_id("")
+
+    def test_whitespace_only_raises(self):
+        from pointblank.mcp._utils import validate_resource_id
+        with pytest.raises(ValueError, match="cannot be empty"):
+            validate_resource_id("   ")
+
+    def test_invalid_chars_raises(self):
+        from pointblank.mcp._utils import validate_resource_id
+        with pytest.raises(ValueError, match="Invalid"):
+            validate_resource_id("bad id!")
+
+    def test_custom_resource_type_in_error(self):
+        from pointblank.mcp._utils import validate_resource_id
+        with pytest.raises(ValueError, match="validator"):
+            validate_resource_id("", resource_type="validator")
+
+
+class TestValidateInputPath:
+    def test_traversal_raises(self):
+        from pointblank.mcp._utils import validate_input_path
+        with pytest.raises(ValueError, match="traversal"):
+            validate_input_path("../some/file.csv")
+
+    def test_invalid_extension_raises(self, tmp_path):
+        from pointblank.mcp._utils import validate_input_path
+        f = tmp_path / "data.txt"
+        f.write_text("hello")
+        with pytest.raises(ValueError, match="not allowed"):
+            validate_input_path(str(f))
+
+    def test_file_not_found_raises(self, tmp_path):
+        from pointblank.mcp._utils import validate_input_path
+        with pytest.raises(FileNotFoundError):
+            validate_input_path(str(tmp_path / "nonexistent.csv"))
+
+    def test_valid_csv_returns_path(self, tmp_path):
+        from pointblank.mcp._utils import validate_input_path
+        f = tmp_path / "data.csv"
+        f.write_text("a,b\n1,2")
+        result = validate_input_path(str(f))
+        assert result == f.resolve()
+
+
+class TestValidateOutputPath:
+    def test_traversal_raises(self):
+        from pointblank.mcp._utils import validate_output_path
+        with pytest.raises(ValueError, match="traversal"):
+            validate_output_path("../out/file.html", {".html"})
+
+    def test_invalid_extension_raises(self, tmp_path):
+        from pointblank.mcp._utils import validate_output_path
+        with pytest.raises(ValueError, match="not allowed"):
+            validate_output_path(str(tmp_path / "out.txt"), {".html"})
+
+    def test_system_dir_raises(self):
+        from pointblank.mcp._utils import validate_output_path
+        with pytest.raises(ValueError, match="system directory"):
+            validate_output_path("/usr/something.html", {".html"})
+
+    def test_valid_output_path_creates_parent(self, tmp_path):
+        from pointblank.mcp._utils import validate_output_path
+        out = tmp_path / "subdir" / "out.html"
+        result = validate_output_path(str(out), {".html"})
+        assert result.parent.exists()
+
+
+class TestSaveDataframeToCsv:
+    def test_save_pandas_df(self, tmp_path):
+        from pointblank.mcp._utils import save_dataframe_to_csv
+        import pandas as pd
+        df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+        out = tmp_path / "out.csv"
+        save_dataframe_to_csv(df, out)
+        assert out.exists()
+        content = out.read_text()
+        assert "a" in content
+
+    def test_save_polars_df(self, tmp_path):
+        try:
+            import polars as pl
+        except ImportError:
+            pytest.skip("polars not available")
+        from pointblank.mcp._utils import save_dataframe_to_csv
+        df = pl.DataFrame({"a": [1, 2], "b": [3, 4]})
+        out = tmp_path / "out.csv"
+        save_dataframe_to_csv(df, out)
+        assert out.exists()
+
+
+class TestOpenBrowserConditionally:
+    def test_testing_mode_suppresses_browser(self):
+        from pointblank.mcp._utils import open_browser_conditionally
+        from pointblank.mcp._config import TESTING_MODE
+        assert TESTING_MODE is True
+        open_browser_conditionally("https://example.com")
+
+
+class TestSaveHtmlAndOpen:
+    def test_testing_mode_returns_message_without_file(self):
+        from pointblank.mcp._utils import save_html_and_open
+        result = save_html_and_open("<p>hello</p>", "Test Title", "test_prefix")
+        assert "HTML generated" in result
+        assert "testing" in result.lower()
+
+
+class TestGenerateValidationReportHtml:
+    def test_testing_mode_returns_path_string(self):
+        import pandas as pd
+        import pointblank as pb
+        from pointblank.mcp._utils import generate_validation_report_html
+        df = pd.DataFrame({"a": [1, 2, 3]})
+        v = pb.Validate(df).col_vals_not_null(columns="a").interrogate()
+        result = generate_validation_report_html(v, "test_validator")
+        assert isinstance(result, str)
+        assert "pointblank_validation_report" in result
+
+
+class TestCleanForJsonSerialization:
+    def test_nan_becomes_none(self):
+        import math
+        from pointblank.mcp._utils import clean_for_json_serialization
+        result = clean_for_json_serialization(float("nan"))
+        assert result is None
+
+    def test_inf_becomes_string(self):
+        from pointblank.mcp._utils import clean_for_json_serialization
+        result = clean_for_json_serialization(float("inf"))
+        assert result == "inf"
+
+    def test_normal_float_unchanged(self):
+        from pointblank.mcp._utils import clean_for_json_serialization
+        assert clean_for_json_serialization(3.14) == 3.14
+
+    def test_dict_cleaned_recursively(self):
+        import math
+        from pointblank.mcp._utils import clean_for_json_serialization
+        result = clean_for_json_serialization({"a": float("nan"), "b": 1})
+        assert result == {"a": None, "b": 1}
+
+    def test_list_cleaned_recursively(self):
+        from pointblank.mcp._utils import clean_for_json_serialization
+        result = clean_for_json_serialization([float("nan"), float("inf"), 1])
+        assert result == [None, "inf", 1]
+
+    def test_non_float_passthrough(self):
+        from pointblank.mcp._utils import clean_for_json_serialization
+        assert clean_for_json_serialization("hello") == "hello"
+        assert clean_for_json_serialization(42) == 42
+
+
+class TestGeneratePythonCodeForValidator:
+    def test_with_df_path(self):
+        import pandas as pd
+        import pointblank as pb
+        from pointblank.mcp._utils import generate_python_code_for_validator
+        df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+        v = (
+            pb.Validate(df)
+            .col_vals_not_null(columns="a")
+            .col_vals_between(columns="b", left=1, right=10)
+            .rows_distinct()
+            .col_exists(columns="a")
+            .interrogate()
+        )
+        code = generate_python_code_for_validator(v, "v1", df_path="data.csv")
+        assert "import pointblank as pb" in code
+        assert "data.csv" in code
+        assert "col_vals_not_null" in code
+
+    def test_without_df_path(self):
+        import pandas as pd
+        import pointblank as pb
+        from pointblank.mcp._utils import generate_python_code_for_validator
+        df = pd.DataFrame({"a": [1, 2]})
+        v = pb.Validate(df).col_vals_ge(columns="a", value=0).interrogate()
+        code = generate_python_code_for_validator(v, "v1")
+        assert "your_data.csv" in code
+        assert "col_vals_ge" in code
+
+    def test_various_assertion_types(self):
+        import pandas as pd
+        import pointblank as pb
+        from pointblank.mcp._utils import generate_python_code_for_validator
+        df = pd.DataFrame({"a": [1, 2], "b": ["x", "y"], "c": [1, 2]})
+        v = (
+            pb.Validate(df)
+            .col_vals_gt(columns="a", value=0)
+            .col_vals_le(columns="a", value=10)
+            .col_vals_lt(columns="a", value=100)
+            .col_vals_in_set(columns="b", set=["x", "y"])
+            .col_vals_regex(columns="b", pattern=r"[a-z]+")
+            .interrogate()
+        )
+        code = generate_python_code_for_validator(v, "v2")
+        assert "col_vals_gt" in code
+        assert "col_vals_le" in code
+        assert "col_vals_lt" in code
+        assert "col_vals_in_set" in code
+        assert "col_vals_regex" in code
+
+
+class TestGetAvailableBackends:
+    def test_returns_list_with_pandas(self):
+        from pointblank.mcp._utils import get_available_backends
+        backends = get_available_backends()
+        assert isinstance(backends, list)
+        assert "pandas" in backends
