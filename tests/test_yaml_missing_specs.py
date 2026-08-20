@@ -125,3 +125,23 @@ steps:
     assert "pb.MissingSpec(" in code
     assert "col_pct_missing" in code
     assert "reasons=" in code
+
+
+def test_resolve_missing_direct_spec():
+    """_resolve_missing returns a MissingSpec as-is."""
+    from pointblank.yaml import YAMLValidator
+    from pointblank.missing import MissingSpec
+
+    validator = YAMLValidator()
+    spec = MissingSpec(reasons={-99: "not_asked"})
+    result = validator._resolve_missing(spec, {})
+    assert result is spec
+
+
+def test_resolve_missing_invalid_value():
+    """_resolve_missing raises on invalid value types."""
+    from pointblank.yaml import YAMLValidator
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Invalid 'missing' value"):
+        validator._resolve_missing(42, {})
