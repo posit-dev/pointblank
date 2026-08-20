@@ -1931,3 +1931,214 @@ def test_engine_domain_presence_check_prohibited_present():
     result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"X": [1]}))})
     assert result.status == STATUS_FAIL
     assert "Prohibited" in result.message
+
+
+# ── CDISC CORE parser (_cdisc_core.py) ────────────────────────────────────────
+
+
+def _minimal_report(**extra):
+    base = {
+        "Conformance_Details": {"Standard": "SDTMIG", "Version": "V3.4", "CORE_Engine_Version": "0.16.0"},
+        "Dataset_Details": [{"filename": "dm.xpt"}],
+        "Issue_Summary": [{"dataset": "DM", "core_id": "CORE-001", "message": "msg", "issues": 2}],
+        "Issue_Details": [
+            {
+                "core_id": "CORE-001",
+                "message": "issue msg",
+                "dataset": "DM",
+                "executability": "fully executable",
+                "USUBJID": "",
+                "row": "1",
+                "SEQ": "",
+                "variables": ["VAR"],
+                "values": ["bad"],
+            }
+        ],
+        "Rules_Report": [
+            {"core_id": "CORE-001", "status": "ISSUE REPORTED", "message": "m", "version": "1", "cdisc_rule_id": "CG01", "fda_rule_id": ""},
+            {"core_id": "CORE-002", "status": "SUCCESS", "message": "", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
+            {"core_id": "CORE-003", "status": "SKIPPED", "message": "", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
+            {"core_id": "CORE-004", "status": "EXECUTION ERROR", "message": "err", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
+        ],
+    }
+    base.update(extra)
+    return base
+
+
+def test_cdisc_core_parse_minimal_report():
+    from pointblank.metadata._cdisc_core import parse_core_report, ParsedCoreReport
+    parsed = parse_core_report(_minimal_report())
+    assert isinstance(parsed, ParsedCoreReport)
+    assert parsed.standard == "SDTMIG"
+    assert parsed.version == "V3.4"
+    assert parsed.engine_version == "0.16.0"
+
+
+def test_cdisc_core_n_total_issues():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    parsed = parse_core_report(_minimal_report())
+    assert parsed.n_total_issues == 2
+
+
+def test_cdisc_core_status_counts():
+    from pointblank.metadata._cdisc_core import parse_core_report, STATUS_SUCCESS, STATUS_SKIPPED, STATUS_ISSUE, STATUS_ERROR
+    parsed = parse_core_report(_minimal_report())
+    counts = parsed.status_counts()
+    assert counts[STATUS_ISSUE] == 1
+    assert counts[STATUS_SUCCESS] == 1
+    assert counts[STATUS_SKIPPED] == 1
+    assert counts[STATUS_ERROR] == 1
+
+
+def test_cdisc_core_failing_rules():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    parsed = parse_core_report(_minimal_report())
+    failing = parsed.failing_rules()
+    assert len(failing) == 2
+    assert all(r.is_failing for r in failing)
+
+
+def test_cdisc_core_all_passed_false():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    parsed = parse_core_report(_minimal_report())
+    assert parsed.all_passed is False
+
+
+def test_cdisc_core_all_passed_true():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    report = {
+        "Conformance_Details": {},
+        "Issue_Summary": [],
+        "Issue_Details": [],
+        "Rules_Report": [{"core_id": "CORE-1", "status": "SUCCESS"}],
+    }
+    parsed = parse_core_report(report)
+    assert parsed.all_passed is True
+
+
+def test_cdisc_core_all_passed_no_rules_fallback():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    report = {
+        "Conformance_Details": {},
+        "Issue_Summary": [],
+        "Issue_Details": [],
+        "Rules_Report": [],
+    }
+    parsed = parse_core_report(report)
+    assert parsed.all_passed is True
+
+
+def test_cdisc_core_finding_fields():
+    from pointblank.metadata._cdisc_core import parse_core_report, CoreFinding
+    parsed = parse_core_report(_minimal_report())
+    assert len(parsed.findings) == 1
+    f = parsed.findings[0]
+    assert isinstance(f, CoreFinding)
+    assert f.rule_id == "CORE-001"
+    assert f.dataset == "DM"
+    assert f.row == 1
+    assert f.usubjid is None
+    assert f.seq is None
+    assert f.variables == ["VAR"]
+    assert f.values == ["bad"]
+    assert f.executability == "fully executable"
+
+
+def test_cdisc_core_rule_result_is_failing_property():
+    from pointblank.metadata._cdisc_core import CoreRuleResult, STATUS_SUCCESS, STATUS_ISSUE, STATUS_ERROR, STATUS_SKIPPED
+    assert CoreRuleResult(rule_id="C", status=STATUS_SUCCESS).is_failing is False
+    assert CoreRuleResult(rule_id="C", status=STATUS_SKIPPED).is_failing is False
+    assert CoreRuleResult(rule_id="C", status=STATUS_ISSUE).is_failing is True
+    assert CoreRuleResult(rule_id="C", status=STATUS_ERROR).is_failing is True
+
+
+def test_cdisc_core_issue_summary_parsed():
+    from pointblank.metadata._cdisc_core import parse_core_report, CoreIssueSummary
+    parsed = parse_core_report(_minimal_report())
+    assert len(parsed.issue_summary) == 1
+    s = parsed.issue_summary[0]
+    assert isinstance(s, CoreIssueSummary)
+    assert s.dataset == "DM"
+    assert s.rule_id == "CORE-001"
+    assert s.issues == 2
+
+
+def test_cdisc_core_datasets_parsed():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    parsed = parse_core_report(_minimal_report())
+    assert len(parsed.datasets) == 1
+    assert parsed.datasets[0]["filename"] == "dm.xpt"
+
+
+def test_cdisc_core_as_int():
+    from pointblank.metadata._cdisc_core import _as_int
+    assert _as_int(None) is None
+    assert _as_int("") is None
+    assert _as_int("5") == 5
+    assert _as_int(3) == 3
+    assert _as_int("bad") is None
+
+
+def test_cdisc_core_empty_to_none():
+    from pointblank.metadata._cdisc_core import _empty_to_none
+    assert _empty_to_none("") is None
+    assert _empty_to_none("hello") == "hello"
+    assert _empty_to_none(None) is None
+
+
+def test_cdisc_core_normalize_version():
+    from pointblank.metadata._cdisc_core import _normalize_version
+    assert _normalize_version("3.4") == "3-4"
+    assert _normalize_version("1.1.1") == "1-1-1"
+    assert _normalize_version("3-4") == "3-4"
+
+
+def test_cdisc_core_resolve_core_command_str():
+    from pointblank.metadata._cdisc_core import _resolve_core_command
+    assert _resolve_core_command("core") == ["core"]
+
+
+def test_cdisc_core_resolve_core_command_sequence():
+    from pointblank.metadata._cdisc_core import _resolve_core_command
+    assert _resolve_core_command(["python", "core.py"]) == ["python", "core.py"]
+
+
+def test_cdisc_core_resolve_core_command_env(monkeypatch):
+    from pointblank.metadata._cdisc_core import _resolve_core_command
+    monkeypatch.setenv("POINTBLANK_CDISC_CORE", "python /path/to/core.py")
+    result = _resolve_core_command(None)
+    assert result == ["python", "/path/to/core.py"]
+
+
+def test_cdisc_core_resolve_core_command_not_found(monkeypatch):
+    from pointblank.metadata._cdisc_core import _resolve_core_command, CoreNotFoundError
+    import shutil
+    monkeypatch.delenv("POINTBLANK_CDISC_CORE", raising=False)
+    monkeypatch.setattr("pointblank.metadata._cdisc_core.shutil.which", lambda name: None)
+    with pytest.raises(CoreNotFoundError):
+        _resolve_core_command(None)
+
+
+def test_cdisc_core_runner_properties():
+    from pointblank.metadata._cdisc_core import _CoreRunner
+    runner = _CoreRunner(core="mycore", cwd="/tmp")
+    assert runner.command == ["mycore"]
+    assert runner.cwd == "/tmp"
+
+
+def test_cdisc_core_runner_cwd_none():
+    from pointblank.metadata._cdisc_core import _CoreRunner
+    runner = _CoreRunner(core="mycore")
+    assert runner.cwd is None
+
+
+def test_cdisc_core_parse_raises_on_non_dict():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    with pytest.raises(TypeError):
+        parse_core_report(["not", "a", "dict"])
+
+
+def test_cdisc_core_parse_raises_on_unrecognized_keys():
+    from pointblank.metadata._cdisc_core import parse_core_report
+    with pytest.raises(ValueError):
+        parse_core_report({"foo": 1, "bar": 2})
