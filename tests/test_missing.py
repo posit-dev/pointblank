@@ -122,3 +122,103 @@ class TestMissingSpecMethods:
     def test_reasons_list_no_null(self):
         spec = MissingSpec(reasons={-99: "a", -98: "b"}, null_is_missing=False)
         assert spec.reasons_list() == ["a", "b"]
+
+
+class TestMissingSpecValidationEdgeCases:
+    def test_null_reason_must_be_string(self):
+        with pytest.raises(TypeError, match="null_reason must be a string"):
+            MissingSpec(reasons={-99: "not_asked"}, null_reason=99)  # type: ignore[arg-type]
+
+    def test_category_value_must_be_list(self):
+        with pytest.raises(TypeError, match="must map to a list"):
+            MissingSpec(
+                reasons={-99: "not_asked"},
+                categories={"bad": "not_a_list"},  # type: ignore[dict-item]
+            )
+
+
+class TestMissingSpecFactoryMethods:
+    def test_from_cdisc_null_flavors_defaults(self):
+        spec = MissingSpec.from_cdisc_null_flavors()
+        assert spec.null_is_missing is True
+        assert spec.null_reason == "no_information"
+        assert spec.description == "CDISC/HL7 null flavors"
+        assert spec.reason_for("NASK") == "not_asked"
+        assert spec.reason_for("UNK") == "unknown"
+        assert "NI" in spec.reasons
+
+    def test_from_cdisc_null_flavors_custom(self):
+        spec = MissingSpec.from_cdisc_null_flavors(null_is_missing=False, null_reason="ni")
+        assert spec.null_is_missing is False
+        assert spec.null_reason == "ni"
+
+    def test_from_cdisc_alias(self):
+        spec = MissingSpec.from_cdisc()
+        assert spec.reason_for("NASK") == "not_asked"
+
+    def test_from_sas_defaults(self):
+        spec = MissingSpec.from_sas()
+        assert spec.reason_for(".") == "system_missing"
+        assert spec.reason_for("._") == "system_missing"
+        assert spec.reason_for(".A") == "user_missing_a"
+        assert spec.reason_for(".Z") == "user_missing_z"
+        assert spec.null_reason == "system_missing"
+
+    def test_from_sas_exclude_underscore(self):
+        spec = MissingSpec.from_sas(include_underscore=False)
+        assert spec.reason_for("._") is None
+
+    def test_from_sas_custom_reasons(self):
+        spec = MissingSpec.from_sas(reasons={".A": "not_applicable"})
+        assert spec.reason_for(".A") == "not_applicable"
+        assert spec.reason_for(".B") == "user_missing_b"
+
+    def test_from_spss_with_labels(self):
+        spec = MissingSpec.from_spss(
+            missing_values=[-99, -98],
+            labels={-99: "Not asked", -98: "Refused"},
+        )
+        assert spec.reason_for(-99) == "not_asked"
+        assert spec.reason_for(-98) == "refused"
+
+    def test_from_spss_without_labels(self):
+        spec = MissingSpec.from_spss(missing_values=[-99, -98])
+        assert spec.reason_for(-99) == "missing_99"
+        assert spec.reason_for(-98) == "missing_98"
+
+    def test_from_spss_empty(self):
+        spec = MissingSpec.from_spss(missing_values=[])
+        assert spec.sentinel_values() == []
+
+    def test_from_variable_metadata_with_missing_values(self):
+        class FakeVar:
+            name = "age"
+            missing_values = [-99, -98]
+            missing_value_labels = {-99: "Not asked"}
+            value_labels = {-98: "Refused"}
+
+        spec = MissingSpec.from_variable_metadata(FakeVar())
+        assert spec is not None
+        assert spec.reason_for(-99) == "not_asked"
+        assert spec.reason_for(-98) == "refused"
+        assert "age" in spec.description
+
+    def test_from_variable_metadata_no_missing_values(self):
+        class FakeVar:
+            missing_values = []
+            missing_value_labels = {}
+            value_labels = {}
+
+        result = MissingSpec.from_variable_metadata(FakeVar())
+        assert result is None
+
+    def test_from_variable_metadata_fallback_label(self):
+        class FakeVar:
+            name = "q1"
+            missing_values = [-99]
+            missing_value_labels = None
+            value_labels = None
+
+        spec = MissingSpec.from_variable_metadata(FakeVar())
+        assert spec is not None
+        assert spec.reason_for(-99) == "missing_99"
