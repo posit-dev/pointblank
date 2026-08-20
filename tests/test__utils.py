@@ -12,6 +12,7 @@ from pointblank._utils_llms_txt import (
     _get_api_and_examples_text,
     _get_api_text,
     _get_examples_text,
+    get_api_details,
 )
 from pointblank._utils import (
     _check_any_df_lib,
@@ -907,3 +908,19 @@ def test_copy_dataframe_exception_handling():
     result = _copy_dataframe(uncopyable)
 
     assert result is uncopyable  # Should return the original
+
+
+def test_get_api_details_agg_docstring_fallback():
+    import types
+
+    def col_sum_gt(self):
+        pass
+
+    col_sum_gt.__doc__ = None
+    col_sum_gt.__name__ = "col_sum_gt"
+
+    mod = types.ModuleType("fake_mod")
+    mod.col_sum_gt = col_sum_gt
+
+    result = get_api_details(mod, ["col_sum_gt"])
+    assert isinstance(result, str)
