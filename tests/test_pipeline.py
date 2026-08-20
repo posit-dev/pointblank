@@ -787,3 +787,134 @@ class TestPipelineEdgeCases:
         result = pipeline.run(data=raw_data, transform=transform_fn)
         assert result.target_passed is False
         assert result.transform_output is not None
+
+
+# ─── Additional Coverage Tests ───────────────────────────────────────────────────
+
+
+class TestPipelineResultTargetValidation:
+    def test_target_passed_with_real_validation(self, raw_data, source_contract, transform_fn):
+        target = Contract(
+            name="clean",
+            direction="target",
+            steps=[Step("col_vals_not_null", columns="id")],
+        )
+        target_data = transform_fn(raw_data)
+        target_pipeline = Pipeline(target=target)
+        validation = target_pipeline.validate_target(target_data)
+        result = PipelineResult(target_validation=validation)
+        assert result.target_passed is True
+        assert result.source_passed is True
+        assert result.passed is True
+
+    def test_target_passed_false_with_failing_validation(self, raw_data, transform_fn):
+        target = Contract(
+            name="impossible",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="amount_cents", value=999999)],
+        )
+        target_pipeline = Pipeline(target=target)
+        validation = target_pipeline.validate_target(raw_data)
+        result = PipelineResult(target_validation=validation)
+        assert result.target_passed is False
+        assert result.passed is False
+
+    def test_get_report_target_only(self, raw_data, transform_fn):
+        target = Contract(
+            name="clean_target",
+            direction="target",
+            steps=[Step("col_vals_not_null", columns="id")],
+        )
+        target_data = transform_fn(raw_data)
+        target_pipeline = Pipeline(target=target)
+        validation = target_pipeline.validate_target(target_data)
+        result = PipelineResult(target_validation=validation)
+        report = result.get_report()
+        assert "Target Boundary" in report
+        assert "Source Boundary" not in report
+        assert "Overall" in report
+
+    def test_repr_with_source_validation(self, raw_data, source_contract):
+        pipeline = Pipeline(source=source_contract)
+        validation = pipeline.validate_source(raw_data)
+        result = PipelineResult(source_validation=validation)
+        text = repr(result)
+        assert "validated" in text
+        assert "PipelineResult" in text
+
+    def test_repr_with_both_validations(self, raw_data, source_contract, target_contract, transform_fn):
+        pipeline = Pipeline(source=source_contract, target=target_contract)
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+        text = repr(result)
+        assert "validated" in text
+        assert "passed=True" in text
+
+    def test_result_transform_output_stored(self, raw_data, source_contract, transform_fn):
+        pipeline = Pipeline(source=source_contract)
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+        assert result.transform_output is not None
+
+
+class TestAppendValidationSummaryBranches:
+    def test_no_validation_info_attr(self):
+        from pointblank.pipeline import _append_validation_summary
+
+        class NoInfoValidation:
+            def n_passed(self):
+                return {0: 3, 1: 2}
+
+            def n_failed(self):
+                return {0: 0, 1: 1}
+
+        lines: list[str] = []
+        _append_validation_summary(lines, NoInfoValidation())  # type: ignore
+        assert any("Steps: 0" in line for line in lines)
+        assert any("Test units passed" in line for line in lines)
+
+    def test_no_n_passed_attr(self):
+        from pointblank.pipeline import _append_validation_summary
+
+        class NoPassedValidation:
+            @property
+            def validation_info(self):
+                return [1, 2, 3]
+
+        lines: list[str] = []
+        _append_validation_summary(lines, NoPassedValidation())  # type: ignore
+        assert any("Steps: 3" in line for line in lines)
+        assert any("Test units passed: 0" in line for line in lines)
+        assert any("Test units failed: 0" in line for line in lines)
+
+    def test_non_dict_n_passed(self):
+        from pointblank.pipeline import _append_validation_summary
+
+        class NonDictValidation:
+            @property
+            def validation_info(self):
+                return []
+
+            def n_passed(self):
+                return 42
+
+            def n_failed(self):
+                return 0
+
+        lines: list[str] = []
+        _append_validation_summary(lines, NonDictValidation())  # type: ignore
+        assert any("Test units passed: 0" in line for line in lines)
+
+    def test_summary_with_mixed_attrs(self):
+        from pointblank.pipeline import _append_validation_summary
+
+        class PartialValidation:
+            @property
+            def validation_info(self):
+                return {"step1": "ok", "step2": "fail"}
+
+            def n_passed(self):
+                return {0: 10, 1: 5}
+
+        lines: list[str] = []
+        _append_validation_summary(lines, PartialValidation())  # type: ignore
+        assert any("Steps: 2" in line for line in lines)
+        assert any("Test units passed: 15" in line for line in lines)
