@@ -11462,6 +11462,13 @@ def test_create_table_type_html() -> None:
     ) != _create_table_type_html(tbl_type="pandas", tbl_name=None)
 
 
+def test_make_sublabel() -> None:
+    from pointblank._utils_html import _make_sublabel
+
+    result = _make_sublabel("P", "value")
+    assert result is not None
+
+
 def test_pointblank_config_class() -> None:
     # Test the default configuration
     config = PointblankConfig()
