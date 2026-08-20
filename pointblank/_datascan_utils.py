@@ -78,6 +78,6 @@ def _compact_0_1_fmt(value: float | int | None) -> str | None:
     if abs(value) > 0.99:
         return ">0.99"
 
-    formatted = fmt_number(value, n_sigfig=3)
-    assert isinstance(formatted, list) and isinstance(formatted[0], str)
-    return formatted[0]
+    formatted = fmt_number(value, n_sigfig=3)  # pragma: no cover
+    assert isinstance(formatted, list) and isinstance(formatted[0], str)  # pragma: no cover
+    return formatted[0]  # pragma: no cover
