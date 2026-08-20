@@ -179,3 +179,21 @@ def test_spans_nest_under_existing_context(otel_span_exporter, validation_all_pa
     pb_root = [s for s in spans if s.name == "pb.validate"][0]
     assert pb_root.parent is not None
     assert pb_root.parent.span_id == parent_span.get_span_context().span_id
+
+
+def test_emit_traces_step_with_null_proc_duration(otel_span_exporter, validation_all_pass):
+    exporter, provider = otel_span_exporter
+
+    # Force proc_duration_s to None on all steps so the else-branch in _emit_traces is exercised
+    for vi in validation_all_pass.validation_info:
+        vi.proc_duration_s = None
+        vi.time_processed = None
+
+    OTelExporter(
+        enable_tracing=True,
+        enable_metrics=False,
+        tracer_provider=provider,
+    ).export(validation_all_pass)
+
+    spans = exporter.get_finished_spans()
+    assert len(spans) > 0
