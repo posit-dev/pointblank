@@ -1,4 +1,5 @@
 import pytest
+from datetime import date, datetime, time, timedelta
 
 from pointblank.field import (
     Field,
@@ -18,6 +19,7 @@ from pointblank.field import (
     datetime_field,
     time_field,
     duration_field,
+    profile_fields,
     AVAILABLE_PRESETS,
 )
 
@@ -430,3 +432,325 @@ class TestFieldTypeInheritance:
         assert isinstance(datetime_field(), DatetimeField)
         assert isinstance(time_field(), TimeField)
         assert isinstance(duration_field(), DurationField)
+
+
+class TestBoolFieldValidation:
+    def test_bool_field_invalid_p_true_raises(self):
+        with pytest.raises(ValueError, match="p_true must be between"):
+            bool_field(p_true=1.5)
+
+    def test_bool_field_p_true_negative_raises(self):
+        with pytest.raises(ValueError, match="p_true must be between"):
+            bool_field(p_true=-0.1)
+
+    def test_bool_field_p_true_extremes(self):
+        f = bool_field(p_true=0.0)
+        assert f.p_true == 0.0
+        f = bool_field(p_true=1.0)
+        assert f.p_true == 1.0
+
+    def test_bool_field_with_generator(self):
+        f = bool_field(generator=lambda: True)
+        assert f.has_custom_generator() is True
+
+    def test_bool_field_unique(self):
+        f = bool_field(unique=True)
+        assert f.unique is True
+
+    def test_bool_field_invalid_dtype_raises(self):
+        with pytest.raises(ValueError, match="BoolField dtype must be 'Boolean'"):
+            BoolField(dtype="String")
+
+    def test_date_field_invalid_dtype_raises(self):
+        with pytest.raises(ValueError, match="DateField dtype must be 'Date'"):
+            DateField(dtype="String")
+
+    def test_datetime_field_invalid_dtype_raises(self):
+        with pytest.raises(ValueError, match="DatetimeField dtype must be 'Datetime'"):
+            DatetimeField(dtype="String")
+
+    def test_time_field_invalid_dtype_raises(self):
+        with pytest.raises(ValueError, match="TimeField dtype must be 'Time'"):
+            TimeField(dtype="String")
+
+    def test_duration_field_invalid_dtype_raises(self):
+        with pytest.raises(ValueError, match="DurationField dtype must be 'Duration'"):
+            DurationField(dtype="String")
+
+
+class TestDateFieldParsing:
+    def test_date_field_with_date_objects(self):
+        f = date_field(min_date=date(2020, 1, 1), max_date=date(2025, 12, 31))
+        assert f.min_date == date(2020, 1, 1)
+        assert f.max_date == date(2025, 12, 31)
+
+    def test_date_field_parse_date_with_datetime_object(self):
+        dt = datetime(2020, 6, 15, 10, 30, 0)
+        result = DateField._parse_date(dt)
+        assert result == dt
+
+    def test_date_field_parse_date_with_date_object(self):
+        d = date(2020, 6, 15)
+        result = DateField._parse_date(d)
+        assert isinstance(result, datetime)
+        assert result.year == 2020
+        assert result.month == 6
+        assert result.day == 15
+
+    def test_date_field_parse_date_with_valid_string(self):
+        result = DateField._parse_date("2024-03-15")
+        assert isinstance(result, datetime)
+        assert result.year == 2024
+        assert result.month == 3
+        assert result.day == 15
+
+    def test_date_field_parse_date_with_invalid_string(self):
+        with pytest.raises(ValueError, match="Unable to parse date string"):
+            DateField._parse_date("not-a-date")
+
+    def test_date_field_parse_date_with_invalid_type(self):
+        with pytest.raises(ValueError, match="Invalid date type"):
+            DateField._parse_date(12345)
+
+    def test_date_field_min_max_with_date_objects(self):
+        with pytest.raises(ValueError, match="min_date.*cannot be greater than max_date"):
+            date_field(min_date=date(2025, 1, 1), max_date=date(2020, 1, 1))
+
+    def test_date_field_nullable_unique(self):
+        f = date_field(nullable=True, null_probability=0.1, unique=True)
+        assert f.nullable is True
+        assert f.unique is True
+
+
+class TestDatetimeFieldParsing:
+    def test_datetime_field_with_datetime_objects(self):
+        f = datetime_field(
+            min_date=datetime(2024, 1, 1, 0, 0, 0),
+            max_date=datetime(2024, 12, 31, 23, 59, 59),
+        )
+        assert f.min_date == datetime(2024, 1, 1, 0, 0, 0)
+
+    def test_datetime_field_parse_datetime_with_datetime(self):
+        dt = datetime(2020, 6, 15, 10, 30, 0)
+        result = DatetimeField._parse_datetime(dt)
+        assert result == dt
+
+    def test_datetime_field_parse_datetime_with_date(self):
+        d = date(2020, 6, 15)
+        result = DatetimeField._parse_datetime(d)
+        assert isinstance(result, datetime)
+        assert result.year == 2020
+
+    def test_datetime_field_parse_datetime_with_valid_string(self):
+        result = DatetimeField._parse_datetime("2024-03-15T10:30:00")
+        assert isinstance(result, datetime)
+        assert result.year == 2024
+
+    def test_datetime_field_parse_datetime_with_invalid_string(self):
+        with pytest.raises(ValueError, match="Unable to parse datetime string"):
+            DatetimeField._parse_datetime("not-a-datetime")
+
+    def test_datetime_field_parse_datetime_with_invalid_type(self):
+        with pytest.raises(ValueError, match="Invalid datetime type"):
+            DatetimeField._parse_datetime(12345)
+
+    def test_datetime_field_min_greater_than_max_raises(self):
+        with pytest.raises(ValueError, match="min_date.*cannot be greater than max_date"):
+            datetime_field(
+                min_date=datetime(2025, 1, 1),
+                max_date=datetime(2020, 1, 1),
+            )
+
+
+class TestTimeFieldParsing:
+    def test_time_field_with_time_objects(self):
+        f = time_field(min_time=time(9, 0, 0), max_time=time(17, 0, 0))
+        assert f.min_time == time(9, 0, 0)
+        assert f.max_time == time(17, 0, 0)
+
+    def test_time_field_parse_time_with_time_object(self):
+        t = time(10, 30, 0)
+        result = TimeField._parse_time(t)
+        assert result == t
+
+    def test_time_field_parse_time_with_valid_string(self):
+        result = TimeField._parse_time("10:30:00")
+        assert isinstance(result, time)
+        assert result.hour == 10
+        assert result.minute == 30
+
+    def test_time_field_parse_time_with_invalid_string(self):
+        with pytest.raises(ValueError, match="Unable to parse time string"):
+            TimeField._parse_time("not-a-time")
+
+    def test_time_field_parse_time_with_invalid_type(self):
+        with pytest.raises(ValueError, match="Invalid time type"):
+            TimeField._parse_time(12345)
+
+    def test_time_field_min_greater_than_max_with_time_objects(self):
+        with pytest.raises(ValueError, match="min_time.*cannot be greater than max_time"):
+            time_field(min_time=time(17, 0, 0), max_time=time(9, 0, 0))
+
+
+class TestDurationFieldParsing:
+    def test_duration_field_with_timedelta_objects(self):
+        f = duration_field(
+            min_duration=timedelta(minutes=5),
+            max_duration=timedelta(hours=2),
+        )
+        assert f.min_duration == timedelta(minutes=5)
+        assert f.max_duration == timedelta(hours=2)
+
+    def test_duration_field_parse_duration_with_timedelta(self):
+        td = timedelta(hours=1, minutes=30)
+        result = DurationField._parse_duration(td)
+        assert result == td
+
+    def test_duration_field_parse_duration_with_hhmmss_string(self):
+        result = DurationField._parse_duration("1:30:00")
+        assert result == timedelta(hours=1, minutes=30)
+
+    def test_duration_field_parse_duration_with_mmss_string(self):
+        result = DurationField._parse_duration("30:00")
+        assert result == timedelta(minutes=30)
+
+    def test_duration_field_parse_duration_with_invalid_string(self):
+        with pytest.raises(ValueError, match="Unable to parse duration string"):
+            DurationField._parse_duration("invalid")
+
+    def test_duration_field_parse_duration_with_nonnumeric_parts(self):
+        with pytest.raises(ValueError, match="Unable to parse duration string"):
+            DurationField._parse_duration("abc:def:xyz")
+
+    def test_duration_field_parse_duration_with_invalid_type(self):
+        with pytest.raises(ValueError, match="Invalid duration type"):
+            DurationField._parse_duration(12345)
+
+    def test_duration_field_min_greater_than_max_raises(self):
+        with pytest.raises(ValueError, match="min_duration.*cannot be greater than max_duration"):
+            duration_field(
+                min_duration=timedelta(hours=5),
+                max_duration=timedelta(hours=1),
+            )
+
+    def test_duration_field_with_string_constraints(self):
+        f = duration_field(min_duration="0:01:00", max_duration="1:00:00")
+        assert f.min_duration == "0:01:00"
+
+    def test_duration_field_is_temporal(self):
+        assert duration_field().is_temporal() is True
+
+
+class TestStringFieldValidation:
+    def test_string_field_empty_allowed_raises(self):
+        with pytest.raises(ValueError, match="allowed list cannot be empty"):
+            string_field(allowed=[])
+
+    def test_string_field_has_no_preset_by_default(self):
+        f = string_field()
+        assert f.has_preset() is False
+
+    def test_string_field_has_no_pattern_by_default(self):
+        f = string_field()
+        assert f.has_pattern() is False
+
+    def test_string_field_has_no_allowed_by_default(self):
+        f = string_field()
+        assert f.has_allowed_values() is False
+
+
+class TestFloatFieldValidation:
+    def test_float_field_empty_allowed_raises(self):
+        with pytest.raises(ValueError, match="allowed list cannot be empty"):
+            float_field(allowed=[])
+
+    def test_float_field_min_greater_than_max_raises(self):
+        with pytest.raises(ValueError, match="min_val.*cannot be greater than max_val"):
+            float_field(min_val=100.0, max_val=50.0)
+
+    def test_float_field_has_allowed_values_true(self):
+        f = float_field(allowed=[1.0, 2.0, 3.0])
+        assert f.has_allowed_values() is True
+
+    def test_float_field_has_allowed_values_false(self):
+        f = float_field()
+        assert f.has_allowed_values() is False
+
+    def test_float_field_with_generator(self):
+        f = float_field(generator=lambda: 3.14)
+        assert f.has_custom_generator() is True
+
+    def test_float_field_unique(self):
+        f = float_field(unique=True)
+        assert f.unique is True
+
+
+class TestProfileFields:
+    def test_profile_fields_default_returns_standard_set(self):
+        result = profile_fields()
+        assert "first_name" in result
+        assert "last_name" in result
+        assert "email" in result
+        assert isinstance(result["first_name"], StringField)
+
+    def test_profile_fields_minimal_set(self):
+        result = profile_fields(set="minimal")
+        assert "first_name" in result
+        assert "email" in result
+        assert "phone_number" in result
+        assert "address" not in result
+
+    def test_profile_fields_full_set(self):
+        result = profile_fields(set="full")
+        assert "company" in result
+        assert "job" in result
+
+    def test_profile_fields_split_name_false(self):
+        result = profile_fields(split_name=False)
+        assert "name" in result
+        assert "first_name" not in result
+        assert "last_name" not in result
+
+    def test_profile_fields_with_prefix(self):
+        result = profile_fields(set="minimal", prefix="cust_")
+        assert "cust_first_name" in result
+        assert "cust_email" in result
+
+    def test_profile_fields_with_include(self):
+        result = profile_fields(set="minimal", include=["company"])
+        assert "company" in result
+
+    def test_profile_fields_with_exclude(self):
+        result = profile_fields(set="standard", exclude=["postcode"])
+        assert "postcode" not in result
+        assert "email" in result
+
+    def test_profile_fields_invalid_set_raises(self):
+        with pytest.raises(ValueError, match="Invalid set"):
+            profile_fields(set="invalid")
+
+    def test_profile_fields_invalid_include_raises(self):
+        with pytest.raises(ValueError, match="Unknown preset"):
+            profile_fields(include=["nonexistent_preset"])
+
+    def test_profile_fields_invalid_exclude_raises(self):
+        with pytest.raises(ValueError, match="Unknown preset"):
+            profile_fields(exclude=["nonexistent_preset"])
+
+    def test_profile_fields_include_exclude_conflict_raises(self):
+        with pytest.raises(ValueError, match="appear"):
+            profile_fields(include=["company"], exclude=["company"])
+
+    def test_profile_fields_include_name_with_split_name_true_raises(self):
+        with pytest.raises(ValueError, match="split_name=False"):
+            profile_fields(split_name=True, include=["name"])
+
+    def test_profile_fields_include_first_name_with_split_name_false_raises(self):
+        with pytest.raises(ValueError, match="split_name=True"):
+            profile_fields(split_name=False, include=["first_name"])
+
+    def test_profile_fields_all_return_string_fields(self):
+        result = profile_fields(set="full")
+        for key, val in result.items():
+            assert isinstance(val, StringField)
+            assert val.preset is not None
