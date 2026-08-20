@@ -1,4 +1,4 @@
-## DataScan
+# DataScan
 
 
 Get a summary of a dataset.

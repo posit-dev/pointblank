@@ -1,4 +1,4 @@
-## Validate.col_sd_le()
+# Validate.col_sd_le()
 
 
 Does the column standard deviation satisfy a less than or equal to comparison?

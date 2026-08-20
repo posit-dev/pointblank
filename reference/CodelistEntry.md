@@ -1,4 +1,4 @@
-## CodelistEntry
+# CodelistEntry
 
 
 A single entry in a codelist (controlled terminology).

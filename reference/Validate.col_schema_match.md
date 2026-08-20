@@ -1,4 +1,4 @@
-## Validate.col_schema_match()
+# Validate.col_schema_match()
 
 
 Do columns in the table (and their types) match a predefined schema?

@@ -1,4 +1,4 @@
-## validate_sdtm_structure()
+# validate_sdtm_structure()
 
 
 Validate the structural conformance of a dataset against an SDTM domain template.

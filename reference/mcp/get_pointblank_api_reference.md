@@ -14,7 +14,7 @@ Get API reference for Pointblank validation methods and common patterns.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `category: string = "validation_methods"`  

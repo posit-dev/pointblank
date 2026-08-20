@@ -1,4 +1,4 @@
-## list_adapters()
+# list_adapters()
 
 
 List all registered adapters with their capabilities.

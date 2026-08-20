@@ -123,14 +123,14 @@ Use `--list-checks` to see all available validation methods with examples. The d
       --help                Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
 
-# Options
+## Options
 
 
 `--list-checks`  
@@ -161,7 +161,7 @@ Maximum number of failing rows to save to CSV (default: 500)
 Exit with non-zero code if validation fails
 
 
-# Examples
+## Examples
 
 ``` bash
 

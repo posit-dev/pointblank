@@ -1,4 +1,4 @@
-## Validate.col_vals_increasing()
+# Validate.col_vals_increasing()
 
 
 Are column data increasing by row?

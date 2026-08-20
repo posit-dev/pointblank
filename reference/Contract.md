@@ -1,4 +1,4 @@
-## Contract
+# Contract
 
 
 A declarative boundary contract for pipeline data.
@@ -96,7 +96,7 @@ source_contract = pb.Contract(
 ------------------------------------------------------------------------
 
 
-#### from_dict()
+### from_dict()
 
 
 Construct a Contract from a dictionary (e.g., parsed from YAML).
@@ -109,14 +109,14 @@ from_dict(data)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: dict[str, Any]`  
 A dictionary representation of a contract.
 
 
-##### Returns
+#### Returns
 
 
 `Contract`  
@@ -126,7 +126,7 @@ A new Contract instance.
 ------------------------------------------------------------------------
 
 
-#### from_yaml()
+### from_yaml()
 
 
 Load a Contract from a YAML file.
@@ -139,14 +139,14 @@ from_yaml(path)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str`  
 Path to the YAML file.
 
 
-##### Returns
+#### Returns
 
 
 `Contract`  
@@ -156,7 +156,7 @@ A new Contract instance.
 ------------------------------------------------------------------------
 
 
-#### to_dict()
+### to_dict()
 
 
 Serialize the Contract to a dictionary for YAML/JSON export.
@@ -169,7 +169,7 @@ to_dict()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict`  
@@ -179,7 +179,7 @@ A dictionary representation of this contract.
 ------------------------------------------------------------------------
 
 
-#### to_validate()
+### to_validate()
 
 
 Compile this Contract into a Validate object ready for interrogation.
@@ -195,21 +195,21 @@ to_validate(data)
 This creates a Validate object with all schema checks and validation steps from this contract applied. The resulting Validate object has NOT been interrogated yet -- call `.interrogate()` on it to execute the validation.
 
 
-##### Parameters
+#### Parameters
 
 
 `data: IntoDataFrame`  
 The data table to validate against this contract.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  
 A Validate object with all contract checks applied (not yet interrogated).
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -227,7 +227,7 @@ validation = contract.to_validate(my_data).interrogate()
 ------------------------------------------------------------------------
 
 
-#### to_yaml()
+### to_yaml()
 
 
 Serialize this Contract to YAML.
@@ -240,14 +240,14 @@ to_yaml(path=None)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str | None = None`  
 Optional file path. If provided, the YAML is written to this file. If None, the YAML string is returned.
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -257,7 +257,7 @@ The YAML representation of this contract.
 ------------------------------------------------------------------------
 
 
-#### validate()
+### validate()
 
 
 Compile and interrogate this Contract against the provided data.
@@ -273,14 +273,14 @@ validate(data)
 This is a convenience method that calls `to_validate(data).interrogate()`.
 
 
-##### Parameters
+#### Parameters
 
 
 `data: IntoDataFrame`  
 The data table to validate against this contract.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  

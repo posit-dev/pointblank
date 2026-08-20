@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Specification for structured missing values in a column.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">from_cdisc()</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">from_cdisc()</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
@@ -1498,7 +1498,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-class doc-label doc-label-dataclass">MissingSpec</span></h2>
+<h1 class="title"><span class="doc-object-name doc-class doc-label doc-label-dataclass">MissingSpec</span></h1>
 </div>
 
 
@@ -1536,7 +1536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This brings the idea of <em>structured missingness</em> (a missing value carries a reason for its absence) into Pointblank’s runtime validation layer. Once defined, a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> can be passed to validation methods (via <code>missing=</code>) to automatically exclude sentinel values from constraint checks, or used with dedicated methods like <a href="Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link"><code>Validate.col_missing_coded()</code></a> and <a href="Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link"><code>Validate.col_pct_missing()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">reasons</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[Any, str]</span></code></dt>
@@ -1563,7 +1563,7 @@ Optional human-readable description of the overall missingness pattern. Default 
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
@@ -1574,7 +1574,7 @@ A missing-value specification that can be attached to a <code>Field</code> (via 
 </div>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Define the missing-value codes for a survey <code>age</code> variable:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1597,7 +1597,7 @@ A missing-value specification that can be attached to a <code>Field</code> (via 
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>age_missing.values_for_category(<span class="st">"item_nonresponse"</span>)  <span class="co"># [-98, -97]</span></span></code></pre></div>
 </section>
 <section id="methods" class="level2 doc-methods">
-<h2 class="doc-methods">Methods</h2>
+<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1702,7 +1702,7 @@ Get all sentinel values that correspond to a given reason.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="from_cdisc" class="level3">
-<h4 class="anchored" data-anchor-id="from_cdisc"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc()</span></h4>
+<h3 class="anchored" data-anchor-id="from_cdisc"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc()</span></h3>
 <div class="doc-subject">
 <p>Alias for <a href="MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.</p>
 </div>
@@ -1716,7 +1716,7 @@ Get all sentinel values that correspond to a given reason.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_cdisc_null_flavors" class="level3">
-<h4 class="anchored" data-anchor-id="from_cdisc_null_flavors"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc_null_flavors()</span></h4>
+<h3 class="anchored" data-anchor-id="from_cdisc_null_flavors"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc_null_flavors()</span></h3>
 <div class="doc-subject">
 <p>Create a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC <em>null flavors</em>.</p>
 </div>
@@ -1735,7 +1735,7 @@ Get all sentinel values that correspond to a given reason.
 <p>Clinical data uses standardized null flavor codes to record <em>why</em> a value is absent (e.g., <code>"NASK"</code> for “not asked”, <code>"UNK"</code> for “unknown”). This returns a ready-to-use spec mapping those codes to reason labels.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">null_is_missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
@@ -1754,7 +1754,7 @@ Optional description. Default identifies the spec as CDISC/HL7 null flavors.
 </div>
 </section>
 <section id="returns-1" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
@@ -1765,7 +1765,7 @@ A spec with the standard null flavor codes.
 </div>
 </section>
 <section id="examples-1" class="level4 doc-examples">
-<h5 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h5>
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cdisc_missing <span class="op">=</span> pb.MissingSpec.from_cdisc_null_flavors()</span>
@@ -1774,7 +1774,7 @@ A spec with the standard null flavor codes.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_sas" class="level3">
-<h4 class="anchored" data-anchor-id="from_sas"><span class="doc-object-name doc-function doc-label doc-label-method">from_sas()</span></h4>
+<h3 class="anchored" data-anchor-id="from_sas"><span class="doc-object-name doc-function doc-label doc-label-method">from_sas()</span></h3>
 <div class="doc-subject">
 <p>Create a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for SAS special missing values.</p>
 </div>
@@ -1795,7 +1795,7 @@ A spec with the standard null flavor codes.
 <p>SAS encodes missingness with <code>"."</code> (system missing), <code>"._"</code>, and <code>".A"</code> through <code>".Z"</code> (27 user-defined missing codes). This returns a spec covering all of them; you can override the reason label for any specific code via <code>reasons=</code>.</p>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">reasons</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
@@ -1822,7 +1822,7 @@ Optional description. Default identifies the spec as SAS special missing values.
 </div>
 </section>
 <section id="returns-2" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
@@ -1833,7 +1833,7 @@ A spec covering the SAS special missing values.
 </div>
 </section>
 <section id="examples-2" class="level4 doc-examples">
-<h5 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h5>
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>sas_missing <span class="op">=</span> pb.MissingSpec.from_sas(</span>
@@ -1845,7 +1845,7 @@ A spec covering the SAS special missing values.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_spss" class="level3">
-<h4 class="anchored" data-anchor-id="from_spss"><span class="doc-object-name doc-function doc-label doc-label-method">from_spss()</span></h4>
+<h3 class="anchored" data-anchor-id="from_spss"><span class="doc-object-name doc-function doc-label doc-label-method">from_spss()</span></h3>
 <div class="doc-subject">
 <p>Create a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from SPSS-style user-defined missing values.</p>
 </div>
@@ -1866,7 +1866,7 @@ A spec covering the SAS special missing values.
 <p>SPSS supports up to 3 user-defined missing values per variable (plus a range). Pass the missing values (and optionally their value labels) to build a spec. Reason labels are derived from the labels when available, otherwise a <code>"missing_&lt;value&gt;"</code> placeholder is used.</p>
 </div>
 <section id="parameters-3" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">missing_values</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list</span></code></dt>
@@ -1893,7 +1893,7 @@ Optional description. Default identifies the spec as SPSS user-defined missing v
 </div>
 </section>
 <section id="returns-3" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
@@ -1904,7 +1904,7 @@ A spec built from the SPSS missing values.
 </div>
 </section>
 <section id="examples-3" class="level4 doc-examples">
-<h5 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h5>
+<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>spss_missing <span class="op">=</span> pb.MissingSpec.from_spss(</span>
@@ -1916,7 +1916,7 @@ A spec built from the SPSS missing values.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_variable_metadata" class="level3">
-<h4 class="anchored" data-anchor-id="from_variable_metadata"><span class="doc-object-name doc-function doc-label doc-label-method">from_variable_metadata()</span></h4>
+<h3 class="anchored" data-anchor-id="from_variable_metadata"><span class="doc-object-name doc-function doc-label doc-label-method">from_variable_metadata()</span></h3>
 <div class="doc-subject">
 <p>Create a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from an imported variable’s metadata.</p>
 </div>
@@ -1931,7 +1931,7 @@ A spec built from the SPSS missing values.
 <p>This works with a <a href="VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> object (as produced by <a href="import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> for SPSS, Stata, and SAS files). It reads the variable’s <code>missing_values</code> and derives reason labels from <code>missing_value_labels</code> or <code>value_labels</code> when available.</p>
 </div>
 <section id="parameters-4" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">variable</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
@@ -1950,7 +1950,7 @@ The reason label for actual null values. Default is <code>"unknown"</code>.
 </div>
 </section>
 <section id="returns-4" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec | None</span></code></dt>
@@ -1963,7 +1963,7 @@ A spec built from the variable’s missing values, or <code>None</code> if the v
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="is_missing" class="level3">
-<h4 class="anchored" data-anchor-id="is_missing"><span class="doc-object-name doc-function doc-label doc-label-method">is_missing()</span></h4>
+<h3 class="anchored" data-anchor-id="is_missing"><span class="doc-object-name doc-function doc-label doc-label-method">is_missing()</span></h3>
 <div class="doc-subject">
 <p>Check whether a value should be considered missing under this spec.</p>
 </div>
@@ -1975,7 +1975,7 @@ A spec built from the variable’s missing values, or <code>None</code> if the v
 <div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>is_missing(value)</span></code></pre></div>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
@@ -1986,7 +1986,7 @@ A value from the data.
 </div>
 </section>
 <section id="returns-5" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">bool</span></code></dt>
@@ -1999,7 +1999,7 @@ A value from the data.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="reason_for" class="level3">
-<h4 class="anchored" data-anchor-id="reason_for"><span class="doc-object-name doc-function doc-label doc-label-method">reason_for()</span></h4>
+<h3 class="anchored" data-anchor-id="reason_for"><span class="doc-object-name doc-function doc-label doc-label-method">reason_for()</span></h3>
 <div class="doc-subject">
 <p>Get the reason label for a specific value.</p>
 </div>
@@ -2011,7 +2011,7 @@ A value from the data.
 <div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>reason_for(value)</span></code></pre></div>
 </div>
 <section id="parameters-6" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-6">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
@@ -2022,7 +2022,7 @@ A value from the data.
 </div>
 </section>
 <section id="returns-6" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-6">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-6">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">str | None</span></code></dt>
@@ -2035,7 +2035,7 @@ The reason label if <code>value</code> is a declared sentinel value, <code>null_
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="reasons_list" class="level3">
-<h4 class="anchored" data-anchor-id="reasons_list"><span class="doc-object-name doc-function doc-label doc-label-method">reasons_list()</span></h4>
+<h3 class="anchored" data-anchor-id="reasons_list"><span class="doc-object-name doc-function doc-label doc-label-method">reasons_list()</span></h3>
 <div class="doc-subject">
 <p>Get the distinct reason labels defined by this spec.</p>
 </div>
@@ -2047,7 +2047,7 @@ The reason label if <code>value</code> is a declared sentinel value, <code>null_
 <div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>reasons_list()</span></code></pre></div>
 </div>
 <section id="returns-7" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list[str]</span></code></dt>
@@ -2060,7 +2060,7 @@ The distinct reason labels (in first-seen order), including <code>null_reason</c
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="sentinel_values" class="level3">
-<h4 class="anchored" data-anchor-id="sentinel_values"><span class="doc-object-name doc-function doc-label doc-label-method">sentinel_values()</span></h4>
+<h3 class="anchored" data-anchor-id="sentinel_values"><span class="doc-object-name doc-function doc-label doc-label-method">sentinel_values()</span></h3>
 <div class="doc-subject">
 <p>Get all sentinel values that encode missingness.</p>
 </div>
@@ -2072,7 +2072,7 @@ The distinct reason labels (in first-seen order), including <code>null_reason</c
 <div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sentinel_values()</span></code></pre></div>
 </div>
 <section id="returns-8" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-8">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-8">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
@@ -2085,7 +2085,7 @@ The keys of <code>reasons</code> (the actual values in the data that represent m
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="values_for_category" class="level3">
-<h4 class="anchored" data-anchor-id="values_for_category"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_category()</span></h4>
+<h3 class="anchored" data-anchor-id="values_for_category"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_category()</span></h3>
 <div class="doc-subject">
 <p>Get all sentinel values whose reason falls in a given category.</p>
 </div>
@@ -2097,7 +2097,7 @@ The keys of <code>reasons</code> (the actual values in the data that represent m
 <div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>values_for_category(category)</span></code></pre></div>
 </div>
 <section id="parameters-7" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-7">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">category</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -2108,7 +2108,7 @@ A category name defined in <code>categories</code>.
 </div>
 </section>
 <section id="returns-9" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-9">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-9">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
@@ -2121,7 +2121,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="values_for_reason" class="level3">
-<h4 class="anchored" data-anchor-id="values_for_reason"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_reason()</span></h4>
+<h3 class="anchored" data-anchor-id="values_for_reason"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_reason()</span></h3>
 <div class="doc-subject">
 <p>Get all sentinel values that correspond to a given reason.</p>
 </div>
@@ -2133,7 +2133,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
 <div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>values_for_reason(reason)</span></code></pre></div>
 </div>
 <section id="parameters-8" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-8">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -2144,7 +2144,7 @@ A reason label.
 </div>
 </section>
 <section id="returns-10" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-10">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-10">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list</span></code></dt>

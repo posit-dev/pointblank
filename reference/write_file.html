@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Write a Validate object to disk as a serialized file.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">write_file()</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">write_file()</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#creating-serializable-validations" id="toc-creating-serializable-validations" class="nav-link" data-scroll-target="#creating-serializable-validations">Creating Serializable Validations</a>
@@ -1495,7 +1495,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-function doc-label doc-label-function">write_file()</span></h2>
+<h1 class="title"><span class="doc-object-name doc-function doc-label doc-label-function">write_file()</span></h1>
 </div>
 
 
@@ -1549,7 +1549,7 @@ Warning
 </div>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">validation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Validate</span></code></dt>
@@ -1580,7 +1580,7 @@ Should the function not inform when the file is written? By default, this is <co
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">None</span></code></dt>
@@ -1591,7 +1591,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </div>
 </section>
 <section id="creating-serializable-validations" class="level2 doc-creating-serializable-validations">
-<h2 class="doc-creating-serializable-validations">Creating Serializable Validations</h2>
+<h2 class="doc-creating-serializable-validations anchored" data-anchor-id="creating-serializable-validations">Creating Serializable Validations</h2>
 <p>To ensure your validations work reliably across different Python sessions, the recommended approach is to use module-Level functions. So, create a separate Python file for your preprocessing functions:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># preprocessing_functions.py</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -1616,7 +1616,7 @@ This function doesn’t return anything but saves the validation object to disk.
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Save validation and it will work reliably across sessions</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>pb.write_file(validation, <span class="st">"my_validation"</span>, keep_tbl<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <section id="problematic-patterns-to-avoid" class="level3">
-<h4 class="anchored" data-anchor-id="problematic-patterns-to-avoid">Problematic Patterns to Avoid</h4>
+<h3 class="anchored" data-anchor-id="problematic-patterns-to-avoid">Problematic Patterns to Avoid</h3>
 <p>Don’t use lambda functions as they will cause immediate errors.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.Validate(data).col_vals_gt(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"value"</span>, value<span class="op">=</span><span class="dv">100</span>,</span>
@@ -1632,7 +1632,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="automatic-analysis-and-guidance" class="level3">
-<h4 class="anchored" data-anchor-id="automatic-analysis-and-guidance">Automatic Analysis and Guidance</h4>
+<h3 class="anchored" data-anchor-id="automatic-analysis-and-guidance">Automatic Analysis and Guidance</h3>
 <p>When you call <a href="write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a>, it automatically analyzes your validation and provides:</p>
 <ul>
 <li>confirmation when all functions will work reliably</li>
@@ -1644,7 +1644,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="loading-your-validation" class="level3">
-<h4 class="anchored" data-anchor-id="loading-your-validation">Loading Your Validation</h4>
+<h3 class="anchored" data-anchor-id="loading-your-validation">Loading Your Validation</h3>
 <p>To load a saved validation in a new Python session:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In a new Python session</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -1666,7 +1666,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="performance-and-storage" class="level3">
-<h4 class="anchored" data-anchor-id="performance-and-storage">Performance and Storage</h4>
+<h3 class="anchored" data-anchor-id="performance-and-storage">Performance and Storage</h3>
 <ul>
 <li>use <code>keep_tbl=False</code> (default) to reduce file size when you don’t need the original data</li>
 <li>use <code>keep_extracts=False</code> (default) to save space by excluding extract data</li>
@@ -1676,9 +1676,9 @@ This function doesn’t return anything but saves the validation object to disk.
 </section>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a simple validation and save it to disk:</p>
-<div id="5a0c6ed2" class="cell" data-execution_count="1">
+<div id="a6858f36" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation</span></span>
@@ -1700,7 +1700,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </div>
 </div>
 <p>To keep the original table data for later analysis:</p>
-<div id="cfc602e4" class="cell" data-execution_count="2">
+<div id="a8af40a6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save with the original table data included</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pb.write_file(validation, <span class="st">"my_validation_with_data"</span>, keep_tbl<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1720,7 +1720,7 @@ This function doesn’t return anything but saves the validation object to disk.
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    keep_extracts<span class="op">=</span><span class="va">True</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <section id="working-with-preprocessing-functions" class="level3">
-<h4 class="anchored" data-anchor-id="working-with-preprocessing-functions">Working with Preprocessing Functions</h4>
+<h3 class="anchored" data-anchor-id="working-with-preprocessing-functions">Working with Preprocessing Functions</h3>
 <p>For validations that use preprocessing functions to be portable across sessions, define your functions in a separate <code>.py</code> file:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In `preprocessing_functions.py`</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1750,7 +1750,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </section>
 </section>
 <section id="see-also" class="level2 doc-see-also">
-<h2 class="doc-see-also">See Also</h2>
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <dl>
 <dt><a href="`~Use`"></a> the <a href="read_file.html#pointblank.read_file" class="gdls-link"><code>read_file()</code></a> function to load a validation object that was</dt>
 <dd>

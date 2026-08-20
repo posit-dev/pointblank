@@ -16,7 +16,7 @@ Load a DataFrame from a CSV, Excel or Parquet file into the server's context.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `input_path: string`  

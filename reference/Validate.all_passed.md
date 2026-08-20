@@ -1,4 +1,4 @@
-## Validate.all_passed()
+# Validate.all_passed()
 
 
 Determine if every validation step passed perfectly, with no failing test units.

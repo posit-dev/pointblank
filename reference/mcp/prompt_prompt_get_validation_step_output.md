@@ -4,7 +4,7 @@
 Prompt to get validation output by specifying either a step index or a sundered type.
 
 
-# Arguments
+## Arguments
 
 
 `validator_id: string`  
@@ -23,7 +23,7 @@ Example sundered type ('pass' or 'fail') for the second mode of operation.
 Provide as a JSON string matching the following schema: {"anyOf":\[{"type":"string"},{"type":"null"}\]}
 
 
-# Prompt Text
+## Prompt Text
 
 > **Note: Assistant**
 >

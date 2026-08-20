@@ -1,4 +1,4 @@
-## Validate.n_passed()
+# Validate.n_passed()
 
 
 Provides a dictionary of the number of test units that passed for each validation step.

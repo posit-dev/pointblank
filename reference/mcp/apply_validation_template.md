@@ -16,7 +16,7 @@ Apply a pre-built validation template to a validator.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `validator_id: string`  

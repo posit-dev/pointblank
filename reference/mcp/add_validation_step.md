@@ -16,7 +16,7 @@ Add a validation step to an existing Pointblank Validator.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `validator_id: string`  

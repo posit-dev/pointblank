@@ -1,4 +1,4 @@
-## Validate.get_data_extracts()
+# Validate.get_data_extracts()
 
 
 Get the rows that failed for each validation step.

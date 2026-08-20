@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Validate whether a column has a specific percentage of Null values.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -226,7 +226,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Validate.col_pct_null()</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Validate.col_pct_null()</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1473,9 +1473,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#tolerance" id="toc-tolerance" class="nav-link" data-scroll-target="#tolerance">Tolerance</a></li>
@@ -1489,7 +1489,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_null()</span></h2>
+<h1 class="title"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.col_pct_null()</span></h1>
 </div>
 
 
@@ -1529,7 +1529,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The <a href="Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null()</a> validation method checks whether the percentage of Null values in a column matches a specified percentage <code>p=</code> (within an optional tolerance <code>tol=</code>). This validation operates at the column level, generating a single validation step per column that passes or fails based on whether the actual percentage of Null values falls within the acceptable range defined by <code>p ± tol</code>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">columns</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals</span></code></dt>
@@ -1568,7 +1568,7 @@ An optional data quality dimension to categorize this validation step for health
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
@@ -1579,7 +1579,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </section>
 <section id="tolerance" class="level2 doc-tolerance">
-<h2 class="doc-tolerance">Tolerance</h2>
+<h2 class="doc-tolerance anchored" data-anchor-id="tolerance">Tolerance</h2>
 <p>The <code>tol=</code> parameter accepts several different formats to specify the acceptable deviation from the expected percentage <code>p=</code>. The tolerance can be expressed as:</p>
 <ol type="1">
 <li><p><em>single integer</em> (absolute tolerance): the exact number of test units that can deviate. For example, <code>tol=2</code> means the actual count can differ from the expected count by up to 2 units in either direction.</p></li>
@@ -1590,7 +1590,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <p>When using a single value (integer or float), the tolerance is applied symmetrically in both directions. When using a tuple, you can specify asymmetric tolerances where the lower and upper bounds differ.</p>
 </section>
 <section id="thresholds" class="level2 doc-thresholds">
-<h2 class="doc-thresholds">Thresholds</h2>
+<h2 class="doc-thresholds anchored" data-anchor-id="thresholds">Thresholds</h2>
 <p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
 <p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
 <p>Thresholds can be defined using one of these input schemes:</p>
@@ -1604,9 +1604,9 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <p>Aside from reporting failure conditions, thresholds can be used to determine the actions to take for each level of failure (using the <code>actions=</code> parameter).</p>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>) that have different percentages of Null values. The table is shown below:</p>
-<div id="cbf8974c" class="cell" data-execution_count="2">
+<div id="14843942" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1759,7 +1759,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Let’s validate that column <code>a</code> has 0% Null values (i.e., no Null values at all).</p>
-<div id="794d92b0" class="cell" data-execution_count="3">
+<div id="8684b047" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"a"</span>, p<span class="op">=</span><span class="fl">0.0</span>)</span>
@@ -1924,7 +1924,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null()</a>. The validation passed since column <code>a</code> has no Null values.</p>
 <p>Now, let’s check that column <code>b</code> has exactly 50% Null values.</p>
-<div id="a254916e" class="cell" data-execution_count="4">
+<div id="1d711011" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.5</span>)</span>
@@ -2089,7 +2089,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>This validation also passes, as column <code>b</code> has exactly 4 out of 8 values as Null (50%).</p>
 <p>Finally, let’s validate column <code>c</code> with a tolerance. Column <code>c</code> has 75% Null values, so we’ll check if it’s approximately 70% Null with a tolerance of 10%.</p>
-<div id="eca805b3" class="cell" data-execution_count="5">
+<div id="c42cfeea" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"c"</span>, p<span class="op">=</span><span class="fl">0.70</span>, tol<span class="op">=</span><span class="fl">0.10</span>)</span>
@@ -2255,7 +2255,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <p>This validation passes because the actual percentage (75%) falls within the acceptable range of 60% to 80% (70% ± 10%).</p>
 <p>The <code>tol=</code> parameter supports multiple formats to express tolerance. Let’s explore all the different ways to specify tolerance using column <code>b</code>, which has exactly 50% Null values (4 out of 8 values).</p>
 <p><em>Using an absolute tolerance (integer)</em>: Specify the exact number of rows that can deviate. With <code>tol=1</code>, we allow the count to differ by 1 row in either direction.</p>
-<div id="db6736a0" class="cell" data-execution_count="6">
+<div id="d8a96618" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span><span class="dv">1</span>)  <span class="co"># Expect 3 nulls, allow ±1 (range: 2-4)</span></span>
@@ -2420,7 +2420,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>This passes because column <code>b</code> has 4 Null values, which falls within the acceptable range of 2 to 4 (3 ± 1).</p>
 <p><em>Using a relative tolerance (float)</em>: Specify the tolerance as a proportion of the expected count. With <code>tol=0.25</code>, we allow a 25% deviation from the expected count.</p>
-<div id="1f021cff" class="cell" data-execution_count="7">
+<div id="6e642e4b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span><span class="fl">0.25</span>)  <span class="co"># Expect 3 nulls, allow ±25% (range: 2.25-3.75)</span></span>
@@ -2585,7 +2585,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates to 2.25 to 3.75, which rounds down to 2 to 3 rows).</p>
 <p><em>Using asymmetric absolute bounds (tuple of integers)</em>: Specify different lower and upper bounds as absolute values. With <code>tol=(0, 2)</code>, we allow no deviation below but up to 2 rows above the expected count.</p>
-<div id="30f12092" class="cell" data-execution_count="8">
+<div id="fa9ecdb7" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.25</span>, tol<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">2</span>))  <span class="co"># Expect 2 Nulls, allow +0/-2 (range: 2-4)</span></span>
@@ -2750,7 +2750,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>This passes because 4 Null values falls within the acceptable range of 2 to 4.</p>
 <p><em>Using asymmetric relative bounds (tuple of floats)</em>: Specify different lower and upper bounds as proportions. With <code>tol=(0.1, 0.3)</code>, we allow 10% below and 30% above the expected count.</p>
-<div id="42883858" class="cell" data-execution_count="9">
+<div id="1c2f5eb6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>))  <span class="co"># Expect 3 Nulls, allow -10%/+30%</span></span>

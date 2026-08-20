@@ -1,4 +1,4 @@
-## Validate.prompt()
+# Validate.prompt()
 
 
 Validate rows using AI/LLM-powered analysis.

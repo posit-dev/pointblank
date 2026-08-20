@@ -1,4 +1,4 @@
-## Validate.col_vals_regex()
+# Validate.col_vals_regex()
 
 
 Validate whether column values match a regular expression pattern.

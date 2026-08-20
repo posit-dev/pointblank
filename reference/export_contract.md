@@ -1,4 +1,4 @@
-## export_contract()
+# export_contract()
 
 
 Export a Pointblank validation or contract to an external format.

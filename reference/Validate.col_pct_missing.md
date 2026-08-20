@@ -1,4 +1,4 @@
-## Validate.col_pct_missing()
+# Validate.col_pct_missing()
 
 
 Validate that the percentage of *structured* missing values stays within a limit.

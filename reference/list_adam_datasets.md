@@ -1,4 +1,4 @@
-## list_adam_datasets()
+# list_adam_datasets()
 
 
 List all available ADaM dataset template names.

@@ -1,4 +1,4 @@
-## Validate.to_json_schema()
+# Validate.to_json_schema()
 
 
 Export this validation plan as a JSON Schema document.

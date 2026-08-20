@@ -1,4 +1,4 @@
-## send_slack_notification()
+# send_slack_notification()
 
 
 Create a Slack notification function using a webhook URL.

@@ -1,4 +1,4 @@
-## Validate.get_health_score()
+# Validate.get_health_score()
 
 
 Get the overall data quality health score from the validation results.

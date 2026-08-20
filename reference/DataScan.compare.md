@@ -1,4 +1,4 @@
-## DataScan.compare()
+# DataScan.compare()
 
 
 Compare this scan against a baseline and return the differences.

@@ -1,4 +1,4 @@
-## Validate.col_missing_consistent()
+# Validate.col_missing_consistent()
 
 
 Validate that related columns share a consistent missingness pattern for a given reason.

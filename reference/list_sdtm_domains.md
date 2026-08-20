@@ -1,4 +1,4 @@
-## list_sdtm_domains()
+# list_sdtm_domains()
 
 
 List all available SDTM domain codes.

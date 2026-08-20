@@ -1,4 +1,4 @@
-## Validate.col_vals_eq()
+# Validate.col_vals_eq()
 
 
 Are column data equal to a fixed value or data in another column?

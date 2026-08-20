@@ -1,4 +1,4 @@
-## Validate.col_vals_str_len()
+# Validate.col_vals_str_len()
 
 
 Validate whether the length of string values falls within specified bounds.

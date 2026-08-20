@@ -1,4 +1,4 @@
-## Validate.col_vals_outside()
+# Validate.col_vals_outside()
 
 
 Do column data lie outside of two specified values or data in other columns?

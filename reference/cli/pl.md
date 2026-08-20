@@ -79,14 +79,14 @@ POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame. 
       --help                          Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `POLARS_EXPRESSION: TEXT`  
 Optional.
 
 
-# Options
+## Options
 
 
 `-e, --edit`  
@@ -117,7 +117,7 @@ Output data in a format suitable for piping to other pb commands
 Format for piped output (default: parquet)
 
 
-# Examples
+## Examples
 
 ``` bash
 

@@ -1,4 +1,4 @@
-## Validate.col_vals_decreasing()
+# Validate.col_vals_decreasing()
 
 
 Are column data decreasing by row?

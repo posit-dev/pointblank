@@ -1,4 +1,4 @@
-## get_sdtm_domain()
+# get_sdtm_domain()
 
 
 Get the SDTM template for a specific domain.

@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="The result of a CDISC conformance validation run.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">is_core</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">is_core</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a>
   <ul class="collapse">
@@ -1503,7 +1503,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-class doc-label doc-label-dataclass">ConformanceReport</span></h2>
+<h1 class="title"><span class="doc-object-name doc-class doc-label doc-label-dataclass">ConformanceReport</span></h1>
 </div>
 
 
@@ -1545,7 +1545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In a Jupyter or Quarto notebook the report renders automatically as a color-coded rule summary table (calling <code>_repr_html_()</code> is equivalent to <code>get_tabular_report()._repr_html_()</code>).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">validations</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, Validate]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">dict()</span></code></dt>
@@ -1572,7 +1572,7 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 </div>
 </section>
 <section id="attributes" class="level2 doc-attributes">
-<h2 class="doc-attributes">Attributes</h2>
+<h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1613,7 +1613,7 @@ Number of datasets validated.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="is_core" class="level3">
-<h4 class="anchored" data-anchor-id="is_core"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_core</span></h4>
+<h3 class="anchored" data-anchor-id="is_core"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_core</span></h3>
 <div class="doc-subject">
 <p>Whether this report wraps CDISC CORE engine results (vs.&nbsp;built-in engine results).</p>
 </div>
@@ -1623,7 +1623,7 @@ Number of datasets validated.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="is_rules" class="level3">
-<h4 class="anchored" data-anchor-id="is_rules"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_rules</span></h4>
+<h3 class="anchored" data-anchor-id="is_rules"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_rules</span></h3>
 <div class="doc-subject">
 <p>Whether this report was produced by Pointblank’s built-in rule-based conformance engine.</p>
 </div>
@@ -1633,7 +1633,7 @@ Number of datasets validated.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="n_datasets" class="level3">
-<h4 class="anchored" data-anchor-id="n_datasets"><span class="doc-object-name doc-attribute doc-label doc-label-property">n_datasets</span></h4>
+<h3 class="anchored" data-anchor-id="n_datasets"><span class="doc-object-name doc-attribute doc-label doc-label-property">n_datasets</span></h3>
 <div class="doc-subject">
 <p>Number of datasets validated.</p>
 </div>
@@ -1643,7 +1643,7 @@ Number of datasets validated.
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
-<h2 class="doc-methods">Methods</h2>
+<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1756,7 +1756,7 @@ Save the conformance report as a JSON file.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="all_passed" class="level3">
-<h4 class="anchored" data-anchor-id="all_passed"><span class="doc-object-name doc-function doc-label doc-label-method">all_passed()</span></h4>
+<h3 class="anchored" data-anchor-id="all_passed"><span class="doc-object-name doc-function doc-label doc-label-method">all_passed()</span></h3>
 <div class="doc-subject">
 <p>Whether the run reported no conformance failures.</p>
 </div>
@@ -1773,7 +1773,7 @@ Save the conformance report as a JSON file.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="findings" class="level3">
-<h4 class="anchored" data-anchor-id="findings"><span class="doc-object-name doc-function doc-label doc-label-method">findings()</span></h4>
+<h3 class="anchored" data-anchor-id="findings"><span class="doc-object-name doc-function doc-label doc-label-method">findings()</span></h3>
 <div class="doc-subject">
 <p>Return the row-level findings.</p>
 </div>
@@ -1790,7 +1790,7 @@ Save the conformance report as a JSON file.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="findings_df" class="level3">
-<h4 class="anchored" data-anchor-id="findings_df"><span class="doc-object-name doc-function doc-label doc-label-method">findings_df()</span></h4>
+<h3 class="anchored" data-anchor-id="findings_df"><span class="doc-object-name doc-function doc-label doc-label-method">findings_df()</span></h3>
 <div class="doc-subject">
 <p>Return all row-level findings as a Polars DataFrame.</p>
 </div>
@@ -1807,7 +1807,7 @@ Save the conformance report as a JSON file.
 <p>Findings are capped at <strong>100 rows per rule</strong> to bound memory use on large datasets. The <code>n_issues</code> value shown in <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> always reflects the true total count for a rule, even when more than 100 records failed.</p>
 </div>
 <section id="returns" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">polars.DataFrame</span></code></dt>
@@ -1830,7 +1830,7 @@ Returns an empty DataFrame (with the same schema) when all rules pass.
 </div>
 </section>
 <section id="raises" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises">Raises</h5>
+<h4 class="doc-raises anchored" data-anchor-id="raises">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">TypeError</span></code></dt>
@@ -1843,7 +1843,7 @@ If called on a CDISC CORE-backed report. Use <a href="ConformanceReport.html#poi
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_core_report" class="level3">
-<h4 class="anchored" data-anchor-id="from_core_report"><span class="doc-object-name doc-function doc-label doc-label-method">from_core_report()</span></h4>
+<h3 class="anchored" data-anchor-id="from_core_report"><span class="doc-object-name doc-function doc-label doc-label-method">from_core_report()</span></h3>
 <div class="doc-subject">
 <p>Build a CORE-backed <a href="ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a> from a CDISC CORE JSON report.</p>
 </div>
@@ -1855,7 +1855,7 @@ If called on a CDISC CORE-backed report. Use <a href="ConformanceReport.html#poi
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>from_core_report(report, package<span class="op">=</span><span class="va">None</span>, agency<span class="op">=</span><span class="va">None</span>)</span></code></pre></div>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">report</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict | ParsedCoreReport</span></code></dt>
@@ -1874,7 +1874,7 @@ The agency rule-set selector used for the run.
 </div>
 </section>
 <section id="returns-1" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>
@@ -1887,7 +1887,7 @@ A report in CORE form (<a href="ConformanceReport.html#pointblank.ConformanceRep
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_findings_table" class="level3">
-<h4 class="anchored" data-anchor-id="get_findings_table"><span class="doc-object-name doc-function doc-label doc-label-method">get_findings_table()</span></h4>
+<h3 class="anchored" data-anchor-id="get_findings_table"><span class="doc-object-name doc-function doc-label doc-label-method">get_findings_table()</span></h3>
 <div class="doc-subject">
 <p>Build a record-level findings table as a styled Great Tables object.</p>
 </div>
@@ -1902,7 +1902,7 @@ A report in CORE form (<a href="ConformanceReport.html#pointblank.ConformanceRep
 <p>Returns one row per failing record captured by Pointblank’s built-in rules engine. This is the drill-down companion to <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>: where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.</p>
 </div>
 <section id="table-layout" class="level4 doc-table-layout">
-<h5 class="doc-table-layout anchored" data-anchor-id="table-layout">Table Layout</h5>
+<h4 class="doc-table-layout anchored" data-anchor-id="table-layout">Table Layout</h4>
 <p>The table has two column spanners:</p>
 <ul>
 <li><p><strong>Rule</strong>: <code>Domain</code> and <code>Description</code> identify which rule fired and in which domain.</p></li>
@@ -1918,11 +1918,11 @@ A report in CORE form (<a href="ConformanceReport.html#pointblank.ConformanceRep
 <p>A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>.</p>
 </section>
 <section id="findings-cap" class="level4 doc-findings-cap">
-<h5 class="doc-findings-cap anchored" data-anchor-id="findings-cap">Findings Cap</h5>
+<h4 class="doc-findings-cap anchored" data-anchor-id="findings-cap">Findings Cap</h4>
 <p>At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>.</p>
 </section>
 <section id="returns-2" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">GT</span></code></dt>
@@ -1933,7 +1933,7 @@ A styled <code>great_tables.GT</code> object. Renders automatically in Jupyter a
 </div>
 </section>
 <section id="raises-1" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h5>
+<h4 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">TypeError</span></code></dt>
@@ -1950,7 +1950,7 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_tabular_report" class="level3">
-<h4 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h4>
+<h3 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h3>
 <div class="doc-subject">
 <p>Build a rule-level conformance summary table as a styled Great Tables object.</p>
 </div>
@@ -1965,7 +1965,7 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 <p>Returns one row per rule in the catalog, summarizing whether each rule passed, failed, was not applicable, or could not be evaluated. This is the high-level overview; use <a href="ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> or <a href="ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> to drill into the individual failing records.</p>
 </div>
 <section id="table-layout-1" class="level4 doc-table-layout">
-<h5 class="doc-table-layout anchored" data-anchor-id="table-layout-1">Table Layout</h5>
+<h4 class="doc-table-layout anchored" data-anchor-id="table-layout-1">Table Layout</h4>
 <p>Each row contains:</p>
 <ul>
 <li>A colored status bar on the left edge: green for pass, red for fail, amber for error, and grey for not-applicable or not-supported.</li>
@@ -1979,7 +1979,7 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 <p>The table header shows <code>"CDISC Conformance"</code> with a <code>PASS</code> or <code>FAIL</code> badge, and a subtitle line with the standard, version, and a count breakdown (e.g., <code>SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a</code>).</p>
 </section>
 <section id="returns-3" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">GT</span></code></dt>
@@ -1990,7 +1990,7 @@ A styled <code>great_tables.GT</code> object set in IBM Plex Sans / IBM Plex Mon
 </div>
 </section>
 <section id="raises-2" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h5>
+<h4 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">TypeError</span></code></dt>
@@ -2003,7 +2003,7 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_validation" class="level3">
-<h4 class="anchored" data-anchor-id="get_validation"><span class="doc-object-name doc-function doc-label doc-label-method">get_validation()</span></h4>
+<h3 class="anchored" data-anchor-id="get_validation"><span class="doc-object-name doc-function doc-label doc-label-method">get_validation()</span></h3>
 <div class="doc-subject">
 <p>Get the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object for a single dataset (case-insensitive).</p>
 </div>
@@ -2017,7 +2017,7 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="issues" class="level3">
-<h4 class="anchored" data-anchor-id="issues"><span class="doc-object-name doc-function doc-label doc-label-method">issues()</span></h4>
+<h3 class="anchored" data-anchor-id="issues"><span class="doc-object-name doc-function doc-label doc-label-method">issues()</span></h3>
 <div class="doc-subject">
 <p>Return the conformance issues found.</p>
 </div>
@@ -2029,7 +2029,7 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 <div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>issues(severity<span class="op">=</span><span class="va">None</span>, status<span class="op">=</span><span class="va">None</span>)</span></code></pre></div>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">severity</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
@@ -2044,7 +2044,7 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 </div>
 </section>
 <section id="returns-4" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list[dict]</span></code></dt>
@@ -2058,7 +2058,7 @@ For a <strong>CORE</strong> report, one dict per (dataset, rule) with reported i
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="rules" class="level3">
-<h4 class="anchored" data-anchor-id="rules"><span class="doc-object-name doc-function doc-label doc-label-method">rules()</span></h4>
+<h3 class="anchored" data-anchor-id="rules"><span class="doc-object-name doc-function doc-label doc-label-method">rules()</span></h3>
 <div class="doc-subject">
 <p>Return the per-rule run results.</p>
 </div>
@@ -2073,7 +2073,7 @@ For a <strong>CORE</strong> report, one dict per (dataset, rule) with reported i
 <p>For CORE reports, returns <code>CoreRuleResult</code> objects. For built-in engine reports, returns <code>NativeRuleResult</code> objects. For Validate-based reports, returns an empty list.</p>
 </div>
 <section id="parameters-3" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">status</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
@@ -2086,7 +2086,7 @@ Optional status filter. For CORE: e.g.&nbsp;<code>"SUCCESS"</code>, <code>"SKIPP
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="summary" class="level3">
-<h4 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h4>
+<h3 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h3>
 <div class="doc-subject">
 <p>Return a summary of the conformance run.</p>
 </div>
@@ -2098,7 +2098,7 @@ Optional status filter. For CORE: e.g.&nbsp;<code>"SUCCESS"</code>, <code>"SKIPP
 <div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>summary()</span></code></pre></div>
 </div>
 <section id="returns-5" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict</span></code></dt>
@@ -2112,7 +2112,7 @@ For a <strong>CORE</strong> report, a single dict with keys <code>standard</code
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_excel" class="level3">
-<h4 class="anchored" data-anchor-id="to_excel"><span class="doc-object-name doc-function doc-label doc-label-method">to_excel()</span></h4>
+<h3 class="anchored" data-anchor-id="to_excel"><span class="doc-object-name doc-function doc-label doc-label-method">to_excel()</span></h3>
 <div class="doc-subject">
 <p>Save the conformance report as an Excel workbook.</p>
 </div>
@@ -2128,7 +2128,7 @@ For a <strong>CORE</strong> report, a single dict with keys <code>standard</code
 <p>Requires the <code>openpyxl</code> package (<code>pip install openpyxl</code> or <code>pip install 'pointblank[excel]'</code>).</p>
 </div>
 <section id="parameters-4" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">path</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path</span></code></dt>
@@ -2139,7 +2139,7 @@ Destination path (including filename). Parent directories are created if needed.
 </div>
 </section>
 <section id="returns-6" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-6">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-6">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Path</span></code></dt>
@@ -2150,7 +2150,7 @@ The path written.
 </div>
 </section>
 <section id="raises-3" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises-3">Raises</h5>
+<h4 class="doc-raises anchored" data-anchor-id="raises-3">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
@@ -2163,7 +2163,7 @@ If <code>openpyxl</code> or <code>pandas</code> are not installed.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_json" class="level3">
-<h4 class="anchored" data-anchor-id="to_json"><span class="doc-object-name doc-function doc-label doc-label-method">to_json()</span></h4>
+<h3 class="anchored" data-anchor-id="to_json"><span class="doc-object-name doc-function doc-label doc-label-method">to_json()</span></h3>
 <div class="doc-subject">
 <p>Save the conformance report as a JSON file.</p>
 </div>
@@ -2178,7 +2178,7 @@ If <code>openpyxl</code> or <code>pandas</code> are not installed.
 <p>For CORE reports the output mirrors the original CORE JSON structure (<code>Conformance_Details</code>, <code>Dataset_Details</code>, <code>Issue_Summary</code>, <code>Issue_Details</code>, <code>Rules_Report</code>), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains <a href="ContractImport.html#pointblank.ContractImport.summary" class="gdls-link gdls-code">summary</a> and <a href="ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> keys.</p>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">path</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path</span></code></dt>
@@ -2189,7 +2189,7 @@ Destination path (including filename). Parent directories are created if needed.
 </div>
 </section>
 <section id="returns-7" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Path</span></code></dt>

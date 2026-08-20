@@ -1,4 +1,4 @@
-## Step
+# Step
 
 
 A single validation step in a Contract, defined declaratively.
@@ -53,7 +53,7 @@ step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$
 ------------------------------------------------------------------------
 
 
-#### from_dict()
+### from_dict()
 
 
 Construct a Step from a dictionary (e.g., parsed from YAML).
@@ -66,14 +66,14 @@ from_dict(data)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: dict[str, Any]`  
 A dictionary with a single key (the method name) mapping to its kwargs dict.
 
 
-##### Returns
+#### Returns
 
 
 `Step`  
@@ -83,7 +83,7 @@ A new Step instance.
 ------------------------------------------------------------------------
 
 
-#### to_dict()
+### to_dict()
 
 
 Serialize the Step to a dictionary for YAML/JSON export.
@@ -96,7 +96,7 @@ to_dict()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict`  

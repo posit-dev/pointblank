@@ -1,4 +1,4 @@
-## Validate.col_sd_gt()
+# Validate.col_sd_gt()
 
 
 Does the column standard deviation satisfy a greater than comparison?

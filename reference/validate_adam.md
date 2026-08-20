@@ -1,4 +1,4 @@
-## validate_adam()
+# validate_adam()
 
 
 Generate a comprehensive ADaM validation workflow for a dataset.

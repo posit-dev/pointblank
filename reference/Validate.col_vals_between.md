@@ -1,4 +1,4 @@
-## Validate.col_vals_between()
+# Validate.col_vals_between()
 
 
 Do column data lie between two specified values or data in other columns?

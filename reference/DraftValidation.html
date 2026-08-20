@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Draft a validation plan for a given table using an LLM.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">DraftValidation</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">DraftValidation</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#constructing-the-model-argument" id="toc-constructing-the-model-argument" class="nav-link" data-scroll-target="#constructing-the-model-argument">Constructing The <code>model</code> Argument</a></li>
@@ -1488,7 +1488,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></h2>
+<h1 class="title"><span class="doc-object-name doc-class doc-label doc-label-dataclass">DraftValidation</span></h1>
 </div>
 
 
@@ -1538,7 +1538,7 @@ Warning
 </div>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
@@ -1561,7 +1561,7 @@ Whether to verify SSL certificates when making requests to the LLM provider. Set
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1572,7 +1572,7 @@ The drafted validation plan.
 </div>
 </section>
 <section id="constructing-the-model-argument" class="level2 doc-constructing-the-model-argument">
-<h2 class="doc-constructing-the-model-argument">Constructing The <code>model</code> Argument</h2>
+<h2 class="doc-constructing-the-model-argument anchored" data-anchor-id="constructing-the-model-argument">Constructing The <code>model</code> Argument</h2>
 <p>The <code>model=</code> argument should be constructed using the provider and model name separated by a colon (<code>provider:model</code>). The provider text can any of:</p>
 <ul>
 <li><code>"anthropic"</code> (Anthropic)</li>
@@ -1584,7 +1584,7 @@ The drafted validation plan.
 <p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables <code>AZURE_OPENAI_API_KEY</code>, <code>AZURE_OPENAI_ENDPOINT</code> (e.g., <code>https://&lt;resource&gt;.openai.azure.com</code>), and <code>OPENAI_API_VERSION</code> (e.g., <code>"2024-06-01"</code>) to be set.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-notes-on-authentication">
-<h2 class="doc-notes-on-authentication">Notes On Authentication</h2>
+<h2 class="doc-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes On Authentication</h2>
 <p>Providing a valid API key as a string in the <code>api_key</code> argument is adequate for getting started but you should consider using a more secure method for handling API keys.</p>
 <p>One way to do this is to load the API key from an environent variable and retrieve it using the <code>os</code> module (specifically the <code>os.getenv()</code> function). Places to store the API key might include <code>.bashrc</code>, <code>.bash_profile</code>, <code>.zshrc</code>, or <code>.zsh_profile</code>.</p>
 <p>Another solution is to store one or more model provider API keys in an <code>.env</code> file (in the root of your project). If the API keys have correct names (e.g., <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>) then DraftValidation will automatically load the API key from the <code>.env</code> file and there’s no need to provide the <code>api_key</code> argument. An <code>.env</code> file might look like this:</p>
@@ -1593,7 +1593,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>There’s no need to have the <code>python-dotenv</code> package installed when using <code>.env</code> files in this way.</p>
 </section>
 <section id="notes-on-ssl-certificate-verification" class="level2 doc-notes-on-ssl-certificate-verification">
-<h2 class="doc-notes-on-ssl-certificate-verification">Notes On Ssl Certificate Verification</h2>
+<h2 class="doc-notes-on-ssl-certificate-verification anchored" data-anchor-id="notes-on-ssl-certificate-verification">Notes On Ssl Certificate Verification</h2>
 <p>By default, SSL certificate verification is enabled for all requests to LLM providers. However, in certain network environments (such as corporate networks with self-signed certificates or firewall proxies), you may encounter SSL certificate verification errors.</p>
 <p>To disable SSL verification, set the <code>verify_ssl</code> parameter to <code>False</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -1621,7 +1621,7 @@ Warning
 </div>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-notes-on-data-sent-to-the-model-provider">
-<h2 class="doc-notes-on-data-sent-to-the-model-provider">Notes On Data Sent To The Model Provider</h2>
+<h2 class="doc-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes On Data Sent To The Model Provider</h2>
 <p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> using the <a href="DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class. The summary includes the following information:</p>
 <ul>
 <li>the number of rows and columns in the table</li>
@@ -1634,7 +1634,7 @@ Warning
 <p>The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user’s AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look at how the <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-opus-4-6"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>

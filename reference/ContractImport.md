@@ -1,4 +1,4 @@
-## ContractImport
+# ContractImport
 
 
 Result of importing an external contract/schema.
@@ -64,7 +64,7 @@ Fraction of source constraints successfully mapped (`0.0` to `1.0`).
 ------------------------------------------------------------------------
 
 
-#### summary()
+### summary()
 
 
 Return a human-readable summary of what was imported.
@@ -77,7 +77,7 @@ summary()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -87,7 +87,7 @@ A formatted summary string.
 ------------------------------------------------------------------------
 
 
-#### to_contract()
+### to_contract()
 
 
 Build a Contract object from the imported data.
@@ -100,7 +100,7 @@ to_contract(name="imported_contract", **kwargs)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `name: str = ``"imported_contract"`  
@@ -110,7 +110,7 @@ Name for the created [Contract](Contract.md#pointblank.Contract).
 Additional keyword arguments passed to the [Contract](Contract.md#pointblank.Contract) constructor.
 
 
-##### Returns
+#### Returns
 
 
 `Contract`  
@@ -120,7 +120,7 @@ A Contract object with schema and steps derived from the import.
 ------------------------------------------------------------------------
 
 
-#### to_python()
+### to_python()
 
 
 Generate Python code string for the validation workflow.
@@ -133,7 +133,7 @@ to_python()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -143,7 +143,7 @@ Python source code that recreates the validation.
 ------------------------------------------------------------------------
 
 
-#### to_validate()
+### to_validate()
 
 
 Build a Validate object from the imported contract.
@@ -156,7 +156,7 @@ to_validate(data, **kwargs)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: Any`  
@@ -166,7 +166,7 @@ The data table to validate.
 Additional keyword arguments passed to the Validate constructor.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  
@@ -176,7 +176,7 @@ A Validate object with all imported checks applied (not yet interrogated).
 ------------------------------------------------------------------------
 
 
-#### to_yaml()
+### to_yaml()
 
 
 Generate Pointblank YAML configuration string.
@@ -189,7 +189,7 @@ to_yaml()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  

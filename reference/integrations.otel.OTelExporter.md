@@ -1,4 +1,4 @@
-## integrations.otel.OTelExporter
+# integrations.otel.OTelExporter
 
 
 Export Pointblank validation results as OpenTelemetry signals.
@@ -70,7 +70,7 @@ Additional key-value pairs attached to all emitted signals.
 ------------------------------------------------------------------------
 
 
-#### export()
+### export()
 
 
 Export validation results as OTel signals.
@@ -83,7 +83,7 @@ export(validation)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `validation: Validate`  

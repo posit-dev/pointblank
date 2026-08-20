@@ -1,4 +1,4 @@
-## VariableMetadata
+# VariableMetadata
 
 
 Metadata for a single variable/column, as imported from an external standard.
@@ -137,7 +137,7 @@ Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
 ------------------------------------------------------------------------
 
 
-#### to_missing_spec()
+### to_missing_spec()
 
 
 Build a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values.
@@ -153,7 +153,7 @@ to_missing_spec()
 Reads `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
 
 
-##### Returns
+#### Returns
 
 
 `MissingSpec | None`  

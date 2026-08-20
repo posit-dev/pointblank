@@ -1,4 +1,4 @@
-## Validate.col_missing_only_coded()
+# Validate.col_missing_only_coded()
 
 
 Validate that a column contains only documented codes and legitimate values.

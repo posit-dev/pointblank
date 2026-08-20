@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -120,7 +120,7 @@ ul.task-list li input[type="checkbox"] {
   <meta name="twitter:description" content="When performing data validation, use the Validate class to get the process started. It takes the target table and options for metadata and failure...">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-reference doc-reference-index quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-reference doc-py-reference quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -162,7 +162,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -176,7 +176,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Index</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Index</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1425,7 +1425,7 @@ ul.task-list li input[type="checkbox"] {
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#validate" id="toc-validate" class="nav-link active" data-scroll-target="#validate">Validate</a></li>
   <li><a href="#contracts-and-pipelines" id="toc-contracts-and-pipelines" class="nav-link" data-scroll-target="#contracts-and-pipelines">Contracts and Pipelines</a></li>
   <li><a href="#contract-importexport" id="toc-contract-importexport" class="nav-link" data-scroll-target="#contract-importexport">Contract Import/Export</a></li>
@@ -1472,7 +1472,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <section id="validate" class="level2 doc-group">
-<h2 class="doc-group">Validate</h2>
+<h2 class="doc-group anchored" data-anchor-id="validate">Validate</h2>
 <div class="doc-description">
 <p>When performing data validation, use the <code>Validate</code> class to get the process started. It takes the target table and options for metadata and failure thresholds (using the <code>Thresholds</code> class or shorthands). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
 </div>
@@ -1512,7 +1512,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="contracts-and-pipelines" class="level2 doc-group">
-<h2 class="doc-group">Contracts and Pipelines</h2>
+<h2 class="doc-group anchored" data-anchor-id="contracts-and-pipelines">Contracts and Pipelines</h2>
 <div class="doc-description">
 <p>Use <code>Contract</code> and <code>Step</code> to define declarative data quality contracts that specify what valid data looks like. Use <code>Pipeline</code> to enforce contracts at both boundaries of a data transformation (source and target), producing a <code>PipelineResult</code> with full introspection into what passed and what failed.</p>
 </div>
@@ -1536,7 +1536,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="contract-importexport" class="level2 doc-group">
-<h2 class="doc-group">Contract Import/Export</h2>
+<h2 class="doc-group anchored" data-anchor-id="contract-importexport">Contract Import/Export</h2>
 <div class="doc-description">
 <p>Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use <code>import_contract()</code> as the entry point, <code>export_contract()</code> for the reverse, and <code>register_adapter()</code> to add support for custom formats.</p>
 </div>
@@ -1568,7 +1568,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="validation-steps" class="level2 doc-group">
-<h2 class="doc-group">Validation Steps</h2>
+<h2 class="doc-group anchored" data-anchor-id="validation-steps">Validation Steps</h2>
 <div class="doc-description">
 <p>Validation steps are sequential validations on the target data. Call <code>Validate</code>’s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</p>
 </div>
@@ -1716,7 +1716,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="aggregation-steps" class="level2 doc-group">
-<h2 class="doc-group">Aggregation Steps</h2>
+<h2 class="doc-group anchored" data-anchor-id="aggregation-steps">Aggregation Steps</h2>
 <div class="doc-description">
 <p>These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.</p>
 </div>
@@ -1784,7 +1784,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="column-selection" class="level2 doc-group">
-<h2 class="doc-group">Column Selection</h2>
+<h2 class="doc-group anchored" data-anchor-id="column-selection">Column Selection</h2>
 <div class="doc-description">
 <p>Use the <code>col()</code> function along with column selection helpers to flexibly select columns for validation. Combine <code>col()</code> with <code>starts_with()</code>, <code>matches()</code>, etc. for selecting multiple target columns.</p>
 </div>
@@ -1828,7 +1828,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="segment-groups" class="level2 doc-group">
-<h2 class="doc-group">Segment Groups</h2>
+<h2 class="doc-group anchored" data-anchor-id="segment-groups">Segment Groups</h2>
 <div class="doc-description">
 <p>Combine multiple values into a single segment using <code>seg_*()</code> helper functions.</p>
 </div>
@@ -1840,7 +1840,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="interrogation-and-reporting" class="level2 doc-group">
-<h2 class="doc-group">Interrogation and Reporting</h2>
+<h2 class="doc-group anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
 <div class="doc-description">
 <p>The validation plan is executed when <code>interrogate()</code> is called. After interrogation, view validation reports, extract metrics, or split data based on results.</p>
 </div>
@@ -1964,7 +1964,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="inspection-and-assistance" class="level2 doc-group">
-<h2 class="doc-group">Inspection and Assistance</h2>
+<h2 class="doc-group anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
 <div class="doc-description">
 <p>Functions for getting to grips with a new data table. Use <code>DataScan</code> for a quick overview, <code>preview()</code> for first/last rows, <code>col_summary_tbl()</code> for column summaries, and <code>missing_vals_tbl()</code> for missing value analysis.</p>
 </div>
@@ -2008,7 +2008,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="datascan-methods" class="level2 doc-group">
-<h2 class="doc-group">DataScan Methods</h2>
+<h2 class="doc-group anchored" data-anchor-id="datascan-methods">DataScan Methods</h2>
 <div class="doc-description">
 <p>Methods for the DataScan class</p>
 </div>
@@ -2052,7 +2052,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="table-pre-checks" class="level2 doc-group">
-<h2 class="doc-group">Table Pre-checks</h2>
+<h2 class="doc-group anchored" data-anchor-id="table-pre-checks">Table Pre-checks</h2>
 <div class="doc-description">
 <p>Helper functions for use with the <code>active=</code> parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.</p>
 </div>
@@ -2068,7 +2068,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="yaml" class="level2 doc-group">
-<h2 class="doc-group">YAML</h2>
+<h2 class="doc-group anchored" data-anchor-id="yaml">YAML</h2>
 <div class="doc-description">
 <p>Functions for using YAML to orchestrate validation workflows.</p>
 </div>
@@ -2088,7 +2088,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="utility-functions" class="level2 doc-group">
-<h2 class="doc-group">Utility Functions</h2>
+<h2 class="doc-group anchored" data-anchor-id="utility-functions">Utility Functions</h2>
 <div class="doc-description">
 <p>Functions for accessing metadata about the target data and managing configuration.</p>
 </div>
@@ -2124,7 +2124,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="test-data-generation" class="level2 doc-group">
-<h2 class="doc-group">Test Data Generation</h2>
+<h2 class="doc-group anchored" data-anchor-id="test-data-generation">Test Data Generation</h2>
 <div class="doc-description">
 <p>Generate synthetic test data based on schema definitions. Use <code>generate_dataset()</code> to create data from a Schema object, or <code>schema_from_tbl()</code> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</p>
 </div>
@@ -2176,7 +2176,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="prebuilt-actions" class="level2 doc-group">
-<h2 class="doc-group">Prebuilt Actions</h2>
+<h2 class="doc-group anchored" data-anchor-id="prebuilt-actions">Prebuilt Actions</h2>
 <div class="doc-description">
 <p>Prebuilt action functions for common notification patterns.</p>
 </div>
@@ -2192,7 +2192,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="metadata-importexport" class="level2 doc-group">
-<h2 class="doc-group">Metadata Import/Export</h2>
+<h2 class="doc-group anchored" data-anchor-id="metadata-importexport">Metadata Import/Export</h2>
 <div class="doc-description">
 <p>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <code>.sav</code>, SAS XPORT, Stata <code>.dta</code>, and more) and export metadata to various formats. Use <code>import_metadata()</code> as the entry point and <code>export_metadata()</code> for the reverse.</p>
 </div>
@@ -2232,7 +2232,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="sdtm-validation" class="level2 doc-group">
-<h2 class="doc-group">SDTM Validation</h2>
+<h2 class="doc-group anchored" data-anchor-id="sdtm-validation">SDTM Validation</h2>
 <div class="doc-description">
 <p>Validate clinical datasets against CDISC SDTM domain templates. Use <code>validate_sdtm()</code> to generate a full <code>Validate</code> workflow, or <code>validate_sdtm_structure()</code> for a quick structural conformance check. Retrieve domain templates with <code>get_sdtm_domain()</code> and <code>list_sdtm_domains()</code>.</p>
 </div>
@@ -2268,7 +2268,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="adam-validation" class="level2 doc-group">
-<h2 class="doc-group">ADaM Validation</h2>
+<h2 class="doc-group anchored" data-anchor-id="adam-validation">ADaM Validation</h2>
 <div class="doc-description">
 <p>Validate analysis datasets against CDISC ADaM templates. Use <code>validate_adam()</code> to generate a full <code>Validate</code> workflow, or <code>validate_adam_structure()</code> for a quick structural conformance check. Retrieve dataset templates with <code>get_adam_dataset()</code> and <code>list_adam_datasets()</code>.</p>
 </div>
@@ -2304,7 +2304,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="cdisc-submission-conformance" class="level2 doc-group">
-<h2 class="doc-group">CDISC Submission Conformance</h2>
+<h2 class="doc-group anchored" data-anchor-id="cdisc-submission-conformance">CDISC Submission Conformance</h2>
 <div class="doc-description">
 <p>Validate SDTM datasets for CDISC conformance. <code>validate_sdtmig()</code> is the primary entry point: pass a dictionary of domain DataFrames and receive a <code>ConformanceReport</code> with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP– linkage, Define-XML) use <code>SubmissionPackage</code>. For the authoritative CDISC-certified rule set, use <code>validate_cdisc_submission()</code> (requires the CORE CLI) or <code>SubmissionPackage.validate_conformance(engine="core")</code>. All paths return a <code>ConformanceReport</code>.</p>
 </div>
@@ -2328,7 +2328,7 @@ ul.task-list li input[type="checkbox"] {
 </dl>
 </section>
 <section id="integrations" class="level2 doc-group">
-<h2 class="doc-group">Integrations</h2>
+<h2 class="doc-group anchored" data-anchor-id="integrations">Integrations</h2>
 <div class="doc-description">
 <p>Classes for integrating Pointblank with external observability and monitoring systems. Use <code>OTelExporter</code> to export validation results as OpenTelemetry metrics, traces, and logs.</p>
 </div>

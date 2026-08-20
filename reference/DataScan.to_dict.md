@@ -1,4 +1,4 @@
-## DataScan.to_dict()
+# DataScan.to_dict()
 
 
 Export the profile as a structured dictionary.

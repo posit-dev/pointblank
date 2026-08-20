@@ -1,4 +1,4 @@
-## Validate.specially()
+# Validate.specially()
 
 
 Perform a specialized validation with customized logic.
@@ -101,7 +101,7 @@ Aside from reporting failure conditions, thresholds can be used to determine the
 The [specially()](Validate.specially.md#pointblank.Validate.specially) method offers maximum flexibility for validation, allowing you to create custom validation logic that fits your specific needs. The following examples demonstrate different patterns and use cases for this powerful validation approach.
 
 
-#### Simple validation with direct table access
+### Simple validation with direct table access
 
 This example shows the most straightforward use case where we create a function that directly checks if the sum of two columns is positive.
 
@@ -244,7 +244,7 @@ The function returns a Polars DataFrame with a single boolean column indicating 
 ------------------------------------------------------------------------
 
 
-#### Advanced validation with closure variables for parameters
+### Advanced validation with closure variables for parameters
 
 When you need to make your validation configurable, you can use the function factory pattern (also known as closures) to create parameterized validations:
 
@@ -383,7 +383,7 @@ This approach allows you to create reusable validation functions that can be con
 ------------------------------------------------------------------------
 
 
-#### Validation function returning a list of booleans
+### Validation function returning a list of booleans
 
 This example demonstrates how to create a validation function that returns a list of boolean values, where each element represents a separate test unit:
 
@@ -525,7 +525,7 @@ def validate_transaction_rules(data):
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">1</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-5Ljg1NTQ2OSBDMTUuNzY1OTUwNywyOS40NzY1Njc5IDE1LjYzNTM5NDYsMjkuMDc0MjExNCAxNS4zMzIwMzEsMjguODI2MTcyIEwzLjY0MDYyNSwxOS4yNjU2MjUgTDE4LjY1MDM5MSwxOC40OTgwNDcgQzE5LjA0NDUwMzgsMTguNDc4NTUxNSAxOS4zOTAzMTEsMTguMjI5MTQxNiAxOS41MzMyMDMsMTcuODYxMzI4IEwyNSwzLjc2MzY3MTkgWiIgaWQ9IlNoYXBlIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
+1NTQ2OSBDMTUuNzY1OTUwNywyOS40NzY1Njc5IDE1LjYzNTM5NDYsMjkuMDc0MjExNCAxNS4zMzIwMzEsMjguODI2MTcyIEwzLjY0MDYyNSwxOS4yNjU2MjUgTDE4LjY1MDM5MSwxOC40OTgwNDcgQzE5LjA0NDUwMzgsMTguNDc4NTUxNSAxOS4zOTAzMTEsMTguMjI5MTQxNiAxOS41MzMyMDMsMTcuODYxMzI4IEwyNSwzLjc2MzY3MTkgWiIgaWQ9IlNoYXBlIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" />
 
 specially()
 
@@ -562,7 +562,7 @@ This approach is powerful when you need to apply complex, conditional logic that
 ------------------------------------------------------------------------
 
 
-#### Table-level validation returning a single boolean
+### Table-level validation returning a single boolean
 
 Sometimes you need to validate properties of the entire table rather than row-by-row. In these cases, your function can return a single boolean value:
 
@@ -703,7 +703,7 @@ This example demonstrates how to perform multiple checks on the table as a whole
 ------------------------------------------------------------------------
 
 
-#### Environment validation that doesn't use the data table
+### Environment validation that doesn't use the data table
 
 The [specially()](Validate.specially.md#pointblank.Validate.specially) validation method can even be used to validate aspects of your environment that are completely independent of the data:
 

@@ -1,4 +1,4 @@
-## print_database_tables()
+# print_database_tables()
 
 
 List all tables in a database from a connection string.

@@ -76,14 +76,14 @@ Tables with \>15 columns automatically show first 7 and last 7 columns with indi
       --help                     Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
 
-# Options
+## Options
 
 
 `--columns: TEXT`  

@@ -1,4 +1,4 @@
-## register_adapter()
+# register_adapter()
 
 
 Register a contract adapter class.

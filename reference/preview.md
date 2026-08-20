@@ -1,4 +1,4 @@
-## preview()
+# preview()
 
 
 Display a table preview that shows some rows from the top, some from the bottom.
@@ -1378,7 +1378,7 @@ item_revenue
 </table>
 
 
-#### Working with CSV Files
+### Working with CSV Files
 
 The [preview()](preview.md#pointblank.preview) function can directly accept CSV file paths, making it easy to preview data stored in CSV files without manual loading:
 
@@ -2103,7 +2103,7 @@ country
 ------------------------------------------------------------------------
 
 
-#### Working with Parquet Files
+### Working with Parquet Files
 
 The [preview()](preview.md#pointblank.preview) function can directly accept Parquet files and datasets in various formats:
 
@@ -2551,7 +2551,7 @@ pb.preview("sales_data/")  # Auto-discovers partition columns
 ------------------------------------------------------------------------
 
 
-#### Working with Database Connection Strings
+### Working with Database Connection Strings
 
 The [preview()](preview.md#pointblank.preview) function supports database connection strings for direct preview of database tables. Connection strings must specify a table using the `::table_name` suffix:
 

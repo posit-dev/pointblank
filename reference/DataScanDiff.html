@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="The result of comparing two DataScan profiles.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">has_changes</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">has_changes</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a>
   <ul class="collapse">
@@ -1492,7 +1492,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-class doc-label doc-label-class">DataScanDiff</span></h2>
+<h1 class="title"><span class="doc-object-name doc-class doc-label doc-label-class">DataScanDiff</span></h1>
 </div>
 
 
@@ -1526,7 +1526,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Created by calling <a href="DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">DataScan.compare()</a>. Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>.</p>
 </div>
 <section id="attributes" class="level2 doc-attributes">
-<h2 class="doc-attributes">Attributes</h2>
+<h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">columns_added</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
@@ -1549,7 +1549,7 @@ Per-column diff details for all columns that appear in either scan.
 </div>
 </section>
 <section id="attributes-1" class="level2 doc-attributes">
-<h2 class="doc-attributes">Attributes</h2>
+<h2 class="doc-attributes anchored" data-anchor-id="attributes-1">Attributes</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1582,7 +1582,7 @@ Return <code>(baseline_row_count, current_row_count)</code>.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="has_changes" class="level3">
-<h4 class="anchored" data-anchor-id="has_changes"><span class="doc-object-name doc-attribute doc-label doc-label-property">has_changes</span></h4>
+<h3 class="anchored" data-anchor-id="has_changes"><span class="doc-object-name doc-attribute doc-label doc-label-property">has_changes</span></h3>
 <div class="doc-subject">
 <p>Return <code>True</code> if any schema or statistical changes were detected.</p>
 </div>
@@ -1592,7 +1592,7 @@ Return <code>(baseline_row_count, current_row_count)</code>.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="row_count_diff" class="level3">
-<h4 class="anchored" data-anchor-id="row_count_diff"><span class="doc-object-name doc-attribute doc-label doc-label-property">row_count_diff</span></h4>
+<h3 class="anchored" data-anchor-id="row_count_diff"><span class="doc-object-name doc-attribute doc-label doc-label-property">row_count_diff</span></h3>
 <div class="doc-subject">
 <p>Return <code>(baseline_row_count, current_row_count)</code>.</p>
 </div>
@@ -1602,7 +1602,7 @@ Return <code>(baseline_row_count, current_row_count)</code>.
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
-<h2 class="doc-methods">Methods</h2>
+<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1635,7 +1635,7 @@ Export the comparison results as a dictionary.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="get_tabular_report" class="level3">
-<h4 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h4>
+<h3 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h3>
 <div class="doc-subject">
 <p>Generate a GT table summarizing the differences between the two scans.</p>
 </div>
@@ -1647,7 +1647,7 @@ Export the comparison results as a dictionary.
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>get_tabular_report()</span></code></pre></div>
 </div>
 <section id="returns" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">GT</span></code></dt>
@@ -1660,7 +1660,7 @@ A styled Great Tables report showing schema and statistical drift.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_dict" class="level3">
-<h4 class="anchored" data-anchor-id="to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></h4>
+<h3 class="anchored" data-anchor-id="to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></h3>
 <div class="doc-subject">
 <p>Export the comparison results as a dictionary.</p>
 </div>
@@ -1672,7 +1672,7 @@ A styled Great Tables report showing schema and statistical drift.
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>to_dict()</span></code></pre></div>
 </div>
 <section id="returns-1" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>

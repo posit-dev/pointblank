@@ -1,4 +1,4 @@
-## load_dataset()
+# load_dataset()
 
 
 Load a dataset hosted in the library as specified table type.

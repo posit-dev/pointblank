@@ -1,4 +1,4 @@
-## connect_to_table()
+# connect_to_table()
 
 
 Connect to a database table using a connection string.

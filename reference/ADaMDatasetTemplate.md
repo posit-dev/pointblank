@@ -1,4 +1,4 @@
-## ADaMDatasetTemplate
+# ADaMDatasetTemplate
 
 
 Structural template for an ADaM dataset.
@@ -51,7 +51,7 @@ List of variable names that form the natural key.
 ------------------------------------------------------------------------
 
 
-#### conditional_variables
+### conditional_variables
 
 
 Get names of all conditionally required variables.
@@ -63,7 +63,7 @@ Get names of all conditionally required variables.
 ------------------------------------------------------------------------
 
 
-#### population_flags
+### population_flags
 
 
 Get names of all population flag variables.
@@ -75,7 +75,7 @@ Get names of all population flag variables.
 ------------------------------------------------------------------------
 
 
-#### required_variables
+### required_variables
 
 
 Get names of all required variables.
@@ -93,7 +93,7 @@ Get names of all required variables.
 ------------------------------------------------------------------------
 
 
-#### get_variable()
+### get_variable()
 
 
 Get a variable spec by name.

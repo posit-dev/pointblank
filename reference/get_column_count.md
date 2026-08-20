@@ -1,4 +1,4 @@
-## get_column_count()
+# get_column_count()
 
 
 Get the number of columns in a table.
@@ -96,7 +96,7 @@ pb.get_column_count(small_table_duckdb)
     8
 
 
-##### Working with CSV Files
+#### Working with CSV Files
 
 The [get_column_count()](get_column_count.md#pointblank.get_column_count) function can directly accept CSV file paths:
 
@@ -112,7 +112,7 @@ pb.get_column_count(csv_path)
     20
 
 
-##### Working with Parquet Files
+#### Working with Parquet Files
 
 The function supports various Parquet input formats:
 
@@ -142,7 +142,7 @@ pb.get_column_count("sales_data/")  # Auto-discovers partition columns
 ```
 
 
-##### Working with Database Connection Strings
+#### Working with Database Connection Strings
 
 The function supports database connection strings for direct access to database tables:
 

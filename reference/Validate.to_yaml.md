@@ -1,4 +1,4 @@
-## Validate.to_yaml()
+# Validate.to_yaml()
 
 
 Serialize this validation plan to a [yaml_interrogate()](yaml_interrogate.md#pointblank.yaml_interrogate)-compatible YAML config.

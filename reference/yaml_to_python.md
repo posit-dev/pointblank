@@ -1,4 +1,4 @@
-## yaml_to_python()
+# yaml_to_python()
 
 
 Convert YAML validation configuration to equivalent Python code.

@@ -1,4 +1,4 @@
-## emit_otel()
+# emit_otel()
 
 
 Create an OTel export action for use in [FinalActions](FinalActions.md#pointblank.FinalActions).

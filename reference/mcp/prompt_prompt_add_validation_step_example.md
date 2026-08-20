@@ -4,7 +4,7 @@
 Prompt to add a validation step to a Pointblank Validator.
 
 
-# Prompt Text
+## Prompt Text
 
 > **Note: Assistant**
 >

@@ -1,4 +1,4 @@
-## DataScan.from_dict()
+# DataScan.from_dict()
 
 
 Restore a [DataScan](DataScan.md#pointblank.DataScan) from a dictionary produced by [to_dict()](Step.md#pointblank.Step.to_dict).

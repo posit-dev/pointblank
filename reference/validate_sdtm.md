@@ -1,4 +1,4 @@
-## validate_sdtm()
+# validate_sdtm()
 
 
 Generate a comprehensive SDTM validation workflow for a dataset.

@@ -1,4 +1,4 @@
-## export_metadata()
+# export_metadata()
 
 
 Export metadata to an external standard format.

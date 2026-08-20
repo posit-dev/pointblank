@@ -1,4 +1,4 @@
-## sdtm_to_metadata()
+# sdtm_to_metadata()
 
 
 Convert an SDTM domain template to a [MetadataImport](MetadataImport.md#pointblank.MetadataImport) object.

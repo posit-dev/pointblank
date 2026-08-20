@@ -1,4 +1,4 @@
-## Validate.get_step_report()
+# Validate.get_step_report()
 
 
 Get a detailed report for a single validation step.

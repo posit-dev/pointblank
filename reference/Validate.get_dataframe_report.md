@@ -1,4 +1,4 @@
-## Validate.get_dataframe_report()
+# Validate.get_dataframe_report()
 
 
 Get a report of the validation results as a DataFrame.

@@ -1,4 +1,4 @@
-## validate_adam_structure()
+# validate_adam_structure()
 
 
 Validate structural conformance of a dataset against an ADaM template.

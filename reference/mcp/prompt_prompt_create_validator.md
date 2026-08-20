@@ -4,7 +4,7 @@
 Prompt to create a Pointblank Validator for a loaded DataFrame.
 
 
-# Arguments
+## Arguments
 
 
 `df_id: string`  
@@ -33,7 +33,7 @@ Example thresholds for validation failures.
 Provide as a JSON string matching the following schema: {"anyOf":\[{"additionalProperties":{"anyOf":\[{"type":"integer"},{"type":"number"}\]},"type":"object"},{"type":"null"}\]}
 
 
-# Prompt Text
+## Prompt Text
 
 > **Note: Assistant**
 >

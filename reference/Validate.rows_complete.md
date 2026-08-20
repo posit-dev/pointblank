@@ -1,4 +1,4 @@
-## Validate.rows_complete()
+# Validate.rows_complete()
 
 
 Validate whether row data are complete by having no missing values.

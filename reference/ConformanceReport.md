@@ -1,4 +1,4 @@
-## ConformanceReport
+# ConformanceReport
 
 
 The result of a CDISC conformance validation run.
@@ -55,7 +55,7 @@ The `NativeConformanceResult` produced by the rules engine (native form only).
 ------------------------------------------------------------------------
 
 
-#### is_core
+### is_core
 
 
 Whether this report wraps CDISC CORE engine results (vs. built-in engine results).
@@ -67,7 +67,7 @@ Whether this report wraps CDISC CORE engine results (vs. built-in engine result
 ------------------------------------------------------------------------
 
 
-#### is_rules
+### is_rules
 
 
 Whether this report was produced by Pointblank's built-in rule-based conformance engine.
@@ -79,7 +79,7 @@ Whether this report was produced by Pointblank's built-in rule-based conformance
 ------------------------------------------------------------------------
 
 
-#### n_datasets
+### n_datasets
 
 
 Number of datasets validated.
@@ -108,7 +108,7 @@ Number of datasets validated.
 ------------------------------------------------------------------------
 
 
-#### all_passed()
+### all_passed()
 
 
 Whether the run reported no conformance failures.
@@ -127,7 +127,7 @@ For built-in engine reports, this is `True` when every check in every dataset pa
 ------------------------------------------------------------------------
 
 
-#### findings()
+### findings()
 
 
 Return the row-level findings.
@@ -146,7 +146,7 @@ For CORE reports, returns `CoreFinding` objects from CORE's `Issue_Details`. For
 ------------------------------------------------------------------------
 
 
-#### findings_df()
+### findings_df()
 
 
 Return all row-level findings as a Polars DataFrame.
@@ -166,7 +166,7 @@ Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level finding
 Findings are capped at **100 rows per rule** to bound memory use on large datasets. The `n_issues` value shown in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) always reflects the true total count for a rule, even when more than 100 records failed.
 
 
-##### Returns
+#### Returns
 
 
 `polars.DataFrame`  
@@ -185,7 +185,7 @@ One row per captured finding with the following columns:
 Returns an empty DataFrame (with the same schema) when all rules pass.
 
 
-##### Raises
+#### Raises
 
 
 `TypeError`  
@@ -195,7 +195,7 @@ If called on a CDISC CORE-backed report. Use [findings()](ConformanceReport.md#p
 ------------------------------------------------------------------------
 
 
-#### from_core_report()
+### from_core_report()
 
 
 Build a CORE-backed [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport) from a CDISC CORE JSON report.
@@ -208,7 +208,7 @@ from_core_report(report, package=None, agency=None)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `report: dict | ParsedCoreReport`  
@@ -221,7 +221,7 @@ The [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) the r
 The agency rule-set selector used for the run.
 
 
-##### Returns
+#### Returns
 
 
 `ConformanceReport`  
@@ -231,7 +231,7 @@ A report in CORE form ([is_core](ConformanceReport.md#pointblank.ConformanceRepo
 ------------------------------------------------------------------------
 
 
-#### get_findings_table()
+### get_findings_table()
 
 
 Build a record-level findings table as a styled Great Tables object.
@@ -247,7 +247,7 @@ get_findings_table()
 Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report): where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
 
 
-##### Table Layout
+#### Table Layout
 
 The table has two column spanners:
 
@@ -265,19 +265,19 @@ The header shows the standard and version (e.g., `SDTMIG 3-4`) alongside a break
 A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
 
 
-##### Findings Cap
+#### Findings Cap
 
 At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
 
 
-##### Returns
+#### Returns
 
 
 `GT`  
 A styled `great_tables.GT` object. Renders automatically in Jupyter and Quarto notebooks.
 
 
-##### Raises
+#### Raises
 
 
 `TypeError`  
@@ -290,7 +290,7 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 ------------------------------------------------------------------------
 
 
-#### get_tabular_report()
+### get_tabular_report()
 
 
 Build a rule-level conformance summary table as a styled Great Tables object.
@@ -306,7 +306,7 @@ get_tabular_report()
 Returns one row per rule in the catalog, summarizing whether each rule passed, failed, was not applicable, or could not be evaluated. This is the high-level overview; use [get_findings_table()](ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) or [findings_df()](ConformanceReport.md#pointblank.ConformanceReport.findings_df) to drill into the individual failing records.
 
 
-##### Table Layout
+#### Table Layout
 
 Each row contains:
 
@@ -322,14 +322,14 @@ Rows are sorted by severity: failing rules appear first, followed by errors, pas
 The table header shows `"CDISC Conformance"` with a `PASS` or `FAIL` badge, and a subtitle line with the standard, version, and a count breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
 
 
-##### Returns
+#### Returns
 
 
 `GT`  
 A styled `great_tables.GT` object set in IBM Plex Sans / IBM Plex Mono. Renders automatically in Jupyter and Quarto notebooks; call `._repr_html_()` to get the HTML string directly. This is the same object produced by `_repr_html_()`.
 
 
-##### Raises
+#### Raises
 
 
 `TypeError`  
@@ -339,7 +339,7 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 ------------------------------------------------------------------------
 
 
-#### get_validation()
+### get_validation()
 
 
 Get the [Validate](Validate.md#pointblank.Validate) object for a single dataset (case-insensitive).
@@ -355,7 +355,7 @@ get_validation(name)
 ------------------------------------------------------------------------
 
 
-#### issues()
+### issues()
 
 
 Return the conformance issues found.
@@ -368,7 +368,7 @@ issues(severity=None, status=None)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `severity: str | None = None`  
@@ -378,7 +378,7 @@ issues(severity=None, status=None)
 (CORE reports only.) Optional rule-status filter, e.g. `"ISSUE REPORTED"` or `"EXECUTION ERROR"`. If `None`, all reported issues are returned.
 
 
-##### Returns
+#### Returns
 
 
 `list[dict]`  
@@ -390,7 +390,7 @@ For a **CORE** report, one dict per (dataset, rule) with reported issues, with k
 ------------------------------------------------------------------------
 
 
-#### rules()
+### rules()
 
 
 Return the per-rule run results.
@@ -406,7 +406,7 @@ rules(status=None)
 For CORE reports, returns `CoreRuleResult` objects. For built-in engine reports, returns `NativeRuleResult` objects. For Validate-based reports, returns an empty list.
 
 
-##### Parameters
+#### Parameters
 
 
 `status: str | None = None`  
@@ -416,7 +416,7 @@ Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For built-in e
 ------------------------------------------------------------------------
 
 
-#### summary()
+### summary()
 
 
 Return a summary of the conformance run.
@@ -429,7 +429,7 @@ summary()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict`  
@@ -441,7 +441,7 @@ For a **CORE** report, a single dict with keys `standard`, `version`, `engine_ve
 ------------------------------------------------------------------------
 
 
-#### to_excel()
+### to_excel()
 
 
 Save the conformance report as an Excel workbook.
@@ -459,21 +459,21 @@ For CORE reports the workbook contains sheets `Issue_Summary`, `Issue_Details`, 
 Requires the `openpyxl` package (`pip install openpyxl` or `pip install 'pointblank[excel]'`).
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str | Path`  
 Destination path (including filename). Parent directories are created if needed.
 
 
-##### Returns
+#### Returns
 
 
 `Path`  
 The path written.
 
 
-##### Raises
+#### Raises
 
 
 `ImportError`  
@@ -483,7 +483,7 @@ If `openpyxl` or `pandas` are not installed.
 ------------------------------------------------------------------------
 
 
-#### to_json()
+### to_json()
 
 
 Save the conformance report as a JSON file.
@@ -499,14 +499,14 @@ to_json(path)
 For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains [summary](ContractImport.md#pointblank.ContractImport.summary) and [issues](ConformanceReport.md#pointblank.ConformanceReport.issues) keys.
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str | Path`  
 Destination path (including filename). Parent directories are created if needed.
 
 
-##### Returns
+#### Returns
 
 
 `Path`  

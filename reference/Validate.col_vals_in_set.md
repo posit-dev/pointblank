@@ -1,4 +1,4 @@
-## Validate.col_vals_in_set()
+# Validate.col_vals_in_set()
 
 
 Validate whether column values are in a set of values.

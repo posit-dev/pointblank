@@ -1,4 +1,4 @@
-## Validate.col_sd_eq()
+# Validate.col_sd_eq()
 
 
 Does the column standard deviation satisfy an equal to comparison?

@@ -1,4 +1,4 @@
-## Validate.get_dimension_scores()
+# Validate.get_dimension_scores()
 
 
 Get per-dimension health scores from the validation results.

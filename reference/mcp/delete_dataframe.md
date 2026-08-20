@@ -14,7 +14,7 @@ Remove a DataFrame from the server context to free up memory.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `df_id: string`  

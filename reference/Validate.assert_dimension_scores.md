@@ -1,4 +1,4 @@
-## Validate.assert_dimension_scores()
+# Validate.assert_dimension_scores()
 
 
 Raise an `AssertionError` if any dimension's health score falls below a minimum.

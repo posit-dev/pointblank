@@ -1,4 +1,4 @@
-## Validate.suggest_improvements()
+# Validate.suggest_improvements()
 
 
 Propose AI-generated improvements to this validation plan.

@@ -1,4 +1,4 @@
-## get_validation_summary()
+# get_validation_summary()
 
 
 Access validation summary information when authoring final actions.

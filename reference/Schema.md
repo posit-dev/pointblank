@@ -1,4 +1,4 @@
-## Schema
+# Schema
 
 
 Definition of a schema object.

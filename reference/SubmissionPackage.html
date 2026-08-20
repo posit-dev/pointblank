@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="A data-level model of a study submission package for CDISC conformance validation.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">domains</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">domains</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a>
@@ -1497,7 +1497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-class doc-label doc-label-dataclass">SubmissionPackage</span></h2>
+<h1 class="title"><span class="doc-object-name doc-class doc-label doc-label-dataclass">SubmissionPackage</span></h1>
 </div>
 
 
@@ -1536,7 +1536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This is the data-level analog of <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups <em>metadata</em> for many datasets.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">datasets</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, Any]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">dict()</span></code></dt>
@@ -1567,7 +1567,7 @@ Optional study identifier, used in report labels.
 </div>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Construct a package from in-memory DataFrames and validate conformance across it:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1584,7 +1584,7 @@ Optional study identifier, used in report labels.
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(agency<span class="op">=</span><span class="st">"FDA"</span>)</span></code></pre></div>
 </section>
 <section id="attributes" class="level2 doc-attributes">
-<h2 class="doc-attributes">Attributes</h2>
+<h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1617,7 +1617,7 @@ The imported Define-XML metadata, if <code>define</code> was supplied.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="domains" class="level3">
-<h4 class="anchored" data-anchor-id="domains"><span class="doc-object-name doc-attribute doc-label doc-label-property">domains</span></h4>
+<h3 class="anchored" data-anchor-id="domains"><span class="doc-object-name doc-attribute doc-label doc-label-property">domains</span></h3>
 <div class="doc-subject">
 <p>The names (domain codes) of all datasets in the package, sorted.</p>
 </div>
@@ -1627,7 +1627,7 @@ The imported Define-XML metadata, if <code>define</code> was supplied.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="metadata" class="level3">
-<h4 class="anchored" data-anchor-id="metadata"><span class="doc-object-name doc-attribute doc-label doc-label-property">metadata</span></h4>
+<h3 class="anchored" data-anchor-id="metadata"><span class="doc-object-name doc-attribute doc-label doc-label-property">metadata</span></h3>
 <div class="doc-subject">
 <p>The imported Define-XML metadata, if <code>define</code> was supplied.</p>
 </div>
@@ -1640,7 +1640,7 @@ The imported Define-XML metadata, if <code>define</code> was supplied.
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
-<h2 class="doc-methods">Methods</h2>
+<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
 <table class="gd-summary-table">
 <thead>
 <tr>
@@ -1705,7 +1705,7 @@ Validate CDISC conformance across the whole submission package.
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="from_folder" class="level3">
-<h4 class="anchored" data-anchor-id="from_folder"><span class="doc-object-name doc-function doc-label doc-label-method">from_folder()</span></h4>
+<h3 class="anchored" data-anchor-id="from_folder"><span class="doc-object-name doc-function doc-label doc-label-method">from_folder()</span></h3>
 <div class="doc-subject">
 <p>Build a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.</p>
 </div>
@@ -1727,7 +1727,7 @@ Validate CDISC conformance across the whole submission package.
 <p>Reads every SAS Transport (<code>.xpt</code>) and CDISC Dataset-JSON (<code>.json</code>) file in the folder, deriving the dataset name from the file stem (uppercased). If a <code>define.xml</code> is present in the folder and <code>define</code> is not supplied, it is picked up automatically.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">path</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path</span></code></dt>
@@ -1758,7 +1758,7 @@ Optional study identifier.
 </div>
 </section>
 <section id="returns" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">SubmissionPackage</span></code></dt>
@@ -1771,7 +1771,7 @@ A package populated with the folder’s datasets.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_dataset" class="level3">
-<h4 class="anchored" data-anchor-id="get_dataset"><span class="doc-object-name doc-function doc-label doc-label-method">get_dataset()</span></h4>
+<h3 class="anchored" data-anchor-id="get_dataset"><span class="doc-object-name doc-function doc-label doc-label-method">get_dataset()</span></h3>
 <div class="doc-subject">
 <p>Get a dataset by name (case-insensitive).</p>
 </div>
@@ -1783,7 +1783,7 @@ A package populated with the folder’s datasets.
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>get_dataset(name)</span></code></pre></div>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1794,7 +1794,7 @@ The dataset name / domain code.
 </div>
 </section>
 <section id="returns-1" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Any</span></code></dt>
@@ -1805,7 +1805,7 @@ The dataset (DataFrame).
 </div>
 </section>
 <section id="raises" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises">Raises</h5>
+<h4 class="doc-raises anchored" data-anchor-id="raises">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
@@ -1818,7 +1818,7 @@ If no dataset with that name exists.
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="orphan_ids" class="level3">
-<h4 class="anchored" data-anchor-id="orphan_ids"><span class="doc-object-name doc-function doc-label doc-label-method">orphan_ids()</span></h4>
+<h3 class="anchored" data-anchor-id="orphan_ids"><span class="doc-object-name doc-function doc-label doc-label-method">orphan_ids()</span></h3>
 <div class="doc-subject">
 <p>Find values of <code>column</code> in <code>child</code> that do not exist in <code>parent</code>.</p>
 </div>
@@ -1833,7 +1833,7 @@ If no dataset with that name exists.
 <p>This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.</p>
 </div>
 <section id="parameters-3" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">child</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1852,7 +1852,7 @@ The key column to check. Defaults to <code>"USUBJID"</code>.
 </div>
 </section>
 <section id="returns-2" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">set</span></code></dt>
@@ -1865,7 +1865,7 @@ The set of orphaned values (present in <code>child.column</code> but not <code>p
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="subject_ids" class="level3">
-<h4 class="anchored" data-anchor-id="subject_ids"><span class="doc-object-name doc-function doc-label doc-label-method">subject_ids()</span></h4>
+<h3 class="anchored" data-anchor-id="subject_ids"><span class="doc-object-name doc-function doc-label doc-label-method">subject_ids()</span></h3>
 <div class="doc-subject">
 <p>Get the set of <code>USUBJID</code> values in a dataset.</p>
 </div>
@@ -1877,7 +1877,7 @@ The set of orphaned values (present in <code>child.column</code> but not <code>p
 <div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>subject_ids(dataset<span class="op">=</span><span class="st">"DM"</span>)</span></code></pre></div>
 </div>
 <section id="parameters-4" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">dataset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"DM"</span></span></code></dt>
@@ -1888,7 +1888,7 @@ The dataset to read subject IDs from. Defaults to <code>"DM"</code> (the referen
 </div>
 </section>
 <section id="returns-3" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">set</span></code></dt>
@@ -1901,7 +1901,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="summary" class="level3">
-<h4 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h4>
+<h3 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h3>
 <div class="doc-subject">
 <p>Return a human-readable summary of the package contents.</p>
 </div>
@@ -1915,7 +1915,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </section>
 <hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="validate_conformance" class="level3">
-<h4 class="anchored" data-anchor-id="validate_conformance"><span class="doc-object-name doc-function doc-label doc-label-method">validate_conformance()</span></h4>
+<h3 class="anchored" data-anchor-id="validate_conformance"><span class="doc-object-name doc-function doc-label doc-label-method">validate_conformance()</span></h3>
 <div class="doc-subject">
 <p>Validate CDISC conformance across the whole submission package.</p>
 </div>
@@ -1956,7 +1956,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </ul>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
-<h5 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h5>
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">agency</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
@@ -2011,7 +2011,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </div>
 </section>
 <section id="returns-4" class="level4 doc-returns">
-<h5 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h5>
+<h4 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>

@@ -46,14 +46,14 @@ OUTPUT_FILE is the path where the template will be created.
       --help  Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `OUTPUT_FILE: PATH`  
 Optional.
 
 
-# Examples
+## Examples
 
 ``` bash
 

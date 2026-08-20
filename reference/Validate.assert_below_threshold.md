@@ -1,4 +1,4 @@
-## Validate.assert_below_threshold()
+# Validate.assert_below_threshold()
 
 
 Raise an `AssertionError` if validation steps exceed a specified threshold level.

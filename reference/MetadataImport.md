@@ -1,4 +1,4 @@
-## MetadataImport
+# MetadataImport
 
 
 Parsed metadata from an external standard.
@@ -76,7 +76,7 @@ Named missing value code definitions.
 ------------------------------------------------------------------------
 
 
-#### variable_names
+### variable_names
 
 
 Get the list of all variable names.
@@ -99,7 +99,7 @@ Get the list of all variable names.
 ------------------------------------------------------------------------
 
 
-#### get_codelist()
+### get_codelist()
 
 
 Get a specific codelist by name.
@@ -112,21 +112,21 @@ get_codelist(name)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `name: str`  
 The codelist name or identifier.
 
 
-##### Returns
+#### Returns
 
 
 `Codelist`  
 The requested codelist.
 
 
-##### Raises
+#### Raises
 
 
 `KeyError`  
@@ -136,7 +136,7 @@ If no codelist with that name exists.
 ------------------------------------------------------------------------
 
 
-#### get_variable()
+### get_variable()
 
 
 Get metadata for a specific variable by name.
@@ -149,21 +149,21 @@ get_variable(name)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `name: str`  
 The variable name to look up.
 
 
-##### Returns
+#### Returns
 
 
 `VariableMetadata`  
 The metadata for the named variable.
 
 
-##### Raises
+#### Raises
 
 
 `KeyError`  
@@ -173,7 +173,7 @@ If no variable with that name exists.
 ------------------------------------------------------------------------
 
 
-#### missing_specs()
+### missing_specs()
 
 
 Auto-generate <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
@@ -189,14 +189,14 @@ missing_specs()
 Builds a mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via `missing=`) or to <a href="missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>.
 
 
-##### Returns
+#### Returns
 
 
 `dict[str, MissingSpec]`  
 A mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec). Variables without declared missing values are omitted.
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -211,7 +211,7 @@ pb.missing_vals_tbl(data, missing=specs)
 ------------------------------------------------------------------------
 
 
-#### summary()
+### summary()
 
 
 Return a human-readable summary of the imported metadata.
@@ -224,7 +224,7 @@ summary()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -234,7 +234,7 @@ Formatted summary string.
 ------------------------------------------------------------------------
 
 
-#### to_schema()
+### to_schema()
 
 
 Convert imported metadata to a Pointblank [Schema](Schema.md#pointblank.Schema) with `Field` objects.
@@ -250,7 +250,7 @@ to_schema()
 Maps variable metadata to appropriate `Field` types with constraints (min/max, allowed values, nullable, etc.).
 
 
-##### Returns
+#### Returns
 
 
 `Schema`  
@@ -260,7 +260,7 @@ A Pointblank [Schema](Schema.md#pointblank.Schema) object with typed fields.
 ------------------------------------------------------------------------
 
 
-#### to_validate()
+### to_validate()
 
 
 Generate a [Validate](Validate.md#pointblank.Validate) workflow from the imported metadata.
@@ -276,7 +276,7 @@ to_validate(data, **kwargs)
 Creates validation steps for all constraints found in the metadata: value ranges, allowed values, required fields, string lengths, etc.
 
 
-##### Parameters
+#### Parameters
 
 
 `data: Any`  
@@ -286,7 +286,7 @@ The DataFrame or table to validate.
 Additional keyword arguments passed to the [Validate](Validate.md#pointblank.Validate) constructor.
 
 
-##### Returns
+#### Returns
 
 
 <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  

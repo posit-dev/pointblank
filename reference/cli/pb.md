@@ -56,14 +56,14 @@ Use pb COMMAND -help for detailed help on any command.
       edit           Edit an existing validation plan with a natural-language...
 
 
-# Options
+## Options
 
 
 `-v, --version`  
 Show the version and exit.
 
 
-# Commands
+## Commands
 
 
 `info`  

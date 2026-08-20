@@ -1,4 +1,4 @@
-## MissingSpec
+# MissingSpec
 
 
 Specification for structured missing values in a column.
@@ -98,7 +98,7 @@ age_missing.values_for_category("item_nonresponse")  # [-98, -97]
 ------------------------------------------------------------------------
 
 
-#### from_cdisc()
+### from_cdisc()
 
 
 Alias for <a href="MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.
@@ -114,7 +114,7 @@ from_cdisc(**kwargs)
 ------------------------------------------------------------------------
 
 
-#### from_cdisc_null_flavors()
+### from_cdisc_null_flavors()
 
 
 Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for the standard HL7/CDISC *null flavors*.
@@ -134,7 +134,7 @@ from_cdisc_null_flavors(
 Clinical data uses standardized null flavor codes to record *why* a value is absent (e.g., `"NASK"` for "not asked", `"UNK"` for "unknown"). This returns a ready-to-use spec mapping those codes to reason labels.
 
 
-##### Parameters
+#### Parameters
 
 
 `null_is_missing: bool = ``True`  
@@ -147,14 +147,14 @@ The reason label for actual null values. Default is `"no_information"`.
 Optional description. Default identifies the spec as CDISC/HL7 null flavors.
 
 
-##### Returns
+#### Returns
 
 
 `MissingSpec`  
 A spec with the standard null flavor codes.
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -166,7 +166,7 @@ cdisc_missing.reason_for("NASK")   # "not_asked"
 ------------------------------------------------------------------------
 
 
-#### from_sas()
+### from_sas()
 
 
 Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for SAS special missing values.
@@ -188,7 +188,7 @@ from_sas(
 SAS encodes missingness with `"."` (system missing), `"._"`, and `".A"` through `".Z"` (27 user-defined missing codes). This returns a spec covering all of them; you can override the reason label for any specific code via `reasons=`.
 
 
-##### Parameters
+#### Parameters
 
 
 `reasons: dict[str, str] | None = None`  
@@ -207,14 +207,14 @@ The reason label for actual null values. Default is `"system_missing"`.
 Optional description. Default identifies the spec as SAS special missing values.
 
 
-##### Returns
+#### Returns
 
 
 `MissingSpec`  
 A spec covering the SAS special missing values.
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -229,7 +229,7 @@ sas_missing.reason_for(".C")   # "user_missing_c"
 ------------------------------------------------------------------------
 
 
-#### from_spss()
+### from_spss()
 
 
 Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) from SPSS-style user-defined missing values.
@@ -251,7 +251,7 @@ from_spss(
 SPSS supports up to 3 user-defined missing values per variable (plus a range). Pass the missing values (and optionally their value labels) to build a spec. Reason labels are derived from the labels when available, otherwise a `"missing_<value>"` placeholder is used.
 
 
-##### Parameters
+#### Parameters
 
 
 `missing_values: list`  
@@ -270,14 +270,14 @@ The reason label for actual null values. Default is `"unknown"`.
 Optional description. Default identifies the spec as SPSS user-defined missing values.
 
 
-##### Returns
+#### Returns
 
 
 `MissingSpec`  
 A spec built from the SPSS missing values.
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -292,7 +292,7 @@ spss_missing.reason_for(-98)   # "refused"
 ------------------------------------------------------------------------
 
 
-#### from_variable_metadata()
+### from_variable_metadata()
 
 
 Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) from an imported variable's metadata.
@@ -308,7 +308,7 @@ from_variable_metadata(variable, null_is_missing=True, null_reason="unknown")
 This works with a <a href="VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> object (as produced by <a href="import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> for SPSS, Stata, and SAS files). It reads the variable's `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
 
 
-##### Parameters
+#### Parameters
 
 
 `variable: Any`  
@@ -321,7 +321,7 @@ Whether actual null values should also be treated as missing. Default is `True`.
 The reason label for actual null values. Default is `"unknown"`.
 
 
-##### Returns
+#### Returns
 
 
 `MissingSpec | None`  
@@ -331,7 +331,7 @@ A spec built from the variable's missing values, or `None` if the variable decla
 ------------------------------------------------------------------------
 
 
-#### is_missing()
+### is_missing()
 
 
 Check whether a value should be considered missing under this spec.
@@ -344,14 +344,14 @@ is_missing(value)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `value: Any`  
 A value from the data.
 
 
-##### Returns
+#### Returns
 
 
 `bool`  
@@ -361,7 +361,7 @@ A value from the data.
 ------------------------------------------------------------------------
 
 
-#### reason_for()
+### reason_for()
 
 
 Get the reason label for a specific value.
@@ -374,14 +374,14 @@ reason_for(value)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `value: Any`  
 A value from the data.
 
 
-##### Returns
+#### Returns
 
 
 `str | None`  
@@ -391,7 +391,7 @@ The reason label if `value` is a declared sentinel value, `null_reason` if `valu
 ------------------------------------------------------------------------
 
 
-#### reasons_list()
+### reasons_list()
 
 
 Get the distinct reason labels defined by this spec.
@@ -404,7 +404,7 @@ reasons_list()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `list[str]`  
@@ -414,7 +414,7 @@ The distinct reason labels (in first-seen order), including `null_reason` when `
 ------------------------------------------------------------------------
 
 
-#### sentinel_values()
+### sentinel_values()
 
 
 Get all sentinel values that encode missingness.
@@ -427,7 +427,7 @@ sentinel_values()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `list`  
@@ -437,7 +437,7 @@ The keys of `reasons` (the actual values in the data that represent missingness)
 ------------------------------------------------------------------------
 
 
-#### values_for_category()
+### values_for_category()
 
 
 Get all sentinel values whose reason falls in a given category.
@@ -450,14 +450,14 @@ values_for_category(category)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `category: str`  
 A category name defined in `categories`.
 
 
-##### Returns
+#### Returns
 
 
 `list`  
@@ -467,7 +467,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
 ------------------------------------------------------------------------
 
 
-#### values_for_reason()
+### values_for_reason()
 
 
 Get all sentinel values that correspond to a given reason.
@@ -480,14 +480,14 @@ values_for_reason(reason)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `reason: str`  
 A reason label.
 
 
-##### Returns
+#### Returns
 
 
 `list`  

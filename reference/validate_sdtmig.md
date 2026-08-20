@@ -1,4 +1,4 @@
-## validate_sdtmig()
+# validate_sdtmig()
 
 
 Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.

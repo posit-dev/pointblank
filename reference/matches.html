@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Select columns that match a specified regular expression pattern.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -226,7 +226,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">matches()</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">matches()</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1473,9 +1473,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#relevant-validation-methods-where-matches-can-be-used" id="toc-relevant-validation-methods-where-matches-can-be-used" class="nav-link" data-scroll-target="#relevant-validation-methods-where-matches-can-be-used">Relevant Validation Methods Where <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> Can Be Used</a></li>
@@ -1489,7 +1489,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-function doc-label doc-label-function">matches()</span></h2>
+<h1 class="title"><span class="doc-object-name doc-function doc-label doc-label-function">matches()</span></h1>
 </div>
 
 
@@ -1526,7 +1526,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There will be a validation step created for every resolved column. Note that if there aren’t any columns resolved from using <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won’t affect the interrogation process overall (i.e., the process won’t be halted).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">pattern</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1541,7 +1541,7 @@ Whether column names should be treated as case-sensitive. The default is <code>F
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Matches</span></code></dt>
@@ -1552,7 +1552,7 @@ A <code>Matches</code> object, which can be used to select columns that match th
 </div>
 </section>
 <section id="relevant-validation-methods-where-matches-can-be-used" class="level2 doc-relevant-validation-methods-where-matches-can-be-used">
-<h2 class="doc-relevant-validation-methods-where-matches-can-be-used">Relevant Validation Methods Where <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> Can Be Used</h2>
+<h2 class="doc-relevant-validation-methods-where-matches-can-be-used anchored" data-anchor-id="relevant-validation-methods-where-matches-can-be-used">Relevant Validation Methods Where <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> Can Be Used</h2>
 <p>This selector function can be used in the <code>columns=</code> argument of the following validation methods:</p>
 <ul>
 <li><a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a></li>
@@ -1576,7 +1576,7 @@ A <code>Matches</code> object, which can be used to select columns that match th
 <p>The <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> selector function doesn’t need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.</p>
 </section>
 <section id="additional-flexibilty-through-composition-with-other-column-selectors" class="level2 doc-additional-flexibilty-through-composition-with-other-column-selectors">
-<h2 class="doc-additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty Through Composition With Other Column Selectors</h2>
+<h2 class="doc-additional-flexibilty-through-composition-with-other-column-selectors anchored" data-anchor-id="additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty Through Composition With Other Column Selectors</h2>
 <p>The <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with <code>"_id"</code>, you can use the <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> and <a href="ends_with.html#pointblank.ends_with" class="gdls-link"><code>ends_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col(matches(<span class="vs">r"</span><span class="dv">^</span><span class="pp">[0-9]</span><span class="op">{5}</span><span class="vs">"</span>) <span class="op">&amp;</span> ends_with(<span class="st">"_id"</span>))</span></code></pre></div>
 <p>There are four operators that can be used to compose column selectors:</p>
@@ -1589,9 +1589,9 @@ A <code>Matches</code> object, which can be used to select columns that match th
 <p>The <code>&amp;</code> operator is used to select columns that satisfy both conditions. The <code>|</code> operator is used to select columns that satisfy either condition. The <code>-</code> operator is used to select columns that satisfy the first condition but not the second. The <code>~</code> operator is used to select columns that don’t satisfy the condition. As many selector functions can be used as needed and the operators can be combined to create complex column selection criteria (parentheses can be used to group conditions and control the order of evaluation).</p>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>name</code>, <code>id_old</code>, <code>new_identifier</code>, and <code>pay_2021</code> and we’d like to validate that text values in columns having <code>"id"</code> or <code>"identifier"</code> in the name have a specific syntax. We can use the <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> column selector function to specify the columns that match the pattern.</p>
-<div id="c8294013" class="cell" data-execution_count="2">
+<div id="d52c1aa0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1644,6 +1644,11 @@ A <code>Matches</code> object, which can be used to select columns that match th
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
@@ -1807,7 +1812,7 @@ A <code>Matches</code> object, which can be used to select columns that match th
 </div>
 <p>From the results of the validation table we get two validation steps, one for <code>id_old</code> and one for <code>new_identifier</code>. The values in both columns all match the pattern <code>"ID[0-9]{4}"</code>.</p>
 <p>We can also use the <a href="matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a> function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain <code>"pay"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="6e0b6093" class="cell" data-execution_count="3">
+<div id="cde8ac23" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
@@ -1863,6 +1868,11 @@ A <code>Matches</code> object, which can be used to select columns that match th
  #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
  #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
  #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }

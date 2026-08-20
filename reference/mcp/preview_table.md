@@ -18,7 +18,7 @@ Display a preview of the DataFrame showing rows from top and bottom.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `dataframe_id: string`  

@@ -1,4 +1,4 @@
-## validate_cdisc_submission()
+# validate_cdisc_submission()
 
 
 Validate a CDISC submission with the CDISC CORE engine, in one call.

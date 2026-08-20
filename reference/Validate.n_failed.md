@@ -1,4 +1,4 @@
-## Validate.n_failed()
+# Validate.n_failed()
 
 
 Provides a dictionary of the number of test units that failed for each validation step.

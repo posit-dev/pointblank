@@ -15,7 +15,7 @@ Profile a loaded DataFrame using Pointblank's DataScan, returning column-level s
 ```
 
 
-# Parameters
+## Parameters
 
 
 `df_id: string`  

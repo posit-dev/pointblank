@@ -1,4 +1,4 @@
-## get_adam_dataset()
+# get_adam_dataset()
 
 
 Get the ADaM template for a specific dataset.

@@ -40,14 +40,14 @@ DATA_SOURCE can be:
       --help              Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
 
-# Options
+## Options
 
 
 `--output-html: PATH`  

@@ -1,4 +1,4 @@
-## DataScanDiff
+# DataScanDiff
 
 
 The result of comparing two [DataScan](DataScan.md#pointblank.DataScan) profiles.
@@ -43,7 +43,7 @@ Per-column diff details for all columns that appear in either scan.
 ------------------------------------------------------------------------
 
 
-#### has_changes
+### has_changes
 
 
 Return `True` if any schema or statistical changes were detected.
@@ -55,7 +55,7 @@ Return `True` if any schema or statistical changes were detected.
 ------------------------------------------------------------------------
 
 
-#### row_count_diff
+### row_count_diff
 
 
 Return `(baseline_row_count, current_row_count)`.
@@ -74,7 +74,7 @@ Return `(baseline_row_count, current_row_count)`.
 ------------------------------------------------------------------------
 
 
-#### get_tabular_report()
+### get_tabular_report()
 
 
 Generate a GT table summarizing the differences between the two scans.
@@ -87,7 +87,7 @@ get_tabular_report()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `GT`  
@@ -97,7 +97,7 @@ A styled Great Tables report showing schema and statistical drift.
 ------------------------------------------------------------------------
 
 
-#### to_dict()
+### to_dict()
 
 
 Export the comparison results as a dictionary.
@@ -110,7 +110,7 @@ to_dict()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict[str, Any]`  

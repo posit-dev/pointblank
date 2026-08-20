@@ -1,4 +1,4 @@
-## import_contract()
+# import_contract()
 
 
 Import a contract/schema from an external format.

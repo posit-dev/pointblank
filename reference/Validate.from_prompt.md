@@ -1,4 +1,4 @@
-## Validate.from_prompt()
+# Validate.from_prompt()
 
 
 Build a validation plan for this table from a natural-language prompt.

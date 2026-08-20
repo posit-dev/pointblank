@@ -1,4 +1,4 @@
-## get_row_count()
+# get_row_count()
 
 
 Get the number of rows in a table.
@@ -97,7 +97,7 @@ pb.get_row_count(game_revenue_duckdb)
     2000
 
 
-##### Working with CSV Files
+#### Working with CSV Files
 
 The [get_row_count()](get_row_count.md#pointblank.get_row_count) function can directly accept CSV file paths:
 
@@ -113,7 +113,7 @@ pb.get_row_count(csv_path)
     50000
 
 
-##### Working with Parquet Files
+#### Working with Parquet Files
 
 The function supports various Parquet input formats:
 
@@ -143,7 +143,7 @@ pb.get_row_count("sales_data/")  # Auto-discovers partition columns
 ```
 
 
-##### Working with Database Connection Strings
+#### Working with Database Connection Strings
 
 The function supports database connection strings for direct access to database tables:
 

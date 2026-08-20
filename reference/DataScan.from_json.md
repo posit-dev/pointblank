@@ -1,4 +1,4 @@
-## DataScan.from_json()
+# DataScan.from_json()
 
 
 Restore a [DataScan](DataScan.md#pointblank.DataScan) from a JSON string produced by [to_json()](DataScan.to_json.md#pointblank.DataScan.to_json).

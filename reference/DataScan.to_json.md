@@ -1,4 +1,4 @@
-## DataScan.to_json()
+# DataScan.to_json()
 
 
 Export the profile as a JSON string.

@@ -1,4 +1,4 @@
-## MetadataPackage
+# MetadataPackage
 
 
 A collection of [MetadataImport](MetadataImport.md#pointblank.MetadataImport) objects from a multi-dataset source.
@@ -47,7 +47,7 @@ Package/study version.
 ------------------------------------------------------------------------
 
 
-#### get_domain()
+### get_domain()
 
 
 Get metadata for a specific domain/dataset.
@@ -60,21 +60,21 @@ get_domain(name)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `name: str`  
 Domain or dataset name (e.g., `"DM"`, `"AE"`).
 
 
-##### Returns
+#### Returns
 
 
 `MetadataImport`  
 The metadata for the named domain.
 
 
-##### Raises
+#### Raises
 
 
 `KeyError`  
@@ -84,7 +84,7 @@ If no domain with that name exists.
 ------------------------------------------------------------------------
 
 
-#### keys()
+### keys()
 
 
 Get the names of all datasets/domains.
@@ -100,7 +100,7 @@ keys()
 ------------------------------------------------------------------------
 
 
-#### summary()
+### summary()
 
 
 Return a human-readable summary of the package.
@@ -113,7 +113,7 @@ summary()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -123,7 +123,7 @@ Formatted summary string.
 ------------------------------------------------------------------------
 
 
-#### values()
+### values()
 
 
 Get all MetadataImport objects.

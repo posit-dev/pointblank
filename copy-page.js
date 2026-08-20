@@ -64,7 +64,7 @@
         if (document.body.classList.contains('gd-blog-index')) return;
 
         // Skip reference index pages (API, CLI, MCP)
-        if (document.body.classList.contains('doc-reference-index')) return;
+        if (document.body.classList.contains('doc-reference')) return;
 
         // Create the widget container
         var widget = document.createElement('div');

@@ -1,4 +1,4 @@
-## import_metadata()
+# import_metadata()
 
 
 Import metadata from an external standard or file.

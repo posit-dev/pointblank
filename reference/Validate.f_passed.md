@@ -1,4 +1,4 @@
-## Validate.f_passed()
+# Validate.f_passed()
 
 
 Provides a dictionary of the fraction of test units that passed for each validation step.

@@ -1,4 +1,4 @@
-## write_file()
+# write_file()
 
 
 Write a Validate object to disk as a serialized file.
@@ -94,7 +94,7 @@ pb.write_file(validation, "my_validation", keep_tbl=True)
 ```
 
 
-#### Problematic Patterns to Avoid
+### Problematic Patterns to Avoid
 
 Don't use lambda functions as they will cause immediate errors.
 
@@ -119,7 +119,7 @@ validation = pb.Validate(data).col_vals_gt(
 ------------------------------------------------------------------------
 
 
-#### Automatic Analysis and Guidance
+### Automatic Analysis and Guidance
 
 When you call [write_file()](write_file.md#pointblank.write_file), it automatically analyzes your validation and provides:
 
@@ -132,7 +132,7 @@ When you call [write_file()](write_file.md#pointblank.write_file), it automatica
 ------------------------------------------------------------------------
 
 
-#### Loading Your Validation
+### Loading Your Validation
 
 To load a saved validation in a new Python session:
 
@@ -160,7 +160,7 @@ To verify your validation works across sessions:
 ------------------------------------------------------------------------
 
 
-#### Performance and Storage
+### Performance and Storage
 
 - use `keep_tbl=False` (default) to reduce file size when you don't need the original data
 - use `keep_extracts=False` (default) to save space by excluding extract data
@@ -225,7 +225,7 @@ pb.write_file(
 ```
 
 
-#### Working with Preprocessing Functions
+### Working with Preprocessing Functions
 
 For validations that use preprocessing functions to be portable across sessions, define your functions in a separate `.py` file:
 

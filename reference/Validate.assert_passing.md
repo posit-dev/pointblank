@@ -1,4 +1,4 @@
-## Validate.assert_passing()
+# Validate.assert_passing()
 
 
 Raise an `AssertionError` if all tests are not passing.

@@ -14,7 +14,7 @@ Remove a validator from the server context.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `validator_id: string`  

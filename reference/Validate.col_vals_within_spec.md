@@ -1,4 +1,4 @@
-## Validate.col_vals_within_spec()
+# Validate.col_vals_within_spec()
 
 
 Validate whether column values fit within a specification.

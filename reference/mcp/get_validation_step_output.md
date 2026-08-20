@@ -17,7 +17,7 @@ Retrieve output for a validation step and save it to a CSV file.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `validator_id: string`  

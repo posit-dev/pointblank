@@ -1,4 +1,4 @@
-## ADaMVariableSpec
+# ADaMVariableSpec
 
 
 Specification for a single variable in an ADaM dataset template.

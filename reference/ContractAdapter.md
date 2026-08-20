@@ -1,4 +1,4 @@
-## ContractAdapter
+# ContractAdapter
 
 
 Base class for contract import/export adapters.
@@ -41,7 +41,7 @@ Whether this adapter supports exporting to the format.
 ------------------------------------------------------------------------
 
 
-#### detect()
+### detect()
 
 
 Return True if this adapter can handle the given source.
@@ -54,14 +54,14 @@ detect(source)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `source: Any`  
 A file path string, dict, or Python object to inspect.
 
 
-##### Returns
+#### Returns
 
 
 `bool`  
@@ -71,7 +71,7 @@ True if this adapter can handle the source.
 ------------------------------------------------------------------------
 
 
-#### export_contract()
+### export_contract()
 
 
 Export to the external format.
@@ -84,7 +84,7 @@ export_contract(validation_or_contract, destination=None, **kwargs)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `validation_or_contract: Any`  
@@ -97,7 +97,7 @@ Optional file path to write the output. If `None`, returns the result.
 Format-specific options.
 
 
-##### Returns
+#### Returns
 
 
 `str | dict`  
@@ -107,7 +107,7 @@ The exported content (string or dict), also written to file if destination given
 ------------------------------------------------------------------------
 
 
-#### import_contract()
+### import_contract()
 
 
 Import from the external format.
@@ -120,7 +120,7 @@ import_contract(source, **kwargs)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `source: Any`  
@@ -130,7 +130,7 @@ The source to import from (file path, dict, or Python object).
 Format-specific options.
 
 
-##### Returns
+#### Returns
 
 
 `ContractImport`  

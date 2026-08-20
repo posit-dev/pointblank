@@ -1,4 +1,4 @@
-## Validate.col_missing_coded()
+# Validate.col_missing_coded()
 
 
 Validate that all missing values in a column are *coded* (no uncoded nulls).

@@ -44,14 +44,14 @@ VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validat
       --help                  Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `VALIDATION_FILE: PATH`  
 Optional.
 
 
-# Options
+## Options
 
 
 `-i, --instruction: TEXT`  
@@ -70,7 +70,7 @@ Write the revised plan to this file.
 Write the output file without asking for confirmation.
 
 
-# Examples
+## Examples
 
 ``` bash
 

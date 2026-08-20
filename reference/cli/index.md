@@ -4,7 +4,7 @@
 Pointblank CLI: Data validation and quality tools for data engineers.
 
 
-# Commands
+## Commands
 
 [info](../../reference/cli/info.md)  
 Display information about a data source.

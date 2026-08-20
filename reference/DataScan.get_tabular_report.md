@@ -1,4 +1,4 @@
-## DataScan.get_tabular_report()
+# DataScan.get_tabular_report()
 
 
 Usage

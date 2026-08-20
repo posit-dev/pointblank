@@ -1,4 +1,4 @@
-## PipelineResult
+# PipelineResult
 
 
 Result of a pipeline boundary validation run.
@@ -53,7 +53,7 @@ True if the target boundary validation passes.
 ------------------------------------------------------------------------
 
 
-#### passed
+### passed
 
 
 True only if BOTH boundaries pass (no critical threshold exceeded).
@@ -65,7 +65,7 @@ True only if BOTH boundaries pass (no critical threshold exceeded).
 ------------------------------------------------------------------------
 
 
-#### source_passed
+### source_passed
 
 
 Whether the source boundary validation passed.
@@ -77,7 +77,7 @@ Whether the source boundary validation passed.
 ------------------------------------------------------------------------
 
 
-#### target_passed
+### target_passed
 
 
 Whether the target boundary validation passed.
@@ -95,7 +95,7 @@ Whether the target boundary validation passed.
 ------------------------------------------------------------------------
 
 
-#### get_report()
+### get_report()
 
 
 Get a combined text summary of both boundary validations.
@@ -108,7 +108,7 @@ get_report()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `str`  

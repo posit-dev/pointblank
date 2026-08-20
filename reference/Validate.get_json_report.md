@@ -1,4 +1,4 @@
-## Validate.get_json_report()
+# Validate.get_json_report()
 
 
 Get a report of the validation results as a JSON-formatted string.
@@ -117,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-08-19T14:40:44.650+00:00",
-            "proc_duration_s": 0.007886
+            "time_processed": "2026-08-20T20:27:21.107+00:00",
+            "proc_duration_s": 0.008311
         },
         {
             "i": 2,
@@ -144,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-08-19T14:40:44.654+00:00",
-            "proc_duration_s": 0.003275
+            "time_processed": "2026-08-20T20:27:21.110+00:00",
+            "proc_duration_s": 0.003114
         }
     ]
 

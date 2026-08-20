@@ -1,4 +1,4 @@
-## adam_to_metadata()
+# adam_to_metadata()
 
 
 Convert an ADaM dataset template to a MetadataImport object.

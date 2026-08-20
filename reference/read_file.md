@@ -1,4 +1,4 @@
-## read_file()
+# read_file()
 
 
 Read a Validate object from disk that was previously saved with [write_file()](write_file.md#pointblank.write_file).

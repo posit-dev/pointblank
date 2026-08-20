@@ -1,4 +1,4 @@
-## Validate.get_scorecard()
+# Validate.get_scorecard()
 
 
 Get a data quality scorecard as a GT table.

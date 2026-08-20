@@ -1,4 +1,4 @@
-## DataScan.save_to_json()
+# DataScan.save_to_json()
 
 
 Save the profile to a JSON file.

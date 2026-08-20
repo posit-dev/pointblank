@@ -1,4 +1,4 @@
-## DraftValidation
+# DraftValidation
 
 
 Draft a validation plan for a given table using an LLM.

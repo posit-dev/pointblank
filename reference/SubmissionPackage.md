@@ -1,4 +1,4 @@
-## SubmissionPackage
+# SubmissionPackage
 
 
 A data-level model of a study submission package for CDISC conformance validation.
@@ -80,7 +80,7 @@ report = study.validate_conformance(agency="FDA")
 ------------------------------------------------------------------------
 
 
-#### domains
+### domains
 
 
 The names (domain codes) of all datasets in the package, sorted.
@@ -92,7 +92,7 @@ The names (domain codes) of all datasets in the package, sorted.
 ------------------------------------------------------------------------
 
 
-#### metadata
+### metadata
 
 
 The imported Define-XML metadata, if `define` was supplied.
@@ -118,7 +118,7 @@ Lazily imports the Define-XML document (via <a href="import_metadata.html#pointb
 ------------------------------------------------------------------------
 
 
-#### from_folder()
+### from_folder()
 
 
 Build a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets.
@@ -141,7 +141,7 @@ from_folder(
 Reads every SAS Transport (`.xpt`) and CDISC Dataset-JSON (`.json`) file in the folder, deriving the dataset name from the file stem (uppercased). If a `define.xml` is present in the folder and `define` is not supplied, it is picked up automatically.
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str | Path`  
@@ -163,7 +163,7 @@ Optional Controlled Terminology version pin.
 Optional study identifier.
 
 
-##### Returns
+#### Returns
 
 
 `SubmissionPackage`  
@@ -173,7 +173,7 @@ A package populated with the folder's datasets.
 ------------------------------------------------------------------------
 
 
-#### get_dataset()
+### get_dataset()
 
 
 Get a dataset by name (case-insensitive).
@@ -186,21 +186,21 @@ get_dataset(name)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `name: str`  
 The dataset name / domain code.
 
 
-##### Returns
+#### Returns
 
 
 `Any`  
 The dataset (DataFrame).
 
 
-##### Raises
+#### Raises
 
 
 `KeyError`  
@@ -210,7 +210,7 @@ If no dataset with that name exists.
 ------------------------------------------------------------------------
 
 
-#### orphan_ids()
+### orphan_ids()
 
 
 Find values of `column` in `child` that do not exist in `parent`.
@@ -226,7 +226,7 @@ orphan_ids(child, parent="DM", column="USUBJID")
 This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.
 
 
-##### Parameters
+#### Parameters
 
 
 `child: str`  
@@ -239,7 +239,7 @@ The referenced dataset (e.g., `"DM"`). Defaults to `"DM"`.
 The key column to check. Defaults to `"USUBJID"`.
 
 
-##### Returns
+#### Returns
 
 
 `set`  
@@ -249,7 +249,7 @@ The set of orphaned values (present in `child.column` but not `parent.column`).
 ------------------------------------------------------------------------
 
 
-#### subject_ids()
+### subject_ids()
 
 
 Get the set of `USUBJID` values in a dataset.
@@ -262,14 +262,14 @@ subject_ids(dataset="DM")
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `dataset: str = ``"DM"`  
 The dataset to read subject IDs from. Defaults to `"DM"` (the reference set of all enrolled subjects).
 
 
-##### Returns
+#### Returns
 
 
 `set`  
@@ -279,7 +279,7 @@ The set of non-null `USUBJID` values, or an empty set if the dataset or column i
 ------------------------------------------------------------------------
 
 
-#### summary()
+### summary()
 
 
 Return a human-readable summary of the package contents.
@@ -295,7 +295,7 @@ summary()
 ------------------------------------------------------------------------
 
 
-#### validate_conformance()
+### validate_conformance()
 
 
 Validate CDISC conformance across the whole submission package.
@@ -334,7 +334,7 @@ Two engines are available:
 - **`"core"`** -- hands the package to the external CDISC CORE engine (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport). Requires an installed CORE executable (see `core`).
 
 
-##### Parameters
+#### Parameters
 
 
 `agency: str | None = None`  
@@ -374,7 +374,7 @@ Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base r
 (CORE only.) Directory for materialized XPT and the CORE report. If `None`, a temporary directory is used and cleaned up.
 
 
-##### Returns
+#### Returns
 
 
 `ConformanceReport`  

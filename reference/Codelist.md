@@ -1,4 +1,4 @@
-## Codelist
+# Codelist
 
 
 A controlled terminology / value set from an external standard.
@@ -53,7 +53,7 @@ Whether additional values beyond the codelist are allowed.
 ------------------------------------------------------------------------
 
 
-#### to_dict()
+### to_dict()
 
 
 Get a value → label mapping.
@@ -66,7 +66,7 @@ to_dict()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict`  
@@ -76,7 +76,7 @@ Mapping of value to human-readable label.
 ------------------------------------------------------------------------
 
 
-#### to_set()
+### to_set()
 
 
 Get the list of valid values (for col_vals_in_set).
@@ -89,7 +89,7 @@ to_set()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `list`  

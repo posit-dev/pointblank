@@ -1,4 +1,4 @@
-## Validate.col_vals_in_table()
+# Validate.col_vals_in_table()
 
 
 Validate that column values exist in a reference table (referential integrity).

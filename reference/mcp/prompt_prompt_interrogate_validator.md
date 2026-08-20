@@ -4,7 +4,7 @@
 Prompt to run validations and generate reports with Python code.
 
 
-# Arguments
+## Arguments
 
 
 `validator_id: string`  
@@ -13,7 +13,7 @@ ID of the Validator to interrogate.
 Provide as a JSON string matching the following schema: {"type":"string"}
 
 
-# Prompt Text
+## Prompt Text
 
 > **Note: Assistant**
 >

@@ -17,7 +17,7 @@ Analyzes your data's structure (types, null counts, value ranges, cardinality) t
 ```
 
 
-# Parameters
+## Parameters
 
 
 `dataframe_id: string`  

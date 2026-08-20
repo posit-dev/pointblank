@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-84ac27f0ad322ca6b46d42a29965ff7f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <meta name="twitter:description" content="Validate rows using AI/LLM-powered analysis.">
 </head>
 
-<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
+<body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="31"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="482" data-forks="30"></div>
     </span>
   </li>  
 </ul>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h1 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Validate.prompt()</span></h1>
+        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">Validate.prompt()</span></h5>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1470,9 +1470,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h3 id="toc-title">On this page</h3>
+    <h2 id="toc-title">On this page</h2>
    
-  <ul class="collapse">
+  <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#constructing-the-model-argument" id="toc-constructing-the-model-argument" class="nav-link" data-scroll-target="#constructing-the-model-argument">Constructing The <code>model</code> Argument</a></li>
@@ -1490,7 +1490,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h2 class="title" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.prompt()</span></h2>
+<h1 class="title"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.prompt()</span></h1>
 </div>
 
 
@@ -1538,7 +1538,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Each row becomes a test unit that either passes or fails the validation criteria, producing the familiar True/False results that appear in Pointblank validation reports. This method is particularly useful for complex validation rules that are difficult to express with traditional validation methods, such as semantic checks, context-dependent validation, or subjective quality assessments.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
-<h2 class="doc-parameters">Parameters</h2>
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">prompt</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
@@ -1597,7 +1597,7 @@ An optional data quality dimension to categorize this validation step for health
 </div>
 </section>
 <section id="returns" class="level2 doc-returns">
-<h2 class="doc-returns">Returns</h2>
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
@@ -1608,7 +1608,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </section>
 <section id="constructing-the-model-argument" class="level2 doc-constructing-the-model-argument">
-<h2 class="doc-constructing-the-model-argument">Constructing The <code>model</code> Argument</h2>
+<h2 class="doc-constructing-the-model-argument anchored" data-anchor-id="constructing-the-model-argument">Constructing The <code>model</code> Argument</h2>
 <p>The <code>model=</code> argument should be constructed using the provider and model name separated by a colon (<code>provider:model</code>). The provider text can any of:</p>
 <ul>
 <li><code>"anthropic"</code> (Anthropic)</li>
@@ -1620,7 +1620,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-notes-on-authentication">
-<h2 class="doc-notes-on-authentication">Notes On Authentication</h2>
+<h2 class="doc-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes On Authentication</h2>
 <p>API keys are automatically loaded from environment variables or <code>.env</code> files and are <strong>not</strong> stored in the validation object for security reasons. You should consider using a secure method for handling API keys.</p>
 <p>One way to do this is to load the API key from an environment variable and retrieve it using the <code>os</code> module (specifically the <code>os.getenv()</code> function). Places to store the API key might include <code>.bashrc</code>, <code>.bash_profile</code>, <code>.zshrc</code>, or <code>.zsh_profile</code>.</p>
 <p>Another solution is to store one or more model provider API keys in an <code>.env</code> file (in the root of your project). If the API keys have correct names (e.g., <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>) then the AI validation will automatically load the API key from the <code>.env</code> file. An <code>.env</code> file might look like this:</p>
@@ -1637,7 +1637,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </ul>
 </section>
 <section id="ai-validation-process" class="level2 doc-ai-validation-process">
-<h2 class="doc-ai-validation-process">Ai Validation Process</h2>
+<h2 class="doc-ai-validation-process anchored" data-anchor-id="ai-validation-process">Ai Validation Process</h2>
 <p>The AI validation process works as follows:</p>
 <ol type="1">
 <li>data batching: the data is split into batches of the specified size</li>
@@ -1665,7 +1665,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
 </section>
 <section id="prompt-design-tips" class="level2 doc-prompt-design-tips">
-<h2 class="doc-prompt-design-tips">Prompt Design Tips</h2>
+<h2 class="doc-prompt-design-tips anchored" data-anchor-id="prompt-design-tips">Prompt Design Tips</h2>
 <p>For best results, design prompts that are:</p>
 <ul>
 <li>boolean-oriented: frame validation criteria to elicit clear valid/invalid responses</li>
@@ -1689,7 +1689,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </ul>
 </section>
 <section id="multi-modal-attachments" class="level2 doc-multi-modal-attachments">
-<h2 class="doc-multi-modal-attachments">Multi-Modal Attachments</h2>
+<h2 class="doc-multi-modal-attachments anchored" data-anchor-id="multi-modal-attachments">Multi-Modal Attachments</h2>
 <p>Use <code>attachments=</code> to give the LLM a reference image or PDF that applies to every row. The attachment is sent as global context, while each row’s values are still serialized as JSON and validated against your <code>prompt=</code>. Useful patterns:</p>
 <ul>
 <li>validating descriptions against a brand-style image: <code>attachments=["brand_guide.pdf"]</code></li>
@@ -1715,7 +1715,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </ul>
 </section>
 <section id="performance-considerations" class="level2 doc-performance-considerations">
-<h2 class="doc-performance-considerations">Performance Considerations</h2>
+<h2 class="doc-performance-considerations anchored" data-anchor-id="performance-considerations">Performance Considerations</h2>
 <p>AI validation is significantly slower than traditional validation methods due to API calls to LLM providers. However, performance varies dramatically based on data characteristics:</p>
 <p><strong>High Memoization Scenarios</strong> (seconds to minutes):</p>
 <ul>
@@ -1741,7 +1741,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </ul>
 </section>
 <section id="examples" class="level2 doc-examples">
-<h2 class="doc-examples">Examples</h2>
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The following examples demonstrate how to use AI validation for different types of data quality checks. These examples show both basic usage and more advanced configurations with custom thresholds and actions.</p>
 <p><strong>Basic AI validation example:</strong></p>
 <p>This first example shows a simple validation scenario where we want to check that customer records have both valid email addresses and non-empty names. Notice how we use <code>columns_subset=</code> to focus only on the relevant columns, which improves both performance and cost-effectiveness.</p>

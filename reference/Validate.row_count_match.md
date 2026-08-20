@@ -1,4 +1,4 @@
-## Validate.row_count_match()
+# Validate.row_count_match()
 
 
 Validate whether the row count of the table matches a specified count.

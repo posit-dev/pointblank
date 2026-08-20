@@ -1,4 +1,4 @@
-## EditValidation
+# EditValidation
 
 
 Edit an existing validation plan with a plain-English instruction using an LLM.
@@ -105,7 +105,7 @@ plan = edited.accept()      # a Validate you can .interrogate()
 ------------------------------------------------------------------------
 
 
-#### accept()
+### accept()
 
 
 Execute the revised plan and return the resulting [Validate](Validate.md#pointblank.Validate) object.
@@ -121,14 +121,14 @@ accept(data=None)
 The returned [Validate](Validate.md#pointblank.Validate) has NOT been interrogated; call `.interrogate()` on it to run the validation.
 
 
-##### Parameters
+#### Parameters
 
 
 `data: Any = None`  
 The data table to bind to the plan's `your_data` placeholder. If omitted, the `data=` provided to [EditValidation](EditValidation.md#pointblank.EditValidation) is used. One of the two must be present.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  
@@ -138,7 +138,7 @@ The revised validation plan as a [Validate](Validate.md#pointblank.Validate) obj
 ------------------------------------------------------------------------
 
 
-#### changed_steps()
+### changed_steps()
 
 
 Return a structured, step-level list of the changes between the plans.
@@ -154,7 +154,7 @@ changed_steps()
 Unlike <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
 
 
-##### Returns
+#### Returns
 
 
 `list[dict]`  
@@ -164,7 +164,7 @@ One record per changed step, e.g. `[{"action": "modify", "method": "col_vals_gt"
 ------------------------------------------------------------------------
 
 
-#### diff()
+### diff()
 
 
 Return a unified textual diff of the original plan versus the revised plan.
@@ -180,7 +180,7 @@ diff()
 ------------------------------------------------------------------------
 
 
-#### from_plans()
+### from_plans()
 
 
 Build an [EditValidation](EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model.
@@ -196,7 +196,7 @@ from_plans(original, revised, instruction="Manual plan comparison")
 This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.
 
 
-##### Parameters
+#### Parameters
 
 
 `original: Any`  
@@ -209,14 +209,14 @@ The revised plan, in any of the same forms as `original`.
 An optional label describing the comparison (shown as the subtitle in <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
 
 
-##### Returns
+#### Returns
 
 
 `EditValidation`  
 An [EditValidation](EditValidation.md#pointblank.EditValidation) whose `original`/`revised` plans are the ones supplied, ready for <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 
 
-##### Examples
+#### Examples
 
 ``` python
 import pointblank as pb
@@ -231,7 +231,7 @@ print(comparison.diff())
 ------------------------------------------------------------------------
 
 
-#### review()
+### review()
 
 
 Return a `great_tables` GT object summarizing the step-level changes.
@@ -247,7 +247,7 @@ review()
 This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.
 
 
-##### Returns
+#### Returns
 
 
 `GT`  
@@ -257,7 +257,7 @@ A `great_tables` table with one row per changed step.
 ------------------------------------------------------------------------
 
 
-#### to_code()
+### to_code()
 
 
 Return the revised validation plan as Python code.
@@ -273,7 +273,7 @@ to_code()
 ------------------------------------------------------------------------
 
 
-#### validate_syntax()
+### validate_syntax()
 
 
 Return whether the revised plan parses and uses only known validation methods.

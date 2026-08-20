@@ -16,7 +16,7 @@ Generate an AI-powered validation plan using Pointblank's DraftValidation class.
 ```
 
 
-# Parameters
+## Parameters
 
 
 `dataframe_id: string`  

@@ -82,14 +82,14 @@ DATA can be:
       --help                          Show this message and exit.
 
 
-# Arguments
+## Arguments
 
 
 `VALIDATION_FILE: PATH`  
 Optional.
 
 
-# Options
+## Options
 
 
 `--data: TEXT`  
@@ -114,7 +114,7 @@ Maximum number of failing rows to save to CSV (default: 500)
 Exit with non-zero code when validation reaches this threshold level
 
 
-# Examples
+## Examples
 
 ``` bash
 

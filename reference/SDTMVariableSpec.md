@@ -1,4 +1,4 @@
-## SDTMVariableSpec
+# SDTMVariableSpec
 
 
 Specification for a single variable in an SDTM domain template.

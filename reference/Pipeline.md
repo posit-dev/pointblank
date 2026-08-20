@@ -1,4 +1,4 @@
-## Pipeline
+# Pipeline
 
 
 Binds source and target contracts into a pipeline boundary enforcement unit.
@@ -95,7 +95,7 @@ result = pipeline.run(data=raw_data, transform=my_transform)
 ------------------------------------------------------------------------
 
 
-#### from_dict()
+### from_dict()
 
 
 Construct a Pipeline from a dictionary (e.g., parsed from YAML).
@@ -108,14 +108,14 @@ from_dict(data)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: dict[str, Any]`  
 A dictionary representation of a pipeline.
 
 
-##### Returns
+#### Returns
 
 
 `Pipeline`  
@@ -125,7 +125,7 @@ A new Pipeline instance.
 ------------------------------------------------------------------------
 
 
-#### from_yaml()
+### from_yaml()
 
 
 Load a Pipeline from a YAML file.
@@ -138,14 +138,14 @@ from_yaml(path)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str`  
 Path to the YAML file.
 
 
-##### Returns
+#### Returns
 
 
 `Pipeline`  
@@ -155,7 +155,7 @@ A new Pipeline instance.
 ------------------------------------------------------------------------
 
 
-#### run()
+### run()
 
 
 Run the full pipeline: validate source, transform, validate target.
@@ -168,7 +168,7 @@ run(data, transform)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: IntoDataFrame`  
@@ -178,7 +178,7 @@ The input data for the pipeline.
 A callable that transforms the source data into target data. Must accept the data and return transformed data.
 
 
-##### Returns
+#### Returns
 
 
 `PipelineResult`  
@@ -188,7 +188,7 @@ A result object containing both validations and the transform output.
 ------------------------------------------------------------------------
 
 
-#### to_dict()
+### to_dict()
 
 
 Serialize the Pipeline to a dictionary for YAML/JSON export.
@@ -201,7 +201,7 @@ to_dict()
 ```
 
 
-##### Returns
+#### Returns
 
 
 `dict`  
@@ -211,7 +211,7 @@ A dictionary representation of this pipeline.
 ------------------------------------------------------------------------
 
 
-#### to_yaml()
+### to_yaml()
 
 
 Serialize this Pipeline to YAML.
@@ -224,14 +224,14 @@ to_yaml(path=None)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `path: str | None = None`  
 Optional file path. If provided, the YAML is written to this file. If None, the YAML string is returned.
 
 
-##### Returns
+#### Returns
 
 
 `str`  
@@ -241,7 +241,7 @@ The YAML representation of this pipeline.
 ------------------------------------------------------------------------
 
 
-#### validate_source()
+### validate_source()
 
 
 Validate data against the source (inbound) contract.
@@ -254,21 +254,21 @@ validate_source(data)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: IntoDataFrame`  
 The incoming data to validate.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  
 An interrogated Validate object with results.
 
 
-##### Raises
+#### Raises
 
 
 `ValueError`  
@@ -281,7 +281,7 @@ If on_violation="raise" and validation fails.
 ------------------------------------------------------------------------
 
 
-#### validate_target()
+### validate_target()
 
 
 Validate data against the target (outbound) contract.
@@ -294,21 +294,21 @@ validate_target(data)
 ```
 
 
-##### Parameters
+#### Parameters
 
 
 `data: IntoDataFrame`  
 The outgoing data to validate.
 
 
-##### Returns
+#### Returns
 
 
 `Validate`  
 An interrogated Validate object with results.
 
 
-##### Raises
+#### Raises
 
 
 `ValueError`  

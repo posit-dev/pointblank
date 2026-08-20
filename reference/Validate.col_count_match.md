@@ -1,4 +1,4 @@
-## Validate.col_count_match()
+# Validate.col_count_match()
 
 
 Validate whether the column count of the table matches a specified count.

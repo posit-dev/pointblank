@@ -1,4 +1,4 @@
-## Validate.col_vals_not_null()
+# Validate.col_vals_not_null()
 
 
 Validate whether values in a column are not Null.

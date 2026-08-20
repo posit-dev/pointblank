@@ -1,4 +1,4 @@
-## SDTMDomainTemplate
+# SDTMDomainTemplate
 
 
 Structural template for an SDTM domain.
@@ -55,7 +55,7 @@ List of variable names that form the natural key.
 ------------------------------------------------------------------------
 
 
-#### expected_variables
+### expected_variables
 
 
 Get names of all expected (Exp core) variables.
@@ -67,7 +67,7 @@ Get names of all expected (Exp core) variables.
 ------------------------------------------------------------------------
 
 
-#### identifier_variables
+### identifier_variables
 
 
 Get names of all Identifier-role variables.
@@ -79,7 +79,7 @@ Get names of all Identifier-role variables.
 ------------------------------------------------------------------------
 
 
-#### required_variables
+### required_variables
 
 
 Get names of all required variables.
@@ -97,7 +97,7 @@ Get names of all required variables.
 ------------------------------------------------------------------------
 
 
-#### get_variable()
+### get_variable()
 
 
 Get a variable spec by name.

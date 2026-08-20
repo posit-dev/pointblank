@@ -1,4 +1,4 @@
-## validate_yaml()
+# validate_yaml()
 
 
 Validate YAML configuration against the expected structure.

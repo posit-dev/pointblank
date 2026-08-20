@@ -1,4 +1,4 @@
-## Validate.col_vals_ne()
+# Validate.col_vals_ne()
 
 
 Are column data not equal to a fixed value or data in another column?

@@ -1,4 +1,4 @@
-## DataScan.load_from_json()
+# DataScan.load_from_json()
 
 
 Load a [DataScan](DataScan.md#pointblank.DataScan) from a JSON file produced by [save_to_json()](DataScan.save_to_json.md#pointblank.DataScan.save_to_json).

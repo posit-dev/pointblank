@@ -4,7 +4,7 @@
 Prompt to load a DataFrame from a file into the server's context for validation.
 
 
-# Arguments
+## Arguments
 
 
 `input_path: string`  
@@ -14,7 +14,7 @@ No description.
 Provide as a JSON string matching the following schema: {"anyOf":\[{"type":"string"},{"type":"null"}\]}
 
 
-# Prompt Text
+## Prompt Text
 
 > **Note: Assistant**
 >

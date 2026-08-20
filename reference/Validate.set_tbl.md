@@ -1,4 +1,4 @@
-## Validate.set_tbl()
+# Validate.set_tbl()
 
 
 Set or replace the table associated with the Validate object.
