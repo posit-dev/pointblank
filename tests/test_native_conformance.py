@@ -294,6 +294,69 @@ def test_evaluator_equal_to_column():
     assert mask.to_list() == [True, False, True]
 
 
+def test_evaluator_greater_than_or_equal_to():
+    df = _nw_df({"x": [1, 3, 5]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "greater_than_or_equal_to", "value": 3}]}
+    )
+    assert mask.to_list() == [False, True, True]
+
+
+def test_evaluator_less_than_or_equal_to():
+    df = _nw_df({"x": [1, 3, 5]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "less_than_or_equal_to", "value": 3}]}
+    )
+    assert mask.to_list() == [True, True, False]
+
+
+def test_evaluator_not_contains():
+    df = _nw_df({"x": ["hello world", "foo", "world"]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "not_contains", "value": "world"}]}
+    )
+    assert mask.to_list() == [False, True, False]
+
+
+def test_evaluator_starts_with():
+    df = _nw_df({"x": ["hello", "world", "hi"]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "starts_with", "value": "h"}]}
+    )
+    assert mask.to_list() == [True, False, True]
+
+
+def test_evaluator_ends_with():
+    df = _nw_df({"x": ["hello", "world", "told"]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "ends_with", "value": "ld"}]}
+    )
+    assert mask.to_list() == [False, True, True]
+
+
+def test_evaluator_matches_regex():
+    df = _nw_df({"x": ["abc123", "hello", "X99"]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "x", "operator": "matches_regex", "value": r"\d+"}]}
+    )
+    assert mask.to_list() == [True, False, True]
+
+
+def test_evaluator_not_equal_to_column():
+    df = _nw_df({"a": [1, 2, 3], "b": [1, 99, 3]})
+    mask = evaluate_conditions(
+        df, {"all": [{"name": "a", "operator": "not_equal_to_column", "value": "b"}]}
+    )
+    assert mask.to_list() == [False, True, False]
+
+
+def test_evaluator_unknown_operator_raises():
+    from pointblank.metadata._conformance.evaluator import _compile_leaf
+
+    with pytest.raises(ValueError, match="Unknown operator"):
+        _compile_leaf({"name": "x", "operator": "does_not_exist", "value": None})
+
+
 def test_iso8601_valid():
     assert is_iso8601("2024-01-15")
     assert is_iso8601("2024-01")
@@ -1433,3 +1496,257 @@ def test_ct_load_default_empty(tmp_path, monkeypatch):
     ct = ct_module.ControlledTerminology.load_default()
     assert isinstance(ct, ct_module.ControlledTerminology)
     assert ct.packages == []
+
+
+def test_native_rule_applies_to_domain_match():
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+
+    rule = NativeRule(
+        core_id="X-001",
+        rule_type="RECORD_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="test",
+        authority="CDISC",
+        domains=["DM", "AE"],
+        standards=["sdtmig"],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    assert rule.applies_to_domain("DM") is True
+    assert rule.applies_to_domain("XX") is False
+
+
+def test_native_rule_applies_to_standard_match():
+    from pointblank.metadata._conformance.rule_loader import NativeRule
+
+    rule = NativeRule(
+        core_id="X-001",
+        rule_type="RECORD_CHECK",
+        executability="Fully Executable",
+        sensitivity="Error",
+        description="test",
+        authority="CDISC",
+        domains=[],
+        standards=["sdtmig"],
+        classes=[],
+        operations=[],
+        conditions={},
+        actions={},
+    )
+    assert rule.applies_to_standard("sdtmig") is True
+    assert rule.applies_to_standard("adamig") is False
+
+
+def test_rule_loader_available_no_dir(tmp_path, monkeypatch):
+    from pointblank.metadata._conformance import rule_loader as rl_module
+
+    monkeypatch.setattr(rl_module, "_DATA_DIR", tmp_path / "nonexistent")
+    result = rl_module.RuleLoader.available()
+    assert result == []
+
+
+def test_rule_loader_available_invalid_json(tmp_path, monkeypatch):
+    from pointblank.metadata._conformance import rule_loader as rl_module
+
+    monkeypatch.setattr(rl_module, "_DATA_DIR", tmp_path)
+    (tmp_path / "bad.json").write_text("not valid json", encoding="utf-8")
+    result = rl_module.RuleLoader.available()
+    assert result == []
+
+
+def test_rule_loader_catalog_metadata_missing_raises():
+    from pointblank.metadata._conformance.rule_loader import RuleLoader
+
+    with pytest.raises(FileNotFoundError):
+        RuleLoader.catalog_metadata("imaginary", "99.0")
+
+
+def test_apply_operations_handler_exception(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M"]}))
+    ops = [{"operator": "codelist_check", "params": {"column": "SEX", "codelist": "SEX"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert "_pb_SEX_valid" in result.columns
+
+
+def test_apply_operations_exception_silenced(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._conformance import operations as ops_module
+    import narwhals as nw
+    import polars as pl
+
+    def _raise(df, params, ct, datasets, define_meta=None):
+        raise RuntimeError("simulated failure")
+
+    original_registry = ops_module._REGISTRY.copy()
+    ops_module._REGISTRY["codelist_check"] = _raise
+    try:
+        df = nw.from_native(pl.DataFrame({"SEX": ["M"]}))
+        ops = [{"operator": "codelist_check", "params": {"column": "SEX", "codelist": "SEX"}}]
+        result = apply_operations(df, ops, ct, {})
+        assert "_pb_SEX_valid" not in result.columns
+    finally:
+        ops_module._REGISTRY["codelist_check"] = original_registry["codelist_check"]
+
+
+def test_op_codelist_check_unknown_codelist(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M"]}))
+    ops = [{"operator": "codelist_check", "params": {"column": "SEX", "codelist": "NONEXISTENT_CL"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_valid"].to_list() == [True]
+
+
+def test_op_consistency_check_missing_column(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"OTHER": [1, 2, 3]}))
+    ops = [{"operator": "consistency_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_consistent"].to_list() == [True, True, True]
+
+
+def test_op_consistency_check_all_null(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": pl.Series([None, None, None], dtype=pl.String)}))
+    ops = [{"operator": "consistency_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_consistent"].to_list() == [True, True, True]
+
+
+def test_op_unique_per_subject_no_usubjid(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "unique_per_subject", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_unique"].to_list() == [True, True]
+
+
+def test_op_unique_per_subject_duplicates(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"USUBJID": ["S1", "S1", "S2"], "AETERM": ["headache", "headache", "fever"]}))
+    ops = [{"operator": "unique_per_subject", "params": {"column": "AETERM"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_AETERM_unique"].to_list() == [False, False, True]
+
+
+def test_op_variable_type_check_numeric(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"AGE": [30, 40, 50]}))
+    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_AGE_type_valid"].to_list() == [True, True, True]
+
+
+def test_op_variable_type_check_character(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "variable_type_check", "params": {"column": "SEX", "expected_type": "character"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_type_valid"].to_list() == [True, True]
+
+
+def test_op_variable_type_check_unknown_type(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "variable_type_check", "params": {"column": "SEX", "expected_type": "unknown_category"}}]
+    result = apply_operations(df, ops, ct, {})
+    assert result["_pb_SEX_type_valid"].to_list() == [True, True]
+
+
+def test_op_define_required_check_no_define_meta(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"STUDYID": ["S1", "S2"]}))
+    ops = [{"operator": "define_required_check", "params": {"column": "STUDYID"}}]
+    result = apply_operations(df, ops, ct, {}, define_meta=None)
+    assert result["_pb_STUDYID_mandatory_ok"].to_list() == [True, True]
+
+
+def test_op_define_codelist_check_no_define_meta(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "define_codelist_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {}, define_meta=None)
+    assert result["_pb_SEX_define_valid"].to_list() == [True, True]
+
+
+def test_op_define_type_check_no_define_meta(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    import narwhals as nw
+    import polars as pl
+
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "define_type_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {}, define_meta=None)
+    assert result["_pb_SEX_define_type_ok"].to_list() == [True, True]
+
+
+def test_op_define_type_check_var_meta_none(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._types import MetadataImport, VariableMetadata
+    import narwhals as nw
+    import polars as pl
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
+        variables=[VariableMetadata(name="STUDYID")],
+    )
+    df = nw.from_native(pl.DataFrame({"AGE": [30, 40]}))
+    ops = [{"operator": "define_type_check", "params": {"column": "AGE"}}]
+    result = apply_operations(df, ops, ct, {}, define_meta=define_meta)
+    assert result["_pb_AGE_define_type_ok"].to_list() == [True, True]
+
+
+def test_op_define_type_check_unknown_define_type(ct):
+    from pointblank.metadata._conformance.operations import apply_operations
+    from pointblank.metadata._types import MetadataImport, VariableMetadata
+    import narwhals as nw
+    import polars as pl
+
+    define_meta = MetadataImport(
+        source_format="cdisc_define",
+        dataset_name="DM",
+        domain="DM",
+        variables=[VariableMetadata(name="SEX", display_format="custom_unknown_type")],
+    )
+    df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
+    ops = [{"operator": "define_type_check", "params": {"column": "SEX"}}]
+    result = apply_operations(df, ops, ct, {}, define_meta=define_meta)
+    assert result["_pb_SEX_define_type_ok"].to_list() == [True, True]
