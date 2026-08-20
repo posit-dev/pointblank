@@ -95,6 +95,29 @@ class TestHasColumns:
 
         assert callable(result)
 
+    def test_list_of_columns_all_present(self, polars_df):
+        checker = has_columns(["a", "b"])
+
+        assert checker(polars_df) is True
+
+    def test_list_of_columns_one_missing(self, polars_df):
+        checker = has_columns(["a", "z"])
+
+        assert checker(polars_df) is False
+
+    def test_list_with_non_string_raises(self):
+        with pytest.raises(TypeError, match="must be strings"):
+            has_columns(["a", 1])
+
+    def test_mixed_string_and_list(self, polars_df):
+        checker = has_columns("a", ["b", "c"])
+
+        assert checker(polars_df) is True
+
+    def test_non_string_non_list_column_raises(self):
+        with pytest.raises(TypeError, match="must be strings or lists of strings"):
+            has_columns(42)
+
 
 # ---------------------------------------------------------------------------
 # Tests for has_rows()
