@@ -102,3 +102,11 @@ def test_log_level_error_filters_warnings(otel_log_exporter, validation_mixed_th
 
     logs = exporter.get_finished_logs()
     assert len(logs) == 0
+
+
+def test_get_logger_without_provider_raises():
+    import pytest
+
+    exporter = OTelExporter(enable_logging=True, enable_metrics=False)
+    with pytest.raises(ValueError, match="logger_provider must be set"):
+        exporter._get_logger()
