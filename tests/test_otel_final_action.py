@@ -61,3 +61,17 @@ def test_emit_otel_combined_with_other_actions(otel_metric_reader):
 
     assert len(callback_called) == 1
     assert "pb.validation.steps.total" in get_all_metric_names(reader)
+
+
+def test_otel_final_action_no_summary(otel_metric_reader):
+    from unittest.mock import patch
+    from pointblank.integrations.otel import emit_otel
+
+    reader, provider = otel_metric_reader
+    action = emit_otel(meter_provider=provider, enable_metrics=True)
+
+    with patch("pointblank.get_validation_summary", return_value=None):
+        action()
+
+    names = get_all_metric_names(reader)
+    assert "pb.validation.steps.total" not in names
