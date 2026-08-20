@@ -4,7 +4,11 @@ from pointblank.validate import Validate
 from pointblank.column import (
     Column,
     ColumnExpression,
+    ColumnLiteral,
+    ColumnSelectorNarwhals,
+    ReferenceColumn,
     col,
+    ref,
     StartsWith,
     EndsWith,
     Contains,
@@ -2175,3 +2179,195 @@ def test_or_operation_pandas_raises_error(df_pd):
     expr = (expr_col("a") > 8) | (expr_col("b") < 1)
     with pytest.raises(ValueError):
         df_pd[expr.to_pandas_expr(df_pd)]
+
+
+def test_ref_function():
+    r = ref("my_column")
+    assert isinstance(r, ReferenceColumn)
+    assert r.column_name == "my_column"
+
+
+def test_reference_column_repr():
+    r = ref("sales")
+    assert repr(r) == "ref('sales')"
+    r2 = ReferenceColumn(column_name="total")
+    assert repr(r2) == "ref('total')"
+
+
+def test_column_repr_with_selector():
+    c = Column(exprs=StartsWith("low"))
+    assert repr(c) == repr(StartsWith(text="low"))
+
+
+def test_column_literal_resolve_directly():
+    literal = ColumnLiteral(exprs="col_a")
+    result = literal.resolve(["col_a", "col_b", "col_c"])
+    assert result == ["col_a"]
+    assert literal.name == "col_a"
+    assert repr(literal) == "col_a"
+
+
+def test_column_literal_from_col():
+    literal = col("my_col")
+    assert isinstance(literal, ColumnLiteral)
+    assert literal.name == "my_col"
+    assert repr(literal) == "my_col"
+    result = literal.resolve(["my_col", "other"])
+    assert result == ["my_col"]
+
+
+def test_column_selector_narwhals_resolve_without_table():
+    selector = ColumnSelectorNarwhals(exprs=ncs.numeric())
+    with pytest.raises(ValueError, match="ColumnSelectorNarwhals requires a table"):
+        selector.resolve(columns=["a", "b"])
+
+
+def test_column_selector_narwhals_resolve_with_table():
+    tbl = pl.DataFrame({"a": [1, 2], "b": ["x", "y"]})
+    validation = (
+        Validate(data=tbl)
+        .col_vals_ge(columns=ncs.numeric(), value=0)
+        .interrogate()
+    )
+    assert validation.n_passed(i=1, scalar=True) == 2
+
+
+def test_starts_with_standalone():
+    sw = starts_with("low")
+    result = sw.resolve(["low_num", "high_num", "low_float"])
+    assert result == ["low_num", "low_float"]
+
+
+def test_ends_with_standalone():
+    ew = ends_with("_num")
+    result = ew.resolve(["low_num", "high_num", "low_float"])
+    assert result == ["low_num", "high_num"]
+
+
+def test_contains_standalone():
+    ct = contains("_num")
+    result = ct.resolve(["low_num", "high_num", "low_float"])
+    assert result == ["low_num", "high_num"]
+
+
+def test_matches_standalone():
+    mt = matches("^low")
+    result = mt.resolve(["low_num", "high_num", "low_float"])
+    assert result == ["low_num", "low_float"]
+    empty = mt.resolve(["high_num", "high_float"])
+    assert empty == []
+
+
+def test_everything_standalone():
+    cols = ["a", "b", "c"]
+    ev = everything()
+    assert ev.resolve(cols) == cols
+
+
+def test_first_n_standalone():
+    cols = ["a", "b", "c", "d"]
+    fn = first_n(2)
+    assert fn.resolve(cols) == ["a", "b"]
+
+
+def test_last_n_standalone():
+    cols = ["a", "b", "c", "d"]
+    ln = last_n(2)
+    assert ln.resolve(cols) == ["c", "d"]
+
+
+def test_selector_and_operator():
+    sw = starts_with("a")
+    ew = ends_with("a")
+    combined = sw & ew
+    assert isinstance(combined, AndSelector)
+    result = combined.resolve(["aa", "ab", "ba", "bb"])
+    assert result == ["aa"]
+
+
+def test_selector_or_operator():
+    sw = starts_with("a")
+    ew = ends_with("b")
+    combined = sw | ew
+    assert isinstance(combined, OrSelector)
+    result = set(combined.resolve(["aa", "ab", "ba", "bb"]))
+    assert result == {"aa", "ab", "bb"}
+
+
+def test_selector_sub_operator():
+    ev = everything()
+    sw = starts_with("a")
+    combined = ev - sw
+    assert isinstance(combined, SubSelector)
+    result = combined.resolve(["aa", "ab", "ba", "bb"])
+    assert result == ["ba", "bb"]
+
+
+def test_selector_invert_operator():
+    sw = starts_with("a")
+    combined = ~sw
+    assert isinstance(combined, NotSelector)
+    result = combined.resolve(["aa", "ab", "ba", "bb"])
+    assert result == ["ba", "bb"]
+
+
+def test_expr_col_invalid_polars_operation():
+    expr = ColumnExpression(operation="invalid_op", left=ColumnExpression(column_name="a"), right=5)
+    with pytest.raises(ValueError, match="Unsupported operation"):
+        expr.to_polars_expr()
+
+
+def test_expr_col_invalid_state_polars():
+    expr = ColumnExpression(operation=None, column_name=None, left=None, right=5)
+    with pytest.raises(ValueError, match="Invalid expression state"):
+        expr.to_polars_expr()
+
+
+def test_expr_col_to_pandas_base_case(df_pd):
+    expr = expr_col("b")
+    result = expr.to_pandas_expr(df_pd)
+    assert len(result) == len(df_pd["b"])
+    assert result[0] == df_pd["b"][0]
+
+
+def test_expr_col_to_pandas_nested_expression(df_pd):
+    expr = expr_col("b") + expr_col("c")
+    result = expr.to_pandas_expr(df_pd)
+    expected = df_pd["b"] + df_pd["c"]
+    assert len(result) == len(expected)
+
+
+def test_expr_col_is_null_pandas_raises(df_pd):
+    expr = expr_col("a").is_null()
+    with pytest.raises(NotImplementedError, match="is_null"):
+        expr.to_pandas_expr(df_pd)
+
+
+def test_expr_col_is_not_null_pandas_raises(df_pd):
+    expr = expr_col("a").is_not_null()
+    with pytest.raises(NotImplementedError, match="is_not_null"):
+        expr.to_pandas_expr(df_pd)
+
+
+def test_expr_col_to_ibis_base_case(df_ibis):
+    expr = expr_col("a")
+    result = expr.to_ibis_expr(df_ibis)
+    assert result is not None
+
+
+def test_expr_col_all_operators_create_expressions():
+    a = expr_col("a")
+    assert isinstance(a > 5, ColumnExpression)
+    assert isinstance(a < 5, ColumnExpression)
+    assert isinstance(a == 5, ColumnExpression)
+    assert isinstance(a != 5, ColumnExpression)
+    assert isinstance(a >= 5, ColumnExpression)
+    assert isinstance(a <= 5, ColumnExpression)
+    assert isinstance(a + 5, ColumnExpression)
+    assert isinstance(a - 5, ColumnExpression)
+    assert isinstance(a * 5, ColumnExpression)
+    assert isinstance(a / 5, ColumnExpression)
+    assert isinstance(a.is_null(), ColumnExpression)
+    assert isinstance(a.is_not_null(), ColumnExpression)
+    assert isinstance(a | expr_col("b"), ColumnExpression)
+    assert isinstance(a & expr_col("b"), ColumnExpression)
