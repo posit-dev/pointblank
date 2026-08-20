@@ -15,7 +15,7 @@ import pointblank as pb
 
 from pointblank.datascan import DataScan, col_summary_tbl
 from pointblank.validate import get_data_path, _process_github_url
-from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
+from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt, _round_to_sig_figs
 from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
 from pointblank.scan_profile import _TypeMap, _DataProfile
 
@@ -287,6 +287,19 @@ def test_compact_0_1_fmt():
     _compact_0_1_fmt(value=0.99) == "0.99"
     _compact_0_1_fmt(value=0.991) == ">0.99"
     _compact_0_1_fmt(value=226.1) == "226"
+
+
+def test_compact_0_1_fmt_none():
+    assert _compact_0_1_fmt(value=None) is None
+
+
+def test_round_to_sig_figs_zero():
+    assert _round_to_sig_figs(0, 3) == 0
+
+
+def test_round_to_sig_figs_nonzero():
+    result = _round_to_sig_figs(1234.567, 3)
+    assert result == 1230.0
 
 
 def test_datascan_csv_input():
