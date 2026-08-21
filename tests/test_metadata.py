@@ -3334,7 +3334,11 @@ class TestCSVWReaderEdgeCases:
                 "columns": [
                     {
                         "name": "x",
-                        "datatype": {"base": "decimal", "minimum": "not_a_number", "maximum": "also_bad"},
+                        "datatype": {
+                            "base": "decimal",
+                            "minimum": "not_a_number",
+                            "maximum": "also_bad",
+                        },
                     }
                 ],
             },
@@ -3398,94 +3402,117 @@ class TestCSVWReaderEdgeCases:
 class TestStatsTypeMapping:
     def test_spss_string_type(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("string", None) == "String"
 
     def test_spss_date_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "DATE11") == "Date"
 
     def test_spss_adate_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "ADATE8") == "Date"
 
     def test_spss_time_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "TIME8") == "Time"
 
     def test_spss_dtime_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "DTIME12") == "Time"
 
     def test_spss_datetime_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         # "DATETIME" contains "DATE" so the date check fires first
         assert _spss_type_to_dtype("double", "DATETIME20") == "Date"
 
     def test_spss_integer_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "F8.0") == "Int64"
 
     def test_spss_float_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", "F8.2") == "Float64"
 
     def test_spss_no_format(self):
         from pointblank.metadata._readers_stats import _spss_type_to_dtype
+
         assert _spss_type_to_dtype("double", None) == "Float64"
 
     def test_sas_character_type(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("character", None) == "String"
 
     def test_sas_date_format(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("numeric", "DATE9.") == "Date"
 
     def test_sas_ddmmyy_format(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("numeric", "DDMMYY10.") == "Date"
 
     def test_sas_time_format(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("numeric", "TIME8.") == "Time"
 
     def test_sas_datetime_format(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         # "DATETIME" contains "DATE" so the date check fires first
         assert _sas_type_to_dtype("numeric", "DATETIME20.") == "Date"
 
     def test_sas_no_format(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("numeric", None) == "Float64"
 
     def test_sas_plain_numeric(self):
         from pointblank.metadata._readers_stats import _sas_type_to_dtype
+
         assert _sas_type_to_dtype("numeric", "8.2") == "Float64"
 
     def test_stata_str_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("str20") == "String"
 
     def test_stata_byte_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("byte") == "Int64"
 
     def test_stata_int_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("int") == "Int64"
 
     def test_stata_long_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("long") == "Int64"
 
     def test_stata_float_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("float") == "Float64"
 
     def test_stata_double_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("double") == "Float64"
 
     def test_stata_unknown_type(self):
         from pointblank.metadata._readers_stats import _stata_type_to_dtype
+
         assert _stata_type_to_dtype("unknown_type") == "String"

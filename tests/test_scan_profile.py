@@ -299,9 +299,7 @@ def test_data_profile_as_dataframe_numeric():
 
 
 def test_data_profile_as_dataframe_multiple_profiles():
-    df = nw.from_native(
-        pl.DataFrame({"a": [1.0, 2.0, 3.0], "b": ["x", "y", "z"]})
-    )
+    df = nw.from_native(pl.DataFrame({"a": [1.0, 2.0, 3.0], "b": ["x", "y", "z"]}))
     dp = _DataProfile(table_name="t", columns=["a", "b"], implementation=nw.Implementation.POLARS)
     dp.set_row_count(df)
 

@@ -2224,11 +2224,7 @@ def test_column_selector_narwhals_resolve_without_table():
 
 def test_column_selector_narwhals_resolve_with_table():
     tbl = pl.DataFrame({"a": [1, 2], "b": ["x", "y"]})
-    validation = (
-        Validate(data=tbl)
-        .col_vals_ge(columns=ncs.numeric(), value=0)
-        .interrogate()
-    )
+    validation = Validate(data=tbl).col_vals_ge(columns=ncs.numeric(), value=0).interrogate()
     assert validation.n_passed(i=1, scalar=True) == 2
 
 

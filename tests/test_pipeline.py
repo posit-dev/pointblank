@@ -842,7 +842,9 @@ class TestPipelineResultTargetValidation:
         assert "validated" in text
         assert "PipelineResult" in text
 
-    def test_repr_with_both_validations(self, raw_data, source_contract, target_contract, transform_fn):
+    def test_repr_with_both_validations(
+        self, raw_data, source_contract, target_contract, transform_fn
+    ):
         pipeline = Pipeline(source=source_contract, target=target_contract)
         result = pipeline.run(data=raw_data, transform=transform_fn)
         text = repr(result)

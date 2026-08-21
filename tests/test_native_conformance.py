@@ -328,9 +328,7 @@ def test_evaluator_starts_with():
 
 def test_evaluator_ends_with():
     df = _nw_df({"x": ["hello", "world", "told"]})
-    mask = evaluate_conditions(
-        df, {"all": [{"name": "x", "operator": "ends_with", "value": "ld"}]}
-    )
+    mask = evaluate_conditions(df, {"all": [{"name": "x", "operator": "ends_with", "value": "ld"}]})
     assert mask.to_list() == [False, True, True]
 
 
@@ -1601,7 +1599,9 @@ def test_op_codelist_check_unknown_codelist(ct):
     import polars as pl
 
     df = nw.from_native(pl.DataFrame({"SEX": ["M"]}))
-    ops = [{"operator": "codelist_check", "params": {"column": "SEX", "codelist": "NONEXISTENT_CL"}}]
+    ops = [
+        {"operator": "codelist_check", "params": {"column": "SEX", "codelist": "NONEXISTENT_CL"}}
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_SEX_valid"].to_list() == [True]
 
@@ -1644,7 +1644,9 @@ def test_op_unique_per_subject_duplicates(ct):
     import narwhals as nw
     import polars as pl
 
-    df = nw.from_native(pl.DataFrame({"USUBJID": ["S1", "S1", "S2"], "AETERM": ["headache", "headache", "fever"]}))
+    df = nw.from_native(
+        pl.DataFrame({"USUBJID": ["S1", "S1", "S2"], "AETERM": ["headache", "headache", "fever"]})
+    )
     ops = [{"operator": "unique_per_subject", "params": {"column": "AETERM"}}]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_AETERM_unique"].to_list() == [False, False, True]
@@ -1656,7 +1658,9 @@ def test_op_variable_type_check_numeric(ct):
     import polars as pl
 
     df = nw.from_native(pl.DataFrame({"AGE": [30, 40, 50]}))
-    ops = [{"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}]
+    ops = [
+        {"operator": "variable_type_check", "params": {"column": "AGE", "expected_type": "numeric"}}
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_AGE_type_valid"].to_list() == [True, True, True]
 
@@ -1667,7 +1671,12 @@ def test_op_variable_type_check_character(ct):
     import polars as pl
 
     df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
-    ops = [{"operator": "variable_type_check", "params": {"column": "SEX", "expected_type": "character"}}]
+    ops = [
+        {
+            "operator": "variable_type_check",
+            "params": {"column": "SEX", "expected_type": "character"},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_SEX_type_valid"].to_list() == [True, True]
 
@@ -1678,7 +1687,12 @@ def test_op_variable_type_check_unknown_type(ct):
     import polars as pl
 
     df = nw.from_native(pl.DataFrame({"SEX": ["M", "F"]}))
-    ops = [{"operator": "variable_type_check", "params": {"column": "SEX", "expected_type": "unknown_category"}}]
+    ops = [
+        {
+            "operator": "variable_type_check",
+            "params": {"column": "SEX", "expected_type": "unknown_category"},
+        }
+    ]
     result = apply_operations(df, ops, ct, {})
     assert result["_pb_SEX_type_valid"].to_list() == [True, True]
 
@@ -1901,7 +1915,9 @@ def test_engine_dataset_metadata_check_evaluation_error():
         standards=[],
         classes=[],
         operations=[],
-        conditions={"all": [{"name": "_pb_NONEXISTENT_col", "operator": "equal_to", "value": True}]},
+        conditions={
+            "all": [{"name": "_pb_NONEXISTENT_col", "operator": "equal_to", "value": True}]
+        },
         actions={},
     )
     result = engine._evaluate_rule(rule, {"DM": nw.from_native(pl.DataFrame({"X": [1]}))})
@@ -1938,7 +1954,11 @@ def test_engine_domain_presence_check_prohibited_present():
 
 def _minimal_report(**extra):
     base = {
-        "Conformance_Details": {"Standard": "SDTMIG", "Version": "V3.4", "CORE_Engine_Version": "0.16.0"},
+        "Conformance_Details": {
+            "Standard": "SDTMIG",
+            "Version": "V3.4",
+            "CORE_Engine_Version": "0.16.0",
+        },
         "Dataset_Details": [{"filename": "dm.xpt"}],
         "Issue_Summary": [{"dataset": "DM", "core_id": "CORE-001", "message": "msg", "issues": 2}],
         "Issue_Details": [
@@ -1955,10 +1975,38 @@ def _minimal_report(**extra):
             }
         ],
         "Rules_Report": [
-            {"core_id": "CORE-001", "status": "ISSUE REPORTED", "message": "m", "version": "1", "cdisc_rule_id": "CG01", "fda_rule_id": ""},
-            {"core_id": "CORE-002", "status": "SUCCESS", "message": "", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
-            {"core_id": "CORE-003", "status": "SKIPPED", "message": "", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
-            {"core_id": "CORE-004", "status": "EXECUTION ERROR", "message": "err", "version": "1", "cdisc_rule_id": "", "fda_rule_id": ""},
+            {
+                "core_id": "CORE-001",
+                "status": "ISSUE REPORTED",
+                "message": "m",
+                "version": "1",
+                "cdisc_rule_id": "CG01",
+                "fda_rule_id": "",
+            },
+            {
+                "core_id": "CORE-002",
+                "status": "SUCCESS",
+                "message": "",
+                "version": "1",
+                "cdisc_rule_id": "",
+                "fda_rule_id": "",
+            },
+            {
+                "core_id": "CORE-003",
+                "status": "SKIPPED",
+                "message": "",
+                "version": "1",
+                "cdisc_rule_id": "",
+                "fda_rule_id": "",
+            },
+            {
+                "core_id": "CORE-004",
+                "status": "EXECUTION ERROR",
+                "message": "err",
+                "version": "1",
+                "cdisc_rule_id": "",
+                "fda_rule_id": "",
+            },
         ],
     }
     base.update(extra)
@@ -1967,6 +2015,7 @@ def _minimal_report(**extra):
 
 def test_cdisc_core_parse_minimal_report():
     from pointblank.metadata._cdisc_core import parse_core_report, ParsedCoreReport
+
     parsed = parse_core_report(_minimal_report())
     assert isinstance(parsed, ParsedCoreReport)
     assert parsed.standard == "SDTMIG"
@@ -1976,12 +2025,20 @@ def test_cdisc_core_parse_minimal_report():
 
 def test_cdisc_core_n_total_issues():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     parsed = parse_core_report(_minimal_report())
     assert parsed.n_total_issues == 2
 
 
 def test_cdisc_core_status_counts():
-    from pointblank.metadata._cdisc_core import parse_core_report, STATUS_SUCCESS, STATUS_SKIPPED, STATUS_ISSUE, STATUS_ERROR
+    from pointblank.metadata._cdisc_core import (
+        parse_core_report,
+        STATUS_SUCCESS,
+        STATUS_SKIPPED,
+        STATUS_ISSUE,
+        STATUS_ERROR,
+    )
+
     parsed = parse_core_report(_minimal_report())
     counts = parsed.status_counts()
     assert counts[STATUS_ISSUE] == 1
@@ -1992,6 +2049,7 @@ def test_cdisc_core_status_counts():
 
 def test_cdisc_core_failing_rules():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     parsed = parse_core_report(_minimal_report())
     failing = parsed.failing_rules()
     assert len(failing) == 2
@@ -2000,12 +2058,14 @@ def test_cdisc_core_failing_rules():
 
 def test_cdisc_core_all_passed_false():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     parsed = parse_core_report(_minimal_report())
     assert parsed.all_passed is False
 
 
 def test_cdisc_core_all_passed_true():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     report = {
         "Conformance_Details": {},
         "Issue_Summary": [],
@@ -2018,6 +2078,7 @@ def test_cdisc_core_all_passed_true():
 
 def test_cdisc_core_all_passed_no_rules_fallback():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     report = {
         "Conformance_Details": {},
         "Issue_Summary": [],
@@ -2030,6 +2091,7 @@ def test_cdisc_core_all_passed_no_rules_fallback():
 
 def test_cdisc_core_finding_fields():
     from pointblank.metadata._cdisc_core import parse_core_report, CoreFinding
+
     parsed = parse_core_report(_minimal_report())
     assert len(parsed.findings) == 1
     f = parsed.findings[0]
@@ -2045,7 +2107,14 @@ def test_cdisc_core_finding_fields():
 
 
 def test_cdisc_core_rule_result_is_failing_property():
-    from pointblank.metadata._cdisc_core import CoreRuleResult, STATUS_SUCCESS, STATUS_ISSUE, STATUS_ERROR, STATUS_SKIPPED
+    from pointblank.metadata._cdisc_core import (
+        CoreRuleResult,
+        STATUS_SUCCESS,
+        STATUS_ISSUE,
+        STATUS_ERROR,
+        STATUS_SKIPPED,
+    )
+
     assert CoreRuleResult(rule_id="C", status=STATUS_SUCCESS).is_failing is False
     assert CoreRuleResult(rule_id="C", status=STATUS_SKIPPED).is_failing is False
     assert CoreRuleResult(rule_id="C", status=STATUS_ISSUE).is_failing is True
@@ -2054,6 +2123,7 @@ def test_cdisc_core_rule_result_is_failing_property():
 
 def test_cdisc_core_issue_summary_parsed():
     from pointblank.metadata._cdisc_core import parse_core_report, CoreIssueSummary
+
     parsed = parse_core_report(_minimal_report())
     assert len(parsed.issue_summary) == 1
     s = parsed.issue_summary[0]
@@ -2065,6 +2135,7 @@ def test_cdisc_core_issue_summary_parsed():
 
 def test_cdisc_core_datasets_parsed():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     parsed = parse_core_report(_minimal_report())
     assert len(parsed.datasets) == 1
     assert parsed.datasets[0]["filename"] == "dm.xpt"
@@ -2072,6 +2143,7 @@ def test_cdisc_core_datasets_parsed():
 
 def test_cdisc_core_as_int():
     from pointblank.metadata._cdisc_core import _as_int
+
     assert _as_int(None) is None
     assert _as_int("") is None
     assert _as_int("5") == 5
@@ -2081,6 +2153,7 @@ def test_cdisc_core_as_int():
 
 def test_cdisc_core_empty_to_none():
     from pointblank.metadata._cdisc_core import _empty_to_none
+
     assert _empty_to_none("") is None
     assert _empty_to_none("hello") == "hello"
     assert _empty_to_none(None) is None
@@ -2088,6 +2161,7 @@ def test_cdisc_core_empty_to_none():
 
 def test_cdisc_core_normalize_version():
     from pointblank.metadata._cdisc_core import _normalize_version
+
     assert _normalize_version("3.4") == "3-4"
     assert _normalize_version("1.1.1") == "1-1-1"
     assert _normalize_version("3-4") == "3-4"
@@ -2095,16 +2169,19 @@ def test_cdisc_core_normalize_version():
 
 def test_cdisc_core_resolve_core_command_str():
     from pointblank.metadata._cdisc_core import _resolve_core_command
+
     assert _resolve_core_command("core") == ["core"]
 
 
 def test_cdisc_core_resolve_core_command_sequence():
     from pointblank.metadata._cdisc_core import _resolve_core_command
+
     assert _resolve_core_command(["python", "core.py"]) == ["python", "core.py"]
 
 
 def test_cdisc_core_resolve_core_command_env(monkeypatch):
     from pointblank.metadata._cdisc_core import _resolve_core_command
+
     monkeypatch.setenv("POINTBLANK_CDISC_CORE", "python /path/to/core.py")
     result = _resolve_core_command(None)
     assert result == ["python", "/path/to/core.py"]
@@ -2113,6 +2190,7 @@ def test_cdisc_core_resolve_core_command_env(monkeypatch):
 def test_cdisc_core_resolve_core_command_not_found(monkeypatch):
     from pointblank.metadata._cdisc_core import _resolve_core_command, CoreNotFoundError
     import shutil
+
     monkeypatch.delenv("POINTBLANK_CDISC_CORE", raising=False)
     monkeypatch.setattr("pointblank.metadata._cdisc_core.shutil.which", lambda name: None)
     with pytest.raises(CoreNotFoundError):
@@ -2121,6 +2199,7 @@ def test_cdisc_core_resolve_core_command_not_found(monkeypatch):
 
 def test_cdisc_core_runner_properties():
     from pointblank.metadata._cdisc_core import _CoreRunner
+
     runner = _CoreRunner(core="mycore", cwd="/tmp")
     assert runner.command == ["mycore"]
     assert runner.cwd == "/tmp"
@@ -2128,17 +2207,20 @@ def test_cdisc_core_runner_properties():
 
 def test_cdisc_core_runner_cwd_none():
     from pointblank.metadata._cdisc_core import _CoreRunner
+
     runner = _CoreRunner(core="mycore")
     assert runner.cwd is None
 
 
 def test_cdisc_core_parse_raises_on_non_dict():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     with pytest.raises(TypeError):
         parse_core_report(["not", "a", "dict"])
 
 
 def test_cdisc_core_parse_raises_on_unrecognized_keys():
     from pointblank.metadata._cdisc_core import parse_core_report
+
     with pytest.raises(ValueError):
         parse_core_report({"foo": 1, "bar": 2})

@@ -1689,47 +1689,57 @@ class TestFrictionlessAdditional:
 
     def test_pb_dtype_to_frictionless_type_int(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Int64") == "integer"
 
     def test_pb_dtype_to_frictionless_type_float(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Float64") == "number"
         assert _pb_dtype_to_frictionless_type("Double") == "number"
         assert _pb_dtype_to_frictionless_type("Decimal") == "number"
 
     def test_pb_dtype_to_frictionless_type_string(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("String") == "string"
         assert _pb_dtype_to_frictionless_type("Utf8") == "string"
         assert _pb_dtype_to_frictionless_type("Object") == "string"
 
     def test_pb_dtype_to_frictionless_type_bool(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Boolean") == "boolean"
 
     def test_pb_dtype_to_frictionless_type_datetime(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Datetime") == "datetime"
         assert _pb_dtype_to_frictionless_type("Timestamp") == "datetime"
 
     def test_pb_dtype_to_frictionless_type_date(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Date") == "date"
 
     def test_pb_dtype_to_frictionless_type_time(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Time") == "time"
 
     def test_pb_dtype_to_frictionless_type_duration(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("Duration") == "duration"
 
     def test_pb_dtype_to_frictionless_type_unknown(self):
         from pointblank.adapters._frictionless import _pb_dtype_to_frictionless_type
+
         assert _pb_dtype_to_frictionless_type("UnknownType") is None
 
     def test_apply_step_to_fields_new_column(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = []
         field_map = {}
         _apply_step_to_fields("col_vals_not_null", {"columns": "new_col"}, field_map, fields)
@@ -1739,6 +1749,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_to_fields_list_columns(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = []
         field_map = {}
         _apply_step_to_fields("col_vals_not_null", {"columns": ["a", "b"]}, field_map, fields)
@@ -1746,6 +1757,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_to_fields_no_columns(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = []
         field_map = {}
         _apply_step_to_fields("col_vals_not_null", {}, field_map, fields)
@@ -1753,6 +1765,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_to_fields_invalid_column_type(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = []
         field_map = {}
         _apply_step_to_fields("col_vals_not_null", {"columns": 42}, field_map, fields)
@@ -1760,6 +1773,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_rows_distinct(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = [{"name": "id"}]
         field_map = {"id": fields[0]}
         _apply_step_to_fields("rows_distinct", {"columns_subset": "id"}, field_map, fields)
@@ -1767,6 +1781,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_col_vals_le(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = [{"name": "age"}]
         field_map = {"age": fields[0]}
         _apply_step_to_fields("col_vals_le", {"columns": "age", "value": 100}, field_map, fields)
@@ -1774,6 +1789,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_col_vals_in_set(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = [{"name": "status"}]
         field_map = {"status": fields[0]}
         _apply_step_to_fields(
@@ -1783,6 +1799,7 @@ class TestFrictionlessAdditional:
 
     def test_apply_step_col_vals_regex(self):
         from pointblank.adapters._frictionless import _apply_step_to_fields
+
         fields = [{"name": "email"}]
         field_map = {"email": fields[0]}
         _apply_step_to_fields(
@@ -1853,12 +1870,14 @@ class TestFrictionlessAdditional:
 class TestODCSAdditional:
     def test_normalize_odcs_type_with_precision(self):
         from pointblank.adapters._odcs import _normalize_odcs_type
+
         assert _normalize_odcs_type("varchar(255)") == "String"
         assert _normalize_odcs_type("numeric(10,2)") == "Float64"
         assert _normalize_odcs_type("TIMESTAMP_NTZ") == "Datetime"
 
     def test_detect_string_valid_yaml_file(self, odcs_v3_dict):
         import yaml as _yaml
+
         adapter = get_adapter("odcs")
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             _yaml.dump(odcs_v3_dict, f)
@@ -1890,6 +1909,7 @@ class TestODCSAdditional:
 
     def test_is_odcs_apiversion_dataset(self):
         from pointblank.adapters._odcs import _is_odcs
+
         assert _is_odcs({"apiVersion": "v3.0.0", "dataset": []}) is True
         assert _is_odcs({"apiVersion": "v3.0.0", "schema": []}) is True
         assert _is_odcs({"something": "else"}) is False
@@ -1978,6 +1998,7 @@ class TestODCSAdditional:
 
     def test_import_doc_not_dict_raises(self):
         import yaml as _yaml
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             f.write("- item1\n- item2\n")
             fname = f.name
@@ -2006,6 +2027,7 @@ class TestODCSAdditional:
 
     def test_pb_dtype_to_odcs_type_all_branches(self):
         from pointblank.adapters._odcs import _pb_dtype_to_odcs_type
+
         assert _pb_dtype_to_odcs_type("Int64") == "integer"
         assert _pb_dtype_to_odcs_type("Float64") == "number"
         assert _pb_dtype_to_odcs_type("Double") == "number"
@@ -2022,6 +2044,7 @@ class TestODCSAdditional:
 
     def test_apply_step_to_odcs_columns_not_null(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns("col_vals_not_null", {"columns": "a"}, col_map, col_defs)
@@ -2029,15 +2052,15 @@ class TestODCSAdditional:
 
     def test_apply_step_to_odcs_columns_distinct(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
-        _apply_step_to_odcs_columns(
-            "rows_distinct", {"columns_subset": "a"}, col_map, col_defs
-        )
+        _apply_step_to_odcs_columns("rows_distinct", {"columns_subset": "a"}, col_map, col_defs)
         assert col_map["a"]["isUnique"] is True
 
     def test_apply_step_to_odcs_columns_in_set(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns(
@@ -2047,6 +2070,7 @@ class TestODCSAdditional:
 
     def test_apply_step_to_odcs_columns_regex(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns(
@@ -2056,6 +2080,7 @@ class TestODCSAdditional:
 
     def test_apply_step_to_odcs_columns_ge_le(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns("col_vals_ge", {"columns": "d", "value": 0}, col_map, col_defs)
@@ -2067,6 +2092,7 @@ class TestODCSAdditional:
 
     def test_apply_step_no_columns(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns("col_vals_not_null", {}, col_map, col_defs)
@@ -2074,15 +2100,15 @@ class TestODCSAdditional:
 
     def test_apply_step_list_columns(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
-        _apply_step_to_odcs_columns(
-            "col_vals_not_null", {"columns": ["a", "b"]}, col_map, col_defs
-        )
+        _apply_step_to_odcs_columns("col_vals_not_null", {"columns": ["a", "b"]}, col_map, col_defs)
         assert len(col_defs) == 2
 
     def test_apply_step_invalid_column_type(self):
         from pointblank.adapters._odcs import _apply_step_to_odcs_columns
+
         col_defs = []
         col_map = {}
         _apply_step_to_odcs_columns("col_vals_not_null", {"columns": 42}, col_map, col_defs)
@@ -2137,12 +2163,14 @@ class TestODCSAdditional:
 class TestDbtAdditional:
     def test_normalize_dbt_type_with_precision(self):
         from pointblank.adapters._dbt import _normalize_dbt_type
+
         assert _normalize_dbt_type("varchar(256)") == "String"
         assert _normalize_dbt_type("numeric(10,2)") == "Float64"
         assert _normalize_dbt_type("TIMESTAMP_NTZ") == "Datetime"
 
     def test_detect_string_valid_yaml_file(self, dbt_schema_dict):
         import yaml as _yaml
+
         adapter = get_adapter("dbt")
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             _yaml.dump(dbt_schema_dict, f)
@@ -2167,18 +2195,22 @@ class TestDbtAdditional:
 
     def test_is_dbt_schema_models(self):
         from pointblank.adapters._dbt import _is_dbt_schema
+
         assert _is_dbt_schema({"models": []}) is True
 
     def test_is_dbt_schema_sources(self):
         from pointblank.adapters._dbt import _is_dbt_schema
+
         assert _is_dbt_schema({"sources": []}) is True
 
     def test_is_dbt_schema_false(self):
         from pointblank.adapters._dbt import _is_dbt_schema
+
         assert _is_dbt_schema({"other": "data"}) is False
 
     def test_import_doc_not_dict_raises(self):
         import yaml as _yaml
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             f.write("- item1\n- item2\n")
             fname = f.name
@@ -2212,9 +2244,7 @@ class TestDbtAdditional:
     def test_import_dict_test_unique(self):
         doc = {
             "version": 2,
-            "models": [
-                {"name": "m", "columns": [{"name": "col", "data_tests": [{"unique": {}}]}]}
-            ],
+            "models": [{"name": "m", "columns": [{"name": "col", "data_tests": [{"unique": {}}]}]}],
         }
         result = import_contract(doc, format="dbt")
         methods = [c.method for c in result.constraints]
@@ -2226,9 +2256,7 @@ class TestDbtAdditional:
             "models": [
                 {
                     "name": "m",
-                    "columns": [
-                        {"name": "col", "data_tests": [{"custom_test": {"param": "val"}}]}
-                    ],
+                    "columns": [{"name": "col", "data_tests": [{"custom_test": {"param": "val"}}]}],
                 }
             ],
         }
@@ -2337,6 +2365,7 @@ class TestDbtAdditional:
 
     def test_pb_dtype_to_dbt_type_all_branches(self):
         from pointblank.adapters._dbt import _pb_dtype_to_dbt_type
+
         assert _pb_dtype_to_dbt_type("Int64") == "integer"
         assert _pb_dtype_to_dbt_type("Float64") == "float"
         assert _pb_dtype_to_dbt_type("Double") == "float"
@@ -2353,6 +2382,7 @@ class TestDbtAdditional:
 
     def test_apply_step_to_dbt_columns_not_null(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("col_vals_not_null", {"columns": "a"}, col_map, columns)
@@ -2360,6 +2390,7 @@ class TestDbtAdditional:
 
     def test_apply_step_to_dbt_columns_distinct(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("rows_distinct", {"columns_subset": "a"}, col_map, columns)
@@ -2367,6 +2398,7 @@ class TestDbtAdditional:
 
     def test_apply_step_to_dbt_columns_in_set(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns(
@@ -2377,6 +2409,7 @@ class TestDbtAdditional:
 
     def test_apply_step_no_columns(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("col_vals_not_null", {}, col_map, columns)
@@ -2384,15 +2417,15 @@ class TestDbtAdditional:
 
     def test_apply_step_list_columns(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
-        _apply_step_to_dbt_columns(
-            "col_vals_not_null", {"columns": ["a", "b"]}, col_map, columns
-        )
+        _apply_step_to_dbt_columns("col_vals_not_null", {"columns": ["a", "b"]}, col_map, columns)
         assert len(columns) == 2
 
     def test_apply_step_invalid_column_type(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("col_vals_not_null", {"columns": 42}, col_map, columns)
@@ -2400,6 +2433,7 @@ class TestDbtAdditional:
 
     def test_apply_step_not_null_no_duplicate(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("col_vals_not_null", {"columns": "a"}, col_map, columns)
@@ -2408,6 +2442,7 @@ class TestDbtAdditional:
 
     def test_apply_step_unique_no_duplicate(self):
         from pointblank.adapters._dbt import _apply_step_to_dbt_columns
+
         columns = []
         col_map = {}
         _apply_step_to_dbt_columns("rows_distinct", {"columns_subset": "a"}, col_map, columns)

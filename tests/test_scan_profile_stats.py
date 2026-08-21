@@ -273,6 +273,7 @@ def test_column_order_registry_contains_all_stat_types():
 
 def test_stat_expr_attributes_exist():
     import narwhals as nw
+
     assert isinstance(MeanStat.expr, nw.Expr)
     assert isinstance(StdStat.expr, nw.Expr)
     assert isinstance(MinStat.expr, nw.Expr)
