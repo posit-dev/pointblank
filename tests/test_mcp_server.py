@@ -3,6 +3,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+pytest.importorskip("mcp", reason="mcp package not installed")
+
 from fastmcp import Client
 from pointblank.mcp.server import mcp
 
