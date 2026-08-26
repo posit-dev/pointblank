@@ -111,11 +111,11 @@ def save_validation_files(validations, output_dir):
             with open(json_path, "w") as f:
                 f.write(json_report)
             print(f"Saved {name} validation JSON to {json_path}")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             print(f"Could not save JSON for {name}: {e}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     # Create validation examples
     validations = create_validation_examples()
 
