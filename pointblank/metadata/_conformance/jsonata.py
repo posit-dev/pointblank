@@ -300,7 +300,7 @@ def _eval(node: tuple, ctx: dict[str, Any]) -> Any:
             return left <= right
         if op == ">=":
             return left >= right
-        return False
+        return False  # pragma: no cover
 
     if kind == "binop":
         _, op, lhs, rhs = node
@@ -316,14 +316,14 @@ def _eval(node: tuple, ctx: dict[str, Any]) -> Any:
             return left * right
         if op == "/":
             return left / right if right != 0 else None
-        return None
+        return None  # pragma: no cover
 
     if kind == "call":
         _, name, args = node
         evaled = [_eval(a, ctx) for a in args]
         return _call_function(name, evaled)
 
-    raise JSONataSyntaxError(f"Unknown AST node: {kind!r}")
+    raise JSONataSyntaxError(f"Unknown AST node: {kind!r}")  # pragma: no cover
 
 
 def _call_function(name: str, args: list[Any]) -> Any:

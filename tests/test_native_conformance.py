@@ -912,6 +912,149 @@ def test_jsonata_syntax_error():
         evaluate_jsonata("= broken", {})
 
 
+def test_jsonata_empty_expression_returns_none():
+    # covers the `if not tokens: return None` guard (line 466)
+    assert evaluate_jsonata("", {}) is None
+    assert evaluate_jsonata("   ", {}) is None
+
+
+def test_jsonata_unrecognized_character_breaks_tokenizer():
+    # `@` matches no token pattern; tokenizer breaks, returning []
+    assert evaluate_jsonata("@", {}) is None
+
+
+def test_jsonata_filter_expression_at_start_raises():
+    # `[` as the START of a primary expression hits the not-supported guard
+    with pytest.raises(JSONataNotSupported):
+        evaluate_jsonata("[1, 2]", {})
+
+
+def test_jsonata_unary_negative():
+    assert evaluate_jsonata("-5", {}) == -5
+    assert evaluate_jsonata("-X", {"X": 3}) == -3
+
+
+def test_jsonata_not_missing_paren_raises():
+    # `_expect("(")` fails when `not` is not followed by `(`
+    with pytest.raises(JSONataSyntaxError):
+        evaluate_jsonata("not true", {})
+
+
+def test_jsonata_unexpected_end_of_expression():
+    # `_primary` gets `t is None`
+    with pytest.raises(JSONataSyntaxError):
+        evaluate_jsonata("1 +", {})
+
+
+def test_jsonata_bare_variable_reference():
+    # bare `$x` (no parens) — parsed as ("var", "$x"), looked up in ctx
+    assert evaluate_jsonata("$x", {"$x": 42}) == 42
+    assert evaluate_jsonata("$y", {}) is None
+
+
+def test_jsonata_path_trailing_dot():
+    # trailing dot: parser breaks out of path loop when nothing follows the dot
+    assert evaluate_jsonata("a.", {"a": 1}) == 1
+    assert evaluate_jsonata("a.", {}) is None
+
+
+def test_jsonata_path_non_identifier_after_dot():
+    # path parsing breaks when a number follows the dot; parse fails
+    with pytest.raises(JSONataSyntaxError):
+        evaluate_jsonata("a.1", {})
+
+
+def test_jsonata_path_non_dict_value_returns_none():
+    # path traversal hits `else: value = None; break`
+    assert evaluate_jsonata("a.b", {"a": "not_a_dict"}) is None
+    assert evaluate_jsonata("a.b.c", {"a": 5}) is None
+
+
+def test_jsonata_comparison_null_operand_returns_false():
+    # ordering operators with a None side return False
+    assert evaluate_jsonata("MISSING > 5", {}) is False
+    assert evaluate_jsonata("MISSING < 5", {}) is False
+    assert evaluate_jsonata("MISSING >= 5", {}) is False
+    assert evaluate_jsonata("MISSING <= 5", {}) is False
+
+
+def test_jsonata_binop_null_operand_returns_none():
+    assert evaluate_jsonata("MISSING + 1", {}) is None
+    assert evaluate_jsonata("MISSING - 1", {}) is None
+    assert evaluate_jsonata("MISSING * 2", {}) is None
+    assert evaluate_jsonata("MISSING / 2", {}) is None
+
+
+def test_jsonata_length_null_and_list():
+    assert evaluate_jsonata("$length(MISSING)", {}) == 0
+    assert evaluate_jsonata("$length(VALS)", {"VALS": [1, 2, 3]}) == 3
+
+
+def test_jsonata_count_scalar():
+    assert evaluate_jsonata("$count(X)", {"X": "hello"}) == 1
+
+
+def test_jsonata_distinct_null_and_scalar():
+    assert evaluate_jsonata("$distinct(MISSING)", {}) == []
+    assert evaluate_jsonata("$distinct(X)", {"X": "hello"}) == ["hello"]
+
+
+def test_jsonata_sum():
+    assert evaluate_jsonata("$sum(VALS)", {"VALS": [1, 2, 3]}) == 6
+    assert evaluate_jsonata("$sum(X)", {"X": 5}) == 5
+    assert evaluate_jsonata("$sum(X)", {"X": "str"}) == 0
+
+
+def test_jsonata_max():
+    assert evaluate_jsonata("$max(VALS)", {"VALS": [3, 1, 2]}) == 3
+    assert evaluate_jsonata("$max(VALS)", {"VALS": []}) is None
+    assert evaluate_jsonata("$max(X)", {"X": 7}) == 7
+
+
+def test_jsonata_min():
+    assert evaluate_jsonata("$min(VALS)", {"VALS": [3, 1, 2]}) == 1
+    assert evaluate_jsonata("$min(VALS)", {"VALS": []}) is None
+    assert evaluate_jsonata("$min(X)", {"X": 7}) == 7
+
+
+def test_jsonata_round():
+    assert evaluate_jsonata("$round(MISSING)", {}) is None
+    assert evaluate_jsonata("$round(3.14, 1)", {}) == 3.1
+    assert evaluate_jsonata("$round(3.14)", {}) == 3
+
+
+def test_jsonata_floor_ceil_abs():
+    assert evaluate_jsonata("$floor(3.7)", {}) == 3
+    assert evaluate_jsonata("$floor(MISSING)", {}) is None
+    assert evaluate_jsonata("$ceil(3.2)", {}) == 4
+    assert evaluate_jsonata("$ceil(MISSING)", {}) is None
+    assert evaluate_jsonata("$abs(-5)", {}) == 5
+    assert evaluate_jsonata("$abs(MISSING)", {}) is None
+
+
+def test_jsonata_type_function():
+    assert evaluate_jsonata("$type(null)", {}) == "null"
+    assert evaluate_jsonata("$type(true)", {}) == "boolean"
+    assert evaluate_jsonata("$type(42)", {}) == "number"
+    assert evaluate_jsonata('$type("hello")', {}) == "string"
+    assert evaluate_jsonata("$type(VALS)", {"VALS": [1, 2]}) == "array"
+    assert evaluate_jsonata("$type(D)", {"D": {"a": 1}}) == "object"
+    # non-standard Python type not reachable through normal parsing
+    from pointblank.metadata._conformance.jsonata import _call_function
+
+    assert _call_function("type", [{1, 2}]) == "unknown"
+
+
+def test_jsonata_not_function():
+    assert evaluate_jsonata("$not(true)", {}) is False
+    assert evaluate_jsonata("$not(false)", {}) is True
+
+
+def test_jsonata_unsupported_function_raises():
+    with pytest.raises(JSONataNotSupported):
+        evaluate_jsonata("$unknown()", {})
+
+
 # ── Phase 2: new operations ───────────────────────────────────────────────────
 
 
