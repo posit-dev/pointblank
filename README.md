@@ -6,18 +6,18 @@
 <br>
 
 <!-- BOOK_PROGRESS_BEGIN -->
-Overall: **2%** complete &mdash; 3 of 37 chapters have content
+Overall: **12%** complete &mdash; 6 of 37 chapters have content
 
 **Foundations**<br>
-Intro: `█░░░░░░░░░░░░░░` 8%<br>
-Getting Started: `█████░░░░░░░░░░` 30%<br>
-Inspecting Data: `█████████░░░░░░` 62%<br>
-Validation Workflow: `░░░░░░░░░░░░░░░` 2%<br>
-Analysis Loop: `█░░░░░░░░░░░░░░` 4%<br>
+Intro: `███████░░░░░░░░` 49%<br>
+Getting Started: `█████████████░░` 89%<br>
+Inspecting Data: `███████████████` 100%<br>
+Validation Workflow: `███████████████` 100%<br>
+Analysis Loop: `██████████░░░░░` 65%<br>
 
 **Building Validation Plans**<br>
-Column Validations: `░░░░░░░░░░░░░░░` 0%<br>
-Aggregate Validations: `░░░░░░░░░░░░░░░` 0%<br>
+Column Validations: `█░░░░░░░░░░░░░░` 3%<br>
+Aggregate Validations: `█░░░░░░░░░░░░░░` 8%<br>
 Row Validations: `░░░░░░░░░░░░░░░` 0%<br>
 Table Validations: `░░░░░░░░░░░░░░░` 0%<br>
 Missing Data: `░░░░░░░░░░░░░░░` 0%<br>
