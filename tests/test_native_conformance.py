@@ -1464,6 +1464,61 @@ def test_engine_rule_count_phase3():
     assert len(result.rule_results) == 426
 
 
+_FIXTURES_DIR = Path(__file__).parent / "metadata_fixtures"
+
+
+def test_load_define_xml_from_path_returns_package():
+    pytest.importorskip("lxml")
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
+    # Pass a filesystem path; _load_define_xml reads it and returns a MetadataPackage
+    result = engine.run({"DM": _clean_dm()}, define_xml=_FIXTURES_DIR / "define.xml")
+    assert result is not None
+    define_rules = [r for r in result.rule_results if r.rule_type == "DEFINE_ITEM_METADATA_CHECK"]
+    assert any(r.status != "not_applicable" for r in define_rules)
+
+
+def test_load_define_xml_from_path_wraps_single_import(monkeypatch):
+    pytest.importorskip("lxml")
+    from pointblank.metadata._types import MetadataImport
+
+    single = MetadataImport(source_format="cdisc_define", dataset_name="DM", domain="DM")
+    monkeypatch.setattr(
+        "pointblank.metadata._conformance.engine._read_define_xml_metadata",
+        lambda path: single,
+        raising=False,
+    )
+    # Patch the import inside the try block so the monkeypatched name is used
+    import pointblank.metadata._conformance.engine as eng_mod
+    import pointblank.metadata._readers_cdisc as readers_mod
+
+    monkeypatch.setattr(readers_mod, "_read_define_xml_metadata", lambda path: single)
+
+    engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["DEFINE_ITEM_METADATA_CHECK"])
+    # Trigger _load_define_xml with a path string; it will call the patched reader
+    pkg = eng_mod.NativeConformanceEngine._load_define_xml(
+        engine, str(_FIXTURES_DIR / "define.xml")
+    )
+    assert pkg is not None
+    assert "DM" in pkg.items
+
+
+def test_load_define_xml_import_error_returns_none(monkeypatch):
+    import builtins
+    import pointblank.metadata._conformance.engine as eng_mod
+
+    real_import = builtins.__import__
+
+    def mock_import(name, *args, **kwargs):
+        if name == "pointblank.metadata._readers_cdisc":
+            raise ImportError("simulated missing lxml")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", mock_import)
+    engine = NativeConformanceEngine("sdtmig", "3.4")
+    pkg = eng_mod.NativeConformanceEngine._load_define_xml(engine, "/some/path/define.xml")
+    assert pkg is None
+
+
 def test_ct_repr():
     """ControlledTerminology.__repr__ returns expected string."""
     from pointblank.metadata._conformance.ct import ControlledTerminology
