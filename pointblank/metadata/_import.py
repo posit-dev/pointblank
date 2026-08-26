@@ -258,7 +258,7 @@ def _detect_xml_format(path: Path) -> str:
     # Use iterparse to avoid loading the entire file
     try:
         from lxml import etree
-    except ImportError:
+    except ImportError:  # pragma: no cover
         raise ImportError(
             "The 'lxml' package is required for XML format detection. "
             "Install it with: pip install lxml"

@@ -2022,6 +2022,14 @@ class TestXMLFormatDetection:
         with pytest.raises(ValueError, match="Cannot auto-detect XML"):
             _detect_xml_format(p)
 
+    def test_xml_malformed_raises(self, tmp_path):
+        from pointblank.metadata._import import _detect_xml_format
+
+        p = tmp_path / "malformed.xml"
+        p.write_text("<<<not valid xml at all>>>")
+        with pytest.raises(ValueError, match="Cannot parse XML file"):
+            _detect_xml_format(p)
+
 
 class TestCDISCImportMetadataIntegration:
     """Test import_metadata() with CDISC format routing."""
