@@ -11469,6 +11469,18 @@ def test_make_sublabel() -> None:
     assert result is not None
 
 
+def test_create_table_dims_html() -> None:
+    from pointblank._utils_html import _create_table_dims_html
+
+    result = _create_table_dims_html(columns=5, rows=100)
+    assert "span" in result
+    assert "100" in result
+    assert "5" in result
+
+    result_large = _create_table_dims_html(columns=20, rows=1_000_000)
+    assert "1,000,000" in result_large
+
+
 def test_pointblank_config_class() -> None:
     # Test the default configuration
     config = PointblankConfig()

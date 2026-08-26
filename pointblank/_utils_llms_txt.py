@@ -52,8 +52,7 @@ def get_api_details(module, exported_list) -> str:
                     from pointblank.validate import _generate_agg_docstring
 
                     doc = _generate_agg_docstring(obj_name)
-                except Exception:
-                    # If we can't generate the docstring, just use what we have
+                except Exception:  # pragma: no cover
                     pass
 
         # Combine the class name, signature, and docstring
@@ -361,7 +360,7 @@ def _get_examples_text() -> str:
         title_match = re.search(r'^title:\s*"(.+?)"', example_text, re.MULTILINE)
         desc_match = re.search(r'^description:\s*"(.+?)"', example_text, re.MULTILINE)
 
-        if not title_match or not desc_match:
+        if not title_match or not desc_match:  # pragma: no cover
             continue
 
         title = title_match.group(1)
