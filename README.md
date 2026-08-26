@@ -1,5 +1,5 @@
 > [!TIP]
-> **📖 [Pointblank: The Complete Guide](https://rich-iannone.github.io/pointblank-the-complete-guide/)** — A comprehensive, free book on data validation with Pointblank is being written! Follow along and learn everything from first steps to advanced validation patterns, AI-assisted workflows, and industry playbooks.
+> **📖 [Pointblank: The Complete Guide](https://rich-iannone.github.io/pointblank-the-complete-guide/)**: A comprehensive (and free!) book on data validation with Pointblank is now being written. Follow along and learn everything from first steps to advanced validation patterns and AI-assisted workflows.
 
 <details>
 <summary>📊 Book chapter progress</summary>
