@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-a548297dc882640771aadabfda74b676.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1703,10 +1703,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>pre-built chatlas <code>Content</code> objects (e.g., <code>chatlas.content_image_plot()</code>)</li>
 </ul>
 <p>Supported extensions: <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.gif</code>, <code>.webp</code>, <code>.pdf</code>.</p>
-<section id="notes" class="level2 doc-section doc-section-notes">
-<h2 class="doc-section doc-section-notes">Notes</h2>
-<p>local image paths auto-coerced through <code>attachments=</code> use <code>resize="low"</code> (chatlas’s default downscale to 512x512) to keep token costs predictable. For higher fidelity, pre-build the content yourself with <code>chatlas.content_image_file(path, resize="high")</code> (or <code>"none"</code>) and pass that object inside <code>attachments=</code>.</p>
-</section>
+<p>Note: local image paths auto-coerced through <code>attachments=</code> use <code>resize="low"</code> (chatlas’s default downscale to 512x512) to keep token costs predictable. For higher fidelity, pre-build the content yourself with <code>chatlas.content_image_file(path, resize="high")</code> (or <code>"none"</code>) and pass that object inside <code>attachments=</code>.</p>
 <p><strong>Cost / batching note</strong>: attachments are re-sent on <em>every</em> batch (one batch = one LLM API call). For a table that requires N batches, each attachment’s input tokens are billed N times. To control costs:</p>
 <ul>
 <li>keep attachments small (downscale images, crop PDFs to the relevant page)</li>
