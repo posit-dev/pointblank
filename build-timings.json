@@ -1,1504 +1,1439 @@
 {
-  "build_time": "2026-08-26T15:12:38Z",
-  "total_seconds": 950.823,
+  "build_time": "2026-08-31T15:41:34Z",
+  "total_seconds": 839.323,
   "pages": [
     {
       "page": "user-guide/yaml/yaml-validation-workflows.qmd",
-      "seconds": 76.442,
+      "seconds": 73.103,
       "frozen": true
     },
     {
       "page": "user-guide/validation-plan/validation-methods.qmd",
-      "seconds": 9.426,
+      "seconds": 8.456,
       "frozen": true
     },
     {
       "page": "reference/Validate.qmd",
-      "seconds": 8.832,
+      "seconds": 7.755,
       "frozen": true
     },
     {
       "page": "reference/preview.qmd",
-      "seconds": 7.382,
+      "seconds": 6.209,
       "frozen": true
     },
     {
       "page": "user-guide/contracts-and-pipelines/importing-contracts.qmd",
-      "seconds": 6.589,
-      "frozen": true
-    },
-    {
-      "page": "reference/load_dataset.qmd",
-      "seconds": 6.444,
-      "frozen": true
-    },
-    {
-      "page": "reference/col_summary_tbl.qmd",
-      "seconds": 6.235,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/post-interrogation/extracts.qmd",
-      "seconds": 6.032,
-      "frozen": true
-    },
-    {
-      "page": "reference/yaml_interrogate.qmd",
-      "seconds": 5.985,
-      "frozen": true
-    },
-    {
-      "page": "reference/Actions.qmd",
-      "seconds": 5.973,
-      "frozen": true
-    },
-    {
-      "page": "reference/get_row_count.qmd",
-      "seconds": 5.962,
-      "frozen": true
-    },
-    {
-      "page": "reference/get_column_count.qmd",
-      "seconds": 5.928,
-      "frozen": true
-    },
-    {
-      "page": "reference/col.qmd",
-      "seconds": 5.923,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.get_step_report.qmd",
-      "seconds": 5.882,
-      "frozen": true
-    },
-    {
-      "page": "reference/get_action_metadata.qmd",
-      "seconds": 5.872,
+      "seconds": 5.853,
       "frozen": true
     },
     {
       "page": "reference/Validate.col_pct_null.qmd",
-      "seconds": 5.748,
+      "seconds": 5.711,
       "frozen": true
     },
     {
-      "page": "reference/connect_to_table.qmd",
-      "seconds": 5.718,
+      "page": "reference/load_dataset.qmd",
+      "seconds": 5.318,
       "frozen": true
     },
     {
-      "page": "reference/generate_dataset.qmd",
-      "seconds": 5.643,
+      "page": "user-guide/post-interrogation/extracts.qmd",
+      "seconds": 5.275,
       "frozen": true
     },
     {
-      "page": "reference/Validate.get_tabular_report.qmd",
-      "seconds": 5.587,
+      "page": "reference/yaml_interrogate.qmd",
+      "seconds": 5.239,
       "frozen": true
     },
     {
-      "page": "examples/actions-and-thresholds/validation-with-actions.qmd",
-      "seconds": 5.559,
-      "frozen": true
-    },
-    {
-      "page": "reference/first_n.qmd",
-      "seconds": 5.553,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.data_freshness.qmd",
-      "seconds": 5.549,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.specially.qmd",
-      "seconds": 5.486,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.rows_complete.qmd",
-      "seconds": 5.465,
-      "frozen": true
-    },
-    {
-      "page": "reference/get_data_path.qmd",
-      "seconds": 5.455,
-      "frozen": true
-    },
-    {
-      "page": "examples/results-and-reporting/step-report-schema-check.qmd",
-      "seconds": 5.438,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.interrogate.qmd",
-      "seconds": 5.413,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.row_count_match.qmd",
-      "seconds": 5.387,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/data-inspection/col-summary-tbl.qmd",
-      "seconds": 5.386,
-      "frozen": true
-    },
-    {
-      "page": "reference/float_field.qmd",
-      "seconds": 5.363,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.error.qmd",
-      "seconds": 5.351,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/post-interrogation/sundering.qmd",
-      "seconds": 5.346,
-      "frozen": true
-    },
-    {
-      "page": "reference/last_n.qmd",
-      "seconds": 5.34,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.prompt.qmd",
-      "seconds": 5.335,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.tbl_match.qmd",
-      "seconds": 5.293,
-      "frozen": true
-    },
-    {
-      "page": "examples/advanced-topics/using-parquet-data.qmd",
-      "seconds": 5.283,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.rows_distinct.qmd",
-      "seconds": 5.281,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.set_tbl.qmd",
-      "seconds": 5.281,
-      "frozen": true
-    },
-    {
-      "page": "reference/profile_fields.qmd",
-      "seconds": 5.27,
-      "frozen": true
-    },
-    {
-      "page": "reference/everything.qmd",
-      "seconds": 5.262,
-      "frozen": true
-    },
-    {
-      "page": "reference/ends_with.qmd",
-      "seconds": 5.261,
-      "frozen": true
-    },
-    {
-      "page": "reference/Schema.qmd",
-      "seconds": 5.259,
-      "frozen": true
-    },
-    {
-      "page": "examples/advanced-topics/check-row-column-counts.qmd",
-      "seconds": 5.255,
-      "frozen": true
-    },
-    {
-      "page": "reference/contains.qmd",
-      "seconds": 5.246,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.get_data_extracts.qmd",
-      "seconds": 5.235,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_avg_le.qmd",
-      "seconds": 5.226,
-      "frozen": true
-    },
-    {
-      "page": "reference/missing_vals_tbl.qmd",
-      "seconds": 5.226,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_avg_gt.qmd",
-      "seconds": 5.224,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/post-interrogation/quality-dimensions-and-scoring.qmd",
-      "seconds": 5.217,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sum_le.qmd",
-      "seconds": 5.2,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sum_lt.qmd",
-      "seconds": 5.191,
-      "frozen": true
-    },
-    {
-      "page": "reference/matches.qmd",
-      "seconds": 5.188,
-      "frozen": true
-    },
-    {
-      "page": "reference/duration_field.qmd",
-      "seconds": 5.183,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sum_ge.qmd",
-      "seconds": 5.181,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.get_sundered_data.qmd",
-      "seconds": 5.179,
-      "frozen": true
-    },
-    {
-      "page": "reference/int_field.qmd",
-      "seconds": 5.176,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sd_le.qmd",
-      "seconds": 5.165,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sd_ge.qmd",
+      "page": "reference/Actions.qmd",
       "seconds": 5.159,
       "frozen": true
     },
     {
-      "page": "reference/Validate.col_sd_gt.qmd",
-      "seconds": 5.159,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_avg_lt.qmd",
-      "seconds": 5.152,
-      "frozen": true
-    },
-    {
-      "page": "reference/string_field.qmd",
-      "seconds": 5.15,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sum_eq.qmd",
-      "seconds": 5.148,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sum_gt.qmd",
-      "seconds": 5.148,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.warning.qmd",
-      "seconds": 5.147,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_avg_eq.qmd",
-      "seconds": 5.142,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_decreasing.qmd",
-      "seconds": 5.139,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.get_dataframe_report.qmd",
-      "seconds": 5.137,
-      "frozen": true
-    },
-    {
-      "page": "reference/has_columns.qmd",
-      "seconds": 5.131,
-      "frozen": true
-    },
-    {
-      "page": "reference/datetime_field.qmd",
-      "seconds": 5.129,
-      "frozen": true
-    },
-    {
-      "page": "reference/date_field.qmd",
-      "seconds": 5.127,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_sd_lt.qmd",
-      "seconds": 5.119,
+      "page": "reference/col_summary_tbl.qmd",
+      "seconds": 5.078,
       "frozen": true
     },
     {
       "page": "reference/Validate.col_sd_eq.qmd",
-      "seconds": 5.118,
-      "frozen": true
-    },
-    {
-      "page": "reference/has_rows.qmd",
-      "seconds": 5.115,
-      "frozen": true
-    },
-    {
-      "page": "reference/seg_group.qmd",
-      "seconds": 5.104,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.conjointly.qmd",
-      "seconds": 5.101,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_exists.qmd",
-      "seconds": 5.1,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_in_set.qmd",
-      "seconds": 5.099,
-      "frozen": true
-    },
-    {
-      "page": "reference/bool_field.qmd",
-      "seconds": 5.093,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/advanced-validation/plan-serialization.qmd",
-      "seconds": 5.091,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_between.qmd",
-      "seconds": 5.081,
-      "frozen": true
-    },
-    {
-      "page": "reference/starts_with.qmd",
-      "seconds": 5.044,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_avg_ge.qmd",
-      "seconds": 5.033,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.f_passed.qmd",
       "seconds": 5.031,
       "frozen": true
     },
     {
-      "page": "examples/advanced-topics/column-selector-functions.qmd",
-      "seconds": 5.027,
+      "page": "examples/advanced-topics/using-parquet-data.qmd",
+      "seconds": 5.016,
       "frozen": true
     },
     {
-      "page": "reference/Validate.col_vals_le.qmd",
-      "seconds": 5.007,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.f_failed.qmd",
-      "seconds": 4.994,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_lt.qmd",
-      "seconds": 4.972,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.get_json_report.qmd",
-      "seconds": 4.971,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_gt.qmd",
-      "seconds": 4.969,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.above_threshold.qmd",
-      "seconds": 4.956,
-      "frozen": true
-    },
-    {
-      "page": "reference/ref.qmd",
-      "seconds": 4.955,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_count_match.qmd",
-      "seconds": 4.954,
-      "frozen": true
-    },
-    {
-      "page": "reference/expr_col.qmd",
-      "seconds": 4.952,
-      "frozen": true
-    },
-    {
-      "page": "examples/results-and-reporting/data-extracts.qmd",
-      "seconds": 4.939,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.n_passed.qmd",
-      "seconds": 4.935,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.assert_below_threshold.qmd",
-      "seconds": 4.93,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_ge.qmd",
+      "page": "reference/get_row_count.qmd",
       "seconds": 4.927,
       "frozen": true
     },
     {
-      "page": "reference/Validate.col_schema_match.qmd",
-      "seconds": 4.923,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_eq.qmd",
-      "seconds": 4.918,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_not_null.qmd",
-      "seconds": 4.913,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_ne.qmd",
-      "seconds": 4.909,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.n.qmd",
+      "page": "reference/Validate.col_sd_le.qmd",
       "seconds": 4.908,
       "frozen": true
     },
     {
-      "page": "reference/Validate.n_failed.qmd",
-      "seconds": 4.901,
+      "page": "reference/Validate.get_step_report.qmd",
+      "seconds": 4.905,
       "frozen": true
     },
     {
-      "page": "reference/write_file.qmd",
-      "seconds": 4.894,
+      "page": "examples/actions-and-thresholds/validation-with-actions.qmd",
+      "seconds": 4.88,
       "frozen": true
     },
     {
-      "page": "reference/Validate.col_missing_coded.qmd",
-      "seconds": 4.893,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_str_len.qmd",
-      "seconds": 4.892,
-      "frozen": true
-    },
-    {
-      "page": "reference/Thresholds.qmd",
-      "seconds": 4.886,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_not_in_set.qmd",
-      "seconds": 4.885,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_regex.qmd",
-      "seconds": 4.885,
-      "frozen": true
-    },
-    {
-      "page": "reference/validate_yaml.qmd",
-      "seconds": 4.884,
-      "frozen": true
-    },
-    {
-      "page": "reference/time_field.qmd",
-      "seconds": 4.879,
-      "frozen": true
-    },
-    {
-      "page": "reference/schema_from_tbl.qmd",
+      "page": "examples/advanced-topics/check-row-column-counts.qmd",
       "seconds": 4.877,
       "frozen": true
     },
     {
-      "page": "reference/Validate.critical.qmd",
-      "seconds": 4.862,
+      "page": "reference/col.qmd",
+      "seconds": 4.873,
       "frozen": true
     },
     {
-      "page": "reference/Validate.col_vals_within_spec.qmd",
-      "seconds": 4.857,
+      "page": "reference/get_column_count.qmd",
+      "seconds": 4.865,
       "frozen": true
     },
     {
-      "page": "examples/results-and-reporting/sundered-data.qmd",
-      "seconds": 4.852,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_pct_missing.qmd",
-      "seconds": 4.843,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_outside.qmd",
-      "seconds": 4.828,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_increasing.qmd",
-      "seconds": 4.794,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_expr.qmd",
-      "seconds": 4.791,
-      "frozen": true
-    },
-    {
-      "page": "examples/actions-and-thresholds/validation-with-final-actions.qmd",
-      "seconds": 4.776,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_null.qmd",
-      "seconds": 4.732,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_missing_consistent.qmd",
-      "seconds": 4.726,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.col_vals_in_table.qmd",
-      "seconds": 4.721,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.all_passed.qmd",
-      "seconds": 4.678,
-      "frozen": true
-    },
-    {
-      "page": "reference/Validate.assert_passing.qmd",
-      "seconds": 4.661,
-      "frozen": true
-    },
-    {
-      "page": "examples/advanced-topics/mutate-table-in-step.qmd",
-      "seconds": 4.595,
-      "frozen": true
-    },
-    {
-      "page": "reference/yaml_to_python.qmd",
-      "seconds": 4.592,
+      "page": "reference/get_action_metadata.qmd",
+      "seconds": 4.782,
       "frozen": true
     },
     {
       "page": "reference/Validate.col_missing_only_coded.qmd",
-      "seconds": 4.59,
+      "seconds": 4.678,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/checks-for-missing.qmd",
-      "seconds": 4.514,
+      "page": "reference/Validate.col_pct_missing.qmd",
+      "seconds": 4.676,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/set-membership.qmd",
-      "seconds": 4.506,
+      "page": "reference/Validate.col_sd_gt.qmd",
+      "seconds": 4.676,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/apply-checks-to-several-columns.qmd",
-      "seconds": 4.478,
+      "page": "examples/results-and-reporting/step-report-schema-check.qmd",
+      "seconds": 4.673,
       "frozen": true
     },
     {
-      "page": "examples/advanced-topics/datetime-validations.qmd",
-      "seconds": 4.467,
+      "page": "reference/Schema.qmd",
+      "seconds": 4.673,
       "frozen": true
     },
     {
-      "page": "examples/advanced-topics/check-for-freshness.qmd",
-      "seconds": 4.447,
+      "page": "reference/Validate.get_tabular_report.qmd",
+      "seconds": 4.632,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/expect-no-duplicate-values.qmd",
-      "seconds": 4.439,
+      "page": "reference/Validate.col_sd_ge.qmd",
+      "seconds": 4.611,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/col-vals-custom-expr.qmd",
-      "seconds": 4.362,
+      "page": "examples/advanced-topics/column-selector-functions.qmd",
+      "seconds": 4.608,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/custom-validation-specially.qmd",
-      "seconds": 4.359,
+      "page": "reference/connect_to_table.qmd",
+      "seconds": 4.6,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/comparisons-across-columns.qmd",
-      "seconds": 4.318,
+      "page": "user-guide/data-inspection/col-summary-tbl.qmd",
+      "seconds": 4.6,
       "frozen": true
     },
     {
-      "page": "examples/column-value-checks/expect-text-pattern.qmd",
-      "seconds": 4.305,
+      "page": "reference/Validate.specially.qmd",
+      "seconds": 4.596,
       "frozen": true
     },
     {
-      "page": "examples/advanced-topics/schema-check.qmd",
+      "page": "user-guide/post-interrogation/sundering.qmd",
+      "seconds": 4.587,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_schema_match.qmd",
+      "seconds": 4.563,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.data_freshness.qmd",
+      "seconds": 4.562,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_avg_ge.qmd",
+      "seconds": 4.55,
+      "frozen": true
+    },
+    {
+      "page": "reference/generate_dataset.qmd",
+      "seconds": 4.541,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_in_set.qmd",
+      "seconds": 4.535,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.conjointly.qmd",
+      "seconds": 4.524,
+      "frozen": true
+    },
+    {
+      "page": "reference/get_data_path.qmd",
+      "seconds": 4.498,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_avg_eq.qmd",
+      "seconds": 4.495,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_avg_gt.qmd",
+      "seconds": 4.492,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sum_le.qmd",
+      "seconds": 4.487,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/post-interrogation/quality-dimensions-and-scoring.qmd",
+      "seconds": 4.481,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sum_lt.qmd",
+      "seconds": 4.453,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sum_eq.qmd",
+      "seconds": 4.45,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sd_lt.qmd",
+      "seconds": 4.449,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_between.qmd",
+      "seconds": 4.434,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.interrogate.qmd",
+      "seconds": 4.434,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sum_gt.qmd",
+      "seconds": 4.431,
+      "frozen": true
+    },
+    {
+      "page": "reference/first_n.qmd",
+      "seconds": 4.43,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_not_in_set.qmd",
+      "seconds": 4.429,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_avg_le.qmd",
+      "seconds": 4.428,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_sum_ge.qmd",
+      "seconds": 4.414,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_outside.qmd",
+      "seconds": 4.414,
+      "frozen": true
+    },
+    {
+      "page": "reference/profile_fields.qmd",
+      "seconds": 4.414,
+      "frozen": true
+    },
+    {
+      "page": "reference/last_n.qmd",
+      "seconds": 4.412,
+      "frozen": true
+    },
+    {
+      "page": "reference/float_field.qmd",
+      "seconds": 4.409,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_avg_lt.qmd",
+      "seconds": 4.396,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_gt.qmd",
+      "seconds": 4.394,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_lt.qmd",
+      "seconds": 4.392,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.assert_below_threshold.qmd",
+      "seconds": 4.389,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_le.qmd",
+      "seconds": 4.383,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_eq.qmd",
+      "seconds": 4.379,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_ne.qmd",
+      "seconds": 4.379,
+      "frozen": true
+    },
+    {
+      "page": "reference/string_field.qmd",
+      "seconds": 4.379,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_decreasing.qmd",
+      "seconds": 4.377,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_regex.qmd",
+      "seconds": 4.377,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_increasing.qmd",
+      "seconds": 4.365,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_ge.qmd",
+      "seconds": 4.363,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.row_count_match.qmd",
+      "seconds": 4.358,
+      "frozen": true
+    },
+    {
+      "page": "reference/Thresholds.qmd",
+      "seconds": 4.348,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.prompt.qmd",
+      "seconds": 4.343,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.tbl_match.qmd",
+      "seconds": 4.337,
+      "frozen": true
+    },
+    {
+      "page": "reference/missing_vals_tbl.qmd",
+      "seconds": 4.337,
+      "frozen": true
+    },
+    {
+      "page": "reference/everything.qmd",
+      "seconds": 4.332,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.rows_complete.qmd",
+      "seconds": 4.328,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_not_null.qmd",
+      "seconds": 4.327,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_null.qmd",
+      "seconds": 4.327,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.rows_distinct.qmd",
+      "seconds": 4.322,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_exists.qmd",
+      "seconds": 4.321,
+      "frozen": true
+    },
+    {
+      "page": "reference/contains.qmd",
+      "seconds": 4.311,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_missing_consistent.qmd",
+      "seconds": 4.294,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/advanced-validation/plan-serialization.qmd",
+      "seconds": 4.29,
+      "frozen": true
+    },
+    {
+      "page": "reference/int_field.qmd",
+      "seconds": 4.285,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_str_len.qmd",
+      "seconds": 4.284,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_count_match.qmd",
+      "seconds": 4.279,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.critical.qmd",
+      "seconds": 4.279,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.above_threshold.qmd",
+      "seconds": 4.277,
+      "frozen": true
+    },
+    {
+      "page": "reference/matches.qmd",
+      "seconds": 4.277,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_within_spec.qmd",
+      "seconds": 4.27,
+      "frozen": true
+    },
+    {
+      "page": "reference/starts_with.qmd",
+      "seconds": 4.269,
+      "frozen": true
+    },
+    {
+      "page": "reference/seg_group.qmd",
+      "seconds": 4.257,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_expr.qmd",
+      "seconds": 4.255,
+      "frozen": true
+    },
+    {
+      "page": "reference/ends_with.qmd",
       "seconds": 4.254,
       "frozen": true
     },
     {
+      "page": "reference/Validate.set_tbl.qmd",
+      "seconds": 4.251,
+      "frozen": true
+    },
+    {
+      "page": "examples/advanced-topics/datetime-validations.qmd",
+      "seconds": 4.22,
+      "frozen": true
+    },
+    {
+      "page": "reference/has_columns.qmd",
+      "seconds": 4.216,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.warning.qmd",
+      "seconds": 4.214,
+      "frozen": true
+    },
+    {
+      "page": "reference/has_rows.qmd",
+      "seconds": 4.213,
+      "frozen": true
+    },
+    {
+      "page": "reference/duration_field.qmd",
+      "seconds": 4.21,
+      "frozen": true
+    },
+    {
+      "page": "reference/bool_field.qmd",
+      "seconds": 4.208,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.error.qmd",
+      "seconds": 4.207,
+      "frozen": true
+    },
+    {
+      "page": "examples/results-and-reporting/data-extracts.qmd",
+      "seconds": 4.2,
+      "frozen": true
+    },
+    {
+      "page": "reference/time_field.qmd",
+      "seconds": 4.198,
+      "frozen": true
+    },
+    {
+      "page": "examples/actions-and-thresholds/validation-with-final-actions.qmd",
+      "seconds": 4.194,
+      "frozen": true
+    },
+    {
+      "page": "reference/date_field.qmd",
+      "seconds": 4.186,
+      "frozen": true
+    },
+    {
+      "page": "reference/datetime_field.qmd",
+      "seconds": 4.186,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.get_sundered_data.qmd",
+      "seconds": 4.177,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_missing_coded.qmd",
+      "seconds": 4.173,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.col_vals_in_table.qmd",
+      "seconds": 4.165,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/apply-checks-to-several-columns.qmd",
+      "seconds": 4.164,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.assert_passing.qmd",
+      "seconds": 4.143,
+      "frozen": true
+    },
+    {
+      "page": "examples/results-and-reporting/sundered-data.qmd",
+      "seconds": 4.132,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/checks-for-missing.qmd",
+      "seconds": 4.114,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.get_data_extracts.qmd",
+      "seconds": 4.113,
+      "frozen": true
+    },
+    {
+      "page": "reference/write_file.qmd",
+      "seconds": 4.088,
+      "frozen": true
+    },
+    {
+      "page": "reference/schema_from_tbl.qmd",
+      "seconds": 4.081,
+      "frozen": true
+    },
+    {
+      "page": "reference/ref.qmd",
+      "seconds": 4.072,
+      "frozen": true
+    },
+    {
+      "page": "examples/advanced-topics/check-for-freshness.qmd",
+      "seconds": 4.055,
+      "frozen": true
+    },
+    {
+      "page": "reference/validate_yaml.qmd",
+      "seconds": 4.05,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.get_dataframe_report.qmd",
+      "seconds": 4.042,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.get_json_report.qmd",
+      "seconds": 4.038,
+      "frozen": true
+    },
+    {
+      "page": "examples/advanced-topics/mutate-table-in-step.qmd",
+      "seconds": 4.031,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.n.qmd",
+      "seconds": 4.026,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.all_passed.qmd",
+      "seconds": 4.024,
+      "frozen": true
+    },
+    {
+      "page": "reference/expr_col.qmd",
+      "seconds": 4.022,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.f_failed.qmd",
+      "seconds": 4.004,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/custom-validation-specially.qmd",
+      "seconds": 3.996,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.n_failed.qmd",
+      "seconds": 3.988,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/comparisons-across-columns.qmd",
+      "seconds": 3.986,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.n_passed.qmd",
+      "seconds": 3.982,
+      "frozen": true
+    },
+    {
+      "page": "reference/Validate.f_passed.qmd",
+      "seconds": 3.979,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/col-vals-custom-expr.qmd",
+      "seconds": 3.972,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/expect-text-pattern.qmd",
+      "seconds": 3.942,
+      "frozen": true
+    },
+    {
+      "page": "examples/advanced-topics/schema-check.qmd",
+      "seconds": 3.932,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/set-membership.qmd",
+      "seconds": 3.921,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/expect-no-duplicate-values.qmd",
+      "seconds": 3.892,
+      "frozen": true
+    },
+    {
       "page": "blog/all-about-actions/index.qmd",
-      "seconds": 4.019,
+      "seconds": 3.801,
+      "frozen": true
+    },
+    {
+      "page": "reference/yaml_to_python.qmd",
+      "seconds": 3.766,
       "frozen": true
     },
     {
       "page": "reference/mcp/add_validation_step.qmd",
-      "seconds": 2.884,
+      "seconds": 2.716,
       "frozen": false
     },
     {
       "page": "skills.qmd",
-      "seconds": 2.087,
+      "seconds": 2.012,
       "frozen": false
     },
     {
       "page": "user-guide/test-data-generation/test-data-generation.qmd",
-      "seconds": 2.08,
+      "seconds": 1.962,
       "frozen": true
     },
     {
       "page": "user-guide/metadata-import/cdisc-validation.qmd",
-      "seconds": 1.918,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/validation-plan/column-selection-patterns.qmd",
-      "seconds": 1.786,
+      "seconds": 1.714,
       "frozen": true
     },
     {
       "page": "user-guide/validation-plan/actions.qmd",
-      "seconds": 1.784,
+      "seconds": 1.703,
       "frozen": true
     },
     {
-      "page": "user-guide/metadata-import/cdisc-submission-conformance.qmd",
-      "seconds": 1.698,
+      "page": "user-guide/validation-plan/column-selection-patterns.qmd",
+      "seconds": 1.666,
       "frozen": true
     },
     {
       "page": "user-guide/post-interrogation/validation-reports.qmd",
-      "seconds": 1.677,
+      "seconds": 1.609,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/metadata-import/cdisc-submission-conformance.qmd",
+      "seconds": 1.603,
       "frozen": true
     },
     {
       "page": "user-guide/yaml/yaml-reference.qmd",
-      "seconds": 1.549,
+      "seconds": 1.48,
       "frozen": true
     },
     {
       "page": "reference/index.qmd",
-      "seconds": 1.517,
+      "seconds": 1.429,
       "frozen": false
     },
     {
       "page": "user-guide/data-inspection/preview.qmd",
-      "seconds": 1.472,
+      "seconds": 1.392,
       "frozen": true
     },
     {
       "page": "user-guide/data-inspection/missing-vals-tbl.qmd",
-      "seconds": 1.406,
-      "frozen": true
-    },
-    {
-      "page": "reference/DraftValidation.qmd",
-      "seconds": 1.389,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/advanced-validation/ai-validation-editor.qmd",
-      "seconds": 1.374,
+      "seconds": 1.357,
       "frozen": true
     },
     {
       "page": "user-guide/advanced-validation/schema-validation.qmd",
-      "seconds": 1.367,
+      "seconds": 1.315,
       "frozen": true
     },
     {
-      "page": "user-guide/contracts-and-pipelines/pipelines.qmd",
-      "seconds": 1.32,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/contracts-and-pipelines/yaml-contracts.qmd",
-      "seconds": 1.312,
-      "frozen": true
-    },
-    {
-      "page": "changelog.qmd",
-      "seconds": 1.292,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/post-interrogation/step-reports.qmd",
-      "seconds": 1.284,
+      "page": "user-guide/advanced-validation/ai-validation-editor.qmd",
+      "seconds": 1.309,
       "frozen": true
     },
     {
       "page": "blog/validation-libs-2025/index.qmd",
-      "seconds": 1.267,
+      "seconds": 1.286,
       "frozen": true
     },
     {
-      "page": "user-guide/contracts-and-pipelines/contracts.qmd",
-      "seconds": 1.254,
+      "page": "reference/DraftValidation.qmd",
+      "seconds": 1.286,
+      "frozen": false
+    },
+    {
+      "page": "changelog.qmd",
+      "seconds": 1.272,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/contracts-and-pipelines/pipelines.qmd",
+      "seconds": 1.261,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/contracts-and-pipelines/yaml-contracts.qmd",
+      "seconds": 1.252,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/post-interrogation/step-reports.qmd",
+      "seconds": 1.238,
       "frozen": true
     },
     {
       "page": "user-guide/integrations/otel-integration.qmd",
-      "seconds": 1.24,
+      "seconds": 1.221,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/contracts-and-pipelines/contracts.qmd",
+      "seconds": 1.217,
       "frozen": true
     },
     {
       "page": "reference/ConformanceReport.qmd",
-      "seconds": 1.238,
+      "seconds": 1.178,
       "frozen": false
     },
     {
+      "page": "blog/intro-pointblank/index.qmd",
+      "seconds": 1.164,
+      "frozen": true
+    },
+    {
       "page": "user-guide/validation-plan/segmentation.qmd",
-      "seconds": 1.235,
+      "seconds": 1.164,
       "frozen": true
     },
     {
       "page": "user-guide/validation-plan/validation-overview.qmd",
-      "seconds": 1.202,
-      "frozen": true
-    },
-    {
-      "page": "blog/intro-pointblank/index.qmd",
-      "seconds": 1.19,
-      "frozen": true
-    },
-    {
-      "page": "package-info.qmd",
-      "seconds": 1.166,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/advanced-validation/draft-validation.qmd",
-      "seconds": 1.148,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/validation-plan/briefs.qmd",
-      "seconds": 1.144,
+      "seconds": 1.158,
       "frozen": true
     },
     {
       "page": "reference/MissingSpec.qmd",
-      "seconds": 1.143,
+      "seconds": 1.157,
       "frozen": false
+    },
+    {
+      "page": "user-guide/advanced-validation/draft-validation.qmd",
+      "seconds": 1.134,
+      "frozen": true
     },
     {
       "page": "reference/SubmissionPackage.qmd",
-      "seconds": 1.112,
+      "seconds": 1.107,
       "frozen": false
     },
     {
-      "page": "user-guide/validation-plan/preprocessing.qmd",
-      "seconds": 1.071,
+      "page": "user-guide/validation-plan/briefs.qmd",
+      "seconds": 1.091,
       "frozen": true
     },
     {
-      "page": "index.qmd",
-      "seconds": 1.047,
-      "frozen": true
-    },
-    {
-      "page": "reference/EditValidation.qmd",
-      "seconds": 1.042,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/validation-plan/thresholds.qmd",
-      "seconds": 1.038,
-      "frozen": true
-    },
-    {
-      "page": "reference/send_slack_notification.qmd",
-      "seconds": 1.004,
+      "page": "package-info.qmd",
+      "seconds": 1.088,
       "frozen": false
     },
     {
       "page": "user-guide/index.qmd",
-      "seconds": 1.004,
+      "seconds": 1.064,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/validation-plan/preprocessing.qmd",
+      "seconds": 1.029,
+      "frozen": true
+    },
+    {
+      "page": "reference/EditValidation.qmd",
+      "seconds": 1.003,
+      "frozen": false
+    },
+    {
+      "page": "index.qmd",
+      "seconds": 0.988,
+      "frozen": true
+    },
+    {
+      "page": "user-guide/validation-plan/thresholds.qmd",
+      "seconds": 0.985,
       "frozen": true
     },
     {
       "page": "user-guide/advanced-validation/assertions.qmd",
-      "seconds": 0.999,
+      "seconds": 0.974,
       "frozen": true
     },
     {
-      "page": "reference/Contract.qmd",
-      "seconds": 0.992,
-      "frozen": false
-    },
-    {
-      "page": "reference/VariableMetadata.qmd",
-      "seconds": 0.978,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/prompt_prompt_create_validator.qmd",
-      "seconds": 0.976,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.suggest_improvements.qmd",
-      "seconds": 0.973,
-      "frozen": false
-    },
-    {
-      "page": "reference/MetadataImport.qmd",
-      "seconds": 0.971,
+      "page": "reference/send_slack_notification.qmd",
+      "seconds": 0.969,
       "frozen": false
     },
     {
       "page": "reference/Pipeline.qmd",
-      "seconds": 0.971,
+      "seconds": 0.959,
+      "frozen": false
+    },
+    {
+      "page": "reference/MetadataImport.qmd",
+      "seconds": 0.947,
+      "frozen": false
+    },
+    {
+      "page": "reference/Contract.qmd",
+      "seconds": 0.944,
       "frozen": false
     },
     {
       "page": "user-guide/contracts-and-pipelines/custom-adapters.qmd",
-      "seconds": 0.967,
+      "seconds": 0.939,
       "frozen": true
-    },
-    {
-      "page": "reference/mcp/prompt_prompt_get_validation_step_output.qmd",
-      "seconds": 0.957,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/prompt_prompt_load_dataframe.qmd",
-      "seconds": 0.954,
-      "frozen": false
     },
     {
       "page": "user-guide/getting-started/quickstart.qmd",
-      "seconds": 0.953,
+      "seconds": 0.925,
       "frozen": true
     },
     {
-      "page": "reference/DataScanDiff.qmd",
-      "seconds": 0.95,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/prompt_prompt_interrogate_validator.qmd",
-      "seconds": 0.945,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/prompt_prompt_add_validation_step_example.qmd",
-      "seconds": 0.939,
+      "page": "reference/mcp/prompt_prompt_create_validator.qmd",
+      "seconds": 0.922,
       "frozen": false
     },
     {
       "page": "user-guide/advanced-validation/expressions.qmd",
-      "seconds": 0.933,
+      "seconds": 0.911,
       "frozen": true
     },
     {
-      "page": "reference/ContractImport.qmd",
-      "seconds": 0.924,
-      "frozen": false
-    },
-    {
-      "page": "reference/get_validation_summary.qmd",
-      "seconds": 0.916,
-      "frozen": false
-    },
-    {
-      "page": "reference/DataScan.qmd",
+      "page": "reference/VariableMetadata.qmd",
       "seconds": 0.905,
       "frozen": false
     },
     {
-      "page": "citation.qmd",
-      "seconds": 0.898,
+      "page": "reference/mcp/prompt_prompt_get_validation_step_output.qmd",
+      "seconds": 0.905,
       "frozen": false
     },
     {
-      "page": "reference/integrations.otel.OTelExporter.qmd",
-      "seconds": 0.898,
-      "frozen": false
-    },
-    {
-      "page": "reference/validate_sdtmig.qmd",
+      "page": "reference/mcp/prompt_prompt_interrogate_validator.qmd",
       "seconds": 0.895,
       "frozen": false
     },
     {
-      "page": "reference/emit_otel.qmd",
-      "seconds": 0.894,
+      "page": "reference/mcp/prompt_prompt_load_dataframe.qmd",
+      "seconds": 0.895,
       "frozen": false
     },
     {
-      "page": "examples/getting-started/advanced-validation.qmd",
-      "seconds": 0.893,
-      "frozen": true
-    },
-    {
-      "page": "reference/validate_cdisc_submission.qmd",
-      "seconds": 0.884,
-      "frozen": false
-    },
-    {
-      "page": "reference/ContractAdapter.qmd",
-      "seconds": 0.883,
-      "frozen": false
-    },
-    {
-      "page": "reference/export_contract.qmd",
-      "seconds": 0.877,
-      "frozen": false
-    },
-    {
-      "page": "reference/FinalActions.qmd",
-      "seconds": 0.876,
+      "page": "reference/mcp/prompt_prompt_add_validation_step_example.qmd",
+      "seconds": 0.886,
       "frozen": false
     },
     {
       "page": "reference/Validate.to_json_schema.qmd",
-      "seconds": 0.875,
+      "seconds": 0.883,
       "frozen": false
     },
     {
-      "page": "reference/ADaMDatasetTemplate.qmd",
-      "seconds": 0.872,
+      "page": "reference/ContractImport.qmd",
+      "seconds": 0.882,
       "frozen": false
     },
     {
-      "page": "reference/PipelineResult.qmd",
-      "seconds": 0.872,
+      "page": "citation.qmd",
+      "seconds": 0.881,
       "frozen": false
     },
     {
-      "page": "reference/SDTMDomainTemplate.qmd",
-      "seconds": 0.87,
+      "page": "examples/actions-and-thresholds/failure-thresholds.qmd",
+      "seconds": 0.867,
+      "frozen": true
+    },
+    {
+      "page": "reference/validate_cdisc_submission.qmd",
+      "seconds": 0.85,
       "frozen": false
     },
     {
-      "page": "reference/read_file.qmd",
-      "seconds": 0.868,
+      "page": "reference/validate_sdtmig.qmd",
+      "seconds": 0.849,
       "frozen": false
     },
     {
-      "page": "reference/Validate.get_dimension_scores.qmd",
-      "seconds": 0.866,
-      "frozen": false
-    },
-    {
-      "page": "reference/validate_sdtm.qmd",
-      "seconds": 0.866,
-      "frozen": false
-    },
-    {
-      "page": "reference/import_contract.qmd",
-      "seconds": 0.864,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.from_prompt.qmd",
-      "seconds": 0.863,
-      "frozen": false
-    },
-    {
-      "page": "reference/Codelist.qmd",
-      "seconds": 0.86,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.get_scorecard.qmd",
-      "seconds": 0.86,
-      "frozen": false
-    },
-    {
-      "page": "reference/MetadataPackage.qmd",
-      "seconds": 0.857,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.assert_dimension_scores.qmd",
-      "seconds": 0.857,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.to_yaml.qmd",
-      "seconds": 0.856,
-      "frozen": false
-    },
-    {
-      "page": "reference/print_database_tables.qmd",
-      "seconds": 0.852,
-      "frozen": false
-    },
-    {
-      "page": "reference/ADaMVariableSpec.qmd",
-      "seconds": 0.851,
-      "frozen": false
-    },
-    {
-      "page": "reference/Validate.get_health_score.qmd",
+      "page": "reference/DataScan.qmd",
       "seconds": 0.848,
       "frozen": false
     },
     {
-      "page": "reference/import_metadata.qmd",
-      "seconds": 0.847,
+      "page": "reference/MetadataPackage.qmd",
+      "seconds": 0.848,
       "frozen": false
     },
     {
-      "page": "reference/validate_adam.qmd",
-      "seconds": 0.846,
+      "page": "reference/FinalActions.qmd",
+      "seconds": 0.844,
       "frozen": false
     },
     {
-      "page": "reference/export_metadata.qmd",
-      "seconds": 0.841,
+      "page": "examples/getting-started/advanced-validation.qmd",
+      "seconds": 0.843,
+      "frozen": true
+    },
+    {
+      "page": "reference/DataScan.to_json.qmd",
+      "seconds": 0.84,
       "frozen": false
     },
     {
-      "page": "reference/Validate.to_code.qmd",
-      "seconds": 0.839,
+      "page": "reference/ADaMDatasetTemplate.qmd",
+      "seconds": 0.837,
       "frozen": false
     },
     {
-      "page": "reference/get_sdtm_domain.qmd",
+      "page": "reference/ContractAdapter.qmd",
+      "seconds": 0.835,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScanDiff.qmd",
       "seconds": 0.834,
       "frozen": false
     },
     {
-      "page": "reference/SDTMVariableSpec.qmd",
+      "page": "reference/SDTMDomainTemplate.qmd",
+      "seconds": 0.834,
+      "frozen": false
+    },
+    {
+      "page": "reference/get_validation_summary.qmd",
       "seconds": 0.833,
       "frozen": false
     },
     {
-      "page": "reference/validate_sdtm_structure.qmd",
+      "page": "reference/integrations.otel.OTelExporter.qmd",
+      "seconds": 0.833,
+      "frozen": false
+    },
+    {
+      "page": "reference/PipelineResult.qmd",
       "seconds": 0.831,
       "frozen": false
     },
     {
-      "page": "reference/Step.qmd",
-      "seconds": 0.829,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/metadata-import/statistical-packages.qmd",
-      "seconds": 0.828,
-      "frozen": true
-    },
-    {
-      "page": "reference/register_adapter.qmd",
+      "page": "reference/emit_otel.qmd",
       "seconds": 0.827,
       "frozen": false
     },
     {
-      "page": "reference/adam_to_metadata.qmd",
-      "seconds": 0.825,
+      "page": "reference/Step.qmd",
+      "seconds": 0.819,
       "frozen": false
     },
     {
-      "page": "reference/list_sdtm_domains.qmd",
-      "seconds": 0.82,
-      "frozen": false
-    },
-    {
-      "page": "reference/DataScan.load_from_json.qmd",
-      "seconds": 0.817,
-      "frozen": false
-    },
-    {
-      "page": "reference/DataScan.from_json.qmd",
+      "page": "reference/Validate.to_yaml.qmd",
       "seconds": 0.816,
       "frozen": false
     },
     {
-      "page": "reference/DataScan.to_dict.qmd",
-      "seconds": 0.815,
+      "page": "reference/Codelist.qmd",
+      "seconds": 0.812,
       "frozen": false
     },
     {
-      "page": "reference/list_adapters.qmd",
-      "seconds": 0.813,
-      "frozen": false
-    },
-    {
-      "page": "reference/sdtm_to_metadata.qmd",
-      "seconds": 0.813,
-      "frozen": false
-    },
-    {
-      "page": "reference/DataScan.save_to_json.qmd",
+      "page": "reference/ADaMVariableSpec.qmd",
       "seconds": 0.811,
       "frozen": false
     },
     {
-      "page": "reference/validate_adam_structure.qmd",
+      "page": "reference/Validate.assert_dimension_scores.qmd",
+      "seconds": 0.811,
+      "frozen": false
+    },
+    {
+      "page": "reference/validate_sdtm.qmd",
       "seconds": 0.81,
       "frozen": false
     },
     {
-      "page": "reference/DataScan.compare.qmd",
-      "seconds": 0.809,
-      "frozen": false
-    },
-    {
-      "page": "reference/DataScan.to_json.qmd",
-      "seconds": 0.809,
-      "frozen": false
-    },
-    {
-      "page": "reference/list_adam_datasets.qmd",
+      "page": "reference/SDTMVariableSpec.qmd",
       "seconds": 0.807,
       "frozen": false
     },
     {
-      "page": "reference/get_adam_dataset.qmd",
+      "page": "reference/validate_adam.qmd",
       "seconds": 0.806,
       "frozen": false
     },
     {
-      "page": "reference/MissingValueCode.qmd",
+      "page": "reference/validate_sdtm_structure.qmd",
       "seconds": 0.803,
       "frozen": false
     },
     {
-      "page": "reference/DataScan.summary_data.qmd",
+      "page": "reference/MissingValueCode.qmd",
       "seconds": 0.801,
       "frozen": false
     },
     {
-      "page": "reference/CodelistEntry.qmd",
-      "seconds": 0.8,
-      "frozen": false
+      "page": "user-guide/metadata-import/statistical-packages.qmd",
+      "seconds": 0.801,
+      "frozen": true
     },
     {
-      "page": "reference/DataScan.from_dict.qmd",
+      "page": "reference/read_file.qmd",
       "seconds": 0.799,
       "frozen": false
     },
     {
-      "page": "examples/results-and-reporting/step-report-column-check.qmd",
-      "seconds": 0.792,
-      "frozen": true
+      "page": "reference/Validate.from_prompt.qmd",
+      "seconds": 0.794,
+      "frozen": false
     },
     {
-      "page": "reference/DataScan.get_tabular_report.qmd",
-      "seconds": 0.788,
+      "page": "reference/Validate.suggest_improvements.qmd",
+      "seconds": 0.793,
+      "frozen": false
+    },
+    {
+      "page": "reference/sdtm_to_metadata.qmd",
+      "seconds": 0.793,
+      "frozen": false
+    },
+    {
+      "page": "reference/Validate.get_scorecard.qmd",
+      "seconds": 0.791,
+      "frozen": false
+    },
+    {
+      "page": "reference/export_contract.qmd",
+      "seconds": 0.79,
+      "frozen": false
+    },
+    {
+      "page": "reference/import_metadata.qmd",
+      "seconds": 0.79,
+      "frozen": false
+    },
+    {
+      "page": "reference/Validate.get_health_score.qmd",
+      "seconds": 0.786,
+      "frozen": false
+    },
+    {
+      "page": "reference/export_metadata.qmd",
+      "seconds": 0.784,
+      "frozen": false
+    },
+    {
+      "page": "reference/Validate.get_dimension_scores.qmd",
+      "seconds": 0.783,
+      "frozen": false
+    },
+    {
+      "page": "reference/validate_adam_structure.qmd",
+      "seconds": 0.783,
+      "frozen": false
+    },
+    {
+      "page": "reference/import_contract.qmd",
+      "seconds": 0.782,
+      "frozen": false
+    },
+    {
+      "page": "reference/register_adapter.qmd",
+      "seconds": 0.776,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.save_to_json.qmd",
+      "seconds": 0.775,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.to_dict.qmd",
+      "seconds": 0.775,
+      "frozen": false
+    },
+    {
+      "page": "reference/print_database_tables.qmd",
+      "seconds": 0.775,
+      "frozen": false
+    },
+    {
+      "page": "reference/Validate.to_code.qmd",
+      "seconds": 0.772,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.load_from_json.qmd",
+      "seconds": 0.771,
+      "frozen": false
+    },
+    {
+      "page": "reference/CodelistEntry.qmd",
+      "seconds": 0.769,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.from_dict.qmd",
+      "seconds": 0.769,
+      "frozen": false
+    },
+    {
+      "page": "reference/adam_to_metadata.qmd",
+      "seconds": 0.769,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.compare.qmd",
+      "seconds": 0.768,
+      "frozen": false
+    },
+    {
+      "page": "reference/get_sdtm_domain.qmd",
+      "seconds": 0.767,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.summary_data.qmd",
+      "seconds": 0.766,
+      "frozen": false
+    },
+    {
+      "page": "reference/list_adapters.qmd",
+      "seconds": 0.76,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.from_json.qmd",
+      "seconds": 0.759,
+      "frozen": false
+    },
+    {
+      "page": "reference/get_adam_dataset.qmd",
+      "seconds": 0.757,
+      "frozen": false
+    },
+    {
+      "page": "reference/list_sdtm_domains.qmd",
+      "seconds": 0.755,
       "frozen": false
     },
     {
       "page": "user-guide/metadata-import/metadata-import.qmd",
-      "seconds": 0.78,
+      "seconds": 0.755,
       "frozen": true
     },
     {
+      "page": "examples/results-and-reporting/step-report-column-check.qmd",
+      "seconds": 0.753,
+      "frozen": true
+    },
+    {
+      "page": "reference/list_adam_datasets.qmd",
+      "seconds": 0.751,
+      "frozen": false
+    },
+    {
+      "page": "reference/DataScan.get_tabular_report.qmd",
+      "seconds": 0.749,
+      "frozen": false
+    },
+    {
       "page": "user-guide/mcp-server/mcp-quick-start.qmd",
-      "seconds": 0.777,
+      "seconds": 0.748,
       "frozen": true
     },
     {
       "page": "user-guide/getting-started/installation.qmd",
-      "seconds": 0.774,
+      "seconds": 0.746,
       "frozen": true
     },
     {
       "page": "user-guide/the-pointblank-cli/cli-data-inspection.qmd",
-      "seconds": 0.774,
+      "seconds": 0.734,
       "frozen": true
     },
     {
       "page": "user-guide/the-pointblank-cli/cli-data-validation.qmd",
-      "seconds": 0.769,
+      "seconds": 0.729,
       "frozen": true
-    },
-    {
-      "page": "examples/column-value-checks/numeric-comparisons.qmd",
-      "seconds": 0.719,
-      "frozen": true
-    },
-    {
-      "page": "examples/actions-and-thresholds/failure-thresholds.qmd",
-      "seconds": 0.708,
-      "frozen": true
-    },
-    {
-      "page": "examples/index.qmd",
-      "seconds": 0.706,
-      "frozen": false
     },
     {
       "page": "blog/index.qmd",
-      "seconds": 0.677,
+      "seconds": 0.692,
       "frozen": false
     },
     {
-      "page": "contributing.qmd",
+      "page": "examples/index.qmd",
+      "seconds": 0.686,
+      "frozen": false
+    },
+    {
+      "page": "examples/column-value-checks/numeric-comparisons.qmd",
       "seconds": 0.672,
+      "frozen": true
+    },
+    {
+      "page": "contributing.qmd",
+      "seconds": 0.661,
       "frozen": false
     },
     {
       "page": "examples/getting-started/starter-validation.qmd",
-      "seconds": 0.67,
-      "frozen": true
-    },
-    {
-      "page": "user-guide/the-pointblank-cli/cli-reference.qmd",
-      "seconds": 0.666,
-      "frozen": true
-    },
-    {
-      "page": "reference/mcp/index.qmd",
-      "seconds": 0.662,
-      "frozen": false
-    },
-    {
-      "page": "examples/column-value-checks/expect-no-duplicate-rows.qmd",
-      "seconds": 0.65,
+      "seconds": 0.653,
       "frozen": true
     },
     {
       "page": "examples/advanced-topics/cli-interactive.qmd",
-      "seconds": 0.644,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/preview.qmd",
-      "seconds": 0.643,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/validate.qmd",
-      "seconds": 0.641,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/pb.qmd",
-      "seconds": 0.639,
+      "seconds": 0.649,
       "frozen": false
     },
     {
       "page": "blog/overhauled-user-guide/index.qmd",
-      "seconds": 0.631,
+      "seconds": 0.64,
       "frozen": true
     },
     {
-      "page": "reference/cli/pl.qmd",
+      "page": "user-guide/the-pointblank-cli/cli-reference.qmd",
+      "seconds": 0.632,
+      "frozen": true
+    },
+    {
+      "page": "examples/column-value-checks/expect-no-duplicate-rows.qmd",
       "seconds": 0.63,
-      "frozen": false
+      "frozen": true
     },
     {
-      "page": "code-of-conduct.qmd",
-      "seconds": 0.629,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/run.qmd",
-      "seconds": 0.624,
+      "page": "reference/mcp/index.qmd",
+      "seconds": 0.618,
       "frozen": false
     },
     {
       "page": "roadmap.qmd",
-      "seconds": 0.603,
+      "seconds": 0.601,
       "frozen": false
     },
     {
-      "page": "reference/cli/missing.qmd",
+      "page": "reference/cli/preview.qmd",
       "seconds": 0.596,
       "frozen": false
     },
     {
-      "page": "reference/cli/edit.qmd",
+      "page": "reference/cli/validate.qmd",
       "seconds": 0.594,
       "frozen": false
     },
     {
-      "page": "reference/cli/scan.qmd",
-      "seconds": 0.591,
+      "page": "reference/cli/pb.qmd",
+      "seconds": 0.588,
       "frozen": false
     },
     {
-      "page": "reference/cli/make_template.qmd",
-      "seconds": 0.585,
+      "page": "reference/cli/pl.qmd",
+      "seconds": 0.58,
       "frozen": false
     },
     {
-      "page": "reference/cli/info.qmd",
-      "seconds": 0.578,
+      "page": "code-of-conduct.qmd",
+      "seconds": 0.577,
       "frozen": false
     },
     {
-      "page": "reference/cli/index.qmd",
-      "seconds": 0.576,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/requirements.qmd",
-      "seconds": 0.572,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/list_available_backends.qmd",
-      "seconds": 0.567,
-      "frozen": false
-    },
-    {
-      "page": "reference/cli/datasets.qmd",
-      "seconds": 0.564,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/create_validator.qmd",
-      "seconds": 0.561,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/apply_validation_template.qmd",
-      "seconds": 0.556,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/draft_validation_plan.qmd",
-      "seconds": 0.556,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/preview_table.qmd",
-      "seconds": 0.555,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/load_dataframe.qmd",
-      "seconds": 0.554,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/get_validation_step_output.qmd",
-      "seconds": 0.553,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/profile_dataframe.qmd",
-      "seconds": 0.55,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/validation_assistant.qmd",
-      "seconds": 0.55,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/get_pointblank_api_reference.qmd",
-      "seconds": 0.547,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/column_summary_table.qmd",
-      "seconds": 0.546,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/delete_dataframe.qmd",
-      "seconds": 0.546,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/delete_validator.qmd",
-      "seconds": 0.545,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/interrogate_validator.qmd",
-      "seconds": 0.541,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/missing_values_table.qmd",
-      "seconds": 0.537,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/list_loaded_dataframes.qmd",
-      "seconds": 0.528,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/server_health_check.qmd",
-      "seconds": 0.528,
-      "frozen": false
-    },
-    {
-      "page": "reference/mcp/list_active_validators.qmd",
-      "seconds": 0.525,
+      "page": "reference/cli/run.qmd",
+      "seconds": 0.577,
       "frozen": false
     },
     {
       "page": "security.qmd",
+      "seconds": 0.572,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/make_template.qmd",
+      "seconds": 0.562,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/validation-plan/index.qmd",
+      "seconds": 0.562,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/edit.qmd",
+      "seconds": 0.56,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/scan.qmd",
+      "seconds": 0.548,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/missing.qmd",
+      "seconds": 0.546,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/index.qmd",
+      "seconds": 0.538,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/get_validation_step_output.qmd",
+      "seconds": 0.535,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/info.qmd",
+      "seconds": 0.534,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/create_validator.qmd",
+      "seconds": 0.529,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/datasets.qmd",
+      "seconds": 0.525,
+      "frozen": false
+    },
+    {
+      "page": "reference/cli/requirements.qmd",
+      "seconds": 0.524,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/preview_table.qmd",
+      "seconds": 0.524,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/draft_validation_plan.qmd",
       "seconds": 0.523,
       "frozen": false
     },
@@ -1508,68 +1443,133 @@
       "frozen": true
     },
     {
-      "page": "user-guide/post-interrogation/index.qmd",
+      "page": "reference/mcp/load_dataframe.qmd",
       "seconds": 0.521,
       "frozen": false
     },
     {
-      "page": "user-guide/validation-plan/index.qmd",
+      "page": "reference/mcp/apply_validation_template.qmd",
       "seconds": 0.519,
       "frozen": false
     },
     {
-      "page": "license.qmd",
-      "seconds": 0.518,
+      "page": "reference/mcp/delete_validator.qmd",
+      "seconds": 0.516,
       "frozen": false
     },
     {
-      "page": "user-guide/advanced-validation/index.qmd",
-      "seconds": 0.517,
+      "page": "reference/mcp/profile_dataframe.qmd",
+      "seconds": 0.514,
       "frozen": false
     },
     {
-      "page": "user-guide/yaml/index.qmd",
-      "seconds": 0.517,
+      "page": "reference/mcp/validation_assistant.qmd",
+      "seconds": 0.514,
       "frozen": false
     },
     {
-      "page": "user-guide/getting-started/index.qmd",
+      "page": "reference/mcp/column_summary_table.qmd",
       "seconds": 0.513,
       "frozen": false
     },
     {
-      "page": "user-guide/contracts-and-pipelines/index.qmd",
-      "seconds": 0.512,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/integrations/index.qmd",
-      "seconds": 0.512,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/mcp-server/index.qmd",
-      "seconds": 0.512,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/data-inspection/index.qmd",
-      "seconds": 0.511,
-      "frozen": false
-    },
-    {
-      "page": "user-guide/test-data-generation/index.qmd",
+      "page": "reference/mcp/get_pointblank_api_reference.qmd",
       "seconds": 0.51,
       "frozen": false
     },
     {
+      "page": "reference/mcp/interrogate_validator.qmd",
+      "seconds": 0.509,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/delete_dataframe.qmd",
+      "seconds": 0.508,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/missing_values_table.qmd",
+      "seconds": 0.507,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/list_loaded_dataframes.qmd",
+      "seconds": 0.5,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/yaml/index.qmd",
+      "seconds": 0.499,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/list_available_backends.qmd",
+      "seconds": 0.498,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/integrations/index.qmd",
+      "seconds": 0.496,
+      "frozen": false
+    },
+    {
+      "page": "license.qmd",
+      "seconds": 0.494,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/list_active_validators.qmd",
+      "seconds": 0.494,
+      "frozen": false
+    },
+    {
+      "page": "reference/mcp/server_health_check.qmd",
+      "seconds": 0.494,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/getting-started/index.qmd",
+      "seconds": 0.494,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/advanced-validation/index.qmd",
+      "seconds": 0.493,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/mcp-server/index.qmd",
+      "seconds": 0.493,
+      "frozen": false
+    },
+    {
       "page": "user-guide/metadata-import/index.qmd",
-      "seconds": 0.506,
+      "seconds": 0.492,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/data-inspection/index.qmd",
+      "seconds": 0.49,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/contracts-and-pipelines/index.qmd",
+      "seconds": 0.489,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/post-interrogation/index.qmd",
+      "seconds": 0.489,
+      "frozen": false
+    },
+    {
+      "page": "user-guide/test-data-generation/index.qmd",
+      "seconds": 0.489,
       "frozen": false
     },
     {
       "page": "user-guide/the-pointblank-cli/index.qmd",
-      "seconds": 0.504,
+      "seconds": 0.473,
       "frozen": false
     }
   ]
