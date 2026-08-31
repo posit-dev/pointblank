@@ -597,6 +597,11 @@ class TestHelperFunctions:
         d = _schema_to_dict(schema)
         assert d == {"id": "Int64", "name": "String"}
 
+    def test_schema_to_dict_with_none_dtype(self):
+        schema = pb.Schema(id="Int64", name=None)
+        d = _schema_to_dict(schema)
+        assert d == {"id": "Int64", "name": None}
+
     def test_dict_to_schema(self):
         d = {"id": "Int64", "name": "String", "amount": "Float64"}
         schema = _dict_to_schema(d)
