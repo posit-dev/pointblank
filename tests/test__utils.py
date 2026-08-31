@@ -910,6 +910,66 @@ def test_copy_dataframe_exception_handling():
     assert result is uncopyable  # Should return the original
 
 
+def test_resolve_columns_with_string():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns("x")
+    assert result == ["x"]
+
+
+def test_resolve_columns_with_column_object():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnLiteral
+
+    c = ColumnLiteral(exprs="x")
+    result = _resolve_columns(c)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0] is c
+
+
+def test_resolve_columns_with_list_of_strings():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns(["a", "b", "c"])
+    assert result == ["a", "b", "c"]
+
+
+def test_resolve_columns_with_column_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import Column, StartsWith
+
+    selector = StartsWith(text="x")
+    result = _resolve_columns(selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], Column)
+
+
+def test_resolve_columns_with_narwhals_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnSelectorNarwhals
+
+    nw_selector = nw.selectors.numeric()
+    result = _resolve_columns(nw_selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], ColumnSelectorNarwhals)
+
+
+def test_get_tbl_type_ibis_get_backend_fallback():
+    """Test the fallback path when ibis.get_backend() raises an exception."""
+    import ibis as ibis_mod
+
+    ibis_table = ibis_mod.memtable(pd.DataFrame({"x": [1, 2, 3]}))
+
+    with patch.object(ibis_mod, "get_backend", side_effect=Exception("get_backend failed")):
+        result = _get_tbl_type(ibis_table)
+
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+
 def test_get_api_details_agg_docstring_fallback():
     import types
 
