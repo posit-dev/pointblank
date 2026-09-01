@@ -18,9 +18,12 @@ from pointblank.validate import (
     _create_text_col_pct_missing,
     _create_text_data_freshness,
     _create_text_str_len,
+    _format_timedelta,
     _get_dimension_label,
     _health_score_color,
+    _parse_max_age,
     _parse_reference_time,
+    _parse_timezone,
     _render_code_value,
     _render_columns_arg,
     _render_schema_code,
@@ -28,6 +31,7 @@ from pointblank.validate import (
     _render_thresholds_code,
     _schema_to_yaml,
     _thresholds_as_dict,
+    _transform_auto_brief,
     _UnserializablePlaceholder,
     _validation_info_to_step,
     _value_to_yaml,
@@ -943,3 +947,532 @@ class TestColMissingConsistentStringInput:
             Validate(data=df).col_missing_consistent(
                 columns="a", missing=spec, when_reason="not_asked"
             )
+
+
+# ─── _format_timedelta ──────────────────────────────────────────────────────────
+
+
+class TestFormatTimedelta:
+    def test_seconds(self):
+        assert _format_timedelta(datetime.timedelta(seconds=30)) == "30.0s"
+
+    def test_sub_second(self):
+        assert _format_timedelta(datetime.timedelta(seconds=0.5)) == "0.5s"
+
+    def test_minutes(self):
+        assert _format_timedelta(datetime.timedelta(minutes=5)) == "5.0m"
+
+    def test_minutes_fractional(self):
+        result = _format_timedelta(datetime.timedelta(seconds=90))
+        assert result == "1.5m"
+
+    def test_hours(self):
+        assert _format_timedelta(datetime.timedelta(hours=3)) == "3.0h"
+
+    def test_hours_fractional(self):
+        result = _format_timedelta(datetime.timedelta(hours=1, minutes=30))
+        assert result == "1.5h"
+
+    def test_days_exact(self):
+        assert _format_timedelta(datetime.timedelta(days=2)) == "2d"
+
+    def test_days_with_hours(self):
+        result = _format_timedelta(datetime.timedelta(days=1, hours=6))
+        assert result == "1d 6.0h"
+
+    def test_weeks(self):
+        result = _format_timedelta(datetime.timedelta(weeks=2))
+        assert result == "2w"
+
+    def test_boundary_under_minute(self):
+        assert _format_timedelta(datetime.timedelta(seconds=59)) == "59.0s"
+
+    def test_boundary_exactly_one_minute(self):
+        assert _format_timedelta(datetime.timedelta(minutes=1)) == "1.0m"
+
+    def test_boundary_exactly_one_hour(self):
+        assert _format_timedelta(datetime.timedelta(hours=1)) == "1.0h"
+
+    def test_boundary_exactly_one_day(self):
+        assert _format_timedelta(datetime.timedelta(days=1)) == "1d"
+
+    def test_boundary_exactly_one_week(self):
+        assert _format_timedelta(datetime.timedelta(weeks=1)) == "1w"
+
+
+# ─── _parse_max_age ─────────────────────────────────────────────────────────────
+
+
+class TestParseMaxAge:
+    def test_timedelta_passthrough(self):
+        td = datetime.timedelta(hours=1)
+        assert _parse_max_age(td) is td
+
+    def test_simple_hours(self):
+        result = _parse_max_age("24 hours")
+        assert result == datetime.timedelta(hours=24)
+
+    def test_simple_day(self):
+        result = _parse_max_age("1 day")
+        assert result == datetime.timedelta(days=1)
+
+    def test_simple_minutes(self):
+        result = _parse_max_age("30 minutes")
+        assert result == datetime.timedelta(minutes=30)
+
+    def test_simple_seconds(self):
+        result = _parse_max_age("60 seconds")
+        assert result == datetime.timedelta(seconds=60)
+
+    def test_simple_weeks(self):
+        result = _parse_max_age("2 weeks")
+        assert result == datetime.timedelta(weeks=2)
+
+    def test_compound_expression(self):
+        result = _parse_max_age("2 hours 15 minutes")
+        assert result == datetime.timedelta(hours=2, minutes=15)
+
+    def test_compound_no_spaces(self):
+        result = _parse_max_age("1day6h")
+        assert result == datetime.timedelta(days=1, hours=6)
+
+    def test_abbreviations_sec(self):
+        assert _parse_max_age("30sec") == datetime.timedelta(seconds=30)
+
+    def test_abbreviations_min(self):
+        assert _parse_max_age("5min") == datetime.timedelta(minutes=5)
+
+    def test_abbreviations_hr(self):
+        assert _parse_max_age("2hr") == datetime.timedelta(hours=2)
+
+    def test_abbreviations_d(self):
+        assert _parse_max_age("3d") == datetime.timedelta(days=3)
+
+    def test_abbreviations_wk(self):
+        assert _parse_max_age("1wk") == datetime.timedelta(weeks=1)
+
+    def test_abbreviations_single_char(self):
+        assert _parse_max_age("5s") == datetime.timedelta(seconds=5)
+        assert _parse_max_age("5m") == datetime.timedelta(minutes=5)
+        assert _parse_max_age("5h") == datetime.timedelta(hours=5)
+        assert _parse_max_age("5d") == datetime.timedelta(days=5)
+        assert _parse_max_age("5w") == datetime.timedelta(weeks=5)
+
+    def test_fractional_value(self):
+        result = _parse_max_age("1.5 hours")
+        assert result == datetime.timedelta(hours=1.5)
+
+    def test_invalid_unit_raises(self):
+        with pytest.raises(ValueError, match="Unknown time unit"):
+            _parse_max_age("5 fortnights")
+
+    def test_no_match_raises(self):
+        with pytest.raises(ValueError, match="Invalid max_age format"):
+            _parse_max_age("foo bar")
+
+    def test_invalid_type_raises(self):
+        with pytest.raises(TypeError, match="must be a string or timedelta"):
+            _parse_max_age(42)
+
+    def test_whitespace_handling(self):
+        result = _parse_max_age("  24 hours  ")
+        assert result == datetime.timedelta(hours=24)
+
+    def test_plural_forms(self):
+        assert _parse_max_age("1 second") == datetime.timedelta(seconds=1)
+        assert _parse_max_age("2 secs") == datetime.timedelta(seconds=2)
+        assert _parse_max_age("1 minute") == datetime.timedelta(minutes=1)
+        assert _parse_max_age("2 mins") == datetime.timedelta(minutes=2)
+        assert _parse_max_age("1 hour") == datetime.timedelta(hours=1)
+        assert _parse_max_age("2 hrs") == datetime.timedelta(hours=2)
+        assert _parse_max_age("1 week") == datetime.timedelta(weeks=1)
+        assert _parse_max_age("2 wks") == datetime.timedelta(weeks=2)
+
+
+# ─── _parse_timezone ─────────────────────────────────────────────────────────────
+
+
+class TestParseTimezone:
+    def test_iana_utc(self):
+        tz = _parse_timezone("UTC")
+        now = datetime.datetime.now(tz)
+        assert now.utcoffset() == datetime.timedelta(0)
+
+    def test_iana_named(self):
+        tz = _parse_timezone("America/New_York")
+        assert tz is not None
+
+    def test_positive_offset_simple(self):
+        tz = _parse_timezone("+5")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=5)
+
+    def test_negative_offset_simple(self):
+        tz = _parse_timezone("-7")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=-7)
+
+    def test_offset_with_colon(self):
+        tz = _parse_timezone("+05:30")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=5, minutes=30)
+
+    def test_negative_offset_with_colon(self):
+        tz = _parse_timezone("-07:00")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=-7)
+
+    def test_unsigned_offset(self):
+        tz = _parse_timezone("5")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=5)
+
+    def test_invalid_raises(self):
+        with pytest.raises(ValueError, match="Invalid timezone"):
+            _parse_timezone("Not/A/Real/Zone")
+
+    def test_whitespace_stripped(self):
+        tz = _parse_timezone("  +5  ")
+        offset = datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+        assert offset == datetime.timedelta(hours=5)
+
+
+# ─── _transform_auto_brief ──────────────────────────────────────────────────────
+
+
+class TestTransformAutoBrief:
+    def test_true_becomes_auto(self):
+        assert _transform_auto_brief(True) == "{auto}"
+
+    def test_false_becomes_none(self):
+        assert _transform_auto_brief(False) is None
+
+    def test_string_passthrough(self):
+        assert _transform_auto_brief("custom brief") == "custom brief"
+
+    def test_none_passthrough(self):
+        assert _transform_auto_brief(None) is None
+
+
+# ─── _coalesce_plan_steps (non-adjacent) ─────────────────────────────────────────
+
+
+class TestCoalescePlanStepsNonAdjacent:
+    def test_interleaved_methods_not_merged(self):
+        steps = [
+            ("col_vals_not_null", {"columns": "a"}),
+            ("col_vals_gt", {"columns": "b", "value": 0}),
+            ("col_vals_not_null", {"columns": "c"}),
+        ]
+        result = _coalesce_plan_steps(steps)
+        assert len(result) == 3
+
+    def test_adjacent_with_different_extra_params_not_merged(self):
+        steps = [
+            ("col_vals_gt", {"columns": "a", "value": 0}),
+            ("col_vals_gt", {"columns": "b", "value": 0, "na_pass": True}),
+        ]
+        result = _coalesce_plan_steps(steps)
+        assert len(result) == 2
+
+    def test_mixed_coalescible_and_not(self):
+        steps = [
+            ("col_vals_not_null", {"columns": "a"}),
+            ("col_vals_not_null", {"columns": "b"}),
+            ("col_vals_gt", {"columns": "c", "value": 0}),
+            ("col_vals_gt", {"columns": "d", "value": 0}),
+        ]
+        result = _coalesce_plan_steps(steps)
+        assert len(result) == 2
+        assert result[0][1]["columns"] == ["a", "b"]
+        assert result[1][1]["columns"] == ["c", "d"]
+
+    def test_single_step(self):
+        steps = [("col_vals_not_null", {"columns": "a"})]
+        result = _coalesce_plan_steps(steps)
+        assert len(result) == 1
+        assert result[0][1]["columns"] == "a"
+
+
+# ─── Threshold normalization via public API ──────────────────────────────────────
+
+
+class TestThresholdNormalization:
+    def test_bare_float(self):
+        df = pl.DataFrame({"a": [1]})
+        v = Validate(data=df, thresholds=0.1)
+        assert v.thresholds is not None
+
+    def test_tuple_two_levels(self):
+        df = pl.DataFrame({"a": [1]})
+        v = Validate(data=df, thresholds=(0.1, 0.25))
+        assert v.thresholds is not None
+
+    def test_tuple_three_levels(self):
+        df = pl.DataFrame({"a": [1]})
+        v = Validate(data=df, thresholds=(0.1, 0.25, 0.5))
+        assert v.thresholds is not None
+
+    def test_dict_form(self):
+        df = pl.DataFrame({"a": [1]})
+        v = Validate(data=df, thresholds={"warning": 0.1, "error": 0.25})
+        assert v.thresholds is not None
+
+    def test_thresholds_object(self):
+        df = pl.DataFrame({"a": [1]})
+        t = pb.Thresholds(warning=0.1)
+        v = Validate(data=df, thresholds=t)
+        assert v.thresholds is t
+
+
+# ─── Multi-step integration ──────────────────────────────────────────────────────
+
+
+class TestMultiStepIntegration:
+    def test_diverse_chain_interrogate_and_query(self):
+        df = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5],
+                "b": ["x", "y", "x", "y", "z"],
+                "c": [10.0, 20.0, None, 40.0, 50.0],
+            }
+        )
+        v = (
+            Validate(data=df)
+            .col_vals_gt(columns="a", value=0)
+            .col_vals_in_set(columns="b", set=["x", "y", "z"])
+            .col_vals_not_null(columns="c")
+            .col_vals_between(columns="a", left=1, right=5)
+            .rows_distinct()
+            .interrogate()
+        )
+        assert v.n_passed(i=1, scalar=True) == 5
+        assert v.n_passed(i=2, scalar=True) == 5
+        assert v.n_passed(i=3, scalar=True) == 4
+        assert v.n_failed(i=3, scalar=True) == 1
+        assert v.n_passed(i=4, scalar=True) == 5
+
+    def test_all_passed_false_with_failures(self):
+        df = pl.DataFrame({"a": [1, 2, -1]})
+        v = Validate(data=df).col_vals_gt(columns="a", value=0).interrogate()
+        assert v.all_passed() is False
+
+    def test_all_passed_true(self):
+        df = pl.DataFrame({"a": [1, 2, 3]})
+        v = Validate(data=df).col_vals_gt(columns="a", value=0).interrogate()
+        assert v.all_passed() is True
+
+    def test_get_data_extracts(self):
+        df = pl.DataFrame({"a": [1, 2, -1, 3]})
+        v = Validate(data=df).col_vals_gt(columns="a", value=0).interrogate()
+        extracts = v.get_data_extracts(i=1)
+        assert len(extracts) == 1
+
+    def test_get_sundered_data_pass(self):
+        df = pl.DataFrame({"a": [1, 2, -1, 3], "b": [10, 20, 30, 40]})
+        v = (
+            Validate(data=df)
+            .col_vals_gt(columns="a", value=0)
+            .interrogate()
+        )
+        passed = v.get_sundered_data(type="pass")
+        assert len(passed) == 3
+
+    def test_get_sundered_data_fail(self):
+        df = pl.DataFrame({"a": [1, 2, -1, 3], "b": [10, 20, 30, 40]})
+        v = (
+            Validate(data=df)
+            .col_vals_gt(columns="a", value=0)
+            .interrogate()
+        )
+        failed = v.get_sundered_data(type="fail")
+        assert len(failed) == 1
+
+
+# ─── to_code/to_yaml round-trips for more assertion types ──────────────────────
+
+
+class TestSerializationRoundTrips:
+    def _exec_code(self, code, data):
+        namespace = {}
+        exec(code.replace("your_data", "data"), {"pb": pb, "data": data}, namespace)
+        return namespace["validation"]
+
+    def test_within_spec_roundtrip(self):
+        df = pl.DataFrame({"email": ["test@example.com"]})
+        v = Validate(data=df, tbl_name="test").col_vals_within_spec(
+            columns="email", spec="email"
+        )
+        code = v.to_code()
+        rebuilt = self._exec_code(code, df)
+        assert rebuilt.validation_info[0].assertion_type == "col_vals_within_spec"
+
+    def test_str_len_roundtrip(self):
+        df = pl.DataFrame({"name": ["abc"]})
+        v = Validate(data=df, tbl_name="test").col_vals_str_len(
+            columns="name", min_val=2, max_val=10
+        )
+        code = v.to_code()
+        rebuilt = self._exec_code(code, df)
+        assert rebuilt.validation_info[0].assertion_type == "col_vals_str_len"
+        assert rebuilt.validation_info[0].values["min_val"] == 2
+        assert rebuilt.validation_info[0].values["max_val"] == 10
+
+    def test_increasing_decreasing_roundtrip(self):
+        df = pl.DataFrame({"x": [1, 2, 3]})
+        v = (
+            Validate(data=df, tbl_name="test")
+            .col_vals_increasing(columns="x")
+            .col_vals_decreasing(columns="x")
+        )
+        code = v.to_code()
+        rebuilt = self._exec_code(code, df)
+        assert rebuilt.validation_info[0].assertion_type == "col_vals_increasing"
+        assert rebuilt.validation_info[1].assertion_type == "col_vals_decreasing"
+
+    def test_col_pct_missing_not_serializable(self):
+        from pointblank.missing import MissingSpec
+
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        df = pl.DataFrame({"age": [25, -99, 30]})
+        v = Validate(data=df, tbl_name="test").col_pct_missing(
+            columns="age", missing=spec, max_pct=0.5
+        )
+        with pytest.warns(UserWarning, match="col_pct_missing"):
+            code = v.to_code()
+        assert "col_pct_missing" not in code
+
+    def test_col_missing_coded_not_serializable(self):
+        from pointblank.missing import MissingSpec
+
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        df = pl.DataFrame({"age": [25, -99, 30]})
+        v = Validate(data=df, tbl_name="test").col_missing_coded(
+            columns="age", missing=spec
+        )
+        with pytest.warns(UserWarning, match="col_missing_coded"):
+            code = v.to_code()
+        assert "col_missing_coded" not in code
+
+    def test_col_missing_consistent_not_serializable(self):
+        from pointblank.missing import MissingSpec
+
+        spec = MissingSpec(reasons={-99: "not_asked"})
+        df = pl.DataFrame({"a": [1, -99], "b": [2, -99]})
+        v = Validate(data=df, tbl_name="test").col_missing_consistent(
+            columns=["a", "b"], missing=spec, when_reason="not_asked"
+        )
+        with pytest.warns(UserWarning, match="col_missing_consistent"):
+            code = v.to_code()
+        assert "col_missing_consistent" not in code
+
+    def test_yaml_within_spec(self):
+        df = pl.DataFrame({"email": ["test@example.com"]})
+        v = Validate(data=df, tbl_name="test").col_vals_within_spec(
+            columns="email", spec="email"
+        )
+        yaml_str = v.to_yaml()
+        assert "col_vals_within_spec" in yaml_str
+        assert "email" in yaml_str
+
+    def test_yaml_str_len(self):
+        df = pl.DataFrame({"name": ["abc"]})
+        v = Validate(data=df, tbl_name="test").col_vals_str_len(
+            columns="name", min_val=2, max_val=10
+        )
+        yaml_str = v.to_yaml()
+        assert "col_vals_str_len" in yaml_str
+        assert "min_val: 2" in yaml_str
+        assert "max_val: 10" in yaml_str
+
+    def test_aggregate_with_tol_roundtrip(self):
+        df = pl.DataFrame({"d": [100, 200, 300]})
+        v = Validate(data=df, tbl_name="test").col_sum_eq(
+            columns="d", value=600, tol=10
+        )
+        code = v.to_code()
+        rebuilt = self._exec_code(code, df)
+        assert rebuilt.validation_info[0].assertion_type == "col_sum_eq"
+
+    def test_data_freshness_yaml(self):
+        df = pl.DataFrame({"dt": [datetime.datetime(2024, 1, 1)]})
+        v = Validate(data=df, tbl_name="test").data_freshness(
+            column="dt", max_age="1 day"
+        )
+        yaml_str = v.to_yaml()
+        assert "data_freshness" in yaml_str
+        assert "max_age" in yaml_str
+
+
+# ─── data_freshness with timezone offsets (end-to-end) ──────────────────────────
+
+
+class TestDataFreshnessTimezones:
+    def test_with_utc_timezone(self):
+        import datetime as dt
+
+        now = dt.datetime.now(dt.timezone.utc)
+        df = pl.DataFrame({"ts": [now - dt.timedelta(hours=1)]})
+        v = (
+            Validate(data=df)
+            .data_freshness(column="ts", max_age="2 hours", timezone="UTC")
+            .interrogate()
+        )
+        assert v.n_passed(i=1, scalar=True) == 1
+
+    def test_with_numeric_offset(self):
+        import datetime as dt
+
+        tz = dt.timezone(dt.timedelta(hours=-5))
+        now = dt.datetime.now(tz)
+        df = pl.DataFrame({"ts": [now - dt.timedelta(minutes=30)]})
+        v = (
+            Validate(data=df)
+            .data_freshness(column="ts", max_age="1 hour", timezone="-5")
+            .interrogate()
+        )
+        assert v.n_passed(i=1, scalar=True) == 1
+
+
+# ─── col_vals_str_len extended scenarios ─────────────────────────────────────────
+
+
+class TestColValsStrLenExtended:
+    def test_multi_column(self):
+        df = pl.DataFrame({"a": ["abc", "ab"], "b": ["xyz", "xy"]})
+        v = (
+            Validate(data=df)
+            .col_vals_str_len(columns=["a", "b"], min_val=2)
+            .interrogate()
+        )
+        assert v.n_passed(i=1, scalar=True) == 2
+        assert v.n_passed(i=2, scalar=True) == 2
+
+    def test_with_thresholds(self):
+        df = pl.DataFrame({"name": ["a", "ab", "abc"]})
+        v = (
+            Validate(data=df)
+            .col_vals_str_len(
+                columns="name", min_val=2, thresholds=pb.Thresholds(warning=0.5)
+            )
+            .interrogate()
+        )
+        assert v.n_failed(i=1, scalar=True) == 1
+
+    def test_with_brief(self):
+        df = pl.DataFrame({"name": ["abc"]})
+        v = Validate(data=df).col_vals_str_len(
+            columns="name", min_val=1, brief="Custom brief"
+        )
+        assert v.validation_info[0].brief == "Custom brief"
+
+    def test_with_pandas(self):
+        import pandas as pd
+
+        df = pd.DataFrame({"name": ["abc", "ab", "abcde"]})
+        v = (
+            Validate(data=df)
+            .col_vals_str_len(columns="name", min_val=3)
+            .interrogate()
+        )
+        assert v.n_passed(i=1, scalar=True) == 2
