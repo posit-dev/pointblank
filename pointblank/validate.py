@@ -19085,7 +19085,9 @@ class Validate:
             else:
                 title_text = scorecard_title
         elif title == ":tbl_name:":
-            title_text = f"<code>{self.tbl_name}</code>" if self.tbl_name else scorecard_title  # pragma: no cover
+            title_text = (
+                f"<code>{self.tbl_name}</code>" if self.tbl_name else scorecard_title
+            )  # pragma: no cover
         elif title in (":none:", None):
             title_text = None
         else:
@@ -20181,7 +20183,9 @@ class Validate:
             elif assertion_type[i] in ["data_freshness"]:  # pragma: no cover
                 # Format max_age nicely for display
                 max_age = value.get("max_age")  # pragma: no cover
-                max_age_str = _format_timedelta(max_age) if max_age else "&mdash;"  # pragma: no cover
+                max_age_str = (
+                    _format_timedelta(max_age) if max_age else "&mdash;"
+                )  # pragma: no cover
 
                 # Build additional lines with non-default parameters
                 extra_lines = []  # pragma: no cover
@@ -20195,7 +20199,9 @@ class Validate:
                         time_str = " " + ref_time.strftime("%H:%M:%S")  # pragma: no cover
 
                         # Add timezone offset if present
-                        if hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None:  # pragma: no cover
+                        if (
+                            hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None
+                        ):  # pragma: no cover
                             tz_offset = ref_time.strftime("%z")  # pragma: no cover
                             if tz_offset:  # pragma: no cover
                                 time_str += tz_offset  # pragma: no cover
@@ -20247,7 +20253,10 @@ class Validate:
             elif assertion_type[i] in ["col_vals_expr", "conjointly"]:
                 values_upd.append("COLUMN EXPR")
 
-            elif assertion_type[i] in ["col_vals_increasing", "col_vals_decreasing"]:  # pragma: no cover
+            elif assertion_type[i] in [
+                "col_vals_increasing",
+                "col_vals_decreasing",
+            ]:  # pragma: no cover
                 values_upd.append("")  # pragma: no cover
 
             elif assertion_type[i] in ["row_count_match", "col_count_match"]:
@@ -23536,7 +23545,9 @@ def _missing_legend_html(spec: Any) -> str:  # pragma: no cover
     """Build an HTML legend of a MissingSpec's sentinel codes and their reasons, for step reports."""
     if not hasattr(spec, "reasons"):  # pragma: no cover
         return ""  # pragma: no cover
-    items = [f"<code>{value}</code> &rarr; {reason}" for value, reason in spec.reasons.items()]  # pragma: no cover
+    items = [
+        f"<code>{value}</code> &rarr; {reason}" for value, reason in spec.reasons.items()
+    ]  # pragma: no cover
     if getattr(spec, "null_is_missing", False):  # pragma: no cover
         items.append(f"<code>null</code> &rarr; {spec.null_reason}")  # pragma: no cover
     if not items:  # pragma: no cover

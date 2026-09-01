@@ -2356,7 +2356,9 @@ def interrogate_within_spec(
 
         native_tbl["pb_is_good_2"] = pd.Series(is_valid_list, index=native_tbl.index)
     else:
-        raise NotImplementedError(f"Backend type not supported: {type(native_tbl)}")  # pragma: no cover
+        raise NotImplementedError(
+            f"Backend type not supported: {type(native_tbl)}"
+        )  # pragma: no cover
 
     result_tbl = nw.from_native(native_tbl)  # Handle NA values and combine validation results
     result_tbl = result_tbl.with_columns(

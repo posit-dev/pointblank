@@ -741,18 +741,14 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pd.DataFrame({"isbn": ["978-0-306-40615-7", "0-306-40615-2"]})
-        result = interrogate_within_spec(
-            df, "isbn", {"spec": "isbn"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "isbn", {"spec": "isbn"}, na_pass=False)
         assert "pb_is_good_" in result.columns
 
     def test_isbn_with_null_na_pass(self):
         from pointblank._interrogation import interrogate_within_spec
 
         df = pd.DataFrame({"isbn": ["978-0-306-40615-7", None]})
-        result = interrogate_within_spec(
-            df, "isbn", {"spec": "isbn"}, na_pass=True
-        )
+        result = interrogate_within_spec(df, "isbn", {"spec": "isbn"}, na_pass=True)
         good = result["pb_is_good_"].tolist()
         assert good[1] is True
 
@@ -760,9 +756,7 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pl.DataFrame({"email": ["test@example.com", "not-an-email", None]})
-        result = interrogate_within_spec(
-            df, "email", {"spec": "email"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "email", {"spec": "email"}, na_pass=False)
         good = result["pb_is_good_"].to_list()
         assert good[0] is True
         assert good[1] is False
@@ -772,9 +766,7 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pl.DataFrame({"email": ["test@example.com", None]})
-        result = interrogate_within_spec(
-            df, "email", {"spec": "email"}, na_pass=True
-        )
+        result = interrogate_within_spec(df, "email", {"spec": "email"}, na_pass=True)
         good = result["pb_is_good_"].to_list()
         assert good[0] is True
         assert good[1] is True
@@ -783,9 +775,7 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pd.DataFrame({"url": ["https://example.com", "not-a-url"]})
-        result = interrogate_within_spec(
-            df, "url", {"spec": "url"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "url", {"spec": "url"}, na_pass=False)
         good = result["pb_is_good_"].tolist()
         assert good[0] is True
         assert good[1] is False
@@ -794,9 +784,7 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pl.DataFrame({"ip": ["192.168.1.1", "999.999.999.999"]})
-        result = interrogate_within_spec(
-            df, "ip", {"spec": "ipv4"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "ip", {"spec": "ipv4"}, na_pass=False)
         good = result["pb_is_good_"].to_list()
         assert good[0] is True
 
@@ -818,9 +806,7 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pl.DataFrame({"isbn": ["978-0-306-40615-7", "invalid-isbn"]})
-        result = interrogate_within_spec(
-            df, "isbn", {"spec": "isbn"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "isbn", {"spec": "isbn"}, na_pass=False)
         good = result["pb_is_good_"].to_list()
         assert good[0] is True
         assert good[1] is False
@@ -829,18 +815,14 @@ class TestInterrogateWithinSpec:
         from pointblank._interrogation import interrogate_within_spec
 
         df = pd.DataFrame({"bic": ["DEUTDEFF", "INVALID"]})
-        result = interrogate_within_spec(
-            df, "bic", {"spec": "swift_bic"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "bic", {"spec": "swift_bic"}, na_pass=False)
         assert "pb_is_good_" in result.columns
 
     def test_spec_with_country_bracket_syntax(self):
         from pointblank._interrogation import interrogate_within_spec
 
         df = pd.DataFrame({"iban": ["DE89370400440532013000"]})
-        result = interrogate_within_spec(
-            df, "iban", {"spec": "iban[DE]"}, na_pass=False
-        )
+        result = interrogate_within_spec(df, "iban", {"spec": "iban[DE]"}, na_pass=False)
         assert "pb_is_good_" in result.columns
 
 
@@ -854,7 +836,8 @@ class TestDataFreshness:
         now = datetime.datetime.now()
         df = pd.DataFrame({"ts": [now - datetime.timedelta(minutes=5)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone=None,
@@ -869,7 +852,8 @@ class TestDataFreshness:
         old_time = datetime.datetime(2020, 1, 1)
         df = pd.DataFrame({"ts": [old_time]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=datetime.datetime.now(),
             timezone=None,
@@ -885,7 +869,8 @@ class TestDataFreshness:
         data_time = datetime.datetime(2023, 6, 15, 11, 0, 0)
         df = pd.DataFrame({"ts": [data_time]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=ref,
             timezone=None,
@@ -900,7 +885,8 @@ class TestDataFreshness:
 
         df = pl.DataFrame({"ts": pl.Series("ts", [None], dtype=pl.Datetime)})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone=None,
@@ -917,7 +903,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [aware_time]})
         naive_ref = datetime.datetime(2023, 6, 15, 13, 0, 0)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=naive_ref,
             timezone=None,
@@ -933,7 +920,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [naive_time]})
         aware_ref = datetime.datetime(2023, 6, 15, 13, 0, 0, tzinfo=datetime.timezone.utc)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=aware_ref,
             timezone=None,
@@ -948,7 +936,8 @@ class TestDataFreshness:
         now = datetime.datetime.now(datetime.timezone.utc)
         df = pd.DataFrame({"ts": [now - datetime.timedelta(minutes=10)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone="-5",
@@ -963,7 +952,8 @@ class TestDataFreshness:
         now = datetime.datetime.now(datetime.timezone.utc)
         df = pd.DataFrame({"ts": [now - datetime.timedelta(minutes=10)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone="US/Eastern",
@@ -978,7 +968,8 @@ class TestDataFreshness:
         now = datetime.datetime.now()
         df = pl.DataFrame({"ts": [now - datetime.timedelta(minutes=5)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone=None,
@@ -994,7 +985,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [aware_time]})
         naive_ref = datetime.datetime(2023, 6, 15, 13, 0, 0)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=naive_ref,
             timezone=None,
@@ -1010,7 +1002,8 @@ class TestDataFreshness:
         now_utc = datetime.datetime.now(datetime.timezone.utc)
         df = pd.DataFrame({"ts": [now_utc - datetime.timedelta(minutes=5)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone=None,
@@ -1027,7 +1020,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [aware_time]})
         naive_ref = datetime.datetime(2023, 6, 15, 13, 0, 0)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=naive_ref,
             timezone="US/Eastern",
@@ -1044,7 +1038,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [naive_time]})
         aware_ref = datetime.datetime(2023, 6, 15, 13, 0, 0, tzinfo=datetime.timezone.utc)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=aware_ref,
             timezone="US/Eastern",
@@ -1061,7 +1056,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [naive_time]})
         aware_ref = datetime.datetime(2023, 6, 15, 13, 0, 0, tzinfo=datetime.timezone.utc)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=aware_ref,
             timezone=None,
@@ -1077,7 +1073,8 @@ class TestDataFreshness:
         now = datetime.datetime.now()
         df = pd.DataFrame({"ts": [now - datetime.timedelta(minutes=5)]})
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=1),
             reference_time=None,
             timezone="-5",
@@ -1094,7 +1091,8 @@ class TestDataFreshness:
         df = pd.DataFrame({"ts": [aware_time]})
         naive_ref = datetime.datetime(2023, 6, 15, 13, 0, 0)
         result = data_freshness(
-            df, "ts",
+            df,
+            "ts",
             max_age=datetime.timedelta(hours=2),
             reference_time=naive_ref,
             timezone=None,
@@ -1187,9 +1185,7 @@ class TestInterrogateRegex:
         from pointblank._interrogation import interrogate_regex
 
         df = pl.DataFrame({"s": ["abc", "def", "ghi"]})
-        result = interrogate_regex(
-            df, "s", {"pattern": "^a", "inverse": True}, na_pass=False
-        )
+        result = interrogate_regex(df, "s", {"pattern": "^a", "inverse": True}, na_pass=False)
         good = result["pb_is_good_"].to_list()
         assert good == [False, True, True]
 
@@ -1242,8 +1238,13 @@ class TestInterrogateMissingOnlyCoded:
 
         df = pd.DataFrame({"a": [1, -99, 5, -99]})
         result = interrogate_missing_only_coded(
-            df, "a", sentinels=[-99], count_null=False,
-            allowed=None, min_val=1, max_val=10,
+            df,
+            "a",
+            sentinels=[-99],
+            count_null=False,
+            allowed=None,
+            min_val=1,
+            max_val=10,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [True, True, True, True]
@@ -1253,8 +1254,13 @@ class TestInterrogateMissingOnlyCoded:
 
         df = pd.DataFrame({"a": [1, -99, 999, 5]})
         result = interrogate_missing_only_coded(
-            df, "a", sentinels=[-99], count_null=False,
-            allowed=None, min_val=1, max_val=10,
+            df,
+            "a",
+            sentinels=[-99],
+            count_null=False,
+            allowed=None,
+            min_val=1,
+            max_val=10,
         )
         good = result["pb_is_good_"].tolist()
         assert good[2] is False
@@ -1264,8 +1270,13 @@ class TestInterrogateMissingOnlyCoded:
 
         df = pd.DataFrame({"a": [1.0, None, 5.0]})
         result = interrogate_missing_only_coded(
-            df, "a", sentinels=[], count_null=True,
-            allowed=None, min_val=None, max_val=None,
+            df,
+            "a",
+            sentinels=[],
+            count_null=True,
+            allowed=None,
+            min_val=None,
+            max_val=None,
         )
         good = result["pb_is_good_"].tolist()
         assert good[1] is True
@@ -1276,8 +1287,13 @@ class TestInterrogateMissingOnlyCoded:
 
         df = pd.DataFrame({"a": [1, 2, 3, 99]})
         result = interrogate_missing_only_coded(
-            df, "a", sentinels=[], count_null=False,
-            allowed=[1, 2, 3], min_val=None, max_val=None,
+            df,
+            "a",
+            sentinels=[],
+            count_null=False,
+            allowed=[1, 2, 3],
+            min_val=None,
+            max_val=None,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [True, True, True, False]
@@ -1287,8 +1303,13 @@ class TestInterrogateMissingOnlyCoded:
 
         df = pd.DataFrame({"a": [1, 2, 3]})
         result = interrogate_missing_only_coded(
-            df, "a", sentinels=[], count_null=False,
-            allowed=None, min_val=None, max_val=None,
+            df,
+            "a",
+            sentinels=[],
+            count_null=False,
+            allowed=None,
+            min_val=None,
+            max_val=None,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [False, False, False]
@@ -1302,7 +1323,10 @@ class TestInterrogateMissingConsistent:
 
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         result = interrogate_missing_consistent(
-            df, columns=["a", "b"], sentinels=[-99], count_null=True,
+            df,
+            columns=["a", "b"],
+            sentinels=[-99],
+            count_null=True,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [True, True, True]
@@ -1312,7 +1336,10 @@ class TestInterrogateMissingConsistent:
 
         df = pd.DataFrame({"a": [-99, -99], "b": [-99, -99]})
         result = interrogate_missing_consistent(
-            df, columns=["a", "b"], sentinels=[-99], count_null=False,
+            df,
+            columns=["a", "b"],
+            sentinels=[-99],
+            count_null=False,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [True, True]
@@ -1322,7 +1349,10 @@ class TestInterrogateMissingConsistent:
 
         df = pd.DataFrame({"a": [-99, 1], "b": [1, -99]})
         result = interrogate_missing_consistent(
-            df, columns=["a", "b"], sentinels=[-99], count_null=False,
+            df,
+            columns=["a", "b"],
+            sentinels=[-99],
+            count_null=False,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [False, False]
@@ -1332,7 +1362,10 @@ class TestInterrogateMissingConsistent:
 
         df = pd.DataFrame({"a": [None, 1.0], "b": [None, 2.0]})
         result = interrogate_missing_consistent(
-            df, columns=["a", "b"], sentinels=[], count_null=True,
+            df,
+            columns=["a", "b"],
+            sentinels=[],
+            count_null=True,
         )
         good = result["pb_is_good_"].tolist()
         assert good == [True, True]
@@ -1342,7 +1375,10 @@ class TestInterrogateMissingConsistent:
 
         df = pl.DataFrame({"a": [1, 2], "b": [3, 4]})
         result = interrogate_missing_consistent(
-            df, columns=["a", "b"], sentinels=[], count_null=False,
+            df,
+            columns=["a", "b"],
+            sentinels=[],
+            count_null=False,
         )
         good = result["pb_is_good_"].to_list()
         assert good == [True, True]

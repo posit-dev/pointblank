@@ -166,15 +166,11 @@ class TestCreateTextColMissingOnlyCoded:
 
 class TestCreateTextColMissingConsistent:
     def test_with_list_columns(self):
-        text = _create_text_col_missing_consistent(
-            "en", ["a", "b"], {"when_reason": "not_asked"}
-        )
+        text = _create_text_col_missing_consistent("en", ["a", "b"], {"when_reason": "not_asked"})
         assert "not_asked" in text
 
     def test_with_single_column(self):
-        text = _create_text_col_missing_consistent(
-            "en", "a", {"when_reason": "refused"}
-        )
+        text = _create_text_col_missing_consistent("en", "a", {"when_reason": "refused"})
         assert "refused" in text
 
     def test_failure(self):
@@ -584,11 +580,7 @@ class TestColValsStrLen:
 
     def test_min_and_max(self):
         df = pl.DataFrame({"name": ["abc", "ab", "abcde"]})
-        v = (
-            Validate(data=df)
-            .col_vals_str_len(columns="name", min_val=2, max_val=4)
-            .interrogate()
-        )
+        v = Validate(data=df).col_vals_str_len(columns="name", min_val=2, max_val=4).interrogate()
         assert v.n_passed(i=1, scalar=True) == 2
 
     def test_no_min_or_max_raises(self):
@@ -622,9 +614,7 @@ class TestSerializationBranches:
 
     def test_within_spec_serialization(self):
         df = pl.DataFrame({"email": ["test@example.com"]})
-        v = Validate(data=df, tbl_name="test").col_vals_within_spec(
-            columns="email", spec="email"
-        )
+        v = Validate(data=df, tbl_name="test").col_vals_within_spec(columns="email", spec="email")
         code = v.to_code()
         assert "col_vals_within_spec" in code
         assert 'spec="email"' in code
@@ -703,9 +693,7 @@ class TestSerializationBranches:
 
     def test_active_false_serialization(self):
         df = pl.DataFrame({"a": [1, 2, 3]})
-        v = Validate(data=df, tbl_name="test").col_vals_gt(
-            columns="a", value=0, active=False
-        )
+        v = Validate(data=df, tbl_name="test").col_vals_gt(columns="a", value=0, active=False)
         code = v.to_code()
         assert "active=False" in code
 
@@ -731,17 +719,13 @@ class TestSerializationBranches:
 
     def test_segments_serialization(self):
         df = pl.DataFrame({"a": [1, 2, 3], "grp": ["x", "y", "x"]})
-        v = Validate(data=df, tbl_name="test").col_vals_gt(
-            columns="a", value=0, segments="grp"
-        )
+        v = Validate(data=df, tbl_name="test").col_vals_gt(columns="a", value=0, segments="grp")
         code = v.to_code()
         assert "segments" in code
 
     def test_aggregate_method_with_tol_serialization(self):
         df = pl.DataFrame({"d": [100, 200, 300]})
-        v = Validate(data=df, tbl_name="test").col_sum_eq(
-            columns="d", value=600, tol=10
-        )
+        v = Validate(data=df, tbl_name="test").col_sum_eq(columns="d", value=600, tol=10)
         code = v.to_code()
         assert "col_sum_eq" in code
         assert "tol=10" in code
@@ -791,9 +775,7 @@ class TestSerializationBranches:
 
     def test_to_code_with_brief_true(self):
         df = pl.DataFrame({"a": [1]})
-        v = Validate(data=df, tbl_name="test", brief=True).col_vals_gt(
-            columns="a", value=0
-        )
+        v = Validate(data=df, tbl_name="test", brief=True).col_vals_gt(columns="a", value=0)
         code = v.to_code()
         assert "brief=True" in code
 
@@ -851,9 +833,9 @@ class TestValidationInfoToStep:
         import warnings
 
         df = pl.DataFrame({"a": [1, 2, 3]})
-        v = Validate(
-            data=df, tbl_name="test", actions=pb.Actions(warning="warn")
-        ).col_vals_gt(columns="a", value=0)
+        v = Validate(data=df, tbl_name="test", actions=pb.Actions(warning="warn")).col_vals_gt(
+            columns="a", value=0
+        )
         with pytest.warns(UserWarning, match="could not be fully serialized"):
             code = v.to_code()
         assert "col_vals_gt" in code
@@ -865,25 +847,21 @@ class TestValidationInfoToStep:
 class TestToYamlTopLevelArgs:
     def test_with_thresholds(self):
         df = pl.DataFrame({"a": [1]})
-        v = Validate(
-            data=df, tbl_name="test", thresholds=pb.Thresholds(warning=0.1)
-        ).col_vals_gt(columns="a", value=0)
+        v = Validate(data=df, tbl_name="test", thresholds=pb.Thresholds(warning=0.1)).col_vals_gt(
+            columns="a", value=0
+        )
         yaml_str = v.to_yaml()
         assert "thresholds" in yaml_str
 
     def test_with_brief(self):
         df = pl.DataFrame({"a": [1]})
-        v = Validate(data=df, tbl_name="test", brief=True).col_vals_gt(
-            columns="a", value=0
-        )
+        v = Validate(data=df, tbl_name="test", brief=True).col_vals_gt(columns="a", value=0)
         yaml_str = v.to_yaml()
         assert "brief: true" in yaml_str
 
     def test_with_lang(self):
         df = pl.DataFrame({"a": [1]})
-        v = Validate(data=df, tbl_name="test", lang="de").col_vals_gt(
-            columns="a", value=0
-        )
+        v = Validate(data=df, tbl_name="test", lang="de").col_vals_gt(columns="a", value=0)
         yaml_str = v.to_yaml()
         assert "lang: de" in yaml_str
 
@@ -897,9 +875,9 @@ class TestToYamlTopLevelArgs:
 
     def test_with_owner_and_version(self):
         df = pl.DataFrame({"a": [1]})
-        v = Validate(
-            data=df, tbl_name="test", owner="data-team", version="1.0"
-        ).col_vals_gt(columns="a", value=0)
+        v = Validate(data=df, tbl_name="test", owner="data-team", version="1.0").col_vals_gt(
+            columns="a", value=0
+        )
         yaml_str = v.to_yaml()
         assert "owner: data-team" in yaml_str
         assert "version: '1.0'" in yaml_str
@@ -916,9 +894,9 @@ class TestToYamlTopLevelArgs:
         import warnings
 
         df = pl.DataFrame({"a": [1]})
-        v = Validate(
-            data=df, tbl_name="test", actions=pb.Actions(warning="warn")
-        ).col_vals_gt(columns="a", value=0)
+        v = Validate(data=df, tbl_name="test", actions=pb.Actions(warning="warn")).col_vals_gt(
+            columns="a", value=0
+        )
         with pytest.warns(UserWarning, match="could not be fully serialized"):
             v.to_yaml()
 
@@ -949,9 +927,7 @@ class TestDataFreshnessEdgeCases:
     def test_invalid_reference_time_type(self):
         df = pl.DataFrame({"dt": [datetime.datetime(2024, 1, 1)]})
         with pytest.raises(TypeError, match="must be a string or datetime"):
-            Validate(data=df).data_freshness(
-                column="dt", max_age="1 day", reference_time=42
-            )
+            Validate(data=df).data_freshness(column="dt", max_age="1 day", reference_time=42)
 
 
 # ─── col_missing_consistent string columns input ───────────────────────────────
