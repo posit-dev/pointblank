@@ -2,7 +2,7 @@
 
 from typing import Annotated, Dict, Optional, Union
 
-from fastmcp.prompts.prompt import Message
+from fastmcp.prompts import Message
 
 
 def prompt_load_dataframe(
