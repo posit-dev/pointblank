@@ -1270,21 +1270,13 @@ class TestMultiStepIntegration:
 
     def test_get_sundered_data_pass(self):
         df = pl.DataFrame({"a": [1, 2, -1, 3], "b": [10, 20, 30, 40]})
-        v = (
-            Validate(data=df)
-            .col_vals_gt(columns="a", value=0)
-            .interrogate()
-        )
+        v = Validate(data=df).col_vals_gt(columns="a", value=0).interrogate()
         passed = v.get_sundered_data(type="pass")
         assert len(passed) == 3
 
     def test_get_sundered_data_fail(self):
         df = pl.DataFrame({"a": [1, 2, -1, 3], "b": [10, 20, 30, 40]})
-        v = (
-            Validate(data=df)
-            .col_vals_gt(columns="a", value=0)
-            .interrogate()
-        )
+        v = Validate(data=df).col_vals_gt(columns="a", value=0).interrogate()
         failed = v.get_sundered_data(type="fail")
         assert len(failed) == 1
 
@@ -1300,9 +1292,7 @@ class TestSerializationRoundTrips:
 
     def test_within_spec_roundtrip(self):
         df = pl.DataFrame({"email": ["test@example.com"]})
-        v = Validate(data=df, tbl_name="test").col_vals_within_spec(
-            columns="email", spec="email"
-        )
+        v = Validate(data=df, tbl_name="test").col_vals_within_spec(columns="email", spec="email")
         code = v.to_code()
         rebuilt = self._exec_code(code, df)
         assert rebuilt.validation_info[0].assertion_type == "col_vals_within_spec"
@@ -1347,9 +1337,7 @@ class TestSerializationRoundTrips:
 
         spec = MissingSpec(reasons={-99: "not_asked"})
         df = pl.DataFrame({"age": [25, -99, 30]})
-        v = Validate(data=df, tbl_name="test").col_missing_coded(
-            columns="age", missing=spec
-        )
+        v = Validate(data=df, tbl_name="test").col_missing_coded(columns="age", missing=spec)
         with pytest.warns(UserWarning, match="col_missing_coded"):
             code = v.to_code()
         assert "col_missing_coded" not in code
@@ -1368,9 +1356,7 @@ class TestSerializationRoundTrips:
 
     def test_yaml_within_spec(self):
         df = pl.DataFrame({"email": ["test@example.com"]})
-        v = Validate(data=df, tbl_name="test").col_vals_within_spec(
-            columns="email", spec="email"
-        )
+        v = Validate(data=df, tbl_name="test").col_vals_within_spec(columns="email", spec="email")
         yaml_str = v.to_yaml()
         assert "col_vals_within_spec" in yaml_str
         assert "email" in yaml_str
@@ -1387,18 +1373,14 @@ class TestSerializationRoundTrips:
 
     def test_aggregate_with_tol_roundtrip(self):
         df = pl.DataFrame({"d": [100, 200, 300]})
-        v = Validate(data=df, tbl_name="test").col_sum_eq(
-            columns="d", value=600, tol=10
-        )
+        v = Validate(data=df, tbl_name="test").col_sum_eq(columns="d", value=600, tol=10)
         code = v.to_code()
         rebuilt = self._exec_code(code, df)
         assert rebuilt.validation_info[0].assertion_type == "col_sum_eq"
 
     def test_data_freshness_yaml(self):
         df = pl.DataFrame({"dt": [datetime.datetime(2024, 1, 1)]})
-        v = Validate(data=df, tbl_name="test").data_freshness(
-            column="dt", max_age="1 day"
-        )
+        v = Validate(data=df, tbl_name="test").data_freshness(column="dt", max_age="1 day")
         yaml_str = v.to_yaml()
         assert "data_freshness" in yaml_str
         assert "max_age" in yaml_str
@@ -1440,11 +1422,7 @@ class TestDataFreshnessTimezones:
 class TestColValsStrLenExtended:
     def test_multi_column(self):
         df = pl.DataFrame({"a": ["abc", "ab"], "b": ["xyz", "xy"]})
-        v = (
-            Validate(data=df)
-            .col_vals_str_len(columns=["a", "b"], min_val=2)
-            .interrogate()
-        )
+        v = Validate(data=df).col_vals_str_len(columns=["a", "b"], min_val=2).interrogate()
         assert v.n_passed(i=1, scalar=True) == 2
         assert v.n_passed(i=2, scalar=True) == 2
 
@@ -1452,27 +1430,19 @@ class TestColValsStrLenExtended:
         df = pl.DataFrame({"name": ["a", "ab", "abc"]})
         v = (
             Validate(data=df)
-            .col_vals_str_len(
-                columns="name", min_val=2, thresholds=pb.Thresholds(warning=0.5)
-            )
+            .col_vals_str_len(columns="name", min_val=2, thresholds=pb.Thresholds(warning=0.5))
             .interrogate()
         )
         assert v.n_failed(i=1, scalar=True) == 1
 
     def test_with_brief(self):
         df = pl.DataFrame({"name": ["abc"]})
-        v = Validate(data=df).col_vals_str_len(
-            columns="name", min_val=1, brief="Custom brief"
-        )
+        v = Validate(data=df).col_vals_str_len(columns="name", min_val=1, brief="Custom brief")
         assert v.validation_info[0].brief == "Custom brief"
 
     def test_with_pandas(self):
         import pandas as pd
 
         df = pd.DataFrame({"name": ["abc", "ab", "abcde"]})
-        v = (
-            Validate(data=df)
-            .col_vals_str_len(columns="name", min_val=3)
-            .interrogate()
-        )
+        v = Validate(data=df).col_vals_str_len(columns="name", min_val=3).interrogate()
         assert v.n_passed(i=1, scalar=True) == 2
