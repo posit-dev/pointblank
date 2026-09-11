@@ -153,6 +153,7 @@ if TYPE_CHECKING:
     from narwhals.typing import IntoDataFrame, IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
+    from pointblank.steps import Steps
 
 
 __all__ = [
@@ -5071,6 +5072,40 @@ def print_database_tables(connection_string: str) -> list[str]:
         _handle_connection_errors(e, connection_string)
 
 
+def _extract_steps_from_validate(validation: Validate) -> list:
+    from pointblank.contract import Step
+
+    steps = []
+    for vi in validation.validation_info:
+        kwargs: dict[str, Any] = {}
+        if vi.column is not None:
+            kwargs["columns"] = vi.column
+        if vi.values is not None:
+            kwargs["value"] = vi.values
+        if vi.inclusive is not None:
+            kwargs["inclusive"] = vi.inclusive
+        if vi.na_pass is not None:
+            kwargs["na_pass"] = vi.na_pass
+        if vi.missing is not None:
+            kwargs["missing"] = vi.missing
+        if vi.pre is not None:
+            kwargs["pre"] = vi.pre
+        if vi.segments is not None:
+            kwargs["segments"] = vi.segments
+        if vi.thresholds is not None:
+            kwargs["thresholds"] = vi.thresholds
+        if vi.actions is not None:
+            kwargs["actions"] = vi.actions
+        if vi.brief is not None:
+            kwargs["brief"] = vi.brief
+        if vi.active is not None and vi.active is not True:
+            kwargs["active"] = vi.active
+        if vi.dimension is not None:
+            kwargs["dimension"] = vi.dimension
+        steps.append(Step(vi.assertion_type, **kwargs))
+    return steps
+
+
 @dataclass
 class Validate:
     """
@@ -5987,6 +6022,139 @@ class Validate:
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
+
+    def add_steps(
+        self,
+        *steps: Steps | Validate,
+        active: bool | Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        exclude: list[str | int] | None = None,
+        columns_map: dict[str, str] | None = None,
+    ) -> Validate:
+        """
+        Add validation steps from one or more Steps or Validate objects.
+
+        This method appends step definitions from the supplied objects to this validation plan.
+        When a [`Steps`](`pointblank.Steps`) object is provided, its recorded step definitions are
+        applied as method calls on this `Validate` instance. When a `Validate` object is provided,
+        its step definitions are extracted and applied the same way. This enables composing
+        validation plans from reusable step libraries.
+
+        Parameters
+        ----------
+        *steps
+            One or more [`Steps`](`pointblank.Steps`) or `Validate` objects whose step definitions
+            should be appended to this validation plan.
+        active
+            Override the `active=` setting for all imported steps. If `None` (the default), each
+            step's own `active=` setting is preserved. If `False`, all imported steps are deactivated.
+            A callable can also be provided to dynamically determine activation.
+        thresholds
+            Override the `thresholds=` setting for all imported steps. If `None` (the default), each
+            step's own `thresholds=` setting is preserved.
+        exclude
+            A list of step method names (strings) or 1-based step indices (integers) to skip when
+            importing. For example, `exclude=["col_vals_regex"]` skips all regex steps, and
+            `exclude=[2]` skips the second step.
+        columns_map
+            A dictionary mapping original column names to replacement column names. This allows the
+            same step definitions to work on tables with different column naming conventions.
+
+        Returns
+        -------
+        Validate
+            The Validate object with the imported steps appended (for method chaining).
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        completeness = (
+            pb.Steps()
+            .col_vals_not_null(columns="order_id")
+            .col_vals_not_null(columns="email")
+        )
+
+        positive_amounts = (
+            pb.Steps()
+            .col_vals_ge(columns="amount", value=0)
+        )
+
+        validation = (
+            pb.Validate(data=orders)
+            .add_steps(completeness, positive_amounts)
+            .interrogate()
+        )
+        ```
+        """
+        from pointblank.steps import Steps
+
+        if not steps:
+            raise ValueError("At least one Steps or Validate object must be provided.")
+
+        exclude_set: set[str] = set()
+        exclude_indices: set[int] = set()
+        if exclude is not None:
+            for item in exclude:
+                if isinstance(item, str):
+                    exclude_set.add(item)
+                elif isinstance(item, int):
+                    exclude_indices.add(item)
+                else:
+                    raise TypeError(
+                        f"Items in `exclude=` must be strings (method names) or integers "
+                        f"(1-based step indices), got {type(item).__name__}."
+                    )
+
+        for step_source in steps:
+            if isinstance(step_source, Steps):
+                step_list = step_source._steps
+            elif isinstance(step_source, Validate):
+                step_list = _extract_steps_from_validate(step_source)
+            else:
+                raise TypeError(
+                    f"`add_steps()` accepts Steps or Validate objects, "
+                    f"got {type(step_source).__name__}."
+                )
+
+            for i, step in enumerate(step_list, start=1):
+                if step.method in exclude_set or i in exclude_indices:
+                    continue
+
+                kwargs = dict(step.kwargs)
+
+                if active is not None:
+                    kwargs["active"] = active
+                if thresholds is not None:
+                    kwargs["thresholds"] = thresholds
+                if columns_map is not None:
+                    for param in ("columns", "column", "columns_subset"):
+                        if param in kwargs and kwargs[param] is not None:
+                            val = kwargs[param]
+                            if isinstance(val, str) and val in columns_map:
+                                kwargs[param] = columns_map[val]
+                            elif isinstance(val, list):
+                                kwargs[param] = [
+                                    columns_map.get(c, c) if isinstance(c, str) else c
+                                    for c in val
+                                ]
+
+                method = getattr(self, step.method, None)
+                if method is None:
+                    raise AttributeError(
+                        f"Validate has no method '{step.method}'. "
+                        f"Check that the step definitions are compatible with this version."
+                    )
+
+                # conjointly uses *exprs positionally
+                if step.method == "conjointly" and "exprs" in kwargs:
+                    exprs = kwargs.pop("exprs")
+                    method(*exprs, **kwargs)
+                else:
+                    method(**kwargs)
+
+        return self
 
     def col_vals_gt(
         self,
