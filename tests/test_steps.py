@@ -233,9 +233,7 @@ class TestAddStepsFromValidate:
         assert v.validation_info[0].assertion_type == "col_vals_gt"
 
     def test_extract_preserves_params(self, sample_df):
-        source = pb.Validate(data=sample_df).col_vals_gt(
-            columns="amount", value=5, na_pass=True
-        )
+        source = pb.Validate(data=sample_df).col_vals_gt(columns="amount", value=5, na_pass=True)
         v = pb.Validate(data=sample_df).add_steps(source)
         vi = v.validation_info[0]
         assert vi.values == 5
@@ -395,9 +393,7 @@ class TestStepsIntegration:
         range_checks = Steps().col_vals_ge(columns="amount", value=0)
 
         result = (
-            pb.Validate(data=df_with_issues)
-            .add_steps(completeness, range_checks)
-            .interrogate()
+            pb.Validate(data=df_with_issues).add_steps(completeness, range_checks).interrogate()
         )
 
         assert len(result.validation_info) == 3
@@ -468,9 +464,7 @@ class TestStepsEdgeCases:
     def test_columns_map_ignores_selectors(self):
         df = pd.DataFrame({"amt_total": [10], "amt_tax": [2]})
         s = Steps().col_vals_gt(columns=pb.starts_with("amt_"), value=0)
-        v = pb.Validate(data=df).add_steps(
-            s, columns_map={"irrelevant": "other"}
-        ).interrogate()
+        v = pb.Validate(data=df).add_steps(s, columns_map={"irrelevant": "other"}).interrogate()
         assert len(v.validation_info) == 2
 
     def test_extract_from_validate_expanded_columns(self):
