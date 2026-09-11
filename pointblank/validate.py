@@ -6136,8 +6136,7 @@ class Validate:
                                 kwargs[param] = columns_map[val]
                             elif isinstance(val, list):
                                 kwargs[param] = [
-                                    columns_map.get(c, c) if isinstance(c, str) else c
-                                    for c in val
+                                    columns_map.get(c, c) if isinstance(c, str) else c for c in val
                                 ]
 
                 method = getattr(self, step.method, None)
