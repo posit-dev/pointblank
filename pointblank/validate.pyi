@@ -10,6 +10,7 @@ from pointblank._utils import _PBUnresolvedColumn
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.missing import MissingSpec
 from pointblank.schema import Schema
+from pointblank.steps import Steps
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
@@ -198,6 +199,14 @@ class Validate:
         self, tbl: Any, tbl_name: str | None = None, label: str | None = None
     ) -> Validate: ...
     def _repr_html_(self) -> str: ...
+    def add_steps(
+        self,
+        *steps: Steps | Validate,
+        active: bool | Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        exclude: list[str | int] | None = None,
+        columns_map: dict[str, str] | None = None,
+    ) -> Validate: ...
     def col_vals_gt(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
