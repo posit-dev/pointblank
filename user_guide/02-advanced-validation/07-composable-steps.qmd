@@ -420,8 +420,7 @@ orders = pl.DataFrame(
 
 The validation plan reads as a sequence of concerns: completeness first (with strict thresholds),
 then format checks, then range checks (only in production), and finally a uniqueness check added
-directly. Each step library can be version-controlled, tested independently, and shared across
-teams.
+directly. Each step library can be version-controlled, tested independently, and easily shared.
 
 ## Conclusion
 
