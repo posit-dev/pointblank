@@ -173,13 +173,16 @@ reference:
     - title: Contracts and Pipelines
       desc: >
         Use `Contract` and `Step` to define declarative data quality contracts that specify what
-        valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data
-        transformation (source and target), producing a `PipelineResult` with full introspection
-        into what passed and what failed.
+        valid data looks like. Use `Steps` to build reusable step libraries with a fluent API and
+        compose them into `Validate` plans via `add_steps()`. Use `Pipeline` to enforce contracts
+        at both boundaries of a data transformation (source and target), producing a
+        `PipelineResult` with full introspection into what passed and what failed.
       contents:
         - name: Contract
           members: true
         - name: Step
+          members: true
+        - name: Steps
           members: true
         - name: Pipeline
           members: true
