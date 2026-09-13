@@ -8,7 +8,11 @@ Usage
 
 ``` python
 CodelistEntry(
-    value, label, description=None, synonyms=None, is_deprecated=False
+    value,
+    label,
+    description=None,
+    synonyms=None,
+    is_deprecated=False,
 )
 ```
 

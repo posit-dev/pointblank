@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1508,16 +1514,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19206-L19373" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19373-L19540" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_json_report</span>(
-    <span class="va">use_fields</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">exclude_fields</span><span class="op">=</span><span class="cn-none">None</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_json_report</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">use_fields</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">exclude_fields</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.get_json_report.html#pointblank.Validate.get_json_report" class="gdls-link gdls-code">get_json_report()</a> method provides a machine-readable report of validation results in JSON format. This is particularly useful for programmatic processing, storing validation results, or integrating with other systems. The report includes detailed information about each validation step, such as assertion type, columns validated, threshold values, test results, and more.</p>
+<p>The <a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report" class="gdls-link gdls-code">get_json_report()</a> method provides a machine-readable report of validation results in JSON format. This is particularly useful for programmatic processing, storing validation results, or integrating with other systems. The report includes detailed information about each validation step, such as assertion type, columns validated, threshold values, test results, and more.</p>
 <p>By default, all available validation information fields are included in the report. However, you can customize the fields to include or exclude using the <code>use_fields=</code> and <code>exclude_fields=</code> parameters.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -1554,7 +1560,7 @@ A JSON-formatted string representing the validation report, with each validation
 <li><code>i_o</code>: the original step index from the validation plan (pre-expansion)</li>
 <li><code>assertion_type</code>: the type of validation assertion (e.g., <code>"col_vals_gt"</code>, etc.)</li>
 <li><code>column</code>: the column being validated (or columns used in certain validations)</li>
-<li><a href="MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>: the comparison values or parameters used in the validation</li>
+<li><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>: the comparison values or parameters used in the validation</li>
 <li><code>inclusive</code>: whether the comparison is inclusive (for range-based validations)</li>
 <li><code>na_pass</code>: whether <code>NA</code>/<code>Null</code> values are considered passing (for certain validations)</li>
 <li><code>pre</code>: preprocessing function applied before validation</li>
@@ -1563,11 +1569,11 @@ A JSON-formatted string representing the validation report, with each validation
 <li><code>label</code>: custom label for the validation step</li>
 <li><code>brief</code>: a brief description of the validation step</li>
 <li><code>active</code>: whether the validation step is active</li>
-<li><a href="Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed</a>: whether all test units passed in the step</li>
-<li><a href="Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a>: total number of test units</li>
-<li><a href="Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link gdls-code">n_passed</a>, <a href="Validate.n_failed.html#pointblank.Validate.n_failed" class="gdls-link gdls-code">n_failed</a>: number of test units that passed and failed</li>
-<li><a href="Validate.f_passed.html#pointblank.Validate.f_passed" class="gdls-link gdls-code">f_passed</a>, <a href="Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link gdls-code">f_failed</a>: Fraction of test units that passed and failed</li>
-<li><a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link gdls-code">warning</a>, <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link gdls-code">error</a>, <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical</a>: whether the namesake threshold level was exceeded (is <code>null</code> if threshold not set)</li>
+<li><code>all_passed</code>: whether all test units passed in the step</li>
+<li><a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a>: total number of test units</li>
+<li><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link gdls-code">n_passed</a>, <a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed" class="gdls-link gdls-code">n_failed</a>: number of test units that passed and failed</li>
+<li><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed" class="gdls-link gdls-code">f_passed</a>, <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link gdls-code">f_failed</a>: Fraction of test units that passed and failed</li>
+<li><a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link gdls-code">warning</a>, <a href="../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link gdls-code">error</a>, <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical</a>: whether the namesake threshold level was exceeded (is <code>null</code> if threshold not set)</li>
 <li><code>time_processed</code>: when the validation step was processed (ISO 8601 format)</li>
 <li><code>proc_duration_s</code>: the processing duration in seconds</li>
 </ul>
@@ -1575,7 +1581,7 @@ A JSON-formatted string representing the validation report, with each validation
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
-<div id="887ba730" class="cell" data-execution_count="1">
+<div id="5cbf9ea1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1623,8 +1629,8 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-09-02T12:46:28.899+00:00",
-        "proc_duration_s": 0.006857
+        "time_processed": "2026-09-13T03:56:51.104+00:00",
+        "proc_duration_s": 0.006584
     },
     {
         "i": 2,
@@ -1650,14 +1656,14 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-09-02T12:46:28.902+00:00",
-        "proc_duration_s": 0.002587
+        "time_processed": "2026-09-13T03:56:51.107+00:00",
+        "proc_duration_s": 0.002502
     }
 ]</code></pre>
 </div>
 </div>
 <p>You can also customize which fields to include:</p>
-<div id="33860166" class="cell" data-execution_count="2">
+<div id="8d115d1a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1683,7 +1689,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>Or which fields to exclude:</p>
-<div id="3ac26617" class="cell" data-execution_count="3">
+<div id="246244ac" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
@@ -1729,7 +1735,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>The JSON output can be further processed or analyzed programmatically:</p>
-<div id="2e1c4439" class="cell" data-execution_count="4">
+<div id="3915e990" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>
@@ -1746,19 +1752,19 @@ A JSON-formatted string representing the validation report, with each validation
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <ul>
-<li><a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a></li>
+<li><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a></li>
 </ul>
 <p>: Get a formatted HTML</p>
 <dl>
-<dt><a href="`~report`"></a> as a GT table</dt>
+<dt><code>report</code> as a GT table</dt>
 <dd>
 
 </dd>
-<dt>- <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a></dt>
+<dt>- <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a></dt>
 <dd>
 <p>Get rows that</p>
 </dd>
-<dt><a href="`~failed`"></a> validation</dt>
+<dt><code>failed</code> validation</dt>
 <dd>
 
 </dd>

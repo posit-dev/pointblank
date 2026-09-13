@@ -837,7 +837,7 @@ target:
 
 ## Loading and Running a Pipeline from YAML
 
-Loading a pipeline from YAML works the same way as loading a contract: call the [from_yaml()](../../reference/Contract.md#pointblank.Contract.from_yaml) class method with the file path. The returned [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) object is fully functional and ready to validate data or run a complete boundary enforcement workflow.
+Loading a pipeline from YAML works the same way as loading a contract: call the `from_yaml()` class method with the file path. The returned [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) object is fully functional and ready to validate data or run a complete boundary enforcement workflow.
 
 
 ``` python

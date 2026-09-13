@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1523,7 +1529,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">constraints</span><span class="op">=</span><span class="bu">list</span>(),</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">metadata</span><span class="op">=</span><span class="bu">dict</span>(),</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">warnings</span><span class="op">=</span><span class="bu">list</span>(),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">coverage</span><span class="op">=</span><span class="fl">1.0</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">coverage</span><span class="op">=</span><span class="fl">1.0</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1660,7 +1666,10 @@ A formatted summary string.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L106-L143" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>to_contract(name<span class="op">=</span><span class="st">"imported_contract"</span>, <span class="op">**</span>kwargs)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>to_contract(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"imported_contract"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1668,11 +1677,11 @@ A formatted summary string.
 <dl>
 <dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"imported_contract"</span></span></code></dt>
 <dd>
-<p>Name for the created <a href="Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>.</p>
+<p>Name for the created <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-Additional keyword arguments passed to the <a href="Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> constructor.
+Additional keyword arguments passed to the <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> constructor.
 </dd>
 </dl>
 </div>
@@ -1725,7 +1734,10 @@ Python source code that recreates the validation.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L70-L104" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>to_validate(data, <span class="op">**</span>kwargs)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>to_validate(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>

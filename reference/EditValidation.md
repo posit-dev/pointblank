@@ -14,12 +14,12 @@ EditValidation(
     data=None,
     api_key=None,
     verify_ssl=True,
-    max_reprompts=1
+    max_reprompts=1,
 )
 ```
 
 
-While <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, [EditValidation](EditValidation.md#pointblank.EditValidation) takes an *existing* plan plus a natural-language instruction (e.g., "add a freshness check on `updated_at`, tighten the email regex, and drop the `price > 0` check") and produces a revised plan. You review the change as a diff and explicitly <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.
+While <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, [EditValidation](EditValidation.md#pointblank.EditValidation) takes an *existing* plan plus a natural-language instruction (e.g., "add a freshness check on `updated_at`, tighten the email regex, and drop the `price > 0` check") and produces a revised plan. You review the change as a diff and explicitly <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.
 
 [EditValidation](EditValidation.md#pointblank.EditValidation) reuses the same provider abstraction as [DraftValidation](DraftValidation.md#pointblank.DraftValidation) (via the `chatlas` package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"` providers. Install the optional requirements with `pip install pointblank[generate]`.
 
@@ -32,7 +32,7 @@ While <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link
 
 
 `validation: Any`  
-The existing validation plan to edit. This can be a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a Python code string (such as the output of <a href="Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a>), a YAML configuration string, or a path to a `.py` or `.yaml`/`.yml` file. All inputs are normalized to Pointblank code before being sent to the model.
+The existing validation plan to edit. This can be a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a Python code string (such as the output of <a href="../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a>), a YAML configuration string, or a path to a `.py` or `.yaml`/`.yml` file. All inputs are normalized to Pointblank code before being sent to the model.
 
 `instruction: str`  
 A plain-English description of the changes to make to the plan.
@@ -41,7 +41,7 @@ A plain-English description of the changes to make to the plan.
 The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`.
 
 `data: Any = None`  
-Optional data table. When provided, a <a href="DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> summary of the table is included in the prompt so the model can make *informed* edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> via <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+Optional data table. When provided, a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> summary of the table is included in the prompt so the model can make *informed* edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> via <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 
 `api_key: str | None = None`  
 The API key to be used for the model.
@@ -57,7 +57,7 @@ The maximum number of times to automatically re-prompt the model when the return
 
 
 `EditValidation`  
-An [EditValidation](EditValidation.md#pointblank.EditValidation) object exposing the revised plan through <a href="EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+An [EditValidation](EditValidation.md#pointblank.EditValidation) object exposing the revised plan through <a href="../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 
 
 ## Notes On Data Sent To The Model Provider
@@ -151,7 +151,7 @@ changed_steps()
 ```
 
 
-Unlike <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
+Unlike <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
 
 
 #### Returns
@@ -189,31 +189,35 @@ Build an [EditValidation](EditValidation.md#pointblank.EditValidation) from two 
 Usage
 
 ``` python
-from_plans(original, revised, instruction="Manual plan comparison")
+from_plans(
+    original,
+    revised,
+    instruction="Manual plan comparison",
+)
 ```
 
 
-This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.
+This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.
 
 
 #### Parameters
 
 
 `original: Any`  
-The original plan. Accepts anything the `validation=` argument accepts: a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a code string, a YAML string, or a file path.
+The original plan. Accepts anything the `validation=` argument accepts: a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a code string, a YAML string, or a file path.
 
 `revised: Any`  
 The revised plan, in any of the same forms as `original`.
 
 `instruction: str = ``"Manual plan comparison"`  
-An optional label describing the comparison (shown as the subtitle in <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
+An optional label describing the comparison (shown as the subtitle in <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
 
 
 #### Returns
 
 
 `EditValidation`  
-An [EditValidation](EditValidation.md#pointblank.EditValidation) whose `original`/`revised` plans are the ones supplied, ready for <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+An [EditValidation](EditValidation.md#pointblank.EditValidation) whose `original`/`revised` plans are the ones supplied, ready for <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 
 
 #### Examples
@@ -244,7 +248,7 @@ review()
 ```
 
 
-This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.
+This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.
 
 
 #### Returns

@@ -17,7 +17,7 @@ ADaMVariableSpec(
     controlled_term=None,
     source=None,
     condition=None,
-    is_population_flag=False
+    is_population_flag=False,
 )
 ```
 

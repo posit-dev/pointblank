@@ -14,7 +14,7 @@ ends_with(
 ```
 
 
-Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [ends_with()](ends_with.md#pointblank.ends_with) selector function can be used to select one or more columns that end with some specified text. So if the set of table columns consists of
+Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [ends_with()](ends_with.md#pointblank.ends_with) selector function can be used to select one or more columns that end with some specified text. So if the set of table columns consists of
 
 `[first_name, last_name, age, address]`
 
@@ -44,30 +44,30 @@ An `EndsWith` object, which can be used to select columns that end with the spec
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 
-- <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
-- <a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
-- <a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
-- <a href="Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
-- <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
-- <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
-- <a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
-- <a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
-- <a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
-- <a href="Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
-- <a href="Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
-- <a href="Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
-- <a href="Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
-- <a href="Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
-- <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
-- <a href="Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
-- <a href="Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
+- <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
+- <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
+- <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
+- <a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
+- <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
+- <a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
+- <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
+- <a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
+- <a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
+- <a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
+- <a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
+- <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
+- <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
+- <a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
+- <a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
 
 The [ends_with()](ends_with.md#pointblank.ends_with) selector function doesn't need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.
 
 
 ## Additional Flexibilty Through Composition With Other Column Selectors
 
-The [ends_with()](ends_with.md#pointblank.ends_with) function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that end with `"e"` and start with `"a"`, you can use the [ends_with()](ends_with.md#pointblank.ends_with) and <a href="starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
+The [ends_with()](ends_with.md#pointblank.ends_with) function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that end with `"e"` and start with `"a"`, you can use the [ends_with()](ends_with.md#pointblank.ends_with) and <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
 
 ``` python
 col(ends_with("e") & starts_with("a"))
@@ -248,7 +248,7 @@ col_vals_gt()
 
 From the results of the validation table we get two validation steps, one for `2021_pay` and one for `2022_pay`. The values in both columns were all greater than `10`.
 
-We can also use the [ends_with()](ends_with.md#pointblank.ends_with) function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that end with `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
+We can also use the [ends_with()](ends_with.md#pointblank.ends_with) function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that end with `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
 
 
 ``` python

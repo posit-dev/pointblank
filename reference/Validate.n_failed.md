@@ -18,7 +18,7 @@ The [n_failed()](Validate.n_failed.md#pointblank.Validate.n_failed) method provi
 
 Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.
 
-The method provides a dictionary of the number of failing test units for each validation step. If the `scalar=True` argument is provided and `i=` is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link"><code>n_passed()</code></a> method (i.e., `n - n_passed`).
+The method provides a dictionary of the number of failing test units for each validation step. If the `scalar=True` argument is provided and `i=` is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link"><code>n_passed()</code></a> method (i.e., `n - n_passed`).
 
 
 ## Parameters

@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1528,12 +1534,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_version</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard</span><span class="op">=</span><span class="st">"sdtmig"</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard_version</span><span class="op">=</span><span class="st">"3.4"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>A <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> groups the datasets of a study (SDTM domains, SUPP– qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the <em>relationships</em> between them. This enables cross-dataset conformance checks — referential integrity, SUPP– linkage, RELREC resolution, and ADaM ⇄ SDTM traceability — that single-dataset validation cannot express.</p>
-<p>This is the data-level analog of <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups <em>metadata</em> for many datasets.</p>
+<p>A <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> groups the datasets of a study (SDTM domains, SUPP– qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the <em>relationships</em> between them. This enables cross-dataset conformance checks — referential integrity, SUPP– linkage, RELREC resolution, and ADaM ⇄ SDTM traceability — that single-dataset validation cannot express.</p>
+<p>This is the data-level analog of <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups <em>metadata</em> for many datasets.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1545,7 +1551,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">define</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML context: a path to a <code>define.xml</code> file, or an already-imported <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.</p>
+<p>Optional Define-XML context: a path to a <code>define.xml</code> file, or an already-imported <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">ct_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1635,7 +1641,7 @@ The imported Define-XML metadata, if <code>define</code> was supplied.
 <p><code><span class="doc-parameter-name">metadata</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MetadataPackage | None</span></code></p>
 </div>
 <div class="doc-text">
-<p>Lazily imports the Define-XML document (via <a href="import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.</p>
+<p>Lazily imports the Define-XML document (via <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.</p>
 </div>
 </section>
 </section>
@@ -1658,7 +1664,7 @@ Description
 <a href="#from_folder" class="doc-function doc-label doc-label-method">from_folder()</a>
 </td>
 <td>
-Build a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.
+Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.
 </td>
 </tr>
 <tr>
@@ -1707,7 +1713,7 @@ Validate CDISC conformance across the whole submission package.
 <section id="from_folder" class="level3">
 <h3 class="anchored" data-anchor-id="from_folder"><span class="doc-object-name doc-function doc-label doc-label-method">from_folder()</span></h3>
 <div class="doc-subject">
-<p>Build a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.</p>
+<p>Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
@@ -1720,7 +1726,7 @@ Validate CDISC conformance across the whole submission package.
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    standard_version<span class="op">=</span><span class="st">"3.4"</span>,</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ct_version<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    study_id<span class="op">=</span><span class="va">None</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    study_id<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1736,7 +1742,7 @@ Validate CDISC conformance across the whole submission package.
 </dd>
 <dt><code><span class="doc-parameter-name">define</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | Any | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML path or <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If <code>None</code>, a <code>define.xml</code> in the folder is used when present.</p>
+<p>Optional Define-XML path or <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If <code>None</code>, a <code>define.xml</code> in the folder is used when present.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"sdtmig"</span></span></code></dt>
 <dd>
@@ -1827,7 +1833,11 @@ If no dataset with that name exists.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L375-L397" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>orphan_ids(child, parent<span class="op">=</span><span class="st">"DM"</span>, column<span class="op">=</span><span class="st">"USUBJID"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>orphan_ids(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    child,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    parent<span class="op">=</span><span class="st">"DM"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"USUBJID"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.</p>
@@ -1939,20 +1949,20 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    core<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    core_cwd<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    cache<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    workdir<span class="op">=</span><span class="va">None</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    workdir<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Two engines are available:</p>
 <ul>
-<li><strong><code>"native"</code></strong> (default) — Pointblank’s own checks. For each dataset this builds a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when <code>cross_dataset=True</code>):
+<li><strong><code>"native"</code></strong> (default) — Pointblank’s own checks. For each dataset this builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when <code>cross_dataset=True</code>):
 <ul>
 <li><strong>Referential integrity</strong> — every <code>USUBJID</code> in a finding/events/interventions domain exists in DM.</li>
 <li><strong>SUPP– linkage</strong> — <code>RDOMAIN</code> references a present domain, <code>USUBJID</code> exists in DM, and <code>(USUBJID, IDVAR=IDVARVAL)</code> resolves to a record in the parent domain.</li>
 <li><strong>RELREC</strong> — each relationship record’s <code>RDOMAIN</code> is present and <code>USUBJID</code> exists in DM.</li>
 <li><strong>ADaM ⇄ SDTM traceability</strong> — <code>ADSL.USUBJID ⊆ DM.USUBJID</code>, and every other ADaM dataset’s <code>USUBJID ⊆ ADSL.USUBJID</code>.</li>
 </ul></li>
-<li><strong><code>"core"</code></strong> — hands the package to the external CDISC CORE engine (<code>cdisc-rules-engine</code>), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form <a href="ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Requires an installed CORE executable (see <code>core</code>).</li>
+<li><strong><code>"core"</code></strong> — hands the package to the external CDISC CORE engine (<code>cdisc-rules-engine</code>), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Requires an installed CORE executable (see <code>core</code>).</li>
 </ul>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
@@ -1973,7 +1983,7 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 </dd>
 <dt><code><span class="doc-parameter-name">thresholds</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(Validate-based engine only.) Optional thresholds passed to each dataset’s <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> (maps failing test units onto Pointblank’s warning/error/critical severity model).</p>
+<p>(Validate-based engine only.) Optional thresholds passed to each dataset’s <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> (maps failing test units onto Pointblank’s warning/error/critical severity model).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">interrogate</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>

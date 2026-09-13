@@ -20,16 +20,16 @@ Validate(
     locale=None,
     owner=None,
     consumers=None,
-    version=None
+    version=None,
 )
 ```
 
 
 The [Validate](Validate.md#pointblank.Validate) class is used for defining a set of validation steps on a table and interrogating the table with the *validation plan*. This class is the main entry point for the *data quality reporting* workflow. The overall aim of this workflow is to generate comprehensive reporting information to assess the level of data quality for a target table.
 
-We can supply as many validation steps as needed, and having a large number of them should increase the validation coverage for a given table. The validation methods (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>, etc.) translate to discrete validation steps, where each step will be sequentially numbered (useful when viewing the reporting data). This process of calling validation methods is known as developing a *validation plan*.
+We can supply as many validation steps as needed, and having a large number of them should increase the validation coverage for a given table. The validation methods (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>, etc.) translate to discrete validation steps, where each step will be sequentially numbered (useful when viewing the reporting data). This process of calling validation methods is known as developing a *validation plan*.
 
-The validation methods, when called, are merely instructions up to the point the concluding <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method is called. That kicks off the process of acting on the *validation plan* by querying the target table getting reporting results for each step. Once the interrogation process is complete, we can say that the workflow now has reporting information. We can then extract useful information from the reporting data to understand the quality of the table. Printing the [Validate](Validate.md#pointblank.Validate) object (or using the <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> method) will return a table with the results of the interrogation and <a href="Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a> allows for the splitting of the table based on passing and failing rows.
+The validation methods, when called, are merely instructions up to the point the concluding <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method is called. That kicks off the process of acting on the *validation plan* by querying the target table getting reporting results for each step. Once the interrogation process is complete, we can say that the workflow now has reporting information. We can then extract useful information from the reporting data to understand the quality of the table. Printing the [Validate](Validate.md#pointblank.Validate) object (or using the <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> method) will return a table with the results of the interrogation and <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a> allows for the splitting of the table based on passing and failing rows.
 
 
 ## Parameters
@@ -123,7 +123,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. The thresh
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only
@@ -141,7 +141,7 @@ The `actions=` and `final_actions=` parameters provide mechanisms to respond to 
 
 The `actions=` parameter allows you to define actions that are triggered when validation steps exceed specific threshold levels (warning, error, or critical). These actions are executed during the interrogation process, right after each step is evaluated.
 
-Step actions should be provided using the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class, which lets you specify different actions for different severity levels:
+Step actions should be provided using the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class, which lets you specify different actions for different severity levels:
 
 ``` python
 # Define an action that logs a message when warning threshold is exceeded
@@ -173,13 +173,13 @@ validation.col_vals_gt(
 )
 ```
 
-Step actions have access to step-specific context through the <a href="get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link"><code>get_action_metadata()</code></a> function, which provides details about the current validation step that triggered the action.
+Step actions have access to step-specific context through the <a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link"><code>get_action_metadata()</code></a> function, which provides details about the current validation step that triggered the action.
 
 *Final Actions*
 
 The `final_actions=` parameter lets you define actions that execute after all validation steps have completed. These are useful for providing summaries, sending notifications based on overall validation status, or performing cleanup operations.
 
-Final actions should be provided using the <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class:
+Final actions should be provided using the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class:
 
 ``` python
 def send_report():
@@ -196,7 +196,7 @@ validation = pb.Validate(
 )
 ```
 
-Final actions have access to validation-wide summary information through the <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which provides a comprehensive overview of the entire validation process.
+Final actions have access to validation-wide summary information through the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which provides a comprehensive overview of the entire validation process.
 
 The combination of step actions and final actions provides a flexible system for responding to data quality issues at both the individual step level and the overall validation level.
 
@@ -246,7 +246,7 @@ Various pieces of reporting in Pointblank can be localized to a specific languag
 - Thai (`"th"`)
 - Persian (`"fa"`)
 
-Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will be written in the selected language. The language setting will also used when generating the validation report table through <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> (or printing the [Validate](Validate.md#pointblank.Validate) object in a notebook environment).
+Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will be written in the selected language. The language setting will also used when generating the validation report table through <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> (or printing the [Validate](Validate.md#pointblank.Validate) object in a notebook environment).
 
 
 ## Examples
@@ -254,7 +254,7 @@ Automatically generated briefs (produced by using `brief=True` or `brief="...{au
 
 ### Creating a validation plan and interrogating
 
-Let's walk through a data quality analysis of an extremely small table. It's actually called `"small_table"` and it's accessible through the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function.
+Let's walk through a data quality analysis of an extremely small table. It's actually called `"small_table"` and it's accessible through the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function.
 
 
 ``` python
@@ -517,7 +517,7 @@ f
 </table>
 
 
-We ought to think about what's tolerable in terms of data quality so let's designate proportional failure thresholds to the 'warning', 'error', and 'critical' states. This can be done by using the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class.
+We ought to think about what's tolerable in terms of data quality so let's designate proportional failure thresholds to the 'warning', 'error', and 'critical' states. This can be done by using the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class.
 
 
 ``` python
@@ -540,7 +540,7 @@ validation = (
 ```
 
 
-Then, as with any [Validate](Validate.md#pointblank.Validate) object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method.
+Then, as with any [Validate](Validate.md#pointblank.Validate) object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method.
 
 
 ``` python
@@ -802,7 +802,7 @@ col_exists()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:02 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:02 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -810,7 +810,7 @@ col_exists()
 </table>
 
 
-The report could be further customized by using the <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> method, which contains options for modifying the display of the table.
+The report could be further customized by using the <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> method, which contains options for modifying the display of the table.
 
 ------------------------------------------------------------------------
 
@@ -1017,7 +1017,7 @@ col_vals_regex()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -1034,7 +1034,7 @@ If you should want to cancel the globally-defined brief for one or more validati
 
 ### Post-interrogation methods
 
-The [Validate](Validate.md#pointblank.Validate) class has a number of post-interrogation methods that can be used to extract useful information from the validation results. For example, the <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method can be used to get the data extracts for each validation step.
+The [Validate](Validate.md#pointblank.Validate) class has a number of post-interrogation methods that can be used to extract useful information from the validation results. For example, the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method can be used to get the data extracts for each validation step.
 
 
 ``` python
@@ -1066,7 +1066,7 @@ validation_2.get_data_extracts()
      └───────────┴──────────────┴──────┴─────┴───┴─────┴─────┴──────┴─────┘}
 
 
-We can also view step reports for each validation step using the <a href="Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a> method. This method adapts to the type of validation step and shows the relevant information for a step's validation.
+We can also view step reports for each validation step using the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a> method. This method adapts to the type of validation step and shows the relevant information for a step's validation.
 
 
 ``` python
@@ -1229,7 +1229,7 @@ f
 </table>
 
 
-The [Validate](Validate.md#pointblank.Validate) class also has a method for getting the sundered data, which is the data that passed or failed the validation steps. This can be done using the <a href="Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a> method.
+The [Validate](Validate.md#pointblank.Validate) class also has a method for getting the sundered data, which is the data that passed or failed the validation steps. This can be done using the <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a> method.
 
 
 ``` python
@@ -1753,7 +1753,7 @@ col_vals_gt()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:22 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -1930,7 +1930,7 @@ col_exists()
 <td class="gt_row gt_left" style="height: 40px; background-color: #4CA64C; color: transparent; font-size: 0px">#4CA64C</td>
 <td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">3</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-U2NTkzODkgQzQ2Ljk0MTQwODEsMzUuMDY5NTIyMSA0Ni44MTg2ODgsMzUuNzQ4NzE0NiA0Ni44MTg2ODgsMzYuNjAzNTM2NSBMNDYuODE4Njg4LDM4LjAwMDAyMDkgTDQ0LjMxNzcxMTQsMzguMDAwMDIwOSBaIiBpZD0iPyIgZmlsbD0iIzAwMDAwMCIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
+C4xMzAzODgxIDUwLjExOTQ2OTIsMjQuOTA0ODA2MSBDNTEuMTM1MDk5MywyNS42NzkyMjQgNTEuNjQyOTA2NywyNi43MjY1NzY4IDUxLjY0MjkwNjcsMjguMDQ2ODk1OSBDNTEuNjQyOTA2NywyOC43OTE2OTEzIDUxLjQ5NjkxMjEsMjkuNDMyNzk4MiA1MS4yMDQ5MTg1LDI5Ljk3MDIzNTggQzUwLjkxMjkyNDgsMzAuNTA3NjczMyA1MC4zNTIyMjA4LDMxLjE2OTkzODkgNDkuNTIyNzg5NiwzMS45NTcwNTIyIEw0OC43MzU2ODAyLDMyLjY5MzM4MDMgQzQ3Ljk0ODU2NjksMzMuNDM4MTc1NyA0Ny40MzIyOTYsMzQuMDYyMzU1NiA0Ny4xODY4NTIxLDM0LjU2NTkzODkgQzQ2Ljk0MTQwODEsMzUuMDY5NTIyMSA0Ni44MTg2ODgsMzUuNzQ4NzE0NiA0Ni44MTg2ODgsMzYuNjAzNTM2NSBMNDYuODE4Njg4LDM4LjAwMDAyMDkgTDQ0LjMxNzcxMTQsMzguMDAwMDIwOSBaIiBpZD0iPyIgZmlsbD0iIzAwMDAwMCIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
 
 col_exists()
 
@@ -1999,7 +1999,7 @@ col_vals_gt()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:03 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:23 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:23 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -2107,7 +2107,7 @@ validation_5
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-02|12:47:04</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-13|03:57:23</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">NYC Flights Data</span>
 
@@ -2211,7 +2211,7 @@ col_vals_gt()
 </div></td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">distance</td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">0</td>
-LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjVweCIgaGVpZ2h0PSIyNXB4IiB2aWV3Ym94PSIwIDAgMjUgMjUiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgc3R5bGU9InZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Ij4KICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTAwMDAwLCAwLjU3MDE0NykiPgogICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiB4PSIwLjEyNTEzMjUwNiIgeT0iMCIgd2lkdGg9IjIzLjc0OTczNSIgaGVpZ2h0PSIyMy43ODk0NzM3IiAvPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44MDM3NTA0Niw4LjE4MTk0NzM2IEMzLjc3MTkxODMyLDguMTgxOTQ3MzYgMi4xMTg3NTA0Niw5LjgzNDk1MzI4IDIuMTE4NzUwNDYsMTEuODY2OTQ3NCBDMi4xMTg3NTA0NiwxMy44OTg5NDE0IDMuNzcxOTE4MzIsMTUuNTUxOTQ3NCA1LjgwMzc1MDQ2LDE1LjU1MTk0NzQgQzcuODM1NTgyNiwxNS41NTE5NDc0IDkuNDg4NzUwNDYsMTMuODk4OTQxNCA5LjQ4ODc1MDQ2LDExLjg2Njk0NzQgQzkuNDg4NzUwNDYsOS44MzQ5NTMyOCA3LjgzNTUyODYzLDguMTgxOTQ3MzYgNS44MDM3NTA0Niw4LjE4MTk0NzM2IFogTTUuODAzNzUwNDYsMTQuODE0OTE1IEM0LjE3ODIxOTk3LDE0LjgxNDkxNSAyLjg1NTc4Mjg1LDEzLjQ5MjQ3NzggMi44NTU3ODI4NSwxMS44NjY5NDc0IEMyLjg1NTc4Mjg1LDEwLjI0MTQxNjkgNC4xNzgyMTk5Nyw4LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3"><span style="color:#4CA64C;">✓</span></td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px">337K</td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">337K<br />
@@ -2227,7 +2227,7 @@ LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUx
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:04 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:23 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:23 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -2483,7 +2483,7 @@ col_vals_gt()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:47:04 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:24 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:24 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -2491,4 +2491,4 @@ col_vals_gt()
 </table>
 
 
-For comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the <a href="connect_to_table.html#pointblank.connect_to_table" class="gdls-link"><code>connect_to_table()</code></a> function. This function handles all the connection logic and provides helpful error messages when table specifications are missing or backend dependencies are not installed.
+For comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the <a href="../reference/connect_to_table.html#pointblank.connect_to_table" class="gdls-link"><code>connect_to_table()</code></a> function. This function handles all the connection logic and provides helpful error messages when table specifications are missing or backend dependencies are not installed.

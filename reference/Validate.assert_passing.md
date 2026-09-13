@@ -11,9 +11,9 @@ Validate.assert_passing()
 ```
 
 
-The [assert_passing()](Validate.assert_passing.md#pointblank.Validate.assert_passing) method will raise an `AssertionError` if a test does not pass. This method simply wraps [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed) for more ready use in test suites. The step number and assertion made is printed in the `AssertionError` message if a failure occurs, ensuring some details are preserved.
+The [assert_passing()](Validate.assert_passing.md#pointblank.Validate.assert_passing) method will raise an `AssertionError` if a test does not pass. This method simply wraps `all_passed` for more ready use in test suites. The step number and assertion made is printed in the `AssertionError` message if a failure occurs, ensuring some details are preserved.
 
-If the validation has not yet been interrogated, this method will automatically call <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> with default parameters before checking for passing tests.
+If the validation has not yet been interrogated, this method will automatically call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> with default parameters before checking for passing tests.
 
 
 ## Raises
@@ -61,12 +61,12 @@ validation.assert_passing()
          19 # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
     ---> 20 validation.assert_passing()
 
-    File ~/work/pointblank/pointblank/pointblank/validate.py:17121, in Validate.assert_passing(self)
-      17117             ]
-      17118             msg = "The following assertions failed:\n" + "\n".join(
-      17119                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-      17120             )
-    > 17121             raise AssertionError(msg)
+    File ~/work/pointblank/pointblank/pointblank/validate.py:17288, in Validate.assert_passing(self)
+      17284             ]
+      17285             msg = "The following assertions failed:\n" + "\n".join(
+      17286                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+      17287             )
+    > 17288             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.

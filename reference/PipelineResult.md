@@ -12,7 +12,7 @@ PipelineResult(
     target_validation=None,
     transform_output=None,
     _source_passed=None,
-    _target_passed=None
+    _target_passed=None,
 )
 ```
 

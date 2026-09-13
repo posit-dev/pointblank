@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1512,14 +1518,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">validate_sdtmig</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">datasets</span>, <span class="va">version</span><span class="op">=</span><span class="st">"3-4"</span>, <span class="va">ct_packages</span><span class="op">=</span><span class="cn-none">None</span>, <span class="va">define_xml</span><span class="op">=</span><span class="cn-none">None</span>, <span class="va">study_id</span><span class="op">=</span><span class="cn-none">None</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">datasets</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span><span class="op">=</span><span class="st">"3-4"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_packages</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">define_xml</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Runs the bundled SDTMIG 3.4 rule catalog (426 rules) against the provided SDTM domain datasets using Pointblank’s built-in conformance engine. No external tools, subprocesses, network calls, or CDISC CORE installation are required.</p>
 <p>The catalog covers seven rule types:</p>
 <ul>
-<li><strong>RECORD_CHECK</strong> — per-row value checks (controlled terminology, ISO 8601 dates, ranges, uniqueness constraints). These rules produce row-level findings accessible via <a href="ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a>.</li>
+<li><strong>RECORD_CHECK</strong> — per-row value checks (controlled terminology, ISO 8601 dates, ranges, uniqueness constraints). These rules produce row-level findings accessible via <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a>.</li>
 <li><strong>VARIABLE_METADATA_CHECK</strong> — variable presence and ordering (e.g., USUBJID must appear before domain-specific variables).</li>
 <li><strong>DATASET_METADATA_CHECK</strong> — dataset-level attributes (sort keys, required sort order).</li>
 <li><strong>DATASET_CONTENTS_CHECK</strong> — dataset-level value constraints (e.g., all rows in a domain must share the same STUDYID).</li>
@@ -1554,7 +1564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">define_xml</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML metadata, supplied as a file path (<code>str</code> or <code>pathlib.Path</code>) or a pre-parsed <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a> object. When provided, <code>DEFINE_ITEM_METADATA_CHECK</code> and <code>DEFINE_CODELIST_CHECK</code> rules become active; without it they are marked <code>not_applicable</code>.</p>
+<p>Optional Define-XML metadata, supplied as a file path (<code>str</code> or <code>pathlib.Path</code>) or a pre-parsed <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a> object. When provided, <code>DEFINE_ITEM_METADATA_CHECK</code> and <code>DEFINE_CODELIST_CHECK</code> rules become active; without it they are marked <code>not_applicable</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1569,7 +1579,7 @@ Optional study identifier (e.g., <code>"CDISCPILOT01"</code>) shown in the repor
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>
 <dd>
-A built-in engine report (<a href="ConformanceReport.html#pointblank.ConformanceReport.is_rules" class="gdls-link gdls-code">is_rules</a> is <code>True</code>). In Jupyter and Quarto notebooks the object renders automatically as the rule-level summary table. Call <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> for the <code>GT</code> object, <a href="ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> for a record-level drill-down, or <a href="ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> for a Polars DataFrame of failing rows.
+A built-in engine report (<a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.is_rules" class="gdls-link gdls-code">is_rules</a> is <code>True</code>). In Jupyter and Quarto notebooks the object renders automatically as the rule-level summary table. Call <code>get_tabular_report()</code> for the <code>GT</code> object, <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> for a record-level drill-down, or <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> for a Polars DataFrame of failing rows.
 </dd>
 </dl>
 </div>

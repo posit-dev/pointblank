@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1506,14 +1512,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18894-L18937" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19061-L19104" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_health_score</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The health score is a single number (a percentage from <code>0</code> to <code>100</code>) that summarizes the overall quality of the data across all validation steps. It is computed as a test-unit weighted pass rate: the total number of passing test units divided by the total number of test units. This means larger tables and steps operating over more rows contribute proportionally more to the score, so it tracks data volume rather than mere step count.</p>
-<p>Per-dimension weights can be set globally via <a href="`pointblank.config`"><code>config(dimension_weights=...)</code></a> for organizations that consider some dimensions (e.g., completeness) more critical than others. A weight scales that dimension’s test-unit contribution to the score (so a dimension’s influence is its weight times its test-unit count); the returned score is always within <code>[0, 100]</code>.</p>
+<p>Per-dimension weights can be set globally via <code>config(dimension_weights=...)</code> for organizations that consider some dimensions (e.g., completeness) more critical than others. A weight scales that dimension’s test-unit contribution to the score (so a dimension’s influence is its weight times its test-unit count); the returned score is always within <code>[0, 100]</code>.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1542,11 +1548,11 @@ The overall health score as a percentage from <code>0</code> to <code>100</code>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <dl>
-<dt><a href="`~Use`"></a> <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> for a per-dimension</dt>
+<dt><code>Use</code> <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> for a per-dimension</dt>
 <dd>
 
 </dd>
-<dt><a href="`~breakdown`"></a> of the score.</dt>
+<dt><code>breakdown</code> of the score.</dt>
 <dd>
 
 </dd>

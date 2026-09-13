@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1513,16 +1519,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L22-L393" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">DraftValidation</span>(
-    <span class="va">data</span>,
-    <span class="va">model</span>,
-    <span class="va">api_key</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">verify_ssl</span><span class="op">=</span><span class="cn-bool">True</span>,
-    <span class="va">max_reprompts</span><span class="op">=</span><span class="dv">1</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">DraftValidation</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">data</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">model</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">api_key</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">verify_ssl</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_reprompts</span><span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, or <code>"azure-openai"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
+<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, or <code>"azure-openai"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1533,7 +1539,7 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
+<p>The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
 </div>
 </div>
 </div>
@@ -1622,7 +1628,7 @@ Warning
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-notes-on-data-sent-to-the-model-provider">
 <h2 class="doc-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes On Data Sent To The Model Provider</h2>
-<p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> using the <a href="DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class. The summary includes the following information:</p>
+<p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> using the <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class. The summary includes the following information:</p>
 <ul>
 <li>the number of rows and columns in the table</li>
 <li>the type of dataset (e.g., Polars, DuckDB, Pandas, etc.)</li>
@@ -1630,12 +1636,12 @@ Warning
 <li>column level statistics such as the number of missing values, min, max, mean, and median, etc.</li>
 <li>a short list of data values in each column</li>
 </ul>
-<p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class since the contents of the table are not sent to the model provider.</p>
+<p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class since the contents of the table are not sent to the model provider.</p>
 <p>The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user’s AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s look at how the <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-opus-4-6"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<p>Let’s look at how the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-opus-4-6"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
@@ -1699,7 +1705,7 @@ validation = (
 validation
 ```</code></pre>
 <p>The drafted validation plan can be copied and pasted into a Python script or notebook for further use. In other words, the generated plan can be adjusted as needed to suit the specific requirements of the table being validated.</p>
-<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class. When adapted for use, this should be replaced with the actual data variable.</p>
+<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class. When adapted for use, this should be replaced with the actual data variable.</p>
 
 
 </section>

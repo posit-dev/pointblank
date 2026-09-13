@@ -19,7 +19,7 @@ MetadataImport(
     domain=None,
     variables=list(),
     codelists=dict(),
-    missing_value_codes=dict()
+    missing_value_codes=dict(),
 )
 ```
 
@@ -91,7 +91,7 @@ Get the list of all variable names.
 |----|----|
 | [get_codelist()](#get_codelist) | Get a specific codelist by name. |
 | [get_variable()](#get_variable) | Get metadata for a specific variable by name. |
-| [missing_specs()](#missing_specs) | Auto-generate <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables. |
+| [missing_specs()](#missing_specs) | Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables. |
 | [summary()](#summary) | Return a human-readable summary of the imported metadata. |
 | [to_schema()](#to_schema) | Convert imported metadata to a Pointblank [Schema](Schema.md#pointblank.Schema) with `Field` objects. |
 | [to_validate()](#to_validate) | Generate a [Validate](Validate.md#pointblank.Validate) workflow from the imported metadata. |
@@ -176,7 +176,7 @@ If no variable with that name exists.
 ### missing_specs()
 
 
-Auto-generate <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
+Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
 
 
 Usage
@@ -186,7 +186,7 @@ missing_specs()
 ```
 
 
-Builds a mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via `missing=`) or to <a href="missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>.
+Builds a mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via `missing=`) or to <a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>.
 
 
 #### Returns
@@ -269,7 +269,10 @@ Generate a [Validate](Validate.md#pointblank.Validate) workflow from the importe
 Usage
 
 ``` python
-to_validate(data, **kwargs)
+to_validate(
+    data,
+    **kwargs,
+)
 ```
 
 
@@ -289,5 +292,5 @@ Additional keyword arguments passed to the [Validate](Validate.md#pointblank.Val
 #### Returns
 
 
-<a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
+<a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
 A configured (but not yet interrogated) [Validate](Validate.md#pointblank.Validate) object.

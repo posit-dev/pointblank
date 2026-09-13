@@ -13,7 +13,7 @@ datetime_field(
     nullable=False,
     null_probability=0.0,
     unique=False,
-    generator=None
+    generator=None,
 )
 ```
 

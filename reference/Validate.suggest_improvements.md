@@ -8,12 +8,15 @@ Usage
 
 ``` python
 Validate.suggest_improvements(
-    model, api_key=None, verify_ssl=True, max_reprompts=1
+    model,
+    api_key=None,
+    verify_ssl=True,
+    max_reprompts=1,
 )
 ```
 
 
-This is a thin, convenience wrapper over <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a>: it profiles the table with <a href="DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a>, derives an instruction that targets gaps in the current plan (columns with no coverage, missing thresholds), and asks the model to extend the plan accordingly. As with [EditValidation](EditValidation.md#pointblank.EditValidation), you review the proposed change as a diff and explicitly accept it.
+This is a thin, convenience wrapper over <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a>: it profiles the table with <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a>, derives an instruction that targets gaps in the current plan (columns with no coverage, missing thresholds), and asks the model to extend the plan accordingly. As with [EditValidation](EditValidation.md#pointblank.EditValidation), you review the proposed change as a diff and explicitly accept it.
 
 
 ## Parameters
@@ -36,7 +39,7 @@ Maximum automatic re-prompts if the returned plan fails the syntax check.
 
 
 `EditValidation`  
-An <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> with the proposed improvements, ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
+An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> with the proposed improvements, ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
 
 
 ## Examples

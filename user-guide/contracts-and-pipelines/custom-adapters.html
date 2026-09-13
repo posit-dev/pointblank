@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -152,7 +152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -187,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -335,6 +335,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
   </div>
 </li>
       </ul>
@@ -572,7 +578,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#the-adapter-architecture" id="toc-the-adapter-architecture" class="nav-link active" data-scroll-target="#the-adapter-architecture">The Adapter Architecture</a></li>
-  <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The <code>ContractAdapter</code> Base Class</a></li>
+  <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The ContractAdapter Base Class</a></li>
   <li><a href="#building-an-import-adapter" id="toc-building-an-import-adapter" class="nav-link" data-scroll-target="#building-an-import-adapter">Building an Import Adapter</a></li>
   <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The <code>MappedConstraint</code> Class</a></li>
   <li><a href="#handling-unmappable-constraints" id="toc-handling-unmappable-constraints" class="nav-link" data-scroll-target="#handling-unmappable-constraints">Handling Unmappable Constraints</a></li>
@@ -605,13 +611,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Pointblank’s contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data catalog, or any other schema definition tool that isn’t covered by the built-in adapters, you can write a <strong>custom adapter</strong> and register it with the framework.</p>
-<p>Once registered, your custom adapter works seamlessly with <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> and <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a>, the same API surface your team already uses for JSON Schema, Frictionless, dbt, and ODCS.</p>
+<p>Once registered, your custom adapter works seamlessly with <code>import_contract()</code> and <code>export_contract()</code>, the same API surface your team already uses for JSON Schema, Frictionless, dbt, and ODCS.</p>
 <section id="the-adapter-architecture" class="level1">
 <h1>The Adapter Architecture</h1>
 <p>Every adapter follows the same pattern:</p>
 <ol type="1">
 <li><strong>Subclass</strong> <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a> and set a few class attributes</li>
-<li><strong>Implement</strong> <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> (for auto-detection), <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a>, and optionally <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></li>
+<li><strong>Implement</strong> <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> (for auto-detection), <code>import_contract()</code>, and optionally <code>export_contract()</code></li>
 <li><strong>Register</strong> the adapter with the <code>@register_adapter</code> decorator</li>
 </ol>
 <p>Here’s a minimal example to illustrate the structure:</p>
@@ -661,7 +667,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>ContractImport(format='my_format', columns=2, constraints=1, coverage=100%)</code></pre>
 </div>
 </div>
-<p>The adapter is now part of the Pointblank ecosystem. Any call to <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> with <code>format="my_format"</code> will route through this adapter, and the auto-detection system will call <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> when no format is specified.</p>
+<p>The adapter is now part of the Pointblank ecosystem. Any call to <code>import_contract()</code> with <code>format="my_format"</code> will route through this adapter, and the auto-detection system will call <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> when no format is specified.</p>
 <div id="6aec1cae" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And it shows up in the adapter list</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pb.list_adapters()</span></code></pre></div>
@@ -715,12 +721,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td><code>supports_import</code></td>
 <td><code>bool</code></td>
-<td>Whether <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> is implemented</td>
+<td>Whether <code>import_contract()</code> is implemented</td>
 </tr>
 <tr class="even">
 <td><code>supports_export</code></td>
 <td><code>bool</code></td>
-<td>Whether <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> is implemented</td>
+<td>Whether <code>export_contract()</code> is implemented</td>
 </tr>
 </tbody>
 </table>
@@ -1526,7 +1532,7 @@ tr { background-color: transparent; }
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>Custom adapters let you extend Pointblank’s import/export system to handle any schema format your organization uses. The plugin architecture is intentionally simple: subclass <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a>, implement one or two methods, and register it with a decorator. From that point forward, your format participates in the same <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> and <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> workflow that the built-in adapters use.</p>
+<p>Custom adapters let you extend Pointblank’s import/export system to handle any schema format your organization uses. The plugin architecture is intentionally simple: subclass <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a>, implement one or two methods, and register it with a decorator. From that point forward, your format participates in the same <code>import_contract()</code> and <code>export_contract()</code> workflow that the built-in adapters use.</p>
 <p>This extensibility means that Pointblank can serve as a universal validation layer regardless of where your data contracts originate. Whether your schemas live in a proprietary YAML format, an internal data catalog API, or a custom metadata store, a short adapter class is all you need to bring them into the Pointblank ecosystem and benefit from its validation reporting, threshold system, and pipeline integration.</p>
 
 

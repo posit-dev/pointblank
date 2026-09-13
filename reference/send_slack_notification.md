@@ -8,15 +8,18 @@ Usage
 
 ``` python
 send_slack_notification(
-    webhook_url=None, step_msg=None, summary_msg=None, debug=False
+    webhook_url=None,
+    step_msg=None,
+    summary_msg=None,
+    debug=False,
 )
 ```
 
 
 This function can be used in two ways:
 
-1.  With <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> to notify about individual validation step failures
-2.  With <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> to provide a summary notification after all validation steps have undergone interrogation
+1.  With <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> to notify about individual validation step failures
+2.  With <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> to provide a summary notification after all validation steps have undergone interrogation
 
 The function creates a callable that sends notifications through a Slack webhook. Message formatting can be customized using templates for both individual steps and summary reports.
 
@@ -195,7 +198,7 @@ validation
 
 By placing the `notify_slack()` function in the `Validate(actions=Actions(critical=))` argument, you can ensure that the notification is sent whenever the 'critical' threshold is reached (as set here, when 15% or more of the test units fail). The notification will include information about the validation step that triggered the alert.
 
-When using a <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:
+When using a <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:
 
 ``` python
 import pointblank as pb

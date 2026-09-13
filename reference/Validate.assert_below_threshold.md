@@ -17,7 +17,7 @@ Validate.assert_below_threshold(
 
 The [assert_below_threshold()](Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) method checks whether validation steps' failure rates are below a given threshold level (`"warning"`, `"error"`, or `"critical"`). This is particularly useful in automated testing environments where you want to ensure your data quality meets minimum standards before proceeding.
 
-If any validation step exceeds the specified threshold level, an `AssertionError` will be raised with details about which steps failed. If the validation has not yet been interrogated, this method will automatically call <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> with default parameters.
+If any validation step exceeds the specified threshold level, an `AssertionError` will be raised with details about which steps failed. If the validation has not yet been interrogated, this method will automatically call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> with default parameters.
 
 
 ## Parameters
@@ -261,21 +261,21 @@ except AssertionError as e:
 
 ## See Also
 
-- <a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>
+- <a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>
 
 : get the 'warning' status for each validation
 
-[](%60~step%60)  
+`step`  
 
-\- <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
+\- <a href="../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
 get the 'error' status for each validation step
 
-\- <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
+\- <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
 get the 'critical' status for each
 
-[](%60~validation%60) step  
+`validation` step  
 
-\- <a href="Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link"><code>assert_passing()</code></a>  
+\- <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link"><code>assert_passing()</code></a>  
 assert all validations pass
 
-[](%60~completely%60)
+`completely`

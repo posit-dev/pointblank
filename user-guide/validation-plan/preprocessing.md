@@ -1133,7 +1133,7 @@ col_vals_ge()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(pre_applied)</span> Precondition applied: table dimensions <span style="font-family: monospace;">[13 rows, 8 columns]</span> → <span style="font-family: monospace;">[<strong>3</strong> rows, <strong>2</strong> columns]</span>.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(syn_target_col)</span> Synthetic target column [n](../../reference/Validate.n.md#pointblank.Validate.n) created via preprocessing.</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(syn_target_col)</span> Synthetic target column <code style="font-family: "IBM Plex Mono", monospace;">n</code> created via preprocessing.</p></td>
 </tr>
 </tfoot>
 

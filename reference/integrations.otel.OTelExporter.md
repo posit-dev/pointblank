@@ -19,7 +19,7 @@ integrations.otel.OTelExporter(
     logger_provider=None,
     metric_prefix="pb.validation",
     log_level="warning",
-    extra_attributes=None
+    extra_attributes=None,
 )
 ```
 

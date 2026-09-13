@@ -300,4 +300,4 @@ tol=0.1</td>
 
 ## See Also
 
-[](%60~The%60) <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function for referencing columns within the same table.
+`The` <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function for referencing columns within the same table.

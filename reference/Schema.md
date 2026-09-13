@@ -15,7 +15,7 @@ Schema(
 ```
 
 
-The schema object defines the structure of a table. Once it is defined, the object can be used in a validation workflow, using [Validate](Validate.md#pointblank.Validate) and its methods, to ensure that the structure of a table matches the expected schema. The validation method that works with the schema object is called <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>.
+The schema object defines the structure of a table. Once it is defined, the object can be used in a validation workflow, using [Validate](Validate.md#pointblank.Validate) and its methods, to ensure that the structure of a table matches the expected schema. The validation method that works with the schema object is called <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>.
 
 A schema for a table can be constructed with the [Schema](Schema.md#pointblank.Schema) class in a number of ways:
 
@@ -71,15 +71,15 @@ The table types marked with an asterisk need to be prepared as Ibis tables (with
 
 While there is flexibility in how a schema can be constructed, there is the potential for some confusion. So let's go through each of the methods of constructing a schema in more detail and single out some important points.
 
-When providing a list of column names to `columns=`, a <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation step will only check the column names. Any arguments pertaining to dtypes will be ignored.
+When providing a list of column names to `columns=`, a <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation step will only check the column names. Any arguments pertaining to dtypes will be ignored.
 
-When using a list of tuples in `columns=`, the tuples could contain the column name and dtype or just the column name. This construction allows for more flexibility in constructing the schema as some columns will be checked for dtypes and others will not. This method is the only way to have mixed checks of column names and dtypes in <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>.
+When using a list of tuples in `columns=`, the tuples could contain the column name and dtype or just the column name. This construction allows for more flexibility in constructing the schema as some columns will be checked for dtypes and others will not. This method is the only way to have mixed checks of column names and dtypes in <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>.
 
 When providing a dictionary to `columns=`, the keys are the column names and the values are the dtypes. This method of input is useful in those cases where you might already have a dictionary of column names and dtypes that you want to use as the schema.
 
 If using individual column arguments in the form of keyword arguments, the column names are the keyword arguments and the dtypes are the values. This method emphasizes readability and is perhaps more convenient when manually constructing a schema with a small number of columns.
 
-Finally, multiple dtypes can be provided for a single column by providing a list or tuple of dtypes in place of a scalar string value. Having multiple dtypes for a column allows for the dtype check via <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> to make multiple attempts at matching the column dtype. Should any of the dtypes match the column dtype, that part of the schema check will pass. Here are some examples of how you could provide single and multiple dtypes for a column:
+Finally, multiple dtypes can be provided for a single column by providing a list or tuple of dtypes in place of a scalar string value. Having multiple dtypes for a column allows for the dtype check via <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> to make multiple attempts at matching the column dtype. Should any of the dtypes match the column dtype, that part of the schema check will pass. Here are some examples of how you could provide single and multiple dtypes for a column:
 
 ``` python
 # list of tuples
@@ -156,7 +156,7 @@ print(schema)
       height: Float64
 
 
-The [Schema](Schema.md#pointblank.Schema) object can be used to validate the structure of a table against the schema. The relevant [Validate](Validate.md#pointblank.Validate) method for this is <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>. In a validation workflow, you'll have a target table (defined at the beginning of the workflow) and you might want to ensure that your expectations of the table structure are met. The <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> method works with a [Schema](Schema.md#pointblank.Schema) object to validate the structure of the table. Here's an example of how you could use <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> in a validation workflow:
+The [Schema](Schema.md#pointblank.Schema) object can be used to validate the structure of a table against the schema. The relevant [Validate](Validate.md#pointblank.Validate) method for this is <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a>. In a validation workflow, you'll have a target table (defined at the beginning of the workflow) and you might want to ensure that your expectations of the table structure are met. The <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> method works with a [Schema](Schema.md#pointblank.Schema) object to validate the structure of the table. Here's an example of how you could use <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> in a validation workflow:
 
 
 ``` python
@@ -440,7 +440,7 @@ float ≠ float64
 </table>
 
 
-The <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method will validate the structure of the table against the schema during interrogation. If the structure of the table does not match the schema, the single test unit will fail. In this case, the defined schema matched the structure of the table, so the validation passed.
+The <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method will validate the structure of the table against the schema during interrogation. If the structure of the table does not match the schema, the single test unit will fail. In this case, the defined schema matched the structure of the table, so the validation passed.
 
 We can also choose to check only the column names of the target table. This can be done by providing a simplified [Schema](Schema.md#pointblank.Schema) object, which is given a list of column names:
 
@@ -1296,6 +1296,6 @@ For the `age` column, the schema will check for both `Float64` and `Int64` dtype
 
 ## See Also
 
-[](%60~The%60) <a href="Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method, where a  
+`The` <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method, where a  
 
 [Schema](Schema.md#pointblank.Schema) object is used in a validation workflow.

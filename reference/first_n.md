@@ -14,7 +14,7 @@ first_n(
 ```
 
 
-Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [first_n()](first_n.md#pointblank.first_n) selector function can be used to select *n* columns positioned at the start of the column list. So if the set of table columns consists of
+Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [first_n()](first_n.md#pointblank.first_n) selector function can be used to select *n* columns positioned at the start of the column list. So if the set of table columns consists of
 
 `[rev_01, rev_02, profit_01, profit_02, age]`
 
@@ -44,30 +44,30 @@ A `FirstN` object, which can be used to select the first [n](Validate.n.md#point
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 
-- <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
-- <a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
-- <a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
-- <a href="Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
-- <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
-- <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
-- <a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
-- <a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
-- <a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
-- <a href="Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
-- <a href="Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
-- <a href="Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
-- <a href="Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
-- <a href="Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
-- <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
-- <a href="Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
-- <a href="Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
+- <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
+- <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
+- <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
+- <a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
+- <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
+- <a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
+- <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
+- <a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
+- <a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
+- <a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
+- <a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
+- <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
+- <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
+- <a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
+- <a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
 
 The [first_n()](first_n.md#pointblank.first_n) selector function doesn't need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.
 
 
 ## Additional Flexibilty Through Composition With Other Column Selectors
 
-The [first_n()](first_n.md#pointblank.first_n) function can be composed with other column selectors to create fine-grained column selections. For example, to select all column names starting with "rev" along with the first two columns, you can use the [first_n()](first_n.md#pointblank.first_n) and <a href="starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
+The [first_n()](first_n.md#pointblank.first_n) function can be composed with other column selectors to create fine-grained column selections. For example, to select all column names starting with "rev" along with the first two columns, you can use the [first_n()](first_n.md#pointblank.first_n) and <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
 
 ``` python
 col(first_n(2) | starts_with("rev"))
@@ -295,7 +295,7 @@ col_vals_gt()
 
 From the results of the validation table we get four validation steps. The values in all those columns were all greater than `10`.
 
-We can also use the [first_n()](first_n.md#pointblank.first_n) function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select the first four columns but also omit those columns that end with `"2023"`, we can use the `-` operator to combine column selectors.
+We can also use the [first_n()](first_n.md#pointblank.first_n) function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select the first four columns but also omit those columns that end with `"2023"`, we can use the `-` operator to combine column selectors.
 
 
 ``` python

@@ -1,7 +1,7 @@
 # DataScan.from_dict()
 
 
-Restore a [DataScan](DataScan.md#pointblank.DataScan) from a dictionary produced by [to_dict()](Step.md#pointblank.Step.to_dict).
+Restore a [DataScan](DataScan.md#pointblank.DataScan) from a dictionary produced by `to_dict()`.
 
 
 Usage
@@ -18,7 +18,7 @@ This reconstructs the profile without needing the original data.
 
 
 `d: dict[str, Any]`  
-A dictionary with `"metadata"` and `"columns"` keys, as produced by [to_dict()](Step.md#pointblank.Step.to_dict).
+A dictionary with `"metadata"` and `"columns"` keys, as produced by `to_dict()`.
 
 
 ## Returns

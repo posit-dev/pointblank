@@ -14,7 +14,7 @@ DataScanDiff(
 ```
 
 
-Created by calling [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
+Created by calling [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via `get_tabular_report()`.
 
 
 ## Attributes

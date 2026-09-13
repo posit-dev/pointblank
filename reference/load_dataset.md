@@ -316,7 +316,7 @@ f
 </table>
 
 
-Note that the `"small_table"` dataset is a Polars DataFrame and using the <a href="preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function will display the table in an HTML viewing environment.
+Note that the `"small_table"` dataset is a Polars DataFrame and using the <a href="../reference/preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function will display the table in an HTML viewing environment.
 
 The `"game_revenue"` dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting `tbl_type="pandas"`:
 

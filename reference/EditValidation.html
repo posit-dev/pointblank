@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1527,12 +1533,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">data</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">api_key</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">verify_ssl</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_reprompts</span><span class="op">=</span><span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_reprompts</span><span class="op">=</span><span class="dv">1</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>While <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> takes an <em>existing</em> plan plus a natural-language instruction (e.g., “add a freshness check on <code>updated_at</code>, tighten the email regex, and drop the <code>price &gt; 0</code> check”) and produces a revised plan. You review the change as a diff and explicitly <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.</p>
-<p><a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> reuses the same provider abstraction as <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> (via the <code>chatlas</code> package), supporting the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, and <code>"azure-openai"</code> providers. Install the optional requirements with <code>pip install pointblank[generate]</code>.</p>
+<p>While <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> takes an <em>existing</em> plan plus a natural-language instruction (e.g., “add a freshness check on <code>updated_at</code>, tighten the email regex, and drop the <code>price &gt; 0</code> check”) and produces a revised plan. You review the change as a diff and explicitly <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.</p>
+<p><a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> reuses the same provider abstraction as <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> (via the <code>chatlas</code> package), supporting the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, and <code>"azure-openai"</code> providers. Install the optional requirements with <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1543,7 +1549,7 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> class is experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
+<p>The <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> class is experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
 </div>
 </div>
 </div>
@@ -1553,7 +1559,7 @@ Warning
 <dl>
 <dt><code><span class="doc-parameter-name">validation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The existing validation plan to edit. This can be a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a Python code string (such as the output of <a href="Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a>), a YAML configuration string, or a path to a <code>.py</code> or <code>.yaml</code>/<code>.yml</code> file. All inputs are normalized to Pointblank code before being sent to the model.</p>
+<p>The existing validation plan to edit. This can be a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a Python code string (such as the output of <a href="../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a>), a YAML configuration string, or a path to a <code>.py</code> or <code>.yaml</code>/<code>.yml</code> file. All inputs are normalized to Pointblank code before being sent to the model.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">instruction</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
@@ -1565,7 +1571,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional data table. When provided, a <a href="DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> summary of the table is included in the prompt so the model can make <em>informed</em> edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> via <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.</p>
+<p>Optional data table. When provided, a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> summary of the table is included in the prompt so the model can make <em>informed</em> edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> via <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">api_key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1588,14 +1594,14 @@ The maximum number of times to automatically re-prompt the model when the return
 <dl>
 <dt><code> <span class="doc-parameter-annotation">EditValidation</span></code></dt>
 <dd>
-An <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> object exposing the revised plan through <a href="EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> object exposing the revised plan through <a href="../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 </dd>
 </dl>
 </div>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-notes-on-data-sent-to-the-model-provider">
 <h2 class="doc-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes On Data Sent To The Model Provider</h2>
-<p>As with <a href="DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a>, only a JSON summary of the table (generated by <a href="DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>) is ever sent to the model, never the underlying rows. If <code>data=</code> is omitted, no table information is sent at all; the model edits the plan using only the plan code and your instruction.</p>
+<p>As with <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a>, only a JSON summary of the table (generated by <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>) is ever sent to the model, never the underlying rows. If <code>data=</code> is omitted, no table information is sent at all; the model edits the plan using only the plan code and your instruction.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
@@ -1638,7 +1644,7 @@ Description
 <a href="#accept" class="doc-function doc-label doc-label-method">accept()</a>
 </td>
 <td>
-Execute the revised plan and return the resulting <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.
+Execute the revised plan and return the resulting <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.
 </td>
 </tr>
 <tr>
@@ -1662,7 +1668,7 @@ Return a unified textual diff of the original plan versus the revised plan.
 <a href="#from_plans" class="doc-function doc-label doc-label-method">from_plans()</a>
 </td>
 <td>
-Build an <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> from two known plans, without calling a model.
+Build an <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> from two known plans, without calling a model.
 </td>
 </tr>
 <tr>
@@ -1695,7 +1701,7 @@ Return whether the revised plan parses and uses only known validation methods.
 <section id="accept" class="level3">
 <h3 class="anchored" data-anchor-id="accept"><span class="doc-object-name doc-function doc-label doc-label-method">accept()</span></h3>
 <div class="doc-subject">
-<p>Execute the revised plan and return the resulting <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.</p>
+<p>Execute the revised plan and return the resulting <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
@@ -1705,7 +1711,7 @@ Return whether the revised plan parses and uses only known validation methods.
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>accept(data<span class="op">=</span><span class="va">None</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The returned <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> has NOT been interrogated; call <code>.interrogate()</code> on it to run the validation.</p>
+<p>The returned <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> has NOT been interrogated; call <code>.interrogate()</code> on it to run the validation.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1713,7 +1719,7 @@ Return whether the revised plan parses and uses only known validation methods.
 <dl>
 <dt><code><span class="doc-parameter-name">data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-The data table to bind to the plan’s <code>your_data</code> placeholder. If omitted, the <code>data=</code> provided to <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> is used. One of the two must be present.
+The data table to bind to the plan’s <code>your_data</code> placeholder. If omitted, the <code>data=</code> provided to <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> is used. One of the two must be present.
 </dd>
 </dl>
 </div>
@@ -1724,7 +1730,7 @@ The data table to bind to the plan’s <code>your_data</code> placeholder. If om
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-The revised validation plan as a <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.
+The revised validation plan as a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.
 </dd>
 </dl>
 </div>
@@ -1744,7 +1750,7 @@ The revised validation plan as a <a href="Validate.html#pointblank.Validate" cla
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>changed_steps()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Unlike <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an <code>"action"</code> of <code>"add"</code>, <code>"remove"</code>, or <code>"modify"</code>, a <code>"method"</code> name, and the relevant <code>"old"</code>/<code>"new"</code> step text.</p>
+<p>Unlike <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an <code>"action"</code> of <code>"add"</code>, <code>"remove"</code>, or <code>"modify"</code>, a <code>"method"</code> name, and the relevant <code>"old"</code>/<code>"new"</code> step text.</p>
 </div>
 <section id="returns-2" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
@@ -1776,17 +1782,21 @@ One record per changed step, e.g. <code>[{"action": "modify", "method": "col_val
 <section id="from_plans" class="level3">
 <h3 class="anchored" data-anchor-id="from_plans"><span class="doc-object-name doc-function doc-label doc-label-method">from_plans()</span></h3>
 <div class="doc-subject">
-<p>Build an <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> from two known plans, without calling a model.</p>
+<p>Build an <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> from two known plans, without calling a model.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L301-L363" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>from_plans(original, revised, instruction<span class="op">=</span><span class="st">"Manual plan comparison"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>from_plans(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    original,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    revised,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    instruction<span class="op">=</span><span class="st">"Manual plan comparison"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.</p>
+<p>This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.</p>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -1794,7 +1804,7 @@ One record per changed step, e.g. <code>[{"action": "modify", "method": "col_val
 <dl>
 <dt><code><span class="doc-parameter-name">original</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The original plan. Accepts anything the <code>validation=</code> argument accepts: a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a code string, a YAML string, or a file path.</p>
+<p>The original plan. Accepts anything the <code>validation=</code> argument accepts: a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a code string, a YAML string, or a file path.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">revised</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
@@ -1802,7 +1812,7 @@ One record per changed step, e.g. <code>[{"action": "modify", "method": "col_val
 </dd>
 <dt><code><span class="doc-parameter-name">instruction</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"Manual plan comparison"</span></span></code></dt>
 <dd>
-An optional label describing the comparison (shown as the subtitle in <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
+An optional label describing the comparison (shown as the subtitle in <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
 </dd>
 </dl>
 </div>
@@ -1813,7 +1823,7 @@ An optional label describing the comparison (shown as the subtitle in <a href="E
 <dl>
 <dt><code> <span class="doc-parameter-annotation">EditValidation</span></code></dt>
 <dd>
-An <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> whose <code>original</code>/<code>revised</code> plans are the ones supplied, ready for <a href="EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> whose <code>original</code>/<code>revised</code> plans are the ones supplied, ready for <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
 </dd>
 </dl>
 </div>
@@ -1843,7 +1853,7 @@ An <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link gdls
 <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>review()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.</p>
+<p>This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.</p>
 </div>
 <section id="returns-4" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h4>

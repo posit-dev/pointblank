@@ -14,7 +14,7 @@ Pipeline(
     actions=None,
     final_actions=None,
     label=None,
-    short_circuit=True
+    short_circuit=True,
 )
 ```
 
@@ -164,7 +164,10 @@ Run the full pipeline: validate source, transform, validate target.
 Usage
 
 ``` python
-run(data, transform)
+run(
+    data,
+    transform,
+)
 ```
 
 

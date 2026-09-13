@@ -15,7 +15,7 @@ validate_adam(
     check_bds_structure=True,
     check_traceability=True,
     label=None,
-    **kwargs
+    **kwargs,
 )
 ```
 

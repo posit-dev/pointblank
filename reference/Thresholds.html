@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1512,14 +1518,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/thresholds.py#L9-L188" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">Thresholds</span>(
-    <span class="va">warning</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">error</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">critical</span><span class="op">=</span><span class="cn-none">None</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">Thresholds</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">warning</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">error</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">critical</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Thresholds are used to set limits on the number of failing test units at different levels. The levels are ‘warning’, ‘error’, and ‘critical’. These levels correspond to different levels of severity when a threshold is reached. The threshold values can be set as absolute counts or as fractions of the total number of test units. When a threshold is reached, an action can be taken (e.g., displaying a message or calling a function) if there is an associated action defined for that level (defined through the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class).</p>
+<p>Thresholds are used to set limits on the number of failing test units at different levels. The levels are ‘warning’, ‘error’, and ‘critical’. These levels correspond to different levels of severity when a threshold is reached. The threshold values can be set as absolute counts or as fractions of the total number of test units. When a threshold is reached, an action can be taken (e.g., displaying a message or calling a function) if there is an associated action defined for that level (defined through the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1546,7 +1552,7 @@ The threshold for the ‘critical’ level. This can be an absolute count or a f
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Thresholds</span></code></dt>
 <dd>
-A <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link gdls-code">Thresholds</a> object. This can be used when using the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set thresholds globally) or when defining validation steps like <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> (so that threshold values are scoped to individual validation steps, overriding any global thresholds).
+A <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link gdls-code">Thresholds</a> object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set thresholds globally) or when defining validation steps like <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> (so that threshold values are scoped to individual validation steps, overriding any global thresholds).
 </dd>
 </dl>
 </div>
@@ -1554,19 +1560,19 @@ A <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link gdls-code">Th
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In a data validation workflow, you can set thresholds for the number of failing test units at different levels. For example, you can set a threshold for the ‘warning’ level when the number of failing test units exceeds 10% of the total number of test units:</p>
-<div id="f976e162" class="cell" data-execution_count="2">
+<div id="d3ce8fd9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>thresholds_1 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>)</span></code></pre></div>
 </div>
 <p>You can also set thresholds for the ‘error’ and ‘critical’ levels:</p>
-<div id="df6d3ba8" class="cell" data-execution_count="3">
+<div id="12d8f1c8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds_2 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>, error<span class="op">=</span><span class="fl">0.2</span>, critical<span class="op">=</span><span class="fl">0.05</span>)</span></code></pre></div>
 </div>
 <p>Thresholds can also be set as absolute counts. Here’s an example where the ‘warning’ level is set to <code>5</code> failing test units:</p>
-<div id="c74e1245" class="cell" data-execution_count="4">
+<div id="fd20d137" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds_3 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
 </div>
-<p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> step:</p>
-<div id="175da839" class="cell" data-execution_count="5">
+<p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> step:</p>
+<div id="20e5c6e2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>),</span>
@@ -1825,7 +1831,7 @@ A <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link gdls-code">Th
 </div>
 </div>
 </div>
-<p>As can be seen, the last step (<a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class).</p>
+<p>As can be seen, the last step (<a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class).</p>
 
 
 </section>

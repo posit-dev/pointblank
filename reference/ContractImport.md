@@ -15,7 +15,7 @@ ContractImport(
     constraints=list(),
     metadata=dict(),
     warnings=list(),
-    coverage=1.0
+    coverage=1.0,
 )
 ```
 
@@ -96,7 +96,10 @@ Build a Contract object from the imported data.
 Usage
 
 ``` python
-to_contract(name="imported_contract", **kwargs)
+to_contract(
+    name="imported_contract",
+    **kwargs,
+)
 ```
 
 
@@ -152,7 +155,10 @@ Build a Validate object from the imported contract.
 Usage
 
 ``` python
-to_validate(data, **kwargs)
+to_validate(
+    data,
+    **kwargs,
+)
 ```
 
 

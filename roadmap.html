@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -112,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -147,7 +147,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -243,7 +243,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="data-profiling-drift-detection" class="level2">
 <h2 class="anchored" data-anchor-id="data-profiling-drift-detection">Data Profiling &amp; Drift Detection</h2>
-<p>Expand <a href="reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.</p>
+<p>Expand <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.</p>
 <ul>
 <li><code>pb.DataProfile</code> class for comprehensive profiling</li>
 <li>Profile persistence and comparison</li>
@@ -257,7 +257,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="schema-export">Schema Export</h2>
 <p>Export validation rules and schemas to standard interchange formats.</p>
 <ul>
-<li><code>.to_json_schema()</code> method on <a href="reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for JSON Schema output</li>
+<li><code>.to_json_schema()</code> method on <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for JSON Schema output</li>
 <li><code>.to_documentation()</code> for auto-generated data documentation (Markdown, HTML)</li>
 <li>Round-trip compatibility with YAML validation configs</li>
 </ul>
@@ -305,9 +305,9 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="test-data-generation-enhancements" class="level2">
 <h2 class="anchored" data-anchor-id="test-data-generation-enhancements">Test Data Generation Enhancements</h2>
-<p>Extend the existing <a href="reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> capabilities.</p>
+<p>Extend the existing <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> capabilities.</p>
 <ul>
-<li>Schema interoperability: use a <a href="reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> schema to generate test data</li>
+<li>Schema interoperability: use a <a href="./reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> schema to generate test data</li>
 <li>Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)</li>
 <li>Edge case generation (nulls, boundaries, Unicode, etc.)</li>
 <li>Hypothesis integration for property-based testing</li>

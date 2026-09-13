@@ -15,7 +15,7 @@ Thresholds(
 ```
 
 
-Thresholds are used to set limits on the number of failing test units at different levels. The levels are 'warning', 'error', and 'critical'. These levels correspond to different levels of severity when a threshold is reached. The threshold values can be set as absolute counts or as fractions of the total number of test units. When a threshold is reached, an action can be taken (e.g., displaying a message or calling a function) if there is an associated action defined for that level (defined through the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class).
+Thresholds are used to set limits on the number of failing test units at different levels. The levels are 'warning', 'error', and 'critical'. These levels correspond to different levels of severity when a threshold is reached. The threshold values can be set as absolute counts or as fractions of the total number of test units. When a threshold is reached, an action can be taken (e.g., displaying a message or calling a function) if there is an associated action defined for that level (defined through the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class).
 
 
 ## Parameters
@@ -35,7 +35,7 @@ The threshold for the 'critical' level. This can be an absolute count or a fract
 
 
 `Thresholds`  
-A [Thresholds](Thresholds.md#pointblank.Thresholds) object. This can be used when using the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set thresholds globally) or when defining validation steps like <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> (so that threshold values are scoped to individual validation steps, overriding any global thresholds).
+A [Thresholds](Thresholds.md#pointblank.Thresholds) object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set thresholds globally) or when defining validation steps like <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> (so that threshold values are scoped to individual validation steps, overriding any global thresholds).
 
 
 ## Examples
@@ -64,7 +64,7 @@ thresholds_3 = pb.Thresholds(warning=5)
 ```
 
 
-The `thresholds` object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here's a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> step:
+The `thresholds` object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here's a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> step:
 
 
 ``` python
@@ -260,4 +260,4 @@ col_vals_gt()
 </table>
 
 
-As can be seen, the last step (<a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class).
+As can be seen, the last step (<a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class).

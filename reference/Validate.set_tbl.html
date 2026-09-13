@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1510,14 +1516,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5853-L5986" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5888-L6021" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">set_tbl</span>(
-    <span class="va">tbl</span>,
-    <span class="va">tbl_name</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">label</span><span class="op">=</span><span class="cn-none">None</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">set_tbl</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">tbl</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">tbl_name</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">label</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>This method allows you to replace the table associated with a Validate object with a different (but presumably similar) table. This is useful when you want to apply the same validation plan to multiple tables or when you have a validation workflow defined but want to swap in a different data source.</p>
@@ -1528,7 +1534,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">tbl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The table to replace the existing table with. This can be any supported table type including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub URLs, or database connection strings. The same table type constraints apply as in the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> constructor.</p>
+<p>The table to replace the existing table with. This can be any supported table type including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub URLs, or database connection strings. The same table type constraints apply as in the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> constructor.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">tbl_name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1547,25 +1553,25 @@ An optional label for the validation plan. If no value is provided, the existing
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the replacement table.
+A new <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the replacement table.
 </dd>
 </dl>
 </div>
 </section>
 <section id="when-to-use" class="level2 doc-when-to-use">
 <h2 class="doc-when-to-use anchored" data-anchor-id="when-to-use">When To Use</h2>
-<p>The <a href="Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method is particularly useful in scenarios where you have:</p>
+<p>The <a href="../reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method is particularly useful in scenarios where you have:</p>
 <ul>
 <li>multiple similar tables that need the same validation checks</li>
 <li>a template validation workflow that should be applied to different data sources</li>
 <li>YAML-defined validations where you want to override the table specified in the YAML</li>
 </ul>
-<p>The <a href="Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method creates a copy of the validation object with the new table, so the original validation object remains unchanged. This allows you to reuse validation plans across multiple tables without interference.</p>
+<p>The <a href="../reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method creates a copy of the validation object with the new table, so the original validation object remains unchanged. This allows you to reuse validation plans across multiple tables without interference.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>We will first create two similar tables for our future validation plans.</p>
-<div id="78f630f3" class="cell" data-execution_count="2">
+<div id="ac761c31" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1583,7 +1589,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 </div>
 <p>Create a validation plan with the first table.</p>
-<div id="efa559b0" class="cell" data-execution_count="3">
+<div id="cf177664" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_table_1 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>table_1,</span>
@@ -1595,7 +1601,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Now apply the same validation plan to the second table.</p>
-<div id="4995d1a9" class="cell" data-execution_count="4">
+<div id="7c3dc2ae" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_table_2 <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    validation_table_1</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .set_tbl(</span>
@@ -1606,7 +1612,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Here is the interrogation of the first table:</p>
-<div id="34bdb5ff" class="cell" data-execution_count="5">
+<div id="396f19dc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation_table_1.interrogate()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1802,7 +1808,7 @@ A new <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Va
 </div>
 </div>
 <p>And the second table:</p>
-<div id="d86fc8c5" class="cell" data-execution_count="6">
+<div id="061a5228" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_table_2.interrogate()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1510,16 +1516,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18193-L18337" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18360-L18504" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_data_extracts</span>(
-    <span class="va">i</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="va">frame</span><span class="op">=</span><span class="cn-bool">False</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_data_extracts</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">i</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">frame</span><span class="op">=</span><span class="cn-bool">False</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>After the <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method has been called, the <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> method can be used to extract the rows that failed in each column-value or row-based validation step (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a>, etc.). The method returns a dictionary of tables containing the rows that failed in every validation step. If <code>frame=True</code> and <code>i=</code> is a scalar, the value is conveniently returned as a table (forgoing the dictionary structure).</p>
+<p>After the <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method has been called, the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> method can be used to extract the rows that failed in each column-value or row-based validation step (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a>, etc.). The method returns a dictionary of tables containing the rows that failed in every validation step. If <code>frame=True</code> and <code>i=</code> is a scalar, the value is conveniently returned as a table (forgoing the dictionary structure).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1551,38 +1557,38 @@ A dictionary of tables containing the rows that failed in every compatible valid
 <h2 class="doc-compatible-validation-methods-for-yielding-extracted-rows anchored" data-anchor-id="compatible-validation-methods-for-yielding-extracted-rows">Compatible Validation Methods For Yielding Extracted Rows</h2>
 <p>The following validation methods operate on column values and will have rows extracted when there are failing test units.</p>
 <ul>
-<li><a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a></li>
-<li><a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a></li>
-<li><a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a></li>
-<li><a href="Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a></li>
-<li><a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a></li>
-<li><a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a></li>
-<li><a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a></li>
-<li><a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a></li>
-<li><a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a></li>
-<li><a href="Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a></li>
-<li><a href="Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a></li>
-<li><a href="Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a></li>
-<li><a href="Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a></li>
-<li><a href="Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a></li>
-<li><a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a></li>
-<li><a href="Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a></li>
-<li><a href="Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a></li>
-<li><a href="Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a></li>
-<li><a href="Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link"><code>prompt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a></li>
+<li><a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a></li>
+<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a></li>
+<li><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a></li>
+<li><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a></li>
+<li><a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link"><code>prompt()</code></a></li>
 </ul>
 <p>An extracted row for these validation methods means that a test unit failed for that row in the validation step.</p>
 <p>These row-based validation methods will also have rows extracted should there be failing rows:</p>
 <ul>
-<li><a href="Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a></li>
-<li><a href="Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link"><code>rows_complete()</code></a></li>
+<li><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a></li>
+<li><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link"><code>rows_complete()</code></a></li>
 </ul>
 <p>The extracted rows are a subset of the original table and are useful for further analysis or for understanding the nature of the failing test units.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s perform a series of validation steps on a Polars DataFrame. We’ll use the <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> in the first step, <a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> in the second step, and <a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a> in the third step. The <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method executes the validation; then, we can extract the rows that failed for each validation step.</p>
-<div id="267a6e3d" class="cell" data-execution_count="2">
+<p>Let’s perform a series of validation steps on a Polars DataFrame. We’ll use the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> in the first step, <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> in the second step, and <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a> in the third step. The <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method executes the validation; then, we can extract the rows that failed for each validation step.</p>
+<div id="21075bd5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1631,12 +1637,12 @@ A dictionary of tables containing the rows that failed in every compatible valid
  └───────────┴─────┴─────┴─────┘}</code></pre>
 </div>
 </div>
-<p>The <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> method returns a dictionary of tables, where each table contains a subset of rows from the table. These are the rows that failed for each validation step.</p>
-<p>In the first step, the<a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> method was used to check if the values in column <code>a</code> were greater than <code>4</code>. The extracted table shows the rows where this condition was not met; look at the <code>a</code> column: all values are less than <code>4</code>.</p>
-<p>In the second step, the <a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> method was used to check if the values in column <code>c</code> were less than <code>5</code>. In the extracted two-row table, we see that the values in column <code>c</code> are greater than <code>5</code>.</p>
-<p>The third step (<a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>) checked if the values in column <code>b</code> were greater than or equal to <code>1</code>. There were no failing test units, so the extracted table is empty (i.e., has columns but no rows).</p>
+<p>The <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> method returns a dictionary of tables, where each table contains a subset of rows from the table. These are the rows that failed for each validation step.</p>
+<p>In the first step, the<a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> method was used to check if the values in column <code>a</code> were greater than <code>4</code>. The extracted table shows the rows where this condition was not met; look at the <code>a</code> column: all values are less than <code>4</code>.</p>
+<p>In the second step, the <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> method was used to check if the values in column <code>c</code> were less than <code>5</code>. In the extracted two-row table, we see that the values in column <code>c</code> are greater than <code>5</code>.</p>
+<p>The third step (<a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>) checked if the values in column <code>b</code> were greater than or equal to <code>1</code>. There were no failing test units, so the extracted table is empty (i.e., has columns but no rows).</p>
 <p>The <code>i=</code> argument can be used to narrow down the extraction to one or more steps. For example, to extract the rows that failed in the first step only:</p>
-<div id="4cd5c99a" class="cell" data-execution_count="3">
+<div id="9b746d43" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{1: shape: (2, 4)
@@ -1652,7 +1658,7 @@ A dictionary of tables containing the rows that failed in every compatible valid
 </div>
 <p>Note that the first validation step is indexed at <code>1</code> (not <code>0</code>). This 1-based indexing is in place here to match the step numbers reported in the validation table. What we get back is still a dictionary, but it only contains one table (the one for the first step).</p>
 <p>If you want to get the extracted table as a DataFrame, set <code>frame=True</code> and provide a scalar value for <code>i</code>. For example, to get the extracted table for the second step as a DataFrame:</p>
-<div id="0f6357d2" class="cell" data-execution_count="4">
+<div id="508756e1" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1757,7 +1763,7 @@ A dictionary of tables containing the rows that failed in every compatible valid
 </div>
 </div>
 </div>
-<p>The extracted table is now a DataFrame, which can serve as a more convenient format for further analysis or visualization. We further used the <a href="preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function to show the DataFrame in an HTML view.</p>
+<p>The extracted table is now a DataFrame, which can serve as a more convenient format for further analysis or visualization. We further used the <a href="../reference/preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function to show the DataFrame in an HTML view.</p>
 
 
 </section>

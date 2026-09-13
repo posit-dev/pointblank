@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1511,16 +1517,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L546-L721" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L547-L722" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">load_dataset</span>(
-    <span class="va">dataset</span><span class="op">=</span><span class="st">"small_table"</span>,
-    <span class="va">tbl_type</span><span class="op">=</span><span class="st">"polars"</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">load_dataset</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">dataset</span><span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">tbl_type</span><span class="op">=</span><span class="st">"polars"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The Pointblank library includes several datasets that can be loaded using the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> function. The datasets can be loaded as a Polars DataFrame, a Pandas DataFrame, or as a DuckDB table (which uses the Ibis library backend). These datasets are used throughout the documentation’s examples to demonstrate the functionality of the library. They’re also useful for experimenting with the library and trying out different validation scenarios.</p>
+<p>The Pointblank library includes several datasets that can be loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> function. The datasets can be loaded as a Polars DataFrame, a Pandas DataFrame, or as a DuckDB table (which uses the Ibis library backend). These datasets are used throughout the documentation’s examples to demonstrate the functionality of the library. They’re also useful for experimenting with the library and trying out different validation scenarios.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1543,14 +1549,14 @@ The type of table to generate from the dataset. The named options are <code>"pol
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-The dataset for the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object. This could be a Polars DataFrame, a Pandas DataFrame, or a DuckDB table as an Ibis table.
+The dataset for the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object. This could be a Polars DataFrame, a Pandas DataFrame, or a DuckDB table as an Ibis table.
 </dd>
 </dl>
 </div>
 </section>
 <section id="included-datasets" class="level2 doc-included-datasets">
 <h2 class="doc-included-datasets anchored" data-anchor-id="included-datasets">Included Datasets</h2>
-<p>There are three included datasets that can be loaded using the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> function:</p>
+<p>There are three included datasets that can be loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> function:</p>
 <ul>
 <li><code>"small_table"</code>: A small dataset with 13 rows and 8 columns. This dataset is useful for testing and demonstration purposes.</li>
 <li><code>"game_revenue"</code>: A dataset with 2000 rows and 11 columns. Provides revenue data for a game development company. For the particular game, there are records of player sessions, the items they purchased, ads viewed, and the revenue generated.</li>
@@ -1569,8 +1575,8 @@ The dataset for the <a href="Validate.html#pointblank.Validate" class="gdls-link
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Load the <code>"small_table"</code> dataset as a Polars DataFrame by calling <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> with <code>dataset="small_table"</code> and <code>tbl_type="polars"</code>:</p>
-<div id="48f99bb4" class="cell" data-execution_count="1">
+<p>Load the <code>"small_table"</code> dataset as a Polars DataFrame by calling <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link gdls-code">load_dataset()</a> with <code>dataset="small_table"</code> and <code>tbl_type="polars"</code>:</p>
+<div id="81904a87" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -1790,9 +1796,9 @@ The dataset for the <a href="Validate.html#pointblank.Validate" class="gdls-link
 </div>
 </div>
 </div>
-<p>Note that the <code>"small_table"</code> dataset is a Polars DataFrame and using the <a href="preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function will display the table in an HTML viewing environment.</p>
+<p>Note that the <code>"small_table"</code> dataset is a Polars DataFrame and using the <a href="../reference/preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function will display the table in an HTML viewing environment.</p>
 <p>The <code>"game_revenue"</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="ddf2698d" class="cell" data-execution_count="2">
+<div id="9fc09fde" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue)</span></code></pre></div>
@@ -2048,7 +2054,7 @@ The dataset for the <a href="Validate.html#pointblank.Validate" class="gdls-link
 </div>
 <p>The <code>"game_revenue"</code> dataset is a more real-world dataset with a mix of data types, and it’s significantly larger than the <code>small_table</code> dataset at 2000 rows and 11 columns.</p>
 <p>The <code>"nycflights"</code> dataset can be loaded as a DuckDB table by specifying the dataset name and setting <code>tbl_type="duckdb"</code>:</p>
-<div id="e0effb44" class="cell" data-execution_count="3">
+<div id="e5fb53aa" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(nycflights)</span></code></pre></div>
@@ -2388,7 +2394,7 @@ The dataset for the <a href="Validate.html#pointblank.Validate" class="gdls-link
 </div>
 <p>The <code>"nycflights"</code> dataset is a large dataset with 336,776 rows and 18 columns. This dataset is truly a real-world dataset and provides information about flights originating from New York City airports in 2013.</p>
 <p>Finally, the <code>"global_sales"</code> dataset can be loaded as a Polars table by specifying the dataset name. Since <code>tbl_type=</code> is set to <code>"polars"</code> by default, we don’t need to specify it:</p>
-<div id="88e33abc" class="cell" data-execution_count="4">
+<div id="98a0d6b8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>global_sales <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"global_sales"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.preview(global_sales)</span></code></pre></div>

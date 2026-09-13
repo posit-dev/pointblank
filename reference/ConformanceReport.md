@@ -12,14 +12,14 @@ ConformanceReport(
     package=None,
     agency=None,
     core=None,
-    native_result=None
+    native_result=None,
 )
 ```
 
 
-A [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport) is returned by <a href="validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a> and <a href="SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>SubmissionPackage.validate_conformance()</code></a>. It exists in one of two forms depending on the engine used:
+A [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport) is returned by <a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a> and <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>SubmissionPackage.validate_conformance()</code></a>. It exists in one of two forms depending on the engine used:
 
-- **Built-in rules engine** ([is_rules](ConformanceReport.md#pointblank.ConformanceReport.is_rules) is `True`) -- produced by Pointblank's SDTMIG rule catalog. Each rule is evaluated against the supplied datasets and receives one of five statuses: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, or `"not_supported"`. Row-level findings (the individual failing records) are collected for RECORD_CHECK rules and accessible via <a href="ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link"><code>findings_df()</code></a> and <a href="ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link"><code>get_findings_table()</code></a>.
+- **Built-in rules engine** ([is_rules](ConformanceReport.md#pointblank.ConformanceReport.is_rules) is `True`) -- produced by Pointblank's SDTMIG rule catalog. Each rule is evaluated against the supplied datasets and receives one of five statuses: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, or `"not_supported"`. Row-level findings (the individual failing records) are collected for RECORD_CHECK rules and accessible via <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link"><code>findings_df()</code></a> and <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link"><code>get_findings_table()</code></a>.
 - **CDISC CORE** ([is_core](ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`) -- produced by the external CDISC CORE command-line engine. Rule-keyed findings and run provenance are exposed via [findings()](ConformanceReport.md#pointblank.ConformanceReport.findings) and [rules()](ConformanceReport.md#pointblank.ConformanceReport.rules).
 
 In a Jupyter or Quarto notebook the report renders automatically as a color-coded rule summary table (calling `_repr_html_()` is equivalent to `get_tabular_report()._repr_html_()`).
@@ -161,9 +161,9 @@ findings_df()
 
 Each row represents one failing record captured during the conformance run. Use this method for programmatic analysis (filtering by rule, grouping by subject, exporting to CSV, or joining back to the source datasets to investigate root causes).
 
-Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`, `DOMAIN_PRESENCE_CHECK`) report a finding count in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) but do not appear here. To see the visual findings table call [get_findings_table()](ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) instead.
+Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`, `DOMAIN_PRESENCE_CHECK`) report a finding count in `get_tabular_report()` but do not appear here. To see the visual findings table call [get_findings_table()](ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) instead.
 
-Findings are capped at **100 rows per rule** to bound memory use on large datasets. The `n_issues` value shown in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) always reflects the true total count for a rule, even when more than 100 records failed.
+Findings are capped at **100 rows per rule** to bound memory use on large datasets. The `n_issues` value shown in `get_tabular_report()` always reflects the true total count for a rule, even when more than 100 records failed.
 
 
 #### Returns
@@ -204,7 +204,11 @@ Build a CORE-backed [ConformanceReport](ConformanceReport.md#pointblank.Conforma
 Usage
 
 ``` python
-from_core_report(report, package=None, agency=None)
+from_core_report(
+    report,
+    package=None,
+    agency=None,
+)
 ```
 
 
@@ -212,7 +216,7 @@ from_core_report(report, package=None, agency=None)
 
 
 `report: dict | ParsedCoreReport`  
-Either a raw CORE JSON report (`dict`, as produced by `core validate -of JSON`) or an already-parsed [`ParsedCoreReport`](%60pointblank.metadata._cdisc_core.ParsedCoreReport%60).
+Either a raw CORE JSON report (`dict`, as produced by `core validate -of JSON`) or an already-parsed `ParsedCoreReport`.
 
 `package: SubmissionPackage | None = None`  
 The [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) the run was produced from, if any.
@@ -244,7 +248,7 @@ get_findings_table()
 ```
 
 
-Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report): where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
+Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to `get_tabular_report()`: where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
 
 
 #### Table Layout
@@ -262,12 +266,12 @@ The table has two column spanners:
 
 The header shows the standard and version (e.g., `SDTMIG 3-4`) alongside a breakdown of how many rules passed, failed, and were not applicable across the full run.
 
-A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
+A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in `get_tabular_report()`.
 
 
 #### Findings Cap
 
-At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report).
+At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in `get_tabular_report()`.
 
 
 #### Returns
@@ -364,7 +368,10 @@ Return the conformance issues found.
 Usage
 
 ``` python
-issues(severity=None, status=None)
+issues(
+    severity=None,
+    status=None,
+)
 ```
 
 
@@ -433,9 +440,9 @@ summary()
 
 
 `dict`  
-For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed) (failing test units), and [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed).
+For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed) (failing test units), and `all_passed`.
 
-For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, `status_counts` (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed).
+For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, `status_counts` (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and `all_passed`.
 
 
 ------------------------------------------------------------------------
@@ -496,7 +503,7 @@ to_json(path)
 ```
 
 
-For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains [summary](ContractImport.md#pointblank.ContractImport.summary) and [issues](ConformanceReport.md#pointblank.ConformanceReport.issues) keys.
+For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains `summary` and [issues](ConformanceReport.md#pointblank.ConformanceReport.issues) keys.
 
 
 #### Parameters

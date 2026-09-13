@@ -13,7 +13,7 @@ schema_from_tbl(
     infer_constraints=True,
     categorical_threshold=20,
     detect_presets=True,
-    sample_size=None
+    sample_size=None,
 )
 ```
 

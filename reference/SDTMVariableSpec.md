@@ -15,7 +15,7 @@ SDTMVariableSpec(
     required=False,
     max_length=None,
     controlled_term=None,
-    core="Perm"
+    core="Perm",
 )
 ```
 

@@ -80,7 +80,11 @@ Export to the external format.
 Usage
 
 ``` python
-export_contract(validation_or_contract, destination=None, **kwargs)
+export_contract(
+    validation_or_contract,
+    destination=None,
+    **kwargs,
+)
 ```
 
 
@@ -116,7 +120,10 @@ Import from the external format.
 Usage
 
 ``` python
-import_contract(source, **kwargs)
+import_contract(
+    source,
+    **kwargs,
+)
 ```
 
 

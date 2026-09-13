@@ -3560,7 +3560,7 @@ Rules are sorted by severity: failures first, then errors, then passes, then not
 
 The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
 
-Call [get_tabular_report()](../../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) to get the `GT` object directly if you need to embed it in a report pipeline:
+Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report pipeline:
 
 
 ``` python
@@ -3731,7 +3731,7 @@ The findings table groups its columns into two spanners:
 - **Rule**: `Domain` and `Description` identify which rule fired and where.
 - **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong; `Row` is the 1-based row number in the source dataset for quick lookup.
 
-At most 100 findings per rule are shown in the table. The true total for each rule is always visible in [get_tabular_report()](../../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report). To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
+At most 100 findings per rule are shown in the table. The true total for each rule is always visible in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
 
 
 ## Programmatic Access with findings_df()
@@ -3817,7 +3817,7 @@ The bundled SDTMIG 3.4 catalog contains 426 rules across seven types:
 | `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
 | `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
 
-Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in [get_tabular_report()](../../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) but do not have individual record detail.
+Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in `get_tabular_report()` but do not have individual record detail.
 
 Rules that require a domain or variable not present in your datasets are automatically marked `not_applicable` (they are not counted as failures). For example, a rule that checks `AESTDTC` in the AE domain is `not_applicable` when no AE dataset is supplied. Adding more domains to the dictionary passed to [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) will convert more rules from `not_applicable` to executable, giving a more complete conformance picture.
 
@@ -4035,7 +4035,7 @@ print(report)
       8 issues -- FAIL
 
 
-**Overall result.** [all_passed()](../../reference/Validate.all_passed.md#pointblank.Validate.all_passed) returns `True` when no rules reported issues; [is_core](../../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) confirms the report originated from the CORE engine rather than the built-in engine:
+**Overall result.** `all_passed()` returns `True` when no rules reported issues; [is_core](../../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) confirms the report originated from the CORE engine rather than the built-in engine:
 
 
 ``` python
@@ -4048,7 +4048,7 @@ print("Is CORE report:", report.is_core)
     Is CORE report: True
 
 
-**Summary dictionary.** [summary()](../../reference/ContractImport.md#pointblank.ContractImport.summary) returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
+**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
 
 
 ``` python
@@ -4203,7 +4203,7 @@ Both built-in and CORE reports can be exported for archiving, sharing with a bio
 
 ## JSON
 
-[to_json()](../../reference/DataScan.to_json.md#pointblank.DataScan.to_json) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
+`to_json()` saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 
 ``` python

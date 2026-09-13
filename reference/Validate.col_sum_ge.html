@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1512,7 +1518,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L836-L873" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L845-L882" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_sum_ge</span>(</span>
@@ -1523,12 +1529,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-bool">False</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a> validation method checks whether the sum of values in a column is at least a specified <code>value=</code>. This is an aggregation-based validation where the entire column is reduced to a single sum value that is then compared against the target. The comparison used in this function is <code>sum(column) &gt;= value</code>.</p>
-<p>Unlike row-level validations (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
+<p>The <a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a> validation method checks whether the sum of values in a column is at least a specified <code>value=</code>. This is an aggregation-based validation where the entire column is reduced to a single sum value that is then compared against the target. The comparison used in this function is <code>sum(column) &gt;= value</code>.</p>
+<p>Unlike row-level validations (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1540,11 +1546,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | Column | ReferenceColumn | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The value to compare the column sum against. This can be: (1) a numeric literal (<code>int</code> or <code>float</code>), (2) a <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object referencing another column whose sum will be used for comparison, (3) a <a href="ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object referencing a column in reference data (when <code>Validate(reference=)</code> has been set), or (4) <code>None</code> to automatically compare against the same column in reference data (shorthand for <code>ref(column_name)</code> when reference data is set).</p>
+<p>The value to compare the column sum against. This can be: (1) a numeric literal (<code>int</code> or <code>float</code>), (2) a <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object referencing another column whose sum will be used for comparison, (3) a <a href="../reference/ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object referencing a column in reference data (when <code>Validate(reference=)</code> has been set), or (4) <code>None</code> to automatically compare against the same column in reference data (shorthand for <code>ref(column_name)</code> when reference data is set).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">tol</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Tolerance</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">0</span></span></code></dt>
 <dd>
-<p>A tolerance value for the comparison. The default is <code>0</code>, meaning exact comparison. When set to a positive value, the comparison becomes more lenient. For example, with <code>tol=0.5</code>, a sum that differs from the target by up to <code>0.5</code> will still pass. The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a>, a tolerance of <code>tol=0.5</code> would mean the sum can be within <code>0.5</code> of the target value and still pass validation.</p>
+<p>A tolerance value for the comparison. The default is <code>0</code>, meaning exact comparison. When set to a positive value, the comparison becomes more lenient. For example, with <code>tol=0.5</code>, a sum that differs from the target by up to <code>0.5</code> will still pass. The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a>, a tolerance of <code>tol=0.5</code> would mean the sum can be within <code>0.5</code> of the target value and still pass validation.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">thresholds</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | bool | tuple | dict | Thresholds | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1556,11 +1562,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">actions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Actions | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
+<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
 </dd>
 </dl>
 </div>
@@ -1571,27 +1577,27 @@ A boolean value or callable that determines whether the validation step should b
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
+The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
 </dd>
 </dl>
 </div>
 </section>
 <section id="using-reference-data" class="level2 doc-using-reference-data">
 <h2 class="doc-using-reference-data anchored" data-anchor-id="using-reference-data">Using Reference Data</h2>
-<p>The <a href="Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a> method supports comparing column aggregations against reference data. This is useful for validating that statistical properties remain consistent across different versions of a dataset, or for comparing current data against historical baselines.</p>
-<p>To use reference data, set the <code>reference=</code> parameter when creating the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object:</p>
+<p>The <a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a> method supports comparing column aggregations against reference data. This is useful for validating that statistical properties remain consistent across different versions of a dataset, or for comparing current data against historical baselines.</p>
+<p>To use reference data, set the <code>reference=</code> parameter when creating the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>current_data, reference<span class="op">=</span>baseline_data)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_ge(columns<span class="op">=</span><span class="st">"revenue"</span>)  <span class="co"># Compares sum(current.revenue) vs sum(baseline.revenue)</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>When <code>value=None</code> and reference data is set, the method automatically compares against the same column in the reference data. You can also explicitly specify reference columns using the <a href="ref.html#pointblank.ref" class="gdls-link gdls-code">ref()</a> helper:</p>
+<p>When <code>value=None</code> and reference data is set, the method automatically compares against the same column in the reference data. You can also explicitly specify reference columns using the <a href="../reference/ref.html#pointblank.ref" class="gdls-link gdls-code">ref()</a> helper:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>.col_sum_ge(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span>pb.ref(<span class="st">"baseline_revenue"</span>))</span></code></pre></div>
 </section>
 <section id="understanding-tolerance" class="level2 doc-understanding-tolerance">
 <h2 class="doc-understanding-tolerance anchored" data-anchor-id="understanding-tolerance">Understanding Tolerance</h2>
 <p>The <code>tol=</code> parameter allows for fuzzy comparisons, which is especially important for floating-point aggregations where exact equality is often unreliable.</p>
-<p>The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a>, a tolerance of <code>tol=0.5</code> would mean the sum can be within <code>0.5</code> of the target value and still pass validation.</p>
+<p>The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge()</a>, a tolerance of <code>tol=0.5</code> would mean the sum can be within <code>0.5</code> of the target value and still pass validation.</p>
 <p>For equality comparisons (<code>col_*_eq</code>), the tolerance creates a range <code>[value - tol, value + tol]</code> within which the aggregation is considered valid. For inequality comparisons, the tolerance shifts the comparison boundary.</p>
 </section>
 <section id="thresholds" class="level2 doc-thresholds">
@@ -1604,7 +1610,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </ul>
 <p>Thresholds can be defined using one of these input schemes:</p>
 <ol type="1">
-<li>use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
+<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
 <li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
 <li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
 <li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
@@ -1613,7 +1619,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples, we’ll use a simple Polars DataFrame with numeric columns. The table is shown below:</p>
-<div id="cba1c920" class="cell" data-execution_count="2">
+<div id="344f6183" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1740,7 +1746,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Let’s validate that the sum of column <code>a</code> is at least <code>15</code>:</p>
-<div id="7ff578e0" class="cell" data-execution_count="3">
+<div id="aec46129" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_ge(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">15</span>)</span>
@@ -1907,7 +1913,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 <p>The validation result shows whether the sum comparison passed or failed. Since this is an aggregation-based validation, there is exactly one test unit per column.</p>
 <p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="6e9a0a2a" class="cell" data-execution_count="4">
+<div id="64f7ae5d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_ge(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">15</span>)</span>
@@ -2119,7 +2125,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 </div>
 </div>
 <p>Using tolerance for flexible comparisons:</p>
-<div id="9a1fd926" class="cell" data-execution_count="5">
+<div id="8c78c7b1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_ge(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">15</span>, tol<span class="op">=</span><span class="fl">1.0</span>)</span>

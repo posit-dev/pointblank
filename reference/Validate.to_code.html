@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1506,14 +1512,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18353-L18451" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18520-L18618" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">to_code</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link gdls-code">to_code()</a> method walks the validation plan and reconstructs the equivalent <code>pb.Validate(...).col_vals_*()...</code> method chain as a string. This is the inverse of writing the plan by hand: it takes an in-memory <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object and produces source code that, when executed, recreates the same plan.</p>
-<p>This is useful for sharing a plan, reviewing it in a diff, persisting it alongside results, and it is the foundation for the AI edit/iterate flow (see <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a>), which sends the current plan to a model as editable code.</p>
+<p>The <code>to_code()</code> method walks the validation plan and reconstructs the equivalent <code>pb.Validate(...).col_vals_*()...</code> method chain as a string. This is the inverse of writing the plan by hand: it takes an in-memory <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object and produces source code that, when executed, recreates the same plan.</p>
+<p>This is useful for sharing a plan, reviewing it in a diff, persisting it alongside results, and it is the foundation for the AI edit/iterate flow (see <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a>), which sends the current plan to a model as editable code.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1528,7 +1534,7 @@ The validation plan as a block of Python code. The data source is rendered as th
 </section>
 <section id="notes-on-fidelity" class="level2 doc-notes-on-fidelity">
 <h2 class="doc-notes-on-fidelity anchored" data-anchor-id="notes-on-fidelity">Notes On Fidelity</h2>
-<p>Most validation steps round-trip exactly. Steps that carry non-serializable Python objects, such as <code>pre=</code> preprocessing callables, <code>actions=</code>, callable <code>active=</code> conditions, or the expressions used by <a href="Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a>, <a href="Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a>, and <a href="Validate.specially.html#pointblank.Validate.specially" class="gdls-link"><code>specially()</code></a>, cannot be reproduced from memory. For those, a syntactically valid placeholder is emitted and a warning is raised so the code still parses and the loss is visible.</p>
+<p>Most validation steps round-trip exactly. Steps that carry non-serializable Python objects, such as <code>pre=</code> preprocessing callables, <code>actions=</code>, callable <code>active=</code> conditions, or the expressions used by <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a>, <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a>, and <a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link"><code>specially()</code></a>, cannot be reproduced from memory. For those, a syntactically valid placeholder is emitted and a warning is raised so the code still parses and the loss is visible.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>

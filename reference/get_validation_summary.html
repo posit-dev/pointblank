@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1507,13 +1513,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L284-L399" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L285-L400" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">get_validation_summary</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class.</p>
+<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1546,7 +1552,7 @@ A dictionary containing validation metrics. If called outside of an final action
 <li><code>dict_warning</code> (<code>dict</code>): The ‘warning’ level status for each validation step.</li>
 <li><code>dict_error</code> (<code>dict</code>): The ‘error’ level status for each validation step.</li>
 <li><code>dict_critical</code> (<code>dict</code>): The ‘critical’ level status for each validation step.</li>
-<li><a href="Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed</a> (<code>bool</code>): Whether or not every validation step had no failing test units.</li>
+<li><code>all_passed</code> (<code>bool</code>): Whether or not every validation step had no failing test units.</li>
 <li><code>highest_severity</code> (<code>str</code>): The highest severity level encountered during validation. This can be one of the following: <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>, <code>"some failing"</code>, or <code>"all passed"</code>.</li>
 <li><code>tbl_row_count</code> (<code>int</code>): The number of rows in the target table.</li>
 <li><code>tbl_column_count</code> (<code>int</code>): The number of columns in the target table.</li>
@@ -1580,7 +1586,7 @@ A dictionary containing validation metrics. If called outside of an final action
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Note that <code>send_alert_email()</code> in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.</p>
-<p>The <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> function can also be used to create custom reporting for validation results:</p>
+<p>The <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> function can also be used to create custom reporting for validation results:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_validation_results():</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1600,11 +1606,11 @@ A dictionary containing validation metrics. If called outside of an final action
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <dl>
-<dt><a href="`~Have`"></a> a look at <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create</dt>
+<dt><code>Have</code> a look at <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create</dt>
 <dd>
 
 </dd>
-<dt><a href="`~custom`"></a> actions that are executed after all validation steps have been completed.</dt>
+<dt><code>custom</code> actions that are executed after all validation steps have been completed.</dt>
 <dd>
 
 </dd>

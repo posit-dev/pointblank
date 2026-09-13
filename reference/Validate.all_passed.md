@@ -11,9 +11,9 @@ Validate.all_passed()
 ```
 
 
-The [all_passed()](Validate.all_passed.md#pointblank.Validate.all_passed) method determines if every validation step passed perfectly, with no failing test units. This method is useful for quickly checking if the table passed all validation steps with flying colors. If there's even a single failing test unit in any validation step, this method will return `False`.
+The `all_passed()` method determines if every validation step passed perfectly, with no failing test units. This method is useful for quickly checking if the table passed all validation steps with flying colors. If there's even a single failing test unit in any validation step, this method will return `False`.
 
-This validation metric might be overly stringent for some validation plans where failing test units are generally expected (and the strategy is to monitor data quality over time). However, the value of [all_passed()](Validate.all_passed.md#pointblank.Validate.all_passed) could be suitable for validation plans designed to ensure that every test unit passes perfectly (e.g., checks for column presence, null-checking tests, etc.).
+This validation metric might be overly stringent for some validation plans where failing test units are generally expected (and the strategy is to monitor data quality over time). However, the value of `all_passed()` could be suitable for validation plans designed to ensure that every test unit passes perfectly (e.g., checks for column presence, null-checking tests, etc.).
 
 
 ## Returns
@@ -25,7 +25,7 @@ This validation metric might be overly stringent for some validation plans where
 
 ## Examples
 
-In the example below, we'll use a simple Polars DataFrame with three columns (`a`, `b`, and `c`). There will be three validation steps, and the second step will have a failing test unit (the value `10` isn't less than `9`). After interrogation, the [all_passed()](Validate.all_passed.md#pointblank.Validate.all_passed) method is used to determine if all validation steps passed perfectly.
+In the example below, we'll use a simple Polars DataFrame with three columns (`a`, `b`, and `c`). There will be three validation steps, and the second step will have a failing test unit (the value `10` isn't less than `9`). After interrogation, the `all_passed()` method is used to determine if all validation steps passed perfectly.
 
 
 ``` python

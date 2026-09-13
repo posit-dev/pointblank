@@ -17,7 +17,7 @@ Contract(
     consumers=None,
     description=None,
     thresholds=None,
-    on_violation="warn"
+    on_violation="warn",
 )
 ```
 

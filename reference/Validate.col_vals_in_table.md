@@ -17,7 +17,7 @@ Validate.col_vals_in_table(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 

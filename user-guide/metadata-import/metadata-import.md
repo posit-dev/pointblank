@@ -7,7 +7,7 @@ Pointblank's metadata import system reads these external descriptions and conver
 
 # Quick Start
 
-The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate). Here is the basic pattern:
+The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call `to_validate()`. Here is the basic pattern:
 
 ``` python
 import pointblank as pb
@@ -58,7 +58,7 @@ The key attributes are:
 | `codelists` | `dict[str, Codelist]` | Named controlled terminologies / value sets |
 | `missing_value_codes` | `dict[str, list]` | Sentinel values that indicate missingness |
 
-Each [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object describes a single column, including its name, data type, label, and any constraints that were defined in the source file. Constraints are automatically mapped to Pointblank validation methods when you call [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate).
+Each [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object describes a single column, including its name, data type, label, and any constraints that were defined in the source file. Constraints are automatically mapped to Pointblank validation methods when you call `to_validate()`.
 
 
 # Converting to a Schema
@@ -84,7 +84,7 @@ The schema captures what the metadata says the table *should* look like, not wha
 
 # Converting to a Validation Workflow
 
-The [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate) method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
+The `to_validate()` method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
 
 | Metadata Constraint | Generated Validation Step |
 |----|----|
@@ -166,7 +166,7 @@ sex_labels = meta.codelists["C66731"].to_dict()
 # e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}
 ```
 
-When [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate) encounters a variable with a `codelist_ref`, it generates a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step using the codelist's values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).
+When `to_validate()` encounters a variable with a `codelist_ref`, it generates a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step using the codelist's values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).
 
 
 # Handling Missing Value Codes

@@ -13,14 +13,14 @@ SubmissionPackage(
     ct_version=None,
     standard="sdtmig",
     standard_version="3.4",
-    study_id=None
+    study_id=None,
 )
 ```
 
 
 A [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) groups the datasets of a study (SDTM domains, SUPP- qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the *relationships* between them. This enables cross-dataset conformance checks -- referential integrity, SUPP- linkage, RELREC resolution, and ADaM ⇄ SDTM traceability -- that single-dataset validation cannot express.
 
-This is the data-level analog of <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups *metadata* for many datasets.
+This is the data-level analog of <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups *metadata* for many datasets.
 
 
 ## Parameters
@@ -30,7 +30,7 @@ This is the data-level analog of <a href="MetadataPackage.html#pointblank.Metada
 A mapping of dataset name (domain code, e.g., `"DM"`, `"AE"`, `"SUPPAE"`, `"ADSL"`) to the dataset itself (a Pandas or Polars DataFrame). Names are matched case-insensitively but conventionally uppercase.
 
 `define: Any = None`  
-Optional Define-XML context: a path to a `define.xml` file, or an already-imported <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.
+Optional Define-XML context: a path to a `define.xml` file, or an already-imported <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.
 
 `ct_version: str | None = None`  
 Optional Controlled Terminology version pin (e.g., `"2024-03-29"`), recorded for reproducible runs.
@@ -101,7 +101,7 @@ The imported Define-XML metadata, if `define` was supplied.
 `metadata: MetadataPackage | None`
 
 
-Lazily imports the Define-XML document (via <a href="import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.
+Lazily imports the Define-XML document (via <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.
 
 
 ## Methods
@@ -133,7 +133,7 @@ from_folder(
     standard="sdtmig",
     standard_version="3.4",
     ct_version=None,
-    study_id=None
+    study_id=None,
 )
 ```
 
@@ -148,7 +148,7 @@ Reads every SAS Transport (`.xpt`) and CDISC Dataset-JSON (`.json`) file in the 
 Path to a folder containing the study datasets.
 
 `define: str | Path | Any | None = None`  
-Optional Define-XML path or <a href="MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If `None`, a `define.xml` in the folder is used when present.
+Optional Define-XML path or <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If `None`, a `define.xml` in the folder is used when present.
 
 `standard: str = ``"sdtmig"`  
 The data standard (`"sdtmig"` or `"adamig"`). Defaults to `"sdtmig"`.
@@ -219,7 +219,11 @@ Find values of `column` in `child` that do not exist in `parent`.
 Usage
 
 ``` python
-orphan_ids(child, parent="DM", column="USUBJID")
+orphan_ids(
+    child,
+    parent="DM",
+    column="USUBJID",
+)
 ```
 
 
@@ -319,14 +323,14 @@ validate_conformance(
     core=None,
     core_cwd=None,
     cache=None,
-    workdir=None
+    workdir=None,
 )
 ```
 
 
 Two engines are available:
 
-- **`"native"`** (default) -- Pointblank's own checks. For each dataset this builds a <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when `cross_dataset=True`):
+- **`"native"`** (default) -- Pointblank's own checks. For each dataset this builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when `cross_dataset=True`):
   - **Referential integrity** -- every `USUBJID` in a finding/events/interventions domain exists in DM.
   - **SUPP- linkage** -- `RDOMAIN` references a present domain, `USUBJID` exists in DM, and `(USUBJID, IDVAR=IDVARVAL)` resolves to a record in the parent domain.
   - **RELREC** -- each relationship record's `RDOMAIN` is present and `USUBJID` exists in DM.

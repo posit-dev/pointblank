@@ -315,7 +315,7 @@ This is particularly useful when:
 In addition to assertion methods that raise exceptions, Pointblank provides status check methods that return boolean values:
 
 
-## [all_passed()](../../reference/Validate.all_passed.md#pointblank.Validate.all_passed)
+## `all_passed()`
 
 The <a href="../../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link"><code>Validate.all_passed()</code></a> method will return `True` only if every single test unit in every validation step passed:
 

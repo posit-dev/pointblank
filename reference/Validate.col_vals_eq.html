@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1513,7 +1519,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6596-L6900" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6763-L7067" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_vals_eq</span>(</span>
@@ -1527,11 +1533,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> validation method checks whether column values in a table are <em>equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val == value</code>). The <code>value=</code> can be specified as a single, literal value or as a column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>The <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> validation method checks whether column values in a table are <em>equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val == value</code>). The <code>value=</code> can be specified as a single, literal value or as a column name given in <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1539,11 +1545,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">columns</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals</span></code></dt>
 <dd>
-<p>A single column or a list of columns to validate. Can also use <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.</p>
+<p>A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | int | Column</span></code></dt>
 <dd>
-<p>The value to compare against. This can be a single value or a single column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison. For more information on which types of values are allowed, see the <em>What Can Be Used in <code>value=</code>?</em> section.</p>
+<p>The value to compare against. This can be a single value or a single column name given in <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison. For more information on which types of values are allowed, see the <em>What Can Be Used in <code>value=</code>?</em> section.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">na_pass</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
@@ -1563,7 +1569,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">actions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Actions | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
+<p>Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">brief</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | bool | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1571,7 +1577,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
+<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">dimension</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1586,7 +1592,7 @@ An optional data quality dimension to categorize this validation step for health
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
+The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
 </dd>
 </dl>
 </div>
@@ -1597,19 +1603,19 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <ul>
 <li>a single numeric value</li>
 <li>a single date or datetime value</li>
-<li>A <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object that represents a column name</li>
+<li>A <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object that represents a column name</li>
 </ul>
 <p>When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value as the <code>value=</code> argument. There is flexibility in how you provide the date or datetime value, as it can be:</p>
 <ul>
 <li>a string-based date or datetime (e.g., <code>"2023-10-01"</code>, <code>"2023-10-01 13:45:30"</code>, etc.)</li>
 <li>a date or datetime object using the <code>datetime</code> module (e.g., <code>datetime.date(2023, 10, 1)</code>, <code>datetime.datetime(2023, 10, 1, 13, 45, 30)</code>, etc.)</li>
 </ul>
-<p>Finally, when supplying a column name in the <code>value=</code> argument, it must be specified within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This is a column-to-column comparison and, crucially, the columns being compared must be of the same type (e.g., both numeric, both date, etc.).</p>
+<p>Finally, when supplying a column name in the <code>value=</code> argument, it must be specified within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This is a column-to-column comparison and, crucially, the columns being compared must be of the same type (e.g., both numeric, both date, etc.).</p>
 </section>
 <section id="preprocessing" class="level2 doc-preprocessing">
 <h2 class="doc-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
-<p>The preprocessing function can be any callable that takes a table as input and returns a modified table. For example, you could use a lambda function to filter the table based on certain criteria or to apply a transformation to the data. Note that you can refer to columns via <code>columns=</code> and <code>value=col(...)</code> that are expected to be present in the transformed table, but may not exist in the table before preprocessing. Regarding the lifetime of the transformed table, it only exists during the validation step and is not stored in the <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object or used in subsequent validation steps.</p>
+<p>The preprocessing function can be any callable that takes a table as input and returns a modified table. For example, you could use a lambda function to filter the table based on certain criteria or to apply a transformation to the data. Note that you can refer to columns via <code>columns=</code> and <code>value=col(...)</code> that are expected to be present in the transformed table, but may not exist in the table before preprocessing. Regarding the lifetime of the transformed table, it only exists during the validation step and is not stored in the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object or used in subsequent validation steps.</p>
 </section>
 <section id="segmentation" class="level2 doc-segmentation">
 <h2 class="doc-segmentation anchored" data-anchor-id="segmentation">Segmentation</h2>
@@ -1632,7 +1638,7 @@ segments=["region", "date"]</code></pre>
 <p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
 <p>Thresholds can be defined using one of these input schemes:</p>
 <ol type="1">
-<li>use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
+<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
 <li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
 <li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
 <li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
@@ -1643,7 +1649,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with two numeric columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="ff9f5b79" class="cell" data-execution_count="2">
+<div id="e26c3e9e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1775,7 +1781,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all equal to the value of <code>5</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="9b331c0a" class="cell" data-execution_count="3">
+<div id="691ce38f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
@@ -1935,9 +1941,9 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 </div>
-<p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a>. All test units passed, and there are no failing test units.</p>
-<p>Aside from checking a column against a literal value, we can also use a column name in the <code>value=</code> argument (with the helper function <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> to perform a column-to-column comparison. For the next example, we’ll use <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> to check whether the values in column <code>a</code> are equal to the values in column <code>b</code>.</p>
-<div id="bc7bfe9e" class="cell" data-execution_count="4">
+<p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a>. All test units passed, and there are no failing test units.</p>
+<p>Aside from checking a column against a literal value, we can also use a column name in the <code>value=</code> argument (with the helper function <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> to perform a column-to-column comparison. For the next example, we’ll use <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a> to check whether the values in column <code>a</code> are equal to the values in column <code>b</code>.</p>
+<div id="0e7ea3e6" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>

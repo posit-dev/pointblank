@@ -13,7 +13,7 @@ profile_fields(
     split_name=True,
     include=None,
     exclude=None,
-    prefix=None
+    prefix=None,
 )
 ```
 

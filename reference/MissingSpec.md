@@ -12,14 +12,14 @@ MissingSpec(
     categories=None,
     null_is_missing=True,
     null_reason="unknown",
-    description=None
+    description=None,
 )
 ```
 
 
 Real-world data rarely encodes missingness as a single `null` value. Survey data distinguishes *refused* from *don't know* from *not applicable*; clinical data uses codes like `"NOT DONE"`; statistical packages use sentinel values such as `-99`, `".A"`, or `""`. A [MissingSpec](MissingSpec.md#pointblank.MissingSpec) captures these sentinel values, the *reason* each one represents, and how they should be handled during validation and analysis.
 
-This brings the idea of *structured missingness* (a missing value carries a reason for its absence) into Pointblank's runtime validation layer. Once defined, a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) can be passed to validation methods (via `missing=`) to automatically exclude sentinel values from constraint checks, or used with dedicated methods like <a href="Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link"><code>Validate.col_missing_coded()</code></a> and <a href="Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link"><code>Validate.col_pct_missing()</code></a>.
+This brings the idea of *structured missingness* (a missing value carries a reason for its absence) into Pointblank's runtime validation layer. Once defined, a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) can be passed to validation methods (via `missing=`) to automatically exclude sentinel values from constraint checks, or used with dedicated methods like <a href="../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link"><code>Validate.col_missing_coded()</code></a> and <a href="../reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link"><code>Validate.col_pct_missing()</code></a>.
 
 
 ## Parameters
@@ -83,7 +83,7 @@ age_missing.values_for_category("item_nonresponse")  # [-98, -97]
 
 | Name | Description |
 |----|----|
-| [from_cdisc()](#from_cdisc) | Alias for <a href="MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>. |
+| [from_cdisc()](#from_cdisc) | Alias for <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>. |
 | [from_cdisc_null_flavors()](#from_cdisc_null_flavors) | Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for the standard HL7/CDISC *null flavors*. |
 | [from_sas()](#from_sas) | Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for SAS special missing values. |
 | [from_spss()](#from_spss) | Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) from SPSS-style user-defined missing values. |
@@ -101,7 +101,7 @@ age_missing.values_for_category("item_nonresponse")  # [-98, -97]
 ### from_cdisc()
 
 
-Alias for <a href="MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.
+Alias for <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.
 
 
 Usage
@@ -126,7 +126,7 @@ Usage
 from_cdisc_null_flavors(
     null_is_missing=True,
     null_reason="no_information",
-    description="CDISC/HL7 null flavors"
+    description="CDISC/HL7 null flavors",
 )
 ```
 
@@ -180,7 +180,7 @@ from_sas(
     include_underscore=True,
     null_is_missing=True,
     null_reason="system_missing",
-    description="SAS special missing values"
+    description="SAS special missing values",
 )
 ```
 
@@ -243,7 +243,7 @@ from_spss(
     labels=None,
     null_is_missing=True,
     null_reason="unknown",
-    description="SPSS user-defined missing values"
+    description="SPSS user-defined missing values",
 )
 ```
 
@@ -301,11 +301,15 @@ Create a [MissingSpec](MissingSpec.md#pointblank.MissingSpec) from an imported v
 Usage
 
 ``` python
-from_variable_metadata(variable, null_is_missing=True, null_reason="unknown")
+from_variable_metadata(
+    variable,
+    null_is_missing=True,
+    null_reason="unknown",
+)
 ```
 
 
-This works with a <a href="VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> object (as produced by <a href="import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> for SPSS, Stata, and SAS files). It reads the variable's `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
+This works with a <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> object (as produced by <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> for SPSS, Stata, and SAS files). It reads the variable's `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
 
 
 #### Parameters
@@ -431,7 +435,7 @@ sentinel_values()
 
 
 `list`  
-The keys of `reasons` (the actual values in the data that represent missingness). Note that this does *not* include `None` even when `null_is_missing=True`; use <a href="MissingSpec.html#pointblank.MissingSpec.is_missing" class="gdls-link"><code>is_missing()</code></a> to test individual values.
+The keys of `reasons` (the actual values in the data that represent missingness). Note that this does *not* include `None` even when `null_is_missing=True`; use <a href="../reference/MissingSpec.html#pointblank.MissingSpec.is_missing" class="gdls-link"><code>is_missing()</code></a> to test individual values.
 
 
 ------------------------------------------------------------------------

@@ -11,7 +11,7 @@ get_validation_summary()
 ```
 
 
-This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class.
+This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class.
 
 
 ## Returns
@@ -41,7 +41,7 @@ The summary dictionary contains the following fields:
 - `dict_warning` (`dict`): The 'warning' level status for each validation step.
 - `dict_error` (`dict`): The 'error' level status for each validation step.
 - `dict_critical` (`dict`): The 'critical' level status for each validation step.
-- [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed) (`bool`): Whether or not every validation step had no failing test units.
+- `all_passed` (`bool`): Whether or not every validation step had no failing test units.
 - `highest_severity` (`str`): The highest severity level encountered during validation. This can be one of the following: `"warning"`, `"error"`, or `"critical"`, `"some failing"`, or `"all passed"`.
 - `tbl_row_count` (`int`): The number of rows in the target table.
 - `tbl_column_count` (`int`): The number of columns in the target table.
@@ -105,6 +105,6 @@ Final actions work well with both simple logging and more complex notification s
 
 ## See Also
 
-[](%60~Have%60) a look at <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create  
+`Have` a look at <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create  
 
-[](%60~custom%60) actions that are executed after all validation steps have been completed.
+`custom` actions that are executed after all validation steps have been completed.

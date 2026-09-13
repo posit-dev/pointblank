@@ -458,7 +458,7 @@ col_exists()
 </table>
 
 
-That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on your team. And if you need help getting started or want to work faster, Pointblank has built-in AI support through the [`assistant()`](%60assistant%60) function to guide you along the way. You can also use [`DraftValidation`](advanced-validation/draft-validation.md) to quickly generate a validation plan from your existing data (great for getting started fast), or the [AI Validation Editor](advanced-validation/ai-validation-editor.md) to refine an existing plan with plain-English instructions.
+That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on your team. And if you need help getting started or want to work faster, Pointblank has built-in AI support through the `assistant()` function to guide you along the way. You can also use [`DraftValidation`](advanced-validation/draft-validation.md) to quickly generate a validation plan from your existing data (great for getting started fast), or the [AI Validation Editor](advanced-validation/ai-validation-editor.md) to refine an existing plan with plain-English instructions.
 
 Ready to validate? Start with our [Installation](getting-started/installation.md) guide or jump straight to the [Quickstart](getting-started/quickstart.md).
 

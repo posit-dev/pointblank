@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1513,22 +1519,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/inspect.py#L146-L322" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">has_rows</span>(
-    <span class="va">count</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="op">*</span>,
-    <span class="bu">min</span><span class="op">=</span><span class="cn-none">None</span>,
-    <span class="bu">max</span><span class="op">=</span><span class="cn-none">None</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">has_rows</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">count</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">min</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">max</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="has_rows.html#pointblank.has_rows" class="gdls-link gdls-code">has_rows()</a> function returns a callable that, when given a table, checks whether the row count satisfies a specified condition. It is designed for use with the <code>active=</code> parameter of validation methods so that a validation step can be conditionally skipped when the target table is too small, too large, or empty.</p>
+<p>The <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link gdls-code">has_rows()</a> function returns a callable that, when given a table, checks whether the row count satisfies a specified condition. It is designed for use with the <code>active=</code> parameter of validation methods so that a validation step can be conditionally skipped when the target table is too small, too large, or empty.</p>
 <p>The callable supports several modes:</p>
 <ul>
 <li><strong>exact count</strong>: <code>has_rows(count=N)</code> returns <code>True</code> only if the table has exactly <code>N</code> rows.</li>
 <li><strong>minimum</strong>: <code>has_rows(min=N)</code> returns <code>True</code> if the table has at least <code>N</code> rows.</li>
 <li><strong>maximum</strong>: <code>has_rows(max=N)</code> returns <code>True</code> if the table has at most <code>N</code> rows.</li>
 <li><strong>range</strong>: <code>has_rows(min=A, max=B)</code> returns <code>True</code> if the row count falls within <code>[A, B]</code>.</li>
-<li><strong>non-empty</strong>: <a href="has_rows.html#pointblank.has_rows" class="gdls-link gdls-code">has_rows()</a> (no arguments) returns <code>True</code> if the table has at least one row.</li>
+<li><strong>non-empty</strong>: <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link gdls-code">has_rows()</a> (no arguments) returns <code>True</code> if the table has at least one row.</li>
 </ul>
 <p>A note is attached to any skipped step in the validation report explaining the row count condition that was not met.</p>
 <p>The callable is evaluated against the original table <em>before</em> any <code>pre=</code> processing is applied. This means the column check is performed on the raw input data, not on a pre-processed version of it.</p>
@@ -1565,12 +1571,12 @@ A callable that accepts a table and returns <code>True</code> if the row count s
 </section>
 <section id="how-it-works" class="level2 doc-how-it-works">
 <h2 class="doc-how-it-works anchored" data-anchor-id="how-it-works">How It Works</h2>
-<p>When <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> is called, each validation step whose <code>active=</code> parameter is a callable will have that callable evaluated with the target table. If the callable returns <code>False</code>, the step is deactivated and an explanatory note is added to the validation report. The note is locale-aware: if the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object was created with a non-English <code>locale=</code>, the note will be translated accordingly.</p>
+<p>When <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> is called, each validation step whose <code>active=</code> parameter is a callable will have that callable evaluated with the target table. If the callable returns <code>False</code>, the step is deactivated and an explanatory note is added to the validation report. The note is locale-aware: if the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object was created with a non-English <code>locale=</code>, the note will be translated accordingly.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Skip a validation step if the table is empty:</p>
-<div id="088da301" class="cell" data-execution_count="2">
+<div id="e1b757fd" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1740,7 +1746,7 @@ A callable that accepts a table and returns <code>True</code> if the row count s
 </div>
 <p>The step was skipped because the table has no rows.</p>
 <p>Only run a step when the table has at least a minimum number of rows:</p>
-<div id="069533af" class="cell" data-execution_count="3">
+<div id="06466c0d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_rows(<span class="bu">min</span><span class="op">=</span><span class="dv">100</span>))</span>
@@ -1904,7 +1910,7 @@ A callable that accepts a table and returns <code>True</code> if the row count s
 </div>
 <p>The step was skipped because the table has only 3 rows, which is fewer than the required minimum of <code>100</code>.</p>
 <p>You can also check for an exact count or a range:</p>
-<div id="0ed70d68" class="cell" data-execution_count="4">
+<div id="a2b01d3c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_rows(count<span class="op">=</span><span class="dv">3</span>))</span>

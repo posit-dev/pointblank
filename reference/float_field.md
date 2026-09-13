@@ -16,7 +16,7 @@ float_field(
     null_probability=0.0,
     unique=False,
     generator=None,
-    dtype="Float64"
+    dtype="Float64",
 )
 ```
 

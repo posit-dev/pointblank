@@ -54,7 +54,7 @@ If you create new tests involving snapshots, please ensure that the resulting sn
 
 ## Creating Aggregation Methods
 
-Aggregation methods are generated dynamically! This is done because they all have the same signature and they're registered on the [Validate](reference/Validate.html#pointblank.Validate) class in the same way. So, to add a new method, go to `pointblank/_agg.py` and add either a comparison or statistical aggregation function.
+Aggregation methods are generated dynamically! This is done because they all have the same signature and they're registered on the [Validate](./reference/Validate.html#pointblank.Validate) class in the same way. So, to add a new method, go to `pointblank/_agg.py` and add either a comparison or statistical aggregation function.
 
 Comparison functions are defined by `comp_*`, for example `comp_gt` for "greater than". Statistical functions are defined by `agg_*`, for example `agg_sum` for "sum". At build time, these are registered and a grid of all combinations are created:
 
@@ -67,7 +67,7 @@ AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
 COMPARATOR_REGISTRY: dict[str, Comparator] = {}
 ```
 
-Once you've added a new method(s), run `make pyi` to generate the updated type stubs in `pointblank/validate.pyi` which contains the new signatures for the aggregation methods. At runtime, or import time to be precise, the methods are added to the [Validate](reference/Validate.html#pointblank.Validate) class and resolved internally through the registry.
+Once you've added a new method(s), run `make pyi` to generate the updated type stubs in `pointblank/validate.pyi` which contains the new signatures for the aggregation methods. At runtime, or import time to be precise, the methods are added to the [Validate](./reference/Validate.html#pointblank.Validate) class and resolved internally through the registry.
 
 ``` python
 # pointblank/validate.py

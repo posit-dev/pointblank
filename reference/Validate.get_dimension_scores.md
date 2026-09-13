@@ -42,6 +42,6 @@ validation.get_dimension_scores()
 
 ## See Also
 
-[](%60~Use%60) <a href="Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link"><code>get_health_score()</code></a> for a single overall  
+`Use` <a href="../reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link"><code>get_health_score()</code></a> for a single overall  
 
-[](%60~score%60) across all dimensions.
+`score` across all dimensions.

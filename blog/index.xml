@@ -1225,7 +1225,7 @@ tr { background-color: transparent; }
 <section id="comparisons-1" class="level2">
 <h2 class="anchored" data-anchor-id="comparisons-1">Comparisons</h2>
 <p>Unlike Pandera’s schema-first approach, Pointblank focuses on step-by-step validation with detailed reporting and flexible failure thresholds that can be set at both the global and individual validation step level. Both Pointblank and Validoopsie use numeric threshold values for granular control over acceptable failure rates, but they differ in their primary focus: Pointblank emphasizes comprehensive reporting and stakeholder communication, while Validoopsie prioritizes operational resilience through its impact level system (low/medium/high) that controls whether threshold breaches are logged, reported, or raise exceptions.</p>
-<p>While both libraries support custom validation logic, Pointblank’s <code>specially()</code> method integrates seamlessly with its reporting system, whereas Validoopsie provides a structured framework for creating custom validation classes that fit into its modular validation catalog.</p>
+<p>While both libraries support custom validation logic, Pointblank’s <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> method integrates seamlessly with its reporting system, whereas Validoopsie provides a structured framework for creating custom validation classes that fit into its modular validation catalog.</p>
 </section>
 <section id="unique-strengths-and-when-to-use-2" class="level2">
 <h2 class="anchored" data-anchor-id="unique-strengths-and-when-to-use-2">Unique Strengths and When to Use</h2>
@@ -1233,7 +1233,7 @@ tr { background-color: transparent; }
 <li>beautiful, interactive HTML reports that are great for sharing with stakeholders</li>
 <li>threshold-based alerting system with configurable actions</li>
 <li>segmented validation for analyzing subsets of data</li>
-<li>LLM-powered validation suggestions via <code>DraftValidation</code></li>
+<li>LLM-powered validation suggestions via <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a></li>
 <li>comprehensive data inspection tools and summary tables</li>
 <li>step-by-step validation reporting with detailed failure analysis (via <code>.get_step_report()</code>)</li>
 </ul>
@@ -1574,7 +1574,7 @@ font-style: inherit;"># Just track high performers</span></span>
 <section id="comparisons-2" class="level2">
 <h2 class="anchored" data-anchor-id="comparisons-2">Comparisons</h2>
 <p>Validoopsie’s functional approach contrasts with Pandera’s schema-centric methodology and Patito’s object-oriented models. While Pandera focuses on statistical validation and Patito emphasizes Pydantic integration, Validoopsie prioritizes flexibility and operational robustness.</p>
-<p>Compared to Pointblank, both libraries offer sophisticated threshold-based failure handling using numeric values (e.g., 0.1 for 10% tolerance), but they differ in their architectural approach: Validoopsie combines numeric thresholds with impact levels (low/medium/high) that control the behavioral response to threshold breaches, while Pointblank integrates thresholds directly into its comprehensive reporting and alerting system. Both support custom validation, but Validoopsie uses a modular validation catalog approach while Pointblank’s <code>specially()</code> method integrates seamlessly with its step-by-step reporting workflow.</p>
+<p>Compared to Pointblank, both libraries offer sophisticated threshold-based failure handling using numeric values (e.g., 0.1 for 10% tolerance), but they differ in their architectural approach: Validoopsie combines numeric thresholds with impact levels (low/medium/high) that control the behavioral response to threshold breaches, while Pointblank integrates thresholds directly into its comprehensive reporting and alerting system. Both support custom validation, but Validoopsie uses a modular validation catalog approach while Pointblank’s <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> method integrates seamlessly with its step-by-step reporting workflow.</p>
 <p>Validoopsie is the only library in this survey that provides built-in logging capabilities, making it particularly valuable for production environments where validation events need to be tracked and monitored.</p>
 <p>The library’s Great Expectations inspiration is evident in its modular design, but Validoopsie delivers this functionality with a much lighter dependency footprint and simpler API. Teams familiar with Great Expectations will find Validoopsie’s approach familiar but more streamlined.</p>
 </section>
@@ -1978,14 +1978,14 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/segments.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice that segments split columns into groups and apply the same validation to each of the groups. Each group is given its own step.</p>
 <p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the <a href="../../user-guide/validation-plan/segmentation.html">Segmentation article in the User Guide</a> is to describe this cross-cutting behavior in a single place.</p>
-<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="`Validate.col_vals_gt`"><code>col_vals_gt()</code></a> and the <a href="../../user-guide/validation-plan/segmentation.html">Segmentation article</a> to get a feel for how each location documents the segments feature.</p>
+<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a> and the <a href="../../user-guide/validation-plan/segmentation.html">Segmentation article</a> to get a feel for how each location documents the segments feature.</p>
 </section>
 <section id="step-report" class="level2">
 <h2 class="anchored" data-anchor-id="step-report">Step Report</h2>
 <p>Step reports display failing cases (e.g., rows) for a validation step, so you can dig deeper into validation failures. Here’s a screenshot of a step report for some validation step 2:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/step-report.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice the arrow pointing to ‘Step 2’ in the title. Failing values are highlighted in red. Once we know we have failures, it’s important to take action and discover <em>why</em> data is failing. Looking at failing cases in step reports often uncovers obvious causes behind failures.</p>
-<p>The <code>get_step_report()</code> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
+<p>The <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
 </section>
 </section>
 <section id="looking-forward" class="level1">
@@ -2251,7 +2251,7 @@ font-style: inherit;">"⚠️ WARNING: Some values in column 'd' are below the m
 </section>
 <section id="the-anatomy-of-actions" class="level1">
 <h1>The Anatomy of Actions</h1>
-<p>The <a href="`Actions`"><code>Actions</code></a> class is a very important piece of Pointblank’s response system. Actions can be defined in several ways:</p>
+<p>The <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class is a very important piece of Pointblank’s response system. Actions can be defined in several ways:</p>
 <ol type="1">
 <li><strong>String messages</strong>: simple text output to the console</li>
 <li><strong>Callable functions</strong>: custom Python functions that execute when triggered</li>
@@ -2801,7 +2801,7 @@ font-style: inherit;">3000</span></span>
 </section>
 <section id="accessing-metadata-in-custom-action-functions" class="level1">
 <h1>Accessing Metadata in Custom Action Functions</h1>
-<p>For more sophisticated actions, you often need access to details about the validation failure. The <code>get_action_metadata()</code> function provides this context when called inside an action function:</p>
+<p>For more sophisticated actions, you often need access to details about the validation failure. The <a href="../../reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link gdls-code">get_action_metadata()</a> function provides this context when called inside an action function:</p>
 <div id="e079fe67" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -3106,10 +3106,10 @@ font-style: inherit;">5000</span></span>
 <p>The metadata dictionary contains essential fields for a given validation step, including the step number, column name, validation type, severity level, and failure explanation. This gives you complete flexibility to create highly customized responses based on the specific nature of the validation failure.</p>
 </section>
 <section id="final-actions-with-finalactions" class="level1">
-<h1>Final Actions with <code>FinalActions</code></h1>
-<p>While regular <a href="`Actions`"><code>Actions</code></a> are great for responding to individual validation steps, sometimes you need to take action based on the overall validation results. This is where the new <code>FinalActions</code> feature from <code>v0.8.1</code> comes in.</p>
-<p>Unlike regular <a href="`Actions`"><code>Actions</code></a> that trigger during validation, <a href="`FinalActions`"><code>FinalActions</code></a> execute after all validation steps are complete. <a href="`FinalActions`"><code>FinalActions</code></a> accepts any number of actions (strings or callables) and executes them in sequence. Each argument can be a string message to display in the console, a callable function, or a list of strings/callables for multiple actions to execute in sequence.</p>
-<p>The real power of <a href="`FinalActions`"><code>FinalActions</code></a> comes from the ability to access comprehensive information about your validation results using <a href="`get_validation_summary`"><code>get_validation_summary()</code></a>. When called inside a function passed to <a href="`FinalActions`"><code>FinalActions</code></a>, this function provides a dictionary containing counts of passing/failing steps and test units, threshold levels exceeded, and much more:</p>
+<h1>Final Actions with <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a></h1>
+<p>While regular <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> are great for responding to individual validation steps, sometimes you need to take action based on the overall validation results. This is where the new <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> feature from <code>v0.8.1</code> comes in.</p>
+<p>Unlike regular <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> that trigger during validation, <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> execute after all validation steps are complete. <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> accepts any number of actions (strings or callables) and executes them in sequence. Each argument can be a string message to display in the console, a callable function, or a list of strings/callables for multiple actions to execute in sequence.</p>
+<p>The real power of <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> comes from the ability to access comprehensive information about your validation results using <a href="../../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a>. When called inside a function passed to <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a>, this function provides a dictionary containing counts of passing/failing steps and test units, threshold levels exceeded, and much more:</p>
 <div id="414fcd28" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -3512,12 +3512,12 @@ Failing steps: 1
 </div>
 </div>
 </div>
-<p>The <a href="`get_validation_summary`"><code>get_validation_summary()</code></a> function is only available within functions passed to <a href="`FinalActions`"><code>FinalActions</code></a>. It gives you access to these key dictionary fields:</p>
+<p>The <a href="../../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function is only available within functions passed to <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a>. It gives you access to these key dictionary fields:</p>
 <ul>
 <li><code>tbl_name</code>: name of the validated table</li>
 <li><code>n_steps</code>: total number of validation steps</li>
 <li><code>n_passing_steps</code>, n_failing_steps: count of passing/failing steps</li>
-<li><code>n</code>, <code>n_passed</code>, <code>n_failed</code>: total test units and their pass/fail counts</li>
+<li><a href="../../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a>, <a href="../../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link gdls-code">n_passed</a>, <a href="../../reference/Validate.n_failed.html#pointblank.Validate.n_failed" class="gdls-link gdls-code">n_failed</a>: total test units and their pass/fail counts</li>
 <li><code>highest_severity</code>: the most severe threshold level reached (‘warning’, ‘error’, ‘critical’)</li>
 <li>and many more detailed statistics</li>
 </ul>
@@ -3525,7 +3525,7 @@ Failing steps: 1
 </section>
 <section id="combining-regular-and-final-actions" class="level1">
 <h1>Combining Regular and Final Actions</h1>
-<p>You can use both <a href="`Actions`"><code>Actions</code></a> and <a href="`FinalActions`"><code>FinalActions</code></a> together for comprehensive control over your validation workflow:</p>
+<p>You can use both <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> and <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> together for comprehensive control over your validation workflow:</p>
 <div id="75c0d005" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -3946,7 +3946,7 @@ Validation complete with:
 </div>
 </div>
 </div>
-<p>This approach allows you to log individual step failures during the validation process using <a href="`Actions`"><code>Actions</code></a> and generate a comprehensive report after all validation steps are complete using <a href="`FinalActions`"><code>FinalActions</code></a>. Using both action types gives you fine-grained control over when and how notifications and other actions are triggered in your validation workflow.</p>
+<p>This approach allows you to log individual step failures during the validation process using <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> and generate a comprehensive report after all validation steps are complete using <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a>. Using both action types gives you fine-grained control over when and how notifications and other actions are triggered in your validation workflow.</p>
 </section>
 <section id="real-world-example-building-an-automated-validation-pipeline" class="level1">
 <h1>Real-World Example: Building an Automated Validation Pipeline</h1>
@@ -4484,7 +4484,7 @@ Failing steps: 2 of 3
 </section>
 <section id="wrapping-up-from-passive-validation-to-active-data-quality-management" class="level1">
 <h1>Wrapping Up: from Passive Validation to Active Data Quality Management</h1>
-<p>With <a href="`Actions`"><code>Actions</code></a> and <a href="`FinalActions`"><code>FinalActions</code></a>, Pointblank is now more of a complete data quality management system. Instead of just detecting problems, you can now:</p>
+<p>With <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> and <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a>, Pointblank is now more of a complete data quality management system. Instead of just detecting problems, you can now:</p>
 <ol type="1">
 <li>respond immediately to validation failures</li>
 <li>customize responses based on severity level</li>
@@ -4493,7 +4493,7 @@ Failing steps: 2 of 3
 <li>automate workflows based on validation results</li>
 </ol>
 <p>These capabilities transform data validation from a passive reporting activity into an active component of your data pipeline, helping ensure that data quality issues are detected, reported, and addressed efficiently.</p>
-<p>As we continue to enhance Pointblank, we’d love to hear how you’re using <a href="`Actions`"><code>Actions</code></a> and <a href="`FinalActions`"><code>FinalActions</code></a> in your workflows. Share your experiences or suggestions with us on <a href="https://discord.gg/YH7CybCNCQ">Discord</a> or file an issue on <a href="https://github.com/posit-dev/pointblank/issues">GitHub</a>.</p>
+<p>As we continue to enhance Pointblank, we’d love to hear how you’re using <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> and <a href="../../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> in your workflows. Share your experiences or suggestions with us on <a href="https://discord.gg/YH7CybCNCQ">Discord</a> or file an issue on <a href="https://github.com/posit-dev/pointblank/issues">GitHub</a>.</p>
 </section>
 <section id="learn-more" class="level1">
 <h1>Learn More</h1>
@@ -4940,13 +4940,13 @@ font-style: inherit;">"</span>)</span>
 <ul>
 <li>the <code>Validate(data=...)</code> argument takes a DataFrame (or database table) that you want to validate</li>
 <li>the methods starting with <code>col_*</code> specify validation steps that run on specific columns</li>
-<li>the <code>interrogate()</code> method executes the validation plan on the table (it’s the finishing step)</li>
+<li>the <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> method executes the validation plan on the table (it’s the finishing step)</li>
 </ul>
-<p>This common pattern is used in a validation workflow, where <a href="`Validate`"><code>Validate</code></a> and <a href="`Validate.interrogate`"><code>interrogate()</code></a> bookend a validation plan generated through calling validation methods.</p>
+<p>This common pattern is used in a validation workflow, where <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> and <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> bookend a validation plan generated through calling validation methods.</p>
 <p>Now, onto the result: it’s a table! Naturally, we’re using the awesome Great Tables package here in Pointblank to really give you the goods on how the validation went down. Each row in this reporting table represents a single validation step (one for each invocation of a <code>col_vals_*()</code> validation method). Generally speaking, the left side of the validation report tables outlines the key validation rules, and the right side provides the results of each validation step.</p>
 <p>We tried to keep it simple in principle, but a lot of useful information can be packed into this validation table. Here’s a diagram that describes a few of the important parts of the validation report table:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/intro-pointblank/validation-table-diagram.png" class="img-fluid" style="width:100.0%"></p>
-<p>All of those numbers under the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns have to do with test units, a measure of central importance in Pointblank. Each validation step will execute a type of validation test on the target table. For example, a <a href="`Validate.col_vals_lt`"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail. This little diagram explains what those numbers mean:</p>
+<p>All of those numbers under the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns have to do with test units, a measure of central importance in Pointblank. Each validation step will execute a type of validation test on the target table. For example, a <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail. This little diagram explains what those numbers mean:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/intro-pointblank/validation-test-units.png" class="img-fluid" data-text-align="center"></p>
 <p>Failing test units can be tied to threshold levels, which can provide a better indication of whether failures should raise some basic awareness or spur you into action. Here’s a validation workflow that sets three failure threshold levels that signal the severity of data quality problems:</p>
 <div id="9347a40d" class="cell" data-execution_count="2">
@@ -5705,7 +5705,7 @@ font-style: inherit;"># STEP 10</span></span>
 <section id="reporting-for-individual-validation-steps" class="level1">
 <h1>Reporting for Individual Validation Steps</h1>
 <p>The second validation step of the previous data validation showed 18 failing test units. That translates to 18 spots in a 2,000 row DataFrame where a data quality assertion failed. We often would like to know exactly what that failing data is; it’s usually the next step toward addressing data quality issues.</p>
-<p>Pointblank offers a method that gives you a tabular report on a specific step: <a href="`Validate.get_step_report`"><code>get_step_report()</code></a>. The previous tables you’ve seen (the validation report table) dealt with providing a summary of all validation steps. In contrast, a focused report on a single step can help to get to the heart of a data quality issue. Here’s how that looks for Step 2:</p>
+<p>Pointblank offers a method that gives you a tabular report on a specific step: <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a>. The previous tables you’ve seen (the validation report table) dealt with providing a summary of all validation steps. In contrast, a focused report on a single step can help to get to the heart of a data quality issue. Here’s how that looks for Step 2:</p>
 <div id="300b387b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1">validation_2.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -5958,7 +5958,7 @@ font-style: inherit;">2</span>)</span></code></pre></div>
 </div>
 </div>
 <p>This report provides the 18 rows where the failure occurred. If you scroll the table to the right you’ll see the column that underwent testing (<code>session_duration</code>) is highlighted in red. All of these values are <code>5.0</code> or less, which is in violation of the assertion (in the header) that <code>session_duration &gt; 5</code>.</p>
-<p>These types of bespoke reports are useful for finding a needle in a haystack. Another good use for a step report is when validating a table schema. Using the <a href="`Validate.col_schema_match`"><code>col_schema_match()</code></a> validation method with a table schema prepared with the <a href="`Schema`"><code>Schema</code></a> class allows us to verify our understanding of the table structure. Here is a validation that performs a schema validation with the <code>small_table</code> dataset prepared as a DuckDB table:</p>
+<p>These types of bespoke reports are useful for finding a needle in a haystack. Another good use for a step report is when validating a table schema. Using the <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation method with a table schema prepared with the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> class allows us to verify our understanding of the table structure. Here is a validation that performs a schema validation with the <code>small_table</code> dataset prepared as a DuckDB table:</p>
 <div id="62a51535" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><span class="im" style="color: #00769E;
 background-color: null;
@@ -6395,7 +6395,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 </div>
-<p>This step fails, but the validation report table doesn’t tell us how (or where). Using <a href="`Validate.get_step_report`"><code>get_step_report()</code></a> will show us what the underlying issues are:</p>
+<p>This step fails, but the validation report table doesn’t tell us how (or where). Using <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a> will show us what the underlying issues are:</p>
 <div id="edba68b1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1">validation_3.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;

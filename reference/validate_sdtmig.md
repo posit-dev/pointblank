@@ -8,7 +8,11 @@ Usage
 
 ``` python
 validate_sdtmig(
-    datasets, version="3-4", ct_packages=None, define_xml=None, study_id=None
+    datasets,
+    version="3-4",
+    ct_packages=None,
+    define_xml=None,
+    study_id=None,
 )
 ```
 
@@ -59,7 +63,7 @@ Optional study identifier (e.g., `"CDISCPILOT01"`) shown in the report header.
 
 
 `ConformanceReport`  
-A built-in engine report ([is_rules](ConformanceReport.md#pointblank.ConformanceReport.is_rules) is `True`). In Jupyter and Quarto notebooks the object renders automatically as the rule-level summary table. Call [get_tabular_report()](Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) for the `GT` object, [get_findings_table()](ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) for a record-level drill-down, or [findings_df()](ConformanceReport.md#pointblank.ConformanceReport.findings_df) for a Polars DataFrame of failing rows.
+A built-in engine report ([is_rules](ConformanceReport.md#pointblank.ConformanceReport.is_rules) is `True`). In Jupyter and Quarto notebooks the object renders automatically as the rule-level summary table. Call `get_tabular_report()` for the `GT` object, [get_findings_table()](ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) for a record-level drill-down, or [findings_df()](ConformanceReport.md#pointblank.ConformanceReport.findings_df) for a Polars DataFrame of failing rows.
 
 
 ## Examples

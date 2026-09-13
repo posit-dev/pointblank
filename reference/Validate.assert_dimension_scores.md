@@ -14,14 +14,14 @@ Validate.assert_dimension_scores(
 ```
 
 
-The [assert_dimension_scores()](Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) method checks each data quality dimension's score (from <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a>) against a minimum acceptable value. This is useful in automated testing and CI environments where you want to fail the run when, say, the completeness score drops below `95`.
+The [assert_dimension_scores()](Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) method checks each data quality dimension's score (from <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a>) against a minimum acceptable value. This is useful in automated testing and CI environments where you want to fail the run when, say, the completeness score drops below `95`.
 
 
 ## Parameters
 
 
 `thresholds: dict[str, float] | None = None`  
-A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`, the minimums set via [`config(dimension_thresholds=...)`](%60pointblank.config%60) are used. A dimension present in the thresholds but absent from the validation is ignored.
+A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`, the minimums set via `config(dimension_thresholds=...)` are used. A dimension present in the thresholds but absent from the validation is ignored.
 
 `message: str | None = None`  
 Custom error message to use if the assertion fails. If `None`, a default message that lists the offending dimensions (with actual vs. required scores) is generated.
@@ -58,8 +58,8 @@ validation.assert_dimension_scores(thresholds={"completeness": 95})
 
 ## See Also
 
-[](%60~Use%60) <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> to retrieve the  
+`Use` <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> to retrieve the  
 
-[](%60~scores%60) without raising, and [`config()`](%60pointblank.config%60) to set default per-dimension  
+`scores` without raising, and `config()` to set default per-dimension  
 
-[](%60~thresholds%60) globally.
+`thresholds` globally.

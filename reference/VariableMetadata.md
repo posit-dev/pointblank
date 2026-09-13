@@ -35,7 +35,7 @@ VariableMetadata(
     adam_derivation=None,
     traceability_ref=None,
     unit=None,
-    unit_system=None
+    unit_system=None,
 )
 ```
 
@@ -132,7 +132,7 @@ Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
 
 | Name | Description |
 |----|----|
-| [to_missing_spec()](#to_missing_spec) | Build a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values. |
+| [to_missing_spec()](#to_missing_spec) | Build a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values. |
 
 ------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
 ### to_missing_spec()
 
 
-Build a <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values.
+Build a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values.
 
 
 Usage

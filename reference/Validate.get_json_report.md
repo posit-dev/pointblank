@@ -53,7 +53,7 @@ The JSON report can include any of the standard validation report fields, includ
 - `label`: custom label for the validation step
 - `brief`: a brief description of the validation step
 - `active`: whether the validation step is active
-- [all_passed](Validate.all_passed.md#pointblank.Validate.all_passed): whether all test units passed in the step
+- `all_passed`: whether all test units passed in the step
 - [n](Validate.n.md#pointblank.Validate.n): total number of test units
 - [n_passed](Validate.n_passed.md#pointblank.Validate.n_passed), [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed): number of test units that passed and failed
 - [f_passed](Validate.f_passed.md#pointblank.Validate.f_passed), [f_failed](Validate.f_failed.md#pointblank.Validate.f_failed): Fraction of test units that passed and failed
@@ -117,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-09-02T12:46:28.899+00:00",
-            "proc_duration_s": 0.006857
+            "time_processed": "2026-09-13T03:56:51.104+00:00",
+            "proc_duration_s": 0.006584
         },
         {
             "i": 2,
@@ -144,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-09-02T12:46:28.902+00:00",
-            "proc_duration_s": 0.002587
+            "time_processed": "2026-09-13T03:56:51.107+00:00",
+            "proc_duration_s": 0.002502
         }
     ]
 
@@ -250,13 +250,13 @@ print(f"Number of failing validation steps: {len(failing_steps)}")
 
 ## See Also
 
-- <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>
+- <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>
 
 : Get a formatted HTML
 
-[](%60~report%60) as a GT table  
+`report` as a GT table  
 
-\- <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>  
+\- <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>  
 Get rows that
 
-[](%60~failed%60) validation
+`failed` validation

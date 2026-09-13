@@ -13,7 +13,7 @@ write_file(
     path=None,
     keep_tbl=False,
     keep_extracts=False,
-    quiet=False
+    quiet=False,
 )
 ```
 
@@ -265,6 +265,6 @@ When you load this validation in a new session, simply import the preprocessing 
 
 ## See Also
 
-[](%60~Use%60) the <a href="read_file.html#pointblank.read_file" class="gdls-link"><code>read_file()</code></a> function to load a validation object that was  
+`Use` the <a href="../reference/read_file.html#pointblank.read_file" class="gdls-link"><code>read_file()</code></a> function to load a validation object that was  
 
-[](%60~previously%60) saved with [write_file()](write_file.md#pointblank.write_file).
+`previously` saved with [write_file()](write_file.md#pointblank.write_file).

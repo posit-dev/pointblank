@@ -68,7 +68,7 @@ When using connection strings, the Ibis library with the appropriate backend dri
 
 ## Examples
 
-To get the number of columns in a table, we can use the [get_column_count()](get_column_count.md#pointblank.get_column_count) function. Here's an example using the `small_table` dataset (itself loaded using the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
+To get the number of columns in a table, we can use the [get_column_count()](get_column_count.md#pointblank.get_column_count) function. Here's an example using the `small_table` dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
 
 
 ``` python

@@ -13,7 +13,7 @@ ADaMDatasetTemplate(
     description,
     dataset_class,
     variables=list(),
-    natural_keys=list()
+    natural_keys=list(),
 )
 ```
 

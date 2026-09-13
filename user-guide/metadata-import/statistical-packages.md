@@ -186,7 +186,7 @@ for var in meta.variables:
 
 ## Length Constraints
 
-Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as `max_length` constraints on the [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object. When you call [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate), variables with length constraints get a [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) step that checks string length does not exceed the specified maximum.
+Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as `max_length` constraints on the [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object. When you call `to_validate()`, variables with length constraints get a [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) step that checks string length does not exceed the specified maximum.
 
 This is particularly important for CDISC submissions where variable lengths are strictly defined in the submission specification. A variable defined as `$200.` (200 characters) must not contain values longer than 200 characters, and Pointblank will flag any violations.
 
@@ -252,7 +252,7 @@ The distinction between integer and floating-point types is preserved, which pro
 
 # Generating Validation from Statistical Metadata
 
-Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate) method examines every variable's constraints and creates the appropriate validation steps.
+Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The `to_validate()` method examines every variable's constraints and creates the appropriate validation steps.
 
 For a typical SPSS file with value labels and types defined, the generated validation includes:
 
@@ -277,7 +277,7 @@ lightweight = (
 )
 ```
 
-You can also combine metadata-generated validation with your own custom steps. The [to_validate()](../../reference/Contract.md#pointblank.Contract.to_validate) method returns an un-interrogated [Validate](../../reference/Validate.md#pointblank.Validate) object, so you can chain additional methods before calling `.interrogate()`:
+You can also combine metadata-generated validation with your own custom steps. The `to_validate()` method returns an un-interrogated [Validate](../../reference/Validate.md#pointblank.Validate) object, so you can chain additional methods before calling `.interrogate()`:
 
 ``` python
 meta = pb.import_metadata("survey.sav")

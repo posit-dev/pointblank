@@ -4,7 +4,7 @@
 ## Validate
 
 
-When performing data validation, use the `Validate` class to get the process started. It takes the target table and options for metadata and failure thresholds (using the `Thresholds` class or shorthands). The `Validate` class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.
+When performing data validation, use the [Validate](Validate.md#pointblank.Validate) class to get the process started. It takes the target table and options for metadata and failure thresholds (using the [Thresholds](Thresholds.md#pointblank.Thresholds) class or shorthands). The [Validate](Validate.md#pointblank.Validate) class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.
 
 
 [Validate](Validate.md#pointblank.Validate)  
@@ -35,7 +35,7 @@ Specification for structured missing values in a column.
 ## Contracts and Pipelines
 
 
-Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+Use [Contract](Contract.md#pointblank.Contract) and [Step](Step.md#pointblank.Step) to define declarative data quality contracts that specify what valid data looks like. Use [Steps](Steps.md#pointblank.Steps) to build reusable step libraries with a fluent API and compose them into [Validate](Validate.md#pointblank.Validate) plans via `add_steps()`. Use [Pipeline](Pipeline.md#pointblank.Pipeline) to enforce contracts at both boundaries of a data transformation (source and target), producing a [PipelineResult](PipelineResult.md#pointblank.PipelineResult) with full introspection into what passed and what failed.
 
 
 [Contract](Contract.md#pointblank.Contract)  
@@ -43,6 +43,9 @@ A declarative boundary contract for pipeline data.
 
 [Step](Step.md#pointblank.Step)  
 A single validation step in a Contract, defined declaratively.
+
+[Steps](Steps.md#pointblank.Steps)  
+A reusable collection of validation step definitions.
 
 [Pipeline](Pipeline.md#pointblank.Pipeline)  
 Binds source and target contracts into a pipeline boundary enforcement unit.
@@ -54,7 +57,7 @@ Result of a pipeline boundary validation run.
 ## Contract Import/Export
 
 
-Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
+Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and [register_adapter()](register_adapter.md#pointblank.register_adapter) to add support for custom formats.
 
 
 [import_contract()](import_contract.md#pointblank.import_contract)  
@@ -79,7 +82,7 @@ Base class for contract import/export adapters.
 ## Validation Steps
 
 
-Validation steps are sequential validations on the target data. Call `Validate`'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
+Validation steps are sequential validations on the target data. Call [Validate](Validate.md#pointblank.Validate)'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
 
 
 [Validate.col_vals_gt()](Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)  
@@ -243,7 +246,7 @@ Does the column standard deviation satisfy an equal to comparison?
 ## Column Selection
 
 
-Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
+Use the [col()](col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](col.md#pointblank.col) with [starts_with()](starts_with.md#pointblank.starts_with), [matches()](matches.md#pointblank.matches), etc. for selecting multiple target columns.
 
 
 [col()](col.md#pointblank.col)  
@@ -265,13 +268,13 @@ Select columns that match a specified regular expression pattern.
 Select all columns.
 
 [first_n()](first_n.md#pointblank.first_n)  
-Select the first `n` columns in the column list.
+Select the first [n](Validate.n.md#pointblank.Validate.n) columns in the column list.
 
 [last_n()](last_n.md#pointblank.last_n)  
-Select the last `n` columns in the column list.
+Select the last [n](Validate.n.md#pointblank.Validate.n) columns in the column list.
 
 [expr_col()](expr_col.md#pointblank.expr_col)  
-Create a column expression for use in `conjointly()` validation.
+Create a column expression for use in [conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly) validation.
 
 
 ## Segment Groups
@@ -287,7 +290,7 @@ Group together values for segmentation.
 ## Interrogation and Reporting
 
 
-The validation plan is executed when `interrogate()` is called. After interrogation, view validation reports, extract metrics, or split data based on results.
+The validation plan is executed when [interrogate()](Validate.interrogate.md#pointblank.Validate.interrogate) is called. After interrogation, view validation reports, extract metrics, or split data based on results.
 
 
 [Validate.interrogate()](Validate.interrogate.md#pointblank.Validate.interrogate)  
@@ -312,7 +315,7 @@ Get a report of the validation results as a DataFrame.
 Render this validation plan as canonical Pointblank Python code.
 
 [Validate.to_yaml()](Validate.to_yaml.md#pointblank.Validate.to_yaml)  
-Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
+Serialize this validation plan to a [yaml_interrogate()](yaml_interrogate.md#pointblank.yaml_interrogate)-compatible YAML config.
 
 [Validate.to_json_schema()](Validate.to_json_schema.md#pointblank.Validate.to_json_schema)  
 Export this validation plan as a JSON Schema document.
@@ -381,14 +384,14 @@ Get the 'critical' level status for each validation step.
 ## Inspection and Assistance
 
 
-Functions for getting to grips with a new data table. Use `DataScan` for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
+Functions for getting to grips with a new data table. Use [DataScan](DataScan.md#pointblank.DataScan) for a quick overview, [preview()](preview.md#pointblank.preview) for first/last rows, [col_summary_tbl()](col_summary_tbl.md#pointblank.col_summary_tbl) for column summaries, and [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) for missing value analysis.
 
 
 [DataScan](DataScan.md#pointblank.DataScan)  
 Get a summary of a dataset.
 
 [DataScanDiff](DataScanDiff.md#pointblank.DataScanDiff)  
-The result of comparing two `DataScan` profiles.
+The result of comparing two [DataScan](DataScan.md#pointblank.DataScan) profiles.
 
 [preview()](preview.md#pointblank.preview)  
 Display a table preview that shows some rows from the top, some from the bottom.
@@ -432,13 +435,13 @@ Export the profile as a JSON string.
 Save the profile to a JSON file.
 
 [DataScan.from_dict()](DataScan.from_dict.md#pointblank.DataScan.from_dict)  
-Restore a `DataScan` from a dictionary produced by `to_dict()`.
+Restore a [DataScan](DataScan.md#pointblank.DataScan) from a dictionary produced by `to_dict()`.
 
 [DataScan.from_json()](DataScan.from_json.md#pointblank.DataScan.from_json)  
-Restore a `DataScan` from a JSON string produced by `to_json()`.
+Restore a [DataScan](DataScan.md#pointblank.DataScan) from a JSON string produced by `to_json()`.
 
 [DataScan.load_from_json()](DataScan.load_from_json.md#pointblank.DataScan.load_from_json)  
-Load a `DataScan` from a JSON file produced by `save_to_json()`.
+Load a [DataScan](DataScan.md#pointblank.DataScan) from a JSON file produced by [save_to_json()](DataScan.save_to_json.md#pointblank.DataScan.save_to_json).
 
 [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
 Compare this scan against a baseline and return the differences.
@@ -495,7 +498,7 @@ Access validation summary information when authoring final actions.
 Write a Validate object to disk as a serialized file.
 
 [read_file()](read_file.md#pointblank.read_file)  
-Read a Validate object from disk that was previously saved with `write_file()`.
+Read a Validate object from disk that was previously saved with [write_file()](write_file.md#pointblank.write_file).
 
 [ref()](ref.md#pointblank.ref)  
 Reference a column from the reference data for aggregate comparisons.
@@ -504,7 +507,7 @@ Reference a column from the reference data for aggregate comparisons.
 ## Test Data Generation
 
 
-Generate synthetic test data based on schema definitions. Use `generate_dataset()` to create data from a Schema object, or `schema_from_tbl()` to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).
+Generate synthetic test data based on schema definitions. Use [generate_dataset()](generate_dataset.md#pointblank.generate_dataset) to create data from a Schema object, or [schema_from_tbl()](schema_from_tbl.md#pointblank.schema_from_tbl) to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).
 
 
 [generate_dataset()](generate_dataset.md#pointblank.generate_dataset)  
@@ -551,13 +554,13 @@ Prebuilt action functions for common notification patterns.
 Create a Slack notification function using a webhook URL.
 
 [emit_otel()](emit_otel.md#pointblank.emit_otel)  
-Create an OTel export action for use in `FinalActions`.
+Create an OTel export action for use in [FinalActions](FinalActions.md#pointblank.FinalActions).
 
 
 ## Metadata Import/Export
 
 
-Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for the reverse.
+Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use [import_metadata()](import_metadata.md#pointblank.import_metadata) as the entry point and [export_metadata()](export_metadata.md#pointblank.export_metadata) for the reverse.
 
 
 [import_metadata()](import_metadata.md#pointblank.import_metadata)  
@@ -570,7 +573,7 @@ Export metadata to an external standard format.
 Parsed metadata from an external standard.
 
 [MetadataPackage](MetadataPackage.md#pointblank.MetadataPackage)  
-A collection of `MetadataImport` objects from a multi-dataset source.
+A collection of [MetadataImport](MetadataImport.md#pointblank.MetadataImport) objects from a multi-dataset source.
 
 [VariableMetadata](VariableMetadata.md#pointblank.VariableMetadata)  
 Metadata for a single variable/column, as imported from an external standard.
@@ -588,7 +591,7 @@ A structured missing value definition from an external standard.
 ## SDTM Validation
 
 
-Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sdtm()` to generate a full `Validate` workflow, or `validate_sdtm_structure()` for a quick structural conformance check. Retrieve domain templates with `get_sdtm_domain()` and `list_sdtm_domains()`.
+Validate clinical datasets against CDISC SDTM domain templates. Use [validate_sdtm()](validate_sdtm.md#pointblank.validate_sdtm) to generate a full [Validate](Validate.md#pointblank.Validate) workflow, or [validate_sdtm_structure()](validate_sdtm_structure.md#pointblank.validate_sdtm_structure) for a quick structural conformance check. Retrieve domain templates with [get_sdtm_domain()](get_sdtm_domain.md#pointblank.get_sdtm_domain) and [list_sdtm_domains()](list_sdtm_domains.md#pointblank.list_sdtm_domains).
 
 
 [validate_sdtm()](validate_sdtm.md#pointblank.validate_sdtm)  
@@ -598,7 +601,7 @@ Generate a comprehensive SDTM validation workflow for a dataset.
 Validate the structural conformance of a dataset against an SDTM domain template.
 
 [sdtm_to_metadata()](sdtm_to_metadata.md#pointblank.sdtm_to_metadata)  
-Convert an SDTM domain template to a `MetadataImport` object.
+Convert an SDTM domain template to a [MetadataImport](MetadataImport.md#pointblank.MetadataImport) object.
 
 [get_sdtm_domain()](get_sdtm_domain.md#pointblank.get_sdtm_domain)  
 Get the SDTM template for a specific domain.
@@ -616,7 +619,7 @@ Specification for a single variable in an SDTM domain template.
 ## ADaM Validation
 
 
-Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` to generate a full `Validate` workflow, or `validate_adam_structure()` for a quick structural conformance check. Retrieve dataset templates with `get_adam_dataset()` and `list_adam_datasets()`.
+Validate analysis datasets against CDISC ADaM templates. Use [validate_adam()](validate_adam.md#pointblank.validate_adam) to generate a full [Validate](Validate.md#pointblank.Validate) workflow, or [validate_adam_structure()](validate_adam_structure.md#pointblank.validate_adam_structure) for a quick structural conformance check. Retrieve dataset templates with [get_adam_dataset()](get_adam_dataset.md#pointblank.get_adam_dataset) and [list_adam_datasets()](list_adam_datasets.md#pointblank.list_adam_datasets).
 
 
 [validate_adam()](validate_adam.md#pointblank.validate_adam)  
@@ -644,7 +647,7 @@ Specification for a single variable in an ADaM dataset template.
 ## CDISC Submission Conformance
 
 
-Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP- linkage, Define-XML) use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
+Validate SDTM datasets for CDISC conformance. [validate_sdtmig()](validate_sdtmig.md#pointblank.validate_sdtmig) is the primary entry point: pass a dictionary of domain DataFrames and receive a [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport) with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP- linkage, Define-XML) use [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage). For the authoritative CDISC-certified rule set, use [validate_cdisc_submission()](validate_cdisc_submission.md#pointblank.validate_cdisc_submission) (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport).
 
 
 [validate_sdtmig()](validate_sdtmig.md#pointblank.validate_sdtmig)  
@@ -663,7 +666,7 @@ The result of a CDISC conformance validation run.
 ## Integrations
 
 
-Classes for integrating Pointblank with external observability and monitoring systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.
+Classes for integrating Pointblank with external observability and monitoring systems. Use [OTelExporter](integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) to export validation results as OpenTelemetry metrics, traces, and logs.
 
 
 [integrations.otel.OTelExporter](integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter)  

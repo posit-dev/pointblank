@@ -14,7 +14,7 @@ sdtm_to_metadata(
 ```
 
 
-This allows using the standard metadata pipeline ([to_schema](MetadataImport.md#pointblank.MetadataImport.to_schema), [to_validate](Contract.md#pointblank.Contract.to_validate)) with SDTM domain specifications.
+This allows using the standard metadata pipeline ([to_schema](MetadataImport.md#pointblank.MetadataImport.to_schema), `to_validate`) with SDTM domain specifications.
 
 
 ## Parameters

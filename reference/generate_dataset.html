@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1525,7 +1531,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">output</span><span class="op">=</span><span class="st">"polars"</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">country</span><span class="op">=</span><span class="st">"US"</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">shuffle</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">weighted</span><span class="op">=</span><span class="cn-bool">True</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">weighted</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1537,7 +1543,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">schema</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Schema</span></code></dt>
 <dd>
-<p>The schema object defining the structure and constraints of the data to generate. Each column can be specified using a field helper function (e.g., <a href="int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>) for fine-grained control, or as a simple dtype string (e.g., <code>"Int64"</code>, <code>"String"</code>) for unconstrained generation.</p>
+<p>The schema object defining the structure and constraints of the data to generate. Each column can be specified using a field helper function (e.g., <a href="../reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>) for fine-grained control, or as a simple dtype string (e.g., <code>"Int64"</code>, <code>"String"</code>) for unconstrained generation.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">n</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">100</span></span></code></dt>
 <dd>
@@ -1594,7 +1600,7 @@ If required optional dependencies are not installed.
 </section>
 <section id="presets-and-the-country-parameter" class="level2 doc-presets-and-the-country-parameter">
 <h2 class="doc-presets-and-the-country-parameter anchored" data-anchor-id="presets-and-the-country-parameter">Presets And The <code>country=</code> Parameter</h2>
-<p>Several <a href="string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a> presets produce locale-aware data that varies depending on the <code>country=</code> parameter. The following presets are particularly affected:</p>
+<p>Several <a href="../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a> presets produce locale-aware data that varies depending on the <code>country=</code> parameter. The following presets are particularly affected:</p>
 <ul>
 <li><strong>Address-related presets</strong> (<code>"address"</code>, <code>"city"</code>, <code>"state"</code>, <code>"postcode"</code>, <code>"phone_number"</code>, <code>"latitude"</code>, <code>"longitude"</code>, <code>"license_plate"</code>): produce addresses, cities, postal codes, phone numbers, and license plates formatted for the specified country. For example, <code>country="DE"</code> yields German street names and PLZ postal codes, while <code>country="JP"</code> yields Japanese addresses. License plates for CA, US, DE, AU, and GB use province/state-specific formats when location fields are present.</li>
 <li><strong>Person-related presets</strong> (<code>"name"</code>, <code>"name_full"</code>, <code>"first_name"</code>, <code>"last_name"</code>, <code>"email"</code>, <code>"user_name"</code>) produce culturally appropriate names for the specified country. For example, <code>country="FR"</code> produces French names, while <code>country="KR"</code> produces Korean names.</li>
@@ -1622,7 +1628,7 @@ If required optional dependencies are not installed.
 </section>
 <section id="pytest-fixture" class="level2 doc-pytest-fixture">
 <h2 class="doc-pytest-fixture anchored" data-anchor-id="pytest-fixture">Pytest Fixture</h2>
-<p>When Pointblank is installed, a <a href="generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture is automatically available in all test files: no imports or <code>conftest.py</code> setup required. The fixture behaves identically to this function, but derives a deterministic seed from the test’s fully-qualified name when <code>seed=</code> is not provided.</p>
+<p>When Pointblank is installed, a <a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture is automatically available in all test files: no imports or <code>conftest.py</code> setup required. The fixture behaves identically to this function, but derives a deterministic seed from the test’s fully-qualified name when <code>seed=</code> is not provided.</p>
 <p>This means:</p>
 <ul>
 <li>the <strong>same test</strong> always produces the <strong>same data</strong>, with no manual seed management.</li>
@@ -1661,7 +1667,7 @@ If required optional dependencies are not installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here we define a schema with field constraints and generate test data from it:</p>
-<div id="6c703177" class="cell" data-execution_count="1">
+<div id="4e73bac5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1839,7 +1845,7 @@ If required optional dependencies are not installed.
 </div>
 </div>
 <p>It’s also possible to generate data from a simple, dtype-only schema. Setting <code>output="pandas"</code> returns a Pandas DataFrame:</p>
-<div id="42252906" class="cell" data-execution_count="2">
+<div id="4a0f23ac" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, active<span class="op">=</span><span class="st">"Boolean"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>))</span></code></pre></div>
@@ -1998,7 +2004,7 @@ If required optional dependencies are not installed.
 </div>
 </div>
 <p>When using presets, the <code>country=</code> parameter controls the locale. Here, <code>country="DE"</code> produces German names and addresses:</p>
-<div id="587da4d9" class="cell" data-execution_count="3">
+<div id="68c8bef4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    address<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"address"</span>),</span>
@@ -2161,7 +2167,7 @@ If required optional dependencies are not installed.
 </div>
 </div>
 <p>We can combine several field types with nullable columns in a mixed-type dataset:</p>
-<div id="ac9a1dc4" class="cell" data-execution_count="4">
+<div id="25b1b8c9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, timedelta</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>

@@ -14,7 +14,7 @@ Validate.conjointly(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
@@ -37,13 +37,13 @@ An optional preprocessing function or lambda to apply to the data table during i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will be set locally and global thresholds (if any) will take effect. Look at the *Thresholds* section for information on how to set threshold levels.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
 
 `active: bool | Callable = ``True`  
-A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
 
 `dimension: str | None = None`  
 An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
@@ -71,7 +71,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. The thresh
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only
@@ -492,7 +492,7 @@ conjointly()
 </div></td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden"></td>
 <td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">COLUMN EXPR</td>
-ZD0iTTE4LjQzMzM2MDEsLTAuNjQwMjg3NTg4IEwxOC40MzMzNjAxLDE0LjU4ODI5NTIgTDkuNTIxMzExMzEsMTQuNTg4Mjk1MiBMMTEuMzcxNjE1MSwxNS45ODA5OTcgQzExLjY1NzYxNjUsMTYuMTk0ODc2NSAxMS43MTQ4MTY5LDE2LjYwMDI1MTggMTEuNTAwOTM3NCwxNi44ODYyNTMyIEMxMS4yODcwNTg1LDE3LjE3MjI1NDYgMTAuODgxNjgyNywxNy4yMjk0NTUgMTAuNTk1NjgxMywxNy4wMTU1NzU1IEwxMC41OTU2ODEzLDE3LjAxNTU3NTUgTDcuMjMzMzAxMjYsMTQuNDY4OTIwOCBDNy4wNjY2NzQyOSwxNC4zNDk1NDY0IDYuOTY3MTk1NTksMTQuMTU1NTYzMiA2Ljk2NzE5NTU5LDEzLjk1MTYzMTYgQzYuOTY3MTk1NTksMTMuNzQ3NzAwNiA3LjA2NjY3NDI5LDEzLjU1MzcxNjggNy4yMzMzMDEyNiwxMy40MzQzNDI0IEw3LjIzMzMwMTI2LDEzLjQzNDM0MjQgTDEwLjU5NTY4MTMsMTAuODg3Njg3NyBDMTAuNjc3NzUxLDEwLjgyNTUxMzcgMTAuNzcyMjU2MSwxMC43ODU3MjIyIDEwLjg3NDIyMTYsMTAuNzY4MzEzMiBDMTAuODk5MDkxNiwxMC43NjA4NTIyIDEwLjkyNjQ0NzgsMTAuNzUzMzkxOCAxMC45NTM4MDQ2LDEwLjc0ODQxNzUgQzExLjI1MjI0MDcsMTAuNzA4NjI2IDExLjUzODI0MjEsMTAuODgyNzE0MSAxMS42Mzc3MjA4LDExLjE2NjIyOCBDMTEuNzM5Njg2MywxMS40NDk3NDI2IDExLjYyNzc3MjksMTEuNzY1NTg3IDExLjM3MTYxNTEsMTEuOTIyMjY2MSBMMTEuMzcxNjE1MSwxMS45MjIyNjYxIEw5LjUyMTMxMTMxLDEzLjMxNDk2NzkgTDE3LjE1OTM1MzMsMTMuMzE0NzEyNCBMMTcuMTU5NDU3NywwLjYzMzYxNDgyOCBMNi45MjgzNTMzLDAuNjMzNjE0ODI4IEw2LjkyODM1MzMsLTAuNjQwMjg3NTg4IEwxOC40MzMzNjAxLC0wLjY0MDI4NzU4OCBaIiBpZD0iYXJyb3ciIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLjY4MDg1NywgOC4yNTIyODYpIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTEyLjY4MDg1NywgLTguMjUyMjg2KSAiIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" /></td>
+uOTgyODIwMyBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTE4LjQzMzM2MDEsLTAuNjQwMjg3NTg4IEwxOC40MzMzNjAxLDE0LjU4ODI5NTIgTDkuNTIxMzExMzEsMTQuNTg4Mjk1MiBMMTEuMzcxNjE1MSwxNS45ODA5OTcgQzExLjY1NzYxNjUsMTYuMTk0ODc2NSAxMS43MTQ4MTY5LDE2LjYwMDI1MTggMTEuNTAwOTM3NCwxNi44ODYyNTMyIEMxMS4yODcwNTg1LDE3LjE3MjI1NDYgMTAuODgxNjgyNywxNy4yMjk0NTUgMTAuNTk1NjgxMywxNy4wMTU1NzU1IEwxMC41OTU2ODEzLDE3LjAxNTU3NTUgTDcuMjMzMzAxMjYsMTQuNDY4OTIwOCBDNy4wNjY2NzQyOSwxNC4zNDk1NDY0IDYuOTY3MTk1NTksMTQuMTU1NTYzMiA2Ljk2NzE5NTU5LDEzLjk1MTYzMTYgQzYuOTY3MTk1NTksMTMuNzQ3NzAwNiA3LjA2NjY3NDI5LDEzLjU1MzcxNjggNy4yMzMzMDEyNiwxMy40MzQzNDI0IEw3LjIzMzMwMTI2LDEzLjQzNDM0MjQgTDEwLjU5NTY4MTMsMTAuODg3Njg3NyBDMTAuNjc3NzUxLDEwLjgyNTUxMzcgMTAuNzcyMjU2MSwxMC43ODU3MjIyIDEwLjg3NDIyMTYsMTAuNzY4MzEzMiBDMTAuODk5MDkxNiwxMC43NjA4NTIyIDEwLjkyNjQ0NzgsMTAuNzUzMzkxOCAxMC45NTM4MDQ2LDEwLjc0ODQxNzUgQzExLjI1MjI0MDcsMTAuNzA4NjI2IDExLjUzODI0MjEsMTAuODgyNzE0MSAxMS42Mzc3MjA4LDExLjE2NjIyOCBDMTEuNzM5Njg2MywxMS40NDk3NDI2IDExLjYyNzc3MjksMTEuNzY1NTg3IDExLjM3MTYxNTEsMTEuOTIyMjY2MSBMMTEuMzcxNjE1MSwxMS45MjIyNjYxIEw5LjUyMTMxMTMxLDEzLjMxNDk2NzkgTDE3LjE1OTM1MzMsMTMuMzE0NzEyNCBMMTcuMTU5NDU3NywwLjYzMzYxNDgyOCBMNi45MjgzNTMzLDAuNjMzNjE0ODI4IEw2LjkyODM1MzMsLTAuNjQwMjg3NTg4IEwxOC40MzMzNjAxLC0wLjY0MDI4NzU4OCBaIiBpZD0iYXJyb3ciIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLjY4MDg1NywgOC4yNTIyODYpIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTEyLjY4MDg1NywgLTguMjUyMjg2KSAiIC8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" /></td>
 <td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3"><span style="color:#4CA64C;">✓</span></td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px">4</td>
 <td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">1<br />
@@ -518,7 +518,7 @@ ZD0iTTE4LjQzMzM2MDEsLTAuNjQwMjg3NTg4IEwxOC40MzMzNjAxLDE0LjU4ODI5NTIgTDkuNTIxMzEx
 
 This allows for more complex validation scenarios where the data is first prepared and then validated against multiple conditions simultaneously.
 
-Or, you can use the backend-agnostic column expression helper <a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> to write expressions that work across different table backends:
+Or, you can use the backend-agnostic column expression helper <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> to write expressions that work across different table backends:
 
 
 ``` python
@@ -657,11 +657,11 @@ conjointly()
 </table>
 
 
-Using <a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> allows your validation code to work consistently across Pandas, Polars, and Ibis table backends without changes, making your validation pipelines more portable.
+Using <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> allows your validation code to work consistently across Pandas, Polars, and Ibis table backends without changes, making your validation pipelines more portable.
 
 
 ## See Also
 
-[](%60~Look%60) at the documentation of the <a href="expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function for more  
+`Look` at the documentation of the <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function for more  
 
-[](%60~information%60) on how to use it with different table backends.
+`information` on how to use it with different table backends.

@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -313,6 +313,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1476,7 +1482,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#types-of-actions" id="toc-types-of-actions" class="nav-link" data-scroll-target="#types-of-actions">Types Of Actions</a></li>
-  <li><a href="#crafting-callables-with-get_validation_summary" id="toc-crafting-callables-with-get_validation_summary" class="nav-link" data-scroll-target="#crafting-callables-with-get_validation_summary">Crafting Callables With <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a></a></li>
+  <li><a href="#crafting-callables-with-get_validation_summary" id="toc-crafting-callables-with-get_validation_summary" class="nav-link" data-scroll-target="#crafting-callables-with-get_validation_summary">Crafting Callables With get_validation_summary()</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
@@ -1534,7 +1540,7 @@ One or more actions to execute after validation. An action can be (1) a callable
 <dl>
 <dt><code> <span class="doc-parameter-annotation">FinalActions</span></code></dt>
 <dd>
-An <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> object. This can be used when using the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set final actions for the validation workflow).
+An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set final actions for the validation workflow).
 </dd>
 </dl>
 </div>
@@ -1546,11 +1552,11 @@ An <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-cod
 <li><strong>String</strong>: A message to be displayed when the validation is complete.</li>
 <li><strong>Callable</strong>: A function that is called when the validation is complete.</li>
 </ol>
-<p>The actions are executed at the end of the validation workflow. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of validation completion. Several strings and callables can be provided to the <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, and they will be executed in the order they are provided.</p>
+<p>The actions are executed at the end of the validation workflow. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of validation completion. Several strings and callables can be provided to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, and they will be executed in the order they are provided.</p>
 </section>
 <section id="crafting-callables-with-get_validation_summary" class="level2 doc-crafting-callables-with-getvalidationsummary">
-<h2 class="doc-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables With <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a></h2>
-<p>When creating a callable function to be used as a final action, you can use the <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.</p>
+<h2 class="doc-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables With <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a></h2>
+<p>When creating a callable function to be used as a final action, you can use the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
@@ -1571,7 +1577,7 @@ An <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-cod
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>In this example, the <code>send_alert()</code> function is defined to check the validation summary for critical failures. If any are found, an alert message is printed to the console. The function is passed to the <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.</p>
+<p>In this example, the <code>send_alert()</code> function is defined to check the validation summary for critical failures. If any are found, an alert message is printed to the console. The function is passed to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.</p>
 <p>Multiple final actions can be provided in a sequence. They will be executed in the order they are specified after all validation steps have completed:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
@@ -1589,11 +1595,11 @@ An <a href="FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-cod
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <dl>
-<dt><a href="`~The`"></a> <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which can be</dt>
+<dt><code>The</code> <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which can be</dt>
 <dd>
 
 </dd>
-<dt><a href="`~used`"></a> to retrieve the summary of the validation results.</dt>
+<dt><code>used</code> to retrieve the summary of the validation results.</dt>
 <dd>
 
 </dd>

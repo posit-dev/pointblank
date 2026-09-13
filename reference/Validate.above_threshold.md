@@ -14,7 +14,7 @@ Validate.above_threshold(
 ```
 
 
-The [above_threshold()](Validate.above_threshold.md#pointblank.Validate.above_threshold) method checks whether validation steps exceed a given threshold level. This provides a non-exception-based alternative to <a href="Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a> for conditional workflow control based on validation results.
+The [above_threshold()](Validate.above_threshold.md#pointblank.Validate.above_threshold) method checks whether validation steps exceed a given threshold level. This provides a non-exception-based alternative to <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a> for conditional workflow control based on validation results.
 
 This method is useful in scenarios where you want to check if any validation steps failed beyond a certain threshold without raising an exception, allowing for more flexible programmatic responses to validation issues.
 
@@ -274,21 +274,21 @@ Note that this is just a suggestion for how to implement conditional workflow pr
 
 ## See Also
 
-- <a href="Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a>
+- <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a>
 
 : a similar
 
-[](%60~method%60) that raises an exception if thresholds are exceeded  
+`method` that raises an exception if thresholds are exceeded  
 
-\- <a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>  
+\- <a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a>  
 get the 'warning' status for each validation
 
-[](%60~step%60)  
+`step`  
 
-\- <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
+\- <a href="../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a>  
 get the 'error' status for each validation step
 
-\- <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
+\- <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a>  
 get the 'critical' status for each
 
-[](%60~validation%60) step
+`validation` step

@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -152,7 +152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -187,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -335,6 +335,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
   </div>
 </li>
       </ul>
@@ -1401,7 +1407,7 @@ tr { background-color: transparent; }
 </section>
 <section id="controlled-terminology-from-define-xml" class="level2">
 <h2 class="anchored" data-anchor-id="controlled-terminology-from-define-xml">Controlled Terminology from Define-XML</h2>
-<p>Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a> method then generates <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> checks for each variable that references a codelist:</p>
+<p>Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The <code>to_validate()</code> method then generates <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> checks for each variable that references a codelist:</p>
 <div id="a16dbe7c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect codelists referenced by the Demographics domain</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cl_name, codelist <span class="kw">in</span> dm_meta.codelists.items():</span>
@@ -4998,7 +5004,7 @@ Population flags present: []</code></pre>
 </section>
 <section id="converting-adam-templates-to-metadataimport" class="level2">
 <h2 class="anchored" data-anchor-id="converting-adam-templates-to-metadataimport">Converting ADaM Templates to MetadataImport</h2>
-<p>The <a href="../../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a> function converts an ADaM template into the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> format, giving you access to <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> and <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a>:</p>
+<p>The <a href="../../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a> function converts an ADaM template into the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> format, giving you access to <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> and <code>to_validate()</code>:</p>
 <div id="b644c167" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> adam_to_metadata</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>

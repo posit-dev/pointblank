@@ -20,11 +20,12 @@
 - [MissingSpec](https://posit-dev.github.io/pointblank/reference/MissingSpec.html): Specification for structured missing values in a column
 
 #### Contracts and Pipelines
-> Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+> Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Steps` to build reusable step libraries with a fluent API and compose them into `Validate` plans via `add_steps()`. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
 
 
 - [Contract](https://posit-dev.github.io/pointblank/reference/Contract.html): A declarative boundary contract for pipeline data
 - [Step](https://posit-dev.github.io/pointblank/reference/Step.html): A single validation step in a Contract, defined declaratively
+- [Steps](https://posit-dev.github.io/pointblank/reference/Steps.html): A reusable collection of validation step definitions
 - [Pipeline](https://posit-dev.github.io/pointblank/reference/Pipeline.html): Binds source and target contracts into a pipeline boundary enforcement unit
 - [PipelineResult](https://posit-dev.github.io/pointblank/reference/PipelineResult.html): Result of a pipeline boundary validation run
 

@@ -16,12 +16,12 @@ Validate.col_missing_coded(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
 
-The [col_missing_coded()](Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded) validation method checks that every absent value in a column is expressed with an explicit missing-value code, rather than a raw null. Under the structured missingness model (see <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a>), every absence should carry a *reason* -- encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing test units while declared sentinel values and real values pass.
+The [col_missing_coded()](Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded) validation method checks that every absent value in a column is expressed with an explicit missing-value code, rather than a raw null. Under the structured missingness model (see <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a>), every absence should carry a *reason* -- encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing test units while declared sentinel values and real values pass.
 
 This validation operates over the number of test units equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
@@ -30,10 +30,10 @@ This validation operates over the number of test units equal to the number of ro
 
 
 `columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals`  
-A single column or a list of columns to validate. Can also use <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.
+A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.
 
 `missing: MissingSpec`  
-A <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> describing the sentinel values (and their reasons) that encode missingness for this column. The spec documents which codes are considered valid expressions of missingness.
+A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> describing the sentinel values (and their reasons) that encode missingness for this column. The spec documents which codes are considered valid expressions of missingness.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table.
@@ -45,7 +45,7 @@ An optional directive on segmentation, which serves to split a validation step i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
@@ -82,7 +82,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. The thresh
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only

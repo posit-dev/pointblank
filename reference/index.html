@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -162,7 +162,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -266,6 +266,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1474,7 +1480,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="validate" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="validate">Validate</h2>
 <div class="doc-description">
-<p>When performing data validation, use the <code>Validate</code> class to get the process started. It takes the target table and options for metadata and failure thresholds (using the <code>Thresholds</code> class or shorthands). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
+<p>When performing data validation, use the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class to get the process started. It takes the target table and options for metadata and failure thresholds (using the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link gdls-code">Thresholds</a> class or shorthands). The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
 </div>
 <dl>
 <dt><a href="../reference/Validate.html#pointblank.Validate" class="doc-class doc-label doc-label-dataclass">Validate</a></dt>
@@ -1514,7 +1520,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="contracts-and-pipelines" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="contracts-and-pipelines">Contracts and Pipelines</h2>
 <div class="doc-description">
-<p>Use <code>Contract</code> and <code>Step</code> to define declarative data quality contracts that specify what valid data looks like. Use <code>Pipeline</code> to enforce contracts at both boundaries of a data transformation (source and target), producing a <code>PipelineResult</code> with full introspection into what passed and what failed.</p>
+<p>Use <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> and <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> to define declarative data quality contracts that specify what valid data looks like. Use <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> to build reusable step libraries with a fluent API and compose them into <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plans via <code>add_steps()</code>. Use <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> to enforce contracts at both boundaries of a data transformation (source and target), producing a <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with full introspection into what passed and what failed.</p>
 </div>
 <dl>
 <dt><a href="../reference/Contract.html#pointblank.Contract" class="doc-class doc-label doc-label-dataclass">Contract</a></dt>
@@ -1524,6 +1530,10 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/Step.html#pointblank.Step" class="doc-class doc-label doc-label-dataclass">Step</a></dt>
 <dd>
 <p>A single validation step in a Contract, defined declaratively.</p>
+</dd>
+<dt><a href="../reference/Steps.html#pointblank.Steps" class="doc-class doc-label doc-label-class">Steps</a></dt>
+<dd>
+<p>A reusable collection of validation step definitions.</p>
 </dd>
 <dt><a href="../reference/Pipeline.html#pointblank.Pipeline" class="doc-class doc-label doc-label-dataclass">Pipeline</a></dt>
 <dd>
@@ -1538,7 +1548,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="contract-importexport" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="contract-importexport">Contract Import/Export</h2>
 <div class="doc-description">
-<p>Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use <code>import_contract()</code> as the entry point, <code>export_contract()</code> for the reverse, and <code>register_adapter()</code> to add support for custom formats.</p>
+<p>Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use <code>import_contract()</code> as the entry point, <code>export_contract()</code> for the reverse, and <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a> to add support for custom formats.</p>
 </div>
 <dl>
 <dt><a href="../reference/import_contract.html#pointblank.import_contract" class="doc-function doc-label doc-label-function">import_contract()</a></dt>
@@ -1570,7 +1580,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="validation-steps" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="validation-steps">Validation Steps</h2>
 <div class="doc-description">
-<p>Validation steps are sequential validations on the target data. Call <code>Validate</code>’s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</p>
+<p>Validation steps are sequential validations on the target data. Call <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>’s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.</p>
 </div>
 <dl>
 <dt><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="doc-function doc-label doc-label-method">Validate.col_vals_gt()</a></dt>
@@ -1786,7 +1796,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="column-selection" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="column-selection">Column Selection</h2>
 <div class="doc-description">
-<p>Use the <code>col()</code> function along with column selection helpers to flexibly select columns for validation. Combine <code>col()</code> with <code>starts_with()</code>, <code>matches()</code>, etc. for selecting multiple target columns.</p>
+<p>Use the <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> function along with column selection helpers to flexibly select columns for validation. Combine <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> with <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link gdls-code">starts_with()</a>, <a href="../reference/matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a>, etc. for selecting multiple target columns.</p>
 </div>
 <dl>
 <dt><a href="../reference/col.html#pointblank.col" class="doc-function doc-label doc-label-function">col()</a></dt>
@@ -1815,15 +1825,15 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/first_n.html#pointblank.first_n" class="doc-function doc-label doc-label-function">first_n()</a></dt>
 <dd>
-<p>Select the first <code>n</code> columns in the column list.</p>
+<p>Select the first <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns in the column list.</p>
 </dd>
 <dt><a href="../reference/last_n.html#pointblank.last_n" class="doc-function doc-label doc-label-function">last_n()</a></dt>
 <dd>
-<p>Select the last <code>n</code> columns in the column list.</p>
+<p>Select the last <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns in the column list.</p>
 </dd>
 <dt><a href="../reference/expr_col.html#pointblank.expr_col" class="doc-function doc-label doc-label-function">expr_col()</a></dt>
 <dd>
-<p>Create a column expression for use in <code>conjointly()</code> validation.</p>
+<p>Create a column expression for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation.</p>
 </dd>
 </dl>
 </section>
@@ -1842,7 +1852,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="interrogation-and-reporting" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
 <div class="doc-description">
-<p>The validation plan is executed when <code>interrogate()</code> is called. After interrogation, view validation reports, extract metrics, or split data based on results.</p>
+<p>The validation plan is executed when <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> is called. After interrogation, view validation reports, extract metrics, or split data based on results.</p>
 </div>
 <dl>
 <dt><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="doc-function doc-label doc-label-method">Validate.interrogate()</a></dt>
@@ -1875,7 +1885,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="doc-function doc-label doc-label-method">Validate.to_yaml()</a></dt>
 <dd>
-<p>Serialize this validation plan to a <code>yaml_interrogate()</code>-compatible YAML config.</p>
+<p>Serialize this validation plan to a <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>-compatible YAML config.</p>
 </dd>
 <dt><a href="../reference/Validate.to_json_schema.html#pointblank.Validate.to_json_schema" class="doc-function doc-label doc-label-method">Validate.to_json_schema()</a></dt>
 <dd>
@@ -1966,7 +1976,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="inspection-and-assistance" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
 <div class="doc-description">
-<p>Functions for getting to grips with a new data table. Use <code>DataScan</code> for a quick overview, <code>preview()</code> for first/last rows, <code>col_summary_tbl()</code> for column summaries, and <code>missing_vals_tbl()</code> for missing value analysis.</p>
+<p>Functions for getting to grips with a new data table. Use <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> for a quick overview, <a href="../reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> for first/last rows, <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> for column summaries, and <a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link gdls-code">missing_vals_tbl()</a> for missing value analysis.</p>
 </div>
 <dl>
 <dt><a href="../reference/DataScan.html#pointblank.DataScan" class="doc-class doc-label doc-label-class">DataScan</a></dt>
@@ -1975,7 +1985,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/DataScanDiff.html#pointblank.DataScanDiff" class="doc-class doc-label doc-label-class">DataScanDiff</a></dt>
 <dd>
-<p>The result of comparing two <code>DataScan</code> profiles.</p>
+<p>The result of comparing two <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profiles.</p>
 </dd>
 <dt><a href="../reference/preview.html#pointblank.preview" class="doc-function doc-label doc-label-function">preview()</a></dt>
 <dd>
@@ -2035,15 +2045,15 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="doc-function doc-label doc-label-method">DataScan.from_dict()</a></dt>
 <dd>
-<p>Restore a <code>DataScan</code> from a dictionary produced by <code>to_dict()</code>.</p>
+<p>Restore a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from a dictionary produced by <code>to_dict()</code>.</p>
 </dd>
 <dt><a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="doc-function doc-label doc-label-method">DataScan.from_json()</a></dt>
 <dd>
-<p>Restore a <code>DataScan</code> from a JSON string produced by <code>to_json()</code>.</p>
+<p>Restore a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from a JSON string produced by <code>to_json()</code>.</p>
 </dd>
 <dt><a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="doc-function doc-label doc-label-method">DataScan.load_from_json()</a></dt>
 <dd>
-<p>Load a <code>DataScan</code> from a JSON file produced by <code>save_to_json()</code>.</p>
+<p>Load a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from a JSON file produced by <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link gdls-code">save_to_json()</a>.</p>
 </dd>
 <dt><a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="doc-function doc-label doc-label-method">DataScan.compare()</a></dt>
 <dd>
@@ -2115,7 +2125,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/read_file.html#pointblank.read_file" class="doc-function doc-label doc-label-function">read_file()</a></dt>
 <dd>
-<p>Read a Validate object from disk that was previously saved with <code>write_file()</code>.</p>
+<p>Read a Validate object from disk that was previously saved with <a href="../reference/write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a>.</p>
 </dd>
 <dt><a href="../reference/ref.html#pointblank.ref" class="doc-function doc-label doc-label-function">ref()</a></dt>
 <dd>
@@ -2126,7 +2136,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="test-data-generation" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="test-data-generation">Test Data Generation</h2>
 <div class="doc-description">
-<p>Generate synthetic test data based on schema definitions. Use <code>generate_dataset()</code> to create data from a Schema object, or <code>schema_from_tbl()</code> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</p>
+<p>Generate synthetic test data based on schema definitions. Use <a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> to create data from a Schema object, or <a href="../reference/schema_from_tbl.html#pointblank.schema_from_tbl" class="gdls-link gdls-code">schema_from_tbl()</a> to infer a generation-ready schema from an existing table (Polars, Pandas, or Ibis/DuckDB).</p>
 </div>
 <dl>
 <dt><a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="doc-function doc-label doc-label-function">generate_dataset()</a></dt>
@@ -2187,14 +2197,14 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/emit_otel.html#pointblank.emit_otel" class="doc-function doc-label doc-label-function">emit_otel()</a></dt>
 <dd>
-<p>Create an OTel export action for use in <code>FinalActions</code>.</p>
+<p>Create an OTel export action for use in <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>.</p>
 </dd>
 </dl>
 </section>
 <section id="metadata-importexport" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="metadata-importexport">Metadata Import/Export</h2>
 <div class="doc-description">
-<p>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <code>.sav</code>, SAS XPORT, Stata <code>.dta</code>, and more) and export metadata to various formats. Use <code>import_metadata()</code> as the entry point and <code>export_metadata()</code> for the reverse.</p>
+<p>Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS <code>.sav</code>, SAS XPORT, Stata <code>.dta</code>, and more) and export metadata to various formats. Use <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> as the entry point and <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link gdls-code">export_metadata()</a> for the reverse.</p>
 </div>
 <dl>
 <dt><a href="../reference/import_metadata.html#pointblank.import_metadata" class="doc-function doc-label doc-label-function">import_metadata()</a></dt>
@@ -2211,7 +2221,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="doc-class doc-label doc-label-dataclass">MetadataPackage</a></dt>
 <dd>
-<p>A collection of <code>MetadataImport</code> objects from a multi-dataset source.</p>
+<p>A collection of <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> objects from a multi-dataset source.</p>
 </dd>
 <dt><a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="doc-class doc-label doc-label-dataclass">VariableMetadata</a></dt>
 <dd>
@@ -2234,7 +2244,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="sdtm-validation" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="sdtm-validation">SDTM Validation</h2>
 <div class="doc-description">
-<p>Validate clinical datasets against CDISC SDTM domain templates. Use <code>validate_sdtm()</code> to generate a full <code>Validate</code> workflow, or <code>validate_sdtm_structure()</code> for a quick structural conformance check. Retrieve domain templates with <code>get_sdtm_domain()</code> and <code>list_sdtm_domains()</code>.</p>
+<p>Validate clinical datasets against CDISC SDTM domain templates. Use <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a> to generate a full <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> workflow, or <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link gdls-code">validate_sdtm_structure()</a> for a quick structural conformance check. Retrieve domain templates with <a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link gdls-code">get_sdtm_domain()</a> and <a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="gdls-link gdls-code">list_sdtm_domains()</a>.</p>
 </div>
 <dl>
 <dt><a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="doc-function doc-label doc-label-function">validate_sdtm()</a></dt>
@@ -2247,7 +2257,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="doc-function doc-label doc-label-function">sdtm_to_metadata()</a></dt>
 <dd>
-<p>Convert an SDTM domain template to a <code>MetadataImport</code> object.</p>
+<p>Convert an SDTM domain template to a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object.</p>
 </dd>
 <dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="doc-function doc-label doc-label-function">get_sdtm_domain()</a></dt>
 <dd>
@@ -2270,7 +2280,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="adam-validation" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="adam-validation">ADaM Validation</h2>
 <div class="doc-description">
-<p>Validate analysis datasets against CDISC ADaM templates. Use <code>validate_adam()</code> to generate a full <code>Validate</code> workflow, or <code>validate_adam_structure()</code> for a quick structural conformance check. Retrieve dataset templates with <code>get_adam_dataset()</code> and <code>list_adam_datasets()</code>.</p>
+<p>Validate analysis datasets against CDISC ADaM templates. Use <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link gdls-code">validate_adam()</a> to generate a full <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> workflow, or <a href="../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="gdls-link gdls-code">validate_adam_structure()</a> for a quick structural conformance check. Retrieve dataset templates with <a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link gdls-code">get_adam_dataset()</a> and <a href="../reference/list_adam_datasets.html#pointblank.list_adam_datasets" class="gdls-link gdls-code">list_adam_datasets()</a>.</p>
 </div>
 <dl>
 <dt><a href="../reference/validate_adam.html#pointblank.validate_adam" class="doc-function doc-label doc-label-function">validate_adam()</a></dt>
@@ -2306,7 +2316,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="cdisc-submission-conformance" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="cdisc-submission-conformance">CDISC Submission Conformance</h2>
 <div class="doc-description">
-<p>Validate SDTM datasets for CDISC conformance. <code>validate_sdtmig()</code> is the primary entry point: pass a dictionary of domain DataFrames and receive a <code>ConformanceReport</code> with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP– linkage, Define-XML) use <code>SubmissionPackage</code>. For the authoritative CDISC-certified rule set, use <code>validate_cdisc_submission()</code> (requires the CORE CLI) or <code>SubmissionPackage.validate_conformance(engine="core")</code>. All paths return a <code>ConformanceReport</code>.</p>
+<p>Validate SDTM datasets for CDISC conformance. <a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a> is the primary entry point: pass a dictionary of domain DataFrames and receive a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a> with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP– linkage, Define-XML) use <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>. For the authoritative CDISC-certified rule set, use <a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> (requires the CORE CLI) or <code>SubmissionPackage.validate_conformance(engine="core")</code>. All paths return a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>.</p>
 </div>
 <dl>
 <dt><a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="doc-function doc-label doc-label-function">validate_sdtmig()</a></dt>
@@ -2330,7 +2340,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="integrations" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="integrations">Integrations</h2>
 <div class="doc-description">
-<p>Classes for integrating Pointblank with external observability and monitoring systems. Use <code>OTelExporter</code> to export validation results as OpenTelemetry metrics, traces, and logs.</p>
+<p>Classes for integrating Pointblank with external observability and monitoring systems. Use <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> to export validation results as OpenTelemetry metrics, traces, and logs.</p>
 </div>
 <dl>
 <dt><a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="doc-class doc-label doc-label-class">integrations.otel.OTelExporter</a></dt>

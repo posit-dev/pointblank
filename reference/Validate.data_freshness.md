@@ -18,7 +18,7 @@ Validate.data_freshness(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
@@ -53,13 +53,13 @@ An optional preprocessing function or lambda to apply to the data table during i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will be set locally and global thresholds (if any) will take effect.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
 
 `active: bool | Callable = ``True`  
-A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
 
 `dimension: str | None = None`  
 An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
@@ -309,7 +309,7 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-02 11:46:05</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-13 02:56:29</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 
@@ -492,9 +492,9 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-09-02 11:46:05</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
-<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-02 11:46:05</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
-<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-02 11:46:05</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-09-13 02:56:29</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
+<p>Step 2 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-13 02:56:29</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
+<p>Step 3 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-13 02:56:29</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></td>
 </tr>
 </tfoot>
 
@@ -642,7 +642,7 @@ data_freshness()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-02 10:46:05</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-13 01:56:29</code> (age: <strong>-7200.0s</strong>, max allowed: 12.0h)</p></td>
 </tr>
 </tfoot>
 
@@ -783,7 +783,7 @@ data_freshness()
 <hr />
 <strong>Notes</strong>
 <p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-02 11:46:05</code> (age: <strong>-83029565.3s</strong>, max allowed: 1d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-09-13 02:56:29</code> (age: <strong>-83948189.3s</strong>, max allowed: 1d)</p></td>
 </tr>
 </tfoot>
 

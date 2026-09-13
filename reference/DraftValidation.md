@@ -117,7 +117,7 @@ The Amazon Bedrock is a special case since it is a self-hosted model and securit
 
 ## Examples
 
-Let's look at how the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
+Let's look at how the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
 ``` python
 import pointblank as pb

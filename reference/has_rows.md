@@ -53,7 +53,7 @@ A callable that accepts a table and returns `True` if the row count satisfies th
 
 ## How It Works
 
-When <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> is called, each validation step whose `active=` parameter is a callable will have that callable evaluated with the target table. If the callable returns `False`, the step is deactivated and an explanatory note is added to the validation report. The note is locale-aware: if the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object was created with a non-English `locale=`, the note will be translated accordingly.
+When <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> is called, each validation step whose `active=` parameter is a callable will have that callable evaluated with the target table. If the callable returns `False`, the step is deactivated and an explanatory note is added to the validation report. The note is locale-aware: if the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object was created with a non-English `locale=`, the note will be translated accordingly.
 
 
 ## Examples

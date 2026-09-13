@@ -8,12 +8,16 @@ Usage
 
 ``` python
 Validate.from_prompt(
-    prompt, model, api_key=None, verify_ssl=True, max_reprompts=1
+    prompt,
+    model,
+    api_key=None,
+    verify_ssl=True,
+    max_reprompts=1,
 )
 ```
 
 
-This is the same AI edit flow as <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> but starting from an *empty* plan: the model is given a bare `pb.Validate(...)` (carrying this object's table name, label, and thresholds) plus a [DataScan](DataScan.md#pointblank.DataScan) profile of the data, and is asked to author steps that satisfy the prompt.
+This is the same AI edit flow as <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> but starting from an *empty* plan: the model is given a bare `pb.Validate(...)` (carrying this object's table name, label, and thresholds) plus a [DataScan](DataScan.md#pointblank.DataScan) profile of the data, and is asked to author steps that satisfy the prompt.
 
 
 ## Parameters
@@ -39,7 +43,7 @@ Maximum automatic re-prompts if the returned plan fails the syntax check.
 
 
 `EditValidation`  
-An <a href="EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> whose revised plan realizes the prompt; inspect it with `.diff()`/`.to_code()` and finalize with `.accept()`.
+An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> whose revised plan realizes the prompt; inspect it with `.diff()`/`.to_code()` and finalize with `.accept()`.
 
 
 ## Examples

@@ -82,7 +82,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -151,7 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -186,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -334,6 +334,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
   </div>
 </li>
       </ul>
@@ -4206,7 +4212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.</p>
 <p>The header shows a <code>PASS</code> or <code>FAIL</code> badge alongside the standard, version, and a full status breakdown (e.g., <code>SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a</code>).</p>
-<p>Call <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> to get the <code>GT</code> object directly if you need to embed it in a report pipeline:</p>
+<p>Call <code>get_tabular_report()</code> to get the <code>GT</code> object directly if you need to embed it in a report pipeline:</p>
 <div id="0ede311a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gt <span class="op">=</span> report.get_tabular_report()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>gt</span></code></pre></div>
@@ -4386,7 +4392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Rule</strong>: <code>Domain</code> and <code>Description</code> identify which rule fired and where.</li>
 <li><strong>Finding</strong>: <code>USUBJID</code> identifies the subject; <code>Column</code> and <code>Value</code> show exactly what was wrong; <code>Row</code> is the 1-based row number in the source dataset for quick lookup.</li>
 </ul>
-<p>At most 100 findings per rule are shown in the table. The true total for each rule is always visible in <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>. To export findings to a spreadsheet or join them back to your source data, use <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> instead.</p>
+<p>At most 100 findings per rule are shown in the table. The true total for each rule is always visible in <code>get_tabular_report()</code>. To export findings to a spreadsheet or join them back to your source data, use <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> instead.</p>
 </section>
 <section id="programmatic-access-with-findings_df" class="level2">
 <h2 class="anchored" data-anchor-id="programmatic-access-with-findings_df">Programmatic Access with findings_df()</h2>
@@ -4525,7 +4531,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>Only <code>RECORD_CHECK</code> and <code>DATASET_CONTENTS_CHECK</code> rules produce row-level findings accessible via <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a>. The other types report a violation count in <a href="../../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> but do not have individual record detail.</p>
+<p>Only <code>RECORD_CHECK</code> and <code>DATASET_CONTENTS_CHECK</code> rules produce row-level findings accessible via <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a>. The other types report a violation count in <code>get_tabular_report()</code> but do not have individual record detail.</p>
 <p>Rules that require a domain or variable not present in your datasets are automatically marked <code>not_applicable</code> (they are not counted as failures). For example, a rule that checks <code>AESTDTC</code> in the AE domain is <code>not_applicable</code> when no AE dataset is supplied. Adding more domains to the dictionary passed to <a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a> will convert more rules from <code>not_applicable</code> to executable, giving a more complete conformance picture.</p>
 </section>
 <section id="controlled-terminology" class="level2">
@@ -4686,7 +4692,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   8 issues — FAIL</code></pre>
 </div>
 </div>
-<p><strong>Overall result.</strong> <a href="../../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link gdls-code">all_passed()</a> returns <code>True</code> when no rules reported issues; <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link gdls-code">is_core</a> confirms the report originated from the CORE engine rather than the built-in engine:</p>
+<p><strong>Overall result.</strong> <code>all_passed()</code> returns <code>True</code> when no rules reported issues; <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link gdls-code">is_core</a> confirms the report originated from the CORE engine rather than the built-in engine:</p>
 <div id="9b76c2df" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All passed:"</span>, report.all_passed())</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Is CORE report:"</span>, report.is_core)</span></code></pre></div>
@@ -4695,7 +4701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Is CORE report: True</code></pre>
 </div>
 </div>
-<p><strong>Summary dictionary.</strong> <a href="../../reference/ContractImport.html#pointblank.ContractImport.summary" class="gdls-link gdls-code">summary()</a> returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:</p>
+<p><strong>Summary dictionary.</strong> <code>summary()</code> returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:</p>
 <div id="70a65a42" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> report.summary()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -4827,7 +4833,7 @@ Failing:      8
 <p>Both built-in and CORE reports can be exported for archiving, sharing with a biometrics team, or loading into a review tool. Two formats are supported: JSON for round-trippable machine-readable output, and Excel for spreadsheet-based review workflows.</p>
 <section id="json" class="level2">
 <h2 class="anchored" data-anchor-id="json">JSON</h2>
-<p><a href="../../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link gdls-code">to_json()</a> saves the report as a JSON file. For CORE reports the structure mirrors CORE’s native output and is parseable by <code>parse_core_report()</code>:</p>
+<p><code>to_json()</code> saves the report as a JSON file. For CORE reports the structure mirrors CORE’s native output and is parseable by <code>parse_core_report()</code>:</p>
 <div id="f89d8cd8" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>

@@ -11,7 +11,7 @@ Validate.get_sundered_data(type="pass")
 ```
 
 
-Validation of the data is one thing but, sometimes, you want to use the best part of the input dataset for something else. The [get_sundered_data()](Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) method works with a [Validate](Validate.md#pointblank.Validate) object that has been interrogated (i.e., the <a href="Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method was used). We can get either the 'pass' data piece (rows with no failing test units across all column-value based validation functions), or, the 'fail' data piece (rows with at least one failing test unit across the same series of validations).
+Validation of the data is one thing but, sometimes, you want to use the best part of the input dataset for something else. The [get_sundered_data()](Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) method works with a [Validate](Validate.md#pointblank.Validate) object that has been interrogated (i.e., the <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> method was used). We can get either the 'pass' data piece (rows with no failing test units across all column-value based validation functions), or, the 'fail' data piece (rows with at least one failing test unit across the same series of validations).
 
 
 ## Details
@@ -139,7 +139,7 @@ validation
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-02|12:46:37</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-13|03:56:58</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -213,7 +213,7 @@ col_vals_in_set()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:46:37 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:46:37 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:56:58 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:56:58 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -338,4 +338,4 @@ c
 </table>
 
 
-The returned DataFrame contains the rows that passed all validation steps (we passed this object to <a href="preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> to show it in an HTML view). From the six-row input DataFrame, the first two rows and the last two rows had test units that failed validation. Thus the middle two rows are the only ones that passed all validation steps and that's what we see in the returned DataFrame.
+The returned DataFrame contains the rows that passed all validation steps (we passed this object to <a href="../reference/preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> to show it in an HTML view). From the six-row input DataFrame, the first two rows and the last two rows had test units that failed validation. Thus the middle two rows are the only ones that passed all validation steps and that's what we see in the returned DataFrame.

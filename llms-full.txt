@@ -1571,7 +1571,7 @@ age_missing.values_for_category("item_nonresponse")  # [-98, -97]
 
 ## Contracts and Pipelines
 
-Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
+Use `Contract` and `Step` to define declarative data quality contracts that specify what valid data looks like. Use `Steps` to build reusable step libraries with a fluent API and compose them into `Validate` plans via `add_steps()`. Use `Pipeline` to enforce contracts at both boundaries of a data transformation (source and target), producing a `PipelineResult` with full introspection into what passed and what failed.
 
 
 
@@ -1657,6 +1657,45 @@ step = pb.Step("rows_distinct", columns=["order_id"])
 
 # A step that checks a regex pattern
 step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")
+```
+
+Steps(steps: 'list[Step] | None' = None) -> 'None'
+
+A reusable collection of validation step definitions.
+
+A `Steps` object records validation steps without binding them to data, thresholds, or
+metadata. It mirrors the validation method API on
+[`Validate`](`pointblank.Validate`) so that defining steps feels identical, but
+the result is a portable recipe that can be imported into any number of pipelines via
+[`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Parameters
+----------
+steps
+    An optional list of [`Step`](`pointblank.Step`) objects to initialize with.
+
+Examples
+--------
+```python
+import pointblank as pb
+
+completeness = (
+    pb.Steps()
+    .col_vals_not_null(columns=pb.ends_with("_id"))
+    .col_vals_not_null(columns="email")
+)
+
+positive_amounts = (
+    pb.Steps()
+    .col_vals_ge(columns=pb.starts_with("amt_"), value=0)
+    .col_vals_gt(columns="amt_total", value=0)
+)
+
+validation = (
+    pb.Validate(data=orders, label="Order quality")
+    .add_steps(completeness, positive_amounts)
+    .interrogate()
+)
 ```
 
 Pipeline(source: 'Contract | None' = None, target: 'Contract | None' = None, thresholds: 'Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, label: 'str | None' = None, short_circuit: 'bool' = True) -> None
@@ -28123,6 +28162,440 @@ them. By combining plan serialization, a natural-language edit prompt, structura
 syntax guardrails, it lets you refine validation plans conversationally while keeping a human firmly
 in control of what actually runs. Together with [Draft Validation](draft-validation.qmd), it
 covers both halves of an AI-assisted validation workflow: create a plan, then keep improving it.
+
+
+### Composable Steps
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+When validation logic grows beyond a handful of checks, you often want to **reuse** groups of steps
+across datasets and **compose** them into larger plans. Pointblank provides two complementary tools
+for this:
+
+- **`Step`** (singular): a declarative data object used inside `Contract` definitions
+- **`Steps`** (plural): a fluent builder that collects validation steps for use in any
+  `Validate` plan
+
+This page focuses on `Steps` and the `Validate.add_steps()` method, which together let you define
+portable step libraries and compose them into readable, top-to-bottom validation plans.
+
+## The Problem
+
+Without composable steps, reusing validation logic means writing helper functions:
+
+```python
+def add_completeness_checks(v):
+    return v.col_vals_not_null(columns=["order_id", "email"])
+
+def add_range_checks(v):
+    return v.col_vals_ge(columns="amount", value=0)
+
+validation = (
+    add_range_checks(add_completeness_checks(
+        pb.Validate(data=orders)
+    ))
+    .interrogate()
+)
+```
+
+This works but reads *inside-out*. With more than two or three groups, the nesting becomes hard to
+follow. The step definitions are also coupled to whichever `Validate` object they happen to be
+called on.
+
+## Building Step Libraries with `Steps`
+
+The `Steps` class lets you record validation steps without binding them to data, thresholds, or any
+other `Validate` configuration. You use the same method names and parameters you already know from
+`Validate` (`col_vals_gt()`, `col_vals_not_null()`, `col_vals_regex()`, etc.), but instead of
+running the checks, `Steps` stores them for later use.
+
+The key benefit is **portability**: a `Steps` object can live in a shared Python module and be
+imported into any number of validation pipelines. The step definitions stay the same and only the
+data and configuration change at the point of use.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+completeness = (
+    pb.Steps()
+    .col_vals_not_null(columns="order_id")
+    .col_vals_not_null(columns="email")
+)
+
+positive_amounts = (
+    pb.Steps()
+    .col_vals_ge(columns="amount", value=0)
+    .col_vals_gt(columns="total", value=0)
+)
+
+format_checks = (
+    pb.Steps()
+    .col_vals_regex(columns="email", pattern=r".+@.+\..+")
+)
+```
+
+Each `Steps` object above is a self-contained recipe. You can inspect one to see what it contains:
+
+```{python}
+print(completeness)
+```
+
+```{python}
+print(f"Number of steps: {len(completeness)}")
+```
+
+In a Jupyter notebook or other rich-display environment, `Steps` renders as an HTML summary table.
+
+## Composing Plans with `add_steps()`
+
+The `add_steps()` method on `Validate` accepts one or more `Steps` objects and appends their
+recorded steps to the validation plan:
+
+```{python}
+orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-003"],
+        "email": ["alice@example.com", "bob@corp.io", "charlie@mail.org"],
+        "amount": [29.99, 149.50, 9.99],
+        "total": [34.99, 155.00, 14.99],
+    }
+)
+
+(
+    pb.Validate(data=orders, label="Order quality")
+    .add_steps(completeness, positive_amounts, format_checks)
+    .interrogate()
+)
+```
+
+Because `add_steps()` returns the `Validate` object, it chains naturally and reads top-to-bottom.
+
+You can also mix `add_steps()` calls with regular validation method calls. This is useful when a
+pipeline needs a shared library of checks plus a few ad-hoc rules specific to that dataset:
+
+```{python}
+(
+    pb.Validate(data=orders, label="Orders (extended)")
+    .add_steps(completeness)
+    .col_vals_lt(columns="amount", value=500)
+    .add_steps(format_checks)
+    .interrogate()
+)
+```
+
+### Passing Multiple Sources
+
+The `add_steps()` method accepts any number of positional arguments. Each can be a `Steps` object or
+even a `Validate` object (more on that [below](#importing-steps-from-a-validate-object)). All steps
+are appended in order:
+
+```{python}
+all_checks = (
+    pb.Validate(data=orders)
+    .add_steps(completeness, positive_amounts, format_checks)
+)
+
+print(f"Total validation steps: {len(all_checks.validation_info)}")
+```
+
+## Selectors and Multi-Column Expansion
+
+One of the strengths of `Steps` is that step definitions are not locked to specific columns at
+definition time. When a step uses a column selector like `starts_with()` or a multi-column list,
+the columns are resolved when `add_steps()` applies them to the `Validate` plan, not when the
+`Steps` object is created. This means the same step library can validate tables with different
+schemas as long as they follow a common naming convention.
+
+```{python}
+products = pl.DataFrame(
+    {
+        "product_id": ["P1", "P2", "P3"],
+        "amt_price": [19.99, 49.99, 9.99],
+        "amt_tax": [1.60, 4.00, 0.80],
+        "amt_total": [21.59, 53.99, 10.79],
+    }
+)
+
+# Column selectors resolve at add_steps() time against the target data
+price_checks = (
+    pb.Steps()
+    .col_vals_gt(columns=pb.starts_with("amt_"), value=0)
+)
+
+(
+    pb.Validate(data=products)
+    .add_steps(price_checks)
+    .interrogate()
+)
+```
+
+The selector `starts_with("amt_")` is recorded verbatim in the `Steps` object and resolved when the
+steps are applied to the `Validate` plan. This means the same `Steps` object adapts to tables
+with different numbers of matching columns.
+
+## Overrides in `add_steps()`
+
+A shared step library represents a general-purpose set of checks, but individual pipelines often
+need to tweak how those checks are applied: tighter thresholds in production, certain checks
+disabled during development, or column names that differ across teams. Rather than creating a
+separate `Steps` object for every variation, `add_steps()` supports keyword arguments that modify
+the imported steps at the point of use, without changing the original `Steps` object.
+
+### Conditional Inclusion with `active=`
+
+Add steps only when a condition is met, keeping the chain flat instead of wrapping in `if` blocks:
+
+```{python}
+is_production = True
+
+strict_checks = (
+    pb.Steps()
+    .col_vals_gt(columns="total", value=0)
+    .col_vals_lt(columns="total", value=10_000)
+)
+
+(
+    pb.Validate(data=orders)
+    .add_steps(completeness)
+    .add_steps(strict_checks, active=is_production)
+    .interrogate()
+)
+```
+
+When `active=False`, the steps are still added to the plan (so they appear in the report) but they
+are not executed during interrogation.
+
+### Threshold Override with `thresholds=`
+
+Different groups of checks often warrant different levels of strictness. Completeness checks might
+need a very low failure tolerance (even 1% missing IDs is a problem), while range checks can
+tolerate slightly more variance. The `thresholds=` parameter lets you set per-group thresholds
+without modifying the shared step library:
+
+```{python}
+(
+    pb.Validate(data=orders, thresholds=pb.Thresholds(warning=0.05))
+    .add_steps(completeness, thresholds=pb.Thresholds(warning=0.01))
+    .add_steps(positive_amounts)
+    .interrogate()
+)
+```
+
+Here, the completeness checks use a stricter 1% warning threshold while the amount checks inherit
+the 5% global threshold.
+
+### Step Filtering with `exclude=`
+
+Sometimes a shared library is *almost* right for a particular pipeline, but one or two checks don't
+apply. Rather than forking the library, you can exclude specific steps at import time. This keeps
+the shared definition as the single source of truth while giving individual pipelines the
+flexibility to opt out of checks that aren't relevant.
+
+You can exclude by method name (a string, which removes all steps using that method) or by 1-based
+step index (an integer, which removes only the step at that position):
+
+```{python}
+full_checks = (
+    pb.Steps()
+    .col_vals_not_null(columns="order_id")
+    .col_vals_not_null(columns="email")
+    .col_vals_regex(columns="email", pattern=r".+@.+\..+")
+)
+
+# Exclude the regex check by method name
+(
+    pb.Validate(data=orders)
+    .add_steps(full_checks, exclude=["col_vals_regex"])
+    .interrogate()
+)
+```
+
+```{python}
+# Or exclude the second step by index
+(
+    pb.Validate(data=orders)
+    .add_steps(full_checks, exclude=[2])
+    .interrogate()
+)
+```
+
+Excluding by method name removes *all* steps with that method name from the source. Excluding by
+index removes only the step at that position (1-based) within the source.
+
+### Column Remapping with `columns_map=`
+
+In practice, teams often have tables that contain the same kind of data but use different column
+names. A finance team might call it `amount` while the warehouse table uses `txn_amount`. Rather
+than maintaining separate step libraries for each naming convention, `columns_map=` lets you remap
+column names at import time:
+
+```{python}
+# Steps written for one naming convention
+amount_checks = (
+    pb.Steps()
+    .col_vals_ge(columns="amount", value=0)
+    .col_vals_lt(columns="amount", value=100_000)
+)
+
+# Table uses a different column name
+transactions = pl.DataFrame(
+    {
+        "txn_id": ["T1", "T2"],
+        "txn_amount": [50.00, 75.00],
+    }
+)
+
+(
+    pb.Validate(data=transactions)
+    .add_steps(amount_checks, columns_map={"amount": "txn_amount"})
+    .interrogate()
+)
+```
+
+The remapping applies to the `columns=`, `column=`, and `columns_subset=` parameters. Column
+selectors (like `starts_with()`) pass through unchanged since they resolve dynamically against the
+target table.
+
+## Importing Steps from a `Validate` Object
+
+You don't always start from a `Steps` object. Sometimes you already have a `Validate` object with
+steps defined on it, perhaps loaded from a YAML file with `Validate.from_yaml()`, generated from a
+prompt with `Validate.from_prompt()`, or simply built up in another part of your codebase. Rather
+than re-expressing those steps from scratch, you can pass the `Validate` object directly to
+`add_steps()` and its step definitions will be extracted and applied:
+
+```{python}
+existing_plan = (
+    pb.Validate(data=orders)
+    .col_vals_not_null(columns="order_id")
+    .col_vals_gt(columns="amount", value=0)
+)
+
+(
+    pb.Validate(data=orders)
+    .add_steps(existing_plan)
+    .col_vals_regex(columns="email", pattern=r".+@.+\..+")
+    .interrogate()
+)
+```
+
+When a `Validate` object is passed as a step source, `add_steps()` extracts its step definitions and
+applies them. The data, thresholds, and metadata from the source `Validate` are *not* carried over,
+only the step recipes.
+
+::: {.callout-note}
+When a `Validate` object used multi-column lists (e.g., `columns=["id", "name"]`), those columns
+were already expanded into separate internal entries. The extracted steps will be individual
+single-column steps, not the original grouped call.
+:::
+
+## `Steps` vs. `Step`: When to Use Which
+
+Pointblank has two similarly named classes that serve different purposes:
+
+| | `Step` | `Steps` |
+|---|---|---|
+| **What it is** | A single step as a data object | A builder that collects multiple steps |
+| **How you create it** | `pb.Step("col_vals_gt", columns="x", value=0)` | `pb.Steps().col_vals_gt(columns="x", value=0)` |
+| **Primary use** | Inside `Contract(steps=[...])` | With `Validate.add_steps()` |
+| **API style** | Declarative (method name as string) | Fluent (same methods as `Validate`) |
+| **Composition** | List concatenation: `steps_a + steps_b` | Chaining: `.add_steps(a).add_steps(b)` |
+
+**Use `Step`** when you're defining data contracts. Contracts are declarative specifications that
+serialize to YAML and represent a fixed agreement about data quality.
+
+**Use `Steps`** when you're building reusable validation logic for `Validate` workflows. The fluent
+API gives you autocomplete, type checking, and the same familiar syntax as writing steps directly on
+`Validate`.
+
+Both ultimately produce the same validation steps when applied to data. You can even initialize a
+`Steps` object from a list of `Step` objects:
+
+```{python}
+step_list = [
+    pb.Step("col_vals_not_null", columns="order_id"),
+    pb.Step("col_vals_gt", columns="amount", value=0),
+]
+
+s = pb.Steps(steps=step_list)
+print(s)
+```
+
+## Putting It All Together
+
+Imagine you're a data platform team maintaining validation rules for an order-processing pipeline.
+You have shared step libraries for common concerns (completeness, format, range), and each pipeline
+applies them with environment-specific configuration. Here's how that looks in practice:
+
+```{python}
+# --- Shared step libraries (defined once, imported anywhere) ---
+
+completeness_lib = (
+    pb.Steps()
+    .col_vals_not_null(columns="order_id")
+    .col_vals_not_null(columns="email")
+    .col_vals_not_null(columns="amount")
+)
+
+format_lib = (
+    pb.Steps()
+    .col_vals_regex(columns="email", pattern=r".+@.+\..+")
+)
+
+range_lib = (
+    pb.Steps()
+    .col_vals_ge(columns="amount", value=0)
+    .col_vals_lt(columns="amount", value=100_000)
+)
+
+# --- Pipeline-specific configuration ---
+
+is_production = True
+strict_thresholds = pb.Thresholds(warning=0.01, error=0.05)
+
+orders = pl.DataFrame(
+    {
+        "order_id": ["ORD-001", "ORD-002", "ORD-003", "ORD-004"],
+        "email": ["alice@example.com", "bob@corp.io", "charlie@mail.org", "dave@startup.co"],
+        "amount": [29.99, 149.50, 9.99, 75.00],
+        "total": [34.99, 155.00, 14.99, 80.00],
+    }
+)
+
+(
+    pb.Validate(data=orders, label="Order validation (production)")
+    .add_steps(completeness_lib, thresholds=strict_thresholds)
+    .add_steps(format_lib)
+    .add_steps(range_lib, active=is_production)
+    .rows_distinct(columns_subset=["order_id"])
+    .interrogate()
+)
+```
+
+The validation plan reads as a sequence of concerns: completeness first (with strict thresholds),
+then format checks, then range checks (only in production), and finally a uniqueness check added
+directly. Each step library can be version-controlled, tested independently, and easily shared.
+
+## Conclusion
+
+The [`Steps`](`pointblank.Steps`) class and
+[`Validate.add_steps()`](`pointblank.Validate.add_steps`) method bring composability to Pointblank's
+validation workflows. By separating step *definitions* from step *execution*, you can build reusable
+rule libraries that stay portable across datasets, teams, and environments. The override parameters
+(`active=`, `thresholds=`, `exclude=`, and `columns_map=`) give each pipeline the flexibility to
+tailor shared checks without forking the underlying library.
+
+For a complementary approach to reusable validation rules, see
+[Data Contracts](../10-contracts-and-pipelines/01-contracts.qmd), which define expectations as
+declarative, serializable specifications using the [`Step`](`pointblank.Step`) class. Both
+approaches produce the same validation steps at interrogation time. Choose `Steps` for fluent,
+code-first composition and `Contract` for declarative, YAML-friendly definitions.
 
 
 ### YAML Validation Workflows

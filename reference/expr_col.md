@@ -11,7 +11,7 @@ expr_col(column_name)
 ```
 
 
-This function returns a ColumnExpression object that supports operations like `>`, `<`, `+`, etc. for use in <a href="Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a> validation expressions.
+This function returns a ColumnExpression object that supports operations like `>`, `<`, `+`, etc. for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a> validation expressions.
 
 
 ## Parameters
@@ -183,6 +183,6 @@ The above code creates a validation object that checks the specified conditions 
 
 ## See Also
 
-[](%60~The%60) <a href="Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a> validation method, which is where this  
+`The` <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a> validation method, which is where this  
 
-[](%60~function%60) should be used.
+`function` should be used.

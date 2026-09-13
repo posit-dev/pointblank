@@ -18,7 +18,7 @@ A measure of the fraction of test units that passed is provided by the [f_passed
 
 Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.
 
-This method provides a dictionary of the fraction of passing test units for each validation step. If the `scalar=True` argument is provided and `i=` is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link"><code>f_failed()</code></a> method (i.e., `1 - f_failed()`).
+This method provides a dictionary of the fraction of passing test units for each validation step. If the `scalar=True` argument is provided and `i=` is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link"><code>f_failed()</code></a> method (i.e., `1 - f_failed()`).
 
 
 ## Parameters

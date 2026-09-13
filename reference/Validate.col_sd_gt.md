@@ -15,7 +15,7 @@ Validate.col_sd_gt(
     brief=False,
     actions=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
@@ -32,7 +32,7 @@ Unlike row-level validations (e.g., [col_vals_gt()](Validate.col_vals_gt.md#poin
 A single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column. The columns must contain numeric data for the standard deviation to be computed.
 
 `value: float | Column | ReferenceColumn | None = None`  
-The value to compare the column standard deviation against. This can be: (1) a numeric literal (`int` or `float`), (2) a <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object referencing another column whose standard deviation will be used for comparison, (3) a <a href="ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object referencing a column in reference data (when `Validate(reference=)` has been set), or (4) `None` to automatically compare against the same column in reference data (shorthand for `ref(column_name)` when reference data is set).
+The value to compare the column standard deviation against. This can be: (1) a numeric literal (`int` or `float`), (2) a <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object referencing another column whose standard deviation will be used for comparison, (3) a <a href="../reference/ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object referencing a column in reference data (when `Validate(reference=)` has been set), or (4) `None` to automatically compare against the same column in reference data (shorthand for `ref(column_name)` when reference data is set).
 
 `tol: Tolerance = ``0`  
 A tolerance value for the comparison. The default is `0`, meaning exact comparison. When set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`, a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For [col_sd_gt()](Validate.col_sd_gt.md#pointblank.Validate.col_sd_gt), a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the target value and still pass validation.
@@ -44,10 +44,10 @@ Failure threshold levels so that the validation step can react accordingly when 
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `active: bool | Callable = ``True`  
-A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
 
 
 ## Returns
@@ -98,7 +98,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. Since aggr
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only

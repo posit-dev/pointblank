@@ -9,7 +9,7 @@
 | Jun 4, 2025 | [Data Validation Libraries for Polars (2025 Edition)](validation-libs-2025/index.md) | Rich Iannone |
 | Jun 3, 2025 | [C'mon C'mon: Let's Do a Pointblank Workshop!](lets-workshop-together/index.md) | Rich Iannone |
 | May 20, 2025 | [Overhauling Pointblank's User Guide](overhauled-user-guide/index.md) | Rich Iannone and Michael Chow |
-| May 2, 2025 | <a href="../blog/all-about-actions/index.html" class="title listing-title">Level Up Your Data Validation with <code>Actions</code> and <code>FinalActions</code></a> | Rich Iannone |
+| May 2, 2025 | [Level Up Your Data Validation with](all-about-actions/index.md) [Actions](../reference/Actions.md#pointblank.Actions) and [FinalActions](../reference/FinalActions.md#pointblank.FinalActions) | Rich Iannone |
 | Apr 4, 2025 | [Introducing Pointblank](intro-pointblank/index.md) | Rich Iannone |
 
 

@@ -14,7 +14,7 @@ matches(
 ```
 
 
-Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [matches()](matches.md#pointblank.matches) selector function can be used to select one or more columns matching a provided regular expression pattern. So if the set of table columns consists of
+Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The [matches()](matches.md#pointblank.matches) selector function can be used to select one or more columns matching a provided regular expression pattern. So if the set of table columns consists of
 
 `[rev_01, rev_02, profit_01, profit_02, age]`
 
@@ -44,30 +44,30 @@ A `Matches` object, which can be used to select columns that match the specified
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 
-- <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
-- <a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
-- <a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
-- <a href="Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
-- <a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
-- <a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
-- <a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
-- <a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
-- <a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
-- <a href="Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
-- <a href="Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
-- <a href="Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
-- <a href="Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
-- <a href="Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
-- <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
-- <a href="Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
-- <a href="Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
+- <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>
+- <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a>
+- <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a>
+- <a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a>
+- <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a>
+- <a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a>
+- <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a>
+- <a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a>
+- <a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a>
+- <a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a>
+- <a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a>
+- <a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a>
+- <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a>
+- <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>
+- <a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a>
+- <a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>
 
 The [matches()](matches.md#pointblank.matches) selector function doesn't need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.
 
 
 ## Additional Flexibilty Through Composition With Other Column Selectors
 
-The [matches()](matches.md#pointblank.matches) function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with `"_id"`, you can use the [matches()](matches.md#pointblank.matches) and <a href="ends_with.html#pointblank.ends_with" class="gdls-link"><code>ends_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
+The [matches()](matches.md#pointblank.matches) function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with `"_id"`, you can use the [matches()](matches.md#pointblank.matches) and <a href="../reference/ends_with.html#pointblank.ends_with" class="gdls-link"><code>ends_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:
 
 ``` python
 col(matches(r"^[0-9]{5}") & ends_with("_id"))
@@ -248,7 +248,7 @@ col_vals_regex()
 
 From the results of the validation table we get two validation steps, one for `id_old` and one for `new_identifier`. The values in both columns all match the pattern `"ID[0-9]{4}"`.
 
-We can also use the [matches()](matches.md#pointblank.matches) function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
+We can also use the [matches()](matches.md#pointblank.matches) function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
 
 
 ``` python

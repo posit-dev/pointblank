@@ -17,7 +17,7 @@ missing_vals_tbl(
 
 The [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) function generates a table that shows the missing values in the input table. The table is displayed using the Great Tables API, which allows for further customization of the table's appearance if so desired.
 
-By default, missingness is treated as binary (a value is either Null or it isn't) and the function renders a sector-based heatmap of the proportion of Null values across the rows of each column. When a `missing=` mapping of columns to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects is supplied, the function instead renders a *structured missingness* breakdown: one row per column with the count and percentage of complete values and of each missing *reason* (e.g., `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so they aren't mistaken for declared reasons.
+By default, missingness is treated as binary (a value is either Null or it isn't) and the function renders a sector-based heatmap of the proportion of Null values across the rows of each column. When a `missing=` mapping of columns to <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects is supplied, the function instead renders a *structured missingness* breakdown: one row per column with the count and percentage of complete values and of each missing *reason* (e.g., `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so they aren't mistaken for declared reasons.
 
 Note that supplying `missing=` produces a *different report* than the default view: it is a distinct visualization (a per-reason breakdown table, or a per-reason heatmap with `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing Pattern Heatmap" for the structured views), and the shared header/title styling makes the family resemblance clear.
 
@@ -29,7 +29,7 @@ Note that supplying `missing=` produces a *different report* than the default vi
 The table for which to display the missing values. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database connection string. Read the *Supported Input Table Types* section for details on the supported table types.
 
 `missing: dict[str, MissingSpec] | None = None`  
-An optional dictionary mapping column names to <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. When provided, the function renders a structured breakdown of missingness by reason for the specified columns (rather than the default sector heatmap). The reason columns are the union of reasons across the supplied specs; a reason that isn't defined for a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved reason (shown as `0 (0%)`).
+An optional dictionary mapping column names to <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. When provided, the function renders a structured breakdown of missingness by reason for the specified columns (rather than the default sector heatmap). The reason columns are the union of reasons across the supplied specs; a reason that isn't defined for a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved reason (shown as `0 (0%)`).
 
 `as_heatmap: bool = ``False`  
 Only applies when `missing=` is provided. When `True`, render the per-reason proportions as a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of the count/percentage text breakdown. Default is `False`.
@@ -74,7 +74,7 @@ To ensure that the table can scale to tables with many columns, each row in the 
 
 ## Examples
 
-The [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) function is useful for quickly identifying columns with missing values in a table. Here's an example using the `nycflights` dataset (loaded as a Polars DataFrame using the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
+The [missing_vals_tbl()](missing_vals_tbl.md#pointblank.missing_vals_tbl) function is useful for quickly identifying columns with missing values in a table. Here's an example using the `nycflights` dataset (loaded as a Polars DataFrame using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
 
 
 ``` python
@@ -89,65 +89,65 @@ pb.missing_vals_tbl(nycflights)
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#bktfymyvpy table {
+#xbqqgtwcbz table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#bktfymyvpy thead, tbody, tfoot, tr, td, th { border-style: none; }
+#xbqqgtwcbz thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#bktfymyvpy p { margin: 0; padding: 0; }
- #bktfymyvpy .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #bktfymyvpy .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #bktfymyvpy .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #bktfymyvpy .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #bktfymyvpy .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #bktfymyvpy .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bktfymyvpy .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #bktfymyvpy .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #bktfymyvpy .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #bktfymyvpy .gt_column_spanner_outer:first-child { padding-left: 0; }
- #bktfymyvpy .gt_column_spanner_outer:last-child { padding-right: 0; }
- #bktfymyvpy .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #bktfymyvpy .gt_spanner_row { border-bottom-style: hidden; }
- #bktfymyvpy .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #bktfymyvpy .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #bktfymyvpy .gt_from_md> :first-child { margin-top: 0; }
- #bktfymyvpy .gt_from_md> :last-child { margin-bottom: 0; }
- #bktfymyvpy .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #bktfymyvpy .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #bktfymyvpy .gt_indent_1 { text-indent: 5px; }
- #bktfymyvpy .gt_indent_2 { text-indent: calc(5px * 2); }
- #bktfymyvpy .gt_indent_3 { text-indent: calc(5px * 3); }
- #bktfymyvpy .gt_indent_4 { text-indent: calc(5px * 4); }
- #bktfymyvpy .gt_indent_5 { text-indent: calc(5px * 5); }
- #bktfymyvpy .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #bktfymyvpy .gt_row_group_first td { border-top-width: 2px; }
- #bktfymyvpy .gt_row_group_first th { border-top-width: 2px; }
- #bktfymyvpy .gt_striped { color: #333333; background-color: #F4F4F4; }
- #bktfymyvpy .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bktfymyvpy .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #bktfymyvpy .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #bktfymyvpy .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bktfymyvpy .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #bktfymyvpy .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #bktfymyvpy .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #bktfymyvpy .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bktfymyvpy .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #bktfymyvpy .gt_left { text-align: left; }
- #bktfymyvpy .gt_center { text-align: center; }
- #bktfymyvpy .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #bktfymyvpy .gt_font_normal { font-weight: normal; }
- #bktfymyvpy .gt_font_bold { font-weight: bold; }
- #bktfymyvpy .gt_font_italic { font-style: italic; }
- #bktfymyvpy .gt_super { font-size: 65%; }
- #bktfymyvpy .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bktfymyvpy .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #bktfymyvpy .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bktfymyvpy .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #bktfymyvpy .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #bktfymyvpy .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#xbqqgtwcbz p { margin: 0; padding: 0; }
+ #xbqqgtwcbz .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #xbqqgtwcbz .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #xbqqgtwcbz .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #xbqqgtwcbz .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #xbqqgtwcbz .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #xbqqgtwcbz .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #xbqqgtwcbz .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #xbqqgtwcbz .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #xbqqgtwcbz .gt_spanner_row { border-bottom-style: hidden; }
+ #xbqqgtwcbz .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #xbqqgtwcbz .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #xbqqgtwcbz .gt_from_md> :first-child { margin-top: 0; }
+ #xbqqgtwcbz .gt_from_md> :last-child { margin-bottom: 0; }
+ #xbqqgtwcbz .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #xbqqgtwcbz .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #xbqqgtwcbz .gt_indent_1 { text-indent: 5px; }
+ #xbqqgtwcbz .gt_indent_2 { text-indent: calc(5px * 2); }
+ #xbqqgtwcbz .gt_indent_3 { text-indent: calc(5px * 3); }
+ #xbqqgtwcbz .gt_indent_4 { text-indent: calc(5px * 4); }
+ #xbqqgtwcbz .gt_indent_5 { text-indent: calc(5px * 5); }
+ #xbqqgtwcbz .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #xbqqgtwcbz .gt_row_group_first td { border-top-width: 2px; }
+ #xbqqgtwcbz .gt_row_group_first th { border-top-width: 2px; }
+ #xbqqgtwcbz .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #xbqqgtwcbz .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #xbqqgtwcbz .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #xbqqgtwcbz .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #xbqqgtwcbz .gt_left { text-align: left; }
+ #xbqqgtwcbz .gt_center { text-align: center; }
+ #xbqqgtwcbz .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #xbqqgtwcbz .gt_font_normal { font-weight: normal; }
+ #xbqqgtwcbz .gt_font_bold { font-weight: bold; }
+ #xbqqgtwcbz .gt_font_italic { font-style: italic; }
+ #xbqqgtwcbz .gt_super { font-size: 65%; }
+ #xbqqgtwcbz .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #xbqqgtwcbz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #xbqqgtwcbz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #xbqqgtwcbz .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #xbqqgtwcbz .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 

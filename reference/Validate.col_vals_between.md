@@ -20,25 +20,25 @@ Validate.col_vals_between(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
 
-The [col_vals_between()](Validate.col_vals_between.md#pointblank.Validate.col_vals_between) validation method checks whether column values in a table fall within a range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The [col_vals_between()](Validate.col_vals_between.md#pointblank.Validate.col_vals_between) validation method checks whether column values in a table fall within a range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 
 ## Parameters
 
 
 `columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals`  
-A single column or a list of columns to validate. Can also use <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.
+A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.
 
 `left: float | int | Column`  
-The lower bound of the range. This can be a single value or a single column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison for this bound. See the *What Can Be Used in `left=` and `right=`?* section for details on this.
+The lower bound of the range. This can be a single value or a single column name given in <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison for this bound. See the *What Can Be Used in `left=` and `right=`?* section for details on this.
 
 `right: float | int | Column`  
-The upper bound of the range. This can be a single value or a single column name given in <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison for this bound. See the *What Can Be Used in `left=` and `right=`?* section for details on this.
+The upper bound of the range. This can be a single value or a single column name given in <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. The latter option allows for a column-to-column comparison for this bound. See the *What Can Be Used in `left=` and `right=`?* section for details on this.
 
 `inclusive: tuple[bool, bool] = (True, True)`  
 A tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the `left=` and `right=` values, respectively. By default, both values are `True`.
@@ -56,13 +56,13 @@ An optional directive on segmentation, which serves to split a validation step i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will be set locally and global thresholds (if any) will take effect. Look at the *Thresholds* section for information on how to set threshold levels.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
 
 `active: bool | Callable = ``True`  
-A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
 
 `dimension: str | None = None`  
 An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
@@ -81,14 +81,14 @@ The `left=` and `right=` arguments both allow for a variety of input types. The 
 
 - a single numeric value
 - a single date or datetime value
-- A <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object that represents a column in the target table
+- A <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object that represents a column in the target table
 
 When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value within `left=` and `right=`. There is flexibility in how you provide the date or datetime values for the bounds; they can be:
 
 - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
 - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`, `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
-Finally, when supplying a column name in either `left=` or `right=` (or both), it must be specified within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This facilitates column-to-column comparisons and, crucially, the columns being compared to either/both of the bounds must be of the same type as the column data (e.g., all numeric, all dates, etc.).
+Finally, when supplying a column name in either `left=` or `right=` (or both), it must be specified within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This facilitates column-to-column comparisons and, crucially, the columns being compared to either/both of the bounds must be of the same type as the column data (e.g., all numeric, all dates, etc.).
 
 
 ## Preprocessing
@@ -128,7 +128,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. The thresh
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only
@@ -420,7 +420,7 @@ col_vals_between()
 
 Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_between()](Validate.col_vals_between.md#pointblank.Validate.col_vals_between). All test units passed, and there are no failing test units.
 
-Aside from checking a column against two literal values representing the lower and upper bounds, we can also provide column names to the `left=` and/or `right=` arguments (by using the helper function <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. In this way, we can perform three additional comparison types:
+Aside from checking a column against two literal values representing the lower and upper bounds, we can also provide column names to the `left=` and/or `right=` arguments (by using the helper function <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. In this way, we can perform three additional comparison types:
 
 1.  `left=column`, `right=column`
 2.  `left=literal`, `right=column`

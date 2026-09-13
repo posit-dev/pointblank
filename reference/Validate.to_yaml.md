@@ -11,7 +11,7 @@ Validate.to_yaml(path=None)
 ```
 
 
-The [to_yaml()](Contract.md#pointblank.Contract.to_yaml) method renders the validation plan as a YAML document using the same schema consumed by <a href="yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>. This enables storing plans as configuration, sharing them across projects, and round-tripping a plan through YAML.
+The `to_yaml()` method renders the validation plan as a YAML document using the same schema consumed by <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>. This enables storing plans as configuration, sharing them across projects, and round-tripping a plan through YAML.
 
 
 ## Parameters
@@ -30,7 +30,7 @@ The validation plan as a YAML string. The `tbl` field is set from `tbl_name` whe
 
 ## Notes On Fidelity
 
-As with <a href="Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a>, steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of [col_vals_expr()](Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)/[conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly)/[specially()](Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
+As with <a href="../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>to_code()</code></a>, steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of [col_vals_expr()](Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)/[conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly)/[specially()](Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
 
 
 ## Examples

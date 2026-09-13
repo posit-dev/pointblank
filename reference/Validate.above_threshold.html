@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1511,16 +1517,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17286-L17425" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17453-L17592" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">above_threshold</span>(
-    <span class="va">level</span><span class="op">=</span><span class="st">"warning"</span>,
-    <span class="va">i</span><span class="op">=</span><span class="cn-none">None</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">above_threshold</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">level</span><span class="op">=</span><span class="st">"warning"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">i</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method checks whether validation steps exceed a given threshold level. This provides a non-exception-based alternative to <a href="Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a> for conditional workflow control based on validation results.</p>
+<p>The <a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method checks whether validation steps exceed a given threshold level. This provides a non-exception-based alternative to <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a> for conditional workflow control based on validation results.</p>
 <p>This method is useful in scenarios where you want to check if any validation steps failed beyond a certain threshold without raising an exception, allowing for more flexible programmatic responses to validation issues.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -1562,8 +1568,8 @@ If an invalid threshold level is provided.
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Below are some examples of how to use the <a href="Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method. First, we’ll create a simple Polars DataFrame with a single column (<a href="MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>).</p>
-<div id="b6e7e42b" class="cell" data-execution_count="2">
+<p>Below are some examples of how to use the <a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method. First, we’ll create a simple Polars DataFrame with a single column (<a href="../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>).</p>
+<div id="986a33d8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({</span>
@@ -1571,7 +1577,7 @@ If an invalid threshold level is provided.
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 </div>
 <p>Then a validation plan will be created with thresholds (<code>warning=0.1</code>, <code>error=0.2</code>, <code>critical=0.3</code>). After interrogating, we display the validation report table:</p>
-<div id="33dbe462" class="cell" data-execution_count="3">
+<div id="7cf72b45" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1817,8 +1823,8 @@ If an invalid threshold level is provided.
 </div>
 </div>
 </div>
-<p>Let’s check if any steps exceed the ‘warning’ threshold with the <a href="Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method. A message will be printed if that’s the case:</p>
-<div id="49d8efe9" class="cell" data-execution_count="4">
+<p>Let’s check if any steps exceed the ‘warning’ threshold with the <a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a> method. A message will be printed if that’s the case:</p>
+<div id="992844bf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> validation.above_threshold(level<span class="op">=</span><span class="st">"warning"</span>):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Some steps have exceeded the warning threshold"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1826,7 +1832,7 @@ If an invalid threshold level is provided.
 </div>
 </div>
 <p>Check if only steps 2 and 3 exceed the ‘error’ threshold through use of the <code>i=</code> argument:</p>
-<div id="793c2ccc" class="cell" data-execution_count="5">
+<div id="139d2e31" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> validation.above_threshold(level<span class="op">=</span><span class="st">"error"</span>, i<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>]):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Steps 2 and/or 3 have exceeded the error threshold"</span>)</span></code></pre></div>
 </div>
@@ -1846,31 +1852,31 @@ If an invalid threshold level is provided.
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <ul>
-<li><a href="Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a></li>
+<li><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link"><code>assert_below_threshold()</code></a></li>
 </ul>
 <p>: a similar</p>
 <dl>
-<dt><a href="`~method`"></a> that raises an exception if thresholds are exceeded</dt>
+<dt><code>method</code> that raises an exception if thresholds are exceeded</dt>
 <dd>
 
 </dd>
-<dt>- <a href="Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a></dt>
+<dt>- <a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link"><code>warning()</code></a></dt>
 <dd>
 <p>get the ‘warning’ status for each validation</p>
 </dd>
-<dt><a href="`~step`"></a></dt>
+<dt><code>step</code></dt>
 <dd>
 
 </dd>
-<dt>- <a href="Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a></dt>
+<dt>- <a href="../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link"><code>error()</code></a></dt>
 <dd>
 <p>get the ‘error’ status for each validation step</p>
 </dd>
-<dt>- <a href="Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a></dt>
+<dt>- <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link"><code>critical()</code></a></dt>
 <dd>
 <p>get the ‘critical’ status for each</p>
 </dd>
-<dt><a href="`~validation`"></a> step</dt>
+<dt><code>validation</code> step</dt>
 <dd>
 
 </dd>

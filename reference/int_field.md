@@ -15,7 +15,7 @@ int_field(
     null_probability=0.0,
     unique=False,
     generator=None,
-    dtype="Int64"
+    dtype="Int64",
 )
 ```
 

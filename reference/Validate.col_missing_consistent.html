@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1512,7 +1518,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12687-L12894" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12854-L13061" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_missing_consistent</span>(</span>
@@ -1525,12 +1531,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link gdls-code">col_missing_consistent()</a> method checks that, across a set of related columns, the “missing for a specific reason” status is <em>consistent</em>: for each row, either <em>none</em> of the columns are missing for <code>when_reason=</code>, or <em>all</em> of them are. This is useful for structured survey or clinical data where a skip pattern should propagate across related fields — for example, if a question wasn’t asked (<code>"not_asked"</code>) then all of its dependent fields should also be coded <code>"not_asked"</code>.</p>
-<p>A value is considered “missing for the reason” when it is one of the sentinel values mapped to <code>when_reason=</code> in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec’s <code>null_reason</code> and <code>null_is_missing=True</code>, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some — but not all — of the columns are missing for the given reason.</p>
+<p>The <a href="../reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link gdls-code">col_missing_consistent()</a> method checks that, across a set of related columns, the “missing for a specific reason” status is <em>consistent</em>: for each row, either <em>none</em> of the columns are missing for <code>when_reason=</code>, or <em>all</em> of them are. This is useful for structured survey or clinical data where a skip pattern should propagate across related fields — for example, if a question wasn’t asked (<code>"not_asked"</code>) then all of its dependent fields should also be coded <code>"not_asked"</code>.</p>
+<p>A value is considered “missing for the reason” when it is one of the sentinel values mapped to <code>when_reason=</code> in the <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> (and, when the reason is the spec’s <code>null_reason</code> and <code>null_is_missing=True</code>, an actual null). This validation operates over the number of test units equal to the number of rows in the table. A row fails when some — but not all — of the columns are missing for the given reason.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1542,7 +1548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
 <dd>
-<p>A <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> describing the sentinel values and their reasons for the columns.</p>
+<p>A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> describing the sentinel values and their reasons for the columns.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">when_reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
@@ -1562,7 +1568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">actions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Actions | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
+<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">brief</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | bool | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1585,7 +1591,7 @@ An optional data quality dimension to categorize this validation step for health
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
+The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the added validation step.
 </dd>
 </dl>
 </div>
@@ -1604,7 +1610,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
 <p>Thresholds can be defined using one of these input schemes:</p>
 <ol type="1">
-<li>use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
+<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
 <li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
 <li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
 <li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
@@ -1615,7 +1621,7 @@ The <a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code">Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here, <code>income_source</code> and <code>income_amount</code> should both be coded <code>"not_asked"</code> (<code>-99</code>) together when the income question wasn’t asked. The last row is inconsistent — only one field is coded <code>-99</code>:</p>
-<div id="ac400339" class="cell" data-execution_count="2">
+<div id="2cd4bb1b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

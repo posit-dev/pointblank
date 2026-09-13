@@ -49,10 +49,10 @@ validation.get_scorecard()
 
 ## See Also
 
-[](%60~Use%60) <a href="Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> and  
+`Use` <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> and  
 
-<a href="Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link"><code>get_health_score()</code></a> for the underlying numbers,  
+<a href="../reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link"><code>get_health_score()</code></a> for the underlying numbers,  
 
-[](%60~and%60) <a href="Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> for the full per-step  
+`and` <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> for the full per-step  
 
-[](%60~validation%60) report.
+`validation` report.

@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -149,7 +149,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -184,7 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -332,6 +332,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
   </div>
 </li>
       </ul>
@@ -843,7 +849,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="length-constraints" class="level2">
 <h2 class="anchored" data-anchor-id="length-constraints">Length Constraints</h2>
-<p>Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as <code>max_length</code> constraints on the <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object. When you call <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a>, variables with length constraints get a <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> step that checks string length does not exceed the specified maximum.</p>
+<p>Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as <code>max_length</code> constraints on the <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object. When you call <code>to_validate()</code>, variables with length constraints get a <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> step that checks string length does not exceed the specified maximum.</p>
 <p>This is particularly important for CDISC submissions where variable lengths are strictly defined in the submission specification. A variable defined as <code>$200.</code> (200 characters) must not contain values longer than 200 characters, and Pointblank will flag any violations.</p>
 </section>
 <section id="format-based-type-detection" class="level2">
@@ -961,7 +967,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="generating-validation-from-statistical-metadata" class="level1">
 <h1>Generating Validation from Statistical Metadata</h1>
-<p>Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a> method examines every variable’s constraints and creates the appropriate validation steps.</p>
+<p>Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The <code>to_validate()</code> method examines every variable’s constraints and creates the appropriate validation steps.</p>
 <p>For a typical SPSS file with value labels and types defined, the generated validation includes:</p>
 <ol type="1">
 <li>A <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> step verifying column names and data types</li>
@@ -982,7 +988,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(schema<span class="op">=</span>schema)</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>You can also combine metadata-generated validation with your own custom steps. The <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link gdls-code">to_validate()</a> method returns an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so you can chain additional methods before calling <code>.interrogate()</code>:</p>
+<p>You can also combine metadata-generated validation with your own custom steps. The <code>to_validate()</code> method returns an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so you can chain additional methods before calling <code>.interrogate()</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"survey.sav"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from metadata, add custom business rules</span></span>

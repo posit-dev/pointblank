@@ -14,7 +14,7 @@ validate_sdtm(
     check_dates=True,
     check_lengths=True,
     label=None,
-    **kwargs
+    **kwargs,
 )
 ```
 
@@ -57,7 +57,7 @@ Additional keyword arguments passed to the [Validate](Validate.md#pointblank.Val
 ## Returns
 
 
-<a href="Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
+<a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
 A configured (but not yet interrogated) [Validate](Validate.md#pointblank.Validate) object.
 
 

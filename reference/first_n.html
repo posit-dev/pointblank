@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-88e96ed4ed5c7cda707d795f96db2e88.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7afbab6c4aba7a42231930f930d9f118.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v0.27.0</code><br>Released 2026-08-13">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="490" data-forks="32"></div>
     </span>
   </li>  
 </ul>
@@ -316,6 +316,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1478,7 +1484,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#relevant-validation-methods-where-first_n-can-be-used" id="toc-relevant-validation-methods-where-first_n-can-be-used" class="nav-link" data-scroll-target="#relevant-validation-methods-where-first_n-can-be-used">Relevant Validation Methods Where <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> Can Be Used</a></li>
+  <li><a href="#relevant-validation-methods-where-first_n-can-be-used" id="toc-relevant-validation-methods-where-first_n-can-be-used" class="nav-link" data-scroll-target="#relevant-validation-methods-where-first_n-can-be-used">Relevant Validation Methods Where first_n() Can Be Used</a></li>
   <li><a href="#additional-flexibilty-through-composition-with-other-column-selectors" id="toc-additional-flexibilty-through-composition-with-other-column-selectors" class="nav-link" data-scroll-target="#additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty Through Composition With Other Column Selectors</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
@@ -1507,20 +1513,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Select the first <a href="Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns in the column list.</p>
+<p>Select the first <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns in the column list.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1414-L1570" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">first_n</span>(
-    <span class="va">n</span>,
-    <span class="va">offset</span><span class="op">=</span><span class="dv">0</span>,
-)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">first_n</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">n</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">offset</span><span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Many validation methods have a <code>columns=</code> argument that can be used to specify the columns for validation (e.g., <a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> selector function can be used to select <em>n</em> columns positioned at the start of the column list. So if the set of table columns consists of</p>
+<p>Many validation methods have a <code>columns=</code> argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a>, etc.). The <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> selector function can be used to select <em>n</em> columns positioned at the start of the column list. So if the set of table columns consists of</p>
 <p><code>[rev_01, rev_02, profit_01, profit_02, age]</code></p>
 <p>and you want to validate the first two columns, you can use <code>columns=first_n(2)</code>. This will select the <code>rev_01</code> and <code>rev_02</code> columns and a validation step will be created for each.</p>
 <p>The <code>offset=</code> parameter can be used to skip a certain number of columns from the start of the column list. So if you want to select the third and fourth columns, you can use <code>columns=first_n(2, offset=2)</code>.</p>
@@ -1531,7 +1537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">n</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></dt>
 <dd>
-<p>The number of columns to select from the start of the column list. Should be a positive integer value. If <a href="Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> is greater than the number of columns in the table, all columns will be selected.</p>
+<p>The number of columns to select from the start of the column list. Should be a positive integer value. If <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> is greater than the number of columns in the table, all columns will be selected.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">offset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">0</span></span></code></dt>
 <dd>
@@ -1546,38 +1552,38 @@ The offset from the start of the column list. The default is <code>0</code>. If 
 <dl>
 <dt><code> <span class="doc-parameter-annotation">FirstN</span></code></dt>
 <dd>
-A <code>FirstN</code> object, which can be used to select the first <a href="Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns.
+A <code>FirstN</code> object, which can be used to select the first <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> columns.
 </dd>
 </dl>
 </div>
 </section>
 <section id="relevant-validation-methods-where-first_n-can-be-used" class="level2 doc-relevant-validation-methods-where-firstn-can-be-used">
-<h2 class="doc-relevant-validation-methods-where-firstn-can-be-used anchored" data-anchor-id="relevant-validation-methods-where-first_n-can-be-used">Relevant Validation Methods Where <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> Can Be Used</h2>
+<h2 class="doc-relevant-validation-methods-where-firstn-can-be-used anchored" data-anchor-id="relevant-validation-methods-where-first_n-can-be-used">Relevant Validation Methods Where <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> Can Be Used</h2>
 <p>This selector function can be used in the <code>columns=</code> argument of the following validation methods:</p>
 <ul>
-<li><a href="Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a></li>
-<li><a href="Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a></li>
-<li><a href="Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a></li>
-<li><a href="Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a></li>
-<li><a href="Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a></li>
-<li><a href="Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a></li>
-<li><a href="Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a></li>
-<li><a href="Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a></li>
-<li><a href="Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a></li>
-<li><a href="Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a></li>
-<li><a href="Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a></li>
-<li><a href="Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a></li>
-<li><a href="Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a></li>
-<li><a href="Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a></li>
-<li><a href="Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a></li>
-<li><a href="Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a></li>
-<li><a href="Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link"><code>col_vals_ne()</code></a></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link"><code>col_vals_outside()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link"><code>col_vals_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link"><code>col_vals_increasing()</code></a></li>
+<li><a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link"><code>col_vals_decreasing()</code></a></li>
+<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link"><code>col_vals_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a></li>
+<li><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a></li>
 </ul>
-<p>The <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> selector function doesn’t need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.</p>
+<p>The <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> selector function doesn’t need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.</p>
 </section>
 <section id="additional-flexibilty-through-composition-with-other-column-selectors" class="level2 doc-additional-flexibilty-through-composition-with-other-column-selectors">
 <h2 class="doc-additional-flexibilty-through-composition-with-other-column-selectors anchored" data-anchor-id="additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty Through Composition With Other Column Selectors</h2>
-<p>The <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> function can be composed with other column selectors to create fine-grained column selections. For example, to select all column names starting with “rev” along with the first two columns, you can use the <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> and <a href="starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:</p>
+<p>The <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> function can be composed with other column selectors to create fine-grained column selections. For example, to select all column names starting with “rev” along with the first two columns, you can use the <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> and <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> function, like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col(first_n(<span class="dv">2</span>) <span class="op">|</span> starts_with(<span class="st">"rev"</span>))</span></code></pre></div>
 <p>There are four operators that can be used to compose column selectors:</p>
 <ul>
@@ -1590,8 +1596,8 @@ A <code>FirstN</code> object, which can be used to select the first <a href="Val
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Suppose we have a table with columns <code>paid_2021</code>, <code>paid_2022</code>, <code>paid_2023</code>, <code>paid_2024</code>, and <code>name</code> and we’d like to validate that the values in the first four columns are greater than <code>10</code>. We can use the <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> column selector function to specify that the first four columns in the table are the columns to validate.</p>
-<div id="68a34e6f" class="cell" data-execution_count="2">
+<p>Suppose we have a table with columns <code>paid_2021</code>, <code>paid_2022</code>, <code>paid_2023</code>, <code>paid_2024</code>, and <code>name</code> and we’d like to validate that the values in the first four columns are greater than <code>10</code>. We can use the <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> column selector function to specify that the first four columns in the table are the columns to validate.</p>
+<div id="588920ec" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1888,8 +1894,8 @@ A <code>FirstN</code> object, which can be used to select the first <a href="Val
 </div>
 </div>
 <p>From the results of the validation table we get four validation steps. The values in all those columns were all greater than <code>10</code>.</p>
-<p>We can also use the <a href="first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> function in combination with other column selectors (within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select the first four columns but also omit those columns that end with <code>"2023"</code>, we can use the <code>-</code> operator to combine column selectors.</p>
-<div id="bdc6ef63" class="cell" data-execution_count="3">
+<p>We can also use the <a href="../reference/first_n.html#pointblank.first_n" class="gdls-link gdls-code">first_n()</a> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select the first four columns but also omit those columns that end with <code>"2023"</code>, we can use the <code>-</code> operator to combine column selectors.</p>
+<div id="e5fe2edd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2021"</span>: [<span class="fl">17.94</span>, <span class="fl">16.55</span>, <span class="fl">17.85</span>],</span>

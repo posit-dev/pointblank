@@ -27,7 +27,7 @@ Expose a general-purpose referential-integrity validation (partial logic already
 
 ## Data Profiling & Drift Detection
 
-Expand [DataScan](reference/DataScan.html#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
+Expand [DataScan](./reference/DataScan.html#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
 
 - `pb.DataProfile` class for comprehensive profiling
 - Profile persistence and comparison
@@ -41,7 +41,7 @@ Expand [DataScan](reference/DataScan.html#pointblank.DataScan) into comprehensiv
 
 Export validation rules and schemas to standard interchange formats.
 
-- `.to_json_schema()` method on [Validate](reference/Validate.html#pointblank.Validate) for JSON Schema output
+- `.to_json_schema()` method on [Validate](./reference/Validate.html#pointblank.Validate) for JSON Schema output
 - `.to_documentation()` for auto-generated data documentation (Markdown, HTML)
 - Round-trip compatibility with YAML validation configs
 
@@ -89,9 +89,9 @@ Improve the existing `.prompt()` LLM-based validation method.
 
 ## Test Data Generation Enhancements
 
-Extend the existing [generate_dataset()](reference/generate_dataset.html#pointblank.generate_dataset) capabilities.
+Extend the existing [generate_dataset()](./reference/generate_dataset.html#pointblank.generate_dataset) capabilities.
 
-- Schema interoperability: use a [col_schema_match()](reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match) schema to generate test data
+- Schema interoperability: use a [col_schema_match()](./reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match) schema to generate test data
 - Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)
 - Edge case generation (nulls, boundaries, Unicode, etc.)
 - Hypothesis integration for property-based testing

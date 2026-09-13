@@ -14,7 +14,7 @@ generate_dataset(
     output="polars",
     country="US",
     shuffle=True,
-    weighted=True
+    weighted=True,
 )
 ```
 

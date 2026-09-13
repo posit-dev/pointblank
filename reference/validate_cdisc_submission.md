@@ -19,12 +19,12 @@ validate_cdisc_submission(
     core=None,
     core_cwd=None,
     cache=None,
-    workdir=None
+    workdir=None,
 )
 ```
 
 
-Convenience wrapper that builds a <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from `source` and runs <a href="SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with `engine="core"`. Requires an installed CORE executable (see `core`).
+Convenience wrapper that builds a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from `source` and runs <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with `engine="core"`. Requires an installed CORE executable (see `core`).
 
 
 ## Parameters

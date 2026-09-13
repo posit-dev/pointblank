@@ -14,7 +14,7 @@ SDTMDomainTemplate(
     domain_class,
     repeating,
     variables=list(),
-    natural_keys=list()
+    natural_keys=list(),
 )
 ```
 

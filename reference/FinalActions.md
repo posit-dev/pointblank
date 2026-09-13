@@ -25,7 +25,7 @@ One or more actions to execute after validation. An action can be (1) a callable
 
 
 `FinalActions`  
-An [FinalActions](FinalActions.md#pointblank.FinalActions) object. This can be used when using the <a href="Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set final actions for the validation workflow).
+An [FinalActions](FinalActions.md#pointblank.FinalActions) object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> class (to set final actions for the validation workflow).
 
 
 ## Types Of Actions
@@ -40,7 +40,7 @@ The actions are executed at the end of the validation workflow. When providing a
 
 ## Crafting Callables With [get_validation_summary()](get_validation_summary.md#pointblank.get_validation_summary)
 
-When creating a callable function to be used as a final action, you can use the <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.
+When creating a callable function to be used as a final action, you can use the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.
 
 
 ## Examples
@@ -67,7 +67,7 @@ validation = (
 )
 ```
 
-In this example, the `send_alert()` function is defined to check the validation summary for critical failures. If any are found, an alert message is printed to the console. The function is passed to the [FinalActions](FinalActions.md#pointblank.FinalActions) class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.
+In this example, the `send_alert()` function is defined to check the validation summary for critical failures. If any are found, an alert message is printed to the console. The function is passed to the [FinalActions](FinalActions.md#pointblank.FinalActions) class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.
 
 Multiple final actions can be provided in a sequence. They will be executed in the order they are specified after all validation steps have completed:
 
@@ -89,6 +89,6 @@ validation = (
 
 ## See Also
 
-[](%60~The%60) <a href="get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which can be  
+`The` <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function, which can be  
 
-[](%60~used%60) to retrieve the summary of the validation results.
+`used` to retrieve the summary of the validation results.

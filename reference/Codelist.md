@@ -13,7 +13,7 @@ Codelist(
     label=None,
     version=None,
     source=None,
-    extensible=False
+    extensible=False,
 )
 ```
 

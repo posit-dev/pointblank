@@ -13,7 +13,7 @@ Validate.interrogate(
     get_first_n=None,
     sample_n=None,
     sample_frac=None,
-    extract_limit=500
+    extract_limit=500,
 )
 ```
 
@@ -22,7 +22,7 @@ When a validation plan has been set with a series of validation steps, the inter
 
 The interrogation process will collect extracts of failing rows if the `collect_extracts=` option is set to `True` (the default). We can control the number of rows collected using the `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `extract_limit=` option will enforce a hard limit on the number of rows collected when `collect_extracts=True`.
 
-After interrogation is complete, the [Validate](Validate.md#pointblank.Validate) object will have gathered information, and we can use methods like <a href="Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link"><code>n_passed()</code></a>, <a href="Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link"><code>f_failed()</code></a>, etc., to understand how the table performed against the validation plan. A visual representation of the validation results can be viewed by printing the [Validate](Validate.md#pointblank.Validate) object; this will display the validation table in an HTML viewing environment.
+After interrogation is complete, the [Validate](Validate.md#pointblank.Validate) object will have gathered information, and we can use methods like <a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link"><code>n_passed()</code></a>, <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link"><code>f_failed()</code></a>, etc., to understand how the table performed against the validation plan. A visual representation of the validation results can be viewed by printing the [Validate](Validate.md#pointblank.Validate) object; this will display the validation table in an HTML viewing environment.
 
 
 ## Parameters
@@ -32,7 +32,7 @@ After interrogation is complete, the [Validate](Validate.md#pointblank.Validate)
 An option to collect rows of the input table that didn't pass a particular validation step. The default is `True` and further options (i.e., `get_first_n=`, `sample_*=`) allow for fine control of how these rows are collected.
 
 `collect_tbl_checked: bool = ``True`  
-The processed data frames produced by executing the validation steps is collected and stored in the [Validate](Validate.md#pointblank.Validate) object if `collect_tbl_checked=True`. This information is necessary for some methods (e.g., <a href="Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a>), but it can potentially make the object grow to a large size. To opt out of attaching this data, set this to `False`.
+The processed data frames produced by executing the validation steps is collected and stored in the [Validate](Validate.md#pointblank.Validate) object if `collect_tbl_checked=True`. This information is necessary for some methods (e.g., <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a>), but it can potentially make the object grow to a large size. To opt out of attaching this data, set this to `False`.
 
 `get_first_n: int | None = None`  
 If the option to collect rows where test units is chosen, there is the option here to collect the first [n](Validate.n.md#pointblank.Validate.n) rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).
@@ -148,7 +148,7 @@ validation.interrogate(get_first_n=10)
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-02|12:46:44</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-09-13|03:57:05</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -291,7 +291,7 @@ col_vals_regex()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:46:44 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-02 12:46:44 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:05 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-09-13 03:57:05 UTC</span>
 </div></td>
 </tr>
 </tfoot>
@@ -299,7 +299,7 @@ col_vals_regex()
 </table>
 
 
-The validation table shows that step 3 (checking for `session_duration` greater than `5`) has 18 failing test units. This means that 18 rows in the table are problematic. We'd like to see the rows that failed this validation step and we can do that with the <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method.
+The validation table shows that step 3 (checking for `session_duration` greater than `5`) has 18 failing test units. This means that 18 rows in the table are problematic. We'd like to see the rows that failed this validation step and we can do that with the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method.
 
 
 ``` python
@@ -607,4 +607,4 @@ country
 </table>
 
 
-The <a href="Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method will return a Polars DataFrame here with the first 10 rows that failed the validation step (we passed that into the <a href="preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function for a better display). There are actually 18 rows that failed but we limited the collection of extracts with `get_first_n=10`.
+The <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method will return a Polars DataFrame here with the first 10 rows that failed the validation step (we passed that into the <a href="../reference/preview.html#pointblank.preview" class="gdls-link"><code>preview()</code></a> function for a better display). There are actually 18 rows that failed but we limited the collection of extracts with `get_first_n=10`.

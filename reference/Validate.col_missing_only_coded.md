@@ -19,12 +19,12 @@ Validate.col_missing_only_coded(
     actions=None,
     brief=None,
     active=True,
-    dimension=None
+    dimension=None,
 )
 ```
 
 
-The [col_missing_only_coded()](Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded) method checks that every value in a column is *accounted for*: it is either a declared missing-value code (a sentinel in the <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a>, or a null when `null_is_missing=True`), or a legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set) and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a legitimate real value is flagged -- this catches *undocumented* sentinel codes (e.g., a stray `-95`) that aren't part of the spec.
+The [col_missing_only_coded()](Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded) method checks that every value in a column is *accounted for*: it is either a declared missing-value code (a sentinel in the <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a>, or a null when `null_is_missing=True`), or a legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set) and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a legitimate real value is flagged -- this catches *undocumented* sentinel codes (e.g., a stray `-95`) that aren't part of the spec.
 
 At least one of `allowed=`, `min_val=`, or `max_val=` must be provided so that legitimate real values can be distinguished from undocumented codes. This validation operates over the number of test units equal to the number of rows in the table.
 
@@ -33,10 +33,10 @@ At least one of `allowed=`, `min_val=`, or `max_val=` must be provided so that l
 
 
 `columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals`  
-A single column or a list of columns to validate. Can also use <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns.
+A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> with column selectors to specify one or more columns.
 
 `missing: MissingSpec`  
-A <a href="MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> declaring the documented sentinel codes.
+A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> declaring the documented sentinel codes.
 
 `allowed: Collection[Any] | None = None`  
 An explicit set of legitimate real values. A value in this set passes. Can be combined with `min_val=`/`max_val=` (a value passes if it satisfies either constraint).
@@ -57,7 +57,7 @@ An optional directive on segmentation, which serves to split a validation step i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
@@ -94,7 +94,7 @@ There are three threshold levels: 'warning', 'error', and 'critical'. The thresh
 
 Thresholds can be defined using one of these input schemes:
 
-1.  use the <a href="Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
+1.  use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)
 2.  provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is the 'error' level, and position `2` is the 'critical' level
 3.  create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and 'critical'
 4.  a single integer/float value denoting absolute number or fraction of failing test units for the 'warning' level only

@@ -16,7 +16,7 @@ preview(
     show_row_numbers=True,
     max_col_width=250,
     min_tbl_width=500,
-    incl_header=None
+    incl_header=None,
 )
 ```
 
@@ -102,7 +102,7 @@ When using connection strings, the Ibis library with the appropriate backend dri
 
 ## Examples
 
-It's easy to preview a table using the [preview()](preview.md#pointblank.preview) function. Here's an example using the `small_table` dataset (itself loaded using the <a href="load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
+It's easy to preview a table using the [preview()](preview.md#pointblank.preview) function. Here's an example using the `small_table` dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):
 
 
 ``` python
@@ -1090,7 +1090,7 @@ item_revenue
 </table>
 
 
-Alternatively, we can use column selector functions like <a href="starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> and <a href="matches.html#pointblank.matches" class="gdls-link"><code>matches()</code></a>\` to select columns based on text or patterns:
+Alternatively, we can use column selector functions like <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> and <a href="../reference/matches.html#pointblank.matches" class="gdls-link"><code>matches()</code></a>\` to select columns based on text or patterns:
 
 
 ``` python
@@ -1226,7 +1226,7 @@ session_duration
 </table>
 
 
-Multiple column selector functions can be combined within <a href="col.html#pointblank.col" class="gdls-link"><code>col()</code></a> using operators like `|` and `&`:
+Multiple column selector functions can be combined within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> using operators like `|` and `&`:
 
 
 ``` python
@@ -2864,4 +2864,4 @@ country
 </table>
 
 
-For comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the <a href="connect_to_table.html#pointblank.connect_to_table" class="gdls-link"><code>connect_to_table()</code></a> function.
+For comprehensive documentation on supported connection string formats, error handling, and installation requirements, see the <a href="../reference/connect_to_table.html#pointblank.connect_to_table" class="gdls-link"><code>connect_to_table()</code></a> function.
