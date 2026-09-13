@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from pointblank.missing import MissingSpec
     from pointblank.schema import Schema
     from pointblank.thresholds import Thresholds
-    from pointblank.validate import Validate
 
 __all__ = ["Steps"]
 
