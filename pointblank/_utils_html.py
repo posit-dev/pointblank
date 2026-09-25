@@ -41,6 +41,21 @@ def _fmt_frac(vec) -> list[str | None]:
     return res
 
 
+def _fmt_raw_html(gt_tbl: Any, columns: Any = None) -> Any:
+    """
+    Render pre-built HTML in body cells without escaping.
+
+    Great Tables v1.0.0 escapes the content of unformatted cells, so columns holding HTML that
+    Pointblank generates must be marked for passthrough with `fmt_passthrough(escape=False)`.
+    Earlier versions of Great Tables lack that method and never escaped cells, so there the table
+    is returned unchanged. Because the last-applied formatter wins, call this before any other
+    `fmt_*()` method that targets the same columns.
+    """
+    if hasattr(gt_tbl, "fmt_passthrough"):
+        return gt_tbl.fmt_passthrough(columns=columns, escape=False)
+    return gt_tbl
+
+
 def _make_sublabel(major: str, minor: str) -> Any:
     return html(
         f'{major!s}<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">{minor!s}</span>'
