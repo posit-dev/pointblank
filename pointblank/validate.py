@@ -122,7 +122,7 @@ from pointblank._utils_check_args import (
     _check_set_types,
     _check_thresholds,
 )
-from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
+from pointblank._utils_html import _create_table_dims_html, _create_table_type_html, _fmt_raw_html
 from pointblank.column import (
     Column,
     ColumnLiteral,
@@ -19337,7 +19337,7 @@ class Validate:
         )
 
         gt_tbl = (
-            GT(df, id="pb_scorecard")
+            _fmt_raw_html(GT(df, id="pb_scorecard"), columns=["dimension", "score"])
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .cols_label(
                 cases={
@@ -20085,7 +20085,7 @@ class Validate:
             )
 
             gt_tbl = (
-                GT(df, id="pb_tbl")
+                _fmt_raw_html(GT(df, id="pb_tbl"))
                 .fmt_markdown(columns=["pass", "fail", "extract_upd"])
                 .opt_table_font(font=google_font(name="IBM Plex Sans"))
                 .opt_align_table_header(align=before)
@@ -20812,7 +20812,7 @@ class Validate:
 
         # Return the DataFrame as a Great Tables table
         gt_tbl = (
-            GT(df, id="pb_tbl")
+            _fmt_raw_html(GT(df, id="pb_tbl"))
             .fmt_markdown(columns=["pass", "fail", "extract_upd"])
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .opt_align_table_header(align=before)
