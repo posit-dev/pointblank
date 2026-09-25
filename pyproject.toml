@@ -76,12 +76,12 @@ cdisc = ["lxml>=4.9.0"]
 cdisc-core = ["pyreadstat>=1.2.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
-duckdb = ["ibis-framework[duckdb]>=9.5.0"]
+duckdb = ["ibis-framework[duckdb]>=9.5.0", "sqlglot>=23.4,<30.18"]  # sqlglot 30.18+ breaks DROP statements
 mysql = ["ibis-framework[mysql]>=9.5.0"]
 mssql = ["ibis-framework[mssql]>=9.5.0"]
 postgres = ["ibis-framework[postgres]>=9.5.0"]
 snowflake = ["ibis-framework[snowflake]>=9.5.0"]
-sqlite = ["ibis-framework[sqlite]>=9.5.0"]
+sqlite = ["ibis-framework[sqlite]>=9.5.0", "sqlglot>=23.4,<30.18"]  # sqlglot 30.18+ breaks DROP statements
 docs = [
     "jupyter",
     "nbclient>=0.10.0",
@@ -101,7 +101,7 @@ dev = [
     "duckdb>=1.2.0,<1.3.3",                                # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0",
-    "sqlglot>=23.4,!=30.18.0",                              # 30.18.0 omits table names in DROP statements (breaks DuckDB/SQLite)
+    "sqlglot>=23.4,<30.18",                                 # 30.18+ omits table names in DROP statements (breaks DuckDB/SQLite)
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
