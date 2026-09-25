@@ -9567,6 +9567,27 @@ def test_validation_report_briefs_global_local_html(snapshot) -> None:
     snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
 
 
+@pytest.mark.parametrize("interrogate", [True, False])
+def test_validation_report_html_not_escaped(interrogate: bool) -> None:
+    # Great Tables v1.0.0 escapes unformatted cell content; the report's pre-built HTML cells
+    # (and the scorecard's) must still render as markup rather than as escaped text
+    validation = (
+        Validate(data=load_dataset(), thresholds=Thresholds(warning=0.10))
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_not_null(columns="c")
+    )
+    if interrogate:
+        validation = validation.interrogate()
+
+    report_html = validation.get_tabular_report().as_raw_html()
+    assert "<svg" in report_html
+    assert not re.search(r"&lt;/?(div|span|svg|title|path|g|code)\b", report_html)
+
+    if interrogate:
+        scorecard_html = validation.get_scorecard().as_raw_html()
+        assert not re.search(r"&lt;/?(div|span)\b", scorecard_html)
+
+
 def test_no_interrogation_validation_report_html_snap(snapshot) -> None:
     validation = (
         Validate(
