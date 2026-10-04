@@ -135,7 +135,10 @@ def build_progress_md(book_dir: Path) -> str:
 
         lines.append("")
 
-    total_chars = sum(content_chars(book_dir / f) for f in all_files if (book_dir / f).exists())
+    # Cap each chapter at the target so overlong chapters don't inflate the overall figure
+    total_chars = sum(
+        min(content_chars(book_dir / f), TARGET_CHARS) for f in all_files if (book_dir / f).exists()
+    )
     total_possible = len(all_files) * TARGET_CHARS
     overall_pct = min(int(total_chars / total_possible * 100), 100)
 
