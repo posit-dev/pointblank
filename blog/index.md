@@ -1,4 +1,4 @@
-<img src="./pointblank_blog_logo.png" class="img-fluid" />
+<img src="pointblank_blog_logo.png" class="img-fluid" />
 
 
  Order By Default Date - Oldest Date - Newest Title Author
