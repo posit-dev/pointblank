@@ -6,46 +6,46 @@
 <br>
 
 <!-- BOOK_PROGRESS_BEGIN -->
-Overall: **12%** complete &mdash; 6 of 37 chapters have content
+Overall: **31%** complete &mdash; 14 of 37 chapters have content
 
 **Foundations**<br>
-Intro: `███████░░░░░░░░` 49%<br>
-Getting Started: `█████████████░░` 89%<br>
+Intro: `███████████████` 100%<br>
+Getting Started: `█████████████░░` 88%<br>
 Inspecting Data: `███████████████` 100%<br>
 Validation Workflow: `███████████████` 100%<br>
 Analysis Loop: `██████████░░░░░` 65%<br>
 
 **Building Validation Plans**<br>
-Column Validations: `█░░░░░░░░░░░░░░` 3%<br>
-Aggregate Validations: `█░░░░░░░░░░░░░░` 8%<br>
-Row Validations: `░░░░░░░░░░░░░░░` 0%<br>
-Table Validations: `░░░░░░░░░░░░░░░` 0%<br>
-Missing Data: `░░░░░░░░░░░░░░░` 0%<br>
-Segmented Validation: `░░░░░░░░░░░░░░░` 0%<br>
-Advanced Validation: `░░░░░░░░░░░░░░░` 0%<br>
+Column Validations: `███████████████` 100%<br>
+Aggregate Validations: `███████████░░░░` 71%<br>
+Row Validations: `███████████░░░░` 72%<br>
+Table Validations: `███████████████` 100%<br>
+Missing Data: `███████████████` 100%<br>
+Segmented Validation: `███████████░░░░` 75%<br>
+Advanced Validation: `████████████░░░` 78%<br>
 
 **Responding to Results**<br>
-Thresholds & Actions: `░░░░░░░░░░░░░░░` 0%<br>
-Reports & Extracts: `░░░░░░░░░░░░░░░` 0%<br>
+Thresholds & Actions: `███████████████` 100%<br>
+Reports & Extracts: `█░░░░░░░░░░░░░░` 9%<br>
 Quality Scoring: `░░░░░░░░░░░░░░░` 0%<br>
 Notifications & Observability: `░░░░░░░░░░░░░░░` 0%<br>
 
 **AI-Assisted Validation**<br>
-Semantic Validation: `░░░░░░░░░░░░░░░` 0%<br>
-AI Authoring: `░░░░░░░░░░░░░░░` 0%<br>
+Semantic Validation: `░░░░░░░░░░░░░░░` 1%<br>
+AI Authoring: `░░░░░░░░░░░░░░░` 1%<br>
 
 **Data Sources, Interfaces & Automation**<br>
-Data Sources: `░░░░░░░░░░░░░░░` 0%<br>
-YAML Workflows: `░░░░░░░░░░░░░░░` 0%<br>
-Command Line: `░░░░░░░░░░░░░░░` 0%<br>
-MCP Server: `░░░░░░░░░░░░░░░` 0%<br>
+Data Sources: `░░░░░░░░░░░░░░░` 1%<br>
+YAML Workflows: `░░░░░░░░░░░░░░░` 1%<br>
+Command Line: `░░░░░░░░░░░░░░░` 1%<br>
+MCP Server: `░░░░░░░░░░░░░░░` 1%<br>
 
 **Data Contracts & Pipelines**<br>
-Data Contracts: `░░░░░░░░░░░░░░░` 0%<br>
-Pipelines: `░░░░░░░░░░░░░░░` 0%<br>
+Data Contracts: `░░░░░░░░░░░░░░░` 1%<br>
+Pipelines: `░░░░░░░░░░░░░░░` 1%<br>
 
 **Test Data Generation**<br>
-Test Data Generation: `░░░░░░░░░░░░░░░` 0%<br>
+Test Data Generation: `░░░░░░░░░░░░░░░` 1%<br>
 
 **Clinical & Regulated Data**<br>
 Clinical & CDISC: `░░░░░░░░░░░░░░░` 0%<br>
