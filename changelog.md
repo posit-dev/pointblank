@@ -3,6 +3,38 @@
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
 
+# v1.0.0
+
+*2026-10-06* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v1.0.0)
+
+Pointblank reaches `v1.0.0` with new ways to reuse and compose validation logic, a new string-length validation method, and full compatibility with Great Tables `v1.0.0`. The new [Steps](./reference/Steps.html#pointblank.Steps) builder and `Validate.add_steps()` let you define step libraries once and combine them across validation plans, with options to remap column names, override thresholds, or skip specific steps when importing. The new [col_vals_str_len()](./reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len) method checks that string lengths fall within minimum and/or maximum bounds. This release also restores validation reports under Great Tables `v1.0.0`, which now escapes HTML in table cells by default.
+
+
+### New Features
+
+- **Composable validation steps**: the new `pb.Steps()` builder records validation steps without attaching them to a table, and `Validate.add_steps()` adds them to any validation plan. When importing steps, you can remap columns with `columns_map=`, override `thresholds=` or `active=`, and drop steps by name or position with `exclude=`. Existing [Validate](./reference/Validate.html#pointblank.Validate) objects can also serve as step sources, and [Steps](./reference/Steps.html#pointblank.Steps) objects show a formatted HTML summary in notebooks. A new *Composable Steps* article in the User Guide covers the workflow. ([\#424](https://github.com/posit-dev/pointblank/issues/424))
+- **[col_vals_str_len()](./reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len) validation method**: checks whether the character length of string values in one or more columns falls between `min_val=` and/or `max_val=`. It supports the usual `na_pass=`, `pre=`, `segments=`, `thresholds=`, and `actions=` options, has translated autobriefs, and is also available on [Steps](./reference/Steps.html#pointblank.Steps). ([\#422](https://github.com/posit-dev/pointblank/issues/422))
+
+
+### Bug Fixes
+
+- Validation reports now render correctly with Great Tables `v1.0.0`. Previously, the HTML in the report's cells (status icons, badges, and labels) appeared as escaped markup. The fix also keeps working with earlier Great Tables versions. ([\#426](https://github.com/posit-dev/pointblank/issues/426))
+- The MCP server's prompts now import `Message` from FastMCP's current module path, fixing an import error with recent FastMCP releases.
+- `sqlglot` is now restricted to versions below `30.18`, since `30.18` and later omit table names in `DROP` statements and break DuckDB and SQLite backends. ([\#425](https://github.com/posit-dev/pointblank/issues/425))
+
+
+### Documentation
+
+- Added a glossary to the reference section of the User Guide that defines key Pointblank terms.
+- LLM examples in the skills docs now use Anthropic model IDs that are still served. ([\#423](https://github.com/posit-dev/pointblank/issues/423))
+- Clarified the failing-case example in the length validation docs.
+
+
+### Maintenance
+
+- Test coverage was expanded substantially across the validation, MCP, metadata, conformance, adapter, scan profile, and data generation modules.
+
+
 # v0.27.0
 
 *2026-08-13* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.27.0)
@@ -934,19 +966,3 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - [<span class="citation" data-cites="phobson">@phobson</span>](https://github.com/phobson) made their first contribution in https://github.com/posit-dev/pointblank/pull/80
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.2…v0.6.3](https://github.com/posit-dev/pointblank/compare/v0.6.2...v0.6.3)
-
-
-# v0.6.2
-
-*2025-03-04* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.6.2)
-
-
-## New Features and Fixes
-
-- Ollama LLM provider support was added to the [DraftValidation](./reference/DraftValidation.html#pointblank.DraftValidation) class by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/70
-- We can now add 'briefs' and Pointblank will generate 'autobriefs' as needed by [<span class="citation" data-cites="rich-iannone">@rich-iannone</span>](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/71
-- Added a tolerance parameter (`tol=`) to the [row_count_match()](./reference/Validate.row_count_match.html#pointblank.Validate.row_count_match) validation method by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/73
-- Incorporated the use of ruff in the project by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/76
-- Enhanced the [assert_passing()](./reference/Validate.assert_passing.html#pointblank.Validate.assert_passing) method to indicate which tests failed by [<span class="citation" data-cites="tylerriccio33">@tylerriccio33</span>](https://github.com/tylerriccio33) in https://github.com/posit-dev/pointblank/pull/72
-
-**Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.6.1…v0.6.2](https://github.com/posit-dev/pointblank/compare/v0.6.1...v0.6.2)
