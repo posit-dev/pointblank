@@ -258,3 +258,26 @@ def test_float_values():
 
     assert validation.n_passed(i=1, scalar=True) == 4
     assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_increasing_decreasing_polars_lazyframe():
+    """Test that Polars LazyFrames give the same results as DataFrames."""
+    data = {"a": [1.0, 2.0, None, 5.0, 2.0], "b": [5, 4, 4, 1, 2]}
+
+    for tbl in [pl.DataFrame(data), pl.LazyFrame(data)]:
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="a")
+            .col_vals_increasing(columns="a", na_pass=True)
+            .col_vals_decreasing(columns="b")
+            .col_vals_decreasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        assert validation.n_passed(scalar=False) == {1: 3, 2: 4, 3: 3, 4: 4}
+        assert validation.n_failed(scalar=False) == {1: 2, 2: 1, 3: 2, 4: 1}
+
+        # The failing rows are extracted without the helper columns
+        extract = validation.get_data_extracts(i=1, frame=True)
+        assert extract["a"].to_list() == [None, 2.0]
+        assert "pb_row_index_" not in extract.columns

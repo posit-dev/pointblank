@@ -12,6 +12,7 @@ from narwhals.dependencies import (
     is_narwhals_lazyframe,
     is_pandas_dataframe,
     is_polars_dataframe,
+    is_polars_lazyframe,
 )
 
 from pointblank._constants import IBIS_BACKENDS
@@ -29,6 +30,7 @@ from pointblank._utils import (
     _get_tbl_type,
     _is_in,
     _is_lazy_frame,
+    _with_row_index,
 )
 from pointblank.column import Column
 
@@ -2879,6 +2881,22 @@ def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
     return result_tbl.to_native()
 
 
+def _with_lagged_difference(
+    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    """
+    Add a `pb_lagged_difference_` column holding the difference from the previous row's value.
+
+    Narwhals needs an explicit row order for `shift()` on LazyFrames. Polars LazyFrames keep their
+    row order, so a `pb_row_index_` column is added to order by (the caller drops it).
+    """
+    lagged = nw.col(column).shift(1)
+    if isinstance(nw_tbl, nw.LazyFrame) and is_polars_lazyframe(nw_tbl.to_native()):
+        nw_tbl = _with_row_index(nw_tbl, name="pb_row_index_")
+        lagged = lagged.over(order_by="pb_row_index_")
+    return nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - lagged)
+
+
 def interrogate_increasing(
     tbl: IntoFrame, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
 ) -> Any:
@@ -2909,7 +2927,7 @@ def interrogate_increasing(
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
-    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
 
     # Build the condition based on allow_stationary and decreasing_tol
     if allow_stationary or decreasing_tol != 0:
@@ -2935,7 +2953,7 @@ def interrogate_increasing(
         )
     )
 
-    return result_tbl.drop("pb_lagged_difference_").to_native()
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def interrogate_decreasing(
@@ -2968,7 +2986,7 @@ def interrogate_decreasing(
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
-    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
 
     # Build the condition based on allow_stationary and increasing_tol
     if allow_stationary or increasing_tol != 0:
@@ -2994,7 +3012,7 @@ def interrogate_decreasing(
         )
     )
 
-    return result_tbl.drop("pb_lagged_difference_").to_native()
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def _interrogate_comparison_base(
