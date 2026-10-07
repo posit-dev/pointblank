@@ -439,3 +439,116 @@ def test_single_col_int_float_mismatch(tbl_values, ref_values):
 
     assert v.n_passed(i=1, scalar=True) == 2
     assert v.n_failed(i=1, scalar=True) == 1
+
+
+# ── Composite keys across backends and key dtypes ────────────────────────────
+
+
+def _to_backend(df: pl.DataFrame, backend: str):
+    if backend == "pandas":
+        return df.to_pandas()
+    if backend == "duckdb":
+        ibis = pytest.importorskip("ibis")
+        return ibis.memtable(df.to_arrow())
+    return df
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+def test_composite_key_backends(backend):
+    ref = _to_backend(pl.DataFrame({"a": [1, 2, 9], "b": ["x", "y", "z"]}), backend)
+    tbl = _to_backend(pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]}), backend)
+
+    v = (
+        pb.Validate(data=tbl)
+        .col_vals_in_table(columns=["a", "b"], ref_table=ref, ref_column=["a", "b"])
+        .interrogate()
+    )
+
+    assert v.n_passed(i=1, scalar=True) == 2
+    assert v.n_failed(i=1, scalar=True) == 1
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize(
+    "tbl_dtype, ref_values, ref_dtype, n_passed",
+    [
+        (pl.Int64, [1.0, 2.0, 9.0], pl.Float64, 2),
+        (pl.Int64, [1.0, 2.5, 9.0], pl.Float64, 1),  # 2.5 can't match an integer key
+        (pl.Float64, [1, 2, 9], pl.Int64, 2),
+        (pl.Int32, [1, 2, 9], pl.Int64, 2),
+        (pl.UInt8, [1, 2, 9], pl.Int64, 2),
+        (pl.Float32, [1.0, 2.0, 9.0], pl.Float64, 2),
+    ],
+    ids=["int_float", "int_float_fractional", "float_int", "int32_int64", "uint8_int64", "f32_f64"],
+)
+def test_composite_key_numeric_dtype_mismatch(backend, tbl_dtype, ref_values, ref_dtype, n_passed):
+    ref = pl.DataFrame({"id": pl.Series(ref_values, dtype=ref_dtype), "k": ["x", "y", "z"]})
+    tbl = pl.DataFrame({"fk": pl.Series([1, 2, 3], dtype=tbl_dtype), "k": ["x", "y", "z"]})
+
+    v = (
+        pb.Validate(data=_to_backend(tbl, backend))
+        .col_vals_in_table(
+            columns=["fk", "k"], ref_table=_to_backend(ref, backend), ref_column=["id", "k"]
+        )
+        .interrogate()
+    )
+
+    assert v.n_passed(i=1, scalar=True) == n_passed
+    assert v.n_failed(i=1, scalar=True) == 3 - n_passed
+
+
+def test_composite_key_decimal_float_mismatch():
+    ref = pl.DataFrame({"id": [1.5, 2.0], "k": ["x", "y"]})
+    tbl = pl.DataFrame({"fk": ["1.5", "2.0", "3.0"], "k": ["x", "y", "z"]}).with_columns(
+        pl.col("fk").str.to_decimal(scale=1)
+    )
+
+    v = (
+        pb.Validate(data=tbl)
+        .col_vals_in_table(columns=["fk", "k"], ref_table=ref, ref_column=["id", "k"])
+        .interrogate()
+    )
+
+    assert v.n_passed(i=1, scalar=True) == 2
+    assert v.n_failed(i=1, scalar=True) == 1
+
+
+def test_composite_key_cast_does_not_change_table():
+    from pointblank._interrogation import interrogate_in_table
+
+    ref = pl.DataFrame({"id": [1.0, 2.0], "k": ["x", "y"]})
+    tbl = pl.DataFrame({"fk": [1, 2, 3], "k": ["x", "y", "z"]})
+
+    result = interrogate_in_table(tbl, ["fk", "k"], ref, ["id", "k"], na_pass=False)
+
+    assert result.schema["fk"] == pl.Int64
+    assert result["pb_is_good_"].to_list() == [True, True, False]
+
+
+def test_composite_key_pandas_non_default_index():
+    from pointblank._interrogation import interrogate_in_table
+
+    ref = pd.DataFrame({"a": [1, 2], "b": ["x", "y"]})
+    tbl = pd.DataFrame({"a": [3, 1, 2, 1], "b": ["z", "x", "y", "q"]}, index=[10, 7, 99, 3])
+
+    result = interrogate_in_table(tbl, ["a", "b"], ref, ["a", "b"], na_pass=False)
+
+    assert result["pb_is_good_"].tolist() == [False, True, True, False]
+    assert result.index.tolist() == [10, 7, 99, 3]
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("composite", [False, True])
+def test_incompatible_key_types_eval_error(backend, composite):
+    ref = _to_backend(pl.DataFrame({"id": ["1", "2"], "k": ["x", "y"]}), backend)
+    tbl = _to_backend(pl.DataFrame({"fk": [1, 2, 3], "k": ["x", "y", "z"]}), backend)
+
+    columns, ref_column = (["fk", "k"], ["id", "k"]) if composite else ("fk", "id")
+
+    v = (
+        pb.Validate(data=tbl)
+        .col_vals_in_table(columns=columns, ref_table=ref, ref_column=ref_column)
+        .interrogate()
+    )
+
+    assert v.validation_info[0].eval_error is True
