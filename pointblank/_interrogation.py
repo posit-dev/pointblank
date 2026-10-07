@@ -1273,10 +1273,18 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                 else:
                     raise  # Re-raise unexpected errors
 
+            # The comparison is null when either value is missing, so only use it where both
+            # values are present (`pb_is_good_3`); otherwise the row would count as neither
+            # passing nor failing
             result_tbl = result_tbl.with_columns(
                 pb_is_good_=nw.col("pb_is_good_1")
                 | nw.col("pb_is_good_2")
-                | (nw.col("pb_is_good_4") & ~nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2"))
+                | (
+                    nw.col("pb_is_good_3")
+                    & nw.col("pb_is_good_4")
+                    & ~nw.col("pb_is_good_1")
+                    & ~nw.col("pb_is_good_2")
+                )
             )
 
         return result_tbl.drop(

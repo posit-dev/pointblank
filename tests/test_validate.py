@@ -2795,6 +2795,31 @@ def test_col_vals_ne(request, tbl_fixture) -> None:
     assert validation_2.n_failed(i=1, scalar=True) == 0
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_col_vals_eq_column_missing_values(tbl_type) -> None:
+    # Rows with a missing value on either side fail (or pass with `na_pass=True`), and every row
+    # counts as either passing or failing
+    tbl = pl.DataFrame({"a": [1.0, 2.0, None, 5.0, 2.0], "b": [1.5, None, 3.0, 4.0, 2.0]})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation_1 = Validate(tbl).col_vals_eq(columns="a", value=col("b")).interrogate()
+
+    assert validation_1.n_passed(i=1, scalar=True) == 1
+    assert validation_1.n_failed(i=1, scalar=True) == 4
+
+    validation_2 = (
+        Validate(tbl).col_vals_eq(columns="a", value=col("b"), na_pass=True).interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 3
+    assert validation_2.n_failed(i=1, scalar=True) == 2
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
 def test_col_vals_eq_string(request, tbl_fixture) -> None:
     """Test `col_vals_eq()` with string values (numeric columns cast to string)."""
