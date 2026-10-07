@@ -109,3 +109,15 @@ class TestColMissingOnlyCoded:
             .interrogate()
         )
         assert _info(v).autobrief
+
+    def test_float_column_int_sentinels_and_allowed(self, spec):
+        # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+        tbl = pl.DataFrame({"code": [1.0, -98.0, 2.0, -95.0, 3.0, -99.0]})
+        v = (
+            pb.Validate(data=tbl)
+            .col_missing_only_coded(columns="code", missing=spec, allowed=[1, 2, 3])
+            .interrogate()
+        )
+        info = _info(v)
+        assert info.n == 6
+        assert info.n_failed == 1  # only -95
