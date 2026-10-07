@@ -34,9 +34,16 @@ from __future__ import annotations
 
 import re
 from functools import reduce
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
+
+from pointblank._utils import _is_in
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from narwhals.dtypes import DType
 
 
 class EvaluationError(Exception):
@@ -53,25 +60,25 @@ def evaluate_conditions(df: nw.DataFrame, conditions: dict) -> nw.Series:
         ns = nw.get_native_namespace(df)
         return nw.new_series("_match", [False] * len(df), dtype=nw.Boolean, backend=ns)
     try:
-        expr = _compile(conditions)
+        expr = _compile(conditions, df.collect_schema())
         return df.select(expr.alias("_match"))["_match"]
     except Exception as exc:
         raise EvaluationError(str(exc)) from exc
 
 
-def _compile(cond: dict) -> nw.Expr:
+def _compile(cond: dict, schema: Mapping[str, DType]) -> nw.Expr:
     if "all" in cond:
-        sub = [_compile(c) for c in cond["all"]]
+        sub = [_compile(c, schema) for c in cond["all"]]
         return reduce(lambda a, b: a & b, sub)
     if "any" in cond:
-        sub = [_compile(c) for c in cond["any"]]
+        sub = [_compile(c, schema) for c in cond["any"]]
         return reduce(lambda a, b: a | b, sub)
     if "not" in cond:
-        return ~_compile(cond["not"])
-    return _compile_leaf(cond)
+        return ~_compile(cond["not"], schema)
+    return _compile_leaf(cond, schema)
 
 
-def _compile_leaf(cond: dict) -> nw.Expr:
+def _compile_leaf(cond: dict, schema: Mapping[str, DType]) -> nw.Expr:
     name: str = cond["name"]
     op: str = cond["operator"]
     value: Any = cond.get("value")
@@ -104,10 +111,10 @@ def _compile_leaf(cond: dict) -> nw.Expr:
         return col.cast(nw.String).str.ends_with(str(value))
     if op == "is_in":
         terms = list(value) if not isinstance(value, list) else value
-        return col.is_in(terms)
+        return _is_in(name, terms, schema.get(name))
     if op == "not_in":
         terms = list(value) if not isinstance(value, list) else value
-        return ~col.is_in(terms)
+        return ~_is_in(name, terms, schema.get(name))
     if op == "matches_regex":
         return col.cast(nw.String).str.contains(str(value))
     if op == "equal_to_column":
