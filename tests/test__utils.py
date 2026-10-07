@@ -1,6 +1,7 @@
 import os
 import sys
 import tempfile
+from decimal import Decimal
 from unittest.mock import patch
 
 import narwhals as nw
@@ -36,6 +37,7 @@ from pointblank._utils import (
     _get_tbl_type,
     _is_date_or_datetime_dtype,
     _is_duration_dtype,
+    _is_in,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
@@ -44,6 +46,7 @@ from pointblank._utils import (
     _pivot_to_dict,
     _process_ibis_through_narwhals,
     _select_df_lib,
+    _with_row_index,
     transpose_dicts,
 )
 from pointblank.validate import load_dataset
@@ -984,3 +987,94 @@ def test_get_api_details_agg_docstring_fallback():
 
     result = get_api_details(mod, ["col_sum_gt"])
     assert isinstance(result, str)
+
+
+# Each case: (column values, Polars dtype, `is_in()` values, expected result)
+IS_IN_CASES = {
+    "int_col_integral_floats": ([1, 2, 3], pl.Int64, [1.0, 2.0], [True, True, False]),
+    "int_col_mixed_values": ([1, 2, 3], pl.Int64, [1, 2.5], [True, False, False]),
+    "int_col_mixed_values_float_first": ([1, 2, 3], pl.Int64, [2.5, 3], [False, False, True]),
+    "int_col_non_finite_and_huge_floats": (
+        [1, 2, 3],
+        pl.Int64,
+        [float("nan"), float("inf"), 1e30],
+        [False, False, False],
+    ),
+    "int_col_none_and_float": ([1, 2, 3], pl.Int64, [None, 2.0], [False, True, False]),
+    "int_col_decimals": ([1, 2, 3], pl.Int64, [Decimal("2"), Decimal("2.5")], [False, True, False]),
+    "int_col_exact_above_2_53": ([2**53 + 1], pl.Int64, [float(2**53)], [False]),
+    "uint_col_floats": ([1, 2, 3], pl.UInt8, [1.0, -1.0], [True, False, False]),
+    "float_col_ints": ([1.0, 2.0, 3.5], pl.Float64, [1, 2], [True, True, False]),
+    "float32_col_mixed_values": ([1.0, 2.0, 3.5], pl.Float32, [1, 3.5], [True, False, True]),
+    "float_col_decimals": ([1.0, 2.0, 3.5], pl.Float64, [Decimal("3.5")], [False, False, True]),
+    "decimal_col_floats": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [1.5, 3.25],
+        [True, False, True],
+    ),
+    "decimal_col_ints": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [2],
+        [False, True, False],
+    ),
+    "string_col": (["a", "b", "c"], pl.String, ["a", "c"], [True, False, True]),
+    "bool_col": ([True, False, True], pl.Boolean, [True], [True, False, True]),
+}
+
+
+@pytest.mark.parametrize("case", IS_IN_CASES.values(), ids=IS_IN_CASES.keys())
+@pytest.mark.parametrize("backend", ["polars", "polars_lazy", "pandas"])
+def test_is_in_aligns_numeric_values(case, backend):
+    column_values, dtype, values, expected = case
+
+    tbl = pl.DataFrame({"x": pl.Series(column_values, dtype=dtype)})
+    if backend == "polars_lazy":
+        tbl = tbl.lazy()
+    elif backend == "pandas":
+        if dtype.is_decimal():
+            pytest.skip("pandas has no native decimal dtype")
+        tbl = tbl.to_pandas()
+
+    nw_tbl = nw.from_native(tbl)
+    result = nw_tbl.select(_is_in("x", values, nw_tbl.collect_schema()["x"]))
+    if backend == "polars_lazy":
+        result = result.collect()
+
+    assert result["x"].to_list() == expected
+
+
+def test_is_in_unknown_dtype_passes_values_through():
+    tbl = nw.from_native(pl.DataFrame({"x": ["a", "b"]}))
+
+    assert tbl.select(_is_in("x", ["b"], None))["x"].to_list() == [False, True]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_with_row_index(tbl_type):
+    # The first column is unsorted and has ties so that ordering by it can't masquerade as the
+    # positional row order
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        if ibis is None:
+            pytest.skip("ibis is not installed")
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    result = _with_row_index(tbl, name="idx")
+    if isinstance(result, nw.LazyFrame):
+        result = result.collect()
+
+    assert result.columns == ["idx", "x", "y"]
+
+    if tbl_type == "duckdb":
+        # Tables without an inherent row order are indexed in the order of their first column
+        assert result.sort("idx")["x"].to_list() == [1, 1, 3, 4, 5]
+    else:
+        assert result["idx"].to_list() == [0, 1, 2, 3, 4]
+        assert result["y"].to_list() == [10, 20, 30, 40, 50]
