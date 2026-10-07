@@ -52,6 +52,7 @@ except ImportError:
 
 import pandas as pd
 import polars as pl
+from polars.testing import assert_frame_equal
 import pytz
 import ibis
 
@@ -4689,6 +4690,41 @@ def test_col_vals_not_in_set(request, tbl_fixture) -> None:
     assert validation_2.n_failed(i=1, scalar=True) == 1
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+@pytest.mark.parametrize(
+    "x, set_values, n_in_set",
+    [
+        ([1.0, 2.0, 3.0], [1, 2, 3], 3),  # float column, integer set
+        ([1.0, 2.0, 3.5, 4.0], [1, 3.5], 2),  # float column, mixed set
+        ([1, 2, 3, 4], [1.0, 2.0], 2),  # integer column, float set
+        ([1, 2, 3, 4], [1, 2.5], 1),  # integer column, mixed set
+        ([1, 2, 3, 4], [2.5, 3], 1),  # integer column, mixed set (float first)
+        ([1, 2, 3, 4], [None, 4.0], 1),  # integer column, float set with `None`
+    ],
+)
+def test_col_vals_in_set_int_float_mismatch(tbl_type, x, set_values, n_in_set) -> None:
+    # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+    tbl = pl.DataFrame({"x": x})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation_in = Validate(tbl).col_vals_in_set(columns="x", set=set_values).interrogate()
+
+    assert validation_in.n_passed(i=1, scalar=True) == n_in_set
+
+    # `col_vals_not_in_set()` doesn't accept `None` in `set=`
+    if None not in set_values:
+        validation_not_in = (
+            Validate(tbl).col_vals_not_in_set(columns="x", set=set_values).interrogate()
+        )
+
+        assert validation_not_in.n_passed(i=1, scalar=True) == len(x) - n_in_set
+
+
 def test_schema_validation_with_case_sensitivity() -> None:
     tbl = pl.DataFrame({"Column_A": [1, 2, 3], "COLUMN_B": ["x", "y", "z"]})
 
@@ -9299,6 +9335,45 @@ def test_get_sundered_data(request, tbl_fixture) -> None:
 
     assert failed_data_rows[0] == (1, 4, 8)
     assert failed_data_rows[1] == (4, 7, 8)
+
+
+def test_get_sundered_data_lazy_preserves_row_order() -> None:
+    # Joins don't guarantee row order (Polars >= 2.0 collects LazyFrames with the streaming
+    # engine) so a large table is used, with an unsorted first column that has ties
+    n = 100_000
+    tbl = pl.DataFrame({"x": [(i * 7) % 10 for i in range(n)], "y": list(range(n))})
+
+    validation = (
+        Validate(tbl.lazy())
+        .col_vals_gt(columns="x", value=2)
+        .col_vals_lt(columns="x", value=8)
+        .interrogate()
+    )
+
+    sundered_data_pass = validation.get_sundered_data(type="pass")
+    sundered_data_fail = validation.get_sundered_data(type="fail")
+
+    assert isinstance(sundered_data_pass, pl.LazyFrame)
+
+    expected_pass = tbl.filter((pl.col("x") > 2) & (pl.col("x") < 8))
+    expected_fail = tbl.filter((pl.col("x") <= 2) | (pl.col("x") >= 8))
+
+    assert_frame_equal(sundered_data_pass.collect(), expected_pass)
+    assert_frame_equal(sundered_data_fail.collect(), expected_fail)
+
+
+def test_get_data_extracts_lazy_row_numbers() -> None:
+    # Row numbers must follow the table's row order, not the sort order of its first column
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    extracts = {}
+    for label, data in [("eager", tbl), ("lazy", tbl.lazy())]:
+        validation = Validate(data).col_vals_gt(columns="y", value=25).interrogate()
+        extract = validation.get_data_extracts(i=1, frame=True)
+        extracts[label] = extract.collect() if isinstance(extract, pl.LazyFrame) else extract
+
+    assert extracts["lazy"].rows() == [(1, 5, 10), (2, 1, 20)]
+    assert_frame_equal(extracts["lazy"], extracts["eager"])
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])

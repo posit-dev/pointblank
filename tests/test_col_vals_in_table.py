@@ -419,3 +419,23 @@ def test_chaining_with_other_validations():
 
     assert v.n_passed(i=1, scalar=True) == 3
     assert v.n_passed(i=2, scalar=True) == 3
+
+
+@pytest.mark.parametrize(
+    "tbl_values, ref_values",
+    [([1.0, 2.0, 99.0], [1, 2, 3]), ([1, 2, 99], [1.0, 2.0, 3.0])],
+    ids=["float_tbl_int_ref", "int_tbl_float_ref"],
+)
+def test_single_col_int_float_mismatch(tbl_values, ref_values):
+    # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+    ref = pl.DataFrame({"id": ref_values})
+    tbl = pl.DataFrame({"fk": tbl_values})
+
+    v = (
+        pb.Validate(data=tbl)
+        .col_vals_in_table(columns="fk", ref_table=ref, ref_column="id")
+        .interrogate()
+    )
+
+    assert v.n_passed(i=1, scalar=True) == 2
+    assert v.n_failed(i=1, scalar=True) == 1

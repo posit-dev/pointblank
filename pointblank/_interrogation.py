@@ -27,13 +27,12 @@ from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
     _get_tbl_type,
+    _is_in,
     _is_lazy_frame,
 )
 from pointblank.column import Column
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
-
     from narwhals.typing import Frame, IntoFrame
 
 
@@ -774,7 +773,7 @@ def col_pct_missing(
     # Build a boolean expression that flags missing values
     missing_expr = None
     if sentinels:
-        missing_expr = nw.col(column).is_in(sentinels)
+        missing_expr = _is_in(column, sentinels, nw_frame.collect_schema()[column])
     if count_null:
         null_expr = nw.col(column).is_null()
         missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
@@ -2044,30 +2043,6 @@ def interrogate_outside(
     return result_tbl.to_native()
 
 
-def _is_in(
-    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, set_values: Collection[Any]
-) -> nw.Expr:
-    """`nw.col(column).is_in(set_values)`, coercing integers and floats like Polars < 2.0."""
-    # NOTE: Polars < 2.0 compared an integer column with float values (or a float column with
-    # integer values) as Float64; Polars >= 2.0 raises instead. Booleans and mixed-type
-    # sets are passed through unchanged, so they keep raising on Polars as they always did.
-    # See https://docs.pola.rs/releases/upgrade/2/#make-coercion-casts-for-is_in-strict-instead-of-lossy
-    dtype = nw_tbl.collect_schema()[column]
-    clashing_type = float if dtype.is_integer() else int if dtype.is_float() else None
-    allowed = (float, int) if clashing_type is float else (int,)
-    first = next((v for v in set_values if v is not None), None)
-    if (
-        clashing_type is None
-        or not isinstance(first, clashing_type)
-        or not all(
-            v is None or (isinstance(v, allowed) and not isinstance(v, bool)) for v in set_values
-        )
-    ):
-        return nw.col(column).is_in(set_values)
-    float_values = [None if v is None else float(v) for v in set_values]
-    return nw.col(column).cast(nw.Float64).is_in(float_values)
-
-
 def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """In set interrogation."""
 
@@ -2075,7 +2050,7 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = _is_in(nw_tbl, column, set_values)
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
@@ -2129,7 +2104,7 @@ def interrogate_in_table(
         ref_values = ref_unique.get_column(ref_col_name).to_list()
         ref_values_clean = [v for v in ref_values if v is not None]
 
-        expr: nw.Expr = nw.col(col_name).is_in(ref_values_clean)
+        expr: nw.Expr = _is_in(col_name, ref_values_clean, nw_tbl.collect_schema()[col_name])
         if na_pass:
             expr = expr | nw.col(col_name).is_null()
 
@@ -2172,7 +2147,7 @@ def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(
-        pb_is_good_=_is_in(nw_tbl, column, set_values),
+        pb_is_good_=_is_in(column, set_values, nw_tbl.collect_schema()[column]),
     ).with_columns(pb_is_good_=~nw.col("pb_is_good_"))
     return result_tbl.to_native()
 
@@ -2734,12 +2709,15 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     """
     sentinels = spec.sentinel_values()
 
+    nw_tbl = nw.from_native(results_tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
     # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
     # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
     # sentinel mask is explicitly filled with `False` for null rows.
     mask = None
     if sentinels:
-        mask = nw.col(column).is_in(sentinels).fill_null(False)
+        mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
     if spec.null_is_missing:
         null_expr = nw.col(column).is_null()
         mask = null_expr if mask is None else (mask | null_expr)
@@ -2747,8 +2725,6 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     if mask is None:
         return results_tbl
 
-    nw_tbl = nw.from_native(results_tbl)
-    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
     return nw_tbl.to_native()
 
@@ -2769,6 +2745,7 @@ def interrogate_missing_only_coded(
     `[min_val, max_val]` range. Any other value is treated as an *undocumented* code and fails.
     """
     nw_tbl = nw.from_native(tbl)
+    dtype = nw_tbl.collect_schema()[column]
 
     good = None
 
@@ -2777,11 +2754,11 @@ def interrogate_missing_only_coded(
         good = expr if good is None else (good | expr)
 
     if sentinels:
-        _or(nw.col(column).is_in(sentinels).fill_null(False))
+        _or(_is_in(column, sentinels, dtype).fill_null(False))
     if count_null:
         _or(nw.col(column).is_null())
     if allowed:
-        _or(nw.col(column).is_in(allowed).fill_null(False))
+        _or(_is_in(column, allowed, dtype).fill_null(False))
     if min_val is not None or max_val is not None:
         range_expr = nw.lit(True)
         if min_val is not None:
@@ -2808,12 +2785,13 @@ def interrogate_missing_consistent(
     for the reason is encoded by the `sentinels` values (and, when `count_null=True`, actual nulls).
     """
     nw_tbl = nw.from_native(tbl)
+    schema = nw_tbl.collect_schema()
     n_cols = len(columns)
 
     count_expr = None
     for c in columns:
         if sentinels:
-            col_expr = nw.col(c).is_in(sentinels).fill_null(False)
+            col_expr = _is_in(c, sentinels, schema[c]).fill_null(False)
         else:
             col_expr = nw.lit(False)  # noqa
         if count_null:

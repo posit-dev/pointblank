@@ -140,3 +140,21 @@ class TestColPctMissing:
         )
         gt = validation.get_tabular_report()
         assert gt is not None
+
+    @pytest.mark.parametrize("lazy", [False, True])
+    def test_float_column_int_sentinels(self, age_missing, lazy):
+        # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+        tbl = pl.DataFrame({"age": [34.0, -98.0, 41.0, -99.0, 29.0, -98.0, 55.0, 38.0]})
+        tbl = tbl.lazy() if lazy else tbl
+        passing = (
+            pb.Validate(data=tbl)
+            .col_pct_missing(columns="age", missing=age_missing, max_pct=0.375)
+            .interrogate()
+        )
+        failing = (
+            pb.Validate(data=tbl)
+            .col_pct_missing(columns="age", missing=age_missing, max_pct=0.37)
+            .interrogate()
+        )
+        assert _single_step_passed(passing)
+        assert not _single_step_passed(failing)

@@ -92,3 +92,19 @@ class TestMissingExclusion:
             .interrogate()
         )
         assert v.get_tabular_report() is not None
+
+    @pytest.mark.parametrize("lazy", [False, True])
+    def test_float_column_int_sentinels(self, spec, lazy):
+        # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+        tbl = pl.DataFrame({"age": [34.0, -98.0, 41.0, -99.0, 29.0, 200.0, 55.0, None]})
+        tbl = tbl.lazy() if lazy else tbl
+        v = (
+            pb.Validate(data=tbl)
+            .col_vals_between(columns="age", left=0, right=120, missing=spec)
+            .interrogate()
+        )
+        assert _info(v).n_failed == 1  # only 200
+
+    def test_missing_vals_tbl_float_column_int_sentinels(self, spec):
+        tbl = pl.DataFrame({"age": [34.0, -98.0, 41.0, -99.0, None]})
+        assert pb.missing_vals_tbl(tbl, missing={"age": spec}) is not None
