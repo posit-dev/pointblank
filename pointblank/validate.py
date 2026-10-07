@@ -106,6 +106,7 @@ from pointblank._utils import (
     _get_fn_name,
     _get_tbl_type,
     _is_duration_dtype,
+    _is_in,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
@@ -113,6 +114,7 @@ from pointblank._utils import (
     _PBUnresolvedColumn,
     _resolve_columns,
     _select_df_lib,
+    _with_row_index,
 )
 from pointblank._utils_check_args import (
     _check_active_input,
@@ -2786,7 +2788,8 @@ def _build_structured_missing_tbl(
     nw_frame = nw.from_native(data)
     is_lazy = isinstance(nw_frame, nw.LazyFrame)
 
-    available_columns = list(nw_frame.columns)
+    schema = nw_frame.collect_schema()
+    available_columns = list(schema.names())
 
     # Build the ordered union of *declared* (coded) reason labels across all specs (first-seen
     # order). Raw Null/None/NA values are tallied separately in a fixed "Null" column rather than
@@ -2813,7 +2816,7 @@ def _build_structured_missing_tbl(
         for i, r in enumerate(declared_reasons):
             reason_alias[r] = f"__r{i}__"
             select_exprs[reason_alias[r]] = (
-                nw.col(column).is_in(spec.values_for_reason(r)).cast(nw.Int32).sum()
+                _is_in(column, spec.values_for_reason(r), schema[column]).cast(nw.Int32).sum()
             )
         if spec.null_is_missing:
             select_exprs["__null__"] = nw.col(column).is_null().cast(nw.Int32).sum()
@@ -17019,18 +17022,7 @@ class Validate:
                 and tbl_type not in IBIS_BACKENDS
             ):
                 # Add row numbers to the results table
-                validation_extract_nw = nw.from_native(results_tbl)
-
-                # Handle LazyFrame row indexing which requires order_by parameter
-                try:
-                    # Try without order_by first (for DataFrames)
-                    validation_extract_nw = validation_extract_nw.with_row_index(name="_row_num_")
-                except TypeError:
-                    # LazyFrames require order_by parameter: use first column for ordering
-                    first_col = validation_extract_nw.columns[0]
-                    validation_extract_nw = validation_extract_nw.with_row_index(
-                        name="_row_num_", order_by=first_col
-                    )
+                validation_extract_nw = _with_row_index(results_tbl, name="_row_num_")
 
                 validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
                     "pb_is_good_"
@@ -19651,36 +19643,15 @@ class Validate:
         # TODO: add argument for user to specify the index column name
         index_name = "pb_index_"
 
-        data_nw = nw.from_native(self.data)
-
-        # Handle LazyFrame row indexing which requires order_by parameter
-        try:
-            # Try without order_by first (for DataFrames)
-            data_nw = data_nw.with_row_index(name=index_name)
-        except TypeError:  # pragma: no cover
-            # LazyFrames require order_by parameter: use first column for ordering
-            first_col = data_nw.columns[0]  # pragma: no cover
-            data_nw = data_nw.with_row_index(
-                name=index_name, order_by=first_col
-            )  # pragma: no cover
+        data_nw = _with_row_index(self.data, name=index_name)
 
         # Get all validation step result tables and join together the `pb_is_good_` columns
         # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
         # and that the index is reset
         labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
         for i, validation in enumerate(validation_info):
-            results_tbl = nw.from_native(validation.tbl_checked)
-
             # Add row numbers to the results table
-            try:
-                # Try without order_by first (for DataFrames)
-                results_tbl = results_tbl.with_row_index(name=index_name)
-            except TypeError:  # pragma: no cover
-                # LazyFrames require order_by parameter: use first column for ordering
-                first_col = results_tbl.columns[0]  # pragma: no cover
-                results_tbl = results_tbl.with_row_index(
-                    name=index_name, order_by=first_col
-                )  # pragma: no cover
+            results_tbl = _with_row_index(validation.tbl_checked, name=index_name)
 
             # Add numerical suffix to the `pb_is_good_` column to make it unique
             results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
@@ -19697,12 +19668,14 @@ class Validate:
         pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
 
         # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
-        # columns are `True`
+        # columns are `True`; joins don't guarantee row order (e.g., Polars >= 2.0 collects
+        # LazyFrames with the streaming engine), so the original order is restored via the index
         labeled_tbl_nw = (
             labeled_tbl_nw.with_columns(
                 pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
             )
             .join(data_nw, on=index_name, how="left")
+            .sort(index_name)
             .drop(index_name)
         )
 
@@ -23616,7 +23589,8 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
         elif isinstance(segment, list):
             # Check if the segment is a segment group
-            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_in(segment))
+            dtype = data_tbl_nw.collect_schema()[column]
+            data_tbl_nw = data_tbl_nw.filter(_is_in(column, segment, dtype))
         else:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column) == segment)
 
