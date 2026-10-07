@@ -106,3 +106,19 @@ class TestColMissingConsistent:
             .interrogate()
         )
         assert _info(v).autobrief
+
+    def test_float_columns_int_sentinels(self, spec):
+        # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+        tbl = pl.DataFrame(
+            {"income_source": [1.0, -99.0, 2.0, -99.0], "income_amount": [5e4, -99.0, 4.2e4, 3.8e4]}
+        )
+        v = (
+            pb.Validate(data=tbl)
+            .col_missing_consistent(
+                columns=["income_source", "income_amount"], missing=spec, when_reason="not_asked"
+            )
+            .interrogate()
+        )
+        info = _info(v)
+        assert info.n == 4
+        assert info.n_failed == 1
