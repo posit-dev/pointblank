@@ -2205,9 +2205,10 @@ def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-    result_tbl = nw_tbl.with_columns(
-        pb_is_good_=_is_in(column, set_values, nw_tbl.collect_schema()[column]),
-    ).with_columns(pb_is_good_=~nw.col("pb_is_good_"))
+    # Missing values fail, like in `interrogate_isin()`; `is_in()` gives null for them on most
+    # backends (and False for NaN in pandas), so make the result a plain boolean
+    in_set = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(False)
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~in_set & ~nw.col(column).is_null())
     return result_tbl.to_native()
 
 
