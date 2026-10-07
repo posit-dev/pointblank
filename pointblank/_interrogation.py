@@ -32,6 +32,8 @@ from pointblank._utils import (
 from pointblank.column import Column
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
+
     from narwhals.typing import Frame, IntoFrame
 
 
@@ -2042,6 +2044,30 @@ def interrogate_outside(
     return result_tbl.to_native()
 
 
+def _is_in(
+    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, set_values: Collection[Any]
+) -> nw.Expr:
+    """`nw.col(column).is_in(set_values)`, coercing integers and floats like Polars < 2.0."""
+    # NOTE: Polars < 2.0 compared an integer column with float values (or a float column with
+    # integer values) as Float64; Polars >= 2.0 raises instead. Booleans and mixed-type
+    # sets are passed through unchanged, so they keep raising on Polars as they always did.
+    # See https://docs.pola.rs/releases/upgrade/2/#make-coercion-casts-for-is_in-strict-instead-of-lossy
+    dtype = nw_tbl.collect_schema()[column]
+    clashing_type = float if dtype.is_integer() else int if dtype.is_float() else None
+    allowed = (float, int) if clashing_type is float else (int,)
+    first = next((v for v in set_values if v is not None), None)
+    if (
+        clashing_type is None
+        or not isinstance(first, clashing_type)
+        or not all(
+            v is None or (isinstance(v, allowed) and not isinstance(v, bool)) for v in set_values
+        )
+    ):
+        return nw.col(column).is_in(set_values)
+    float_values = [None if v is None else float(v) for v in set_values]
+    return nw.col(column).cast(nw.Float64).is_in(float_values)
+
+
 def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """In set interrogation."""
 
@@ -2049,7 +2075,7 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = nw.col(column).is_in(set_values)
+    base_expr: nw.Expr = _is_in(nw_tbl, column, set_values)
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
@@ -2146,7 +2172,7 @@ def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(
-        pb_is_good_=nw.col(column).is_in(set_values),
+        pb_is_good_=_is_in(nw_tbl, column, set_values),
     ).with_columns(pb_is_good_=~nw.col("pb_is_good_"))
     return result_tbl.to_native()
 

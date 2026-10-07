@@ -26315,6 +26315,18 @@ def _step_report_aggregate(
     return step_report
 
 
+def _pl_concat_horizontal(frames: list[Any]) -> Any:
+    """Concatenate Polars DataFrames horizontally, padding shorter frames with nulls."""
+    # NOTE: Polars 2.0 made `how="horizontal"` require equal heights; `"horizontal_extend"`
+    # (added in 1.42.1) pads shorter frames, which is what `"horizontal"` did before.
+    # See https://docs.pola.rs/releases/upgrade/2/#update-the-strict-behavior-of-plconcatplunion
+    import polars as pl
+
+    polars_version = tuple(int(part) for part in re.findall(r"\d+", version("polars"))[:3])
+    how = "horizontal_extend" if polars_version >= (1, 42, 1) else "horizontal"
+    return pl.concat(frames, how=how)
+
+
 def _step_report_schema_in_order(
     step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
@@ -26490,7 +26502,7 @@ def _step_report_schema_in_order(
     )
 
     # Concatenate the tables horizontally
-    schema_combined = pl.concat([schema_tbl, schema_exp], how="horizontal")
+    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
 
     # Return the DataFrame if the `debug_return_df` parameter is set to True
     if debug_return_df:
@@ -26939,7 +26951,7 @@ def _step_report_schema_any_order(
         schema_exp = pl.concat([schema_exp, schema_exp_unmatched], how="vertical")
 
     # Concatenate the tables horizontally
-    schema_combined = pl.concat([schema_tbl, schema_exp], how="horizontal")
+    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
 
     # Return the DataFrame if the `debug_return_df` parameter is set to True
     if debug_return_df:
