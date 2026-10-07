@@ -2058,6 +2058,45 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     return result_tbl.to_native()
 
 
+def _dtype_kind(dtype: Any) -> str | None:
+    """Classify a Narwhals dtype as numeric, string, temporal, or boolean (`None` if other)."""
+    if dtype.is_numeric():
+        return "numeric"
+    if dtype.is_temporal():
+        return "temporal"
+    if dtype in (nw.String, nw.Categorical, nw.Enum):
+        return "string"
+    if dtype == nw.Boolean:
+        return "boolean"
+    return None
+
+
+def _check_key_dtypes_compatible(
+    columns: list[str], ref_columns: list[str], tbl_schema: Any, ref_schema: Any
+) -> None:
+    """Raise a `TypeError` if a key column can never match its reference column's values."""
+    for c, rc in zip(columns, ref_columns):
+        kind, ref_kind = _dtype_kind(tbl_schema[c]), _dtype_kind(ref_schema[rc])
+        if kind is not None and ref_kind is not None and kind != ref_kind:
+            raise TypeError(
+                f"Column '{c}' ({tbl_schema[c]}) and reference column '{rc}' "
+                f"({ref_schema[rc]}) have incompatible types."
+            )
+
+
+def _common_numeric_key_dtype(dtype: Any, ref_dtype: Any) -> Any:
+    """Get the dtype that mismatched numeric join keys should be cast to (`None` if no cast)."""
+    if dtype == ref_dtype or not (dtype.is_numeric() and ref_dtype.is_numeric()):
+        return None
+    if dtype.is_integer() and ref_dtype.is_integer():
+        # `UInt64` values can't all be represented by `Int64` (or vice versa), so such a pair is
+        # left to the backend
+        if dtype == nw.UInt64 or ref_dtype == nw.UInt64:
+            return None
+        return nw.Int64
+    return nw.Float64
+
+
 def interrogate_in_table(
     tbl: IntoFrame,
     columns: str | list[str],
@@ -2093,6 +2132,10 @@ def interrogate_in_table(
             f"got {len(columns)} and {len(ref_columns)}."
         )
 
+    tbl_schema = nw_tbl.collect_schema()
+    ref_schema = nw_ref.collect_schema()
+    _check_key_dtypes_compatible(columns, ref_columns, tbl_schema, ref_schema)
+
     if single_col:
         # Single-column path: extract distinct ref values, use is_in()
         col_name = columns[0]
@@ -2104,7 +2147,7 @@ def interrogate_in_table(
         ref_values = ref_unique.get_column(ref_col_name).to_list()
         ref_values_clean = [v for v in ref_values if v is not None]
 
-        expr: nw.Expr = _is_in(col_name, ref_values_clean, nw_tbl.collect_schema()[col_name])
+        expr: nw.Expr = _is_in(col_name, ref_values_clean, tbl_schema[col_name])
         if na_pass:
             expr = expr | nw.col(col_name).is_null()
 
@@ -2127,8 +2170,24 @@ def interrogate_in_table(
     if isinstance(nw_tbl, nw.LazyFrame):  # pragma: no cover
         nw_tbl = nw_tbl.collect()
 
-    joined = nw_tbl.join(ref_keys, on=columns, how="left")
-    matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False)
+    # Joins require the key columns on both sides to have the same dtype, so mismatched numeric
+    # keys (e.g., an integer key against a float reference key) are cast to a common dtype; this
+    # only applies to the join keys, the returned table keeps its original dtypes
+    key_casts = {
+        c: dtype
+        for c, rc in zip(columns, ref_columns)
+        if (dtype := _common_numeric_key_dtype(tbl_schema[c], ref_schema[rc])) is not None
+    }
+    tbl_keys = nw_tbl.select(columns)
+    if key_casts:
+        tbl_keys = tbl_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+        ref_keys = ref_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+
+    joined = tbl_keys.join(ref_keys, on=columns, how="left")
+
+    # The marker is `True` or null after the left join; pandas stores that as an `object` column,
+    # so it is cast to make it a proper boolean column
+    matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False).cast(nw.Boolean)
 
     if na_pass:
         all_null = nw.all_horizontal(*[nw.col(c).is_null() for c in columns], ignore_nulls=False)
