@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import inspect
+import math
+import numbers
 import re
 from collections import defaultdict
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Collection
 
 import narwhals as nw
 from great_tables import GT
 from great_tables.gt import _get_column_of_values
-from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
+from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe, is_polars_lazyframe
 from narwhals.utils import Implementation
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
@@ -17,6 +20,7 @@ from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelec
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from narwhals.dtypes import DType
     from narwhals.typing import IntoFrame, IntoFrameT
 
     from pointblank._typing import AbsoluteBounds, Tolerance
@@ -302,6 +306,110 @@ def _convert_to_narwhals(df: IntoFrame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]
     result = nw.from_native(df)
     assert is_narwhals_dataframe(result) or is_narwhals_lazyframe(result)
     return result
+
+
+def _is_real_number(value: Any) -> bool:
+    # `Decimal` isn't registered as `numbers.Real`; `bool` is (as an `Integral`) but isn't a number
+    # for the purposes of set membership
+    return isinstance(value, (numbers.Real, Decimal)) and not isinstance(value, bool)
+
+
+def _is_float_value(value: Any) -> bool:
+    return isinstance(value, numbers.Real) and not isinstance(value, numbers.Integral)
+
+
+def _is_in(column: str, values: Collection[Any], dtype: DType | None) -> nw.Expr:
+    """
+    Build `nw.col(column).is_in(values)`, aligning numeric values with the column's dtype.
+
+    Polars < 2.0 coerced the column and the values of `is_in()` to a common supertype (e.g., an
+    integer column checked against `[1.0, 2.0]`), whereas Polars >= 2.0 raises an
+    `InvalidOperationError` when the dtypes differ. Narwhals passes `is_in()` through to the
+    backend unchanged, so the values are aligned here instead. Only numeric columns checked against
+    purely numeric values are adjusted; anything else (strings, temporal values, mixed-type
+    collections) is passed through as is, keeping whatever behavior the backend has for it.
+
+    Parameters
+    ----------
+    column
+        The name of the column to check.
+    values
+        The values to check membership against. A `None` value is passed through as is.
+    dtype
+        The Narwhals dtype of `column`. If `None` (dtype unknown), no alignment is performed.
+
+    Returns
+    -------
+    nw.Expr
+        A boolean expression.
+    """
+    values = list(values)
+    non_null = [v for v in values if v is not None]
+
+    if (
+        dtype is None
+        or not dtype.is_numeric()
+        or not non_null
+        or not all(_is_real_number(v) for v in non_null)
+    ):
+        return nw.col(column).is_in(values)
+
+    # NOTE: See https://docs.pola.rs/releases/upgrade/2/#make-coercion-casts-for-is_in-strict-instead-of-lossy
+    if dtype.is_float():
+        # Compare as floats (an integer or `Decimal` value can't be checked against float data)
+        return nw.col(column).is_in([None if v is None else float(v) for v in values])
+
+    if dtype.is_integer() and not all(isinstance(v, numbers.Integral) for v in non_null):
+        # A value can only ever match an integer if it is integral, so integral values are
+        # converted to integers and all others (fractional values, NaN, infinity, values outside of
+        # the 64-bit range) are dropped; this is exact, unlike casting the column to `Float64`
+        # (which is lossy above 2**53)
+        int_values: list[Any] = [
+            None if v is None else int(v)
+            for v in values
+            if v is None or (math.isfinite(v) and v == int(v) and -(2**63) <= v < 2**64)
+        ]
+        return nw.col(column).is_in(int_values)
+
+    if dtype.is_decimal() and any(_is_float_value(v) for v in non_null):
+        # A `Decimal` column checked against float values is compared as `Float64`
+        float_values = [None if v is None else float(v) for v in values]
+        return nw.col(column).cast(nw.Float64).is_in(float_values)
+
+    # Integer values against integer data, and integer or `Decimal` values against `Decimal` data,
+    # are accepted as is
+    return nw.col(column).is_in(values)
+
+
+def _with_row_index(tbl: Any, name: str) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    """
+    Add a zero-based row index column to a table, following the table's row order.
+
+    Narwhals requires an `order_by=` column for row indexes on LazyFrames. Polars LazyFrames do
+    have a positional row order though (and ordering by a column would number the rows in sorted
+    order rather than in their actual order), so the native Polars row index is used for those.
+    Other LazyFrames have no inherent row order, so their first column is used for ordering.
+
+    Parameters
+    ----------
+    tbl
+        A native table or a Narwhals DataFrame/LazyFrame.
+    name
+        The name of the row index column.
+
+    Returns
+    -------
+    nw.DataFrame | nw.LazyFrame
+        The Narwhals table with the row index as its first column.
+    """
+    tbl_nw = nw.from_native(tbl)
+    if isinstance(tbl_nw, nw.DataFrame):
+        return tbl_nw.with_row_index(name=name)
+    native = tbl_nw.to_native()
+    if is_polars_lazyframe(native):
+        return nw.from_native(native.with_row_index(name=name))
+    first_col = tbl_nw.collect_schema().names()[0]
+    return tbl_nw.with_row_index(name=name, order_by=first_col)
 
 
 def _check_column_exists(dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> None:
