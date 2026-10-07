@@ -5176,15 +5176,39 @@ def test_col_vals_expr_polars_tbl() -> None:
         Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_passed(i=1, scalar=True) == 6
     )
     assert (
-        Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_failed(i=1, scalar=True) == 5
+        Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_failed(i=1, scalar=True) == 7
     )
 
     assert (
         Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_passed(i=1, scalar=True) == 6
     )
     assert (
-        Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_failed(i=1, scalar=True) == 5
+        Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_failed(i=1, scalar=True) == 7
     )
+
+
+def test_col_vals_expr_null_results_fail() -> None:
+    """Test that rows where the expression gives a null fail on every backend."""
+    data = {"a": [1.0, 2.0, None, 5.0, 2.0]}
+
+    tbls_exprs = [
+        (pl.DataFrame(data), pl.col("a") > 1),
+        (pl.DataFrame(data), nw.col("a") > 1),
+        (pl.LazyFrame(data), pl.col("a") > 1),
+        (pd.DataFrame(data), lambda df: df["a"] > 1),
+        (pd.DataFrame(data), nw.col("a") > 1),
+        (pd.DataFrame({"a": pd.array([1, 2, None, 5, 2], dtype="Int64")}), lambda df: df["a"] > 1),
+    ]
+
+    for tbl, expr in tbls_exprs:
+        validation = Validate(data=tbl).col_vals_expr(expr=expr).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 3
+        assert validation.n_failed(i=1, scalar=True) == 2
+        assert validation.n(i=1, scalar=True) == 5
+
+        extract = validation.get_data_extracts(i=1, frame=True)
+        assert list(extract["_row_num_"]) == [1, 3]
 
 
 def test_col_vals_expr_pandas_tbl() -> None:

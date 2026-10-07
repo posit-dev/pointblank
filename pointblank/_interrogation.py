@@ -623,6 +623,14 @@ def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     return compare_expr
 
 
+def _fill_null_as_failing(tbl: Any) -> Any:
+    """Make a null `pb_is_good_` result (e.g., from an expression on a null value) fail."""
+    tbl_nw = nw.from_native(tbl)
+    return tbl_nw.with_columns(
+        pb_is_good_=nw.col("pb_is_good_").fill_null(False).cast(nw.Boolean)
+    ).to_native()
+
+
 def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
     """Check if values in a column evaluate to True for a given predicate expression."""
     if tbl_type == "local":
@@ -641,13 +649,13 @@ def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
         if expression_type == "narwhals":
             tbl_nw = _convert_to_narwhals(df=data_tbl)
             tbl_nw = tbl_nw.with_columns(pb_is_good_=expr)
-            return tbl_nw.to_native()
+            return _fill_null_as_failing(tbl_nw.to_native())
 
         if df_lib_name == "polars" and expression_type == "polars":
-            return data_tbl.with_columns(pb_is_good_=expr)
+            return _fill_null_as_failing(data_tbl.with_columns(pb_is_good_=expr))
 
         if df_lib_name == "pandas" and expression_type == "pandas":
-            return data_tbl.assign(pb_is_good_=expr)
+            return _fill_null_as_failing(data_tbl.assign(pb_is_good_=expr))
 
     # For remote backends, return original table (placeholder)
     return data_tbl  # pragma: no cover
