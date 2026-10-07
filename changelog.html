@@ -112,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.0.0</code><br>Released 2026-10-06">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.0.1</code><br>Released 2026-10-07">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="./pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -166,7 +166,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#v1.0.0" id="toc-v1.0.0" class="nav-link active" data-scroll-target="#v1.0.0">v1.0.0</a></li>
+  <li><a href="#v1.0.1" id="toc-v1.0.1" class="nav-link active" data-scroll-target="#v1.0.1">v1.0.1</a></li>
+  <li><a href="#v1.0.0" id="toc-v1.0.0" class="nav-link" data-scroll-target="#v1.0.0">v1.0.0</a></li>
   <li><a href="#v0.27.0" id="toc-v0.27.0" class="nav-link" data-scroll-target="#v0.27.0">v0.27.0</a></li>
   <li><a href="#v0.26.0" id="toc-v0.26.0" class="nav-link" data-scroll-target="#v0.26.0">v0.26.0</a></li>
   <li><a href="#v0.25.0" id="toc-v0.25.0" class="nav-link" data-scroll-target="#v0.25.0">v0.25.0</a></li>
@@ -184,7 +185,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#v0.22.0" id="toc-v0.22.0" class="nav-link" data-scroll-target="#v0.22.0">v0.22.0</a>
   <ul class="collapse">
   <li><a href="#new-features-5" id="toc-new-features-5" class="nav-link" data-scroll-target="#new-features-5">New Features</a></li>
-  <li><a href="#bug-fixes-4" id="toc-bug-fixes-4" class="nav-link" data-scroll-target="#bug-fixes-4">Bug Fixes</a></li>
+  <li><a href="#bug-fixes-5" id="toc-bug-fixes-5" class="nav-link" data-scroll-target="#bug-fixes-5">Bug Fixes</a></li>
   <li><a href="#docs-1" id="toc-docs-1" class="nav-link" data-scroll-target="#docs-1">Docs</a></li>
   </ul></li>
   <li><a href="#v0.21.0" id="toc-v0.21.0" class="nav-link" data-scroll-target="#v0.21.0">v0.21.0</a>
@@ -385,11 +386,6 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#new-features-and-fixes-5" id="toc-new-features-and-fixes-5" class="nav-link" data-scroll-target="#new-features-and-fixes-5">New Features and Fixes</a></li>
   </ul></li>
-  <li><a href="#v0.6.3" id="toc-v0.6.3" class="nav-link" data-scroll-target="#v0.6.3">v0.6.3</a>
-  <ul class="collapse">
-  <li><a href="#new-features-and-fixes-6" id="toc-new-features-and-fixes-6" class="nav-link" data-scroll-target="#new-features-and-fixes-6">New Features and Fixes</a></li>
-  <li><a href="#new-contributors-10" id="toc-new-contributors-10" class="nav-link" data-scroll-target="#new-contributors-10">New Contributors</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -416,6 +412,27 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>This changelog is generated automatically from <a href="https://github.com/posit-dev/pointblank/releases">GitHub Releases</a>.</p>
+<section id="v1.0.1" class="level1 changelog-version">
+<h1 class="changelog-version">v1.0.1</h1>
+<p><em>2026-10-07</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.0.1">GitHub</a></p>
+<p>Pointblank <code>v1.0.1</code> is a maintenance release that makes Pointblank fully compatible with Polars 2.0. Polars 2.0 no longer silently converts between integers and floats in membership checks, and it requires equal-height frames for horizontal concatenation. Both changes caused errors in several validation methods and in schema step reports. This release fixes those errors across the board and corrects row ordering and row numbering for Polars LazyFrames. Polars <code>1.33.0</code> and later remain supported. Many thanks to <a href="https://github.com/FBruzzesi"><span class="citation" data-cites="FBruzzesi">@FBruzzesi</span></a> for spotting these issues in Narwhals CI and contributing the first set of fixes!</p>
+<section id="bug-fixes" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h3>
+<ul>
+<li><a href="./reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> and <a href="./reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a> work again on Polars 2.0 when integer columns are checked against float values or float columns against integer values, including mixed sets such as <code>[1, 2.5]</code>. (<a href="https://github.com/posit-dev/pointblank/issues/429">#429</a>, <a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
+<li>Step reports for <a href="./reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> no longer raise a <code>ShapeError</code> on Polars 2.0 when the table and the expected schema have different numbers of columns. (<a href="https://github.com/posit-dev/pointblank/issues/429">#429</a>)</li>
+<li>Mismatches between integer, float and Decimal types no longer raise errors on Polars 2.0 in <a href="./reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a>, <a href="./reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link gdls-code">col_pct_missing()</a>, <a href="./reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="gdls-link gdls-code">col_missing_only_coded()</a>, <a href="./reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link gdls-code">col_missing_consistent()</a>, <a href="./reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link gdls-code">missing_vals_tbl()</a>, the <code>missing=</code> argument of validation methods, segment groups, or the native CDISC conformance rule engine. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
+<li><a href="./reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a> now returns rows in their original order for Polars LazyFrames. Polars 2.0’s streaming engine could otherwise reorder them. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
+<li><a href="./reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> now reports correct row numbers for Polars LazyFrames. Previously, rows were numbered by the sort order of the first column, on every Polars version. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
+</ul>
+</section>
+<section id="maintenance" class="level3">
+<h3 class="anchored" data-anchor-id="maintenance">Maintenance</h3>
+<ul>
+<li>CI now runs the test suite against the latest Polars and Narwhals releases as well as the minimum supported versions, so new releases of either library are tested as soon as they come out. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
+</ul>
+</section>
+</section>
 <section id="v1.0.0" class="level1 changelog-version">
 <h1 class="changelog-version">v1.0.0</h1>
 <p><em>2026-10-06</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.0.0">GitHub</a></p>
@@ -427,8 +444,8 @@ ul.task-list li input[type="checkbox"] {
 <li><strong><a href="./reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len" class="gdls-link gdls-code">col_vals_str_len()</a> validation method</strong>: checks whether the character length of string values in one or more columns falls between <code>min_val=</code> and/or <code>max_val=</code>. It supports the usual <code>na_pass=</code>, <code>pre=</code>, <code>segments=</code>, <code>thresholds=</code>, and <code>actions=</code> options, has translated autobriefs, and is also available on <a href="./reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a>. (<a href="https://github.com/posit-dev/pointblank/issues/422">#422</a>)</li>
 </ul>
 </section>
-<section id="bug-fixes" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h3>
+<section id="bug-fixes-1" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-1">Bug Fixes</h3>
 <ul>
 <li>Validation reports now render correctly with Great Tables <code>v1.0.0</code>. Previously, the HTML in the report’s cells (status icons, badges, and labels) appeared as escaped markup. The fix also keeps working with earlier Great Tables versions. (<a href="https://github.com/posit-dev/pointblank/issues/426">#426</a>)</li>
 <li>The MCP server’s prompts now import <code>Message</code> from FastMCP’s current module path, fixing an import error with recent FastMCP releases.</li>
@@ -443,8 +460,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Clarified the failing-case example in the length validation docs.</li>
 </ul>
 </section>
-<section id="maintenance" class="level3">
-<h3 class="anchored" data-anchor-id="maintenance">Maintenance</h3>
+<section id="maintenance-1" class="level3">
+<h3 class="anchored" data-anchor-id="maintenance-1">Maintenance</h3>
 <ul>
 <li>Test coverage was expanded substantially across the validation, MCP, metadata, conformance, adapter, scan profile, and data generation modules.</li>
 </ul>
@@ -469,8 +486,8 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong>Contract adapter additions and fixes</strong> — The contract adapter system received expanded functionality and correctness fixes across the supported formats (dbt, Frictionless, JSON Schema, ODCS). Adapter import and export coverage was improved, and <a href="./reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">ContractImport.to_contract()</a> and <a href="./reference/ContractImport.html#pointblank.ContractImport.to_python" class="gdls-link gdls-code">ContractImport.to_python()</a> output is now more reliable. (<a href="https://github.com/posit-dev/pointblank/issues/418">#418</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-1" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-1">Bug Fixes</h3>
+<section id="bug-fixes-2" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-2">Bug Fixes</h3>
 <ul>
 <li>Removed the direct <code>mcp[cli]</code> dependency and replaced it with an updated <code>fastmcp&gt;=2.14.2</code> pin, resolving installation conflicts in environments that use the MCP optional extra. (<a href="https://github.com/posit-dev/pointblank/issues/416">#416</a>)</li>
 </ul>
@@ -498,8 +515,8 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong><a href="./reference/float_field.html#pointblank.float_field" class="gdls-link gdls-code">float_field()</a> <code>precision=</code> parameter</strong> — Generated float values can now be rounded to a specified number of decimal places, useful for prices, scores, and other fields where full floating-point precision is not desired. (<a href="https://github.com/posit-dev/pointblank/issues/412">#412</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-2" class="level4">
-<h4 class="anchored" data-anchor-id="bug-fixes-2">Bug Fixes</h4>
+<section id="bug-fixes-3" class="level4">
+<h4 class="anchored" data-anchor-id="bug-fixes-3">Bug Fixes</h4>
 <ul>
 <li><p>Per-row validation checks on Polars LazyFrames are no longer 8–11× slower than v0.24.0. The result-tallying code now computes row, pass, fail, and null counts in a single aggregation instead of issuing three to four separate <code>.collect()</code> calls that re-executed the entire lazy plan. (<a href="https://github.com/posit-dev/pointblank/issues/407">#407</a>)</p></li>
 <li><p>Segmented validation on Polars LazyFrames no longer raises an <code>UnboundLocalError</code> for <code>seg_tuples()</code>. Segment expressions now work consistently for both eager and lazy DataFrames. (<a href="https://github.com/posit-dev/pointblank/issues/414">#414</a>)</p></li>
@@ -524,8 +541,8 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong>Boundary enforcement with contracts and pipelines</strong> — New <a href="./reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> and <a href="./reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> classes enable dual-boundary validation at the source and target of data transformations. Contracts define schema expectations and validation steps with ownership metadata, while pipelines orchestrate the full validate-transform-validate workflow with short-circuit optimization. (<a href="https://github.com/posit-dev/pointblank/issues/401">#401</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-3" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-3">Bug Fixes</h3>
+<section id="bug-fixes-4" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-4">Bug Fixes</h3>
 <ul>
 <li><p>Lazy frames are no longer prematurely collected during interrogation, preserving the performance benefits of deferred evaluation with Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/398">#398</a>)</p></li>
 <li><p><a href="./reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> now correctly handles rows containing null values instead of dropping them from validation results. (<a href="https://github.com/posit-dev/pointblank/issues/399">#399</a>)</p></li>
@@ -591,8 +608,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Significantly expanded YAML workflow support with governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>), <code>final_actions</code> and <code>reference</code> top-level keys, aggregate validation methods (<a href="./reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt</a>, <a href="./reference/Validate.col_avg_le.html#pointblank.Validate.col_avg_le" class="gdls-link gdls-code">col_avg_le</a>, etc.), <a href="./reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null</a>, <a href="./reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness</a>, shortcut syntax for the <code>active</code> parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. (<a href="https://github.com/posit-dev/pointblank/issues/369">#369</a>)</li>
 </ul>
 </section>
-<section id="bug-fixes-4" class="level2">
-<h2 class="anchored" data-anchor-id="bug-fixes-4">Bug Fixes</h2>
+<section id="bug-fixes-5" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-5">Bug Fixes</h2>
 <ul>
 <li>Fixed <a href="./reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> failing on tables with duration (timedelta) columns by casting them to strings before display. (<a href="https://github.com/posit-dev/pointblank/issues/368">#368</a>)</li>
 </ul>
@@ -1343,26 +1360,6 @@ ul.task-list li input[type="checkbox"] {
 <li>Introduced a <code>Code Checks</code> CI workflow to incorporate Ruff and pre-commit by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/87</li>
 </ul>
 <p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.3...v0.7.0">https://github.com/posit-dev/pointblank/compare/v0.6.3…v0.7.0</a></p>
-</section>
-</section>
-<section id="v0.6.3" class="level1 changelog-version">
-<h1 class="changelog-version">v0.6.3</h1>
-<p><em>2025-03-11</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.6.3">GitHub</a></p>
-<section id="new-features-and-fixes-6" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-and-fixes-6">New Features and Fixes</h2>
-<ul>
-<li>Templating options are now available for strings used in <code>brief=</code> (all validation methods) and for any <a href="./reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> consisting of text printed to the console, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/78</li>
-<li>Much more information about a table is now collected through a <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/84</li>
-<li>Any tables generated by Pointblank should no longer yield warnings in a Quarto publishing environment when Great Tables <code>0.17.0</code> (or higher) is installed, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/85</li>
-<li>Fixed a display issue concerning value sets within step reports, by <a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> in https://github.com/posit-dev/pointblank/pull/80</li>
-</ul>
-</section>
-<section id="new-contributors-10" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-10">New Contributors</h2>
-<ul>
-<li><a href="https://github.com/phobson"><span class="citation" data-cites="phobson">@phobson</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/80</li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.6.2...v0.6.3">https://github.com/posit-dev/pointblank/compare/v0.6.2…v0.6.3</a></p>
 
 
 </section>
