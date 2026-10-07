@@ -252,6 +252,16 @@ def test_evaluator_not_in():
     assert mask.to_list() == [False, True, False]
 
 
+def test_evaluator_is_in_not_in_numeric_dtype_mismatch():
+    # Numeric columns read from SAS transport files are floats while rule values are often integers
+    # (Polars >= 2.0 no longer coerces between the two in `is_in()`)
+    df = _nw_df({"x": [1.0, 2.0, 3.0], "y": [1, 2, 3]})
+    mask_x = evaluate_conditions(df, {"name": "x", "operator": "is_in", "value": [1, 3]})
+    mask_y = evaluate_conditions(df, {"name": "y", "operator": "not_in", "value": [1.0, 3.0]})
+    assert mask_x.to_list() == [True, False, True]
+    assert mask_y.to_list() == [False, True, False]
+
+
 def test_evaluator_contains():
     df = _nw_df({"x": ["hello world", "foo", "world"]})
     mask = evaluate_conditions(
@@ -352,7 +362,7 @@ def test_evaluator_unknown_operator_raises():
     from pointblank.metadata._conformance.evaluator import _compile_leaf
 
     with pytest.raises(ValueError, match="Unknown operator"):
-        _compile_leaf({"name": "x", "operator": "does_not_exist", "value": None})
+        _compile_leaf({"name": "x", "operator": "does_not_exist", "value": None}, {})
 
 
 def test_iso8601_valid():
