@@ -4691,6 +4691,23 @@ def test_col_vals_not_in_set(request, tbl_fixture) -> None:
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_col_vals_not_in_set_missing_values(tbl_type) -> None:
+    # Missing values fail, and every row counts as either passing or failing
+    tbl = pl.DataFrame({"x": [1.0, 2.0, None, 5.0]})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation = Validate(tbl).col_vals_not_in_set(columns="x", set=[1.0, 5.0]).interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 3
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
 @pytest.mark.parametrize(
     "x, set_values, n_in_set",
     [
