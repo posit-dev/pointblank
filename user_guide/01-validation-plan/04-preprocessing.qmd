@@ -55,15 +55,11 @@ less than 10 characters. We can't directly use the [`Validate.col_vals_lt()`](`V
 that column because it is meant to be used with a column of numeric values. Let's just give that
 method what it needs and create a column with string lengths!
 
-The target table is a Polars DataFrame so we'll provide a function that uses the Polars API to add
-in that numeric column:
+The target table is a Polars DataFrame so we'll provide a lambda function that uses the Polars API
+to add in that numeric column:
 
 ```{python}
 import polars as pl
-
-# Define a preprocessing function that gets string lengths from column `b`
-def add_string_length_column(df):
-    return df.with_columns(string_lengths=pl.col("b").str.len_chars())
 
 (
     pb.Validate(
@@ -79,8 +75,8 @@ def add_string_length_column(df):
         # The string length value to be less than ---
         value=10,
 
-        # The preprocessing function that modifies the table ---
-        pre=add_string_length_column
+        # Lambda function that modifies the table ---
+        pre=lambda df: df.with_columns(string_lengths=pl.col("b").str.len_chars())
     )
     .interrogate()
 )
@@ -213,7 +209,7 @@ def get_median_columns_c_and_a(df):
         columns="c",
         value=pb.col("a"),
 
-        # Using Narwhals to modify the table; generates table with columns `c` and `a` ---
+        # Custom function to modify the table; generates table with columns `c` and `a` ---
         pre=get_median_columns_c_and_a
     )
     .interrogate()
@@ -224,11 +220,11 @@ The goal is to check that the median value of `c` is greater than the correspond
 column `a`, which we set up through the `columns=` and `value=` parameters in the
 [`Validate.col_vals_gt()`](`Validate.col_vals_gt`) method.
 
-There's a bit to unpack here so let's look at at the lambda function first. Narwhals can translate
-a Pandas DataFrame to a Narwhals DataFrame with its `from_native()` function. After that initiating
-step, you're free to use the Narwhals API (which is modeled on a subset of the Polars API) to do the
-necessary data transformation. In this case, we are getting the medians of the `c` and `a` columns
-and ending up with a one-row, two-column table.
+There's a bit to unpack here, so let's look at the preprocessing function first. Narwhals can
+translate a Pandas DataFrame to a Narwhals DataFrame with its `from_native()` function. After that
+initiating step, you're free to use the Narwhals API (which is modeled on a subset of the Polars
+API) to do the necessary data transformation. In this case, we are getting the medians of the `c`
+and `a` columns and ending up with a one-row, two-column table.
 
 We should note that the transformed table is, perhaps surprisingly, a Narwhals DataFrame (we didn't
 have to go back to a Pandas DataFrame by using `.to_native()`). Pointblank is able to work directly
