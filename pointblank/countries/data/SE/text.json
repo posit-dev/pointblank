@@ -1,0 +1,43 @@
+{
+  "words": [
+    "hus", "bil", "bok", "tid", "dag",
+    "år", "man", "kvinna", "barn", "vän",
+    "arbete", "skola", "land", "stad", "väg",
+    "sol", "regn", "snö", "vind", "hav",
+    "skog", "fält", "berg", "sjö", "strand",
+    "mat", "vatten", "bröd", "kaffe", "öl",
+    "kärlek", "liv", "död", "glädje", "sorg",
+    "stor", "liten", "god", "dålig", "ny",
+    "gammal", "ung", "vacker", "snabb", "långsam"
+  ],
+  "sentence_patterns": [
+    "{subject} {verb} {object}.",
+    "Det var en gång {subject}.",
+    "{subject} är {adjective}.",
+    "Jag kan se {object}.",
+    "{subject} och {subject} {verb}."
+  ],
+  "adjectives": [
+    "stor", "liten", "god", "dålig", "ny",
+    "gammal", "ung", "vacker", "snabb", "långsam",
+    "varm", "kall", "ljus", "mörk", "stark",
+    "svag", "rik", "fattig", "glad", "ledsen"
+  ],
+  "nouns": [
+    "hus", "bil", "bok", "tid", "dag",
+    "man", "kvinna", "barn", "vän", "arbete",
+    "skola", "land", "stad", "väg", "sol",
+    "regn", "snö", "vind", "hav", "skog"
+  ],
+  "verbs": [
+    "vara", "ha", "göra", "säga", "komma",
+    "gå", "se", "ta", "ge", "hitta",
+    "veta", "vilja", "kunna", "skola", "måste",
+    "tro", "tänka", "arbeta", "leva", "älska"
+  ],
+  "adverbs": [
+    "mycket", "alltid", "aldrig", "ofta", "sällan",
+    "nu", "snart", "senare", "här", "där",
+    "snabbt", "långsamt", "bra", "dåligt", "plötsligt"
+  ]
+}

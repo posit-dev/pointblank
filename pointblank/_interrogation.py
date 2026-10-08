@@ -1,2073 +1,153 @@
 from __future__ import annotations
 
 import functools
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
+from zoneinfo import ZoneInfo
 
 import narwhals as nw
-from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
-from narwhals.typing import FrameT
+from narwhals.dependencies import (
+    is_narwhals_dataframe,
+    is_narwhals_lazyframe,
+    is_pandas_dataframe,
+    is_polars_dataframe,
+    is_polars_lazyframe,
+)
 
 from pointblank._constants import IBIS_BACKENDS
+from pointblank._spec_utils import (
+    check_credit_card,
+    check_iban,
+    check_isbn,
+    check_postal_code,
+    check_vin,
+)
+from pointblank._typing import AbsoluteBounds
 from pointblank._utils import (
-    _column_subset_test_prep,
     _column_test_prep,
     _convert_to_narwhals,
     _get_tbl_type,
+    _is_in,
+    _is_lazy_frame,
+    _with_row_index,
 )
-from pointblank.column import Column, ColumnLiteral
-from pointblank.schema import Schema
-from pointblank.thresholds import _threshold_check
+from pointblank.column import Column
 
 if TYPE_CHECKING:
-    from pointblank._typing import AbsoluteTolBounds
+    from narwhals.typing import Frame, IntoFrame
 
 
-@dataclass
-class Interrogator:
+def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
     """
-    Compare values against a single value, a set of values, or a range of values.
+    Safely modify datetime comparison values for LazyFrame compatibility.
+
+    This function handles the case where we can't directly slice LazyFrames
+    to get column dtypes for datetime conversion.
+    """
+    try:
+        # First try to get column dtype from schema for LazyFrames
+        column_dtype = None
+
+        if is_narwhals_lazyframe(data_frame):
+            schema = data_frame.collect_schema()
+            column_dtype = schema.get(column)
+        elif is_narwhals_dataframe(data_frame):
+            schema = data_frame.schema
+            column_dtype = schema.get(column)
+
+        # If we got a dtype from schema, use it
+        if column_dtype is not None:
+            # Create a mock column object for _modify_datetime_compare_val
+            class MockColumn:
+                def __init__(self, dtype) -> None:
+                    self.dtype = dtype
+
+            mock_column = MockColumn(column_dtype)
+            return _modify_datetime_compare_val(tgt_column=mock_column, compare_val=compare_val)
+
+        # Fallback: try collecting a small sample if possible
+        try:
+            sample = data_frame.head(1).collect()
+            if hasattr(sample, "dtypes") and column in sample.columns:
+                # For pandas-like dtypes
+                column_dtype = sample.dtypes[column] if hasattr(sample, "dtypes") else None
+                if column_dtype:
+
+                    class MockColumn:
+                        def __init__(self, dtype) -> None:
+                            self.dtype = dtype
+
+                    mock_column = MockColumn(column_dtype)
+                    return _modify_datetime_compare_val(
+                        tgt_column=mock_column, compare_val=compare_val
+                    )
+        except Exception:
+            pass
+
+        # Final fallback: try direct access (for eager DataFrames)
+        try:
+            if hasattr(data_frame, "dtypes") and column in data_frame.columns:
+                column_dtype = data_frame.dtypes[column]
+
+                class MockColumn:
+                    def __init__(self, dtype) -> None:
+                        self.dtype = dtype
+
+                mock_column = MockColumn(column_dtype)
+                return _modify_datetime_compare_val(tgt_column=mock_column, compare_val=compare_val)
+        except Exception:
+            pass
+
+    except Exception:  # pragma: no cover
+        pass
+
+    # If all else fails, return the original compare_val
+    return compare_val
+
+
+def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, column_name: str) -> Any:
+    """
+    Create an expression that safely checks for both Null and NaN values.
+
+    This function handles the case where `is_nan()` is not supported for certain data types (like
+    strings) or backends (like `SQLite` via Ibis) by checking the backend type and column type
+    first.
 
     Parameters
     ----------
-    x
-        The values to compare.
-    column
-        The column to check.
-    columns_subset
-        The subset of columns to use for the check.
-    compare
-        The value to compare against. Used in the following interrogations:
-        - 'gt' for greater than
-        - 'lt' for less than
-        - 'eq' for equal to
-        - 'ne' for not equal to
-        - 'ge' for greater than or equal to
-        - 'le' for less than or equal to
-    set
-        The set of values to compare against. Used in the following interrogations:
-        - 'isin' for values in the set
-        - 'notin' for values not in the set
-    pattern
-        The regular expression pattern to compare against. Used in the following:
-        - 'regex' for values that match the pattern
-    low
-        The lower bound of the range of values to compare against. Used in the following:
-        - 'between' for values between the range
-        - 'outside' for values outside the range
-    high
-        The upper bound of the range of values to compare against. Used in the following:
-        - 'between' for values between the range
-        - 'outside' for values outside the range
-    inclusive
-        A tuple of booleans that state which bounds are inclusive. The position of the boolean
-        corresponds to the value in the following order: (low, high). Used in the following:
-        - 'between' for values between the range
-        - 'outside' for values outside the range
-    na_pass
-        `True` to pass test units with missing values, `False` otherwise.
-    tbl_type
-        The type of table to use for the assertion. This is used to determine the backend for the
-        assertion. The default is 'local' but it can also be any of the table types in the
-        `IBIS_BACKENDS` constant.
+    data_frame
+        The data frame to get schema information from.
+    column_expr
+        The narwhals column expression to check.
+    column_name
+        The name of the column.
 
     Returns
     -------
-    list[bool]
-        A list of booleans where `True` indicates a passing test unit.
+    Any
+        A narwhals expression that returns `True` for Null or NaN values.
     """
+    null_check = column_expr.is_null()
 
-    x: nw.DataFrame | Any
-    column: str = None
-    columns_subset: list[str] = None
-    compare: float | int | list[float | int] = None
-    set: list[float | int] = None
-    pattern: str = None
-    low: float | int | list[float | int] = None
-    high: float | int | list[float | int] = None
-    inclusive: tuple[bool, bool] = None
-    na_pass: bool = False
-    tbl_type: str = "local"
+    df: Frame = nw.from_native(data_frame, allow_series=False)
 
-    def gt(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
+    # Ibis backends (e.g. SQLite) don't support is_nan(), so only check nulls
+    if df.implementation.is_ibis():
+        return null_check
 
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
+    schema: nw.Schema = df.collect_schema()
 
-            if isinstance(self.compare, ColumnLiteral):
-                #
-                # Ibis column-to-column comparison
-                #
+    dtype: nw.dtypes.DType = schema[column_name]
 
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] > self.x[self.compare.name],
-                )
+    if not dtype.is_numeric():
+        return null_check
 
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] > ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) > compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
-
-    def lt(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] < self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] < ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) < compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
-
-    def eq(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] == self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] == ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        if isinstance(self.compare, Column):
-            compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-            tbl = self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-            )
-
-            tbl = tbl.with_columns(
-                pb_is_good_3=(~nw.col(self.compare.name).is_null() & ~nw.col(self.column).is_null())
-            )
-
-            if is_pandas_dataframe(tbl.to_native()):
-                tbl = tbl.with_columns(
-                    pb_is_good_4=nw.col(self.column) - compare_expr,
-                )
-
-                tbl = tbl.with_columns(
-                    pb_is_good_=nw.col("pb_is_good_1")
-                    | nw.col("pb_is_good_2")
-                    | (nw.col("pb_is_good_4") == 0 & ~nw.col("pb_is_good_3").is_null())
-                )
-
-            else:
-                tbl = tbl.with_columns(
-                    pb_is_good_4=nw.col(self.column) == compare_expr,
-                )
-
-                tbl = tbl.with_columns(
-                    pb_is_good_=nw.col("pb_is_good_1")
-                    | nw.col("pb_is_good_2")
-                    | (nw.col("pb_is_good_4") & ~nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2"))
-                )
-
-            return tbl.drop(
-                "pb_is_good_1", "pb_is_good_2", "pb_is_good_3", "pb_is_good_4"
-            ).to_native()
-
-        else:
-            compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-            compare_expr = _modify_datetime_compare_val(
-                tgt_column=self.x[self.column], compare_val=compare_expr
-            )
-
-            tbl = self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-            )
-
-            tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) == compare_expr)
-
-            tbl = tbl.with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-
-            tbl = tbl.with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-
-            return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-    def ne(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] != self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=ibis.ifelse(
-                    self.x[self.column].notnull(),
-                    self.x[self.column] != ibis.literal(self.compare),
-                    ibis.literal(False),
-                ),
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        # Determine if the reference and comparison columns have any null values
-        ref_col_has_null_vals = _column_has_null_values(table=self.x, column=self.column)
-
-        if isinstance(self.compare, Column):
-            compare_name = self.compare.name if isinstance(self.compare, Column) else self.compare
-            cmp_col_has_null_vals = _column_has_null_values(table=self.x, column=compare_name)
-        else:
-            cmp_col_has_null_vals = False
-
-        # If neither column has null values, we can proceed with the comparison
-        # without too many complications
-        if not ref_col_has_null_vals and not cmp_col_has_null_vals:
-            if isinstance(self.compare, Column):
-                compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-                return self.x.with_columns(
-                    pb_is_good_=nw.col(self.column) != compare_expr,
-                ).to_native()
-
-            else:
-                compare_expr = _modify_datetime_compare_val(
-                    tgt_column=self.x[self.column], compare_val=self.compare
-                )
-
-                return self.x.with_columns(
-                    pb_is_good_=nw.col(self.column) != nw.lit(compare_expr),
-                ).to_native()
-
-        # If either column has null values, we need to handle the comparison
-        # much more carefully since we can't inadverdently compare null values
-        # to non-null values
-
-        if isinstance(self.compare, Column):
-            compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-            # CASE 1: the reference column has null values but the comparison column does not
-            if ref_col_has_null_vals and not cmp_col_has_null_vals:
-                if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.lit(self.column) != nw.col(self.compare.name),
-                    )
-
-                else:
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.col(self.column) != nw.col(self.compare.name),
-                    )
-
-                if not self.na_pass:
-                    tbl = tbl.with_columns(
-                        pb_is_good_2=nw.col("pb_is_good_2") & ~nw.col("pb_is_good_1")
-                    )
-
-                if is_polars_dataframe(self.x.to_native()):
-                    # There may be Null values in the pb_is_good_2 column, change those to
-                    # True if na_pass is True, False otherwise
-
-                    tbl = tbl.with_columns(
-                        pb_is_good_2=nw.when(nw.col("pb_is_good_2").is_null())
-                        .then(False)
-                        .otherwise(nw.col("pb_is_good_2")),
-                    )
-
-                    if self.na_pass:
-                        tbl = tbl.with_columns(
-                            pb_is_good_2=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
-                        )
-
-                return (
-                    tbl.with_columns(pb_is_good_=nw.col("pb_is_good_2"))
-                    .drop("pb_is_good_1", "pb_is_good_2")
-                    .to_native()
-                )
-
-            # CASE 2: the comparison column has null values but the reference column does not
-            elif not ref_col_has_null_vals and cmp_col_has_null_vals:
-                if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column) != nw.lit(self.compare.name),
-                        pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    )
-
-                else:
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column) != nw.col(self.compare.name),
-                        pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    )
-
-                if not self.na_pass:
-                    tbl = tbl.with_columns(
-                        pb_is_good_1=nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2")
-                    )
-
-                if is_polars_dataframe(self.x.to_native()):
-                    if self.na_pass:
-                        tbl = tbl.with_columns(
-                            pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
-                        )
-
-                return (
-                    tbl.with_columns(pb_is_good_=nw.col("pb_is_good_1"))
-                    .drop("pb_is_good_1", "pb_is_good_2")
-                    .to_native()
-                )
-
-            # CASE 3: both columns have null values and there may potentially be cases where
-            # there could even be null/null comparisons
-            elif ref_col_has_null_vals and cmp_col_has_null_vals:
-                tbl = self.x.with_columns(
-                    pb_is_good_1=nw.col(self.column).is_null(),
-                    pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    pb_is_good_3=nw.col(self.column) != nw.col(self.compare.name),
-                )
-
-                if not self.na_pass:
-                    tbl = tbl.with_columns(
-                        pb_is_good_3=nw.col("pb_is_good_3")
-                        & ~nw.col("pb_is_good_1")
-                        & ~nw.col("pb_is_good_2")
-                    )
-
-                if is_polars_dataframe(self.x.to_native()):
-                    if self.na_pass:
-                        tbl = tbl.with_columns(
-                            pb_is_good_3=(
-                                nw.when(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
-                                .then(True)
-                                .otherwise(False)
-                            )
-                        )
-
-                return (
-                    tbl.with_columns(pb_is_good_=nw.col("pb_is_good_3"))
-                    .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-                    .to_native()
-                )
-
-        else:
-            # Case where the reference column contains null values
-            if ref_col_has_null_vals:
-                # Create individual cases for Pandas and Polars
-
-                compare_expr = _modify_datetime_compare_val(
-                    tgt_column=self.x[self.column], compare_val=self.compare
-                )
-
-                if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.lit(self.column) != nw.lit(compare_expr),
-                    )
-
-                    if not self.na_pass:
-                        tbl = tbl.with_columns(
-                            pb_is_good_2=nw.col("pb_is_good_2") & ~nw.col("pb_is_good_1")
-                        )
-
-                    return (
-                        tbl.with_columns(pb_is_good_=nw.col("pb_is_good_2"))
-                        .drop("pb_is_good_1", "pb_is_good_2")
-                        .to_native()
-                    )
-
-                elif is_polars_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
-                        pb_is_good_2=nw.lit(self.na_pass),  # Pass if any Null in val or compare
-                    )
-
-                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr))
-
-                    tbl = tbl.with_columns(
-                        pb_is_good_=(
-                            (nw.col("pb_is_good_1") & nw.col("pb_is_good_2"))
-                            | (nw.col("pb_is_good_3") & ~nw.col("pb_is_good_1"))
-                        )
-                    )
-
-                    tbl = tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-                    return tbl
-
-    def ge(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] >= self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column] >= ibis.literal(self.compare),
-            )
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
-
-        tbl = (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) >= compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-        )
-
-        return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-    def le(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] <= self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column] <= ibis.literal(self.compare),
-            )
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) <= compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
-
-    def between(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.low, Column) or isinstance(self.high, Column):
-                #
-                # Ibis column-to-column/column or column-to-column/literal comparison
-                #
-
-                if isinstance(self.low, Column):
-                    low_val = self.x[self.low.name]
-                else:
-                    low_val = ibis.literal(self.low)
-
-                if isinstance(self.high, Column):
-                    high_val = self.x[self.high.name]
-                else:
-                    high_val = ibis.literal(self.high)
-
-                if isinstance(self.low, Column) and isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull()
-                            | self.x[self.low.name].isnull()
-                            | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.low, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(self.x[self.column].isnull() | self.x[self.low.name].isnull())
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull() | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] >= low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] > low_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] <= high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] < high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 & tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-            else:
-                #
-                # Ibis column-to-literal/literal comparison
-                #
-
-                low_val = ibis.literal(self.low)
-                high_val = ibis.literal(self.high)
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass)
-                )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] >= low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] > low_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] <= high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] < high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 & tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-        # Local backends (Narwhals) ---------------------------------
-
-        low_val = _get_compare_expr_nw(compare=self.low)
-        high_val = _get_compare_expr_nw(compare=self.high)
-
-        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
-        high_val = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=high_val
-        )
-
-        tbl = self.x.with_columns(
-            pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
-            pb_is_good_2=(  # lb is Null in Column
-                nw.col(self.low.name).is_null() if isinstance(self.low, Column) else nw.lit(False)
-            ),
-            pb_is_good_3=(  # ub is Null in Column
-                nw.col(self.high.name).is_null() if isinstance(self.high, Column) else nw.lit(False)
-            ),
-            pb_is_good_4=nw.lit(self.na_pass),  # Pass if any Null in lb, val, or ub
-        )
-
-        if self.inclusive[0]:
-            tbl = tbl.with_columns(pb_is_good_5=nw.col(self.column) >= low_val)
-        else:
-            tbl = tbl.with_columns(pb_is_good_5=nw.col(self.column) > low_val)
-
-        if self.inclusive[1]:
-            tbl = tbl.with_columns(pb_is_good_6=nw.col(self.column) <= high_val)
-        else:
-            tbl = tbl.with_columns(pb_is_good_6=nw.col(self.column) < high_val)
-
-        tbl = tbl.with_columns(
-            pb_is_good_5=(
-                nw.when(nw.col("pb_is_good_5").is_null())
-                .then(nw.lit(False))
-                .otherwise(nw.col("pb_is_good_5"))
-            )
-        )
-
-        tbl = tbl.with_columns(
-            pb_is_good_6=(
-                nw.when(nw.col("pb_is_good_6").is_null())
-                .then(nw.lit(False))
-                .otherwise(nw.col("pb_is_good_6"))
-            )
-        )
-
-        tbl = (
-            tbl.with_columns(
-                pb_is_good_=(
-                    (
-                        (nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3"))
-                        & nw.col("pb_is_good_4")
-                    )
-                    | (nw.col("pb_is_good_5") & nw.col("pb_is_good_6"))
-                )
-            )
-            .drop(
-                "pb_is_good_1",
-                "pb_is_good_2",
-                "pb_is_good_3",
-                "pb_is_good_4",
-                "pb_is_good_5",
-                "pb_is_good_6",
-            )
-            .to_native()
-        )
-
-        return tbl
-
-    def outside(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.low, Column) or isinstance(self.high, Column):
-                #
-                # Ibis column-to-column/column or column-to-column/literal comparison
-                #
-
-                if isinstance(self.low, Column):
-                    low_val = self.x[self.low.name]
-                else:
-                    low_val = ibis.literal(self.low)
-
-                if isinstance(self.high, Column):
-                    high_val = self.x[self.high.name]
-                else:
-                    high_val = ibis.literal(self.high)
-
-                if isinstance(self.low, Column) and isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull()
-                            | self.x[self.low.name].isnull()
-                            | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                elif isinstance(self.low, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(self.x[self.column].isnull() | self.x[self.low.name].isnull())
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull() | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] < low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] <= low_val)
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] > high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] >= high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(
-                        tbl.pb_is_good_3.isnull(),
-                        False,
-                        tbl.pb_is_good_2,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(
-                        tbl.pb_is_good_2.isnull(),
-                        False,
-                        tbl.pb_is_good_3,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(
-                        tbl.pb_is_good_2.isnull(),
-                        False,
-                        tbl.pb_is_good_2,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(
-                        tbl.pb_is_good_3.isnull(),
-                        False,
-                        tbl.pb_is_good_3,
-                    )
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 | tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-            #
-            # Ibis column-to-literal/literal comparison
-            #
-            low_val = ibis.literal(self.low)
-            high_val = ibis.literal(self.high)
-
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass)
-            )
-
-            if self.inclusive[0]:
-                tbl = tbl.mutate(pb_is_good_2=tbl[self.column] < low_val)
-            else:
-                tbl = tbl.mutate(pb_is_good_2=tbl[self.column] <= low_val)
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            if self.inclusive[1]:
-                tbl = tbl.mutate(pb_is_good_3=tbl[self.column] > high_val)
-            else:
-                tbl = tbl.mutate(pb_is_good_3=tbl[self.column] >= high_val)
-
-            tbl = tbl.mutate(
-                pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-            )
-
-            return tbl.mutate(
-                pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2 | tbl.pb_is_good_3
-            ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-        # Local backends (Narwhals) ---------------------------------
-
-        low_val = _get_compare_expr_nw(compare=self.low)
-        high_val = _get_compare_expr_nw(compare=self.high)
-
-        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
-        high_val = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=high_val
-        )
-
-        tbl = self.x.with_columns(
-            pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
-            pb_is_good_2=(  # lb is Null in Column
-                nw.col(self.low.name).is_null() if isinstance(self.low, Column) else nw.lit(False)
-            ),
-            pb_is_good_3=(  # ub is Null in Column
-                nw.col(self.high.name).is_null() if isinstance(self.high, Column) else nw.lit(False)
-            ),
-            pb_is_good_4=nw.lit(self.na_pass),  # Pass if any Null in lb, val, or ub
-        )
-
-        if self.inclusive[0]:
-            tbl = tbl.with_columns(pb_is_good_5=nw.col(self.column) < low_val)
-        else:
-            tbl = tbl.with_columns(pb_is_good_5=nw.col(self.column) <= low_val)
-
-        if self.inclusive[1]:
-            tbl = tbl.with_columns(pb_is_good_6=nw.col(self.column) > high_val)
-        else:
-            tbl = tbl.with_columns(pb_is_good_6=nw.col(self.column) >= high_val)
-
-        tbl = tbl.with_columns(
-            pb_is_good_5=nw.when(nw.col("pb_is_good_5").is_null())
-            .then(False)
-            .otherwise(nw.col("pb_is_good_5")),
-            pb_is_good_6=nw.when(nw.col("pb_is_good_6").is_null())
-            .then(False)
-            .otherwise(nw.col("pb_is_good_6")),
-        )
-
-        tbl = (
-            tbl.with_columns(
-                pb_is_good_=(
-                    (
-                        (nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3"))
-                        & nw.col("pb_is_good_4")
-                    )
-                    | (
-                        (nw.col("pb_is_good_5") & ~nw.col("pb_is_good_3"))
-                        | (nw.col("pb_is_good_6")) & ~nw.col("pb_is_good_2")
-                    )
-                )
-            )
-            .drop(
-                "pb_is_good_1",
-                "pb_is_good_2",
-                "pb_is_good_3",
-                "pb_is_good_4",
-                "pb_is_good_5",
-                "pb_is_good_6",
-            )
-            .to_native()
-        )
-
-        return tbl
-
-    def isin(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        can_be_null: bool = None in self.set
-
-        if self.tbl_type in IBIS_BACKENDS:
-            base_expr = self.x[self.column].isin(self.set)
-            if can_be_null:
-                base_expr = base_expr | self.x[self.column].isnull()
-            return self.x.mutate(pb_is_good_=base_expr)
-
-        # Local backends (Narwhals) ---------------------------------
-        base_expr: nw.Expr = nw.col(self.column).is_in(self.set)
-        if can_be_null:
-            base_expr = base_expr | nw.col(self.column).is_null()
-
-        return self.x.with_columns(pb_is_good_=base_expr).to_native()
-
-    def notin(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(pb_is_good_=self.x[self.column].notin(self.set))
-
-        # Local backends (Narwhals) ---------------------------------
-
-        return (
-            self.x.with_columns(
-                pb_is_good_=nw.col(self.column).is_in(self.set),
-            )
-            .with_columns(pb_is_good_=~nw.col("pb_is_good_"))
-            .to_native()
-        )
-
-    def regex(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column].re_search(self.pattern),
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=nw.when(~nw.col(self.column).is_null())
-                .then(nw.col(self.column).str.contains(pattern=self.pattern))
-                .otherwise(False),
-            )
-            .with_columns(pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
-            .drop("pb_is_good_1", "pb_is_good_2")
-            .to_native()
-        )
-
-    def null(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(
-                pb_is_good_=self.x[self.column].isnull(),
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        return self.x.with_columns(
-            pb_is_good_=nw.col(self.column).is_null(),
-        ).to_native()
-
-    def not_null(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(
-                pb_is_good_=~self.x[self.column].isnull(),
-            )
-
-        # Local backends (Narwhals) ---------------------------------
-
-        return self.x.with_columns(
-            pb_is_good_=~nw.col(self.column).is_null(),
-        ).to_native()
-
-    def rows_distinct(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            tbl = self.x
-
-            # Get the column subset to use for the test
-            if self.columns_subset is None:
-                columns_subset = tbl.columns
-            else:
-                columns_subset = self.columns_subset
-
-            # Create a subset of the table with only the columns of interest and count the
-            # number of times each unique row (or portion thereof) appears
-            tbl = tbl.group_by(columns_subset).mutate(pb_count_=ibis._.count())
-
-            # Passing rows will have the value `1` (no duplicates, so True), otherwise False applies
-            return tbl.mutate(pb_is_good_=tbl["pb_count_"] == 1).drop("pb_count_")
-
-        # Local backends (Narwhals) ---------------------------------
-
-        tbl = self.x
-
-        # Get the column subset to use for the test
-        if self.columns_subset is None:
-            columns_subset = tbl.columns
-        else:
-            columns_subset = self.columns_subset
-
-        # Create a subset of the table with only the columns of interest
-        subset_tbl = tbl.select(columns_subset)
-
-        # Check for duplicates in the subset table, creating a series of booleans
-        pb_is_good_series = subset_tbl.is_duplicated()
-
-        # Add the series to the input table
-        tbl = tbl.with_columns(pb_is_good_=~pb_is_good_series)
-
-        return tbl.to_native()
-
-    def rows_complete(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.x
-
-            # Determine the number of null values in each row (column subsets are handled in
-            # the `_check_nulls_across_columns_ibis()` function)
-            tbl = _check_nulls_across_columns_ibis(table=tbl, columns_subset=self.columns_subset)
-
-            # Failing rows will have the value `True` in the generated column, so we need to negate
-            # the result to get the passing rows
-            return tbl.mutate(pb_is_good_=~tbl["_any_is_null_"]).drop("_any_is_null_")
-
-        # Local backends (Narwhals) ---------------------------------
-
-        tbl = self.x
-
-        # Determine the number of null values in each row (column subsets are handled in
-        # the `_check_nulls_across_columns_nw()` function)
-        tbl = _check_nulls_across_columns_nw(table=tbl, columns_subset=self.columns_subset)
-
-        # Failing rows will have the value `True` in the generated column, so we need to negate
-        # the result to get the passing rows
-        tbl = tbl.with_columns(pb_is_good_=~nw.col("_any_is_null_"))
-        tbl = tbl.drop("_any_is_null_")
-
-        # Convert the table to a native format
-        return tbl.to_native()
-
-
-@dataclass
-class ColValsCompareOne:
-    """
-    Compare values in a table column against a single value.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    value
-        A value to check against.
-    na_pass
-        `True` to pass test units with missing values, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    assertion_method
-        The type of assertion ('gt' for greater than, 'lt' for less than).
-    allowed_types
-        The allowed data types for the column.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    value: float | int
-    na_pass: bool
-    threshold: int
-    assertion_method: str
-    allowed_types: list[str]
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_test_prep(
-                df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
-            )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        if self.assertion_method == "gt":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).gt()
-        elif self.assertion_method == "lt":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).lt()
-        elif self.assertion_method == "eq":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).eq()
-        elif self.assertion_method == "ne":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).ne()
-        elif self.assertion_method == "ge":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).ge()
-        elif self.assertion_method == "le":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).le()
-        elif self.assertion_method == "null":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                tbl_type=self.tbl_type,
-            ).null()
-        elif self.assertion_method == "not_null":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                compare=self.value,
-                tbl_type=self.tbl_type,
-            ).not_null()
-        else:
-            raise ValueError(
-                """Invalid comparison type. Use:
-                - `gt` for greater than,
-                - `lt` for less than,
-                - `eq` for equal to,
-                - `ne` for not equal to,
-                - `ge` for greater than or equal to,
-                - `le` for less than or equal to,
-                - `null` for null values, or
-                - `not_null` for not null values.
-                """
-            )
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-    def test(self):
-        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
-        # column and then determine if the test passes overall by comparing the number of failing
-        # test units to the threshold for failing test units
-
-        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
-
-        return _threshold_check(
-            failing_test_units=results_list.count(False), threshold=self.threshold
-        )
-
-
-@dataclass
-class ColValsCompareTwo:
-    """
-    General routine to compare values in a column against two values.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    value1
-        A value to check against.
-    value2
-        A value to check against.
-    inclusive
-        A tuple of booleans that state which bounds are inclusive. The position of the boolean
-        corresponds to the value in the following order: (value1, value2).
-    na_pass
-        `True` to pass test units with missing values, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    assertion_method
-        The type of assertion ('between' for between two values and 'outside' for outside two
-        values).
-    allowed_types
-        The allowed data types for the column.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    value1: float | int
-    value2: float | int
-    inclusive: tuple[bool, bool]
-    na_pass: bool
-    threshold: int
-    assertion_method: str
-    allowed_types: list[str]
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_test_prep(
-                df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
-            )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        if self.assertion_method == "between":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                low=self.value1,
-                high=self.value2,
-                inclusive=self.inclusive,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).between()
-        elif self.assertion_method == "outside":
-            self.test_unit_res = Interrogator(
-                x=tbl,
-                column=self.column,
-                low=self.value1,
-                high=self.value2,
-                inclusive=self.inclusive,
-                na_pass=self.na_pass,
-                tbl_type=self.tbl_type,
-            ).outside()
-        else:
-            raise ValueError(
-                """Invalid assertion type. Use:
-                - `between` for values between two values, or
-                - `outside` for values outside two values."""
-            )
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-    def test(self):
-        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
-        # column and then determine if the test passes overall by comparing the number of failing
-        # test units to the threshold for failing test units
-
-        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
-
-        return _threshold_check(
-            failing_test_units=results_list.count(False), threshold=self.threshold
-        )
-
-
-@dataclass
-class ColValsCompareSet:
-    """
-    General routine to compare values in a column against a set of values.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    values
-        A set of values to check against.
-    threshold
-        The maximum number of failing test units to allow.
-    inside
-        `True` to check if the values are inside the set, `False` to check if the values are
-        outside the set.
-    allowed_types
-        The allowed data types for the column.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    values: list[float | int]
-    threshold: int
-    inside: bool
-    allowed_types: list[str]
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_test_prep(
-                df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
-            )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        if self.inside:
-            self.test_unit_res = Interrogator(
-                x=tbl, column=self.column, set=self.values, tbl_type=self.tbl_type
-            ).isin()
-        else:
-            self.test_unit_res = Interrogator(
-                x=tbl, column=self.column, set=self.values, tbl_type=self.tbl_type
-            ).notin()
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-    def test(self):
-        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
-        # column and then determine if the test passes overall by comparing the number of failing
-        # test units to the threshold for failing test units
-
-        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
-
-        return _threshold_check(
-            failing_test_units=results_list.count(False), threshold=self.threshold
-        )
-
-
-@dataclass
-class ColValsRegex:
-    """
-    Check if values in a column match a regular expression pattern.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    pattern
-        The regular expression pattern to check against.
-    na_pass
-        `True` to pass test units with missing values, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    allowed_types
-        The allowed data types for the column.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    pattern: str
-    na_pass: bool
-    threshold: int
-    allowed_types: list[str]
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_test_prep(
-                df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
-            )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        self.test_unit_res = Interrogator(
-            x=tbl,
-            column=self.column,
-            pattern=self.pattern,
-            na_pass=self.na_pass,
-            tbl_type=self.tbl_type,
-        ).regex()
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-    def test(self):
-        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
-        # column and then determine if the test passes overall by comparing the number of failing
-        # test units to the threshold for failing test units
-
-        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
-
-        return _threshold_check(
-            failing_test_units=results_list.count(False), threshold=self.threshold
-        )
-
-
-@dataclass
-class ColValsExpr:
-    """
-    Check if values in a column evaluate to True for a given predicate expression.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    expr
-        The expression to check against.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    expr: str
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Check the type of expression provided
-            if "narwhals" in str(type(self.expr)) and "expr" in str(type(self.expr)):
-                expression_type = "narwhals"
-            elif "polars" in str(type(self.expr)) and "expr" in str(type(self.expr)):
-                expression_type = "polars"
-            else:
-                expression_type = "pandas"
-
-            # Determine whether this is a Pandas or Polars table
-            tbl_type = _get_tbl_type(data=self.data_tbl)
-
-            df_lib_name = "polars" if "polars" in tbl_type else "pandas"
-
-            if expression_type == "narwhals":
-                tbl_nw = _convert_to_narwhals(df=self.data_tbl)
-                tbl_nw = tbl_nw.with_columns(pb_is_good_=self.expr)
-                tbl = tbl_nw.to_native()
-                self.test_unit_res = tbl
-
-                return self
-
-            if df_lib_name == "polars" and expression_type == "polars":
-                self.test_unit_res = self.data_tbl.with_columns(pb_is_good_=self.expr)
-
-            if df_lib_name == "pandas" and expression_type == "pandas":
-                self.test_unit_res = self.data_tbl.assign(pb_is_good_=self.expr)
-
-            return self
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class ColExistsHasType:
-    """
-    Check if a column exists in a DataFrame or has a certain data type.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    threshold
-        The maximum number of failing test units to allow.
-    assertion_method
-        The type of assertion ('exists' for column existence).
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    threshold: int
-    assertion_method: str
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _convert_to_narwhals(df=self.data_tbl)
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        if self.assertion_method == "exists":
-            res = int(self.column in tbl.columns)
-
-        self.test_unit_res = res
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class RowsDistinct:
-    """
-    Check if rows in a DataFrame are distinct.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    columns_subset
-        A list of columns to check for distinctness.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    columns_subset: list[str] | None
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_subset_test_prep(df=self.data_tbl, columns_subset=self.columns_subset)
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        self.test_unit_res = Interrogator(
-            x=tbl,
-            columns_subset=self.columns_subset,
-            tbl_type=self.tbl_type,
-        ).rows_distinct()
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class RowsComplete:
-    """
-    Check if rows in a DataFrame are complete.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    columns_subset
-        A list of columns to check for completeness.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    columns_subset: list[str] | None
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_subset_test_prep(df=self.data_tbl, columns_subset=self.columns_subset)
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        self.test_unit_res = Interrogator(
-            x=tbl,
-            columns_subset=self.columns_subset,
-            tbl_type=self.tbl_type,
-        ).rows_complete()
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class ColSchemaMatch:
-    """
-    Check if a column exists in a DataFrame or has a certain data type.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    schema
-        A schema to check against.
-    complete
-        `True` to check if the schema is complete, `False` otherwise.
-    in_order
-        `True` to check if the schema is in order, `False` otherwise.
-    case_sensitive_colnames
-        `True` to perform column-name matching in a case-sensitive manner, `False` otherwise.
-    case_sensitive_dtypes
-        `True` to perform data-type matching in a case-sensitive manner, `False` otherwise.
-    full_match_dtypes
-        `True` to perform a full match of data types, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT | Any
-    schema: any
-    complete: bool
-    in_order: bool
-    case_sensitive_colnames: bool
-    case_sensitive_dtypes: bool
-    full_match_dtypes: bool
-    threshold: int
-
-    def __post_init__(self):
-        schema_expect = self.schema
-        schema_actual = Schema(tbl=self.data_tbl)
-
-        if self.complete and self.in_order:
-            # Check if the schema is complete and in order (most restrictive check)
-            # complete: True, in_order: True
-            res = schema_expect._compare_schema_columns_complete_in_order(
-                other=schema_actual,
-                case_sensitive_colnames=self.case_sensitive_colnames,
-                case_sensitive_dtypes=self.case_sensitive_dtypes,
-                full_match_dtypes=self.full_match_dtypes,
-            )
-
-        elif not self.complete and not self.in_order:
-            # Check if the schema is at least a subset, and, order of columns does not matter
-            # complete: False, in_order: False
-            res = schema_expect._compare_schema_columns_subset_any_order(
-                other=schema_actual,
-                case_sensitive_colnames=self.case_sensitive_colnames,
-                case_sensitive_dtypes=self.case_sensitive_dtypes,
-                full_match_dtypes=self.full_match_dtypes,
-            )
-
-        elif self.complete:
-            # Check if the schema is complete, but the order of columns does not matter
-            # complete: True, in_order: False
-            res = schema_expect._compare_schema_columns_complete_any_order(
-                other=schema_actual,
-                case_sensitive_colnames=self.case_sensitive_colnames,
-                case_sensitive_dtypes=self.case_sensitive_dtypes,
-                full_match_dtypes=self.full_match_dtypes,
-            )
-
-        else:
-            # Check if the schema is a subset (doesn't need to be complete) and in order
-            # complete: False, in_order: True
-            res = schema_expect._compare_schema_columns_subset_in_order(
-                other=schema_actual,
-                case_sensitive_colnames=self.case_sensitive_colnames,
-                case_sensitive_dtypes=self.case_sensitive_dtypes,
-                full_match_dtypes=self.full_match_dtypes,
-            )
-
-        self.test_unit_res = res
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class RowCountMatch:
-    """
-    Check if rows in a DataFrame either match or don't match a fixed value.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    count
-        The fixed row count to check against.
-    inverse
-        `True` to check if the row count does not match the fixed value, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    count: int
-    inverse: bool
-    threshold: int
-    abs_tol_bounds: AbsoluteTolBounds
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        from pointblank.validate import get_row_count
-
-        row_count: int = get_row_count(data=self.data_tbl)
-
-        lower_abs_limit, upper_abs_limit = self.abs_tol_bounds
-        min_val: int = self.count - lower_abs_limit
-        max_val: int = self.count + upper_abs_limit
-
-        if self.inverse:
-            res: bool = not (row_count >= min_val and row_count <= max_val)
-        else:
-            res: bool = row_count >= min_val and row_count <= max_val
-
-        self.test_unit_res = res
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
-class ColCountMatch:
-    """
-    Check if columns in a DataFrame either match or don't match a fixed value.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    count
-        The fixed column count to check against.
-    inverse
-        `True` to check if the column count does not match the fixed value, `False` otherwise.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    count: int
-    inverse: bool
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        from pointblank.validate import get_column_count
-
-        if not self.inverse:
-            res = get_column_count(data=self.data_tbl) == self.count
-        else:
-            res = get_column_count(data=self.data_tbl) != self.count
-
-        self.test_unit_res = res
-
-    def get_test_results(self):
-        return self.test_unit_res
+    return null_check | column_expr.is_nan()
 
 
 class ConjointlyValidation:
-    def __init__(self, data_tbl, expressions, threshold, tbl_type):
+    def __init__(self, data_tbl, expressions: type[nw.Expr], threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expressions = expressions
         self.threshold = threshold
@@ -2079,6 +159,11 @@ class ConjointlyValidation:
         else:
             self.tbl_type = tbl_type
 
+        # Conjointly validation requires eager frames (uses .to_series())
+        # Collect lazy frames here since this validation inherently needs materialized data
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
+
     def get_test_results(self):
         """Evaluate all expressions and combine them conjointly."""
 
@@ -2088,6 +173,8 @@ class ConjointlyValidation:
             return self._get_pandas_results()
         elif "duckdb" in self.tbl_type or "ibis" in self.tbl_type:
             return self._get_ibis_results()
+        elif "pyspark" in self.tbl_type:
+            return self._get_pyspark_results()
         else:  # pragma: no cover
             raise NotImplementedError(f"Support for {self.tbl_type} is not yet implemented")
 
@@ -2095,33 +182,48 @@ class ConjointlyValidation:
         """Process expressions for Polars DataFrames."""
         import polars as pl
 
-        polars_expressions = []
+        polars_results = []  # Changed from polars_expressions to polars_results
 
         for expr_fn in self.expressions:
             try:
-                # First try direct evaluation with native Polars expressions
+                # First try direct evaluation with native expressions
                 expr_result = expr_fn(self.data_tbl)
                 if isinstance(expr_result, pl.Expr):
-                    polars_expressions.append(expr_result)
+                    # This is a Polars expression, we'll evaluate it later
+                    polars_results.append(("expr", expr_result))
+                elif isinstance(expr_result, pl.Series):
+                    # This is a boolean Series from lambda function
+                    polars_results.append(("series", expr_result))
                 else:
-                    raise TypeError("Not a valid Polars expression")
+                    raise TypeError("Not a valid Polars expression or series")
             except Exception as e:
                 try:
                     # Try to get a ColumnExpression
                     col_expr = expr_fn(None)
                     if hasattr(col_expr, "to_polars_expr"):
                         polars_expr = col_expr.to_polars_expr()
-                        polars_expressions.append(polars_expr)
+                        polars_results.append(("expr", polars_expr))
                     else:  # pragma: no cover
                         raise TypeError(f"Cannot convert {type(col_expr)} to Polars expression")
                 except Exception as e:  # pragma: no cover
                     print(f"Error evaluating expression: {e}")
 
         # Combine results with AND logic
-        if polars_expressions:
-            final_result = polars_expressions[0]
-            for expr in polars_expressions[1:]:
-                final_result = final_result & expr
+        if polars_results:
+            # Convert everything to Series for consistent handling
+            series_results = []
+            for result_type, result_value in polars_results:
+                if result_type == "series":
+                    series_results.append(result_value)
+                elif result_type == "expr":
+                    # Evaluate the expression on the DataFrame to get a Series
+                    evaluated_series = self.data_tbl.select(result_value).to_series()
+                    series_results.append(evaluated_series)
+
+            # Combine all boolean Series with AND logic
+            final_result = series_results[0]
+            for series in series_results[1:]:
+                final_result = final_result & series
 
             # Create results table with boolean column
             results_tbl = self.data_tbl.with_columns(pb_is_good_=final_result)
@@ -2227,7 +329,7 @@ class ConjointlyValidation:
                     ibis_expr = col_expr.to_ibis_expr(self.data_tbl)
                     ibis_expressions.append(ibis_expr)
             except Exception:  # pragma: no cover
-                # Silent failure - we already tried both strategies
+                # Silent failure where we already tried both strategies
                 pass
 
         # Combine expressions
@@ -2247,9 +349,58 @@ class ConjointlyValidation:
         results_tbl = self.data_tbl.mutate(pb_is_good_=ibis.literal(True))
         return results_tbl
 
+    def _get_pyspark_results(self):
+        """Process expressions for PySpark DataFrames."""
+        from pyspark.sql import functions as F
+
+        pyspark_columns = []
+
+        for expr_fn in self.expressions:
+            try:
+                # First try direct evaluation with PySpark DataFrame
+                expr_result = expr_fn(self.data_tbl)
+
+                # Check if it's a PySpark Column
+                if hasattr(expr_result, "_jc"):  # PySpark Column has _jc attribute
+                    pyspark_columns.append(expr_result)
+                else:
+                    raise TypeError(
+                        f"Expression returned {type(expr_result)}, expected PySpark Column"
+                    )  # pragma: no cover
+
+            except Exception as e:
+                try:
+                    # Try as a ColumnExpression (for pb.expr_col style)
+                    col_expr = expr_fn(None)
+
+                    if hasattr(col_expr, "to_pyspark_expr"):  # pragma: no cover
+                        # Convert to PySpark expression
+                        pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
+                        pyspark_columns.append(pyspark_expr)
+                    else:
+                        raise TypeError(
+                            f"Cannot convert {type(col_expr)} to PySpark Column"
+                        )  # pragma: no cover
+                except Exception as nested_e:
+                    print(f"Error evaluating PySpark expression: {e} -> {nested_e}")
+
+        # Combine results with AND logic
+        if pyspark_columns:
+            final_result = pyspark_columns[0]
+            for col in pyspark_columns[1:]:
+                final_result = final_result & col
+
+            # Create results table with boolean column
+            results_tbl = self.data_tbl.withColumn("pb_is_good_", final_result)
+            return results_tbl
+
+        # Default case
+        results_tbl = self.data_tbl.withColumn("pb_is_good_", F.lit(True))
+        return results_tbl
+
 
 class SpeciallyValidation:
-    def __init__(self, data_tbl, expression, threshold, tbl_type):
+    def __init__(self, data_tbl, expression, threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expression = expression
         self.threshold = threshold
@@ -2261,7 +412,11 @@ class SpeciallyValidation:
         else:
             self.tbl_type = tbl_type
 
-    def get_test_results(self) -> any | list[bool]:
+        # User-defined specially() functions expect eager frames for backwards compatibility
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
+
+    def get_test_results(self) -> Any | list[bool]:
         """Evaluate the expression get either a list of booleans or a results table."""
 
         # Get the expression and inspect whether there is a `data` argument
@@ -2282,7 +437,7 @@ class SpeciallyValidation:
             data_tbl = self.data_tbl
             result = expression(data_tbl)
         else:
-            # More than one parameter - this doesn't match either allowed signature
+            # More than one parameter: this doesn't match either allowed signature
             raise ValueError(
                 f"The function provided to 'specially()' should have either no parameters or a "
                 f"single 'data' parameter, but it has {len(params)} parameters: {params}"
@@ -2355,23 +510,35 @@ class NumberOfTestUnits:
     Count the number of test units in a column.
     """
 
-    df: FrameT
+    df: Any  # Can be IntoFrame or Ibis table
     column: str
 
     def get_test_units(self, tbl_type: str) -> int:
-        if tbl_type == "pandas" or tbl_type == "polars":
+        if (
+            tbl_type == "pandas"
+            or tbl_type == "polars"
+            or tbl_type == "pyspark"
+            or tbl_type == "local"
+        ):
             # Convert the DataFrame to a format that narwhals can work with and:
             #  - check if the column exists
             dfn = _column_test_prep(
                 df=self.df, column=self.column, allowed_types=None, check_exists=False
             )
 
+            # Use lazy-compatible row count (avoids collecting the entire frame)
+            if is_narwhals_lazyframe(dfn):
+                return dfn.select(nw.len()).collect().item()
+
+            assert is_narwhals_dataframe(dfn)
             return len(dfn)
 
         if tbl_type in IBIS_BACKENDS:
             # Get the count of test units and convert to a native format
             # TODO: check whether pandas or polars is available
             return self.df.count().to_polars()
+
+        raise ValueError(f"Unsupported table type: {tbl_type}")  # pragma: no cover
 
 
 def _get_compare_expr_nw(compare: Any) -> Any:
@@ -2382,30 +549,19 @@ def _get_compare_expr_nw(compare: Any) -> Any:
     return compare
 
 
-def _column_has_null_values(table: FrameT, column: str) -> bool:
-    null_count = (table.select(column).null_count())[column][0]
-
-    if null_count is None or null_count == 0:
+def _column_has_null_values(table: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> bool:
+    try:
+        # Use lazy-compatible aggregation to count nulls
+        # Cast to Int32 before sum to support PySpark which can't sum booleans
+        result = table.select(nw.col(column).is_null().cast(nw.Int32).sum().alias("null_count"))
+        if is_narwhals_lazyframe(result):
+            result = result.collect()
+        null_count = result["null_count"][0]
+    except Exception:
+        # Last resort: return False (assume no nulls)
         return False
 
-    return True
-
-
-def _check_nulls_across_columns_ibis(table, columns_subset):
-    # Get all column names from the table
-    column_names = columns_subset if columns_subset else table.columns
-
-    # Build the expression by combining each column's isnull() with OR operations
-    null_expr = functools.reduce(
-        lambda acc, col: acc | table[col].isnull() if acc is not None else table[col].isnull(),
-        column_names,
-        None,
-    )
-
-    # Add the expression as a new column to the table
-    result = table.mutate(_any_is_null_=null_expr)
-
-    return result
+    return null_count is not None and null_count > 0
 
 
 def _check_nulls_across_columns_nw(table, columns_subset):
@@ -2414,7 +570,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
 
     # Build the expression by combining each column's `is_null()` with OR operations
     null_expr = functools.reduce(
-        lambda acc, col: acc | table[col].is_null() if acc is not None else table[col].is_null(),
+        lambda acc, col: acc | nw.col(col).is_null() if acc is not None else nw.col(col).is_null(),
         column_names,
         None,
     )
@@ -2425,7 +581,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
     return result
 
 
-def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
+def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     tgt_col_dtype_str = str(tgt_column.dtype).lower()
 
     if compare_val is isinstance(compare_val, Column):  # pragma: no cover
@@ -2467,3 +623,2926 @@ def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
         return compare_val
 
     return compare_expr
+
+
+def _fill_null_as_failing(tbl: Any) -> Any:
+    """Make a null `pb_is_good_` result (e.g., from an expression on a null value) fail."""
+    tbl_nw = nw.from_native(tbl)
+    return tbl_nw.with_columns(
+        pb_is_good_=nw.col("pb_is_good_").fill_null(False).cast(nw.Boolean)
+    ).to_native()
+
+
+def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
+    """Check if values in a column evaluate to True for a given predicate expression."""
+    if tbl_type == "local":
+        # Check the type of expression provided
+        if "narwhals" in str(type(expr)) and "expr" in str(type(expr)):
+            expression_type = "narwhals"
+        elif "polars" in str(type(expr)) and "expr" in str(type(expr)):
+            expression_type = "polars"
+        else:
+            expression_type = "pandas"
+
+        # Determine whether this is a Pandas or Polars table
+        tbl_type_detected = _get_tbl_type(data=data_tbl)
+        df_lib_name = "polars" if "polars" in tbl_type_detected else "pandas"
+
+        if expression_type == "narwhals":
+            tbl_nw = _convert_to_narwhals(df=data_tbl)
+            tbl_nw = tbl_nw.with_columns(pb_is_good_=expr)
+            return _fill_null_as_failing(tbl_nw.to_native())
+
+        if df_lib_name == "polars" and expression_type == "polars":
+            return _fill_null_as_failing(data_tbl.with_columns(pb_is_good_=expr))
+
+        if df_lib_name == "pandas" and expression_type == "pandas":
+            return _fill_null_as_failing(data_tbl.assign(pb_is_good_=expr))
+
+    # For remote backends, return original table (placeholder)
+    return data_tbl  # pragma: no cover
+
+
+def rows_complete(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
+    """
+    Check if rows in a DataFrame are complete (no null values).
+
+    This function replaces the RowsComplete dataclass for direct usage.
+    """
+    return interrogate_rows_complete(
+        tbl=data_tbl,
+        columns_subset=columns_subset,
+    )
+
+
+def col_exists(data_tbl: IntoFrame, column: str) -> bool:
+    """
+    Check if a column exists in a DataFrame.
+
+    Parameters
+    ----------
+    data_tbl
+        A data table.
+    column
+        The column to check.
+
+    Returns
+    -------
+    bool
+        `True` if the column exists, `False` otherwise.
+    """
+    tbl = _convert_to_narwhals(df=data_tbl)
+    return column in tbl.columns
+
+
+def col_schema_match(
+    data_tbl: IntoFrame,
+    schema: Any,
+    complete: bool,
+    in_order: bool,
+    case_sensitive_colnames: bool,
+    case_sensitive_dtypes: bool,
+    full_match_dtypes: bool,
+    threshold: int,
+) -> bool:
+    """
+    Check if DataFrame schema matches expected schema.
+    """
+    from pointblank.schema import _check_schema_match
+
+    return _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=complete,
+        in_order=in_order,
+        case_sensitive_colnames=case_sensitive_colnames,
+        case_sensitive_dtypes=case_sensitive_dtypes,
+        full_match_dtypes=full_match_dtypes,
+    )
+
+
+def row_count_match(
+    data_tbl: IntoFrame, count: Any, inverse: bool, abs_tol_bounds: AbsoluteBounds
+) -> bool:
+    """
+    Check if DataFrame row count matches expected count.
+    """
+    from pointblank.validate import get_row_count
+
+    row_count: int = get_row_count(data=data_tbl)
+    lower_abs_limit, upper_abs_limit = abs_tol_bounds
+    min_val: int = count - lower_abs_limit
+    max_val: int = count + upper_abs_limit
+
+    if inverse:
+        return not (row_count >= min_val and row_count <= max_val)
+    else:
+        return row_count >= min_val and row_count <= max_val
+
+
+def col_pct_null(
+    data_tbl: IntoFrame, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+) -> bool:
+    """Check if the percentage of null vales are within p given the absolute bounds."""
+    nw_frame = nw.from_native(data_tbl)
+
+    # Use lazy-compatible aggregation to get total rows and null count
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_null=nw.col(column).is_null().cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_null: int = int(stats["n_null"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_null = int(nw_frame.select(nw.col(column).is_null().cast(nw.Int32).sum()).item())
+
+    abs_target: float = round(total_rows * p)
+    lower_bound, upper_bound = bound_finder(abs_target)
+
+    return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
+
+
+def col_pct_missing(
+    data_tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    max_pct: float,
+) -> bool:
+    """Check that the percentage of missing values in a column does not exceed `max_pct`.
+
+    Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
+    null values. The percentage is computed over the total number of rows.
+    """
+    nw_frame = nw.from_native(data_tbl)
+
+    # Build a boolean expression that flags missing values
+    missing_expr = None
+    if sentinels:
+        missing_expr = _is_in(column, sentinels, nw_frame.collect_schema()[column])
+    if count_null:
+        null_expr = nw.col(column).is_null()
+        missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
+
+    if missing_expr is None:
+        # Nothing counts as missing under this spec/filter
+        return 0.0 <= max_pct
+
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_missing=missing_expr.cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_missing: int = int(stats["n_missing"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_missing = int(nw_frame.select(missing_expr.cast(nw.Int32).sum()).item())
+
+    if total_rows == 0:
+        return True
+
+    pct_missing = n_missing / total_rows
+    return pct_missing <= max_pct
+
+
+def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
+    """
+    Check if DataFrame column count matches expected count.
+    """
+    from pointblank.validate import get_column_count
+
+    if not inverse:
+        return get_column_count(data=data_tbl) == count
+    else:
+        return get_column_count(data=data_tbl) != count
+
+
+def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any]:
+    """
+    Coerce two tables to the same backend if they differ.
+
+    If the tables to compare have different backends (e.g., one is Polars and one is Pandas),
+    this function will convert the comparison table to match the data table's backend.
+    This ensures consistent dtype handling during comparison.
+
+    Parameters
+    ----------
+    data_tbl
+        The primary table (backend is preserved).
+    tbl_compare
+        The comparison table (may be converted to match data_tbl's backend).
+
+    Returns
+    -------
+    tuple[Any, Any]
+        Both tables, with tbl_compare potentially converted to data_tbl's backend.
+    """
+    # Get backend types for both tables
+    data_backend = _get_tbl_type(data_tbl)
+    compare_backend = _get_tbl_type(tbl_compare)
+
+    # If backends match, no conversion needed
+    if data_backend == compare_backend:
+        return data_tbl, tbl_compare
+
+    # Define database backends (Ibis tables that need materialization)
+    database_backends = set(IBIS_BACKENDS)
+
+    #
+    # If backends differ, convert tbl_compare to match data_tbl's backend
+    #
+
+    # Handle Ibis/database tables: materialize them to match the target backend
+    if compare_backend in database_backends:  # pragma: no cover
+        # Materialize to Polars if data table is Polars, otherwise Pandas
+        if data_backend == "polars":
+            try:
+                tbl_compare = tbl_compare.to_polars()
+                compare_backend = "polars"
+            except Exception:
+                # Fallback: materialize to Pandas, then convert to Polars
+                try:
+                    tbl_compare = tbl_compare.execute()
+                    compare_backend = "pandas"
+                except Exception:
+                    try:
+                        tbl_compare = tbl_compare.to_pandas()
+                        compare_backend = "pandas"
+                    except Exception:
+                        pass
+        else:
+            # Materialize to Pandas for Pandas or other backends
+            try:
+                tbl_compare = tbl_compare.execute()  # Returns Pandas DataFrame
+                compare_backend = "pandas"
+            except Exception:
+                try:
+                    tbl_compare = tbl_compare.to_pandas()
+                    compare_backend = "pandas"
+                except Exception:
+                    pass
+
+    if data_backend in database_backends:  # pragma: no cover
+        # If data table itself is a database backend, materialize to Polars
+        # (Polars is the default modern backend for optimal performance)
+        try:
+            data_tbl = data_tbl.to_polars()
+            data_backend = "polars"
+        except Exception:
+            # Fallback to Pandas if Polars conversion fails
+            try:
+                data_tbl = data_tbl.execute()
+                data_backend = "pandas"
+            except Exception:
+                try:
+                    data_tbl = data_tbl.to_pandas()
+                    data_backend = "pandas"
+                except Exception:
+                    pass
+
+    # Now handle the Polars/Pandas conversions
+    if data_backend == "polars" and compare_backend == "pandas":
+        try:
+            import polars as pl
+
+            tbl_compare = pl.from_pandas(tbl_compare)
+        except Exception:  # pragma: no cover
+            # If conversion fails, return original tables
+            pass
+
+    elif data_backend == "pandas" and compare_backend == "polars":
+        try:
+            tbl_compare = tbl_compare.to_pandas()
+        except Exception:  # pragma: no cover
+            # If conversion fails, return original tables
+            pass
+
+    return data_tbl, tbl_compare
+
+
+def tbl_match(data_tbl: IntoFrame, tbl_compare: IntoFrame) -> bool:
+    """
+    Check if two tables match exactly in schema, row count, and data.
+
+    This function performs a comprehensive comparison between two tables,
+    checking progressively stricter conditions from least to most stringent:
+
+    1. Column count match
+    2. Row count match
+    3. Schema match (case-insensitive column names, any order)
+    4. Schema match (case-insensitive column names, correct order)
+    5. Schema match (case-sensitive column names, correct order)
+    6. Data match: compares values column-by-column
+
+    If the two tables have different backends (e.g., one is Polars and one is Pandas),
+    the comparison table will be automatically coerced to match the data table's backend
+    before comparison. This ensures consistent dtype handling.
+
+    Parameters
+    ----------
+    data_tbl
+        The target table to validate.
+    tbl_compare
+        The comparison table to validate against.
+
+    Returns
+    -------
+    bool
+        True if tables match completely, False otherwise.
+    """
+    from pointblank.schema import Schema, _check_schema_match
+    from pointblank.validate import get_column_count, get_row_count
+
+    # Coerce to common backend if needed
+    data_tbl, tbl_compare = _coerce_to_common_backend(data_tbl, tbl_compare)
+
+    # Convert both tables to narwhals for compatibility
+    tbl = _convert_to_narwhals(df=data_tbl)
+    tbl_cmp = _convert_to_narwhals(df=tbl_compare)
+
+    # Stage 1: Check column count (least stringent)
+    col_count_matching = get_column_count(data=data_tbl) == get_column_count(data=tbl_compare)
+
+    if not col_count_matching:
+        return False
+
+    # Stage 2: Check row count
+    row_count_matching = get_row_count(data=data_tbl) == get_row_count(data=tbl_compare)
+
+    if not row_count_matching:
+        return False
+
+    # Stage 3: Check schema match for case-insensitive column names, any order
+    schema = Schema(tbl=tbl_compare)
+
+    col_schema_matching_any_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=False,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_any_order:
+        return False
+
+    # Stage 4: Check schema match for case-insensitive column names, correct order
+    col_schema_matching_in_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_in_order:
+        return False
+
+    # Stage 5: Check schema match for case-sensitive column names, correct order
+    col_schema_matching_exact = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=True,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_exact:
+        return False
+
+    # Stage 6: Check for exact data by cell across matched columns (most stringent)
+    # Handle edge case where both tables have zero rows (they match)
+    if get_row_count(data=data_tbl) == 0:
+        return True
+
+    column_count = get_column_count(data=data_tbl)
+
+    # Compare column-by-column
+    for i in range(column_count):
+        # Get column name
+        col_name = tbl.columns[i]
+
+        # Get column data from both tables
+        col_data_1 = tbl.select(col_name)
+        col_data_2 = tbl_cmp.select(col_name)
+
+        # Convert to native format for comparison
+        # We need to collect if lazy frames
+        if is_narwhals_lazyframe(col_data_1):  # pragma: no cover
+            col_data_1 = col_data_1.collect()
+
+        if is_narwhals_lazyframe(col_data_2):  # pragma: no cover
+            col_data_2 = col_data_2.collect()
+
+        # Convert to native and then to lists for comparison
+        # Native frames could be Polars, Pandas, or Ibis - use Any for dynamic access
+        col_1_native: Any = col_data_1.to_native()
+        col_2_native: Any = col_data_2.to_native()
+
+        # Extract values as lists for comparison
+        # Note: We use hasattr for runtime detection but maintain Any typing
+        values_1: list[Any]
+        values_2: list[Any]
+        if hasattr(col_1_native, "to_list"):  # pragma: no cover  # Polars DataFrame
+            values_1 = col_1_native[col_name].to_list()
+            values_2 = col_2_native[col_name].to_list()
+
+        elif hasattr(col_1_native, "tolist"):  # pragma: no cover  # Pandas DataFrame
+            values_1 = col_1_native[col_name].tolist()
+            values_2 = col_2_native[col_name].tolist()
+
+        elif hasattr(col_1_native, "collect"):  # pragma: no cover  # Ibis
+            values_1 = col_1_native[col_name].to_pandas().tolist()
+            values_2 = col_2_native[col_name].to_pandas().tolist()
+
+        else:  # pragma: no cover
+            # Fallback: try direct comparison
+            values_1 = list(col_1_native[col_name])
+            values_2 = list(col_2_native[col_name])
+
+        # Compare the two lists element by element, handling NaN/None
+        if len(values_1) != len(values_2):  # pragma: no cover
+            return False
+
+        for v1, v2 in zip(values_1, values_2):
+            # Handle None/NaN comparisons and check both None and NaN
+            # Note: When Pandas NaN is converted to Polars, it may become None
+            v1_is_null = v1 is None
+            v2_is_null = v2 is None
+
+            # Check if v1 is NaN
+            if not v1_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v1):
+                        v1_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # Check if v2 is NaN
+            if not v2_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v2):
+                        v2_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # If both are null (None or NaN), they match
+            if v1_is_null and v2_is_null:
+                continue
+
+            # If only one is null, they don't match
+            if v1_is_null or v2_is_null:
+                return False
+
+            # Direct comparison: handle lists/arrays separately
+            try:
+                if v1 != v2:
+                    return False
+            except (TypeError, ValueError):  # pragma: no cover
+                # If direct comparison fails (e.g., for lists/arrays), try element-wise comparison
+                try:
+                    if isinstance(v1, list) and isinstance(v2, list):
+                        if v1 != v2:
+                            return False
+                    elif hasattr(v1, "__eq__") and hasattr(v2, "__eq__"):
+                        # For array-like objects, check if they're equal
+                        if not (v1 == v2).all() if hasattr((v1 == v2), "all") else v1 == v2:
+                            return False
+                    else:
+                        return False
+                except Exception:
+                    return False
+
+    return True
+
+
+def conjointly_validation(
+    data_tbl: IntoFrame, expressions: Any, threshold: int, tbl_type: str = "local"
+) -> Any:
+    """
+    Perform conjoint validation using multiple expressions.
+    """
+    # Create a ConjointlyValidation instance and get the results
+    conjointly_instance = ConjointlyValidation(
+        data_tbl=data_tbl,
+        expressions=expressions,
+        threshold=threshold,
+        tbl_type=tbl_type,
+    )
+
+    return conjointly_instance.get_test_results()
+
+
+# TODO: we can certainly simplify this
+def interrogate_gt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Greater than interrogation."""
+    return _interrogate_comparison_base(tbl, column, compare, na_pass, "gt")
+
+
+def interrogate_lt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Less than interrogation."""
+    return _interrogate_comparison_base(tbl, column, compare, na_pass, "lt")
+
+
+def interrogate_ge(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Greater than or equal interrogation."""
+    return _interrogate_comparison_base(tbl, column, compare, na_pass, "ge")
+
+
+def interrogate_le(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Less than or equal interrogation."""
+    return _interrogate_comparison_base(tbl, column, compare, na_pass, "le")
+
+
+def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Equal interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert is_narwhals_dataframe(nw_tbl) or is_narwhals_lazyframe(nw_tbl)
+
+    if isinstance(compare, Column):
+        compare_expr = _get_compare_expr_nw(compare=compare)
+
+        result_tbl = nw_tbl.with_columns(
+            pb_is_good_1=nw.col(column).is_null() & na_pass,
+            pb_is_good_2=(
+                nw.col(compare.name).is_null() & na_pass
+                if isinstance(compare, Column)
+                else nw.lit(False)
+            ),
+        )
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_3=(~nw.col(compare.name).is_null() & ~nw.col(column).is_null())
+        )
+
+        if is_pandas_dataframe(result_tbl.to_native()):
+            # For Pandas, handle potential NA comparison issues
+            try:
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_4=nw.col(column) == compare_expr,
+                )
+            except (TypeError, ValueError) as e:  # pragma: no cover
+                # Handle Pandas NA comparison issues
+                if "boolean value of NA is ambiguous" in str(e):
+                    # Work around Pandas NA comparison issue by using Null checks first
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_4_tmp=(
+                            # Both Null: True (they're equal)
+                            (nw.col(column).is_null() & nw.col(compare.name).is_null())
+                            |
+                            # Both not Null and values are equal: use string conversion
+                            # as a fallback
+                            (
+                                (~nw.col(column).is_null() & ~nw.col(compare.name).is_null())
+                                & (
+                                    nw.col(column).cast(nw.String)
+                                    == nw.col(compare.name).cast(nw.String)
+                                )
+                            )
+                        )
+                    )
+                    result_tbl = result_tbl.rename({"pb_is_good_4_tmp": "pb_is_good_4"})
+                elif "cannot compare" in str(e).lower():
+                    # Handle genuine type incompatibility - native_df type varies by backend
+                    native_df = result_tbl.to_native()
+                    col_dtype = str(native_df[column].dtype)
+                    compare_dtype = str(native_df[compare.name].dtype)
+
+                    raise TypeError(
+                        f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                        f"'{compare.name}' (dtype: {compare_dtype}). "
+                        f"Column types are incompatible for equality comparison. "
+                        f"Ensure both columns have compatible data types (both numeric, "
+                        f"both string, or both datetime) before comparing."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
+
+            result_tbl = result_tbl.with_columns(
+                pb_is_good_=nw.col("pb_is_good_1")
+                | nw.col("pb_is_good_2")
+                | (nw.col("pb_is_good_4") & ~nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2"))
+            )
+
+        else:
+            # For non-Pandas backends (Polars, Ibis, etc.), handle type incompatibility
+            try:
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_4=nw.col(column) == compare_expr,
+                )
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                # Handle type compatibility issues for all backends
+                error_msg = str(e).lower()
+                if (
+                    "cannot compare" in error_msg
+                    or "type" in error_msg
+                    and ("mismatch" in error_msg or "incompatible" in error_msg)
+                    or "dtype" in error_msg
+                    or "conversion" in error_msg
+                    and "failed" in error_msg
+                ):
+                    # Get column types for a descriptive error message - native type varies by backend
+                    col_dtype = "unknown"
+                    compare_dtype = "unknown"
+                    try:
+                        native_df = result_tbl.to_native()
+                        if hasattr(native_df, "dtypes"):
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                        elif hasattr(native_df, "schema"):
+                            col_dtype = str(native_df.schema.get(column, "unknown"))
+                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
+                    except Exception:
+                        pass
+
+                    raise TypeError(
+                        f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                        f"'{compare.name}' (dtype: {compare_dtype}). "
+                        f"Column types are incompatible for equality comparison. "
+                        f"Ensure both columns have compatible data types (both numeric, "
+                        f"both string, or both datetime) before comparing."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
+
+            # The comparison is null when either value is missing, so only use it where both
+            # values are present (`pb_is_good_3`); otherwise the row would count as neither
+            # passing nor failing
+            result_tbl = result_tbl.with_columns(
+                pb_is_good_=nw.col("pb_is_good_1")
+                | nw.col("pb_is_good_2")
+                | (
+                    nw.col("pb_is_good_3")
+                    & nw.col("pb_is_good_4")
+                    & ~nw.col("pb_is_good_1")
+                    & ~nw.col("pb_is_good_2")
+                )
+            )
+
+        return result_tbl.drop(
+            "pb_is_good_1", "pb_is_good_2", "pb_is_good_3", "pb_is_good_4"
+        ).to_native()
+
+    else:
+        compare_expr = _get_compare_expr_nw(compare=compare)
+        compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
+
+        result_tbl = nw_tbl.with_columns(
+            pb_is_good_1=nw.col(column).is_null() & na_pass,
+            pb_is_good_2=(
+                nw.col(compare.name).is_null() & na_pass
+                if isinstance(compare, Column)
+                else nw.lit(False)
+            ),
+        )
+
+        # Handle type incompatibility for literal value comparisons
+        try:
+            result_tbl = result_tbl.with_columns(pb_is_good_3=nw.col(column) == compare_expr)
+        except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+            # Handle type compatibility issues for column vs literal comparisons
+            error_msg = str(e).lower()
+            if (
+                "cannot compare" in error_msg
+                or "type" in error_msg
+                and ("mismatch" in error_msg or "incompatible" in error_msg)
+                or "dtype" in error_msg
+                or "conversion" in error_msg
+                and "failed" in error_msg
+            ):
+                # Get column type for a descriptive error message - native type varies by backend
+                col_dtype = "unknown"
+                try:
+                    native_df = result_tbl.to_native()
+                    if hasattr(native_df, "dtypes"):
+                        col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                    elif hasattr(native_df, "schema"):
+                        col_dtype = str(native_df.schema.get(column, "unknown"))
+                except Exception:
+                    pass
+
+                compare_type = type(compare).__name__
+                compare_value = str(compare)
+
+                raise TypeError(
+                    f"Cannot compare column '{column}' (dtype: {col_dtype}) with "
+                    f"literal value '{compare_value}' (type: {compare_type}). "
+                    f"Column type and literal value type are incompatible for equality comparison. "
+                    f"Ensure the column data type is compatible with the comparison value "
+                    f"(e.g., numeric column with numeric value, string column with string value)."
+                ) from e
+            else:
+                raise  # Re-raise unexpected errors
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_3=(
+                nw.when(nw.col("pb_is_good_3").is_null())
+                .then(nw.lit(False))
+                .otherwise(nw.col("pb_is_good_3"))
+            )
+        )
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
+        )
+
+        return result_tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
+
+
+def interrogate_ne(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
+    """Not equal interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Determine if the reference and comparison columns have any null values
+    ref_col_has_null_vals = _column_has_null_values(table=nw_tbl, column=column)
+
+    if isinstance(compare, Column):
+        compare_name = compare.name if isinstance(compare, Column) else compare
+        cmp_col_has_null_vals = _column_has_null_values(table=nw_tbl, column=compare_name)
+    else:
+        cmp_col_has_null_vals = False
+
+    # If neither column has null values, we can proceed with the comparison
+    # without too many complications
+    if not ref_col_has_null_vals and not cmp_col_has_null_vals:
+        if isinstance(compare, Column):
+            compare_expr = _get_compare_expr_nw(compare=compare)
+
+            # Handle type incompatibility for column comparisons
+            try:
+                return nw_tbl.with_columns(
+                    pb_is_good_=nw.col(column) != compare_expr,
+                ).to_native()
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                # Handle type compatibility issues for column vs column comparisons
+                error_msg = str(e).lower()
+                if (
+                    "cannot compare" in error_msg
+                    or "type" in error_msg
+                    and ("mismatch" in error_msg or "incompatible" in error_msg)
+                    or "dtype" in error_msg
+                    or "conversion" in error_msg
+                    and "failed" in error_msg
+                    or "boolean value of na is ambiguous" in error_msg
+                ):
+                    # Get column types for a descriptive error message
+                    try:
+                        native_df = nw_tbl.to_native()
+                        if hasattr(native_df, "dtypes"):
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                        elif hasattr(native_df, "schema"):
+                            col_dtype = str(native_df.schema.get(column, "unknown"))
+                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
+                        else:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+                    except Exception:
+                        col_dtype = "unknown"
+                        compare_dtype = "unknown"
+
+                    raise TypeError(
+                        f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                        f"'{compare.name}' (dtype: {compare_dtype}). "
+                        f"Column types are incompatible for inequality comparison. "
+                        f"Ensure both columns have compatible data types (both numeric, "
+                        f"both string, or both datetime) before comparing."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
+
+        else:
+            compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare)
+
+            # Handle type incompatibility for literal comparisons
+            try:
+                return nw_tbl.with_columns(
+                    pb_is_good_=nw.col(column) != nw.lit(compare_expr),
+                ).to_native()
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                # Handle type compatibility issues for column vs literal comparisons
+                error_msg = str(e).lower()
+                if (
+                    "cannot compare" in error_msg
+                    or "type" in error_msg
+                    and ("mismatch" in error_msg or "incompatible" in error_msg)
+                    or "dtype" in error_msg
+                    or "conversion" in error_msg
+                    and "failed" in error_msg
+                ):
+                    # Get column type for a descriptive error message
+                    try:
+                        native_df = nw_tbl.to_native()
+                        if hasattr(native_df, "dtypes"):
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                        elif hasattr(native_df, "schema"):
+                            col_dtype = str(native_df.schema.get(column, "unknown"))
+                        else:
+                            col_dtype = "unknown"
+                    except Exception:
+                        col_dtype = "unknown"
+
+                    compare_type = type(compare).__name__
+                    compare_value = str(compare)
+
+                    raise TypeError(
+                        f"Cannot compare column '{column}' (dtype: {col_dtype}) with "
+                        f"literal value '{compare_value}' (type: {compare_type}). "
+                        f"Column type and literal value type are incompatible for inequality comparison. "
+                        f"Ensure the column data type is compatible with the comparison value "
+                        f"(e.g., numeric column with numeric value, string column with string value)."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
+
+    # If either column has Null values, we need to handle the comparison
+    # much more carefully since we can't inadvertently compare Null values
+    # to non-Null values
+
+    if isinstance(compare, Column):
+        compare_expr = _get_compare_expr_nw(compare=compare)
+
+        # CASE 1: the reference column has Null values but the comparison column does not
+        if ref_col_has_null_vals and not cmp_col_has_null_vals:
+            if is_pandas_dataframe(nw_tbl.to_native()):
+                try:
+                    result_tbl = nw_tbl.with_columns(
+                        pb_is_good_1=nw.col(column).is_null(),
+                        pb_is_good_2=nw.col(column) != nw.col(compare.name),
+                    )
+                except (TypeError, ValueError) as e:  # pragma: no cover
+                    # Handle Pandas type compatibility issues
+                    if (
+                        "boolean value of NA is ambiguous" in str(e)
+                        or "cannot compare" in str(e).lower()
+                    ):
+                        # Get column types for a descriptive error message
+                        native_df = nw_tbl.to_native()
+                        col_dtype = str(native_df[column].dtype)
+                        compare_dtype = str(native_df[compare.name].dtype)
+
+                        raise TypeError(
+                            f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                            f"'{compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+            else:
+                try:
+                    result_tbl = nw_tbl.with_columns(
+                        pb_is_good_1=nw.col(column).is_null(),
+                        pb_is_good_2=nw.col(column) != nw.col(compare.name),
+                    )
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                    # Handle type compatibility issues for non-Pandas backends
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column types for a descriptive error message
+                        try:
+                            native_df = nw_tbl.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                                compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(column, "unknown"))
+                                compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
+                            else:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+
+                        raise TypeError(
+                            f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                            f"'{compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+            if not na_pass:
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_2=nw.col("pb_is_good_2") & ~nw.col("pb_is_good_1")
+                )
+
+            if is_polars_dataframe(nw_tbl.to_native()):
+                # There may be Null values in the `pb_is_good_2` column, change those to
+                # True if `na_pass=` is True, False otherwise
+
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_2=nw.when(nw.col("pb_is_good_2").is_null())
+                    .then(False)
+                    .otherwise(nw.col("pb_is_good_2")),
+                )
+
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_2=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                    )
+            else:
+                # General case (non-Polars): handle na_pass=True properly
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_2=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                    )
+
+            return (
+                result_tbl.with_columns(pb_is_good_=nw.col("pb_is_good_2"))
+                .drop("pb_is_good_1", "pb_is_good_2")
+                .to_native()
+            )
+
+        # CASE 2: the comparison column has Null values but the reference column does not
+        elif not ref_col_has_null_vals and cmp_col_has_null_vals:
+            if is_pandas_dataframe(nw_tbl.to_native()):
+                try:
+                    result_tbl = nw_tbl.with_columns(
+                        pb_is_good_1=nw.col(column) != nw.lit(compare.name),
+                        pb_is_good_2=nw.col(compare.name).is_null(),
+                    )
+                except (TypeError, ValueError) as e:  # pragma: no cover
+                    # Handle Pandas type compatibility issues
+                    if (
+                        "boolean value of NA is ambiguous" in str(e)
+                        or "cannot compare" in str(e).lower()
+                    ):
+                        # Get column types for a descriptive error message
+                        native_df = nw_tbl.to_native()
+                        col_dtype = str(native_df[column].dtype)
+                        compare_dtype = str(native_df[compare.name].dtype)
+
+                        raise TypeError(
+                            f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                            f"'{compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+            else:
+                try:
+                    result_tbl = nw_tbl.with_columns(
+                        pb_is_good_1=nw.col(column) != nw.col(compare.name),
+                        pb_is_good_2=nw.col(compare.name).is_null(),
+                    )
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                    # Handle type compatibility issues for non-Pandas backends
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column types for a descriptive error message
+                        try:
+                            native_df = nw_tbl.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                                compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(column, "unknown"))
+                                compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
+                            else:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+
+                        raise TypeError(
+                            f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                            f"'{compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+            if not na_pass:
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_1=nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2")
+                )
+
+            if is_polars_dataframe(nw_tbl.to_native()):
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                    )
+            else:
+                # General case (non-Polars): handle `na_pass=True` properly
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                    )
+
+            return (
+                result_tbl.with_columns(pb_is_good_=nw.col("pb_is_good_1"))
+                .drop("pb_is_good_1", "pb_is_good_2")
+                .to_native()
+            )
+
+        # CASE 3: both columns have Null values and there may potentially be cases where
+        # there could even be Null/Null comparisons
+        elif ref_col_has_null_vals and cmp_col_has_null_vals:
+            try:
+                result_tbl = nw_tbl.with_columns(
+                    pb_is_good_1=nw.col(column).is_null(),
+                    pb_is_good_2=nw.col(compare.name).is_null(),
+                    pb_is_good_3=nw.col(column) != nw.col(compare.name),
+                )
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                # Handle type compatibility issues for column vs column comparisons
+                error_msg = str(e).lower()
+                if (
+                    "cannot compare" in error_msg
+                    or "type" in error_msg
+                    and ("mismatch" in error_msg or "incompatible" in error_msg)
+                    or "dtype" in error_msg
+                    or "conversion" in error_msg
+                    and "failed" in error_msg
+                    or "boolean value of na is ambiguous" in error_msg
+                ):
+                    # Get column types for a descriptive error message
+                    try:
+                        native_df = nw_tbl.to_native()
+                        if hasattr(native_df, "dtypes"):
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                        elif hasattr(native_df, "schema"):
+                            col_dtype = str(native_df.schema.get(column, "unknown"))
+                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
+                        else:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+                    except Exception:
+                        col_dtype = "unknown"
+                        compare_dtype = "unknown"
+
+                    raise TypeError(
+                        f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
+                        f"'{compare.name}' (dtype: {compare_dtype}). "
+                        f"Column types are incompatible for inequality comparison. "
+                        f"Ensure both columns have compatible data types (both numeric, "
+                        f"both string, or both datetime) before comparing."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
+
+            if not na_pass:
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_3=nw.col("pb_is_good_3")
+                    & ~nw.col("pb_is_good_1")
+                    & ~nw.col("pb_is_good_2")
+                )
+
+            if is_polars_dataframe(nw_tbl.to_native()):
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_3=(
+                            nw.when(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                            .then(True)
+                            .otherwise(False)
+                        )
+                    )
+            else:
+                # General case (non-Polars): handle na_pass=True properly
+                if na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_3=(
+                            nw.when(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                            .then(True)
+                            .otherwise(nw.col("pb_is_good_3"))
+                        )
+                    )
+
+            return (
+                result_tbl.with_columns(pb_is_good_=nw.col("pb_is_good_3"))
+                .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
+                .to_native()
+            )
+
+    else:
+        # Case where the reference column contains null values
+        if ref_col_has_null_vals:
+            # Create individual cases for Pandas and Polars
+            compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare)
+
+            if is_pandas_dataframe(nw_tbl.to_native()):
+                try:
+                    result_tbl = nw_tbl.with_columns(
+                        pb_is_good_1=nw.col(column).is_null(),
+                        pb_is_good_2=nw.col(column) != nw.lit(compare_expr),
+                    )
+                except (TypeError, ValueError) as e:  # pragma: no cover
+                    # Handle Pandas type compatibility issues for literal comparisons
+                    if (
+                        "boolean value of NA is ambiguous" in str(e)
+                        or "cannot compare" in str(e).lower()
+                    ):
+                        # Get column type for a descriptive error message
+                        native_df = nw_tbl.to_native()
+                        col_dtype = str(native_df[column].dtype)
+                        compare_type = type(compare).__name__
+                        compare_value = str(compare)
+
+                        raise TypeError(
+                            f"Cannot compare column '{column}' (dtype: {col_dtype}) with "
+                            f"literal value '{compare_value}' (type: {compare_type}). "
+                            f"Column type and literal value type are incompatible for inequality comparison. "
+                            f"Ensure the column data type is compatible with the comparison value "
+                            f"(e.g., numeric column with numeric value, string column with string value)."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+                if not na_pass:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_2=nw.col("pb_is_good_2") & ~nw.col("pb_is_good_1")
+                    )
+
+                return (
+                    result_tbl.with_columns(pb_is_good_=nw.col("pb_is_good_2"))
+                    .drop("pb_is_good_1", "pb_is_good_2")
+                    .to_native()
+                )
+
+            elif is_polars_dataframe(nw_tbl.to_native()):
+                result_tbl = nw_tbl.with_columns(
+                    pb_is_good_1=nw.col(column).is_null(),  # val is Null in Column
+                    pb_is_good_2=nw.lit(na_pass),  # Pass if any Null in val or compare
+                )
+
+                try:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_3=nw.col(column) != nw.lit(compare_expr)
+                    )
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                    # Handle type compatibility issues for literal comparisons
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column type for a descriptive error message
+                        try:
+                            native_df = nw_tbl.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(column, "unknown"))
+                            else:
+                                col_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+
+                        compare_type = type(compare).__name__
+                        compare_value = str(compare)
+
+                        raise TypeError(
+                            f"Cannot compare column '{column}' (dtype: {col_dtype}) with "
+                            f"literal value '{compare_value}' (type: {compare_type}). "
+                            f"Column type and literal value type are incompatible for inequality comparison. "
+                            f"Ensure the column data type is compatible with the comparison value "
+                            f"(e.g., numeric column with numeric value, string column with string value)."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_=(
+                        (nw.col("pb_is_good_1") & nw.col("pb_is_good_2"))
+                        | (nw.col("pb_is_good_3") & ~nw.col("pb_is_good_1"))
+                    )
+                )
+
+                result_tbl = result_tbl.drop(
+                    "pb_is_good_1", "pb_is_good_2", "pb_is_good_3"
+                ).to_native()
+
+                return result_tbl
+
+            else:
+                # Generic case for other DataFrame types (PySpark, etc.)
+                # Use similar logic to Polars but handle potential differences
+                result_tbl = nw_tbl.with_columns(
+                    pb_is_good_1=nw.col(column).is_null(),  # val is Null in Column
+                    pb_is_good_2=nw.lit(na_pass),  # Pass if any Null in val or compare
+                )
+
+                try:
+                    result_tbl = result_tbl.with_columns(
+                        pb_is_good_3=nw.col(column) != nw.lit(compare_expr)
+                    )
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
+                    # Handle type compatibility issues for literal comparisons
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column type for a descriptive error message
+                        try:
+                            native_df = nw_tbl.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(column, "unknown"))
+                            else:
+                                col_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+
+                        compare_type = type(compare).__name__
+                        compare_value = str(compare)
+
+                        raise TypeError(
+                            f"Cannot compare column '{column}' (dtype: {col_dtype}) with "
+                            f"literal value '{compare_value}' (type: {compare_type}). "
+                            f"Column type and literal value type are incompatible for inequality comparison. "
+                            f"Ensure the column data type is compatible with the comparison value "
+                            f"(e.g., numeric column with numeric value, string column with string value)."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+                result_tbl = result_tbl.with_columns(
+                    pb_is_good_=(
+                        (nw.col("pb_is_good_1") & nw.col("pb_is_good_2"))
+                        | (nw.col("pb_is_good_3") & ~nw.col("pb_is_good_1"))
+                    )
+                )
+
+                return result_tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
+
+
+def interrogate_between(
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
+    """Between interrogation."""
+
+    low_val = _get_compare_expr_nw(compare=low)
+    high_val = _get_compare_expr_nw(compare=high)
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
+    high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null(),  # val is Null in Column
+        pb_is_good_2=(  # lb is Null in Column
+            nw.col(low.name).is_null() if isinstance(low, Column) else nw.lit(False)
+        ),
+        pb_is_good_3=(  # ub is Null in Column
+            nw.col(high.name).is_null() if isinstance(high, Column) else nw.lit(False)
+        ),
+        pb_is_good_4=nw.lit(na_pass),  # Pass if any Null in lb, val, or ub
+    )
+
+    if inclusive[0]:
+        result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) >= low_val)
+    else:
+        result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) > low_val)
+
+    if inclusive[1]:
+        result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) <= high_val)
+    else:
+        result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) < high_val)
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_5=(
+            nw.when(nw.col("pb_is_good_5").is_null())
+            .then(nw.lit(False))
+            .otherwise(nw.col("pb_is_good_5"))
+        )
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_6=(
+            nw.when(nw.col("pb_is_good_6").is_null())
+            .then(nw.lit(False))
+            .otherwise(nw.col("pb_is_good_6"))
+        )
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=(
+            (
+                (nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3"))
+                & nw.col("pb_is_good_4")
+            )
+            | (nw.col("pb_is_good_5") & nw.col("pb_is_good_6"))
+        )
+    ).drop(
+        "pb_is_good_1",
+        "pb_is_good_2",
+        "pb_is_good_3",
+        "pb_is_good_4",
+        "pb_is_good_5",
+        "pb_is_good_6",
+    )
+
+    return result_tbl.to_native()
+
+
+def interrogate_outside(
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
+    """Outside range interrogation."""
+
+    low_val = _get_compare_expr_nw(compare=low)
+    high_val = _get_compare_expr_nw(compare=high)
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
+    high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null(),  # val is Null in Column
+        pb_is_good_2=(  # lb is Null in Column
+            nw.col(low.name).is_null() if isinstance(low, Column) else nw.lit(False)
+        ),
+        pb_is_good_3=(  # ub is Null in Column
+            nw.col(high.name).is_null() if isinstance(high, Column) else nw.lit(False)
+        ),
+        pb_is_good_4=nw.lit(na_pass),  # Pass if any Null in lb, val, or ub
+    )
+
+    # Note: Logic is inverted for "outside"; when inclusive[0] is True,
+    # we want values < low_val (not <= low_val) to be "outside"
+    if inclusive[0]:
+        result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) < low_val)
+    else:
+        result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) <= low_val)
+
+    if inclusive[1]:
+        result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) > high_val)
+    else:
+        result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) >= high_val)
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_5=nw.when(nw.col("pb_is_good_5").is_null())
+        .then(False)
+        .otherwise(nw.col("pb_is_good_5")),
+        pb_is_good_6=nw.when(nw.col("pb_is_good_6").is_null())
+        .then(False)
+        .otherwise(nw.col("pb_is_good_6")),
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=(
+            (
+                (nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3"))
+                & nw.col("pb_is_good_4")
+            )
+            | (
+                (nw.col("pb_is_good_5") & ~nw.col("pb_is_good_3"))
+                | (nw.col("pb_is_good_6")) & ~nw.col("pb_is_good_2")
+            )
+        )
+    ).drop(
+        "pb_is_good_1",
+        "pb_is_good_2",
+        "pb_is_good_3",
+        "pb_is_good_4",
+        "pb_is_good_5",
+        "pb_is_good_6",
+    )
+
+    return result_tbl.to_native()
+
+
+def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
+    """In set interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    can_be_null: bool = None in set_values
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
+    if can_be_null:
+        base_expr = base_expr | nw.col(column).is_null()
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=base_expr)
+    return result_tbl.to_native()
+
+
+def _dtype_kind(dtype: Any) -> str | None:
+    """Classify a Narwhals dtype as numeric, string, temporal, or boolean (`None` if other)."""
+    if dtype.is_numeric():
+        return "numeric"
+    if dtype.is_temporal():
+        return "temporal"
+    if dtype in (nw.String, nw.Categorical, nw.Enum):
+        return "string"
+    if dtype == nw.Boolean:
+        return "boolean"
+    return None
+
+
+def _check_key_dtypes_compatible(
+    columns: list[str], ref_columns: list[str], tbl_schema: Any, ref_schema: Any
+) -> None:
+    """Raise a `TypeError` if a key column can never match its reference column's values."""
+    for c, rc in zip(columns, ref_columns):
+        kind, ref_kind = _dtype_kind(tbl_schema[c]), _dtype_kind(ref_schema[rc])
+        if kind is not None and ref_kind is not None and kind != ref_kind:
+            raise TypeError(
+                f"Column '{c}' ({tbl_schema[c]}) and reference column '{rc}' "
+                f"({ref_schema[rc]}) have incompatible types."
+            )
+
+
+def _common_numeric_key_dtype(dtype: Any, ref_dtype: Any) -> Any:
+    """Get the dtype that mismatched numeric join keys should be cast to (`None` if no cast)."""
+    if dtype == ref_dtype or not (dtype.is_numeric() and ref_dtype.is_numeric()):
+        return None
+    if dtype.is_integer() and ref_dtype.is_integer():
+        # `UInt64` values can't all be represented by `Int64` (or vice versa), so such a pair is
+        # left to the backend
+        if dtype == nw.UInt64 or ref_dtype == nw.UInt64:
+            return None
+        return nw.Int64
+    return nw.Float64
+
+
+def interrogate_in_table(
+    tbl: IntoFrame,
+    columns: str | list[str],
+    ref_tbl: IntoFrame,
+    ref_columns: str | list[str],
+    na_pass: bool,
+) -> Any:
+    """Referential integrity interrogation.
+
+    Checks that each value (or composite key) in the target column(s) exists in the reference
+    table's column(s). Returns the table with a `pb_is_good_` boolean column.
+
+    Heterogeneous backends (e.g. MySQL table + Polars DataFrame) are handled via
+    `_coerce_to_common_backend()`, which materializes the lighter side to match the heavier side's
+    backend before comparison.
+    """
+    # Coerce both tables to the same backend
+    tbl, ref_tbl = _coerce_to_common_backend(tbl, ref_tbl)
+
+    nw_tbl = nw.from_native(tbl)
+    nw_ref = nw.from_native(ref_tbl)
+
+    # Normalize to lists
+    single_col = isinstance(columns, str)
+    if isinstance(columns, str):
+        columns = [columns]
+    if isinstance(ref_columns, str):
+        ref_columns = [ref_columns]
+
+    if len(columns) != len(ref_columns):
+        raise ValueError(
+            f"columns and ref_column must have the same length, "
+            f"got {len(columns)} and {len(ref_columns)}."
+        )
+
+    tbl_schema = nw_tbl.collect_schema()
+    ref_schema = nw_ref.collect_schema()
+    _check_key_dtypes_compatible(columns, ref_columns, tbl_schema, ref_schema)
+
+    if single_col:
+        # Single-column path: extract distinct ref values, use is_in()
+        col_name = columns[0]
+        ref_col_name = ref_columns[0]
+
+        ref_unique = nw_ref.select(nw.col(ref_col_name)).unique()
+        if isinstance(ref_unique, nw.LazyFrame):  # pragma: no cover
+            ref_unique = ref_unique.collect()
+        ref_values = ref_unique.get_column(ref_col_name).to_list()
+        ref_values_clean = [v for v in ref_values if v is not None]
+
+        expr: nw.Expr = _is_in(col_name, ref_values_clean, tbl_schema[col_name])
+        if na_pass:
+            expr = expr | nw.col(col_name).is_null()
+
+        result_tbl = nw_tbl.with_columns(pb_is_good_=expr)
+        return result_tbl.to_native()
+
+    # Composite-key path: left-join with distinct ref keys + marker
+    ref_keys = nw_ref.select(ref_columns).unique()
+    if isinstance(ref_keys, nw.LazyFrame):  # pragma: no cover
+        ref_keys = ref_keys.collect()
+
+    # Rename ref columns to match target columns (required for join)
+    rename_map = {src: tgt for src, tgt in zip(ref_columns, columns) if src != tgt}
+    if rename_map:
+        ref_keys = ref_keys.rename(rename_map)
+
+    ref_keys = ref_keys.with_columns(nw.lit(True).alias("__pb_ref_matched__"))
+
+    # Materialize lazy main table for the join
+    if isinstance(nw_tbl, nw.LazyFrame):  # pragma: no cover
+        nw_tbl = nw_tbl.collect()
+
+    # Joins require the key columns on both sides to have the same dtype, so mismatched numeric
+    # keys (e.g., an integer key against a float reference key) are cast to a common dtype; this
+    # only applies to the join keys, the returned table keeps its original dtypes
+    key_casts = {
+        c: dtype
+        for c, rc in zip(columns, ref_columns)
+        if (dtype := _common_numeric_key_dtype(tbl_schema[c], ref_schema[rc])) is not None
+    }
+    tbl_keys = nw_tbl.select(columns)
+    if key_casts:
+        tbl_keys = tbl_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+        ref_keys = ref_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+
+    joined = tbl_keys.join(ref_keys, on=columns, how="left")
+
+    # The marker is `True` or null after the left join; pandas stores that as an `object` column,
+    # so it is cast to make it a proper boolean column
+    matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False).cast(nw.Boolean)
+
+    if na_pass:
+        all_null = nw.all_horizontal(*[nw.col(c).is_null() for c in columns], ignore_nulls=False)
+        all_null_series = nw_tbl.select(all_null.alias("__pb_all_null__")).get_column(
+            "__pb_all_null__"
+        )
+        matched_series = matched_series | all_null_series
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=matched_series)
+    return result_tbl.to_native()
+
+
+def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
+    """Not in set interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    # Missing values fail, like in `interrogate_isin()`; `is_in()` gives null for them on most
+    # backends (and False for NaN in pandas), so make the result a plain boolean
+    in_set = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(False)
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~in_set & ~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def interrogate_regex(
+    tbl: IntoFrame, column: str, values: dict[str, Any] | str, na_pass: bool
+) -> Any:
+    """Regex interrogation."""
+
+    # Handle both old and new formats for backward compatibility
+    if isinstance(values, str):
+        pattern = values
+        inverse = False
+    else:
+        pattern = values["pattern"]
+        inverse = values["inverse"]
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+        pb_is_good_2=nw.col(column).str.contains(pattern, literal=False).fill_null(False),
+    )
+
+    # Apply inverse logic if needed
+    if inverse:
+        # Use explicit boolean logic instead of bitwise NOT for pandas compatibility
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_2=nw.when(nw.col("pb_is_good_2")).then(False).otherwise(True)
+        )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+    ).drop("pb_is_good_1", "pb_is_good_2")
+
+    return result_tbl.to_native()
+
+
+def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
+    """String length interrogation."""
+
+    min_val = values.get("min_val")
+    max_val = values.get("max_val")
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+        pb_is_good_2=nw.lit(True),
+        pb_is_good_3=nw.lit(True),
+    )
+
+    if min_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_2=(nw.col(column).str.len_chars() >= min_val).fill_null(False)
+        )
+
+    if max_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_3=(nw.col(column).str.len_chars() <= max_val).fill_null(False)
+        )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=(nw.col("pb_is_good_1") | (nw.col("pb_is_good_2") & nw.col("pb_is_good_3")))
+    ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
+
+    return result_tbl.to_native()
+
+
+def interrogate_within_spec(
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
+    """Within specification interrogation."""
+    from pointblank._spec_utils import (
+        regex_email,
+        regex_ipv4_address,
+        regex_ipv6_address,
+        regex_mac,
+        regex_phone,
+        regex_swift_bic,
+        regex_url,
+    )
+
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Parse spec for country-specific formats
+    country = None
+    if "[" in spec and "]" in spec:
+        # Extract country code from spec like "postal_code[US]" or "iban[DE]"
+        base_spec = spec[: spec.index("[")]
+        country = spec[spec.index("[") + 1 : spec.index("]")]
+        spec_lower = base_spec.lower()
+
+    # Convert to Narwhals for cross-backend compatibility
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Regex-based specifications can use Narwhals directly (no materialization needed)
+    regex_specs = {
+        "email": regex_email(),
+        "url": regex_url(),
+        "phone": regex_phone(),
+        "ipv4": regex_ipv4_address(),
+        "ipv4_address": regex_ipv4_address(),
+        "ipv6": regex_ipv6_address(),
+        "ipv6_address": regex_ipv6_address(),
+        "mac": regex_mac(),
+        "mac_address": regex_mac(),
+        "swift": regex_swift_bic(),
+        "swift_bic": regex_swift_bic(),
+        "bic": regex_swift_bic(),
+    }
+
+    if spec_lower in regex_specs:
+        # Use regex validation through Narwhals (works for all backends including Ibis!)
+        pattern = regex_specs[spec_lower]
+
+        # For SWIFT/BIC, need to uppercase first
+        if spec_lower in ("swift", "swift_bic", "bic"):
+            col_expr = nw.col(column).str.to_uppercase()
+        else:
+            col_expr = nw.col(column)
+
+        result_tbl = nw_tbl.with_columns(
+            pb_is_good_1=nw.col(column).is_null() & na_pass,
+            pb_is_good_2=col_expr.str.contains(f"^{pattern}$", literal=False).fill_null(False),
+        )
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+        ).drop("pb_is_good_1", "pb_is_good_2")
+
+        return result_tbl.to_native()
+
+    # For specifications requiring checksums or complex logic:
+    # Auto-detect Ibis tables and use database-native validation when available
+    native_tbl = nw_tbl.to_native()
+    is_ibis = hasattr(native_tbl, "execute")
+
+    # Use database-native validation for VIN and credit_card when using Ibis
+    if is_ibis and spec_lower == "vin":  # pragma: no cover
+        # Route to database-native VIN validation
+        return interrogate_within_spec_db(tbl, column, values, na_pass)
+    elif is_ibis and spec_lower in ("credit_card", "creditcard"):  # pragma: no cover
+        # Route to database-native credit card validation
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+
+    # For non-Ibis tables or other specs, materialize data and use Python validation
+    # Get the column data as a list
+    col_data: Any = nw_tbl.select(column).to_native()
+
+    # Convert to list based on backend - type varies so use duck typing
+    if hasattr(col_data, "to_list"):  # pragma: no cover  # Polars
+        col_list = col_data[column].to_list()  # type: ignore[index]
+    elif hasattr(col_data, "tolist"):  # pragma: no cover  # Pandas
+        col_list = col_data[column].tolist()  # type: ignore[index]
+    else:  # pragma: no cover  # For Ibis tables, we need to execute the query first
+        try:
+            # Try to execute if it's an Ibis table
+            if hasattr(col_data, "execute"):
+                col_data_exec = col_data.execute()  # type: ignore[operator]
+                if hasattr(col_data_exec, "to_list"):  # Polars result
+                    col_list = col_data_exec[column].to_list()
+                elif hasattr(col_data_exec, "tolist"):  # Pandas result
+                    col_list = col_data_exec[column].tolist()
+                else:
+                    col_list = list(col_data_exec[column])
+            else:
+                col_list = list(col_data[column])
+        except Exception:
+            # Fallback to direct list conversion
+            col_list = list(col_data[column])
+
+    assert isinstance(col_list, list)
+
+    # Validate based on spec type (checksum-based validations)
+    if spec_lower in ("isbn", "isbn-10", "isbn-13"):
+        is_valid_list = check_isbn(col_list)
+    elif spec_lower == "vin":
+        is_valid_list = check_vin(col_list)
+    elif spec_lower in ("credit_card", "creditcard"):
+        is_valid_list = check_credit_card(col_list)
+    elif spec_lower == "iban":
+        is_valid_list = check_iban(col_list, country=country)
+    elif spec_lower in ("postal_code", "postalcode", "postcode", "zip"):
+        if country is None:
+            raise ValueError("Country code required for postal code validation")
+        is_valid_list = check_postal_code(col_list, country=country)
+    else:
+        raise ValueError(f"Unknown specification type: {spec}")
+
+    # Create result table with validation results
+    # For Ibis tables, execute to get a materialized dataframe first
+    native_tbl = nw_tbl.to_native()
+    if hasattr(native_tbl, "execute"):  # pragma: no cover
+        native_tbl = native_tbl.execute()
+
+    # Add validation column: convert native table to Series, then back through Narwhals
+    if is_polars_dataframe(native_tbl):
+        import polars as pl
+
+        native_tbl = native_tbl.with_columns(pb_is_good_2=pl.Series(is_valid_list))
+    elif is_pandas_dataframe(native_tbl):
+        import pandas as pd
+
+        native_tbl["pb_is_good_2"] = pd.Series(is_valid_list, index=native_tbl.index)
+    else:
+        raise NotImplementedError(
+            f"Backend type not supported: {type(native_tbl)}"
+        )  # pragma: no cover
+
+    result_tbl = nw.from_native(native_tbl)  # Handle NA values and combine validation results
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+    ).drop("pb_is_good_1", "pb_is_good_2")
+
+    return result_tbl.to_native()
+
+
+def interrogate_within_spec_db(  # pragma: no cover
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
+    """
+    Database-native specification validation (proof of concept).
+
+    This function uses Ibis expressions to perform validation entirely in SQL,
+    avoiding data materialization for remote database tables. Currently only
+    supports VIN validation as a proof of concept.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key with specification type.
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    Any
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    This is a proof-of-concept implementation demonstrating database-native
+    validation. It translates complex Python validation logic (regex, checksums)
+    into SQL expressions that can be executed directly in the database.
+    """
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Check if this is an Ibis table
+    native_tbl: Any = tbl
+    if is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl):
+        native_tbl = tbl.to_native()
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    # Route to appropriate database-native validation
+    if spec_lower == "credit_card":
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+    elif spec_lower != "vin":
+        raise NotImplementedError(
+            f"Database-native validation for '{spec}' not yet implemented. "
+            "Currently 'vin' and 'credit_card' are supported in interrogate_within_spec_db(). "
+            "Use interrogate_within_spec() for other specifications."
+        )
+
+    # VIN validation using Ibis expressions (database-native)
+    # Implementation based on ISO 3779 standard with check digit algorithm
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # VIN transliteration map (character to numeric value for checksum)
+    # Based on ISO 3779 standard for VIN check digit calculation
+    transliteration = {
+        "A": 1,
+        "B": 2,
+        "C": 3,
+        "D": 4,
+        "E": 5,
+        "F": 6,
+        "G": 7,
+        "H": 8,
+        "J": 1,
+        "K": 2,
+        "L": 3,
+        "M": 4,
+        "N": 5,
+        "P": 7,
+        "R": 9,
+        "S": 2,
+        "T": 3,
+        "U": 4,
+        "V": 5,
+        "W": 6,
+        "X": 7,
+        "Y": 8,
+        "Z": 9,
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+    }
+
+    # Position weights for checksum calculation
+    weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]  # type: ignore[index]
+
+    # Basic checks: length must be 17, no invalid characters (I, O, Q)
+    valid_length = col_expr.length() == 17
+    no_invalid_chars = (
+        ~col_expr.upper().contains("I")
+        & ~col_expr.upper().contains("O")
+        & ~col_expr.upper().contains("Q")
+    )
+
+    # Calculate checksum using Ibis expressions
+    # For each position, extract character, transliterate to number, multiply by weight, sum
+    checksum = ibis.literal(0)
+
+    for pos in range(17):
+        if pos == 8:  # Position 9 (0-indexed 8) is the check digit itself
+            continue
+
+        # Extract character at position (1-indexed for substr)
+        char = col_expr.upper().substr(pos, 1)
+
+        # Build a case expression for transliteration using ibis.cases()
+        # Add final else condition for invalid characters
+        conditions = [(char == ch, num) for ch, num in transliteration.items()]
+        value = ibis.cases(*conditions, else_=0)  # Default: invalid char = 0 (will fail validation)
+
+        # Multiply by weight and add to checksum
+        checksum = checksum + (value * weights[pos])  # type: ignore[operator]
+
+    # Check digit calculation: checksum % 11
+    # If result is 10, check digit should be 'X', otherwise it's the digit itself
+    expected_check = checksum % 11  # type: ignore[operator]
+    actual_check_char = col_expr.upper().substr(8, 1)  # Position 9 (0-indexed 8)
+
+    # Validate check digit using ibis.cases()
+    check_digit_valid = ibis.cases(
+        (expected_check == 10, actual_check_char == "X"),
+        (expected_check < 10, actual_check_char == expected_check.cast(str)),
+        else_=False,
+    )
+
+    # Combine all validation checks
+    is_valid = valid_length & no_invalid_chars & check_digit_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
+        # Use fill_null to convert NULL results to False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
+
+    return result_tbl
+
+
+def interrogate_credit_card_db(  # pragma: no cover
+    tbl: IntoFrame, column: str, values: dict[str, str], na_pass: bool
+) -> Any:
+    """
+    Database-native credit card validation using Luhn algorithm in SQL.
+
+    This function implements the Luhn checksum algorithm entirely in SQL using
+    Ibis expressions, avoiding data materialization for remote database tables.
+    This is a unique implementation that validates credit card numbers directly
+    in the database.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key (should be 'credit_card').
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    Any
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    The Luhn algorithm works as follows:
+    1. Remove spaces and hyphens from the card number
+    2. Starting from the rightmost digit, double every second digit
+    3. If doubled digit > 9, subtract 9
+    4. Sum all digits
+    5. Valid if sum % 10 == 0
+
+    This implementation translates the entire algorithm into SQL expressions.
+    """
+    # Check if this is an Ibis table
+    native_tbl = tbl
+    if hasattr(tbl, "to_native"):
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl  # type: ignore[operator]
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]  # type: ignore[index]
+
+    # Step 1: Clean the input and remove spaces and hyphens
+    # First check format: only digits, spaces, and hyphens allowed
+    valid_chars = col_expr.re_search(r"^[0-9\s\-]+$").notnull()
+
+    # Clean: remove spaces and hyphens
+    clean_card = col_expr.replace(" ", "").replace("-", "")
+
+    # Step 2: Check length (13-19 digits after cleaning)
+    card_length = clean_card.length()
+    valid_length = (card_length >= 13) & (card_length <= 19)
+
+    # Step 3: Luhn algorithm implementation in SQL
+    # We'll process each digit position and calculate the checksum
+    # Starting from the right, double every second digit
+
+    # Initialize checksum
+    checksum = ibis.literal(0)
+
+    # Process up to 19 digits (maximum credit card length)
+    for pos in range(19):
+        # Calculate position from right (0 = rightmost)
+        pos_from_right = pos
+
+        # Extract digit at this position from the right
+        # substr with negative index or using length - pos
+        digit_pos = card_length - pos_from_right
+        digit_char = clean_card.substr(digit_pos - 1, 1)
+
+        # Convert character to integer (using case statement)
+        digit_val = ibis.cases(
+            (digit_char == "0", 0),
+            (digit_char == "1", 1),
+            (digit_char == "2", 2),
+            (digit_char == "3", 3),
+            (digit_char == "4", 4),
+            (digit_char == "5", 5),
+            (digit_char == "6", 6),
+            (digit_char == "7", 7),
+            (digit_char == "8", 8),
+            (digit_char == "9", 9),
+            else_=-1,  # Invalid character
+        )
+
+        # Check if this position should be processed (within card length)
+        in_range = digit_pos > 0
+
+        # Double every second digit (odd positions from right, 0-indexed)
+        should_double = (pos_from_right % 2) == 1
+
+        # Calculate contribution to checksum
+        # If should_double: double the digit, then if > 9 subtract 9
+        doubled = digit_val * 2  # type: ignore[operator]
+        adjusted = ibis.cases(
+            (should_double & (doubled > 9), doubled - 9),
+            (should_double, doubled),
+            else_=digit_val,
+        )
+
+        # Add to checksum only if in range
+        contribution = ibis.cases(
+            (in_range, adjusted),
+            else_=0,
+        )
+
+        checksum = checksum + contribution  # type: ignore[operator]
+
+    # Step 4: Valid if checksum % 10 == 0
+    luhn_valid = (checksum % 10) == 0  # type: ignore[operator]
+
+    # Combine all validation checks
+    is_valid = valid_chars & valid_length & luhn_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
+
+    return result_tbl
+
+
+def interrogate_null(tbl: IntoFrame, column: str) -> Any:
+    """Null interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
+    """Not null interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> Any:
+    """Mark rows with structured-missing values as passing.
+
+    Given a `results_tbl` that already carries a boolean `pb_is_good_` column, force that column to
+    `True` for any row whose value in `column` is a declared sentinel of `spec` (a `MissingSpec`),
+    or a null when `spec.null_is_missing` is `True`. This implements the `missing=` exclusion on
+    `col_vals_*` validation methods: sentinel/missing values are excluded from the check (they pass)
+    so that only the "real" values are validated.
+    """
+    sentinels = spec.sentinel_values()
+
+    nw_tbl = nw.from_native(results_tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
+    # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
+    # sentinel mask is explicitly filled with `False` for null rows.
+    mask = None
+    if sentinels:
+        mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
+    if spec.null_is_missing:
+        null_expr = nw.col(column).is_null()
+        mask = null_expr if mask is None else (mask | null_expr)
+
+    if mask is None:
+        return results_tbl
+
+    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
+    return nw_tbl.to_native()
+
+
+def interrogate_missing_only_coded(
+    tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    allowed: list | None,
+    min_val: Any,
+    max_val: Any,
+) -> Any:
+    """Missing-only-coded interrogation.
+
+    A row passes when its value is either a declared sentinel (a documented missing code), a null
+    (when `count_null=True`), or a legitimate "real" value — one in `allowed` or within the
+    `[min_val, max_val]` range. Any other value is treated as an *undocumented* code and fails.
+    """
+    nw_tbl = nw.from_native(tbl)
+    dtype = nw_tbl.collect_schema()[column]
+
+    good = None
+
+    def _or(expr):
+        nonlocal good
+        good = expr if good is None else (good | expr)
+
+    if sentinels:
+        _or(_is_in(column, sentinels, dtype).fill_null(False))
+    if count_null:
+        _or(nw.col(column).is_null())
+    if allowed:
+        _or(_is_in(column, allowed, dtype).fill_null(False))
+    if min_val is not None or max_val is not None:
+        range_expr = nw.lit(True)
+        if min_val is not None:
+            range_expr = range_expr & (nw.col(column) >= min_val)
+        if max_val is not None:
+            range_expr = range_expr & (nw.col(column) <= max_val)
+        _or(range_expr.fill_null(False))
+
+    if good is None:
+        good = nw.lit(False)
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=good)
+    return result_tbl.to_native()
+
+
+def interrogate_missing_consistent(
+    tbl: IntoFrame, columns: list[str], sentinels: list, count_null: bool
+) -> Any:
+    """Cross-column missing-consistency interrogation.
+
+    Given a set of related `columns`, a row passes when the "missing for a given reason" status is
+    consistent across all of them: either *none* of the columns carry the reason, or *all* of them
+    do. A row fails when some-but-not-all of the columns are missing for that reason. Missingness
+    for the reason is encoded by the `sentinels` values (and, when `count_null=True`, actual nulls).
+    """
+    nw_tbl = nw.from_native(tbl)
+    schema = nw_tbl.collect_schema()
+    n_cols = len(columns)
+
+    count_expr = None
+    for c in columns:
+        if sentinels:
+            col_expr = _is_in(c, sentinels, schema[c]).fill_null(False)
+        else:
+            col_expr = nw.lit(False)  # noqa
+        if count_null:
+            col_expr = col_expr | nw.col(c).is_null()
+        col_count = col_expr.cast(nw.Int32)
+        count_expr = col_count if count_expr is None else (count_expr + col_count)
+
+    result_tbl = nw_tbl.with_columns(_n_reason_=count_expr)
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=((nw.col("_n_reason_") == 0) | (nw.col("_n_reason_") == n_cols))
+    )
+    result_tbl = result_tbl.drop("_n_reason_")
+    return result_tbl.to_native()
+
+
+def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
+    """Missing-coded interrogation.
+
+    A row passes when its value is *not* a raw null. Under the structured-missingness model, every
+    absence should be expressed with an explicit sentinel code (which is non-null), so a raw null
+    represents *uncoded* missingness and fails the test unit.
+    """
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def _with_lagged_difference(
+    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    """
+    Add a `pb_lagged_difference_` column holding the difference from the previous row's value.
+
+    Narwhals needs an explicit row order for `shift()` on LazyFrames. Polars LazyFrames keep their
+    row order, so a `pb_row_index_` column is added to order by (the caller drops it).
+    """
+    lagged = nw.col(column).shift(1)
+    if isinstance(nw_tbl, nw.LazyFrame) and is_polars_lazyframe(nw_tbl.to_native()):
+        nw_tbl = _with_row_index(nw_tbl, name="pb_row_index_")
+        lagged = lagged.over(order_by="pb_row_index_")
+    return nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - lagged)
+
+
+def interrogate_increasing(
+    tbl: IntoFrame, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+) -> Any:
+    """
+    Increasing interrogation.
+
+    Checks whether column values are increasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    decreasing_tol
+        Optional tolerance for negative movement (decreasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    Any
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Create a lagged difference column
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
+
+    # Build the condition based on allow_stationary and decreasing_tol
+    if allow_stationary or decreasing_tol != 0:
+        # Allow stationary (diff >= 0) or within tolerance
+        threshold = -abs(decreasing_tol) if decreasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") >= threshold
+    else:
+        # Strictly increasing (diff > 0)
+        good_condition = nw.col("pb_lagged_difference_") > 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
+
+
+def interrogate_decreasing(
+    tbl: IntoFrame, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+) -> Any:
+    """
+    Decreasing interrogation.
+
+    Checks whether column values are decreasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    increasing_tol
+        Optional tolerance for positive movement (increasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    Any
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Create a lagged difference column
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
+
+    # Build the condition based on allow_stationary and increasing_tol
+    if allow_stationary or increasing_tol != 0:
+        # Allow stationary (diff <= 0) or within tolerance
+        threshold = abs(increasing_tol) if increasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") <= threshold
+    else:
+        # Strictly decreasing (diff < 0)
+        good_condition = nw.col("pb_lagged_difference_") < 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
+
+
+def _interrogate_comparison_base(
+    tbl: IntoFrame, column: str, compare: Any, na_pass: bool, operator: str
+) -> Any:
+    """
+    Unified base function for comparison operations (gt, ge, lt, le, eq, ne).
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    compare
+        The value to compare against.
+    na_pass
+        Whether to pass null values.
+    operator
+        The comparison operator: 'gt', 'ge', 'lt', 'le', 'eq', 'ne'.
+
+    Returns
+    -------
+    Any
+        The result table with `pb_is_good_` column indicating the passing test units.
+    """
+
+    compare_expr = _get_compare_expr_nw(compare=compare)
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
+
+    # Create the comparison expression based on the operator
+    column_expr = nw.col(column)
+    if operator == "gt":
+        comparison = column_expr > compare_expr
+    elif operator == "ge":
+        comparison = column_expr >= compare_expr
+    elif operator == "lt":
+        comparison = column_expr < compare_expr
+    elif operator == "le":
+        comparison = column_expr <= compare_expr
+    elif operator == "eq":  # pragma: no cover
+        comparison = column_expr == compare_expr
+    elif operator == "ne":  # pragma: no cover
+        comparison = column_expr != compare_expr
+    else:
+        raise ValueError(  # pragma: no cover
+            f"Invalid operator: {operator}. Must be one of: 'gt', 'ge', 'lt', 'le', 'eq', 'ne'"
+        )
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column) & na_pass,
+        pb_is_good_2=(
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(compare.name), compare.name) & na_pass
+            if isinstance(compare, Column)
+            else nw.lit(False)
+        ),
+        pb_is_good_3=comparison & ~_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_3=(
+            nw.when(nw.col("pb_is_good_3").is_null())
+            .then(nw.lit(False))
+            .otherwise(nw.col("pb_is_good_3"))
+        )
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
+    ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
+
+    return result_tbl.to_native()
+
+
+def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
+    """
+    Check if rows in a DataFrame are distinct.
+
+    Parameters
+    ----------
+    data_tbl
+        A data table.
+    columns_subset
+        A list of columns to check for distinctness.
+    threshold
+        The maximum number of failing test units to allow.
+    tbl_type
+        The type of table to use for the assertion.
+
+    Returns
+    -------
+    Any
+        A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
+    """
+    tbl = nw.from_native(data_tbl)
+    assert is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl)
+
+    # Get the column subset to use for the test
+    if columns_subset is None:
+        columns_subset = tbl.collect_schema().names() if is_narwhals_lazyframe(tbl) else tbl.columns
+
+    # Check for duplicate rows using null-safe approaches
+    # The previous group_by + join approach failed because NULL != NULL in join semantics,
+    # causing rows with nulls to be excluded from both PASS and FAIL counts.
+    if is_narwhals_dataframe(tbl):
+        # For DataFrames, is_duplicated() correctly treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=~tbl.select(columns_subset).is_duplicated())
+        return result.to_native()
+    elif is_narwhals_lazyframe(tbl):
+        # For LazyFrames, use a window function which treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=nw.len().over(columns_subset) == 1)
+        return result.to_native()
+    else:  # pragma: no cover
+        msg = f"Expected DataFrame or LazyFrame, got {type(tbl)}"
+        raise TypeError(msg)
+
+
+def interrogate_rows_complete(tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
+    """Rows complete interrogation."""
+    nw_tbl = nw.from_native(tbl)
+
+    # Determine the number of null values in each row (column subsets are handled in
+    # the `_check_nulls_across_columns_nw()` function)
+    result_tbl = _check_nulls_across_columns_nw(table=nw_tbl, columns_subset=columns_subset)
+
+    # Failing rows will have the value `True` in the generated column, so we need to negate
+    # the result to get the passing rows
+    result_tbl = result_tbl.with_columns(pb_is_good_=~nw.col("_any_is_null_"))
+    result_tbl = result_tbl.drop("_any_is_null_")
+
+    return result_tbl.to_native()
+
+
+def interrogate_prompt(  # pragma: no cover
+    tbl: IntoFrame, columns_subset: list[str] | None, ai_config: dict[str, Any]
+) -> Any:
+    """AI-powered interrogation of rows."""
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # AI validation inherently needs materialized data (sends rows to LLM)
+    # Collect lazy frames here since this cannot operate lazily
+    if _is_lazy_frame(tbl):
+        tbl = tbl.collect()
+
+    # Convert to narwhals early for consistent row counting
+    nw_tbl = nw.from_native(tbl)
+    # Get row count - for LazyFrame we need to use select/collect
+    if is_narwhals_lazyframe(nw_tbl):
+        row_count = nw_tbl.select(nw.len()).collect().item()
+        assert isinstance(row_count, int)
+        total_rows = row_count
+    else:
+        assert is_narwhals_dataframe(nw_tbl)
+        total_rows = len(nw_tbl)
+
+    try:
+        # Import AI validation modules
+        from pointblank._utils_ai import (
+            _AIValidationEngine,
+            _BatchConfig,
+            _DataBatcher,
+            _LLMConfig,
+            _PromptBuilder,
+            _ValidationResponseParser,
+        )
+
+        # Extract AI configuration
+        prompt = ai_config["prompt"]
+        llm_provider = ai_config["llm_provider"]
+        llm_model = ai_config["llm_model"]
+        batch_size = ai_config.get("batch_size", 1000)
+        max_concurrent = ai_config.get("max_concurrent", 3)
+        attachments = ai_config.get("attachments", [])
+
+        # Set up LLM configuration (api_key will be loaded from environment)
+        llm_config = _LLMConfig(
+            provider=llm_provider,
+            model=llm_model,
+            api_key=None,  # Will be loaded from environment variables
+            verify_ssl=True,  # Default to verifying SSL certificates
+        )
+
+        # Set up batch configuration
+        batch_config = _BatchConfig(size=batch_size, max_concurrent=max_concurrent)
+
+        # Create optimized data batcher
+        batcher = _DataBatcher(data=tbl, columns=columns_subset, config=batch_config)
+
+        # Create batches with signature mapping for optimization
+        batches, signature_mapping = batcher.create_batches()
+        logger.info(f"Created {len(batches)} batches for AI validation")
+
+        # Log optimization stats
+        if hasattr(batcher, "get_reduction_stats"):
+            stats = batcher.get_reduction_stats()
+            if stats.get("reduction_percentage", 0) > 0:
+                logger.info(
+                    f"Optimization: {stats['original_rows']} → {stats['unique_rows']} rows ({stats['reduction_percentage']:.1f}% reduction)"
+                )
+
+        # Create prompt builder
+        prompt_builder = _PromptBuilder(prompt)
+
+        # Create AI validation engine
+        engine = _AIValidationEngine(llm_config, attachments=attachments)
+
+        # Run AI validation synchronously (chatlas is synchronous)
+        batch_results = engine.validate_batches(
+            batches=batches, prompt_builder=prompt_builder, max_concurrent=max_concurrent
+        )
+
+        # Parse and combine results with signature mapping optimization
+        parser = _ValidationResponseParser(total_rows=total_rows)
+        combined_results = parser.combine_batch_results(batch_results, signature_mapping)
+
+        # Debug: Log table info and combined results
+        logger.debug("🏁 Final result conversion:")
+        logger.debug(f"   - Table length: {total_rows}")
+        logger.debug(
+            f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
+        )
+
+        # Create a boolean column for validation results
+        validation_results = []
+        for i in range(total_rows):
+            # Default to False if row wasn't processed
+            result = combined_results.get(i, False)
+            validation_results.append(result)
+
+            # Debug: Log first few conversions
+            if i < 5 or total_rows - i <= 2:
+                logger.debug(f"   Row {i}: {result} (from combined_results.get({i}, False))")
+
+        logger.debug(f"   - Final validation_results length: {len(validation_results)}")
+        logger.debug(f"   - Final passed count: {sum(validation_results)}")
+        logger.debug(
+            f"   - Final failed count: {len(validation_results) - sum(validation_results)}"
+        )
+
+        # Add the pb_is_good_ column by creating a proper boolean Series
+        # First convert to native to work with the underlying data frame
+        native_tbl = nw_tbl.to_native()
+
+        # Create the result table with the boolean column
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Generic fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        logger.info(
+            f"AI validation completed. {sum(validation_results)} rows passed out of {len(validation_results)}"
+        )
+
+        return result_tbl
+
+    except ImportError as e:
+        logger.error(f"Missing dependencies for AI validation: {e}")
+        logger.error("Install required packages: pip install openai anthropic aiohttp")
+
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
+        native_tbl = nw_tbl.to_native()
+        validation_results = [False] * total_rows
+
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        return result_tbl
+
+    except Exception as e:
+        logger.error(f"AI validation failed: {e}")
+
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
+        native_tbl = nw_tbl.to_native()
+        validation_results = [False] * total_rows
+
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        return result_tbl
+
+
+def data_freshness(
+    data_tbl: IntoFrame,
+    column: str,
+    max_age: Any,  # datetime.timedelta
+    reference_time: Any | None,  # datetime.datetime | None
+    timezone: str | None,
+    allow_tz_mismatch: bool,
+) -> dict:
+    """
+    Check if the most recent datetime value in a column is within the allowed max_age.
+
+    Parameters
+    ----------
+    data_tbl
+        The data table to check.
+    column
+        The datetime column to check.
+    max_age
+        The maximum allowed age as a timedelta.
+    reference_time
+        The reference time to compare against (None = use current time).
+    timezone
+        The timezone to use for interpretation.
+    allow_tz_mismatch
+        Whether to suppress timezone mismatch warnings.
+
+    Returns
+    -------
+    dict
+        A dictionary containing:
+        - 'passed': bool, whether the validation passed
+        - 'max_datetime': the maximum datetime found in the column
+        - 'reference_time': the reference time used
+        - 'age': the calculated age (timedelta)
+        - 'max_age': the maximum allowed age
+        - 'tz_warning': any timezone warning message
+    """
+    import datetime
+
+    nw_frame = nw.from_native(data_tbl)
+
+    result = {
+        "passed": False,
+        "max_datetime": None,
+        "reference_time": None,
+        "age": None,
+        "max_age": max_age,
+        "tz_warning": None,
+        "column_empty": False,
+    }
+
+    # Get the maximum datetime value from the column using lazy-compatible aggregation
+    try:
+        max_val_result = nw_frame.select(nw.col(column).max())
+        if is_narwhals_lazyframe(max_val_result):  # pragma: no cover
+            max_val_result = max_val_result.collect()
+        max_datetime_raw = max_val_result.item()
+
+        if max_datetime_raw is None:
+            result["column_empty"] = True
+            result["passed"] = False
+            return result
+
+        # Convert to Python datetime if needed
+        if hasattr(max_datetime_raw, "to_pydatetime"):
+            # Pandas Timestamp
+            max_datetime = max_datetime_raw.to_pydatetime()
+        elif hasattr(max_datetime_raw, "isoformat"):
+            # Already a datetime-like object
+            max_datetime = max_datetime_raw
+        else:  # pragma: no cover
+            # Try to parse as string or handle other types
+            max_datetime = datetime.datetime.fromisoformat(str(max_datetime_raw))
+
+        result["max_datetime"] = max_datetime
+
+    except Exception as e:  # pragma: no cover
+        result["error"] = str(e)
+        result["passed"] = False
+        return result
+
+    # Determine the reference time
+    # We'll set the reference time after we know the timezone awareness of the data
+    if reference_time is None:
+        ref_time = None  # Will be set below based on data timezone awareness
+    else:
+        ref_time = reference_time
+
+    # Handle timezone awareness/naivete
+    max_dt_aware = _is_datetime_aware(max_datetime)
+
+    # Helper to parse timezone string (supports IANA names and offsets like "-7", "-07:00")
+    def _get_tz_from_string(tz_str: str) -> datetime.tzinfo:
+        import re
+
+        # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+        offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+        match = re.match(offset_pattern, tz_str.strip())
+
+        if match:
+            sign_str, hours_str, minutes_str = match.groups()
+            hours = int(hours_str)
+            minutes = int(minutes_str) if minutes_str else 0
+
+            total_minutes = hours * 60 + minutes
+            if sign_str == "-":
+                total_minutes = -total_minutes
+
+            return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+        # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+        try:
+            return ZoneInfo(tz_str)
+        except KeyError:  # pragma: no cover
+            # Invalid timezone name, fall back to UTC
+            return datetime.timezone.utc
+
+    # If ref_time is None (no reference_time provided), set it based on data awareness
+    if ref_time is None:
+        if max_dt_aware:
+            # Data is timezone-aware, use timezone-aware now
+            if timezone:
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # Default to UTC when data is aware but no timezone specified
+                ref_time = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            # Data is naive, use naive local time for comparison
+            if timezone:
+                # If user specified timezone, use it for reference
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # No timezone specified and data is naive -> use naive local time
+                ref_time = datetime.datetime.now()
+
+    result["reference_time"] = ref_time
+    ref_dt_aware = _is_datetime_aware(ref_time)
+
+    # Track timezone warnings - use keys for translation lookup
+    tz_warning_key = None
+
+    if max_dt_aware != ref_dt_aware:
+        if not allow_tz_mismatch:
+            if max_dt_aware and not ref_dt_aware:
+                tz_warning_key = "data_freshness_tz_warning_aware_naive"
+            else:
+                tz_warning_key = "data_freshness_tz_warning_naive_aware"
+        result["tz_warning_key"] = tz_warning_key
+
+    # Make both comparable
+    try:
+        if max_dt_aware and not ref_dt_aware:
+            # Add timezone to reference time
+            if timezone:
+                try:
+                    ref_time = ref_time.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:  # pragma: no cover
+                    ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+            else:
+                # Assume UTC
+                ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+
+        elif not max_dt_aware and ref_dt_aware:
+            # Localize the max_datetime if we have a timezone
+            if timezone:
+                try:
+                    max_datetime = max_datetime.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:  # pragma: no cover
+                    # Remove timezone from reference for comparison
+                    ref_time = ref_time.replace(tzinfo=None)
+            else:
+                # Remove timezone from reference for comparison
+                ref_time = ref_time.replace(tzinfo=None)
+
+        # Calculate the age
+        age = ref_time - max_datetime
+        result["age"] = age
+        result["reference_time"] = ref_time
+
+        # Check if within max_age
+        result["passed"] = age <= max_age
+
+    except Exception as e:  # pragma: no cover
+        result["error"] = str(e)
+        result["passed"] = False
+
+    return result
+
+
+def _is_datetime_aware(dt: Any) -> bool:
+    """Check if a datetime object is timezone-aware."""
+    if dt is None:
+        return False
+    if hasattr(dt, "tzinfo"):
+        return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+    return False

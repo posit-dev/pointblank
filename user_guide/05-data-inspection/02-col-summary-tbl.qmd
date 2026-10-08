@@ -1,0 +1,285 @@
+---
+title: Column Summaries
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import os
+```
+
+While previewing a table with `preview()` is undoubtedly a good thing to do, sometimes you need
+more. This is where summarizing a table comes in. When you view a summary of a table, the
+column-by-column info can quickly increase your understanding of a dataset. Plus, it allows you to
+quickly catch anomalies in your data (e.g., the maximum value of a column could be far outside the
+realm of possibility).
+
+Pointblank provides a function to make it extremely easy to view column-level summaries in a single
+table. That function is called `col_summary_tbl()` and, just like `preview()` does, it supports the
+use of any table that Pointblank can use for validation. And no matter what the input data is, the
+resultant reporting table is consistent in its design and construction.
+
+## Trying out `col_summary_tbl()`{.qd-no-link}
+
+The function only requires a table. Let's use the `small_table` dataset (a very simple table) to
+start us off:
+
+```{python}
+import pointblank as pb
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+pb.col_summary_tbl(small_table)
+```
+
+The header provides the type of table we're looking at (`POLARS`, since this is a Polars DataFrame)
+and the table dimensions. The rest of the table focuses on the column-level summaries. As such, each
+row represents a summary of a column in the `small_table` dataset. There's a lot of information in
+this summary table to digest. Some of it is intuitive since this sort of table summarization isn't
+all that uncommon, but other aspects of it could also give some pause. So we'll carefully wade
+through how to interpret this report.
+
+## Data Categories in the Column Summary Table
+
+On the left side of the table are icons of different colors. These represent categories that the
+columns fall into. There are only five categories and columns can only be of one type. The
+categories (and their letter marks) are:
+
+- `N`: numeric
+- `S`: string-based
+- `D`: date/datetime
+- `T/F`: boolean
+- `O`: object
+
+The numeric category (`N`) takes data types such as floats and integers. The `S` category is for
+string-based columns. Date or datetime values are lumped into the `D` category. Boolean columns
+(`T/F`) have their own category and are *not* considered numeric (e.g., `0`/`1`). The `O` category
+is a catchall for all other types of columns. Given the disparity of these categories and that we
+want them in the same table, some statistical measures will be sensible for certain column
+categories but not for others. Given that, we'll explain how each category is represented in the
+column summary table.
+
+## Numeric Data
+
+Three columns in `small_table` are numeric: `a` (`Int64`), `c` (`Int64`), and `d` (`Float64`). The
+common measures of the missing count/proportion (`NA`) and the unique value count/proportion (`UQ`)
+are provided for the numeric data type. For these two measures, the top number is the absolute count
+of missing values and the count of unique values. The bottom number is a proportion of the absolute
+count divided by the row count; this makes each proportion a value between `0` and `1` (bounds
+included).
+
+The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minumum
+(`Min`), maximum, (`Max`) and a set of quantiles occupy the next few columns (includes `P5`, `Q1`,
+`Med` for median, `Q3`, and `P95`). Finally, the interquartile range (`IQR`: `Q3` - `Q1`) is the
+last measure provided.
+
+## String Data
+
+String data is present in `small_table`, being in columns `b` and `f`. The missing value (`NA`) and
+uniqueness (`UQ`) measures are accounted for here. The statistical measures are all based on string
+lengths, so what happens is that all strings in a column are converted to those numeric values and a
+subset of stats values is presented. To avoid some understandable confusion when reading the table,
+the stats values in each of the cells with values are annotated with the text `"SL"`. It makes less
+sense to provide a full suite of quantile values so only the minimum (`Min`), median (`Med`), and
+maximum (`Max`) are provided.
+
+## Date/Datetime Data and Boolean Data
+
+We see that in the first two rows of our summary table there are summaries of the `date_time` and
+`date` columns. The summaries we provide for a date/datetime category (notice the green `D` to the
+left of the column names) are:
+
+1. the missing count/proportion (`NA`)
+2. the unique value count/proportion (`UQ`)
+3. the minimum and maximum dates/datetimes
+
+One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`,
+`False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of
+`True` and `False` values (under `UQ`).
+
+## Using `DataScan` Directly
+
+The `col_summary_tbl()` function is a convenience wrapper around the
+[`DataScan`](`pointblank.DataScan`) class. When you need more than a visual report (for example, to
+save the profile for later comparison), you can work with `DataScan` directly:
+
+```{python}
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+scan = pb.DataScan(data=small_table, tbl_name="small_table")
+```
+
+The `DataScan` object computes the same column-level statistics shown in the summary table. You can
+access the profile as a dictionary with `to_dict()`, export it as JSON with `to_json()`, or render
+the same tabular report with `get_tabular_report()`.
+
+## Saving and Loading Profiles
+
+A `DataScan` profile can be saved to disk and loaded back later. This is useful for establishing
+baselines that you compare against in the future.
+
+```{python}
+# Save the profile to a JSON file
+scan.save_to_json("small_table_profile.json")
+
+# Later, load it back without needing the original data
+loaded = pb.DataScan.load_from_json("small_table_profile.json")
+```
+
+```{python}
+#| echo: false
+#| output: false
+os.remove("small_table_profile.json")
+```
+
+The `from_json()` classmethod works with JSON strings directly, and `from_dict()` accepts the
+dictionary format produced by `to_dict()`. All three approaches produce a fully restored `DataScan`
+that retains the column names, types, statistics, and sample data from the original scan.
+
+## Comparing Profiles for Drift
+
+When your data changes over time, you can compare two `DataScan` profiles to detect drift. The
+`compare()` method identifies schema changes (columns added, removed, or with changed types) and
+statistical shifts in common columns.
+
+```{python}
+import polars as pl
+
+# Simulate two versions of a dataset
+orders_v1 = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5],
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0],
+    "status": ["paid", "paid", "refund", "paid", "paid"],
+})
+
+orders_v2 = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5, 6, 7, 8],
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 150.0, 200.0, 175.0],
+    "status": ["paid", "paid", "refund", "paid", "paid", "paid", "paid", "paid"],
+    "region": ["US", "EU", "US", "EU", "US", "US", "EU", "EU"],
+})
+
+baseline = pb.DataScan(data=orders_v1, tbl_name="orders_v1")
+current = pb.DataScan(data=orders_v2, tbl_name="orders_v2")
+
+diff = current.compare(baseline)
+```
+
+The returned [`DataScanDiff`](`pointblank.DataScanDiff`) object provides programmatic access to the
+changes:
+
+```{python}
+print("Has changes:", diff.has_changes)
+print("Columns added:", diff.columns_added)
+print("Row count (baseline vs current):", diff.row_count_diff)
+```
+
+You can also get the full comparison as a dictionary with `to_dict()`, or view it as a styled
+report:
+
+```{python}
+diff.get_tabular_report()
+```
+
+The report shows each column's status (OK, Added, Removed, Stats Changed, or Type Changed) along
+with any statistics that shifted between the baseline and current profiles. This makes it
+straightforward to spot when your data's shape or distribution has changed in ways that might affect
+downstream analyses or validation rules.
+
+### Statistical Drift Measures
+
+When both the baseline and current `DataScan` objects have their original data attached (i.e., they
+haven't been loaded from disk), the comparison also computes formal drift statistics for each
+column:
+
+- **PSI (Population Stability Index)**: Measures how much a distribution has shifted. Computed for
+both numeric and categorical columns. Values below 0.1 indicate no meaningful drift, 0.1 to 0.25
+suggests moderate drift, and above 0.25 signals a significant population shift.
+- **KS (Kolmogorov-Smirnov) test**: For numeric columns only, this measures the maximum distance
+between two empirical CDFs and provides a p-value. A small p-value (e.g., below 0.05) indicates the
+two distributions are statistically different.
+
+These scores appear in the `drift_scores` field of the comparison dictionary and in the "Drift
+Scores" column of the generated report. Let's look at a more dramatic drift example to see them in
+action:
+
+```{python}
+# Baseline: normal revenue range
+revenue_v1 = pl.DataFrame({
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 12.0, 18.0, 22.0, 28.0, 35.0,
+               14.0, 26.0, 19.0, 31.0, 23.0, 11.0, 17.0, 29.0, 33.0, 21.0],
+    "category": (["electronics"] * 8 + ["clothing"] * 7 + ["food"] * 5),
+})
+
+# Current: large orders have appeared, category mix shifted
+revenue_v2 = pl.DataFrame({
+    "amount": [10.0, 25.0, 15.0, 30.0, 20.0, 150.0, 200.0, 175.0, 180.0, 160.0,
+               14.0, 26.0, 190.0, 170.0, 165.0, 11.0, 17.0, 155.0, 185.0, 195.0],
+    "category": (["electronics"] * 12 + ["clothing"] * 3 + ["food"] * 5),
+})
+
+baseline = pb.DataScan(data=revenue_v1, tbl_name="revenue_v1")
+current = pb.DataScan(data=revenue_v2, tbl_name="revenue_v2")
+
+diff = current.compare(baseline)
+diff.get_tabular_report()
+```
+
+The drift scores are also available programmatically through `to_dict()`:
+
+```{python}
+drift = diff.to_dict().get("drift_scores", {})
+for col_name, scores in drift.items():
+    print(f"{col_name}: {scores}")
+```
+
+When a `DataScan` is loaded from a saved JSON file (with no original data attached), drift scores
+cannot be computed. The comparison still reports schema changes and raw stat differences, but the
+`drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow,
+keep the original data available when calling `compare()`.
+
+### A Typical Workflow
+
+In practice, drift detection works best as a two-phase process. First, you establish a baseline
+profile once your data quality checks pass and save it to disk. Then, on each subsequent pipeline
+run, you load that baseline and compare it against a fresh scan of the incoming data.
+
+```python
+# On the first run: establish the baseline
+baseline = pb.DataScan(data=production_table, tbl_name="orders")
+baseline.save_to_json("orders_baseline.json")
+
+# On subsequent runs: compare against the baseline
+baseline = pb.DataScan.load_from_json("orders_baseline.json")
+current = pb.DataScan(data=production_table, tbl_name="orders")
+diff = current.compare(baseline)
+
+if diff.has_changes:
+    print("Data drift detected!")
+    print(diff.to_dict())
+```
+
+The key thing to notice is that the baseline is loaded from a saved JSON file, so it won't have
+original data attached. This means drift scores (PSI and KS) won't be computed for the loaded
+baseline. If you need those scores, keep the baseline data accessible and create a fresh `DataScan`
+from it rather than loading from JSON.
+
+The `has_changes` property gives you a simple boolean for CI pipelines or alerting. So if anything
+shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect
+`columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and
+`drift_scores` in the object provided by `to_dict()`.
+
+## Conclusion
+
+The `col_summary_tbl()` function and the `DataScan` class give you two levels of access to
+column-level profiling. The function is a quick, visual summary you can drop into a notebook to
+understand a dataset at a glance. The class provides the same statistics in a structured form that
+you can save, load, and compare over time. When your data evolves, `compare()` catches schema drift
+(columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates,
+and frequency distributions), optionally backed by formal measures like PSI and the KS test.
+Together, these tools make it straightforward to move from initial data discovery to ongoing data
+quality monitoring.

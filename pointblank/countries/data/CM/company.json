@@ -1,0 +1,547 @@
+{
+  "suffixes": [
+    "SA",
+    "SARL",
+    "SAS",
+    "Ets",
+    "GIC",
+    "COOP",
+    "PLC",
+    "Ltd",
+    "Inc",
+    "Group"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Camerounaise",
+    "Africaine",
+    "Centrale",
+    "Nationale",
+    "Continentale",
+    "Tropicale",
+    "Moderne",
+    "Nouvelle",
+    "Grande",
+    "Première",
+    "Générale",
+    "Internationale",
+    "Commerciale",
+    "Industrielle",
+    "Financière",
+    "Technique",
+    "Globale",
+    "Panafricaine",
+    "Équatoriale",
+    "Dynamique",
+    "Excellente",
+    "Supérieure",
+    "Digitale",
+    "Innovante",
+    "Stratégique",
+    "Professionnelle",
+    "Urbaine",
+    "Régionale"
+  ],
+  "nouns": [
+    "Services",
+    "Solutions",
+    "Entreprise",
+    "Commerce",
+    "Industries",
+    "Technologies",
+    "Consulting",
+    "Logistique",
+    "Construction",
+    "Transport",
+    "Distribution",
+    "Agro-Business",
+    "Immobilier",
+    "Énergie",
+    "Télécommunications",
+    "Agriculture",
+    "Mining",
+    "Engineering",
+    "Finance",
+    "Trading",
+    "Holdings",
+    "Bois",
+    "Cacao",
+    "Banane",
+    "Café",
+    "Pétrole",
+    "Développement",
+    "Ressources",
+    "Infrastructure",
+    "Capital",
+    "Ventures",
+    "Partners",
+    "Associates",
+    "Media",
+    "Pharma",
+    "Systems"
+  ],
+  "well_known_companies": [
+    {
+      "name": "SONARA",
+      "weight": 0.05,
+      "cities": [
+        "Limbe"
+      ]
+    },
+    {
+      "name": "SNH (Société Nationale des Hydrocarbures)",
+      "weight": 0.05,
+      "cities": [
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "CAMTEL",
+      "weight": 0.03,
+      "cities": [
+        "Yaoundé",
+        "Douala"
+      ]
+    },
+    {
+      "name": "MTN Cameroon",
+      "weight": 0.05,
+      "cities": [
+        "Douala",
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "Orange Cameroun",
+      "weight": 0.05,
+      "cities": [
+        "Douala",
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "Nexttel",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Brasseries du Cameroun (SABC)",
+      "weight": 0.05,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Cimencam",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "SOCAPALM",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CDC (Cameroon Development Corporation)",
+      "weight": 0.03,
+      "cities": [
+        "Limbe"
+      ]
+    },
+    {
+      "name": "SODECOTON",
+      "weight": 0.02,
+      "cities": [
+        "Garoua"
+      ]
+    },
+    {
+      "name": "SOSUCAM",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CICAM",
+      "weight": 0.02,
+      "cities": [
+        "Garoua"
+      ]
+    },
+    {
+      "name": "AES-SONEL",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "ENEO Cameroon",
+      "weight": 0.03,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Afriland First Bank",
+      "weight": 0.03,
+      "cities": [
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "Société Générale Cameroun",
+      "weight": 0.03,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "BICEC",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Ecobank Cameroon",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "SGBC",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "UBA Cameroon",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CCA Bank",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "National Refining Company",
+      "weight": 0.01,
+      "cities": [
+        "Limbe"
+      ]
+    },
+    {
+      "name": "Dangote Cement Cameroon",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CHOCOCAM",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "SIC Cameroun",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "PHP (Plantations du Haut Penja)",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "SOCATRAL",
+      "weight": 0.01,
+      "cities": [
+        "Edéa"
+      ]
+    },
+    {
+      "name": "ALUCAM",
+      "weight": 0.02,
+      "cities": [
+        "Edéa"
+      ]
+    },
+    {
+      "name": "HEVECAM",
+      "weight": 0.01,
+      "cities": [
+        "Kribi"
+      ]
+    },
+    {
+      "name": "SAFACAM",
+      "weight": 0.01,
+      "cities": [
+        "Kribi"
+      ]
+    },
+    {
+      "name": "PAD (Port Autonome de Douala)",
+      "weight": 0.03,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "ART (Agence de Régulation des Télécommunications)",
+      "weight": 0.02,
+      "cities": [
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "Camrail",
+      "weight": 0.02,
+      "cities": [
+        "Douala",
+        "Yaoundé"
+      ]
+    },
+    {
+      "name": "Express Union",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CONGELCAM",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "COTCO (Cameroon Oil Transportation Company)",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Bolloré Transport & Logistics Cameroon",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Nestlé Cameroun",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Total Energies Cameroun",
+      "weight": 0.03,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Canal+ Cameroun",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Guinness Cameroun",
+      "weight": 0.02,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "Tractafric Motors Cameroun",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    },
+    {
+      "name": "CFAO Cameroun",
+      "weight": 0.01,
+      "cities": [
+        "Douala"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrator",
+    "Agronomist",
+    "Architect",
+    "Auditor",
+    "Bank Manager",
+    "Banker",
+    "Business Analyst",
+    "Carpenter",
+    "Cashier",
+    "Civil Engineer",
+    "Consultant",
+    "Customs Officer",
+    "Data Analyst",
+    "Dentist",
+    "Doctor",
+    "Driver",
+    "Economist",
+    "Electrician",
+    "Engineer",
+    "Entrepreneur",
+    "Farmer",
+    "Financial Analyst",
+    "Fisherman",
+    "Geologist",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Judge",
+    "Lawyer",
+    "Lecturer",
+    "Mechanic",
+    "Mining Engineer",
+    "Nurse",
+    "Pharmacist",
+    "Plumber",
+    "Police Officer",
+    "Professor",
+    "Project Manager",
+    "Sales Manager",
+    "Secretary",
+    "Teacher",
+    "Veterinarian"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "sustainable",
+    "African",
+    "dynamic",
+    "reliable",
+    "professional",
+    "modern",
+    "strategic",
+    "integrated",
+    "digital",
+    "creative",
+    "efficient",
+    "leading",
+    "trusted",
+    "global",
+    "expert",
+    "premium",
+    "quality",
+    "advanced",
+    "smart"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "partnership",
+    "excellence",
+    "development",
+    "growth",
+    "innovation",
+    "technology",
+    "infrastructure",
+    "resources",
+    "systems",
+    "networks",
+    "platforms",
+    "consulting",
+    "ventures"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "build",
+    "transform",
+    "connect",
+    "empower",
+    "enable",
+    "accelerate",
+    "drive",
+    "create",
+    "develop",
+    "innovate",
+    "provide",
+    "support",
+    "achieve",
+    "grow"
+  ],
+  "catch_phrase_connector": "to",
+  "industries": [
+    {
+      "name": "oil_gas",
+      "weight": 0.16
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.15
+    },
+    {
+      "name": "telecom",
+      "weight": 0.14
+    },
+    {
+      "name": "finance",
+      "weight": 0.12
+    },
+    {
+      "name": "mining",
+      "weight": 0.1
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.09
+    },
+    {
+      "name": "construction",
+      "weight": 0.08
+    },
+    {
+      "name": "forestry",
+      "weight": 0.06
+    },
+    {
+      "name": "tourism",
+      "weight": 0.05
+    },
+    {
+      "name": "technology",
+      "weight": 0.05
+    }
+  ]
+}

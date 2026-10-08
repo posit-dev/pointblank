@@ -1,0 +1,434 @@
+---
+jupyter: python3
+html-table-processing: none
+title: "Level Up Your Data Validation with `Actions` and `FinalActions`"
+author: Rich Iannone
+date: 2025-05-02
+freeze: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+Data validation is only useful if you can respond appropriately when problems arise. That's why
+Pointblank's recent `v0.8.0` and `v0.8.1` releases have significantly enhanced our action framework,
+allowing you to create sophisticated, automated responses to validation failures.
+
+In this post, we'll explore how to use:
+
+1. **Actions** to respond to individual validation failures
+2. **FinalActions** to execute code after your entire validation plan completes
+3. New customization features that make your validation workflows more expressive
+
+Let's dive into how these features can transform your data validation process from passive reporting
+to active response.
+
+## From Passive Validation to Active Response
+
+Traditional data validation simply reports problems: "Column X has invalid values." But what if you
+want to:
+
+- send a Slack message when critical errors occur?
+- log detailed diagnostics about failing data?
+- trigger automatic data cleaning processes?
+- generate custom reports for stakeholders?
+
+This is where Pointblank's action system can help. By pairing thresholds with actions, you can
+create automated responses that trigger exactly when needed.
+
+## Getting Started with Actions
+
+Actions are executed when validation steps fail to meet certain thresholds. Let's start with a
+simple example:
+
+```{python}
+import pointblank as pb
+
+validation_1 = (
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        thresholds=pb.Thresholds(warning=1, error=5),
+        actions=pb.Actions(
+            warning="⚠️ WARNING: Some values in column 'd' are below the minimum threshold!"
+        )
+    )
+    .interrogate()
+)
+
+validation_1
+```
+
+In this example:
+
+1. we're validating that values in column "d" are greater than 1000
+2. we set a warning threshold of 1 (triggers if any values fail)
+3. we define an action that prints a warning message when the threshold is exceeded
+
+Since several values in column `d` are below `1000`, our 'warning' action is triggered and the
+message appears above the validation report.
+
+## The Anatomy of Actions
+
+The [`Actions`](`Actions`) class is a very
+important piece of Pointblank's response system. Actions can be defined in several ways:
+
+1. **String messages**: simple text output to the console
+2. **Callable functions**: custom Python functions that execute when triggered
+3. **Lists of strings/callables**: multiple actions that execute in sequence
+
+Actions can be paired with different severity levels:
+
+- 'warning': for minor issues that need attention
+- 'error': for more significant problems
+- 'critical': for severe issues that require immediate action
+
+The `v0.8.0` release added two (very) useful new parameters:
+
+- `default=`: apply the same action to all threshold levels
+- `highest_only=`: only trigger the action for the highest threshold level reached (`True` by
+default)
+
+Let's see how these work in practice:
+
+```{python}
+def log_problem():
+    # Simple action that runs when thresholds are exceeded
+    print("A validation threshold has been exceeded!")
+
+validation_2 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue"),
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        actions=pb.Actions(default=log_problem)  # Apply this action to all threshold levels
+    )
+    .col_vals_regex(
+        columns="player_id",
+        pattern=r"[A-Z]{12}\d{3}"
+    )
+    .col_vals_gt(
+        columns="item_revenue",
+        value=0.10
+    )
+    .interrogate()
+)
+
+validation_2
+```
+
+In this example, we're using a simple function that prints a generic message whenever any threshold
+is exceeded. By using the `Actions(default=)` parameter, this same function gets applied to all
+threshold levels ('warning', 'error', and 'critical'). This saves you from having to define separate
+actions for each level when you want the same behavior for all of them. The `highest_only=`
+parameter (`True` by default, so not shown here) is complementary and it ensures that only the
+action for the highest threshold level reached will be triggered, preventing multiple notifications
+for the same validation failure.
+
+## Dynamic Messages with Templating
+
+Actions don't have to be static messages. With Pointblank's templating system, you can create
+context-aware notifications that include details about the specific validation failure.
+
+Available placeholders include:
+
+- `{type}`: the validation step type (e.g., `"col_vals_gt"`)
+- `{level}`: the threshold level ('warning', 'error', 'critical')
+- `{step}` or `{i}`: the step number in the validation workflow
+- `{col}` or `{column}`: the column name being validated
+- `{val}` or `{value}`: the comparison value used in the validation
+- `{time}`: when the action was executed
+
+You can also capitalize placeholders (like `{LEVEL}`) to get uppercase text.
+
+```{python}
+action_template = "[{LEVEL}] Step {step}: Values in '{column}' failed validation against {value}."
+
+validation_3 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        thresholds=pb.Thresholds(warning=1, error=4, critical=10),
+        actions=pb.Actions(default=action_template)
+    )
+    .col_vals_lt(
+        columns="d",
+        value=3000
+    )
+    .interrogate()
+)
+
+validation_3
+```
+
+This templating approach is a great way to create context-aware notifications that adapt to the
+specific validation failures occurring. As the example shows, when values in column `d` fail
+validation against the limit of `3000`, the template automatically generates a meaningful error
+message showing exactly which step, column, and threshold value was involved.
+
+## Accessing Metadata in Custom Action Functions
+
+For more sophisticated actions, you often need access to details about the validation failure. The
+`get_action_metadata()` function provides this context when called inside an action function:
+
+```{python}
+def send_detailed_alert():
+    # Get metadata about the validation failure
+    metadata = pb.get_action_metadata()
+
+    # Create a customized alert message
+    print(f"""
+    VALIDATION FAILURE DETAILS
+    -------------------------
+    Step: {metadata['step']}
+    Column: {metadata['column']}
+    Validation type: {metadata['type']}
+    Severity: {metadata['level']} (level {metadata['level_num']})
+    Time: {metadata['time']}
+
+    Explanation: {metadata['failure_text']}
+    """)
+
+validation_4 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        thresholds=pb.Thresholds(critical=1),
+        actions=pb.Actions(critical=send_detailed_alert)
+    )
+    .col_vals_gt(
+        columns="d",
+        value=5000
+    )
+    .interrogate()
+)
+
+validation_4
+```
+
+The metadata dictionary contains essential fields for a given validation step, including the step
+number, column name, validation type, severity level, and failure explanation. This gives you
+complete flexibility to create highly customized responses based on the specific nature of the
+validation failure.
+
+## Final Actions with `FinalActions`
+
+While regular [`Actions`](`Actions`) are great
+for responding to individual validation steps, sometimes you need to take action based on the
+overall validation results. This is where the new `FinalActions` feature from `v0.8.1` comes in.
+
+Unlike regular [`Actions`](`Actions`) that
+trigger during validation,
+[`FinalActions`](`FinalActions`) execute after
+all validation steps are complete.
+[`FinalActions`](`FinalActions`) accepts any
+number of actions (strings or callables) and executes them in sequence. Each argument can be a
+string message to display in the console, a callable function, or a list of strings/callables for
+multiple actions to execute in sequence.
+
+The real power of [`FinalActions`](`FinalActions`)
+comes from the ability to access comprehensive information about your validation results using
+[`get_validation_summary()`](`get_validation_summary`).
+When called inside a function passed to
+[`FinalActions`](`FinalActions`), this function
+provides a dictionary containing counts of passing/failing steps and test units, threshold levels
+exceeded, and much more:
+
+```{python}
+def generate_summary():
+    # Access comprehensive validation results
+    summary = pb.get_validation_summary()
+
+    print("\n=== VALIDATION SUMMARY ===")
+    print(f"Total steps: {summary['n_steps']}")
+    print(f"Passing steps: {summary['n_passing_steps']}")
+    print(f"Failing steps: {summary['n_failing_steps']}")
+
+    if summary['highest_severity'] == "critical":
+        print("\n⚠️ CRITICAL FAILURES DETECTED - immediate action required!")
+    elif summary['highest_severity'] == "error":
+        print("\n⚠️ ERRORS DETECTED - review needed")
+    elif summary['highest_severity'] == "warning":
+        print("\n⚠️ WARNINGS DETECTED - please investigate")
+    else:
+        print("\n✅ All validations passed!")
+
+validation_5 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        tbl_name="small_table",
+        thresholds=pb.Thresholds(warning=1, error=5, critical=10),
+        final_actions=pb.FinalActions(
+            "Validation process complete.",  # A simple string message
+            generate_summary               # Our function using get_validation_summary()
+        )
+    )
+    .col_vals_gt(columns="a", value=1)
+    .col_vals_lt(columns="d", value=10000)
+    .interrogate()
+)
+
+validation_5
+```
+
+The [`get_validation_summary()`](`get_validation_summary`)
+function is only available within functions passed to
+[`FinalActions`](`FinalActions`). It gives you
+access to these key dictionary fields:
+
+- `tbl_name`: name of the validated table
+- `n_steps`: total number of validation steps
+- `n_passing_steps`, n_failing_steps: count of passing/failing steps
+- `n`, `n_passed`, `n_failed`: total test units and their pass/fail counts
+- `highest_severity`: the most severe threshold level reached ('warning', 'error', 'critical')
+- and many more detailed statistics
+
+This information allows you to create detailed and specific final actions that can respond
+appropriately to the overall validation results.
+
+## Combining Regular and Final Actions
+
+You can use both [`Actions`](`Actions`) and
+[`FinalActions`](`FinalActions`) together for
+comprehensive control over your validation workflow:
+
+```{python}
+def step_alert():
+    metadata = pb.get_action_metadata()
+    print(f"Step {metadata['step']} failed with {metadata['level']} severity")
+
+
+def final_summary():
+    summary = pb.get_validation_summary()
+
+    # Get counts by checking each step's status in the dictionaries
+    steps = range(1, summary['n_steps'] + 1)
+    n_critical = sum(1 for step in steps if summary['dict_critical'].get(step, False))
+    n_error = sum(1 for step in steps if summary['dict_error'].get(step, False))
+    n_warning = sum(1 for step in steps if summary['dict_warning'].get(step, False))
+
+    print(f"\nValidation complete with:")
+    print(f"- {n_critical} critical issues")
+    print(f"- {n_error} errors")
+    print(f"- {n_warning} warnings")
+
+
+validation_6 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table"),
+        thresholds=pb.Thresholds(warning=1, error=5, critical=10),
+        actions=pb.Actions(default=step_alert),
+        final_actions=pb.FinalActions(final_summary),
+    )
+    .col_vals_gt(columns="a", value=5)
+    .col_vals_lt(columns="d", value=1000)
+    .interrogate()
+)
+
+validation_6
+```
+
+This approach allows you to log individual step failures during the validation process using
+[`Actions`](`Actions`) and generate a
+comprehensive report after all validation steps are complete using
+[`FinalActions`](`FinalActions`). Using both
+action types gives you fine-grained control over when and how notifications and other actions are
+triggered in your validation workflow.
+
+## Real-World Example: Building an Automated Validation Pipeline
+
+Let's put everything together in a more realistic example. Imagine you're validating a gaming
+revenue dataset and want to:
+
+1. log detailed information about each failure
+2. send a Slack notification if critical failures occur
+3. generate a comprehensive report after validation completes
+
+```{python}
+def log_step_failure():
+    metadata = pb.get_action_metadata()
+    print(f"[{metadata['level'].upper()}] Step {metadata['step']}: {metadata['failure_text']}")
+
+def analyze_results():
+    summary = pb.get_validation_summary()
+
+    # Calculate overall pass rate
+    pass_rate = (summary['n_passing_steps'] / summary['n_steps']) * 100
+
+    print(f"\n==== VALIDATION RESULTS ====")
+    print(f"Table: {summary['tbl_name']}")
+    print(f"Pass rate: {pass_rate:.2f}%")
+    print(f"Failing steps: {summary['n_failing_steps']} of {summary['n_steps']}")
+
+    # In a real scenario, here you might:
+    # 1. Save results to a database
+    # 2. Generate and email an HTML report
+    # 3. Trigger data cleansing workflows
+
+    # Simulate a Slack notification
+    if summary['highest_severity'] == "critical":
+        print("\n🚨 [SLACK NOTIFICATION] Critical data quality issues detected!")
+        print("@data-team Please investigate immediately.")
+
+# Create our validation workflow with actions
+validation_7 = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue"),
+        tbl_name="game_revenue",
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        actions=pb.Actions(default=log_step_failure, highest_only=True),
+        final_actions=pb.FinalActions(analyze_results),
+        brief=True  # Add automatically-generated briefs
+    )
+    .col_vals_regex(
+        columns="player_id",
+        pattern=r"[A-Z]{12}\d{3}",
+        brief="Player IDs must follow standard format"  # Custom brief text
+    )
+    .col_vals_gt(
+        columns="item_revenue",
+        value=0.10
+    )
+    .col_vals_gt(
+        columns="session_duration",
+        value=15
+    )
+    .interrogate()
+)
+
+validation_7
+```
+
+## Wrapping Up: from Passive Validation to Active Data Quality Management
+
+With [`Actions`](`Actions`) and
+[`FinalActions`](`FinalActions`), Pointblank is
+now more of a complete data quality management system. Instead of just detecting problems, you can
+now:
+
+1. respond immediately to validation failures
+2. customize responses based on severity level
+3. generate comprehensive reports after validation completes
+4. integrate with other systems through custom action functions
+5. automate workflows based on validation results
+
+These capabilities transform data validation from a passive reporting activity into an active
+component of your data pipeline, helping ensure that data quality issues are detected, reported, and
+addressed efficiently.
+
+As we continue to enhance Pointblank, we'd love to hear how you're using
+[`Actions`](`Actions`) and
+[`FinalActions`](`FinalActions`) in your
+workflows. Share your experiences or suggestions with us on
+[Discord](https://discord.gg/YH7CybCNCQ) or file an issue on
+[GitHub](https://github.com/posit-dev/pointblank/issues).
+
+## Learn More
+
+Explore our documentation to learn more about Pointblank's action capabilities:
+
+- [Actions documentation](../../reference/Actions.qmd)
+- [FinalActions documentation](../../reference/FinalActions.qmd)
+- [User Guide on Triggering Actions](../../user-guide/actions.qmd)

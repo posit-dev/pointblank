@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, cast
 
 __all__ = ["Thresholds", "Actions", "FinalActions"]
 
@@ -44,7 +44,7 @@ class Thresholds:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_footer=False)
+    pb.config(report_incl_footer_timings=False)
     ```
     In a data validation workflow, you can set thresholds for the number of failing test units at
     different levels. For example, you can set a threshold for the 'warning' level when the number
@@ -103,12 +103,12 @@ class Thresholds:
     critical_fraction: float | None = field(default=None, init=False)
     critical_count: int | None = field(default=None, init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self._process_threshold("warning", "warning")
         self._process_threshold("error", "error")
         self._process_threshold("critical", "critical")
 
-    def _process_threshold(self, attribute_name, base_name):
+    def _process_threshold(self, attribute_name: str, base_name: str) -> None:
         value = getattr(self, attribute_name)
         if value is not None:
             if value == 0:
@@ -180,14 +180,15 @@ class Thresholds:
         # The threshold value might be an absolute count, but we need to convert
         # it to a fractional value
         if isinstance(threshold_value, int):
-            threshold_value = _convert_abs_count_to_fraction(
-                value=threshold_value, test_units=test_units
-            )
+            converted = _convert_abs_count_to_fraction(value=threshold_value, test_units=test_units)
+            if converted is None:  # pragma: no cover
+                return None
+            threshold_value = converted
 
         return fraction_failing >= threshold_value
 
 
-def _convert_abs_count_to_fraction(value: int | None, test_units: int) -> float:
+def _convert_abs_count_to_fraction(value: int | None, test_units: int) -> float | None:
     # Using a integer value signifying the total number of 'test units' (in the
     # context of a validation), we convert an integer count (absolute) threshold
     # value to a fractional threshold value
@@ -251,12 +252,12 @@ def _normalize_thresholds_creation(
         # any of these keys
 
         # Check keys for invalid entries and raise a ValueError if any are found
-        invalid_keys = set(thresholds.keys()) - {"warning", "error", "critical"}
+        invalid_keys: set = set(thresholds.keys()) - {"warning", "error", "critical"}
 
         if invalid_keys:
             raise ValueError(f"Invalid keys in the thresholds dictionary: {invalid_keys}")
 
-        thresholds = Thresholds(**thresholds)
+        thresholds = Thresholds(**cast(dict[str, int | float | None], thresholds))
 
     elif isinstance(thresholds, Thresholds):
         pass
@@ -388,7 +389,7 @@ class Actions:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_footer=False)
+    pb.config(report_incl_footer_timings=False)
     ```
 
     Let's define both threshold values and actions for a data validation workflow. We'll set these
@@ -465,7 +466,7 @@ class Actions:
     default: str | Callable | list[str | Callable] | None = None
     highest_only: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.warning = self._ensure_list(self.warning)
         self.error = self._ensure_list(self.error)
         self.critical = self._ensure_list(self.critical)
@@ -483,12 +484,12 @@ class Actions:
 
     def _ensure_list(
         self, value: str | Callable | list[str | Callable] | None
-    ) -> list[str | Callable]:
+    ) -> list[str | Callable] | None:
         if value is None:
             return None
-        if not isinstance(value, list):
-            return [value]
-        return value
+        if isinstance(value, list):
+            return cast(list[str | Callable], value)
+        return [value]
 
     def __repr__(self) -> str:
         return f"Actions(warning={self.warning}, error={self.error}, critical={self.critical})"
@@ -559,7 +560,7 @@ class FinalActions:
     def send_alert():
         summary = pb.get_validation_summary()
         if summary["highest_severity"] == "critical":
-            print(f"ALERT: Critical validation failures found in {summary['table_name']}")
+            print(f"ALERT: Critical validation failures found in {summary['tbl_name']}")
 
     validation = (
         pb.Validate(
@@ -604,9 +605,9 @@ class FinalActions:
 
     actions: list | str | Callable
 
-    def __init__(self, *args):
+    def __init__(self, *actions) -> None:
         # Check that all arguments are either strings or callables
-        for arg in args:
+        for arg in actions:
             if not isinstance(arg, (str, Callable)) and not (
                 isinstance(arg, list) and all(isinstance(item, (str, Callable)) for item in arg)
             ):
@@ -615,25 +616,26 @@ class FinalActions:
                     f"Got {type(arg).__name__} instead."
                 )
 
-        if len(args) == 0:
+        if len(actions) == 0:
             self.actions = []
-        elif len(args) == 1:
+        elif len(actions) == 1:
             # If a single action is provided, store it directly (not in a list)
-            self.actions = args[0]
+            self.actions = actions[0]
         else:
             # Multiple actions, store as a list
-            self.actions = list(args)
+            self.actions = list(actions)
 
     def __repr__(self) -> str:
         if isinstance(self.actions, list):
             action_reprs = ", ".join(
-                f"'{a}'" if isinstance(a, str) else a.__name__ for a in self.actions
+                f"'{a}'" if isinstance(a, str) else getattr(a, "__name__", repr(a))
+                for a in self.actions
             )
             return f"FinalActions([{action_reprs}])"
         elif isinstance(self.actions, str):
             return f"FinalActions('{self.actions}')"
         elif callable(self.actions):
-            return f"FinalActions({self.actions.__name__})"
+            return f"FinalActions({getattr(self.actions, '__name__', repr(self.actions))})"
         else:
             return f"FinalActions({self.actions})"  # pragma: no cover
 

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:nciodm="http://ncicb.nci.nih.gov/xml/odm/EVS/CDISC"
+     FileOID="CT.SDTM.2024-03-29"
+     FileType="Snapshot"
+     CreationDateTime="2024-03-29T00:00:00"
+     ODMVersion="1.3.2">
+
+  <Study OID="CT.SDTM">
+    <GlobalVariables>
+      <StudyName>CDISC SDTM Controlled Terminology</StudyName>
+      <StudyDescription>CDISC Submission Value-Level Terminology, 2024-03-29</StudyDescription>
+      <ProtocolName>SDTM Terminology</ProtocolName>
+    </GlobalVariables>
+
+    <MetaDataVersion OID="MDV.CT.SDTM.2024-03-29" Name="CDISC SDTM CT 2024-03-29">
+
+      <!-- Sex Codelist (C66731) -->
+      <CodeList OID="CL.C66731.SEX" Name="Sex" DataType="text"
+                nciodm:CodeListExtensible="No"
+                nciodm:CDISCSubmissionValue="SEX">
+        <nciodm:CDISCSynonym>Sex</nciodm:CDISCSynonym>
+        <nciodm:CDISCDefinition>Sex of the subject.</nciodm:CDISCDefinition>
+        <CodeListItem CodedValue="F" nciodm:ExtCodeID="C16576">
+          <Decode><TranslatedText xml:lang="en">Female</TranslatedText></Decode>
+          <nciodm:CDISCSynonym>Female</nciodm:CDISCSynonym>
+          <nciodm:CDISCDefinition>A person who belongs to the sex that normally produces ova.</nciodm:CDISCDefinition>
+        </CodeListItem>
+        <CodeListItem CodedValue="M" nciodm:ExtCodeID="C20197">
+          <Decode><TranslatedText xml:lang="en">Male</TranslatedText></Decode>
+          <nciodm:CDISCSynonym>Male</nciodm:CDISCSynonym>
+          <nciodm:CDISCDefinition>A person who belongs to the sex that normally produces sperm.</nciodm:CDISCDefinition>
+        </CodeListItem>
+        <CodeListItem CodedValue="U" nciodm:ExtCodeID="C17998">
+          <Decode><TranslatedText xml:lang="en">Unknown</TranslatedText></Decode>
+          <nciodm:CDISCSynonym>Unknown</nciodm:CDISCSynonym>
+          <nciodm:CDISCDefinition>Not known, not observed, not recorded, or refused.</nciodm:CDISCDefinition>
+        </CodeListItem>
+        <CodeListItem CodedValue="UNDIFFERENTIATED" nciodm:ExtCodeID="C45908">
+          <Decode><TranslatedText xml:lang="en">Undifferentiated</TranslatedText></Decode>
+          <nciodm:CDISCSynonym>Undifferentiated</nciodm:CDISCSynonym>
+          <nciodm:CDISCDefinition>Sex could not be determined.</nciodm:CDISCDefinition>
+        </CodeListItem>
+      </CodeList>
+
+      <!-- Severity (C66769) -->
+      <CodeList OID="CL.C66769.SEVERITY" Name="Severity/Intensity Scale for Adverse Events"
+                DataType="text"
+                nciodm:CodeListExtensible="No"
+                nciodm:CDISCSubmissionValue="AESEV">
+        <nciodm:CDISCSynonym>Severity/Intensity Scale for Adverse Events</nciodm:CDISCSynonym>
+        <CodeListItem CodedValue="MILD" nciodm:ExtCodeID="C41338">
+          <Decode><TranslatedText xml:lang="en">Mild</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="MODERATE" nciodm:ExtCodeID="C41339">
+          <Decode><TranslatedText xml:lang="en">Moderate</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="SEVERE" nciodm:ExtCodeID="C41340">
+          <Decode><TranslatedText xml:lang="en">Severe</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+
+      <!-- No Yes (C66742) -->
+      <CodeList OID="CL.C66742.NY" Name="No Yes Response" DataType="text"
+                nciodm:CodeListExtensible="No"
+                nciodm:CDISCSubmissionValue="NY">
+        <CodeListItem CodedValue="N" nciodm:ExtCodeID="C49487">
+          <Decode><TranslatedText xml:lang="en">No</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="Y" nciodm:ExtCodeID="C49488">
+          <Decode><TranslatedText xml:lang="en">Yes</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+
+      <!-- Race (C74457) -->
+      <CodeList OID="CL.C74457.RACE" Name="Race" DataType="text"
+                nciodm:CodeListExtensible="Yes"
+                nciodm:CDISCSubmissionValue="RACE">
+        <CodeListItem CodedValue="AMERICAN INDIAN OR ALASKA NATIVE" nciodm:ExtCodeID="C41259">
+          <Decode><TranslatedText xml:lang="en">American Indian or Alaska Native</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="ASIAN" nciodm:ExtCodeID="C41260">
+          <Decode><TranslatedText xml:lang="en">Asian</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="BLACK OR AFRICAN AMERICAN" nciodm:ExtCodeID="C16352">
+          <Decode><TranslatedText xml:lang="en">Black or African American</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER" nciodm:ExtCodeID="C41219">
+          <Decode><TranslatedText xml:lang="en">Native Hawaiian or Other Pacific Islander</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="WHITE" nciodm:ExtCodeID="C41261">
+          <Decode><TranslatedText xml:lang="en">White</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+
+      <!-- Route of Administration (C66729) - extensible example -->
+      <CodeList OID="CL.C66729.ROUTE" Name="Route of Administration" DataType="text"
+                nciodm:CodeListExtensible="Yes"
+                nciodm:CDISCSubmissionValue="ROUTE">
+        <CodeListItem CodedValue="ORAL" nciodm:ExtCodeID="C38288">
+          <Decode><TranslatedText xml:lang="en">Oral</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="INTRAVENOUS" nciodm:ExtCodeID="C38276">
+          <Decode><TranslatedText xml:lang="en">Intravenous</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="SUBCUTANEOUS" nciodm:ExtCodeID="C38299">
+          <Decode><TranslatedText xml:lang="en">Subcutaneous</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="TOPICAL" nciodm:ExtCodeID="C38304">
+          <Decode><TranslatedText xml:lang="en">Topical</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="INTRAMUSCULAR" nciodm:ExtCodeID="C28161">
+          <Decode><TranslatedText xml:lang="en">Intramuscular</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+
+    </MetaDataVersion>
+  </Study>
+</ODM>

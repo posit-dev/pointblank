@@ -4,7 +4,8 @@ import sys
 import pytest
 from unittest.mock import patch
 
-from pointblank.schema import Schema
+import narwhals as nw
+from pointblank.schema import Schema, _check_schema_match
 from pointblank.validate import load_dataset
 
 import pandas as pd
@@ -432,5 +433,149 @@ def test_schema_input_errors(request, tbl_fixture):
         Schema(columns=(1, "int"))
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
+def test_schema_from_narwhals_lazy_frame():
+    """Test schema extraction from a Narwhals lazy frame."""
+    # Create a polars lazy frame and convert to narwhals
+    tbl_pl_lazy = pl.LazyFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
+    tbl_nw_lazy = nw.from_native(tbl_pl_lazy)
+
+    # Create schema from narwhals lazy frame
+    schema = Schema(tbl=tbl_nw_lazy)
+
+    assert schema.columns is not None
+    assert len(schema.columns) == 3
+    assert schema.columns[0][0] == "x"
+    assert schema.columns[1][0] == "y"
+    assert schema.columns[2][0] == "z"
+
+
+def test_schema_from_narwhals_eager_frame():
+    """Test schema extraction from a Narwhals eager/non-lazy frame."""
+    tbl_pl = pl.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
+    tbl_nw = nw.from_native(tbl_pl)
+
+    # Create schema from narwhals eager frame
+    schema = Schema(tbl=tbl_nw)
+
+    assert schema.columns is not None
+    assert len(schema.columns) == 3
+    assert schema.columns[0][0] == "x"
+    assert schema.columns[1][0] == "y"
+    assert schema.columns[2][0] == "z"
+
+
+def test_schema_from_polars_lazy_frame():
+    """Test schema extraction from a Polars LazyFrame directly."""
+    tbl_pl_lazy = pl.LazyFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
+
+    # Create schema from polars lazy frame
+    schema = Schema(tbl=tbl_pl_lazy)
+
+    assert schema.columns is not None
+    assert len(schema.columns) == 3
+    assert schema.columns[0][0] == "x"
+    assert schema.columns[1][0] == "y"
+    assert schema.columns[2][0] == "z"
+
+
+def test_check_schema_match_basic():
+    """Test the _check_schema_match() function with basic validation."""
+    # Create a simple DataFrame
+    tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+
+    # Create a matching schema - use actual pandas dtypes or partial match
+    schema = Schema(columns=[("x", "int"), ("y", "int")])
+
+    # Should pass with partial dtype matching (full_match_dtypes=False)
+    assert _check_schema_match(data_tbl=tbl, schema=schema, full_match_dtypes=False) is True
+
+    # Create a non-matching schema (wrong column name)
+    schema_wrong = Schema(columns=[("x", "int"), ("z", "int")])
+    assert _check_schema_match(data_tbl=tbl, schema=schema_wrong, full_match_dtypes=False) is False
+
+    # Create a schema with wrong dtype
+    schema_wrong_dtype = Schema(columns=[("x", "str"), ("y", "int")])
+    assert (
+        _check_schema_match(data_tbl=tbl, schema=schema_wrong_dtype, full_match_dtypes=False)
+        is False
+    )
+
+
+def test_check_schema_match_complete_option():
+    """Test the _check_schema_match() function with complete= parameter."""
+    tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6], "z": [7, 8, 9]})
+
+    # Partial schema (only 2 of 3 columns)
+    schema_partial = Schema(columns=[("x", "int"), ("y", "int")])
+
+    # Should fail when complete=True
+    assert (
+        _check_schema_match(
+            data_tbl=tbl, schema=schema_partial, complete=True, full_match_dtypes=False
+        )
+        is False
+    )
+
+    # Should pass when complete=False
+    assert (
+        _check_schema_match(
+            data_tbl=tbl, schema=schema_partial, complete=False, full_match_dtypes=False
+        )
+        is True
+    )
+
+
+def test_check_schema_match_in_order_option():
+    """Test the _check_schema_match() function with in_order= parameter."""
+    tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+
+    # Schema with columns in different order
+    schema_wrong_order = Schema(columns=[("y", "int"), ("x", "int")])
+
+    # Should fail when in_order=True
+    assert (
+        _check_schema_match(
+            data_tbl=tbl, schema=schema_wrong_order, in_order=True, full_match_dtypes=False
+        )
+        is False
+    )
+
+    # Should pass when in_order=False
+    assert (
+        _check_schema_match(
+            data_tbl=tbl, schema=schema_wrong_order, in_order=False, full_match_dtypes=False
+        )
+        is True
+    )
+
+
+def test_get_column_list_none_columns():
+    schema = Schema(columns=["a", "b"])
+    schema.columns = None
+    assert schema.get_column_list() == []
+
+
+def test_get_dtype_list_none_columns():
+    schema = Schema(columns=["a", "b"])
+    schema.columns = None
+    assert schema.get_dtype_list() == []
+
+
+def test_schema_str_empty():
+    schema = Schema(tbl=pl.DataFrame({"x": [1]}))
+    schema.columns = None
+    assert str(schema) == "Pointblank Schema (empty)"
+
+
+def test_schema_repr():
+    schema = Schema(columns=["a", "b"])
+    r = repr(schema)
+    assert "Schema" in r
+    assert "columns" in r
+
+
+def test_get_schema_coerced_unsupported_type():
+    df = pl.DataFrame({"a": [1, 2, 3]})
+    schema = Schema(tbl=df)
+    with pytest.raises(ValueError, match="Cannot coerce schema"):
+        schema.get_schema_coerced(to="dask")

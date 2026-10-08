@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_Validação de dados bonita e poderosa_
+_Kit de ferramentas de validação de dados para avaliar e monitorar a qualidade dos dados_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _Validação de dados bonita e poderosa_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## O que é o Pointblank?
+O Pointblank adota uma abordagem diferente para a qualidade dos dados. Não precisa ser uma tarefa técnica tediosa. Em vez disso, pode se tornar um processo focado na comunicação clara entre os membros da equipe. Enquanto outras bibliotecas de validação se concentram apenas na detecção de erros, o Pointblank se destaca tanto em **encontrar problemas quanto em compartilhar insights**. Nossos belos relatórios personalizáveis transformam resultados de validação em conversas com stakeholders, tornando os problemas de qualidade dos dados imediatamente compreensíveis e acionáveis para toda sua equipe.
 
-O Pointblank é um framework de validação de dados poderoso e elegante para Python que transforma a maneira como você garante a qualidade dos dados. Com sua API intuitiva e encadeável, você pode validar rapidamente seus dados contra verificações de qualidade abrangentes e visualizar os resultados através de relatórios interativos impressionantes que tornam os problemas de dados imediatamente acionáveis.
+**Comece em minutos, não em horas.** O recurso [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) alimentado por IA do Pointblank analisa seus dados e sugere regras de validação inteligentes automaticamente. Assim, não há necessidade de ficar olhando para um script de validação vazio se perguntando por onde começar. O Pointblank pode impulsionar sua jornada de qualidade de dados para que você possa focar no que mais importa.
 
-Seja você um cientista de dados, engenheiro de dados ou analista, o Pointblank ajuda a detectar problemas de qualidade antes que eles afetem suas análises ou sistemas subsequentes.
+Seja você um cientista de dados que precisa comunicar rapidamente descobertas de qualidade de dados, um engenheiro de dados construindo pipelines robustos, ou um analista apresentando resultados de qualidade de dados para stakeholders do negócio, o Pointblank ajuda você a transformar a qualidade dos dados de uma reflextão tardia em uma vantagem competitiva.
 
-## Começando em 30 Segundos
+## Começando com Validação Alimentada por IA
+
+A classe `DraftValidation` usa LLMs para analisar seus dados e gerar um plano de validação completo com sugestões inteligentes. Isso ajuda você a começar rapidamente com a validação de dados ou iniciar um novo projeto.
+
+```python
+import pointblank as pb
+
+# Carregue seus dados
+data = pb.load_dataset("game_revenue")              # Um conjunto de dados de exemplo
+
+# Use DraftValidation para gerar um plano de validação
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+A saída é um plano de validação completo com sugestões inteligentes baseadas em seus dados:
+
+```python
+import pointblank as pb
+
+# O plano de validação
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Copie, cole e personalize o plano de validação gerado conforme suas necessidades.
+
+## API de Validação Encadeável
+
+A API encadeável do Pointblank torna a validação simples e legível. O mesmo padrão sempre se aplica: (1) comece com `Validate`, (2) adicione etapas de validação, e (3) termine com `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+Uma vez que você tenha um objeto `validation` interrogado, você pode aproveitar uma variedade de métodos para extrair insights como:
+
+- obter relatórios detalhados para etapas individuais para ver o que deu errado
+- filtrar tabelas baseadas em resultados de validação
+- extrair dados problemáticos para depuração
 
 ## Por que escolher o Pointblank?
 
@@ -149,6 +203,48 @@ validation.get_step_report(i=3).show("browser")  # Obtenha os registros com falh
 
 <br>
 
+## Configuração YAML
+
+Para equipes que precisam de fluxos de trabalho de validação portáteis e controlados por versão, o Pointblank suporta arquivos de configuração YAML. Isso facilita o compartilhamento da lógica de validação entre diferentes ambientes e membros da equipe, garantindo que todos estejam na mesma página.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Validação de início"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Execute a validação YAML**
+
+```python
+import pointblank as pb
+
+# Execute validação da configuração YAML
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Obtenha os resultados como qualquer outra validação
+validation.get_tabular_report().show()
+```
+
+Esta abordagem é perfeita para:
+
+- **Pipelines CI/CD**: Armazene regras de validação junto com seu código
+- **Colaboração em equipe**: Compartilhe lógica de validação em formato legível
+- **Consistência de ambiente**: Use a mesma validação em desenvolvimento, staging e produção
+- **Documentação**: Arquivos YAML servem como documentação viva dos seus requisitos de qualidade de dados
+
 ## Interface de Linha de Comando (CLI)
 
 O Pointblank inclui uma poderosa ferramenta CLI chamada `pb` que permite executar fluxos de trabalho de validação de dados diretamente da linha de comando. Perfeita para pipelines CI/CD, verificações programadas de qualidade de dados ou tarefas de validação rápidas.
@@ -176,6 +272,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Execute validações essenciais**
 
 ```bash
+# Execute validação do arquivo de configuração YAML
+pb run validation.yaml
+
+# Execute validação do arquivo Python
+pb run validation.py
+
 # Verifique linhas duplicadas
 pb validate small_table --check rows-distinct
 
@@ -192,9 +294,49 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integre com CI/CD**
 
 ```bash
-# Use códigos de saída para automação (0 = sucesso, 1 = falha)
+# Use códigos de saída para automação em validações de linha única (0 = sucesso, 1 = falha)
 pb validate small_table --check rows-distinct --exit-code
+
+# Execute fluxos de trabalho de validação com códigos de saída
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
+
+## Gerar Dados de Teste Realistas
+
+Precisa de dados de teste para seus fluxos de trabalho de validação? A função `generate_dataset()` cria dados sintéticos realistas e adaptados ao local, baseados em definições de esquema. É muito útil para desenvolver pipelines sem dados de produção, executar testes de CI/CD com cenários reproduzíveis, ou prototipar fluxos de trabalho antes que os dados de produção estejam disponíveis.
+
+```python
+import pointblank as pb
+
+# Definir um esquema com restrições de campos
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Gerar 10 linhas de dados de teste realistas
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+O gerador suporta geração de dados sofisticada com estas capacidades:
+
+- **Dados realistas com presets**: Use presets integrados como `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **Strings de user agent**: Gere strings de user agent de navegador altamente variadas e realistas de 17 categorias de navegadores com mais de 42.000 combinações únicas
+- **Suporte a 100 países**: Gere dados específicos de localização (ex., `country="DE"` para endereços alemães)
+- **Restrições de campos**: Controle intervalos, padrões, unicidade e valores permitidos
+- **Múltiplos formatos de saída**: Retorna DataFrames Polars por padrão, mas também suporta Pandas (`output="pandas"`) ou dicionários (`output="dict"`)
 
 ## Recursos que diferenciam o Pointblank
 
@@ -202,8 +344,9 @@ pb validate small_table --check rows-distinct --exit-code
 - **Construído para colaboração**: Compartilhe resultados com colegas através de relatórios interativos bonitos
 - **Saídas práticas**: Obtenha exatamente o que você precisa: contagens, extratos, resumos ou relatórios completos
 - **Implementação flexível**: Use em notebooks, scripts ou pipelines de dados
+- **Geração de dados sintéticos**: Crie dados de teste realistas com mais de 30 presets, strings de user agent, formatação adaptada ao locale e suporte a 100 países
 - **Personalizável**: Adapte etapas de validação e relatórios às suas necessidades específicas
-- **Internacionalização**: Os relatórios podem ser gerados em mais de 20 idiomas, incluindo inglês, espanhol, francês e alemão
+- **Internacionalização**: Os relatórios podem ser gerados em 40 idiomas, incluindo inglês, espanhol, francês e alemão
 
 ## Documentação e exemplos
 

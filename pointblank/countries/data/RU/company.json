@@ -1,0 +1,488 @@
+{
+  "suffixes": [
+    "OOO",
+    "ZAO",
+    "OAO",
+    "PAO",
+    "AO",
+    "Group",
+    "Holding",
+    "Russia",
+    "RU",
+    "Corporation"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Russian",
+    "Rossiyskaya",
+    "National",
+    "United",
+    "Global",
+    "Federal",
+    "Premier",
+    "First",
+    "Digital",
+    "Smart",
+    "Eastern",
+    "Northern",
+    "Siberian",
+    "Moscow",
+    "Saint Petersburg",
+    "Ural",
+    "Modern",
+    "New"
+  ],
+  "nouns": [
+    "Bank",
+    "Telecom",
+    "Energy",
+    "Oil",
+    "Gas",
+    "Steel",
+    "Rail",
+    "Aero",
+    "Tech",
+    "Mining",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Insurance",
+    "Finance",
+    "Nuclear",
+    "Defense",
+    "Pharma",
+    "Construction",
+    "Media"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Gazprom",
+      "cities": [
+        "Moscow",
+        "Saint Petersburg"
+      ]
+    },
+    {
+      "name": "Lukoil",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Rosneft",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Sberbank",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Russian Railways",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Rosatom",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Rostec",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "VTB Bank",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Norilsk Nickel",
+      "cities": [
+        "Moscow",
+        "Norilsk"
+      ]
+    },
+    {
+      "name": "Surgutneftegaz",
+      "cities": [
+        "Surgut"
+      ]
+    },
+    {
+      "name": "Tatneft",
+      "cities": [
+        "Almetyevsk",
+        "Kazan"
+      ]
+    },
+    {
+      "name": "Aeroflot",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "MTS",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Megafon",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Severstal",
+      "cities": [
+        "Cherepovets",
+        "Moscow"
+      ]
+    },
+    {
+      "name": "NLMK",
+      "cities": [
+        "Lipetsk",
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Magnitogorsk Iron and Steel Works",
+      "cities": [
+        "Magnitogorsk"
+      ]
+    },
+    {
+      "name": "Yandex",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Mail.ru Group",
+      "cities": [
+        "Moscow"
+      ]
+    },
+    {
+      "name": "Kaspersky Lab",
+      "cities": [
+        "Moscow"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Customer Service Representative",
+    "Logistics Coordinator",
+    "Production Manager",
+    "Oil Engineer",
+    "Mining Engineer",
+    "IT Administrator",
+    "Nuclear Engineer",
+    "Cybersecurity Analyst"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "Russian",
+    "Global",
+    "National"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "innovations",
+    "values",
+    "partnerships",
+    "strategies",
+    "results",
+    "frameworks",
+    "principles",
+    "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.15,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "MTS",
+        "Megafon"
+      ],
+      "company_suffixes": [
+        "OAO",
+        "ZAO",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.15,
+      "jobs": [
+        "Production Manager",
+        "Oil Engineer",
+        "Mining Engineer",
+        "Nuclear Engineer"
+      ],
+      "well_known": [
+        "Gazprom",
+        "Lukoil",
+        "Rosneft",
+        "Russian Railways",
+        "Rosatom",
+        "Rostec",
+        "Norilsk Nickel",
+        "Surgutneftegaz",
+        "Tatneft",
+        "Severstal",
+        "NLMK",
+        "Magnitogorsk Iron and Steel Works"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.15,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Sberbank",
+        "VTB Bank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Logistics Coordinator"
+      ],
+      "well_known": [
+        "Aeroflot"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.26,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "QA Engineer",
+        "Data Scientist",
+        "IT Administrator",
+        "Cybersecurity Analyst"
+      ],
+      "well_known": [
+        "Yandex",
+        "Mail.ru Group",
+        "Kaspersky Lab"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
+}

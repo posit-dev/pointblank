@@ -1,0 +1,68 @@
+{
+  "name": "quarterly-sales",
+  "title": "Quarterly Sales Dataset",
+  "description": "Sales transactions for Q1 2024",
+  "resources": [
+    {
+      "name": "transactions",
+      "path": "transactions.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "transaction_id",
+            "type": "string",
+            "description": "Unique transaction identifier",
+            "constraints": {"required": true, "unique": true, "minLength": 5, "maxLength": 20}
+          },
+          {
+            "name": "customer_id",
+            "type": "string",
+            "description": "Customer account number",
+            "constraints": {"required": true, "minLength": 5, "maxLength": 20}
+          },
+          {
+            "name": "amount",
+            "type": "number",
+            "description": "Transaction amount in USD",
+            "constraints": {"required": true, "minimum": 0.01, "maximum": 99999.99}
+          },
+          {
+            "name": "quantity",
+            "type": "integer",
+            "description": "Number of items purchased",
+            "constraints": {"required": true, "minimum": 1, "maximum": 1000}
+          },
+          {
+            "name": "category",
+            "type": "string",
+            "description": "Product category",
+            "constraints": {
+              "required": true,
+              "enum": ["electronics", "clothing", "food", "home", "sports"]
+            }
+          },
+          {
+            "name": "sale_date",
+            "type": "date",
+            "description": "Date of sale",
+            "constraints": {"required": true}
+          },
+          {
+            "name": "discount_pct",
+            "type": "number",
+            "description": "Discount percentage applied",
+            "constraints": {"minimum": 0, "maximum": 50}
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "description": "Customer email address",
+            "constraints": {"pattern": "^[^@]+@[^@]+\\.[^@]+$"}
+          }
+        ],
+        "primaryKey": ["transaction_id"],
+        "missingValues": ["", "NA", "N/A"]
+      }
+    }
+  ]
+}

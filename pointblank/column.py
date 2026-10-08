@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Any
 
 import narwhals as nw
+from narwhals.dependencies import is_narwhals_lazyframe
 from narwhals.typing import IntoDataFrame
 
 __all__ = [
     "col",
+    "ref",
     "starts_with",
     "ends_with",
     "contains",
@@ -167,7 +170,7 @@ class Column:
 
         raise TypeError(f"Unsupported type: {type(self.exprs)}")  # pragma: no cover
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.exprs if isinstance(self.exprs, str) else repr(self.exprs)
 
 
@@ -188,8 +191,24 @@ class ColumnLiteral(Column):
     def name(self) -> str:
         return self.exprs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.exprs
+
+
+@dataclass
+class ReferenceColumn:
+    """
+    A class to represent a column from the reference data.
+
+    This is used with aggregate validation methods (like `col_sum_eq`, `col_avg_gt`, etc.)
+    to compare the aggregate value of a column in the main data against the aggregate
+    value of a column in the reference data.
+    """
+
+    column_name: str
+
+    def __repr__(self) -> str:
+        return f"ref({self.column_name!r})"
 
 
 @dataclass
@@ -211,16 +230,25 @@ class ColumnSelectorNarwhals(Column):
 
     exprs: nw.selectors.Selector
 
-    def resolve(self, table) -> list[str]:
+    def resolve(
+        self, columns: list[str] | None = None, table: IntoDataFrame | None = None
+    ) -> list[str]:
+        # Note: columns parameter is unused - Narwhals selectors need the actual table
+        if table is None:
+            raise ValueError("ColumnSelectorNarwhals requires a table for resolution")
         # Convert the native table to a Narwhals DataFrame
         dfn = nw.from_native(table)
         # Use the selector to select columns and return their names
-        columns = dfn.select(self.exprs.exprs).columns
-        return columns
+        selected_df = dfn.select(self.exprs.exprs)  # type: ignore[attr-defined]
+        # Use `collect_schema()` for LazyFrame to avoid performance warnings
+        if is_narwhals_lazyframe(selected_df):
+            return list(selected_df.collect_schema().keys())
+        else:  # pragma: no cover
+            return list(selected_df.columns)
 
 
 def col(
-    exprs: str | ColumnSelector | ColumnSelectorNarwhals,
+    exprs: str | ColumnSelector | ColumnSelectorNarwhals | nw.selectors.Selector,
 ) -> Column | ColumnLiteral | ColumnSelectorNarwhals:
     """
     Helper function for referencing a column in the input table.
@@ -264,9 +292,12 @@ def col(
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     If specifying a single column with certainty (you have the exact name), `col()` is not necessary
@@ -344,7 +375,7 @@ def col(
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `a` and `b` and we'd like to validate that the values in
@@ -515,6 +546,83 @@ def col(
     raise TypeError(f"Unsupported type: {type(exprs)}")  # pragma: no cover
 
 
+def ref(column_name: str) -> ReferenceColumn:
+    """
+    Reference a column from the reference data for aggregate comparisons.
+
+    This function is used with aggregate validation methods (like `col_sum_eq`, `col_avg_gt`, etc.)
+    to compare the aggregate value of a column in the main data against the aggregate value of
+    a column in the reference data.
+
+    To use this function, you must first set the reference data on the `Validate` object using
+    the `reference=` parameter in the constructor.
+
+    Parameters
+    ----------
+    column_name
+        The name of the column in the reference data to compute the aggregate from.
+
+    Returns
+    -------
+    ReferenceColumn
+        A reference column marker that indicates the value should be computed from the
+        reference data.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Suppose we have two DataFrames: a current data table and a reference (historical) table.
+    We want to validate that the sum of a column in the current data matches the sum of the
+    same column in the reference data.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    # Current data
+    current_data = pl.DataFrame({"sales": [100, 200, 300]})
+
+    # Reference (historical) data
+    reference_data = pl.DataFrame({"sales": [100, 200, 300]})
+
+    validation = (
+        pb.Validate(data=current_data, reference=reference_data)
+        .col_sum_eq("sales", pb.ref("sales"))
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    You can also compare different columns or use tolerance:
+
+    ```{python}
+    current_data = pl.DataFrame({"revenue": [105, 205, 305]})
+    reference_data = pl.DataFrame({"sales": [100, 200, 300]})
+
+    # Check if revenue sum is within 10% of sales sum
+    validation = (
+        pb.Validate(data=current_data, reference=reference_data)
+        .col_sum_eq("revenue", pb.ref("sales"), tol=0.1)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    See Also
+    --------
+    The [`col()`](`pointblank.col`) function for referencing columns within the same table.
+    """
+    return ReferenceColumn(column_name=column_name)
+
+
 def starts_with(text: str, case_sensitive: bool = False) -> StartsWith:
     """
     Select columns that start with specified text.
@@ -564,9 +672,12 @@ def starts_with(text: str, case_sensitive: bool = False) -> StartsWith:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `starts_with()` selector function doesn't need to be used in isolation. Read the next
@@ -605,7 +716,7 @@ def starts_with(text: str, case_sensitive: bool = False) -> StartsWith:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `paid_2021`, `paid_2022`, and `person_id` and
@@ -723,9 +834,12 @@ def ends_with(text: str, case_sensitive: bool = False) -> EndsWith:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `ends_with()` selector function doesn't need to be used in isolation. Read the next section
@@ -764,7 +878,7 @@ def ends_with(text: str, case_sensitive: bool = False) -> EndsWith:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `2021_pay`, `2022_pay`, and `person_id` and
@@ -883,9 +997,12 @@ def contains(text: str, case_sensitive: bool = False) -> Contains:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `contains()` selector function doesn't need to be used in isolation. Read the next section
@@ -924,7 +1041,7 @@ def contains(text: str, case_sensitive: bool = False) -> Contains:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `2021_pay_total`, `2022_pay_total`, and `person_id`
@@ -1043,9 +1160,12 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `matches()` selector function doesn't need to be used in isolation. Read the next section
@@ -1084,7 +1204,7 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd
@@ -1185,9 +1305,12 @@ def everything() -> Everything:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `everything()` selector function doesn't need to be used in isolation. Read the next section
@@ -1226,7 +1349,7 @@ def everything() -> Everything:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with several numeric columns and we'd like to validate that all these
@@ -1337,9 +1460,12 @@ def first_n(n: int, offset: int = 0) -> FirstN:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `first_n()` selector function doesn't need to be used in isolation. Read the next section
@@ -1378,7 +1504,7 @@ def first_n(n: int, offset: int = 0) -> FirstN:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `paid_2021`, `paid_2022`, `paid_2023`, `paid_2024`, and
@@ -1493,9 +1619,12 @@ def last_n(n: int, offset: int = 0) -> LastN:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `last_n()` selector function doesn't need to be used in isolation. Read the next section for
@@ -1534,7 +1663,7 @@ def last_n(n: int, offset: int = 0) -> LastN:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `paid_2021`, `paid_2022`, `paid_2023`, and
@@ -1606,13 +1735,25 @@ class ColumnExpression:
     Supports operations like >, <, +, etc. for creating backend-agnostic validation expressions.
     """
 
-    def __init__(self, column_name=None, operation=None, left=None, right=None):
+    column_name: str | None
+    operation: str | None
+    left: ColumnExpression | None
+    right: ColumnExpression | str | int | float | None
+
+    def __init__(
+        self,
+        column_name: str | None = None,
+        operation: str | None = None,
+        left: ColumnExpression | None = None,
+        right: ColumnExpression | str | int | float | None = None,
+    ) -> None:
         self.column_name = column_name  # Name of the column (for leaf nodes)
         self.operation = operation  # Operation type (gt, lt, add, etc.)
         self.left = left  # Left operand (ColumnExpression or None for column reference)
         self.right = right  # Right operand (ColumnExpression, value, or None)
 
-    def to_polars_expr(self):
+    # TODO: This method would benefit from stronger typing
+    def to_polars_expr(self) -> Any:
         """Convert this expression to a Polars expression."""
         import polars as pl
 
@@ -1622,16 +1763,16 @@ class ColumnExpression:
 
         # Handle unary operations like is_null
         if self.operation == "is_null":
-            left_expr = self.left
+            left_expr: Any = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_polars_expr()
-            return left_expr.is_null()
+            return left_expr.is_null()  # type: ignore[union-attr]
 
         if self.operation == "is_not_null":
             left_expr = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_polars_expr()
-            return left_expr.is_not_null()
+            return left_expr.is_not_null()  # type: ignore[union-attr]
 
         # Handle nested expressions through recursive evaluation
         if self.operation is None:
@@ -1639,6 +1780,7 @@ class ColumnExpression:
             raise ValueError("Invalid expression state: No operation or column name")
 
         # Get the left operand
+        left_expr: Any
         if self.left is None and self.column_name is not None:
             # Column name as left operand
             left_expr = pl.col(self.column_name)  # pragma: no cover
@@ -1650,6 +1792,7 @@ class ColumnExpression:
             left_expr = self.left  # pragma: no cover
 
         # Get the right operand
+        right_expr: Any
         if isinstance(self.right, ColumnExpression):
             # Nested expression as right operand
             right_expr = self.right.to_polars_expr()  # pragma: no cover
@@ -1660,35 +1803,35 @@ class ColumnExpression:
             # Literal value as right operand
             right_expr = self.right  # pragma: no cover
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         elif self.operation == "and":
-            return left_expr & right_expr
+            return left_expr & right_expr  # type: ignore[operator]
         elif self.operation == "or":
-            return left_expr | right_expr
+            return left_expr | right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def to_pandas_expr(self, df):
+    def to_pandas_expr(self, df: Any) -> Any:
         """Convert this expression to a Pandas Series of booleans."""
 
         # Handle is_null as a special case - but raise an error
@@ -1711,43 +1854,43 @@ class ColumnExpression:
             return df[self.column_name]
 
         # For other operations, recursively process operands
-        left_expr = self.left
+        left_expr: Any = self.left
         if isinstance(left_expr, ColumnExpression):
             left_expr = left_expr.to_pandas_expr(df)
         elif isinstance(left_expr, str) and left_expr in df.columns:  # pragma: no cover
             left_expr = df[left_expr]
 
-        right_expr = self.right
+        right_expr: Any = self.right
         if isinstance(right_expr, ColumnExpression):
             right_expr = right_expr.to_pandas_expr(df)
         elif isinstance(right_expr, str) and right_expr in df.columns:  # pragma: no cover
             right_expr = df[right_expr]
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def to_ibis_expr(self, table):
+    def to_ibis_expr(self, table: Any) -> Any:
         """Convert this expression to an Ibis expression."""
 
         # Base case: simple column reference
@@ -1756,16 +1899,16 @@ class ColumnExpression:
 
         # Handle unary operations
         if self.operation == "is_null":
-            left_expr = self.left
+            left_expr: Any = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_ibis_expr(table)
-            return left_expr.isnull()
+            return left_expr.isnull()  # type: ignore[union-attr]
 
         if self.operation == "is_not_null":
             left_expr = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_ibis_expr(table)
-            return ~left_expr.isnull()
+            return ~left_expr.isnull()  # type: ignore[union-attr,operator]
 
         # Handle nested expressions through recursive evaluation
         if self.operation is None:
@@ -1773,6 +1916,7 @@ class ColumnExpression:
             raise ValueError("Invalid expression state: No operation or column name")
 
         # Get the left operand
+        left_expr: Any
         if self.left is None and self.column_name is not None:
             # Column name as left operand
             left_expr = table[self.column_name]  # pragma: no cover
@@ -1784,6 +1928,7 @@ class ColumnExpression:
             left_expr = self.left  # pragma: no cover
 
         # Get the right operand
+        right_expr: Any
         if isinstance(self.right, ColumnExpression):
             # Nested expression as right operand
             right_expr = self.right.to_ibis_expr(table)  # pragma: no cover
@@ -1794,77 +1939,77 @@ class ColumnExpression:
             # Literal value as right operand
             right_expr = self.right  # pragma: no cover
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         elif self.operation == "and":
-            return left_expr & right_expr
+            return left_expr & right_expr  # type: ignore[operator]
         elif self.operation == "or":
-            return left_expr | right_expr
+            return left_expr | right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="gt", left=self, right=other)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="lt", left=self, right=other)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="eq", left=self, right=other)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="ne", left=self, right=other)
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="ge", left=self, right=other)
 
-    def __le__(self, other):
+    def __le__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="le", left=self, right=other)
 
-    def __add__(self, other):
+    def __add__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="add", left=self, right=other)
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="sub", left=self, right=other)
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="mul", left=self, right=other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="div", left=self, right=other)
 
-    def is_null(self):
+    def is_null(self) -> ColumnExpression:
         """Check if values are null."""
         return ColumnExpression(operation="is_null", left=self, right=None)
 
-    def is_not_null(self):
+    def is_not_null(self) -> ColumnExpression:
         """Check if values are not null."""
         return ColumnExpression(operation="is_not_null", left=self, right=None)
 
-    def __or__(self, other):
+    def __or__(self, other) -> ColumnExpression:
         """Logical OR operation."""
         return ColumnExpression(operation="or", left=self, right=other)
 
-    def __and__(self, other):
+    def __and__(self, other) -> ColumnExpression:
         """Logical AND operation."""
         return ColumnExpression(operation="and", left=self, right=other)
 
@@ -1892,7 +2037,7 @@ def expr_col(column_name: str) -> ColumnExpression:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     Let's say we have a table with three columns: `a`, `b`, and `c`. We want to validate that:
 

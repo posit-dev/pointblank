@@ -1,12 +1,81 @@
+> [!TIP]
+> **📖 [Pointblank: The Complete Guide](https://rich-iannone.github.io/pointblank-the-complete-guide/)**: A comprehensive (and free!) book on data validation with Pointblank is now being written. Follow along and learn everything from first steps to advanced validation patterns and AI-assisted workflows.
+
+<details>
+<summary>📊 Book chapter progress</summary>
+<br>
+
+<!-- BOOK_PROGRESS_BEGIN -->
+Overall: **31%** complete &mdash; 14 of 37 chapters have content
+
+**Foundations**<br>
+Intro: `███████████████` 100%<br>
+Getting Started: `█████████████░░` 88%<br>
+Inspecting Data: `███████████████` 100%<br>
+Validation Workflow: `███████████████` 100%<br>
+Analysis Loop: `██████████░░░░░` 65%<br>
+
+**Building Validation Plans**<br>
+Column Validations: `███████████████` 100%<br>
+Aggregate Validations: `███████████░░░░` 71%<br>
+Row Validations: `███████████░░░░` 72%<br>
+Table Validations: `███████████████` 100%<br>
+Missing Data: `███████████████` 100%<br>
+Segmented Validation: `███████████░░░░` 75%<br>
+Advanced Validation: `████████████░░░` 78%<br>
+
+**Responding to Results**<br>
+Thresholds & Actions: `███████████████` 100%<br>
+Reports & Extracts: `█░░░░░░░░░░░░░░` 9%<br>
+Quality Scoring: `░░░░░░░░░░░░░░░` 0%<br>
+Notifications & Observability: `░░░░░░░░░░░░░░░` 0%<br>
+
+**AI-Assisted Validation**<br>
+Semantic Validation: `░░░░░░░░░░░░░░░` 1%<br>
+AI Authoring: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Data Sources, Interfaces & Automation**<br>
+Data Sources: `░░░░░░░░░░░░░░░` 1%<br>
+YAML Workflows: `░░░░░░░░░░░░░░░` 1%<br>
+Command Line: `░░░░░░░░░░░░░░░` 1%<br>
+MCP Server: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Data Contracts & Pipelines**<br>
+Data Contracts: `░░░░░░░░░░░░░░░` 1%<br>
+Pipelines: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Test Data Generation**<br>
+Test Data Generation: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Clinical & Regulated Data**<br>
+Clinical & CDISC: `░░░░░░░░░░░░░░░` 0%<br>
+CDISC Conformance: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Industry Playbooks**<br>
+Financial: `░░░░░░░░░░░░░░░` 0%<br>
+Ecommerce: `░░░░░░░░░░░░░░░` 0%<br>
+Data Engineering: `░░░░░░░░░░░░░░░` 0%<br>
+Healthcare: `░░░░░░░░░░░░░░░` 0%<br>
+Real-World Evidence: `░░░░░░░░░░░░░░░` 0%<br>
+ML Monitoring: `░░░░░░░░░░░░░░░` 0%<br>
+IoT Sensors: `░░░░░░░░░░░░░░░` 0%<br>
+Insurance: `░░░░░░░░░░░░░░░` 0%<br>
+Public Sector: `░░░░░░░░░░░░░░░` 0%<br>
+Marketing: `░░░░░░░░░░░░░░░` 0%<br>
+
+<!-- BOOK_PROGRESS_END -->
+
+</details>
+
 <div align="center">
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="85%"/></a>
 
-_Data validation made beautiful and powerful_
+_Data validation toolkit for assessing and monitoring data quality._
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/pointblank)](https://pypistats.org/packages/pointblank)
+[![PyPI Downloads](https://static.pepy.tech/badge/pointblank)](https://pepy.tech/projects/pointblank)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/pointblank.svg)](https://anaconda.org/conda-forge/pointblank)
 [![License](https://img.shields.io/github/license/posit-dev/pointblank)](https://img.shields.io/github/license/posit-dev/pointblank)
 
@@ -36,13 +105,63 @@ _Data validation made beautiful and powerful_
    <a href="translations/README.ar.md">العربية</a>
 </div>
 
-## What is Pointblank?
+<br>
 
-Pointblank is a powerful, yet elegant data validation framework for Python that transforms how you ensure data quality. With its intuitive, chainable API, you can quickly validate your data against comprehensive quality checks and visualize results through stunning, interactive reports that make data issues immediately actionable.
+Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank is great at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
 
-Whether you're a data scientist, data engineer, or analyst, Pointblank helps you catch data quality issues before they impact your analyses or downstream systems.
+**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
 
-## Getting Started in 30 Seconds
+Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you to turn data quality from an afterthought into a competitive advantage.
+
+## Getting Started with AI-Powered Validation Drafting
+
+The `DraftValidation` class uses LLMs to analyze your data and generate a complete validation plan with intelligent suggestions. This helps you quickly get started with data validation or jumpstart a new project.
+
+```python
+import pointblank as pb
+
+# Load your data
+data = pb.load_dataset("game_revenue")              # A sample dataset
+
+# Use DraftValidation to generate a validation plan
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+The output is a complete validation plan with intelligent suggestions based on your data:
+
+```python
+import pointblank as pb
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Copy, paste, and customize the generated validation plan for your needs.
+
+## Chainable Validation API
+
+Pointblank's chainable API makes validation simple and readable. The same pattern always applies: (1) start with `Validate`, (2) add validation steps, and (3) finish with `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -68,6 +187,12 @@ validation
 
 <br>
 
+Once you have an interrogated `validation` object, you can leverage a variety of methods to extract insights like:
+
+- getting detailed reports for single steps to see what went wrong
+- filtering tables based on validation results
+- extracting problematic data for debugging
+
 ## Why Choose Pointblank?
 
 - **Works with your existing stack**: Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
@@ -76,7 +201,9 @@ validation
 - **Threshold-based alerts**: Set 'warning', 'error', and 'critical' thresholds with custom actions
 - **Practical outputs**: Use validation results to filter tables, extract problematic data, or trigger downstream processes
 
-## Real-World Example
+## Production-Ready Validation Pipeline
+
+Here's how Pointblank handles complex, real-world scenarios with advanced features like threshold management, automated alerts, and comprehensive business rule validation:
 
 ```python
 import pointblank as pb
@@ -149,6 +276,48 @@ validation.get_step_report(i=3).show("browser")  # Get failing records from step
 
 <br>
 
+## YAML Configuration
+
+For teams that need portable, version-controlled validation workflows, Pointblank supports YAML configuration files. This makes it easy to share validation logic across different environments and team members, ensuring everyone is on the same page.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Getting started validation"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Execute the YAML validation**
+
+```python
+import pointblank as pb
+
+# Run validation from YAML configuration
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Get the results just like any other validation
+validation.get_tabular_report().show()
+```
+
+This approach is suitable for:
+
+- **CI/CD pipelines**: Store validation rules alongside your code
+- **Team collaboration**: Share validation logic in a readable format
+- **Environment consistency**: Use the same validation across dev, staging, and production
+- **Documentation**: YAML files serve as living documentation of your data quality requirements
+
 ## Command Line Interface (CLI)
 
 Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.
@@ -176,6 +345,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Run Essential Validations**
 
 ```bash
+# Run validation from YAML configuration file
+pb run validation.yaml
+
+# Run validation from Python file
+pb run validation.py
+
 # Check for duplicate rows
 pb validate small_table --check rows-distinct
 
@@ -192,9 +367,94 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integrate with CI/CD**
 
 ```bash
-# Use exit codes for automation (0 = pass, 1 = fail)
+# Use exit codes for automation in one-liner validations (0 = pass, 1 = fail)
 pb validate small_table --check rows-distinct --exit-code
+
+# Run validation workflows with exit codes
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
+
+Click the following headings to see some video demonstrations of the CLI:
+
+<details>
+<summary>Getting Started with the Pointblank CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-getting-started.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Doing Some Data Exploration</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-data-exploration.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Validating Data with the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-essential-validations.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Using Polars in the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-using-polars.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Integrating Pointblank with CI/CD</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-cicd-workflows.gif" width="100%">
+</div>
+
+</details>
+
+## Generate Realistic Test Data
+
+Need test data for your validation workflows? The `generate_dataset()` function creates realistic, locale-aware synthetic data based on schema definitions. It's very useful for developing pipelines without production data, running CI/CD tests with reproducible scenarios, or prototyping workflows before production data is available.
+
+```python
+import pointblank as pb
+
+# Define a schema with field constraints
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate 10 rows of realistic test data
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+The generator supports sophisticated data generation with these capabilities:
+
+- **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **User agent strings**: Generate highly varied, realistic browser user agent strings from 17 browser categories with over 42,000 unique combinations
+- **100 country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
+- **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
+- **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
+
+This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data.
 
 ## Features That Set Pointblank Apart
 
@@ -202,8 +462,9 @@ pb validate small_table --check rows-distinct --exit-code
 - **Built for collaboration**: Share results with colleagues through beautiful interactive reports
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
+- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
 - **Customizable**: Tailor validation steps and reporting to your specific needs
-- **Internationalization**: Reports can be generated in over 20 languages, including English, Spanish, French, and German
+- **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 
 ## Documentation and Examples
 

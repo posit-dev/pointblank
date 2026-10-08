@@ -1,0 +1,50 @@
+{
+  "words": [
+    "le", "la", "les", "de", "et", "est", "un", "une", "en", "que",
+    "qui", "dans", "ce", "il", "pas", "plus", "par", "je", "sur", "se",
+    "au", "avec", "ne", "son", "tout", "mais", "nous", "comme", "ou", "si",
+    "leur", "bien", "aussi", "où", "être", "fait", "encore", "deux", "même", "très",
+    "cette", "entre", "autre", "après", "sous", "sans", "donc", "puis", "avant", "depuis",
+    "aujourd'hui", "demain", "hier", "toujours", "jamais", "souvent", "parfois", "peut-être",
+    "maison", "ville", "pays", "homme", "temps", "année", "jour", "monde", "vie", "travail",
+    "argent", "enfant", "femme", "main", "tête", "œil", "mot", "image", "question",
+    "bon", "nouveau", "grand", "petit", "vieux", "jeune", "long", "court", "haut", "bas",
+    "rapide", "lent", "fort", "faible", "riche", "pauvre", "beau", "laid", "clair", "sombre",
+    "aller", "venir", "voir", "faire", "savoir", "dire", "donner", "prendre", "trouver", "penser",
+    "rester", "laisser", "demeurer", "appeler", "porter", "parler", "tenir", "mener", "mettre", "montrer"
+  ],
+  "sentence_patterns": [
+    "Le {adjective} {noun} {verb} le {adjective} {noun}.",
+    "Un {noun} {verb} {adverb} dans le {noun}.",
+    "{proper_noun} {verb} le {adjective} {noun} {adverb}."
+  ],
+  "adjectives": [
+    "rapide", "brun", "paresseux", "lent", "grand", "petit", "vieux", "nouveau", "jeune",
+    "clair", "sombre", "fort", "doux", "chaud", "froid", "tiède", "frais", "mou", "dur",
+    "lisse", "rugueux", "propre", "sale", "heureux", "triste", "fâché", "calme", "courageux",
+    "timide", "intelligent", "stupide", "gentil", "méchant", "riche", "pauvre", "fort", "faible",
+    "grand", "petit", "large", "étroit", "profond", "peu", "épais", "mince", "lourd",
+    "léger", "plein", "vide", "ouvert", "fermé", "mouillé", "sec", "frais", "vieux"
+  ],
+  "nouns": [
+    "chien", "chat", "oiseau", "poisson", "arbre", "maison", "voiture", "livre", "table", "chaise",
+    "porte", "fenêtre", "route", "rivière", "montagne", "océan", "ciel", "soleil", "lune",
+    "étoile", "nuage", "pluie", "neige", "vent", "feu", "eau", "terre", "air",
+    "pierre", "bois", "métal", "verre", "papier", "tissu", "nourriture", "boisson", "argent",
+    "temps", "lieu", "personne", "enfant", "homme", "femme", "garçon", "fille", "ami",
+    "famille", "école", "travail", "ville", "pays", "monde", "vie", "jour", "nuit",
+    "matin", "soir", "semaine", "mois", "année", "histoire", "chanson", "jeu", "sport"
+  ],
+  "verbs": [
+    "court", "saute", "marche", "parle", "voit", "entend", "sent", "pense", "sait",
+    "veut", "a besoin", "aime", "adore", "déteste", "trouve", "donne", "prend", "fait",
+    "dit", "raconte", "demande", "répond", "aide", "travaille", "joue", "lit", "écrit",
+    "dessine", "chante", "danse", "cuisine", "mange", "boit", "dort", "se réveille", "ouvre",
+    "ferme", "commence", "finit", "arrête", "termine", "bouge", "reste", "vient", "va"
+  ],
+  "adverbs": [
+    "rapidement", "lentement", "soigneusement", "joyeusement", "tristement", "fort", "doucement",
+    "facilement", "difficilement", "toujours", "jamais", "souvent", "parfois", "habituellement",
+    "vraiment", "très", "assez", "presque", "déjà", "encore", "juste", "seulement"
+  ]
+}

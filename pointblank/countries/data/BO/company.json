@@ -1,0 +1,689 @@
+{
+  "suffixes": [
+    "S.A.",
+    "S.R.L.",
+    "Ltda.",
+    "y Cía.",
+    "S.A.M.",
+    "e Hijos",
+    "y Asociados"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} de Bolivia {suffix}",
+    "Grupo {last_name}"
+  ],
+  "adjectives": [
+    "Boliviana",
+    "Nacional",
+    "Andina",
+    "Imperial",
+    "Colonial",
+    "Golden",
+    "Royal",
+    "United",
+    "Global",
+    "Continental",
+    "Altiplánica",
+    "Solar",
+    "Sur",
+    "Norte",
+    "Gran",
+    "Nueva",
+    "Alta",
+    "Real",
+    "Oriental",
+    "Amazónica"
+  ],
+  "nouns": [
+    "Trading",
+    "Industrias",
+    "Minera",
+    "Constructora",
+    "Alimentos",
+    "Servicios",
+    "Inversiones",
+    "Comercial",
+    "Agroindustrial",
+    "Textil",
+    "Transportes",
+    "Inmobiliaria",
+    "Financiera",
+    "Petrolera",
+    "Energía",
+    "Tecnología",
+    "Consulting",
+    "Logística",
+    "Distribuidora",
+    "Exportadora"
+  ],
+  "well_known_companies": [
+    {
+      "name": "YPFB (Yacimientos Petrolíferos Fiscales Bolivianos)",
+      "cities": ["La Paz", "Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Comibol",
+      "cities": ["La Paz", "Oruro"]
+    },
+    {
+      "name": "BancoSol",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco Mercantil Santa Cruz",
+      "cities": ["La Paz", "Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Viva (NuevaTel)",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Tigo Bolivia",
+      "cities": ["La Paz", "Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Embol (Coca-Cola Bolivia)",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "PIL Andina",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "Banco Nacional de Bolivia",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco de Crédito de Bolivia",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco BISA",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco Ganadero",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Banco Económico",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "ENTEL Bolivia",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Boliviana de Aviación (BoA)",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "Cervecería Boliviana Nacional (CBN)",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Minera San Cristóbal",
+      "cities": ["Potosí"]
+    },
+    {
+      "name": "Empresa Minera Huanuni",
+      "cities": ["Oruro"]
+    },
+    {
+      "name": "Coboce",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "Soboce",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Fancesa",
+      "cities": ["Sucre"]
+    },
+    {
+      "name": "ENDE (Empresa Nacional de Electricidad)",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "Empresa Siderúrgica del Mutún",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Gravetal Bolivia",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "Ingenio Azucarero Guabirá",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "AMETEX",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "COFADENA",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco FIE",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Banco Prodem",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "SAGUAPAC",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "CRE (Cooperativa Rural de Electrificación)",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "ELFEC",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "Empresa de Luz y Fuerza Eléctrica de Oruro",
+      "cities": ["Oruro"]
+    },
+    {
+      "name": "TDE (Transportadora de Electricidad)",
+      "cities": ["Cochabamba"]
+    },
+    {
+      "name": "ATC (Administradora de Tarjetas de Crédito)",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "Caja Los Andes",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "BAGO Bolivia",
+      "cities": ["La Paz"]
+    },
+    {
+      "name": "INTI RAYMI",
+      "cities": ["Oruro"]
+    },
+    {
+      "name": "Yacimientos de Litio Bolivianos",
+      "cities": ["Potosí"]
+    },
+    {
+      "name": "Empresa Boliviana de Almendras (EBA)",
+      "cities": ["Cobija"]
+    },
+    {
+      "name": "Industrias Venado",
+      "cities": ["Santa Cruz de la Sierra"]
+    },
+    {
+      "name": "UNAGRO",
+      "cities": ["Santa Cruz de la Sierra"]
+    }
+  ],
+  "jobs": [
+    "Ingeniero Civil",
+    "Contador",
+    "Abogado",
+    "Médico",
+    "Ingeniero de Sistemas",
+    "Administrador",
+    "Economista",
+    "Arquitecto",
+    "Profesor",
+    "Enfermera",
+    "Ejecutivo de Marketing",
+    "Gerente de Ventas",
+    "Gerente de Recursos Humanos",
+    "Analista Financiero",
+    "Ingeniero de Minas",
+    "Ingeniero Agrónomo",
+    "Gerente de Proyectos",
+    "Desarrollador de Software",
+    "Analista de Datos",
+    "Gerente de Operaciones",
+    "Auditor",
+    "Consultor Empresarial",
+    "Ingeniero Químico",
+    "Ingeniero Ambiental",
+    "Geólogo",
+    "Periodista",
+    "Diseñador Gráfico",
+    "Farmacéutico",
+    "Veterinario",
+    "Odontólogo",
+    "Psicólogo",
+    "Trabajador Social",
+    "Técnico en Electricidad",
+    "Mecánico Industrial",
+    "Piloto Comercial",
+    "Chef",
+    "Guía de Turismo",
+    "Topógrafo",
+    "Biólogo",
+    "Nutricionista",
+    "Ingeniero Petrolero",
+    "Técnico en Telecomunicaciones"
+  ],
+  "catch_phrase_adjectives": [
+    "innovador",
+    "confiable",
+    "líder",
+    "calidad",
+    "premium",
+    "sostenible",
+    "dinámico",
+    "progresivo",
+    "eficiente",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones",
+    "servicios",
+    "productos",
+    "excelencia",
+    "calidad",
+    "valor",
+    "crecimiento",
+    "alianza",
+    "innovación",
+    "rendimiento"
+  ],
+  "catch_phrase_verbs": [
+    "ofrece",
+    "crea",
+    "construye",
+    "impulsa",
+    "permite",
+    "asegura",
+    "provee",
+    "logra",
+    "transforma",
+    "conecta"
+  ],
+  "catch_phrase_connector": [
+    "y",
+    "con",
+    "para",
+    "en"
+  ],
+  "industries": [
+    {
+      "name": "mining",
+      "weight": 0.15,
+      "jobs": [
+        "Ingeniero de Minas",
+        "Geólogo",
+        "Oficial de Seguridad",
+        "Operador de Planta",
+        "Especialista Ambiental"
+      ],
+      "well_known": [
+        "Comibol",
+        "Minera San Cristóbal",
+        "Empresa Minera Huanuni",
+        "INTI RAYMI"
+      ],
+      "company_suffixes": [
+        "Minera",
+        "Mining",
+        "Resources"
+      ],
+      "company_nouns": [
+        "Minera",
+        "Mining",
+        "Mineral",
+        "Resources"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L.",
+        "Compañía {noun} de Bolivia"
+      ]
+    },
+    {
+      "name": "oil_gas",
+      "weight": 0.14,
+      "jobs": [
+        "Ingeniero Petrolero",
+        "Geólogo de Petróleo",
+        "Operador de Perforación",
+        "Ingeniero de Procesos",
+        "Técnico de Campo"
+      ],
+      "well_known": [
+        "YPFB",
+        "Chaco S.A.",
+        "Andina S.A.",
+        "Repsol Bolivia"
+      ],
+      "company_suffixes": [
+        "Petrolera",
+        "Energy",
+        "Gas"
+      ],
+      "company_nouns": [
+        "Petrolera",
+        "Energía",
+        "Hidrocarburos",
+        "Gas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.",
+        "Empresa {noun} de Bolivia"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.1,
+      "jobs": [
+        "Ingeniero Agrónomo",
+        "Gerente de Finca",
+        "Coordinador de Exportación",
+        "Inspector de Calidad"
+      ],
+      "well_known": [
+        "Gravetal Bolivia",
+        "Ingenio Azucarero Guabirá",
+        "UNAGRO",
+        "PIL Andina"
+      ],
+      "company_suffixes": [
+        "Agroindustrial",
+        "Agro",
+        "Foods",
+        "Export"
+      ],
+      "company_nouns": [
+        "Agro",
+        "Agroindustrial",
+        "Alimentos",
+        "Export"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.08,
+      "jobs": [
+        "Ingeniero Industrial",
+        "Gerente de Producción",
+        "Inspector de Calidad",
+        "Técnico de Manufactura"
+      ],
+      "well_known": [
+        "AMETEX",
+        "COFADENA",
+        "Industrias Venado",
+        "Embol"
+      ],
+      "company_suffixes": [
+        "Industrial",
+        "Manufacturing",
+        "Industrias"
+      ],
+      "company_nouns": [
+        "Industrial",
+        "Manufactura",
+        "Producción",
+        "Industrias"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Oficial de Banco",
+        "Analista de Crédito",
+        "Asesor Financiero",
+        "Auditor",
+        "Gerente de Riesgos"
+      ],
+      "well_known": [
+        "BancoSol",
+        "Banco Mercantil Santa Cruz",
+        "Banco Nacional de Bolivia",
+        "Banco BISA",
+        "Banco FIE"
+      ],
+      "company_suffixes": [
+        "Financiera",
+        "Bank",
+        "Capital",
+        "Inversiones"
+      ],
+      "company_nouns": [
+        "Financiera",
+        "Capital",
+        "Banco",
+        "Inversiones"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.08,
+      "jobs": [
+        "Ingeniero Civil",
+        "Arquitecto",
+        "Gerente de Proyectos",
+        "Topógrafo",
+        "Ingeniero de Obra"
+      ],
+      "well_known": [
+        "Soboce",
+        "Coboce",
+        "Fancesa"
+      ],
+      "company_suffixes": [
+        "Constructora",
+        "Inmobiliaria",
+        "Ingeniería"
+      ],
+      "company_nouns": [
+        "Constructora",
+        "Inmobiliaria",
+        "Ingeniería",
+        "Cementos"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.07,
+      "jobs": [
+        "Ingeniero de Redes",
+        "Representante de Servicio al Cliente",
+        "Gerente de Ventas",
+        "Soporte Técnico"
+      ],
+      "well_known": [
+        "ENTEL Bolivia",
+        "Tigo Bolivia",
+        "Viva (NuevaTel)"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Comunicaciones",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Red",
+        "Comunicaciones",
+        "Connect"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.07,
+      "jobs": [
+        "Guía de Turismo",
+        "Gerente de Hotel",
+        "Chef",
+        "Consultor de Viajes",
+        "Recepcionista"
+      ],
+      "well_known": [
+        "Boliviana de Aviación",
+        "Fremen Tours",
+        "Crillon Tours"
+      ],
+      "company_suffixes": [
+        "Tours",
+        "Travel",
+        "Hotels",
+        "Turismo"
+      ],
+      "company_nouns": [
+        "Tours",
+        "Travel",
+        "Hotel",
+        "Turismo"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Médico",
+        "Enfermera",
+        "Farmacéutico",
+        "Administrador Hospitalario",
+        "Técnico de Laboratorio"
+      ],
+      "well_known": [
+        "BAGO Bolivia",
+        "Clínica Foianini",
+        "Hospital Obrero"
+      ],
+      "company_suffixes": [
+        "Salud",
+        "Healthcare",
+        "Medical",
+        "Clínica"
+      ],
+      "company_nouns": [
+        "Salud",
+        "Medical",
+        "Health",
+        "Clínica"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Profesor",
+        "Director Académico",
+        "Investigador",
+        "Coordinador Educativo",
+        "Psicólogo Educativo"
+      ],
+      "well_known": [
+        "Universidad Mayor de San Andrés",
+        "Universidad Mayor de San Simón",
+        "Universidad Católica Boliviana"
+      ],
+      "company_suffixes": [
+        "Educativa",
+        "Academy",
+        "Instituto"
+      ],
+      "company_nouns": [
+        "Educación",
+        "Academia",
+        "Instituto",
+        "Centro"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.05,
+      "jobs": [
+        "Desarrollador de Software",
+        "Analista de Datos",
+        "Ingeniero de Sistemas",
+        "Diseñador UX",
+        "Administrador de Base de Datos"
+      ],
+      "well_known": [
+        "Jala Group",
+        "Mojix Bolivia",
+        "Softvision Bolivia"
+      ],
+      "company_suffixes": [
+        "Tech",
+        "Software",
+        "Solutions",
+        "Digital"
+      ],
+      "company_nouns": [
+        "Tecnología",
+        "Software",
+        "Digital",
+        "Sistemas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.R.L."
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.05,
+      "jobs": [
+        "Ingeniero Eléctrico",
+        "Operador de Planta Eléctrica",
+        "Ingeniero de Proyectos",
+        "Gerente HSE"
+      ],
+      "well_known": [
+        "ENDE",
+        "CRE",
+        "ELFEC",
+        "TDE"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Energía",
+        "Power"
+      ],
+      "company_nouns": [
+        "Energía",
+        "Power",
+        "Eléctrica",
+        "Solar"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    }
+  ]
+}

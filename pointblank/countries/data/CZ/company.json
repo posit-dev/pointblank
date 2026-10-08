@@ -1,0 +1,514 @@
+{
+  "suffixes": [
+    "a.s.",
+    "s.r.o.",
+    "k.s.",
+    "v.o.s.",
+    "Group",
+    "Holdings",
+    "Czech",
+    "CZ",
+    "International",
+    "Industries",
+    "Solutions",
+    "Services",
+    "Technologies",
+    "Systems"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Czech",
+    "Ceska",
+    "Central",
+    "Euro",
+    "Global",
+    "United",
+    "National",
+    "Premier",
+    "Dynamic",
+    "Modern",
+    "Digital",
+    "Smart",
+    "First",
+    "Prime",
+    "Nordic",
+    "Bohemian",
+    "Moravian",
+    "European",
+    "Advanced",
+    "New"
+  ],
+  "nouns": [
+    "Bank",
+    "Telecom",
+    "Energy",
+    "Power",
+    "Gas",
+    "Pharma",
+    "Chemicals",
+    "Electronics",
+    "Engineering",
+    "Manufacturing",
+    "Automotive",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Insurance",
+    "Finance",
+    "Construction",
+    "Foods",
+    "Retail",
+    "Steel"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Skoda Auto",
+      "cities": [
+        "Praha 1",
+        "Mlada Boleslav"
+      ]
+    },
+    {
+      "name": "CEZ Group",
+      "cities": [
+        "Praha 4",
+        "Ostrava"
+      ]
+    },
+    {
+      "name": "Agrofert",
+      "cities": [
+        "Praha 3",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Ceska sporitelna",
+      "cities": [
+        "Praha 4",
+        "Brno",
+        "Ostrava"
+      ]
+    },
+    {
+      "name": "CSOB",
+      "cities": [
+        "Praha 5",
+        "Brno",
+        "Plzen"
+      ]
+    },
+    {
+      "name": "Komercni banka",
+      "cities": [
+        "Praha 1",
+        "Brno",
+        "Ostrava"
+      ]
+    },
+    {
+      "name": "O2 Czech Republic",
+      "cities": [
+        "Praha 4",
+        "Brno"
+      ]
+    },
+    {
+      "name": "T-Mobile Czech Republic",
+      "cities": [
+        "Praha 4",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Vodafone Czech Republic",
+      "cities": [
+        "Praha 10",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Avast Software",
+      "cities": [
+        "Praha 4",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Kofola",
+      "cities": [
+        "Ostrava",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Zentiva",
+      "cities": [
+        "Praha 10",
+        "Brno"
+      ]
+    },
+    {
+      "name": "PPF Group",
+      "cities": [
+        "Praha 4",
+        "Amsterdam"
+      ]
+    },
+    {
+      "name": "Energeticky a prumyslovy holding",
+      "cities": [
+        "Praha 1",
+        "Ostrava"
+      ]
+    },
+    {
+      "name": "Metrostav",
+      "cities": [
+        "Praha 8",
+        "Brno"
+      ]
+    },
+    {
+      "name": "Prazska energetika",
+      "cities": [
+        "Praha 10"
+      ]
+    },
+    {
+      "name": "Ceske drahy",
+      "cities": [
+        "Praha 1",
+        "Brno",
+        "Ostrava"
+      ]
+    },
+    {
+      "name": "Linet",
+      "cities": [
+        "Zelevcice",
+        "Praha 4"
+      ]
+    },
+    {
+      "name": "Pilsner Urquell",
+      "cities": [
+        "Plzen"
+      ]
+    },
+    {
+      "name": "Budejovicky Budvar",
+      "cities": [
+        "Ceske Budejovice"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Customer Service Representative",
+    "Logistics Coordinator",
+    "Procurement Specialist",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Chemical Engineer",
+    "Production Manager",
+    "Quality Manager"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "Excellent",
+    "Advanced",
+    "Strategic",
+    "Premium"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "innovations",
+    "values",
+    "partnerships",
+    "strategies",
+    "results",
+    "frameworks",
+    "principles",
+    "success",
+    "commitments"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead",
+    "develop",
+    "optimize",
+    "enhance"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.15,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "CEZ Group",
+        "Agrofert",
+        "Ceska sporitelna",
+        "CSOB",
+        "O2 Czech Republic",
+        "T-Mobile Czech Republic",
+        "Vodafone Czech Republic",
+        "Kofola",
+        "Zentiva",
+        "PPF Group",
+        "Energeticky a prumyslovy holding",
+        "Metrostav",
+        "Prazska energetika",
+        "Ceske drahy",
+        "Linet",
+        "Pilsner Urquell",
+        "Budejovicky Budvar"
+      ],
+      "company_suffixes": [
+        "a.s.",
+        "s.r.o.",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.15,
+      "jobs": [
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Chemical Engineer",
+        "Production Manager",
+        "Quality Manager"
+      ],
+      "well_known": [
+        "Skoda Auto"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.15,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Komercni banka"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Logistics Coordinator",
+        "Procurement Specialist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.26,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "QA Engineer",
+        "Data Scientist"
+      ],
+      "well_known": [
+        "Avast Software"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
+}

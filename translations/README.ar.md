@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_التحقق من البيانات بشكل جميل وقوي_
+_مجموعة أدوات التحقق من صحة البيانات لتقييم ومراقبة جودة البيانات_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _التحقق من البيانات بشكل جميل وقوي_
    <a href="README.hi.md">हिन्दी</a>
 </div>
 
-## ما هو Pointblank؟
+Pointblank يتبع نهجًا مختلفًا لجودة البيانات. لا يجب أن تكون مهمة تقنية مملة. بل بالعكس، يمكن أن تصبح عملية تركز على التواصل الواضح بين أعضاء الفريق. بينما تركز مكتبات التحقق الأخرى على اكتشاف الأخطاء فقط، يتفوق Pointblank في **العثور على المشاكل ومشاركة الرؤى**. تقاريرنا الجميلة والقابلة للتخصيص تحول نتائج التحقق إلى محادثات مع أصحاب المصلحة، مما يجعل مشاكل جودة البيانات مفهومة وقابلة للتنفيذ على الفور لجميع فريقك.
 
-Pointblank هو إطار عمل قوي وأنيق للتحقق من صحة البيانات في Python يغير طريقة ضمان جودة البيانات. من خلال واجهة برمجة التطبيقات البديهية والقابلة للسلسلة، يمكنك بسرعة التحقق من صحة بياناتك مقابل فحوصات جودة شاملة وعرض النتائج من خلال تقارير مذهلة وتفاعلية تجعل مشكلات البيانات قابلة للتنفيذ فورًا.
+**ابدأ في دقائق، وليس ساعات.** تحلل خاصية [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) المدعومة بالذكاء الاصطناعي في Pointblank بياناتك وتقترح قواعد تحقق ذكية تلقائيًا. لذا لا حاجة للتحديق في سيناريو تحقق فارغ والتساؤل عن مكان البدء. يمكن لـ Pointblank بدء رحلة جودة بياناتك حتى يمكنك التركيز على ما يهم أكثر.
 
-سواء كنت عالم بيانات أو مهندس بيانات أو محلل، يساعدك Pointblank في اكتشاف مشكلات جودة البيانات قبل أن تؤثر على تحليلاتك أو أنظمتك اللاحقة.
+سواء كنت عالم بيانات يحتاج إلى إيصال نتائج جودة البيانات بسرعة، أو مهندس بيانات يبني خطوط أنابيب قوية، أو محلل يقدم نتائج جودة البيانات لأصحاب المصلحة التجاريين، يساعدك Pointblank في تحويل جودة البيانات من فكرة لاحقة إلى ميزة تنافسية.
 
-## البدء في 30 ثانية
+## البدء بصياغة تحقق مدعومة بالذكاء الاصطناعي
+
+تستخدم فئة `DraftValidation` نماذج اللغة الكبيرة لتحليل بياناتك وإنشاء خطة تحقق كاملة مع اقتراحات ذكية. هذا يساعدك على البدء بسرعة في تحقق البيانات أو إطلاق مشروع جديد.
+
+```python
+import pointblank as pb
+
+# قم بتحميل بياناتك
+data = pb.load_dataset("game_revenue")              # مجموعة بيانات عينة
+
+# استخدم DraftValidation لإنشاء خطة تحقق
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+الناتج هو خطة تحقق كاملة مع اقتراحات ذكية مبنية على بياناتك:
+
+```python
+import pointblank as pb
+
+# خطة التحقق
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+انسخ والصق وخصص خطة التحقق المنشأة حسب احتياجاتك.
+
+## واجهة برمجة تطبيقات التحقق القابلة للسلسلة
+
+تجعل واجهة برمجة التطبيقات القابلة للسلسلة في Pointblank التحقق بسيطًا وقابلاً للقراءة. ينطبق نفس النمط دائمًا: (1) ابدأ بـ `Validate`، (2) أضف خطوات التحقق، و(3) انته بـ `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+بمجرد حصولك على كائن `validation` مستجوب، يمكنك استغلال مجموعة متنوعة من الطرق لاستخراج الرؤى مثل:
+
+- الحصول على تقارير مفصلة لخطوات فردية لمعرفة ما الذي حدث خطأ
+- تصفية الجداول بناءً على نتائج التحقق
+- استخراج بيانات مشكلة للتنقيح
 
 ## لماذا تختار Pointblank؟
 
@@ -148,14 +202,93 @@ validation.get_step_report(i=3).show("browser")  # الحصول على السج�
 
 <br>
 
+## إنشاء بيانات اختبار واقعية
+
+هل تحتاج إلى بيانات اختبار لسير عمل التحقق الخاص بك؟ تنشئ وظيفة `generate_dataset()` بيانات اصطناعية واقعية ومدركة للغة المحلية بناءً على تعريفات المخطط. مفيدة جدًا لتطوير خطوط الأنابيب بدون بيانات الإنتاج، أو تشغيل اختبارات CI/CD بسيناريوهات قابلة للتكرار، أو إنشاء نماذج أولية لسير العمل قبل توفر بيانات الإنتاج.
+
+```python
+import pointblank as pb
+
+# تعريف مخطط مع قيود الحقول
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# إنشاء 10 صفوف من بيانات الاختبار الواقعية
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+يدعم المولد إنشاء بيانات متطورة بهذه القدرات:
+
+- **بيانات واقعية مع قوالب مسبقة**: استخدم قوالب مدمجة مثل `"name"`، `"email"`، `"address"`، `"phone"`، إلخ.
+- **سلاسل وكيل المستخدم**: إنشاء سلاسل وكيل مستخدم متصفح متنوعة وواقعية للغاية من 17 فئة متصفح بأكثر من 42,000 توليفة فريدة
+- **دعم 100 دولة**: إنشاء بيانات خاصة بالمنطقة (مثل `country="DE"` للعناوين الألمانية)
+- **قيود الحقول**: التحكم في النطاقات والأنماط والتفرد والقيم المسموح بها
+- **تنسيقات إخراج متعددة**: يُرجع Polars DataFrame افتراضيًا، ولكنه يدعم أيضًا Pandas (`output="pandas"`) أو القواميس (`output="dict"`)
+
 ## الميزات التي تميز Pointblank
 
 - **سير عمل تحقق كامل**: من الوصول إلى البيانات إلى التحقق إلى إعداد التقارير في خط أنابيب واحد
 - **مبني للتعاون**: مشاركة النتائج مع الزملاء من خلال تقارير تفاعلية جميلة
 - **مخرجات عملية**: احصل بالضبط على ما تحتاجه: عدد، مقتطفات، ملخصات، أو تقارير كاملة
 - **نشر مرن**: استخدم في دفاتر الملاحظات أو النصوص البرمجية أو خطوط أنابيب البيانات
+- **توليد بيانات اصطناعية**: إنشاء بيانات اختبار واقعية مع أكثر من 30 قالب مسبق، سلاسل وكيل المستخدم، تنسيق متوافق مع المنطقة، ودعم 100 دولة
 - **قابل للتخصيص**: تخصيص خطوات التحقق وإعداد التقارير وفقًا لاحتياجاتك المحددة
-- **تدويل**: يمكن إنشاء التقارير بأكثر من 20 لغة، بما في ذلك الإنجليزية والإسبانية والفرنسية والألمانية
+- **تدويل**: يمكن إنشاء التقارير بـ 40 لغة، بما في ذلك الإنجليزية والإسبانية والفرنسية والألمانية
+
+## تكوين YAML
+
+للفرق التي تحتاج إلى سير عمل تحقق محمول ومتحكم في الإصدار، يدعم Pointblank ملفات تكوين YAML. هذا يجعل من السهل مشاركة منطق التحقق عبر بيئات مختلفة وأعضاء الفريق، مما يضمن أن الجميع على نفس الصفحة.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "تحقق البدء"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**تنفيذ تحقق YAML**
+
+```python
+import pointblank as pb
+
+# تشغيل التحقق من تكوين YAML
+validation = pb.yaml_interrogate("validation.yaml")
+
+# احصل على النتائج تماماً مثل أي تحقق آخر
+validation.get_tabular_report().show()
+```
+
+هذا النهج مثالي لـ:
+
+- **خطوط أنابيب CI/CD**: تخزين قواعد التحقق جنباً إلى جنب مع الكود الخاص بك
+- **تعاون الفريق**: مشاركة منطق التحقق في تنسيق قابل للقراءة
+- **اتساق البيئة**: استخدام نفس التحقق عبر التطوير والمرحلة والإنتاج
+- **التوثيق**: ملفات YAML تعمل كتوثيق حي لمتطلبات جودة البيانات
 
 ## واجهة سطر الأوامر (CLI)
 
@@ -184,6 +317,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **تشغيل التحققات الأساسية**
 
 ```bash
+# تشغيل التحقق من ملف تكوين YAML
+pb run validation.yaml
+
+# تشغيل التحقق من ملف Python
+pb run validation.py
+
 # تحقق من الصفوف المكررة
 pb validate small_table --check rows-distinct
 
@@ -200,8 +339,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **التكامل مع CI/CD**
 
 ```bash
-# استخدم أكواد الخروج للأتمتة (0 = نجح، 1 = فشل)
+# استخدم أكواد الخروج للأتمتة في تحققات البناء الواحد (0 = نجح، 1 = فشل)
 pb validate small_table --check rows-distinct --exit-code
+
+# تشغيل سير عمل التحقق مع أكواد الخروج
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## التوثيق والأمثلة

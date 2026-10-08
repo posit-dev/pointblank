@@ -1,36 +1,61 @@
-import pytest
-import pandas as pd
-import polars as pl
-
+import os
 import sys
+import tempfile
+from decimal import Decimal
 from unittest.mock import patch
 
 import narwhals as nw
+import pandas as pd
+import polars as pl
+import pytest
 
+from pointblank._utils_llms_txt import (
+    _get_api_and_examples_text,
+    _get_api_text,
+    _get_examples_text,
+    get_api_details,
+)
 from pointblank._utils import (
-    _convert_to_narwhals,
+    _check_any_df_lib,
     _check_column_exists,
     _check_column_type,
     _check_invalid_fields,
+    _column_subset_test_prep,
     _column_test_prep,
-    _count_true_values_in_column,
+    _convert_to_narwhals,
+    _copy_dataframe,
     _count_null_values_in_column,
+    _count_true_values_in_column,
+    _count_validation_units,
+    _derive_bounds,
+    _derive_single_bound,
     _format_to_float_value,
     _format_to_integer_value,
     _get_assertion_from_fname,
     _get_column_dtype,
-    _get_api_and_examples_text,
-    _get_api_text,
-    _get_examples_text,
     _get_fn_name,
     _get_tbl_type,
-    _is_numeric_dtype,
     _is_date_or_datetime_dtype,
     _is_duration_dtype,
+    _is_in,
+    _is_lazy_frame,
+    _is_lib_present,
+    _is_narwhals_table,
+    _is_numeric_dtype,
+    _is_value_a_df,
+    _pivot_to_dict,
+    _process_ibis_through_narwhals,
     _select_df_lib,
+    _with_row_index,
+    transpose_dicts,
 )
-
 from pointblank.validate import load_dataset
+
+# Import ibis conditionally for tests that need it
+try:
+    import ibis
+except ImportError:
+    ibis = None
 
 
 @pytest.fixture
@@ -344,6 +369,31 @@ def test_count_null_values_in_column(tbl_type):
     assert _count_null_values_in_column(tbl=data, column="c") == 2
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_count_validation_units(tbl_type):
+    data = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Column `e` has 8 True and 5 False values (13 rows total, no nulls)
+    n, n_passed, n_failed, n_null = _count_validation_units(tbl=data, column="e")
+
+    assert n == 13
+    assert n_passed == 8
+    assert n_failed == 5
+    assert n_null == 0
+
+
+def test_count_validation_units_with_nulls():
+    import polars as pl
+
+    df = pl.DataFrame({"pb_is_good_": [True, False, True, None, None]})
+
+    # A LazyFrame and an eager DataFrame should yield identical counts; Null values are excluded
+    # from both the pass and fail counts and surfaced separately
+    for native in (df, df.lazy()):
+        n, n_passed, n_failed, n_null = _count_validation_units(tbl=native, column="pb_is_good_")
+        assert (n, n_passed, n_failed, n_null) == (5, 2, 1, 2)
+
+
 def test_format_to_integer_value():
     assert _format_to_integer_value(0) == "0"
     assert _format_to_integer_value(0.3) == "0"
@@ -509,3 +559,522 @@ def test_get_examples_text():
 
 def test_get_api_and_examples_text():
     assert isinstance(_get_api_and_examples_text(), str)
+
+
+def test_transpose_dicts():
+    # Test with empty list
+    assert transpose_dicts([]) == {}
+
+    # Test with single dict
+    result = transpose_dicts([{"a": 1, "b": 2}])
+    expected = {"a": [1], "b": [2]}
+    assert result == expected
+
+    # Test with multiple dicts with same keys
+    result = transpose_dicts([{"a": 1, "b": 2}, {"a": 3, "b": 4}])
+    expected = {"a": [1, 3], "b": [2, 4]}
+    assert result == expected
+
+    # Test with multiple dicts with different keys (missing values become None)
+    result = transpose_dicts([{"a": 1, "b": 2}, {"a": 3, "c": 4}])
+    expected = {"a": [1, 3], "b": [2, None], "c": [None, 4]}
+    assert result == expected
+
+
+def test_derive_single_bound():
+    # Test with valid inputs
+    assert _derive_single_bound(100, 0.1) == 10  # tol < 1, so tol * ref
+    assert _derive_single_bound(100, 1.5) == 1  # tol >= 1, so int(tol)
+    assert _derive_single_bound(100, 2) == 2  # integer tolerance
+    assert _derive_single_bound(50, 0.5) == 25  # half of reference
+
+    # Test error cases
+    with pytest.raises(TypeError):
+        _derive_single_bound(100, "invalid")
+
+    with pytest.raises(TypeError):
+        _derive_single_bound(100, [1, 2])
+
+    with pytest.raises(ValueError):
+        _derive_single_bound(100, -1)
+
+    with pytest.raises(ValueError):
+        _derive_single_bound(100, -0.5)
+
+
+def test_derive_bounds():
+    # Test with single tolerance value
+    result = _derive_bounds(100, 0.1)
+    expected = (10, 10)
+    assert result == expected
+
+    # Test with tuple tolerance
+    result = _derive_bounds(100, (0.1, 0.2))
+    expected = (10, 20)
+    assert result == expected
+
+    # Test with tuple of integers
+    result = _derive_bounds(100, (2, 3))
+    expected = (2, 3)
+    assert result == expected
+
+
+def test_is_narwhals_table():
+    # Test with actual Polars/Pandas DataFrames (not narwhals wrapped)
+    pd_df = pd.DataFrame({"x": [1, 2, 3]})
+    pl_df = pl.DataFrame({"x": [1, 2, 3]})
+    assert not _is_narwhals_table(pd_df)
+    assert not _is_narwhals_table(pl_df)
+
+    # Test with narwhals wrapped DataFrame
+    nw_df = nw.from_native(pd_df)
+    assert _is_narwhals_table(nw_df)
+
+    # Test with non-DataFrame objects
+    assert not _is_narwhals_table("string")
+    assert not _is_narwhals_table(123)
+    assert not _is_narwhals_table([1, 2, 3])
+
+
+def test_is_lazy_frame():
+    # Test with regular DataFrames
+    pd_df = pd.DataFrame({"x": [1, 2, 3]})
+    pl_df = pl.DataFrame({"x": [1, 2, 3]})
+    assert not _is_lazy_frame(pd_df)
+    assert not _is_lazy_frame(pl_df)
+
+    # Test with lazy frame
+    pl_lazy = pl.DataFrame({"x": [1, 2, 3]}).lazy()
+    assert _is_lazy_frame(pl_lazy)
+
+    # Test with narwhals lazy frame
+    nw_lazy = nw.from_native(pl_lazy)
+    assert _is_lazy_frame(nw_lazy)
+
+    # Test with non-DataFrame objects
+    assert not _is_lazy_frame("string")
+    assert not _is_lazy_frame(123)
+
+
+def test_is_lib_present():
+    # Test with libraries that should be present
+    assert _is_lib_present("sys")
+    assert _is_lib_present("os")
+    assert _is_lib_present("pandas")
+    assert _is_lib_present("polars")
+
+    # Test with library that should not be present
+    assert not _is_lib_present("nonexistent_library")
+
+
+def test_check_any_df_lib():
+    # Should not raise an error since both pandas and polars are available
+    _check_any_df_lib("test_method")
+
+    # Test error case when neither pandas nor polars is available
+    with patch.dict(sys.modules, {"pandas": None, "polars": None}):
+        with pytest.raises(ImportError):
+            _check_any_df_lib("test_method")
+
+
+def test_is_value_a_df():
+    # Test with valid DataFrames
+    pd_df = pd.DataFrame({"x": [1, 2, 3]})
+    pl_df = pl.DataFrame({"x": [1, 2, 3]})
+    assert _is_value_a_df(pd_df)
+    assert _is_value_a_df(pl_df)
+
+    # Test with non-DataFrame objects
+    assert not _is_value_a_df("string")
+    assert not _is_value_a_df(123)
+    assert not _is_value_a_df([1, 2, 3])
+    assert not _is_value_a_df({"x": [1, 2, 3]})
+
+
+@pytest.mark.parametrize(
+    "tbl_fixture",
+    ["tbl_multiple_types_pd", "tbl_multiple_types_pl"],
+)
+def test_column_subset_test_prep(request, tbl_fixture):
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Test with valid column subset
+    dfn = _column_subset_test_prep(df=tbl, columns_subset=["int", "str"])
+    assert isinstance(dfn, nw.DataFrame)
+
+    # Test with None columns_subset
+    dfn = _column_subset_test_prep(df=tbl, columns_subset=None)
+    assert isinstance(dfn, nw.DataFrame)
+
+    # Test with empty columns_subset
+    dfn = _column_subset_test_prep(df=tbl, columns_subset=[])
+    assert isinstance(dfn, nw.DataFrame)
+
+    # Test with check_exists=False (should not raise even with invalid columns)
+    dfn = _column_subset_test_prep(df=tbl, columns_subset=["invalid"], check_exists=False)
+    assert isinstance(dfn, nw.DataFrame)
+
+    # Test error case with invalid column when check_exists=True
+    with pytest.raises(ValueError):
+        _column_subset_test_prep(df=tbl, columns_subset=["invalid"], check_exists=True)
+
+
+def test_pivot_to_dict():
+    # Test basic functionality
+    input_dict = {
+        "col1": {"key1": "value1", "key2": "value2"},
+        "col2": {"key1": "value3", "key3": "value4"},
+    }
+
+    result = _pivot_to_dict(input_dict)
+    expected = {"key1": ["value1", "value3"], "key2": ["value2", None], "key3": [None, "value4"]}
+    assert result == expected
+
+    # Test with empty dict
+    assert _pivot_to_dict({}) == {}
+
+    # Test with single column
+    input_dict = {"col1": {"key1": "value1", "key2": "value2"}}
+    result = _pivot_to_dict(input_dict)
+    expected = {"key1": ["value1"], "key2": ["value2"]}
+    assert result == expected
+
+
+def test_process_ibis_through_narwhals():
+    # Test with non-Ibis table type
+    pd_df = pd.DataFrame({"x": [1, 2, 3]})
+    result_data, result_type = _process_ibis_through_narwhals(pd_df, "pandas")
+    assert result_data is pd_df
+    assert result_type == "pandas"
+
+    # Test with mock Ibis table type
+    # Since we can't easily create real Ibis tables in tests, we'll mock the behavior
+    with patch("pointblank._utils.nw.from_native") as mock_nw:
+        mock_nw.return_value = "mocked_narwhals_df"
+
+        # Test successful Narwhals wrapping
+        result_data, result_type = _process_ibis_through_narwhals("mock_ibis_table", "duckdb")
+        assert result_data == "mocked_narwhals_df"
+        assert result_type == "narwhals"
+
+        # Test fallback when Narwhals fails
+        mock_nw.side_effect = Exception("Narwhals failed")
+        result_data, result_type = _process_ibis_through_narwhals("mock_ibis_table", "duckdb")
+        assert result_data == "mock_ibis_table"
+        assert result_type == "duckdb"
+
+
+def test_get_tbl_type_additional():
+    """Test invalid input detection in _get_tbl_type()."""
+    with pytest.raises(TypeError):
+        _get_tbl_type("invalid_data")
+
+
+def test_get_tbl_type_pyspark():
+    """Test detection of PySpark DataFrames."""
+
+    class MockPySparkNamespace:
+        def __str__(self):
+            return "pyspark.sql.module"
+
+    class MockPySparkDF:
+        def __native_namespace__(self):
+            return MockPySparkNamespace()
+
+    mock_pyspark_df = MockPySparkDF()
+
+    with patch("pointblank._utils.nw.from_native", return_value=mock_pyspark_df):
+        # Create a non-Ibis object to trigger the regular DataFrame path
+        mock_data = type("MockNonIbisData", (), {})()
+        result = _get_tbl_type(mock_data)
+        assert result == "pyspark"
+
+
+def test_get_column_dtype_raw_parameter():
+    """Test the `raw=` parameter of _get_column_dtype()."""
+
+    tbl = pd.DataFrame({"int_col": [1, 2, 3]})
+    dfn = _convert_to_narwhals(tbl)
+
+    # Test raw=True as this should return the raw dtype from the schema
+    raw_dtype = _get_column_dtype(dfn=dfn, column="int_col", raw=True)
+
+    assert raw_dtype is not None  # Just check that it returns something
+
+
+def test_get_tbl_type_ibis_memtable():
+    """Test detection of Ibis memtable tables."""
+
+    # Create an actual Ibis memtable
+    df_pd = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    ibis_table = ibis.memtable(df_pd)
+
+    # Test that it's detected as a memtable
+    result = _get_tbl_type(ibis_table)
+    assert result == "memtable"
+
+
+def test_get_tbl_type_ibis_parquet():
+    """Test detection of Ibis parquet tables."""
+
+    # Create a temporary parquet file
+    df_pd = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+
+    with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
+        tmp_path = tmp.name
+        df_pd.to_parquet(tmp_path)
+
+    try:
+        # Read it with ibis
+        conn = ibis.duckdb.connect()
+        ibis_table = conn.read_parquet(tmp_path)
+
+        # Test that it's detected as parquet
+        result = _get_tbl_type(ibis_table)
+        assert result == "parquet"
+    finally:
+        # Clean up
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+
+def test_get_tbl_type_ibis_duckdb():
+    """Test detection of plain DuckDB Ibis tables."""
+
+    # Create a DuckDB table that's not a memtable or Parquet
+    conn = ibis.duckdb.connect()
+
+    # Create a table directly in DuckDB
+    ibis_table = conn.create_table(
+        "test_table", pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]}), overwrite=True
+    )
+
+    # Test that it's detected as duckdb
+    result = _get_tbl_type(ibis_table)
+
+    assert result == "duckdb"
+
+
+def test_copy_dataframe_exception_handling():
+    """Test _copy_dataframe() with DataFrames that don't support standard copy methods."""
+
+    # Test with a normal DataFrame (should use .copy())
+    df_pd = pd.DataFrame({"x": [1, 2, 3]})
+    copied = _copy_dataframe(df_pd)
+
+    assert copied is not df_pd  # Should be a different object
+    assert copied.equals(df_pd)  # But with same values
+
+    # Test with a Polars DataFrame (should use .clone())
+    df_pl = pl.DataFrame({"x": [1, 2, 3]})
+    copied_pl = _copy_dataframe(df_pl)
+
+    assert copied_pl is not df_pl
+    assert copied_pl.equals(df_pl)
+
+    # Test with a mock object that has copy() but it raises an exception
+    class MockDFWithBrokenCopy:
+        def copy(self):
+            raise RuntimeError("Copy failed!")
+
+        def clone(self):
+            raise RuntimeError("Clone failed!")
+
+        def select(self, col):
+            raise RuntimeError("Select failed!")
+
+    mock_df = MockDFWithBrokenCopy()
+
+    # Should fall back to deepcopy or return original
+    result = _copy_dataframe(mock_df)
+
+    # Since deepcopy might work or fail, we just verify no exception is raised
+    assert result is not None
+
+    # Test with an object that can't be deepcopied either
+    class UncopyableObject:
+        def copy(self):
+            raise RuntimeError("Copy failed!")
+
+        def clone(self):
+            raise RuntimeError("Clone failed!")
+
+        def select(self, col):
+            raise RuntimeError("Select failed!")
+
+        def __deepcopy__(self, memo):
+            raise RuntimeError("Deepcopy failed!")
+
+    uncopyable = UncopyableObject()
+
+    # Should return the original object without raising an exception
+    result = _copy_dataframe(uncopyable)
+
+    assert result is uncopyable  # Should return the original
+
+
+def test_resolve_columns_with_string():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns("x")
+    assert result == ["x"]
+
+
+def test_resolve_columns_with_column_object():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnLiteral
+
+    c = ColumnLiteral(exprs="x")
+    result = _resolve_columns(c)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0] is c
+
+
+def test_resolve_columns_with_list_of_strings():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns(["a", "b", "c"])
+    assert result == ["a", "b", "c"]
+
+
+def test_resolve_columns_with_column_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import Column, StartsWith
+
+    selector = StartsWith(text="x")
+    result = _resolve_columns(selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], Column)
+
+
+def test_resolve_columns_with_narwhals_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnSelectorNarwhals
+
+    nw_selector = nw.selectors.numeric()
+    result = _resolve_columns(nw_selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], ColumnSelectorNarwhals)
+
+
+def test_get_tbl_type_ibis_get_backend_fallback():
+    """Test the fallback path when ibis.get_backend() raises an exception."""
+    import ibis as ibis_mod
+
+    ibis_table = ibis_mod.memtable(pd.DataFrame({"x": [1, 2, 3]}))
+
+    with patch.object(ibis_mod, "get_backend", side_effect=Exception("get_backend failed")):
+        result = _get_tbl_type(ibis_table)
+
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+
+def test_get_api_details_agg_docstring_fallback():
+    import types
+
+    def col_sum_gt(self):
+        pass
+
+    col_sum_gt.__doc__ = None
+    col_sum_gt.__name__ = "col_sum_gt"
+
+    mod = types.ModuleType("fake_mod")
+    mod.col_sum_gt = col_sum_gt
+
+    result = get_api_details(mod, ["col_sum_gt"])
+    assert isinstance(result, str)
+
+
+# Each case: (column values, Polars dtype, `is_in()` values, expected result)
+IS_IN_CASES = {
+    "int_col_integral_floats": ([1, 2, 3], pl.Int64, [1.0, 2.0], [True, True, False]),
+    "int_col_mixed_values": ([1, 2, 3], pl.Int64, [1, 2.5], [True, False, False]),
+    "int_col_mixed_values_float_first": ([1, 2, 3], pl.Int64, [2.5, 3], [False, False, True]),
+    "int_col_non_finite_and_huge_floats": (
+        [1, 2, 3],
+        pl.Int64,
+        [float("nan"), float("inf"), 1e30],
+        [False, False, False],
+    ),
+    "int_col_none_and_float": ([1, 2, 3], pl.Int64, [None, 2.0], [False, True, False]),
+    "int_col_decimals": ([1, 2, 3], pl.Int64, [Decimal("2"), Decimal("2.5")], [False, True, False]),
+    "int_col_exact_above_2_53": ([2**53 + 1], pl.Int64, [float(2**53)], [False]),
+    "uint_col_floats": ([1, 2, 3], pl.UInt8, [1.0, -1.0], [True, False, False]),
+    "float_col_ints": ([1.0, 2.0, 3.5], pl.Float64, [1, 2], [True, True, False]),
+    "float32_col_mixed_values": ([1.0, 2.0, 3.5], pl.Float32, [1, 3.5], [True, False, True]),
+    "float_col_decimals": ([1.0, 2.0, 3.5], pl.Float64, [Decimal("3.5")], [False, False, True]),
+    "decimal_col_floats": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [1.5, 3.25],
+        [True, False, True],
+    ),
+    "decimal_col_ints": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [2],
+        [False, True, False],
+    ),
+    "string_col": (["a", "b", "c"], pl.String, ["a", "c"], [True, False, True]),
+    "bool_col": ([True, False, True], pl.Boolean, [True], [True, False, True]),
+}
+
+
+@pytest.mark.parametrize("case", IS_IN_CASES.values(), ids=IS_IN_CASES.keys())
+@pytest.mark.parametrize("backend", ["polars", "polars_lazy", "pandas"])
+def test_is_in_aligns_numeric_values(case, backend):
+    column_values, dtype, values, expected = case
+
+    tbl = pl.DataFrame({"x": pl.Series(column_values, dtype=dtype)})
+    if backend == "polars_lazy":
+        tbl = tbl.lazy()
+    elif backend == "pandas":
+        if dtype.is_decimal():
+            pytest.skip("pandas has no native decimal dtype")
+        tbl = tbl.to_pandas()
+
+    nw_tbl = nw.from_native(tbl)
+    result = nw_tbl.select(_is_in("x", values, nw_tbl.collect_schema()["x"]))
+    if backend == "polars_lazy":
+        result = result.collect()
+
+    assert result["x"].to_list() == expected
+
+
+def test_is_in_unknown_dtype_passes_values_through():
+    tbl = nw.from_native(pl.DataFrame({"x": ["a", "b"]}))
+
+    assert tbl.select(_is_in("x", ["b"], None))["x"].to_list() == [False, True]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_with_row_index(tbl_type):
+    # The first column is unsorted and has ties so that ordering by it can't masquerade as the
+    # positional row order
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        if ibis is None:
+            pytest.skip("ibis is not installed")
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    result = _with_row_index(tbl, name="idx")
+    if isinstance(result, nw.LazyFrame):
+        result = result.collect()
+
+    assert result.columns == ["idx", "x", "y"]
+
+    if tbl_type == "duckdb":
+        # Tables without an inherent row order are indexed in the order of their first column
+        assert result.sort("idx")["x"].to_list() == [1, 1, 3, 4, 5]
+    else:
+        assert result["idx"].to_list() == [0, 1, 2, 3, 4]
+        assert result["y"].to_list() == [10, 20, 30, 40, 50]

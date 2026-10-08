@@ -1,0 +1,62 @@
+---
+title: "Verifying Row and Column Counts"
+description: "Check the dimensions of the table with the *_count_match() validation methods."
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb")
+    )
+    .col_count_match(count=11)                       # expect 11 columns in the table
+    .row_count_match(count=2000)                     # expect 2,000 rows in the table
+    .row_count_match(count=0, inverse=True)          # expect that the table has rows
+    .col_count_match(                                # compare column count against
+        count=pb.load_dataset(                       # that of another table
+            dataset="game_revenue", tbl_type="pandas"
+        )
+    )
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb")
+    )
+    .col_count_match(count=11)                       # expect 11 columns in the table
+    .row_count_match(count=2000)                     # expect 2,000 rows in the table
+    .row_count_match(count=0, inverse=True)          # expect that the table has rows
+    .col_count_match(                                # compare column count against
+        count=pb.load_dataset(                       # that of another table
+            dataset="game_revenue", tbl_type="pandas"
+        )
+    )
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"))
+```
+
+</details>

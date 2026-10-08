@@ -4,15 +4,21 @@ import base64
 import contextlib
 import copy
 import datetime
+import html as html_module
 import inspect
 import json
+import pickle
 import re
 import tempfile
 import threading
 from dataclasses import dataclass
+from enum import Enum
+from functools import partial
 from importlib.metadata import version
-from typing import TYPE_CHECKING, Any, Callable, Literal
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 import commonmark
 import narwhals as nw
@@ -20,18 +26,28 @@ from great_tables import GT, from_column, google_font, html, loc, md, style, val
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
-from narwhals.typing import FrameT
+from narwhals.dependencies import is_narwhals_lazyframe
 
+from pointblank._agg import (
+    is_valid_agg,
+    load_validation_method_grid,
+    resolve_agg_registries,
+    split_agg_name,
+)
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
+    ASSERTION_TYPE_TO_DIMENSION,
     CHECK_MARK_SPAN,
     COMPARISON_OPERATORS,
     COMPARISON_OPERATORS_AR,
     COMPATIBLE_DTYPES,
     CROSS_MARK_SPAN,
+    DIMENSION_ABBR,
+    DIMENSION_COLORS,
+    DIMENSION_NAMES,
     IBIS_BACKENDS,
     LOG_LEVELS_MAP,
-    METHOD_CATEGORY_MAP,
+    MODEL_PROVIDERS,
     REPORTING_LANGUAGES,
     ROW_BASED_VALIDATION_TYPES,
     RTL_LANGUAGES,
@@ -42,51 +58,84 @@ from pointblank._constants import (
 )
 from pointblank._constants_translations import (
     EXPECT_FAIL_TEXT,
+    NOTES_TEXT,
     STEP_REPORT_TEXT,
     VALIDATION_REPORT_TEXT,
 )
 from pointblank._interrogation import (
-    ColCountMatch,
-    ColExistsHasType,
-    ColSchemaMatch,
-    ColValsCompareOne,
-    ColValsCompareSet,
-    ColValsCompareTwo,
-    ColValsExpr,
-    ColValsRegex,
-    ConjointlyValidation,
     NumberOfTestUnits,
-    RowCountMatch,
-    RowsComplete,
-    RowsDistinct,
     SpeciallyValidation,
+    apply_missing_exclusion,
+    col_count_match,
+    col_exists,
+    col_pct_missing,
+    col_pct_null,
+    col_schema_match,
+    col_vals_expr,
+    conjointly_validation,
+    interrogate_between,
+    interrogate_eq,
+    interrogate_ge,
+    interrogate_gt,
+    interrogate_isin,
+    interrogate_le,
+    interrogate_lt,
+    interrogate_missing_coded,
+    interrogate_missing_consistent,
+    interrogate_missing_only_coded,
+    interrogate_ne,
+    interrogate_not_null,
+    interrogate_notin,
+    interrogate_null,
+    interrogate_outside,
+    interrogate_regex,
+    interrogate_str_len,
+    interrogate_rows_distinct,
+    row_count_match,
+    rows_complete,
 )
 from pointblank._typing import SegmentSpec
 from pointblank._utils import (
     _check_any_df_lib,
     _check_invalid_fields,
-    _count_null_values_in_column,
-    _count_true_values_in_column,
+    _column_test_prep,
+    _copy_dataframe,
+    _count_validation_units,
     _derive_bounds,
     _format_to_integer_value,
     _get_fn_name,
     _get_tbl_type,
+    _is_duration_dtype,
+    _is_in,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
     _is_value_a_df,
+    _PBUnresolvedColumn,
+    _resolve_columns,
     _select_df_lib,
+    _with_row_index,
 )
 from pointblank._utils_check_args import (
+    _check_active_input,
     _check_boolean_input,
     _check_column,
     _check_pre,
     _check_set_types,
     _check_thresholds,
 )
-from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
-from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
+from pointblank._utils_html import _create_table_dims_html, _create_table_type_html, _fmt_raw_html
+from pointblank.column import (
+    Column,
+    ColumnLiteral,
+    ColumnSelector,
+    ColumnSelectorNarwhals,
+    ReferenceColumn,
+    col,
+)
+from pointblank.missing import MissingSpec
 from pointblank.schema import Schema, _get_schema_validation_info
+from pointblank.segments import Segment
 from pointblank.thresholds import (
     Actions,
     FinalActions,
@@ -95,24 +144,37 @@ from pointblank.thresholds import (
     _normalize_thresholds_creation,
 )
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from typing import Any
 
-    from pointblank._typing import AbsoluteBounds, Tolerance
+    import polars as pl
+    from narwhals.typing import IntoDataFrame, IntoFrame
+
+    from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
+    from pointblank.steps import Steps
+
 
 __all__ = [
-    "Validate",
-    "load_dataset",
+    "get_action_metadata",
+    "get_validation_summary",
     "config",
-    "connect_to_table",
+    "load_dataset",
+    "read_file",
+    "write_file",
+    "get_data_path",
     "preview",
     "missing_vals_tbl",
-    "get_action_metadata",
     "get_column_count",
-    "get_data_path",
     "get_row_count",
-    "get_validation_summary",
+    "connect_to_table",
+    "print_database_tables",
+    "Validate",
 ]
+
 
 # Create a thread-local storage for the metadata
 _action_context = threading.local()
@@ -264,6 +326,10 @@ def get_validation_summary() -> dict | None:
     - `tbl_column_count` (`int`): The number of columns in the target table.
     - `tbl_name` (`str`): The name of the target table.
     - `validation_duration` (`float`): The duration of the validation in seconds.
+    - `dimension_scores` (`dict`): The test-unit-weighted health score (`0`-`100`) for each data
+      quality dimension present in the validation (e.g., `{"completeness": 99.2, "validity": 97.8}`).
+    - `overall_health_score` (`float`): The overall, test-unit-weighted health score (`0`-`100`)
+      across all dimensions.
 
     Note that the summary dictionary is only available within the context of a final action. If
     called outside of a final action (i.e., when no final action is being executed), this function
@@ -344,13 +410,25 @@ class PointblankConfig:
 
     report_incl_header: bool = True
     report_incl_footer: bool = True
+    report_incl_footer_timings: bool = True
+    report_incl_footer_notes: bool = True
+    report_incl_dimensions: bool = False
     preview_incl_header: bool = True
+    dimension_map: dict[str, str] | None = None
+    dimension_weights: dict[str, float] | None = None
+    dimension_thresholds: dict[str, float] | None = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"PointblankConfig(report_incl_header={self.report_incl_header}, "
             f"report_incl_footer={self.report_incl_footer}, "
-            f"preview_incl_header={self.preview_incl_header})"
+            f"report_incl_footer_timings={self.report_incl_footer_timings}, "
+            f"report_incl_footer_notes={self.report_incl_footer_notes}, "
+            f"report_incl_dimensions={self.report_incl_dimensions}, "
+            f"preview_incl_header={self.preview_incl_header}, "
+            f"dimension_map={self.dimension_map}, "
+            f"dimension_weights={self.dimension_weights}, "
+            f"dimension_thresholds={self.dimension_thresholds})"
         )
 
 
@@ -361,7 +439,13 @@ global_config = PointblankConfig()
 def config(
     report_incl_header: bool = True,
     report_incl_footer: bool = True,
+    report_incl_footer_timings: bool = True,
+    report_incl_footer_notes: bool = True,
+    report_incl_dimensions: bool = False,
     preview_incl_header: bool = True,
+    dimension_map: dict[str, str] | None = None,
+    dimension_weights: dict[str, float] | None = None,
+    dimension_thresholds: dict[str, float] | None = None,
 ) -> PointblankConfig:
     """
     Configuration settings for the Pointblank library.
@@ -374,10 +458,39 @@ def config(
         threshold levels (if set).
     report_incl_footer
         Should the footer of the validation table report be displayed? The footer contains the
-        starting and ending times of the interrogation.
+        starting and ending times of the interrogation and any notes added to validation steps.
+    report_incl_footer_timings
+        Controls whether the validation timing information (start time, duration, and end time)
+        should be displayed in the footer. Only applies when `report_incl_footer=True`.
+    report_incl_footer_notes
+        Controls whether the notes from validation steps should be displayed in the footer. Only
+        applies when `report_incl_footer=True`.
+    report_incl_dimensions
+        Controls whether the data quality dimension display is included in the validation report by
+        default. When `True`, each step's report shows a color-coded dimension badge on the step
+        number and a health-score summary block in the footer. This is `False` by default (opt-in);
+        it can also be toggled per-report via `get_tabular_report(incl_dimensions=...)`.
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
+    dimension_map
+        An optional mapping of `assertion_type` (e.g., `"col_vals_gt"`) to a data quality dimension
+        name (e.g., `"validity"`). This is merged on top of the built-in inference map, letting you
+        remap how validation steps are categorized for health scoring. Only affects steps where the
+        dimension is not set explicitly via a validation method's `dimension=` parameter.
+    dimension_weights
+        An optional mapping of dimension name to a relative weight (a positive number) used when
+        computing the overall health score. A weight scales that dimension's *test-unit*
+        contribution to the overall score, so a dimension's influence is its weight multiplied by
+        its number of test units (a heavily-weighted dimension with few test units still
+        contributes modestly). Dimensions not present in the mapping default to a weight of `1.0`;
+        when omitted entirely, the overall score is a pure test-unit-weighted pass rate.
+    dimension_thresholds
+        An optional mapping of dimension name to a minimum acceptable health score (`0`-`100`).
+        This is used as the default by
+        [`assert_dimension_scores()`](`pointblank.Validate.assert_dimension_scores`), which raises
+        an `AssertionError` when any dimension's score falls below its minimum (e.g., to fail a CI
+        run when the completeness score drops below `95`).
 
     Returns
     -------
@@ -388,13 +501,55 @@ def config(
     global global_config
     global_config.report_incl_header = report_incl_header  # pragma: no cover
     global_config.report_incl_footer = report_incl_footer  # pragma: no cover
+    global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
+    global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
+    global_config.report_incl_dimensions = report_incl_dimensions  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
+    global_config.dimension_map = dimension_map  # pragma: no cover
+    global_config.dimension_weights = dimension_weights  # pragma: no cover
+    global_config.dimension_thresholds = dimension_thresholds  # pragma: no cover
+    return global_config  # pragma: no cover
+
+
+def _base_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
+    """
+    Infer the data quality dimension from the built-in defaults only (ignoring any config override).
+
+    Uses `ASSERTION_TYPE_TO_DIMENSION`, with a regex fallback for the dynamically-generated
+    aggregate comparison methods (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`). Assertion types
+    not covered are categorized as `"unknown"`. Returns `None` if `assertion_type` is `None`.
+    """
+    if assertion_type is None:
+        return None
+    if assertion_type in ASSERTION_TYPE_TO_DIMENSION:
+        return ASSERTION_TYPE_TO_DIMENSION[assertion_type]
+    if re.match(
+        r"^col_(sum|avg|mean|median|min|max|sd|std|var)_(eq|ne|gt|ge|lt|le|between|outside)$",
+        assertion_type,
+    ):
+        return "validity"
+    return "unknown"
+
+
+def _infer_dimension_from_assertion_type(assertion_type: str | None) -> str | None:
+    """
+    Infer the data quality dimension for a validation step from its `assertion_type`.
+
+    Any `pb.config(dimension_map=...)` override takes precedence over the built-in
+    `ASSERTION_TYPE_TO_DIMENSION` defaults. Returns `None` if `assertion_type` is `None`.
+    """
+    if assertion_type is None:
+        return None
+    override = getattr(global_config, "dimension_map", None) or {}
+    if assertion_type in override:
+        return override[assertion_type]
+    return _base_dimension_from_assertion_type(assertion_type)
 
 
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
-) -> FrameT | Any:
+) -> Any:
     """
     Load a dataset hosted in the library as specified table type.
 
@@ -415,7 +570,7 @@ def load_dataset(
 
     Returns
     -------
-    FrameT | Any
+    Any
         The dataset for the `Validate` object. This could be a Polars DataFrame, a Pandas DataFrame,
         or a DuckDB table as an Ibis table.
 
@@ -570,6 +725,759 @@ def load_dataset(
             conn.disconnect()  # Explicitly close the connection
 
     return dataset
+
+
+def read_file(filepath: str | Path) -> Validate:
+    """
+    Read a Validate object from disk that was previously saved with `write_file()`.
+
+    This function loads a validation object that was previously serialized to disk using the
+    `write_file()` function. The validation object will be restored with all its validation results,
+    metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
+
+    :::{.callout-warning}
+    The `read_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    filepath
+        The path to the saved validation file. Can be a string or Path object.
+
+    Returns
+    -------
+    Validate
+        The restored validation object with all its original state, validation results, and
+        metadata.
+
+    Examples
+    --------
+    Load a validation object that was previously saved:
+
+    ```python
+    import pointblank as pb
+
+    # Load a validation object from disk
+    validation = pb.read_file("my_validation.pkl")
+
+    # View the validation results
+    validation
+    ```
+
+    You can also load using just the filename (without extension):
+
+    ```python
+    # This will automatically look for "my_validation.pkl"
+    validation = pb.read_file("my_validation")
+    ```
+
+    The loaded validation object retains all its functionality:
+
+    ```python
+    # Get validation summary
+    summary = validation.get_json_report()
+
+    # Get sundered data (if original table was saved)
+    if validation.data is not None:
+        failing_rows = validation.get_sundered_data(type="fail")
+    ```
+
+    See Also
+    --------
+    Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
+    to disk for later retrieval with this function.
+    """
+    # Handle file path and extension
+    file_path = Path(filepath)
+    if not file_path.suffix:
+        file_path = file_path.with_suffix(".pkl")
+
+    # Check if file exists
+    if not file_path.exists():
+        raise FileNotFoundError(f"Validation file not found: {file_path}")
+
+    # Load and deserialize the validation object
+    try:
+        with open(file_path, "rb") as f:
+            loaded_data = pickle.load(f)
+
+        # Expect validation package format with function sources
+        if not isinstance(loaded_data, dict) or "validation" not in loaded_data:
+            raise RuntimeError(f"Invalid validation file format: {file_path}")
+
+        validation = loaded_data["validation"]
+        function_sources = loaded_data["function_sources"]
+
+        # Restore functions from source code
+        if function_sources:  # pragma: no cover
+            restored_functions = {}  # pragma: no cover
+            for func_name, source_code in function_sources.items():  # pragma: no cover
+                try:  # pragma: no cover
+                    # Create a namespace with common imports that functions might need
+                    execution_namespace = {}  # pragma: no cover
+
+                    # Add common imports to the execution namespace
+                    try:  # pragma: no cover
+                        import polars as pl  # pragma: no cover
+
+                        execution_namespace["pl"] = pl  # pragma: no cover
+
+                    except ImportError:  # pragma: no cover
+                        pass  # pragma: no cover
+
+                    try:  # pragma: no cover
+                        import pandas as pd  # pragma: no cover
+
+                        execution_namespace["pd"] = pd  # pragma: no cover
+
+                    except ImportError:  # pragma: no cover
+                        pass  # pragma: no cover
+
+                    try:  # pragma: no cover
+                        import narwhals as nw  # pragma: no cover
+
+                        execution_namespace["nw"] = nw  # pragma: no cover
+
+                    except ImportError:  # pragma: no cover
+                        pass  # pragma: no cover
+
+                    # Execute the function source code with the enhanced namespace
+                    exec(source_code, execution_namespace, execution_namespace)  # pragma: no cover
+
+                    # The function should now be in the execution namespace
+                    if func_name in execution_namespace:  # pragma: no cover
+                        restored_functions[func_name] = execution_namespace[
+                            func_name
+                        ]  # pragma: no cover
+                    else:  # pragma: no cover
+                        print(
+                            f"Warning: Function '{func_name}' not found after executing source code"
+                        )
+
+                except Exception as e:  # pragma: no cover
+                    print(f"Warning: Could not restore function '{func_name}': {e}")
+
+            # Restore functions to validation steps
+            for validation_info in validation.validation_info:  # pragma: no cover
+                if (  # pragma: no cover
+                    hasattr(validation_info, "_pb_function_name")
+                    and validation_info._pb_function_name in restored_functions
+                ):
+                    func_name = validation_info._pb_function_name  # pragma: no cover
+                    validation_info.pre = restored_functions[func_name]  # pragma: no cover
+                    # Clean up the temporary attribute
+                    delattr(validation_info, "_pb_function_name")  # pragma: no cover
+
+        # Verify that we loaded a Validate object
+        if not isinstance(validation, Validate):  # pragma: no cover
+            raise RuntimeError(f"File does not contain a valid Validate object: {file_path}")
+
+        return validation
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to read validation object from {file_path}: {e}")
+
+
+def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str], list[int]]:
+    """
+    Check for functions and capture source code for preservation across sessions.
+
+    This function examines all preprocessing functions and attempts to capture their source code for
+    later restoration. Lambda functions are rejected. Functions that might be picklable in the
+    current session but fail across sessions (e.g., interactively defined functions) have their
+    source preserved.
+
+    Returns
+    -------
+    tuple[dict[str, str], list[int]]
+        A tuple containing:
+        - A dictionary mapping function names to their source code
+        - A list of step indices that have unpicklable lambda functions (which should cause errors)
+    """
+    import inspect
+    import pickle
+
+    unpicklable_lambda_steps = []
+    function_sources = {}
+
+    for i, validation_info in enumerate(validation.validation_info):
+        if hasattr(validation_info, "pre") and validation_info.pre is not None:
+            func = validation_info.pre
+            func_name = getattr(func, "__name__", "<unknown>")
+
+            # Always reject lambda functions
+            if func_name == "<lambda>":
+                unpicklable_lambda_steps.append((i, validation_info))
+                continue
+
+            # For all non-lambda functions, try to capture source code
+            # This helps with functions that might be picklable now but fail across sessions
+            source_code = None
+
+            try:
+                # Try to get the source code
+                source_code = inspect.getsource(func)
+
+                # Test if the function can be pickled and loaded in a clean environment
+                # by checking if it's defined in a "real" module vs interactively
+                func_module = getattr(func, "__module__", None)
+
+                if func_module == "__main__" or not func_module:
+                    # Functions defined in __main__ or without a module are risky
+                    # These might pickle now but fail when loaded elsewhere
+                    function_sources[func_name] = source_code  # pragma: no cover
+                    validation_info._pb_function_name = func_name  # pragma: no cover
+
+            except (OSError, TypeError):  # pragma: no cover
+                # If we can't get source, check if it's at least picklable
+                try:  # pragma: no cover
+                    pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
+                    # It's picklable but no source: this might cause issues across sessions
+                    print(  # pragma: no cover
+                        f"Warning: Function '{func_name}' is picklable but source code could not be captured. "
+                        f"It may not be available when loading in a different session."
+                    )
+                except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
+                    # Not picklable and no source: treat as problematic
+                    print(  # pragma: no cover
+                        f"Warning: Function '{func_name}' is not picklable and source could not be captured. "
+                        f"It will not be available after saving/loading."
+                    )
+                    unpicklable_lambda_steps.append((i, validation_info))  # pragma: no cover
+
+    # Only raise error for lambda functions now
+    if unpicklable_lambda_steps:
+        step_descriptions = []
+        for i, step in unpicklable_lambda_steps:
+            desc = f"Step {i + 1}"
+            if hasattr(step, "assertion_type"):
+                desc += f" ({step.assertion_type})"
+            if hasattr(step, "column") and step.column:
+                desc += f" on column '{step.column}'"
+            step_descriptions.append(desc)
+
+        raise ValueError(
+            f"Cannot serialize validation object: found {len(unpicklable_lambda_steps)} validation step(s) "
+            f"with unpicklable preprocessing functions (likely lambda functions defined in interactive "
+            f"environments):\n\n"
+            + "\n".join(f"  - {desc}" for desc in step_descriptions)
+            + "\n\nTo resolve this, define your preprocessing functions at the module level:\n\n"
+            "  # Instead of:\n"
+            "  .col_vals_gt(columns='a', value=10, pre=lambda df: df.with_columns(...))\n\n"
+            "  # Use:\n"
+            "  def preprocess_data(df):\n"
+            "      return df.with_columns(...)\n\n"
+            "  .col_vals_gt(columns='a', value=10, pre=preprocess_data)\n\n"
+            "Module-level functions can be pickled and will preserve the complete validation logic."
+        )
+
+    return function_sources, []
+
+
+def _provide_serialization_guidance(validation: Validate) -> None:
+    """
+    Provide helpful guidance to users about creating serializable validations.
+
+    This function analyzes the validation object and provides tailored advice
+    about preprocessing functions, best practices, and potential issues.
+    """
+    import pickle
+
+    # Find all preprocessing functions in the validation
+    preprocessing_functions = []
+
+    for i, validation_info in enumerate(validation.validation_info):
+        if hasattr(validation_info, "pre") and validation_info.pre is not None:
+            preprocessing_functions.append((i, validation_info))  # pragma: no cover
+
+    if not preprocessing_functions:  # pragma: no cover
+        # No preprocessing functions: validation should serialize cleanly
+        print("  Serialization Analysis:")  # pragma: no cover
+        print("   ✓ No preprocessing functions detected")  # pragma: no cover
+        print(
+            "   ✓ This validation should serialize and load reliably across sessions"
+        )  # pragma: no cover
+        return  # pragma: no cover
+
+    print("  Serialization Analysis:")  # pragma: no cover
+    print(  # pragma: no cover
+        f"   Found {len(preprocessing_functions)} validation step(s) with preprocessing functions"
+    )
+
+    # Analyze each function
+    functions_analysis = {  # pragma: no cover
+        "module_functions": [],
+        "interactive_functions": [],
+        "lambda_functions": [],
+        "unpicklable_functions": [],
+    }
+
+    for i, validation_info in preprocessing_functions:  # pragma: no cover
+        func = validation_info.pre  # pragma: no cover
+        func_name = getattr(func, "__name__", "<unknown>")  # pragma: no cover
+        func_module = getattr(func, "__module__", "<unknown>")  # pragma: no cover
+
+        # Categorize the function
+        if func_name == "<lambda>":  # pragma: no cover
+            functions_analysis["lambda_functions"].append(
+                (i, func_name, func_module)
+            )  # pragma: no cover
+        else:  # pragma: no cover
+            # Test if it can be pickled
+            try:  # pragma: no cover
+                pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
+                can_pickle = True  # pragma: no cover
+            except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
+                can_pickle = False  # pragma: no cover
+                functions_analysis["unpicklable_functions"].append(
+                    (i, func_name, func_module)
+                )  # pragma: no cover
+                continue  # pragma: no cover
+
+            # Check if it's likely to work across sessions
+            if (
+                func_module == "__main__" or not func_module or func_module == "<unknown>"
+            ):  # pragma: no cover
+                # Function defined interactively - risky for cross-session use
+                functions_analysis["interactive_functions"].append(
+                    (i, func_name, func_module)
+                )  # pragma: no cover
+            else:  # pragma: no cover
+                # Function from a proper module - should work reliably
+                functions_analysis["module_functions"].append(
+                    (i, func_name, func_module)
+                )  # pragma: no cover
+
+    # Provide specific guidance based on analysis
+    if functions_analysis["module_functions"]:  # pragma: no cover
+        print("   ✓ Module-level functions detected:")
+        for i, func_name, func_module in functions_analysis["module_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (from {func_module})")
+        print("     These should work reliably across sessions")
+
+    if functions_analysis["interactive_functions"]:  # pragma: no cover
+        print("      Interactive functions detected:")
+        for i, func_name, func_module in functions_analysis["interactive_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (defined in {func_module})")
+        print("     These may not load properly in different sessions")
+        print()
+        print("     Recommendation: Move these functions to a separate .py module:")
+        print("      1. Create a file like 'preprocessing_functions.py'")
+        print("      2. Define your functions there with proper imports")
+        print("      3. Import them: from preprocessing_functions import your_function")
+        print("      4. This ensures reliable serialization across sessions")
+
+    if functions_analysis["lambda_functions"]:  # pragma: no cover
+        print("     Lambda functions detected:")
+        for i, func_name, func_module in functions_analysis["lambda_functions"]:
+            print(f"     • Step {i + 1}: {func_name}")
+        print("     Lambda functions cannot be serialized!")
+        print()
+        print("     Required fix: Replace lambda functions with named functions:")
+        print("      # Instead of: pre=lambda df: df.with_columns(...)")
+        print("      # Use: ")
+        print("      def my_preprocessing_function(df):")
+        print("          return df.with_columns(...)")
+        print("      # Then: pre=my_preprocessing_function")
+
+    if functions_analysis["unpicklable_functions"]:  # pragma: no cover
+        print("     Unpicklable functions detected:")
+        for i, func_name, func_module in functions_analysis["unpicklable_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (from {func_module})")
+        print("     These functions cannot be serialized")
+
+    # Provide overall assessment
+    total_problematic = (  # pragma: no cover
+        len(functions_analysis["interactive_functions"])
+        + len(functions_analysis["lambda_functions"])
+        + len(functions_analysis["unpicklable_functions"])
+    )
+
+    if total_problematic == 0:  # pragma: no cover
+        print("     All preprocessing functions should serialize reliably!")
+    else:  # pragma: no cover
+        print(
+            f"      {total_problematic} function(s) may cause issues when loading in different sessions"
+        )
+        print()
+        print("     Best Practice Guide:")
+        print("      • Define all preprocessing functions in separate .py modules")
+        print("      • Import functions before creating and loading validations")
+        print("      • Avoid lambda functions and interactive definitions")
+        print("      • Test your validation by loading it in a fresh Python session")
+
+        # Offer to create a template
+        print()
+        print("     Example module structure:")
+        print("      # preprocessing_functions.py")
+        print("      import polars as pl  # or pandas, numpy, etc.")
+        print("      ")
+        print("      def multiply_by_factor(df, factor=10):")
+        print("          return df.with_columns(pl.col('value') * factor)")
+        print("      ")
+        print("      # your_main_script.py")
+        print("      import pointblank as pb")
+        print("      from preprocessing_functions import multiply_by_factor")
+        print("      ")
+        print(
+            "      validation = pb.Validate(data).col_vals_gt('value', 100, pre=multiply_by_factor)"
+        )
+
+
+def write_file(
+    validation: Validate,
+    filename: str,
+    path: str | None = None,
+    keep_tbl: bool = False,
+    keep_extracts: bool = False,
+    quiet: bool = False,
+) -> None:
+    """
+    Write a Validate object to disk as a serialized file.
+
+    Writing a validation object to disk with `write_file()` can be useful for keeping data
+    validation results close at hand for later retrieval (with `read_file()`). By default, any data
+    table that the validation object holds will be removed before writing to disk (not applicable if
+    no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this
+    only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as
+    database connections cannot be serialized.
+
+    Extract data from failing validation steps can also be preserved by setting
+    `keep_extracts=True`, which is useful for later analysis of data quality issues.
+
+    The serialized file uses Python's pickle format for storage of the validation object state,
+    including all validation results, metadata, and optionally the source data.
+
+    **Important note.** If your validation uses custom preprocessing functions (via the `pre=`
+    parameter), these functions must be defined at the module level (not interactively or as lambda
+    functions) to ensure they can be properly restored when loading the validation in a different
+    Python session. Read the *Creating Serializable Validations* section below for more information.
+
+    :::{.callout-warning}
+    The `write_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    validation
+        The `Validate` object to write to disk.
+    filename
+        The filename to create on disk for the validation object. Should not include the file
+        extension as `.pkl` will be added automatically.
+    path
+        An optional directory path where the file should be saved. If not provided, the file will be
+        saved in the current working directory. The directory will be created if it doesn't exist.
+    keep_tbl
+        An option to keep the data table that is associated with the validation object. The default
+        is `False` where the data table is removed before writing to disk. For database tables
+        (e.g., Ibis tables with database backends), the table is always removed even if
+        `keep_tbl=True`, as database connections cannot be serialized.
+    keep_extracts
+        An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+    quiet
+        Should the function not inform when the file is written? By default, this is `False`, so a
+        message will be printed when the file is successfully written.
+
+    Returns
+    -------
+    None
+        This function doesn't return anything but saves the validation object to disk.
+
+    Creating Serializable Validations
+    ---------------------------------
+    To ensure your validations work reliably across different Python sessions, the recommended
+    approach is to use module-Level functions. So, create a separate Python file for your
+    preprocessing functions:
+
+    ```python
+    # preprocessing_functions.py
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # your_main_script.py
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # Save validation and it will work reliably across sessions
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    ### Problematic Patterns to Avoid
+
+    Don't use lambda functions as they will cause immediate errors.
+
+    ```python
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100,
+        pre=lambda df: df.with_columns(pl.col("value") * 2)
+    )
+    ```
+
+    Don't use interactive function definitions (as they may fail when loading).
+
+    ```python
+    def my_function(df):  # Defined in notebook/REPL
+        return df.with_columns(pl.col("value") * 2)
+
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100, pre=my_function
+    )
+    ```
+
+    ### Automatic Analysis and Guidance
+
+    When you call `write_file()`, it automatically analyzes your validation and provides:
+
+    - confirmation when all functions will work reliably
+    - warnings for functions that may cause cross-session issues
+    - clear errors for unsupported patterns (lambda functions)
+    - specific recommendations and code examples
+    - loading instructions tailored to your validation
+
+    ### Loading Your Validation
+
+    To load a saved validation in a new Python session:
+
+    ```python
+    # In a new Python session
+    import pointblank as pb
+
+    # Import the same preprocessing functions used when creating the validation
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    # Upon loading the validation, functions will be automatically restored
+    validation = pb.read_file("my_validation.pkl")
+    ```
+
+    ** Testing Your Validation:**
+
+    To verify your validation works across sessions:
+
+    1. save your validation in one Python session
+    2. start a fresh Python session (restart kernel/interpreter)
+    3. import required preprocessing functions
+    4. load the validation using `read_file()`
+    5. test that preprocessing functions work as expected
+
+    ### Performance and Storage
+
+    - use `keep_tbl=False` (default) to reduce file size when you don't need the original data
+    - use `keep_extracts=False` (default) to save space by excluding extract data
+    - set `quiet=True` to suppress guidance messages in automated scripts
+    - files are saved using pickle's highest protocol for optimal performance
+
+    Examples
+    --------
+    Let's create a simple validation and save it to disk:
+
+    ```{python}
+    import pointblank as pb
+
+    # Create a validation
+    validation = (
+        pb.Validate(data=pb.load_dataset("small_table"), label="My validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .interrogate()
+    )
+
+    # Save to disk (without the original table data)
+    pb.write_file(validation, "my_validation")
+    ```
+
+    To keep the original table data for later analysis:
+
+    ```{python}
+    # Save with the original table data included
+    pb.write_file(validation, "my_validation_with_data", keep_tbl=True)
+    ```
+
+    You can also specify a custom directory and keep extract data:
+
+    ```python
+    pb.write_file(
+        validation,
+        filename="detailed_validation",
+        path="/path/to/validations",
+        keep_tbl=True,
+        keep_extracts=True
+    )
+    ```
+
+    ### Working with Preprocessing Functions
+
+    For validations that use preprocessing functions to be portable across sessions, define your
+    functions in a separate `.py` file:
+
+    ```python
+    # In `preprocessing_functions.py`
+
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # In your main script
+
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # This validation can now be saved and loaded reliably
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    When you load this validation in a new session, simply import the preprocessing functions
+    again and they will be automatically restored.
+
+    See Also
+    --------
+    Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
+    previously saved with `write_file()`.
+    """
+    # Construct the full file path
+    if not filename.endswith(".pkl"):
+        filename = f"{filename}.pkl"
+
+    if path is not None:
+        file_path = Path(path) / filename
+    else:
+        file_path = Path(filename)
+
+    # Create directory if it doesn't exist
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Create a copy of the validation object to avoid modifying the original
+    validation_copy = copy.deepcopy(validation)
+
+    # Handle data table preservation
+    if not keep_tbl:
+        validation_copy.data = None
+    else:
+        # Check if the data is a database table that cannot be serialized
+        if validation_copy.data is not None:
+            tbl_type = _get_tbl_type(validation_copy.data)
+
+            # Database tables cannot be serialized, so remove them regardless of keep_tbl
+            if tbl_type in [
+                "duckdb",
+                "mysql",
+                "postgresql",
+                "sqlite",
+                "mssql",
+                "snowflake",
+                "databricks",
+                "bigquery",
+            ]:
+                validation_copy.data = None
+                if not quiet:  # pragma: no cover
+                    print(
+                        f"Note: Database table removed from saved validation "
+                        f"(table type: {tbl_type})"
+                    )
+
+    # Handle extract data preservation
+    if not keep_extracts:
+        # Remove extract data from validation_info to save space
+        for validation_info in validation_copy.validation_info:
+            if hasattr(validation_info, "extract"):
+                validation_info.extract = None
+
+    # Provide user guidance about serialization if not quiet
+    if not quiet:
+        _provide_serialization_guidance(validation_copy)
+
+    # Check for unpicklable objects and capture function sources
+    function_sources, lambda_steps = _check_for_unpicklable_objects(validation_copy)
+
+    # Create a validation package that includes both the object and function sources
+    validation_package = {"validation": validation_copy, "function_sources": function_sources}
+
+    # Serialize to disk using pickle
+    try:
+        with open(file_path, "wb") as f:
+            pickle.dump(validation_package, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+        if not quiet:  # pragma: no cover
+            print(f"✅ Validation object written to: {file_path}")
+
+            if function_sources:  # pragma: no cover
+                print(
+                    f"   🔧 Enhanced preservation: Captured source code for {len(function_sources)} function(s)"
+                )
+                for func_name in function_sources.keys():
+                    print(f"      • {func_name}")
+                print("   📥 These functions will be automatically restored when loading")
+
+            # Provide loading instructions
+            preprocessing_funcs = [
+                info
+                for info in validation_copy.validation_info
+                if hasattr(info, "pre") and info.pre is not None
+            ]
+            if preprocessing_funcs:
+                print()
+                print("   💡 To load this validation in a new session:")
+                print("      import pointblank as pb")
+                if any(
+                    hasattr(info.pre, "__module__")
+                    and info.pre.__module__ not in ["__main__", None]
+                    for info in preprocessing_funcs
+                    if hasattr(info, "pre") and info.pre
+                ):
+                    print("      # Import any preprocessing functions from their modules")
+                    modules_mentioned = set()
+                    for info in preprocessing_funcs:
+                        if (
+                            hasattr(info, "pre")
+                            and hasattr(info.pre, "__module__")
+                            and info.pre.__module__ not in ["__main__", None]
+                        ):
+                            if info.pre.__module__ not in modules_mentioned:
+                                print(
+                                    f"      from {info.pre.__module__} import {info.pre.__name__}"
+                                )
+                                modules_mentioned.add(info.pre.__module__)
+                print(f"      validation = pb.read_file('{file_path.name}')")
+            else:
+                print("   📖 To load: validation = pb.read_file('{}')".format(file_path.name))
+
+    except Exception as e:  # pragma: no cover
+        raise RuntimeError(
+            f"Failed to write validation object to {file_path}: {e}"
+        )  # pragma: no cover
 
 
 def get_data_path(
@@ -738,13 +1646,13 @@ def get_data_path(
                 return tmp_file.name
 
 
-def _process_data(data: FrameT | Any) -> FrameT | Any:
+def _process_data(data: Any) -> Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
-    This function consolidates the data processing pipeline used across multiple
-    classes and functions in Pointblank. It processes data through a consistent
-    sequence of transformations to handle different data source types.
+    This function consolidates the data processing pipeline used across multiple classes and
+    functions in Pointblank. It processes data through a consistent sequence of transformations to
+    handle different data source types.
 
     The processing order is important:
 
@@ -755,7 +1663,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The input data which could be:
         - a DataFrame object (Polars, Pandas, Ibis, etc.)
         - a GitHub URL pointing to a CSV or Parquet file
@@ -766,7 +1674,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Returns
     -------
-    FrameT | Any
+    Any
         Processed data as a DataFrame if input was a supported data source type,
         otherwise the original data unchanged.
     """
@@ -785,7 +1693,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
     return data
 
 
-def _process_github_url(data: FrameT | Any) -> FrameT | Any:
+def _process_github_url(data: Any) -> Any:
     """
     Process data parameter to handle GitHub URLs pointing to CSV or Parquet files.
 
@@ -800,12 +1708,12 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The data parameter which may be a GitHub URL string or any other data type.
 
     Returns
     -------
-    FrameT | Any
+    Any
         If the input is a supported GitHub URL, returns a DataFrame loaded from the downloaded file.
         Otherwise, returns the original data unchanged.
 
@@ -831,7 +1739,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
     # Parse the URL to check if it's a GitHub URL
     try:
         parsed = urlparse(data)
-    except Exception:
+    except ValueError:
+        # urlparse can raise ValueError for malformed URLs (e.g., invalid IPv6)
+        # Return original data as it's likely not a GitHub URL we can process
         return data
 
     # Check if it's a GitHub URL (standard or raw)
@@ -883,15 +1793,12 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         else:  # .parquet
             return _process_parquet_input(tmp_file_path)
 
-    except Exception:
+    except Exception:  # pragma: no cover
         # If download or processing fails, return original data
         return data
 
-    except Exception as e:
-        raise RuntimeError(f"Failed to download or process GitHub file from {raw_url}: {e}") from e
 
-
-def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
+def _process_connection_string(data: Any) -> Any:
     """
     Process data parameter to handle database connection strings.
 
@@ -918,7 +1825,7 @@ def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
     return connect_to_table(data)
 
 
-def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
+def _process_csv_input(data: Any) -> Any:
     """
     Process data parameter to handle CSV file inputs.
 
@@ -945,8 +1852,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
-    # Determine which library to use for reading CSV
-    # Prefer Polars, fallback to Pandas
+    # Determine which library to use for reading CSV: prefer Polars but fallback to Pandas
     if _is_lib_present(lib_name="polars"):
         try:
             import polars as pl
@@ -958,7 +1864,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
                 import pandas as pd
 
                 return pd.read_csv(csv_path)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read CSV file with Polars: {e}. "
                     "Pandas is not available as fallback."
@@ -977,7 +1883,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
         )
 
 
-def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
+def _process_parquet_input(data: Any) -> Any:
     """
     Process data parameter to handle Parquet file inputs.
 
@@ -1095,7 +2001,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
                     # Multiple files: concatenate them
                     dfs = [pd.read_parquet(path) for path in parquet_paths]
                     return pd.concat(dfs, ignore_index=True)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read Parquet file(s) with Polars: {e}. "
                     "Pandas is not available as fallback."
@@ -1120,7 +2026,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
 
 
 def preview(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -1128,7 +2034,7 @@ def preview(
     show_row_numbers: bool = True,
     max_col_width: int = 250,
     min_tbl_width: int = 500,
-    incl_header: bool = None,
+    incl_header: bool | None = None,
 ) -> GT:
     """
     Display a table preview that shows some rows from the top, some from the bottom.
@@ -1197,6 +2103,7 @@ def preview(
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -1204,7 +2111,6 @@ def preview(
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -1386,7 +2292,7 @@ def preview(
 
 
 def _generate_display_table(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -1394,12 +2300,15 @@ def _generate_display_table(
     show_row_numbers: bool = True,
     max_col_width: int = 250,
     min_tbl_width: int = 500,
-    incl_header: bool = None,
+    incl_header: bool | None = None,
     mark_missing_values: bool = True,
     row_number_list: list[int] | None = None,
 ) -> GT:
     # Make a copy of the data to avoid modifying the original
-    data = copy.deepcopy(data)
+    # Note: PySpark DataFrames cannot be deep copied due to SparkContext serialization issues
+    tbl_type = _get_tbl_type(data=data)
+    if "pyspark" not in tbl_type:
+        data = copy.deepcopy(data)
 
     # Does the data table already have a leading row number column?
     if "_row_num_" in data.columns:
@@ -1411,7 +2320,7 @@ def _generate_display_table(
         has_leading_row_num_col = False
 
     # Check that the n_head and n_tail aren't greater than the limit
-    if n_head + n_tail > limit:
+    if limit is not None and n_head + n_tail > limit:
         raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
 
     # Do we have a DataFrame library to work with? We need at least one to display
@@ -1425,22 +2334,31 @@ def _generate_display_table(
     # Determine if the table is a DataFrame or an Ibis table
     tbl_type = _get_tbl_type(data=data)
     ibis_tbl = "ibis.expr.types.relations.Table" in str(type(data))
-    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type
+    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type or "pyspark" in tbl_type
 
     # Select the DataFrame library to use for displaying the Ibis table
     df_lib_gt = _select_df_lib(preference="polars")
     df_lib_name_gt = df_lib_gt.__name__
 
-    # If the table is a DataFrame (Pandas or Polars), set `df_lib_name_gt` to the name of the
-    # library (e.g., "polars" or "pandas")
+    # If the table is a DataFrame (Pandas, Polars, or PySpark), set `df_lib_name_gt` to the name of the
+    # library (e.g., "polars", "pandas", or "pyspark")
     if pl_pb_tbl:
-        df_lib_name_gt = "polars" if "polars" in tbl_type else "pandas"
+        if "polars" in tbl_type:
+            df_lib_name_gt = "polars"
+        elif "pandas" in tbl_type:
+            df_lib_name_gt = "pandas"
+        elif "pyspark" in tbl_type:
+            df_lib_name_gt = "pyspark"
 
-        # Handle imports of Polars or Pandas here
+        # Handle imports of Polars, Pandas, or PySpark here
         if df_lib_name_gt == "polars":
             import polars as pl
-        else:
+        elif df_lib_name_gt == "pandas":
             import pandas as pd
+        elif df_lib_name_gt == "pyspark":
+            # Import pandas for conversion since Great Tables needs pandas DataFrame
+            import pandas as pd
+        # Note: PySpark import is handled as needed, typically already imported in user's environment
 
     # Get the initial column count for the table
     n_columns = len(data.columns)
@@ -1479,6 +2397,7 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         # Get the row count for the table
+        # Note: ibis tables have count(), to_polars(), to_pandas() methods
         ibis_rows = data.count()
         n_rows = ibis_rows.to_polars() if df_lib_name_gt == "polars" else int(ibis_rows.to_pandas())
 
@@ -1488,7 +2407,7 @@ def _generate_display_table(
             data_subset = data
 
             if row_number_list is None:
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
         else:
             # Get the first n and last n rows of the table
             data_head = data.head(n_head)
@@ -1517,6 +2436,7 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         if tbl_type == "polars":
+            # Note: polars DataFrames have height, head(), tail() attributes
             n_rows = int(data.height)
 
             # If n_head + n_tail is greater than the row count, display the entire table
@@ -1524,7 +2444,7 @@ def _generate_display_table(
                 full_dataset = True
 
                 if row_number_list is None:
-                    row_number_list = range(1, n_rows + 1)
+                    row_number_list = list(range(1, n_rows + 1))
 
             else:
                 data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])
@@ -1535,6 +2455,7 @@ def _generate_display_table(
                     )
 
         if tbl_type == "pandas":
+            # Note: pandas DataFrames have shape, head(), tail() attributes
             n_rows = data.shape[0]
 
             # If n_head + n_tail is greater than the row count, display the entire table
@@ -1542,7 +2463,7 @@ def _generate_display_table(
                 full_dataset = True
                 data_subset = data
 
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
             else:
                 data = pd.concat([data.head(n=n_head), data.tail(n=n_tail)])
 
@@ -1550,15 +2471,61 @@ def _generate_display_table(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
+        if tbl_type == "pyspark":
+            # Note: pyspark DataFrames have count(), toPandas(), limit(), tail(), sparkSession
+            n_rows = data.count()
+
+            # If n_head + n_tail is greater than the row count, display the entire table
+            if n_head + n_tail >= n_rows:
+                full_dataset = True
+                # Convert to pandas for Great Tables compatibility
+                data = data.toPandas()
+
+                row_number_list = list(range(1, n_rows + 1))
+            else:
+                # Get head and tail samples, then convert to pandas
+                head_data = data.limit(n_head).toPandas()
+
+                # PySpark tail() returns a list of Row objects, need to convert to DataFrame
+                tail_rows = data.tail(n_tail)
+                if tail_rows:
+                    # Convert list of Row objects back to DataFrame, then to pandas
+                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)
+                    tail_data = tail_df.toPandas()
+                else:
+                    # If no tail data, create empty DataFrame with same schema
+                    import pandas as pd
+
+                    tail_data = pd.DataFrame(columns=head_data.columns)
+
+                # Suppress the FutureWarning about DataFrame concatenation with empty entries
+                import warnings
+
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated",
+                    )
+                    data = pd.concat([head_data, tail_data])
+
+                row_number_list = list(range(1, n_head + 1)) + list(
+                    range(n_rows - n_tail + 1, n_rows + 1)
+                )
+
+        # For PySpark, update schema after conversion to Pandas
+        if tbl_type == "pyspark":
+            tbl_schema = Schema(tbl=data)
+
     # From the table schema, get a list of tuples containing column names and data types
-    col_dtype_dict = tbl_schema.columns
+    col_dtype_list = tbl_schema.columns or []
 
     # Extract the column names from the list of tuples (first element of each tuple)
-    col_names = [col[0] for col in col_dtype_dict]
+    col_names = [col[0] for col in col_dtype_list]
 
     # Iterate over the list of tuples and create a new dictionary with the
     # column names and data types
-    col_dtype_dict = {k: v for k, v in col_dtype_dict}
+    col_dtype_dict = {k: v for k, v in col_dtype_list}
 
     # Create short versions of the data types by omitting any text in parentheses
     col_dtype_dict_short = {
@@ -1570,9 +2537,32 @@ def _generate_display_table(
     if df_lib_name_gt == "polars":
         none_values = {k: data[k].is_null().to_list() for k in col_names}
     else:
+        # PySpark data has been converted to Pandas by this point so the 'isnull()'
+        # method can be used
         none_values = {k: data[k].isnull() for k in col_names}
 
     none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
+
+    # Cast duration columns to string for display since Great Tables cannot handle duration types;
+    # the original dtype labels are already captured in `col_dtype_dict` / `col_dtype_dict_short`
+    # so they will still show correctly in the column headers
+    duration_cols = [
+        col_name
+        for col_name, col_dtype in col_dtype_dict.items()
+        if _is_duration_dtype(col_dtype.lower())
+    ]
+    if duration_cols:  # pragma: no cover
+        if df_lib_name_gt == "polars":  # pragma: no cover
+            import polars as pl  # pragma: no cover
+
+            for c in duration_cols:  # pragma: no cover
+                vals = data[c].to_list()  # pragma: no cover
+                str_vals = [str(v) if v is not None else None for v in vals]  # pragma: no cover
+                data = data.with_columns(pl.Series(c, str_vals, dtype=pl.Utf8))  # pragma: no cover
+        else:  # pragma: no cover
+            # Pandas (and PySpark converted to Pandas)
+            for c in duration_cols:  # pragma: no cover
+                data[c] = data[c].astype(str)  # pragma: no cover
 
     # Import Great Tables to get preliminary renders of the columns
     import great_tables as gt
@@ -1582,7 +2572,13 @@ def _generate_display_table(
 
     for column in col_dtype_dict.keys():
         # Select a single column of values
-        data_col = data[[column]] if df_lib_name_gt == "pandas" else data.select([column])
+        if df_lib_name_gt == "pandas":
+            data_col = data[[column]]
+        elif df_lib_name_gt == "pyspark":
+            # PySpark data should have been converted to pandas by now
+            data_col = data[[column]]
+        else:
+            data_col = data.select([column])
 
         # Using Great Tables, render the columns and get the list of values as formatted strings
         built_gt = GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
@@ -1659,6 +2655,10 @@ def _generate_display_table(
                 data = data.insert_column(0, row_number_series)
 
             if df_lib_name_gt == "pandas":
+                data.insert(0, "_row_num_", row_number_list)
+
+            if df_lib_name_gt == "pyspark":
+                # For PySpark converted to pandas, use pandas method
                 data.insert(0, "_row_num_", row_number_list)
 
         # Get the highest number in the `row_number_list` and calculate a width that will
@@ -1768,7 +2768,207 @@ def _generate_display_table(
     return gt_tbl
 
 
-def missing_vals_tbl(data: FrameT | Any) -> GT:
+def _build_structured_missing_tbl(
+    data: Any, missing: dict[str, MissingSpec], as_heatmap: bool = False
+) -> GT:
+    """Build a structured-missingness breakdown table (one row per column, columns for the count
+    and percentage of complete values and of each missing reason).
+
+    When `as_heatmap=True`, render the reason proportions as a color-coded heatmap (cells shaded
+    from light to dark by the proportion missing for each reason) instead of count/percent text.
+    """
+    if not isinstance(missing, dict):  # pragma: no cover
+        raise TypeError(  # pragma: no cover
+            f"`missing=` must be a dict mapping column names to MissingSpec objects, "
+            f"got {type(missing).__name__}."
+        )
+    for col_name, spec in missing.items():
+        if not isinstance(spec, MissingSpec):
+            raise TypeError(
+                f"`missing[{col_name!r}]` must be a MissingSpec, got {type(spec).__name__}."
+            )
+
+    nw_frame = nw.from_native(data)
+    is_lazy = isinstance(nw_frame, nw.LazyFrame)
+
+    schema = nw_frame.collect_schema()
+    available_columns = list(schema.names())
+
+    # Build the ordered union of *declared* (coded) reason labels across all specs (first-seen
+    # order). Raw Null/None/NA values are tallied separately in a fixed "Null" column rather than
+    # being treated as a reason, since they are not part of any MissingSpec.
+    reason_order: list[str] = []
+    for spec in missing.values():
+        for r in spec.reasons.values():
+            if r not in reason_order:
+                reason_order.append(r)
+
+    # A "Null" column is shown only if at least one spec counts raw nulls as missing
+    has_null_col = any(spec.null_is_missing for spec in missing.values())
+
+    records: list[dict[str, Any]] = []
+    for column, spec in missing.items():
+        if column not in available_columns:
+            raise ValueError(f"Column '{column}' given in `missing=` was not found in the table.")
+
+        # One aggregation per declared reason (sentinel values only), plus a separate raw-null
+        # count when the spec treats nulls as missing; coded reasons and raw nulls are kept distinct
+        declared_reasons = list(dict.fromkeys(spec.reasons.values()))
+        select_exprs: dict[str, Any] = {"__total__": nw.len()}
+        reason_alias: dict[str, str] = {}
+        for i, r in enumerate(declared_reasons):
+            reason_alias[r] = f"__r{i}__"
+            select_exprs[reason_alias[r]] = (
+                _is_in(column, spec.values_for_reason(r), schema[column]).cast(nw.Int32).sum()
+            )
+        if spec.null_is_missing:
+            select_exprs["__null__"] = nw.col(column).is_null().cast(nw.Int32).sum()
+
+        out = nw_frame.select(**select_exprs)
+        if is_lazy:  # pragma: no cover
+            out = out.collect()  # pragma: no cover
+
+        total = int(out["__total__"][0])
+        coded_counts = {r: int(out[reason_alias[r]][0]) for r in declared_reasons}
+        n_null = int(out["__null__"][0]) if spec.null_is_missing else 0
+
+        total_missing = sum(coded_counts.values()) + n_null
+        complete = total - total_missing
+
+        # A coded reason only *applies* to a column if its spec declares it; non-applicable reasons
+        # render as an em dash (not "0"). The "Null" column applies only when null_is_missing=True.
+        applicable = set(declared_reasons)
+
+        def _prop(count: int) -> float:
+            return (count / total) if total > 0 else 0.0
+
+        if as_heatmap:
+            # Numeric proportions (0..1) so reason cells can be color-shaded; non-applicable cells
+            # are left as None (shown as an em dash, uncolored)
+            record: dict[str, Any] = {"columns": column, "complete": _prop(complete)}
+            for r in reason_order:
+                record[r] = _prop(coded_counts.get(r, 0)) if r in applicable else None
+            if has_null_col:
+                record["null"] = _prop(n_null) if spec.null_is_missing else None
+        else:
+
+            def _fmt(count: int) -> str:
+                pct = round(100 * count / total) if total > 0 else 0
+                return f"{count} ({pct}%)"
+
+            record = {"columns": column, "complete": _fmt(complete)}
+            for r in reason_order:
+                record[r] = _fmt(coded_counts.get(r, 0)) if r in applicable else "—"
+            if has_null_col:
+                record["null"] = _fmt(n_null) if spec.null_is_missing else "—"
+        records.append(record)
+
+    # Build a DataFrame from the records using the available DataFrame library
+    df_lib_gt = _select_df_lib(preference="polars")
+    if df_lib_gt.__name__ == "polars":
+        import polars as pl
+
+        breakdown_df = pl.DataFrame(records)
+    else:  # pragma: no cover
+        import pandas as pd  # pragma: no cover
+
+        breakdown_df = pd.DataFrame(records)  # pragma: no cover
+
+    # Reason columns keep their raw input form as labels (e.g. "not_asked", not "Not Asked"); the
+    # fixed columns are relabeled. The total row count is already shown in the header, so there's no
+    # redundant "Total N" column. Raw nulls appear in a fixed "Null" column (styled like "Complete"),
+    # not as a reason.
+    cols_labels = {"columns": "Column", "complete": "Complete"}
+    if has_null_col:
+        cols_labels["null"] = "Null"
+
+    value_columns = ["complete"] + reason_order + (["null"] if has_null_col else [])
+
+    # Build a header that matches the default `missing_vals_tbl()` look: a plain (large) title in
+    # IBM Plex Sans and a subtitle showing the table type and dimensions
+    tbl_type = _get_tbl_type(data=data)
+    n_rows_total = get_row_count(data)
+    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        columns=len(available_columns), rows=n_rows_total, font_size="10px"
+    )
+    combined_subtitle = (
+        "<div>"
+        '<div style="padding-top: 0; padding-bottom: 7px;">'
+        f"{table_type_html}"
+        f"{tbl_dims_html}"
+        "</div>"
+        "</div>"
+    )
+
+    # The left "Column" column is rendered in monospace, matching the default report's body font
+    column_name_style = style.text(
+        color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+    )
+    # The reason column labels keep their raw input form and are shown in monospace
+    reason_label_style = style.text(font=google_font(name="IBM Plex Mono"), size="12px")
+
+    # Columns that should show an em dash for non-applicable cells (reason columns + the Null column)
+    em_dash_columns = reason_order + (["null"] if has_null_col else [])
+
+    if as_heatmap:
+        title = "Missing Pattern Heatmap"
+        # "complete" and "null" are shown as plain percentages (uncolored, like the default report);
+        # only the coded reason columns are color-shaded by proportion
+        prop_columns = ["complete"] + reason_order + (["null"] if has_null_col else [])
+
+        gt_tbl = (
+            GT(breakdown_df)
+            .tab_header(title=title, subtitle=html(combined_subtitle))
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .cols_label(cases=cols_labels)
+            .cols_align(align="center", columns=value_columns)
+            .cols_align(align="left", columns="columns")
+            .fmt_percent(columns=prop_columns, decimals=0)
+            .data_color(
+                columns=reason_order,
+                palette=["#F5F5F5", "#000000"],
+                domain=[0, 1],
+                na_color="#FFFFFF",
+            )
+            .sub_missing(columns=em_dash_columns, missing_text="—")
+            .tab_style(style=column_name_style, locations=loc.body(columns="columns"))
+            .tab_style(style=reason_label_style, locations=loc.column_labels(columns=reason_order))
+        )
+    else:
+        title = "Missing Values by Reason"
+
+        gt_tbl = (
+            GT(breakdown_df)
+            .tab_header(title=title, subtitle=html(combined_subtitle))
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .opt_align_table_header(align="left")
+            .cols_label(cases=cols_labels)
+            .cols_align(align="right", columns=value_columns)
+            .cols_align(align="left", columns="columns")
+            .tab_style(
+                style=style.text(font=google_font(name="IBM Plex Mono"), size="12px"),
+                locations=loc.body(columns=value_columns),
+            )
+            .tab_style(style=column_name_style, locations=loc.body(columns="columns"))
+            .tab_style(style=reason_label_style, locations=loc.column_labels(columns=reason_order))
+        )
+
+    # Group only the coded reasons under a "Missing Reasons" spanner. Raw nulls live in the fixed
+    # "Null" column (styled like "Complete"), so they aren't mistaken for declared spec reasons.
+    if reason_order:
+        gt_tbl = gt_tbl.tab_spanner(label="Missing Reasons", columns=reason_order)
+
+    if version("great_tables") >= "0.17.0":
+        gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+
+    return gt_tbl
+
+
+def missing_vals_tbl(
+    data: Any, missing: dict[str, MissingSpec] | None = None, as_heatmap: bool = False
+) -> GT:
     """
     Display a table that shows the missing values in the input table.
 
@@ -1776,12 +2976,40 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     table. The table is displayed using the Great Tables API, which allows for further customization
     of the table's appearance if so desired.
 
+    By default, missingness is treated as binary (a value is either Null or it isn't) and the
+    function renders a sector-based heatmap of the proportion of Null values across the rows of each
+    column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
+    is supplied, the function instead renders a *structured missingness* breakdown: one row per
+    column with the count and percentage of complete values and of each missing *reason* (e.g.,
+    `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner
+    and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of
+    the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
+    they aren't mistaken for declared reasons.
+
+    Note that supplying `missing=` produces a *different report* than the default view: it is a
+    distinct visualization (a per-reason breakdown table, or a per-reason heatmap with
+    `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles
+    differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing
+    Pattern Heatmap" for the structured views), and the shared header/title styling makes the family
+    resemblance clear.
+
     Parameters
     ----------
     data
         The table for which to display the missing values. This could be a DataFrame object, an
         Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
         Read the *Supported Input Table Types* section for details on the supported table types.
+    missing
+        An optional dictionary mapping column names to [`MissingSpec`](`pointblank.MissingSpec`)
+        objects. When provided, the function renders a structured breakdown of missingness by
+        reason for the specified columns (rather than the default sector heatmap). The reason
+        columns are the union of reasons across the supplied specs; a reason that isn't defined for
+        a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved
+        reason (shown as `0 (0%)`).
+    as_heatmap
+        Only applies when `missing=` is provided. When `True`, render the per-reason proportions as
+        a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of
+        the count/percentage text breakdown. Default is `False`.
 
     Returns
     -------
@@ -1794,6 +3022,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -1801,7 +3030,6 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -1854,7 +3082,16 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     data = _process_data(data)
 
     # Make a copy of the data to avoid modifying the original
-    data = copy.deepcopy(data)
+    # Note: PySpark DataFrames cannot be deep copied due to SparkContext serialization issues
+    tbl_type = _get_tbl_type(data=data)
+    if "pyspark" not in tbl_type:
+        data = copy.deepcopy(data)
+
+    # If a `missing=` spec mapping is provided, render the structured missingness breakdown
+    # (count and percentage of complete values and each missing reason, per column) instead of
+    # the default sector heatmap
+    if missing is not None:
+        return _build_structured_missing_tbl(data=data, missing=missing, as_heatmap=as_heatmap)
 
     # Get the number of rows in the table
     n_rows = get_row_count(data)
@@ -1871,22 +3108,28 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     # Determine if the table is a DataFrame or an Ibis table
     tbl_type = _get_tbl_type(data=data)
     ibis_tbl = "ibis.expr.types.relations.Table" in str(type(data))
-    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type
+    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type or "pyspark" in tbl_type
 
     # Select the DataFrame library to use for displaying the Ibis table
     df_lib_gt = _select_df_lib(preference="polars")
     df_lib_name_gt = df_lib_gt.__name__
 
-    # If the table is a DataFrame (Pandas or Polars), set `df_lib_name_gt` to the name of the
-    # library (e.g., "polars" or "pandas")
+    # If the table is a DataFrame (Pandas, Polars, or PySpark), set `df_lib_name_gt` to the name of the
+    # library (e.g., "polars", "pandas", or "pyspark")
     if pl_pb_tbl:
-        df_lib_name_gt = "polars" if "polars" in tbl_type else "pandas"
+        if "polars" in tbl_type:
+            df_lib_name_gt = "polars"
+        elif "pandas" in tbl_type:
+            df_lib_name_gt = "pandas"
+        elif "pyspark" in tbl_type:
+            df_lib_name_gt = "pyspark"
 
-        # Handle imports of Polars or Pandas here
+        # Handle imports of Polars, Pandas, or PySpark here
         if df_lib_name_gt == "polars":
             import polars as pl
-        else:
+        elif df_lib_name_gt == "pandas":
             import pandas as pd
+        # Note: PySpark import is handled as needed, typically already imported in user's environment
 
     # From an Ibis table:
     # - get the row count
@@ -1898,59 +3141,72 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
         # Use the `row_ranges` list of lists to query, for each column, the proportion of missing
         # values in each 'sector' of the table (a sector is a range of rows)
-        if df_lib_name_gt == "polars":
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_polars()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_polars()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+        def _calculate_missing_proportions(use_polars_conversion: bool = False):
+            """
+            Calculate missing value proportions for each column and sector.
 
+            Parameters
+            ----------
+            use_polars_conversion
+                If True, use `.to_polars()` for conversions, otherwise use `.to_pandas()`
+            """
+            missing_vals = {}
+            for col in data.columns:
+                col_missing_props = []
+
+                # Calculate missing value proportions for each sector
+                for i in range(len(cut_points)):
+                    start_row = cut_points[i - 1] if i > 0 else 0
+                    end_row = cut_points[i]
+                    sector_size = end_row - start_row
+
+                    if sector_size > 0:
+                        sector_data = data[start_row:end_row][col]
+                        null_sum = sector_data.isnull().sum()
+
+                        # Apply the appropriate conversion method
+                        if use_polars_conversion:
+                            null_sum_converted = null_sum.to_polars()  # pragma: no cover
+                        else:
+                            null_sum_converted = null_sum.to_pandas()  # pragma: no cover
+
+                        missing_prop = (null_sum_converted / sector_size) * 100
+                        col_missing_props.append(missing_prop)
+                    else:
+                        col_missing_props.append(0)
+
+                # Handle the final sector (after last cut point)
+                if n_rows > cut_points[-1]:
+                    start_row = cut_points[-1]
+                    sector_size = n_rows - start_row
+
+                    sector_data = data[start_row:n_rows][col]
+                    null_sum = sector_data.isnull().sum()
+
+                    # Apply the appropriate conversion method
+                    if use_polars_conversion:
+                        null_sum_converted = null_sum.to_polars()  # pragma: no cover
+                    else:
+                        null_sum_converted = null_sum.to_pandas()  # pragma: no cover
+
+                    missing_prop = (null_sum_converted / sector_size) * 100
+                    col_missing_props.append(missing_prop)
+                else:
+                    col_missing_props.append(0)  # pragma: no cover
+
+                missing_vals[col] = col_missing_props
+
+            return missing_vals
+
+        # Use the helper function based on the DataFrame library
+        if df_lib_name_gt == "polars":
+            missing_vals = _calculate_missing_proportions(
+                use_polars_conversion=True
+            )  # pragma: no cover
         else:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_pandas()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_pandas()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals = _calculate_missing_proportions(
+                use_polars_conversion=False
+            )  # pragma: no cover
 
         # Pivot the `missing_vals` dictionary to create a table with the missing value proportions
         missing_vals = {
@@ -1963,43 +3219,133 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
         # Get a dictionary of counts of missing values in each column
         if df_lib_name_gt == "polars":
-            missing_val_counts = {col: data[col].isnull().sum().to_polars() for col in data.columns}
+            missing_val_counts = {
+                col: data[col].isnull().sum().to_polars() for col in data.columns
+            }  # pragma: no cover
         else:
-            missing_val_counts = {col: data[col].isnull().sum().to_pandas() for col in data.columns}
+            missing_val_counts = {
+                col: data[col].isnull().sum().to_pandas() for col in data.columns
+            }  # pragma: no cover
 
     if pl_pb_tbl:
         # Get the column names from the table
         col_names = list(data.columns)
 
+        # Helper function for DataFrame missing value calculation (Polars/Pandas)
+        def _calculate_missing_proportions_dataframe(is_polars: bool = False):
+            null_method = "is_null" if is_polars else "isnull"
+
+            missing_vals = {
+                col: [
+                    (
+                        getattr(
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
+                            null_method,
+                        )().sum()
+                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
+                        * 100
+                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
+                        else 0
+                    )
+                    for i in range(len(cut_points))
+                ]
+                + [
+                    (
+                        getattr(data[cut_points[-1] : n_rows][col], null_method)().sum()
+                        / (n_rows - cut_points[-1])
+                        * 100
+                        if n_rows > cut_points[-1]
+                        else 0
+                    )
+                ]
+                for col in data.columns
+            }
+
+            # Transform to the expected format
+            formatted_missing_vals = {
+                "columns": list(missing_vals.keys()),
+                **{
+                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
+                    for i in range(len(cut_points) + 1)
+                },
+            }
+
+            # Get a dictionary of counts of missing values in each column
+            missing_val_counts = {
+                col: getattr(data[col], null_method)().sum() for col in data.columns
+            }
+
+            return formatted_missing_vals, missing_val_counts
+
         # Iterate over the cut points and get the proportion of missing values in each 'sector'
         # for each column
         if "polars" in tbl_type:
-            # Polars case
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .is_null()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].is_null().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=True
+            )
 
+        elif "pandas" in tbl_type:
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=False
+            )
+
+        elif "pyspark" in tbl_type:
+            from pyspark.sql.functions import col as pyspark_col
+
+            # PySpark implementation for missing values calculation
+            missing_vals = {}
+            for col_name in data.columns:
+                col_missing_props = []
+
+                # Calculate missing value proportions for each sector
+                for i in range(len(cut_points)):
+                    start_row = cut_points[i - 1] if i > 0 else 0
+                    end_row = cut_points[i]
+                    sector_size = end_row - start_row
+
+                    if sector_size > 0:
+                        # Use row_number() to filter rows by range
+                        from pyspark.sql.functions import row_number
+                        from pyspark.sql.window import Window
+
+                        window = Window.orderBy(
+                            pyspark_col(data.columns[0])
+                        )  # Order by first column
+                        sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                            (pyspark_col("row_num") > start_row)
+                            & (pyspark_col("row_num") <= end_row)
+                        )
+
+                        # Count nulls in this sector
+                        null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                        missing_prop = (null_count / sector_size) * 100
+                        col_missing_props.append(missing_prop)
+                    else:
+                        col_missing_props.append(0)  # pragma: no cover
+
+                # Handle the final sector (after last cut point)
+                if n_rows > cut_points[-1]:
+                    start_row = cut_points[-1]
+                    end_row = n_rows
+                    sector_size = end_row - start_row
+
+                    from pyspark.sql.functions import row_number
+                    from pyspark.sql.window import Window
+
+                    window = Window.orderBy(pyspark_col(data.columns[0]))
+                    sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                        pyspark_col("row_num") > start_row
+                    )
+
+                    null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                    missing_prop = (null_count / sector_size) * 100
+                    col_missing_props.append(missing_prop)
+                else:
+                    col_missing_props.append(0)  # pragma: no cover
+
+                missing_vals[col_name] = col_missing_props
+
+            # Pivot the `missing_vals` dictionary to create a table with the missing value proportions
             missing_vals = {
                 "columns": list(missing_vals.keys()),
                 **{
@@ -2009,46 +3355,10 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
             }
 
             # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].is_null().sum() for col in data.columns}
-
-        if "pandas" in tbl_type:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
-
-            # Pivot the `missing_vals` dictionary to create a table with the missing
-            # value proportions
-            missing_vals = {
-                "columns": list(missing_vals.keys()),
-                **{
-                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
-                    for i in range(len(cut_points) + 1)
-                },
-            }
-
-            # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].isnull().sum() for col in data.columns}
+            missing_val_counts = {}
+            for col_name in data.columns:
+                null_count = data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                missing_val_counts[col_name] = null_count
 
     # From `missing_vals`, create the DataFrame with the missing value proportions
     if df_lib_name_gt == "polars":
@@ -2274,10 +3584,31 @@ def _get_row_ranges(cut_points: list[int], n_rows: int) -> list[list[int]]:
     return [lhs_values, rhs_values]
 
 
-def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
+def _get_column_names_safe(data: Any) -> list[str]:
+    """
+    Safely get column names from a DataFrame, optimized for LazyFrames.
+    This function avoids the Narwhals PerformanceWarning for LazyFrames.
+    """
+    try:
+        import narwhals as nw
+
+        df_nw = nw.from_native(data)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if is_narwhals_lazyframe(df_nw):  # pragma: no cover
+            return list(df_nw.collect_schema().keys())  # pragma: no cover
+        else:
+            return list(df_nw.columns)  # pragma: no cover
+    except Exception:  # pragma: no cover
+        # Fallback to direct column access
+        return list(data.columns)  # pragma: no cover
+
+
+def _get_column_names(data: Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
-    return list(data.columns)
+
+    # Use the optimized helper function
+    return _get_column_names_safe(data)
 
 
 def _validate_columns_subset(
@@ -2296,12 +3627,10 @@ def _validate_columns_subset(
                 )
             return columns_subset
 
-    return columns_subset.resolve(columns=col_names)
+    return columns_subset.resolve(columns=col_names)  # type: ignore[union-attr]
 
 
-def _select_columns(
-    data: FrameT | Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str
-) -> FrameT | Any:
+def _select_columns(data: Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str) -> Any:
     if ibis_tbl:
         return data[resolved_columns]
     if tbl_type == "polars":
@@ -2309,7 +3638,7 @@ def _select_columns(
     return data[resolved_columns]
 
 
-def get_column_count(data: FrameT | Any) -> int:
+def get_column_count(data: Any) -> int:
     """
     Get the number of columns in a table.
 
@@ -2336,6 +3665,7 @@ def get_column_count(data: FrameT | Any) -> int:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -2343,7 +3673,6 @@ def get_column_count(data: FrameT | Any) -> int:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -2461,23 +3790,67 @@ def get_column_count(data: FrameT | Any) -> int:
         # Handle list of file paths (likely Parquet files)
         data = _process_parquet_input(data)
 
-    if "ibis.expr.types.relations.Table" in str(type(data)):
-        return len(data.columns)
+    # Use Narwhals to handle all DataFrame types (including Ibis) uniformly
+    try:
+        import narwhals as nw
 
-    elif "polars" in str(type(data)):
-        return len(data.columns)
+        df_nw = nw.from_native(data)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if is_narwhals_lazyframe(df_nw):
+            return len(df_nw.collect_schema())
+        else:
+            return len(df_nw.columns)  # pragma: no cover
+    except Exception:
+        # Fallback for unsupported types
+        if "pandas" in str(type(data)):
+            return data.shape[1]  # pragma: no cover
+        else:
+            raise ValueError("The input table type supplied in `data=` is not supported.")
 
-    elif "pandas" in str(type(data)):
-        return data.shape[1]
 
-    elif "narwhals" in str(type(data)):
-        return len(data.columns)
+def _extract_enum_values(set_values: Any) -> list[Any]:
+    """
+    Extract values from Enum classes or collections containing Enum instances.
 
-    else:
-        raise ValueError("The input table type supplied in `data=` is not supported.")
+    This helper function handles:
+    1. Enum classes: extracts all enum values
+    2. Collections containing Enum instances: extracts their values
+    3. Regular collections: returns as-is
+
+    Parameters
+    ----------
+    set_values
+        The input collection that may contain Enum class or Enum instances.
+
+    Returns
+    -------
+    list[Any]
+        A list of extracted values
+    """
+    from collections.abc import Collection
+
+    # Check if set_values is an Enum class (not an instance)
+    if inspect.isclass(set_values) and issubclass(set_values, Enum):
+        # Extract all values from the Enum class
+        return [enum_member.value for enum_member in set_values]
+
+    # Check if set_values is a collection
+    if isinstance(set_values, Collection) and not isinstance(set_values, (str, bytes)):
+        extracted_values = []
+        for item in set_values:
+            if isinstance(item, Enum):
+                # If item is an Enum instance, extract its value
+                extracted_values.append(item.value)
+            else:
+                # If item is not an Enum instance, keep as-is
+                extracted_values.append(item)
+        return extracted_values
+
+    # If set_values is neither an Enum class nor a collection, return as list
+    return [set_values]
 
 
-def get_row_count(data: FrameT | Any) -> int:
+def get_row_count(data: Any) -> int:
     """
     Get the number of rows in a table.
 
@@ -2504,6 +3877,7 @@ def get_row_count(data: FrameT | Any) -> int:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -2511,7 +3885,6 @@ def get_row_count(data: FrameT | Any) -> int:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -2630,30 +4003,31 @@ def get_row_count(data: FrameT | Any) -> int:
         # Handle list of file paths (likely Parquet files)
         data = _process_parquet_input(data)
 
-    if "ibis.expr.types.relations.Table" in str(type(data)):
-        # Determine whether Pandas or Polars is available to get the row count
-        _check_any_df_lib(method_used="get_row_count")
+    # Use Narwhals to handle all DataFrame types (including Ibis) uniformly
+    try:
+        import narwhals as nw
 
-        # Select the DataFrame library to use for displaying the Ibis table
-        df_lib = _select_df_lib(preference="polars")
-        df_lib_name = df_lib.__name__
+        df_nw = nw.from_native(data, allow_series=False)
 
-        if df_lib_name == "pandas":
-            return int(data.count().to_pandas())
+        # For LazyFrames, use lazy aggregation to avoid materializing entire frame
+        if is_narwhals_lazyframe(df_nw):
+            # Use lazy len() aggregation instead of collecting entire frame
+            return df_nw.select(nw.len()).collect().item()
+        # Try different ways to get row count for eager frames
+        elif hasattr(df_nw, "shape"):
+            return df_nw.shape[0]
+        elif hasattr(df_nw, "height"):  # pragma: no cover
+            return df_nw.height  # pragma: no cover
+        else:  # pragma: no cover
+            raise ValueError("Unable to determine row count from Narwhals DataFrame")
+    except Exception:  # pragma: no cover
+        # Fallback for types that don't work with Narwhals
+        if "pandas" in str(type(data)):  # pragma: no cover
+            return data.shape[0]
+        elif "pyspark" in str(type(data)):  # pragma: no cover
+            return data.count()
         else:
-            return int(data.count().to_polars())
-
-    elif "polars" in str(type(data)):
-        return int(data.height)
-
-    elif "pandas" in str(type(data)):
-        return data.shape[0]
-
-    elif "narwhals" in str(type(data)):
-        return data.shape[0]
-
-    else:
-        raise ValueError("The input table type supplied in `data=` is not supported.")
+            raise ValueError("The input table type supplied in `data=` is not supported.")
 
 
 @dataclass
@@ -2693,6 +4067,9 @@ class _ValidationInfo:
         A brief description of the validation step.
     autobrief
         An automatically-generated brief for the validation step.
+    dimension
+        The data quality dimension for the validation step (e.g., `"completeness"`, `"validity"`,
+        `"uniqueness"`, etc.). If not set explicitly, it is inferred from the `assertion_type`.
     active
         Whether the validation step is active.
     all_passed
@@ -2725,7 +4102,41 @@ class _ValidationInfo:
         The time the validation step was processed. This is in the ISO 8601 format in UTC time.
     proc_duration_s
         The duration of processing for the validation step in seconds.
+    notes
+        An ordered dictionary of notes/footnotes associated with the validation step. Each entry
+        contains both 'markdown' and 'text' versions of the note content. The dictionary preserves
+        insertion order, ensuring notes appear in a consistent sequence in reports and logs.
     """
+
+    @classmethod
+    def from_agg_validator(
+        cls,
+        assertion_type: str,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> _ValidationInfo:
+        # This factory method creates a `_ValidationInfo` instance for aggregate
+        # methods. The reason this is created, is because all agg methods share the same
+        # signature so instead of instantiating the class directly each time, this method
+        # can be used to reduce redundancy, boilerplate and mistakes :)
+        _check_thresholds(thresholds=thresholds)
+
+        return cls(
+            assertion_type=assertion_type,
+            column=_resolve_columns(columns),
+            values={"value": value, "tol": tol},
+            thresholds=_normalize_thresholds_creation(thresholds),
+            brief=_transform_auto_brief(brief=brief),
+            actions=actions,
+            active=active,
+            dimension=dimension,
+        )
 
     # Validation plan
     i: int | None = None
@@ -2733,18 +4144,20 @@ class _ValidationInfo:
     step_id: str | None = None
     sha1: str | None = None
     assertion_type: str | None = None
-    column: any | None = None
-    values: any | list[any] | tuple | None = None
+    column: Any | None = None
+    values: Any | list[Any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
+    missing: Any | None = None
     pre: Callable | None = None
-    segments: any | None = None
+    segments: Any | None = None
     thresholds: Thresholds | None = None
     actions: Actions | None = None
     label: str | None = None
     brief: str | None = None
     autobrief: str | None = None
-    active: bool | None = None
+    dimension: str | None = None
+    active: bool | Callable | None = None
     # Interrogation results
     eval_error: bool | None = None
     all_passed: bool | None = None
@@ -2757,14 +4170,677 @@ class _ValidationInfo:
     error: bool | None = None
     critical: bool | None = None
     failure_text: str | None = None
-    tbl_checked: FrameT | None = None
-    extract: FrameT | None = None
-    val_info: dict[str, any] | None = None
+    tbl_checked: Any = None
+    extract: Any = None
+    val_info: dict[str, Any] | None = None
     time_processed: str | None = None
     proc_duration_s: float | None = None
+    notes: dict[str, dict[str, str]] | None = None
 
-    def get_val_info(self) -> dict[str, any]:
+    def get_val_info(self) -> dict[str, Any] | None:
         return self.val_info
+
+    def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
+        """
+        Add a note/footnote to the validation step.
+
+        This internal method adds a note entry to the validation step's notes dictionary.
+        Notes are displayed as footnotes in validation reports and included in log output.
+
+        Parameters
+        ----------
+        key
+            A unique identifier for the note. If a note with this key already exists, it will
+            be overwritten.
+        markdown
+            The note content formatted with Markdown. This version is used for display in
+            HTML reports and other rich text formats.
+        text
+            The note content as plain text. This version is used for log files and text-based
+            output. If not provided, the markdown version will be used (with markdown formatting
+            intact).
+
+        Examples
+        --------
+        ```python
+        # Add a note about evaluation failure
+        validation_info._add_note(
+            key="eval_error",
+            markdown="Column expression evaluation **failed**",
+            text="Column expression evaluation failed"
+        )
+
+        # Add a note about LLM response
+        validation_info._add_note(
+            key="llm_response",
+            markdown="LLM validation returned `200` passing rows",
+            text="LLM validation returned 200 passing rows"
+        )
+        ```
+        """
+        # Initialize notes dictionary if it doesn't exist
+        if self.notes is None:
+            self.notes = {}
+
+        # Use markdown as text if text is not provided
+        if text is None:
+            text = markdown
+
+        # Add the note entry
+        self.notes[key] = {"markdown": markdown, "text": text}
+
+    def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None:
+        """
+        Get notes associated with this validation step.
+
+        Parameters
+        ----------
+        format
+            The format to return notes in:
+            - `"dict"`: Returns the full notes dictionary (default)
+            - `"markdown"`: Returns a list of markdown-formatted note values
+            - `"text"`: Returns a list of plain text note values
+            - `"keys"`: Returns a list of note keys
+
+        Returns
+        -------
+        dict, list, or None
+            The notes in the requested format, or `None` if no notes exist.
+
+        Examples
+        --------
+        ```python
+        # Get all notes as dictionary
+        notes = validation_info._get_notes()
+        # Returns: {'key1': {'markdown': '...', 'text': '...'}, ...}
+
+        # Get just markdown versions
+        markdown_notes = validation_info._get_notes(format="markdown")
+        # Returns: ['First note with **emphasis**', 'Second note']
+
+        # Get just plain text versions
+        text_notes = validation_info._get_notes(format="text")
+        # Returns: ['First note with emphasis', 'Second note']
+
+        # Get just the keys
+        keys = validation_info._get_notes(format="keys")
+        # Returns: ['key1', 'key2']
+        ```
+        """
+        if self.notes is None:
+            return None
+
+        if format == "dict":
+            return self.notes
+        elif format == "markdown":
+            return [note["markdown"] for note in self.notes.values()]
+        elif format == "text":
+            return [note["text"] for note in self.notes.values()]
+        elif format == "keys":
+            return list(self.notes.keys())
+        else:
+            raise ValueError(
+                f"Invalid format '{format}'. Must be one of: 'dict', 'markdown', 'text', 'keys'"
+            )
+
+    def _get_note(self, key: str, format: str = "dict") -> dict[str, str] | str | None:
+        """
+        Get a specific note by its key.
+
+        Parameters
+        ----------
+        key
+            The unique identifier of the note to retrieve.
+        format
+            The format to return the note in:
+            - `"dict"`: Returns `{'markdown': '...', 'text': '...'}` (default)
+            - `"markdown"`: Returns just the markdown string
+            - `"text"`: Returns just the plain text string
+
+        Returns
+        -------
+        dict, str, or None
+            The note in the requested format, or `None` if the note doesn't exist.
+
+        Examples
+        --------
+        ```python
+        # Get a specific note as dictionary
+        note = validation_info._get_note("threshold_info")
+        # Returns: {'markdown': 'Using **default** thresholds', 'text': '...'}
+
+        # Get just the markdown version
+        markdown = validation_info._get_note("threshold_info", format="markdown")
+        # Returns: 'Using **default** thresholds'
+
+        # Get just the text version
+        text = validation_info._get_note("threshold_info", format="text")
+        # Returns: 'Using default thresholds'
+        ```
+        """
+        if self.notes is None or key not in self.notes:
+            return None
+
+        note = self.notes[key]
+
+        if format == "dict":
+            return note
+        elif format == "markdown":
+            return note["markdown"]
+        elif format == "text":
+            return note["text"]
+        else:
+            raise ValueError(
+                f"Invalid format '{format}'. Must be one of: 'dict', 'markdown', 'text'"
+            )
+
+    def _has_notes(self) -> bool:
+        """
+        Check if this validation step has any notes.
+
+        Returns
+        -------
+        bool
+            `True` if the validation step has notes, `False` otherwise.
+
+        Examples
+        --------
+        ```python
+        if validation_info._has_notes():
+            print("This step has notes")
+        ```
+        """
+        return self.notes is not None and len(self.notes) > 0
+
+
+# ─── Plan serialization (to_code / to_yaml) ──────────────────────────────────────
+#
+# These helpers render an in-memory validation plan (a list of `_ValidationInfo`
+# objects) back into canonical Pointblank source: either a Python method chain
+# (`to_code()`) or a `yaml_interrogate()`-compatible YAML config (`to_yaml()`).
+# They power plan diffing, sharing, and the AI edit/iterate flow (`EditValidation`).
+
+# Method-name groupings used to reconstruct each step's keyword arguments from the
+# heterogeneous `_ValidationInfo.values` field.
+_SERIALIZE_COMPARE_METHODS = frozenset(
+    {"col_vals_gt", "col_vals_lt", "col_vals_eq", "col_vals_ne", "col_vals_ge", "col_vals_le"}
+)
+_SERIALIZE_RANGE_METHODS = frozenset({"col_vals_between", "col_vals_outside"})
+_SERIALIZE_SET_METHODS = frozenset({"col_vals_in_set", "col_vals_not_in_set"})
+_SERIALIZE_COLUMN_ONLY_METHODS = frozenset({"col_vals_null", "col_vals_not_null", "col_exists"})
+_SERIALIZE_SEQUENCE_METHODS = frozenset({"col_vals_increasing", "col_vals_decreasing"})
+
+# Methods whose primary argument is `columns=` and can therefore be coalesced across
+# adjacent steps that differ only by column (for compact, readable output).
+_SERIALIZE_COLUMN_METHODS = (
+    _SERIALIZE_COMPARE_METHODS
+    | _SERIALIZE_RANGE_METHODS
+    | _SERIALIZE_SET_METHODS
+    | _SERIALIZE_COLUMN_ONLY_METHODS
+    | _SERIALIZE_SEQUENCE_METHODS
+    | {"col_vals_regex", "col_vals_within_spec", "col_vals_str_len"}
+)
+
+
+class _UnserializablePlaceholder:
+    """Stand-in for a plan value (callable, expression) that cannot be rendered to source.
+
+    Holds a syntactically-valid Python `code` fragment (so generated code still parses and
+    runs) and a `note` explaining what was lost. Instances compare equal when their notes
+    match, so steps differing only by such a placeholder can still be coalesced.
+    """
+
+    __slots__ = ("code", "yaml_value", "note")
+
+    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None:
+        self.code = code
+        self.yaml_value = yaml_value if yaml_value is not None else code
+        self.note = note
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _UnserializablePlaceholder) and other.note == self.note
+
+    def __hash__(self) -> int:
+        return hash(self.note)
+
+
+def _thresholds_as_dict(thresholds: Thresholds | None) -> dict[str, Any]:
+    """Reduce a `Thresholds` object to a dict of only its set levels."""
+    if thresholds is None:
+        return {}
+    result: dict[str, Any] = {}
+    for level in ("warning", "error", "critical"):
+        value = getattr(thresholds, level, None)
+        if value is not None:
+            result[level] = value
+    return result
+
+
+def _column_to_name(column: Any) -> str | None:
+    """Return a simple string column name, or `None` if the column is a complex selector."""
+    if isinstance(column, str):
+        return column
+    if isinstance(column, Column):
+        exprs = getattr(column, "exprs", None)
+        if isinstance(exprs, str):
+            return exprs
+    return None
+
+
+def _validation_info_to_step(
+    vi: _ValidationInfo,
+    global_thresholds: Thresholds | None,
+    global_actions: Actions | None,
+    warnings_out: list[str],
+) -> tuple[str, dict[str, Any]] | None:
+    """Map a `_ValidationInfo` to its `(method_name, kwargs)` pair.
+
+    Returns `None` for interrogation-only/internal assertion types that have no
+    corresponding public validation method. Non-serializable content (callables,
+    expressions) is replaced with an `_UnserializablePlaceholder` and a message is
+    appended to `warnings_out`.
+    """
+    at = vi.assertion_type
+    if at is None:  # pragma: no cover
+        return None
+
+    params: dict[str, Any] = {}
+
+    def _placeholder(
+        code: str, note: str, yaml_value: str | None = None
+    ) -> _UnserializablePlaceholder:
+        warnings_out.append(note)
+        return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
+
+    def _columns_param() -> None:
+        # Aggregate methods store `column` as a list of resolved names; column-value methods
+        # store a single string (or a Column selector, which can't be serialized simply).
+        if isinstance(vi.column, (list, tuple)):
+            names = [_column_to_name(c) for c in vi.column]
+            if names and all(n is not None for n in names):
+                params["columns"] = names[0] if len(names) == 1 else names
+                return
+        name = _column_to_name(vi.column)
+        if name is not None:
+            params["columns"] = name
+        else:
+            params["columns"] = _placeholder(  # pragma: no cover
+                code=repr(str(vi.column)),
+                note=(
+                    f"Step '{at}' uses a column selector that cannot be serialized to a "
+                    "simple column name; a placeholder was emitted."
+                ),
+            )
+
+    if at in _SERIALIZE_COMPARE_METHODS:
+        _columns_param()
+        params["value"] = vi.values
+    elif at in _SERIALIZE_RANGE_METHODS:
+        _columns_param()
+        left, right = vi.values
+        params["left"] = left
+        params["right"] = right
+        if vi.inclusive is not None and tuple(vi.inclusive) != (True, True):
+            params["inclusive"] = tuple(vi.inclusive)
+    elif at in _SERIALIZE_SET_METHODS:
+        _columns_param()
+        params["set"] = list(vi.values) if vi.values is not None else []
+    elif at == "col_vals_regex":
+        _columns_param()
+        values = vi.values or {}
+        params["pattern"] = values.get("pattern", "")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_vals_within_spec":
+        _columns_param()
+        values = vi.values or {}
+        params["spec"] = values.get("spec", "")
+    elif at == "col_vals_str_len":
+        _columns_param()
+        values = vi.values or {}
+        if values.get("min_val") is not None:
+            params["min_val"] = values["min_val"]
+        if values.get("max_val") is not None:
+            params["max_val"] = values["max_val"]
+    elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
+        _columns_param()
+    elif at in _SERIALIZE_SEQUENCE_METHODS:
+        _columns_param()
+        info = vi.val_info or {}
+        if info.get("allow_stationary"):
+            params["allow_stationary"] = True
+        tol_key = "decreasing_tol" if at == "col_vals_increasing" else "increasing_tol"
+        if info.get(tol_key):  # pragma: no cover
+            params[tol_key] = info[tol_key]  # pragma: no cover
+    elif at == "col_vals_expr":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'col_vals_expr' uses a table expression that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif at == "data_freshness":
+        values = vi.values or {}
+        params["column"] = _column_to_name(vi.column) or vi.column
+        max_age = values.get("max_age_str")
+        if max_age is None and values.get("max_age") is not None:  # pragma: no cover
+            max_age = str(values["max_age"])  # pragma: no cover
+        params["max_age"] = max_age
+        if values.get("reference_time") is not None:
+            params["reference_time"] = values["reference_time"]
+        if values.get("timezone") is not None:
+            params["timezone"] = values["timezone"]
+        if values.get("allow_tz_mismatch"):
+            params["allow_tz_mismatch"] = True
+    elif at == "col_schema_match":
+        values = vi.values or {}
+        params["schema"] = values.get("schema")
+        for key in (
+            "complete",
+            "in_order",
+            "case_sensitive_colnames",
+            "case_sensitive_dtypes",
+            "full_match_dtypes",
+        ):
+            if values.get(key, True) is not True:
+                params[key] = values[key]
+    elif at == "row_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at == "col_count_match":
+        values = vi.values or {}
+        params["count"] = values.get("count")
+        if values.get("inverse"):
+            params["inverse"] = True
+    elif at in ("rows_distinct", "rows_complete"):
+        if vi.column is not None:
+            name = _column_to_name(vi.column)
+            if isinstance(vi.column, (list, tuple)):
+                params["columns_subset"] = list(vi.column)
+            elif name is not None:  # pragma: no cover
+                params["columns_subset"] = name  # pragma: no cover
+    elif at == "conjointly":
+        params["expressions"] = _placeholder(
+            code="[lambda df: df]",
+            note=(
+                "Step 'conjointly' uses callable expressions that cannot be serialized to "
+                "source; a placeholder was emitted and must be edited manually."
+            ),
+            yaml_value="[]",
+        )
+    elif at == "specially":
+        params["expr"] = _placeholder(
+            code="lambda df: df",
+            note=(
+                "Step 'specially' uses a callable that cannot be serialized to source; a "
+                "placeholder was emitted and must be edited manually."
+            ),
+        )
+    elif isinstance(vi.values, dict) and "value" in vi.values:
+        # Aggregate methods (col_sum_eq, col_avg_gt, ...) share a {"value", "tol"} shape.
+        _columns_param()
+        params["value"] = vi.values["value"]
+        if vi.values.get("tol"):
+            params["tol"] = vi.values["tol"]
+    else:
+        warnings_out.append(  # pragma: no cover
+            f"Assertion type '{at}' is not supported by plan serialization and was skipped."
+        )
+        return None  # pragma: no cover
+
+    # Common trailing keyword arguments, emitted only when they deviate from defaults.
+    if vi.na_pass:
+        params["na_pass"] = True
+
+    if vi.pre is not None:
+        params["pre"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has a `pre=` preprocessing callable that cannot be serialized; "
+                "it was dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.segments is not None:
+        params["segments"] = vi.segments
+
+    step_thresholds = _thresholds_as_dict(vi.thresholds)
+    if step_thresholds and step_thresholds != _thresholds_as_dict(global_thresholds):
+        params["thresholds"] = vi.thresholds
+
+    if vi.actions is not None and vi.actions is not global_actions:
+        params["actions"] = _placeholder(
+            code="None",
+            note=(
+                f"Step '{at}' has step-level `actions=` that cannot be serialized; they were "
+                "dropped from the generated plan."
+            ),
+            yaml_value="null",
+        )
+
+    if vi.brief is not None and vi.brief is not False:
+        params["brief"] = True if vi.brief == "{auto}" else vi.brief
+
+    # Emit `dimension=` only when it deviates from the built-in default inference (i.e., an
+    # explicit per-step override or a `dimension_map` remap), so generated plans reproduce the
+    # same dimensions without depending on global config
+    if vi.dimension is not None and vi.dimension != _base_dimension_from_assertion_type(at):
+        params["dimension"] = vi.dimension
+
+    if vi.active is not None and vi.active is not True:
+        if callable(vi.active):
+            params["active"] = _placeholder(
+                code="True",
+                note=(
+                    f"Step '{at}' has a callable `active=` condition that cannot be serialized; "
+                    "it was replaced with `True`."
+                ),
+                yaml_value="true",
+            )
+        else:
+            params["active"] = vi.active
+
+    return at, params
+
+
+def _coalesce_plan_steps(
+    steps: list[tuple[str, dict[str, Any]]],
+) -> list[tuple[str, dict[str, Any]]]:
+    """Merge adjacent column-based steps that differ only by a simple column name.
+
+    Turns e.g. two `col_vals_not_null(columns="a")` / `col_vals_not_null(columns="b")` steps
+    into a single `col_vals_not_null(columns=["a", "b"])` for compact, reviewable output.
+    """
+    merged: list[tuple[str, dict[str, Any]]] = []
+    for method, params in steps:
+        if (
+            merged
+            and method in _SERIALIZE_COLUMN_METHODS
+            and isinstance(params.get("columns"), str)
+        ):
+            prev_method, prev_params = merged[-1]
+            prev_cols = prev_params.get("columns")
+            prev_is_coalescible = isinstance(prev_cols, (str, list)) and all(
+                isinstance(c, str)
+                for c in ([prev_cols] if isinstance(prev_cols, str) else prev_cols)
+            )
+            rest = {k: v for k, v in params.items() if k != "columns"}
+            prev_rest = {k: v for k, v in prev_params.items() if k != "columns"}
+            if prev_method == method and prev_is_coalescible and rest == prev_rest:
+                cols = prev_cols if isinstance(prev_cols, list) else [prev_cols]
+                cols.append(params["columns"])
+                new_params = dict(prev_params)
+                new_params["columns"] = cols
+                merged[-1] = (method, new_params)
+                continue
+        merged.append((method, dict(params)))
+    return merged
+
+
+def _render_code_value(value: Any) -> str:
+    """Render a single Python value as source code for `to_code()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        return value.code
+    if isinstance(value, bool):
+        return "True" if value else "False"
+    if value is None:
+        return "None"
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return json.dumps(value.isoformat())
+    if isinstance(value, ReferenceColumn):
+        return f"pb.ref({json.dumps(value.column_name)})"
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return f"pb.col({json.dumps(name)})" if name is not None else json.dumps(str(value))
+    if isinstance(value, Thresholds):
+        return _render_thresholds_code(value)
+    if isinstance(value, Schema):
+        return _render_schema_code(value)
+    if isinstance(value, tuple):
+        inner = ", ".join(_render_code_value(v) for v in value)
+        return f"({inner},)" if len(value) == 1 else f"({inner})"
+    if isinstance(value, list):
+        return "[" + ", ".join(_render_code_value(v) for v in value) + "]"
+    if callable(value):  # pragma: no cover
+        return "None"
+    return repr(value)  # pragma: no cover
+
+
+def _render_thresholds_code(thresholds: Thresholds) -> str:
+    parts = [
+        f"{level}={_render_code_value(value)}"
+        for level, value in _thresholds_as_dict(thresholds).items()
+    ]
+    return "pb.Thresholds(" + ", ".join(parts) + ")"
+
+
+def _render_schema_code(schema: Schema | None) -> str:
+    if schema is None or not getattr(schema, "columns", None):
+        return "pb.Schema(columns=[])"
+    parts = []
+    for entry in schema.columns:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                dtype_code = "[" + ", ".join(json.dumps(str(d)) for d in dtype) + "]"
+                parts.append(f"({json.dumps(name)}, {dtype_code})")
+            else:
+                parts.append(f"({json.dumps(name)}, {json.dumps(str(dtype))})")
+        else:
+            parts.append(f"({json.dumps(name)},)")
+    return "pb.Schema(columns=[" + ", ".join(parts) + "])"
+
+
+def _render_columns_arg(value: Any) -> str:
+    """Render a `columns=`/`columns_subset=` value, collapsing single-item lists to a string."""
+    if isinstance(value, list) and len(value) == 1 and isinstance(value[0], str):
+        return json.dumps(value[0])
+    return _render_code_value(value)
+
+
+def _render_step_code(method: str, params: dict[str, Any]) -> str:
+    """Render one step as a chained `.method(...)` call."""
+    parts = []
+    for key, value in params.items():
+        if key in ("columns", "columns_subset"):
+            parts.append(f"{key}={_render_columns_arg(value)}")
+        else:
+            parts.append(f"{key}={_render_code_value(value)}")
+    return f"    .{method}(" + ", ".join(parts) + ")"
+
+
+def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
+    """Convert a Python value into a YAML-safe structure for `to_yaml()`."""
+    if isinstance(value, _UnserializablePlaceholder):
+        if value.yaml_value in ("null", None):
+            return None
+        warnings_out.append(value.note)
+        return value.yaml_value
+    if isinstance(value, bool) or value is None or isinstance(value, (int, float, str)):
+        return value
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return value.isoformat()
+    if isinstance(value, ReferenceColumn):
+        # A column reference used as a comparison value must round-trip as a Python expression,
+        # not a bare string (which YAML would treat as a literal).
+        return {"python": f"pb.ref({value.column_name!r})"}
+    if isinstance(value, Column):
+        name = _column_to_name(value)
+        return {"python": f"pb.col({name!r})"} if name is not None else str(value)
+    if isinstance(value, Thresholds):
+        return _thresholds_as_dict(value)
+    if isinstance(value, Schema):
+        return _schema_to_yaml(value)
+    if isinstance(value, tuple):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    if isinstance(value, list):
+        return [_value_to_yaml(v, warnings_out) for v in value]
+    return str(value)  # pragma: no cover
+
+
+def _schema_to_yaml(schema: Schema | None) -> dict[str, Any]:
+    columns: list[Any] = []
+    for entry in getattr(schema, "columns", None) or []:
+        name = entry[0]
+        if len(entry) >= 2 and entry[1] is not None:
+            dtype = entry[1]
+            if isinstance(dtype, (list, tuple)):
+                columns.append([name, [str(d) for d in dtype]])
+            else:
+                columns.append([name, str(dtype)])
+        else:
+            columns.append([name])
+    return {"columns": columns}
+
+
+def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
+    """
+    Shared error handling for database connection failures.
+
+    Raises appropriate ConnectionError with helpful messages based on the exception.
+    """
+
+    error_str = str(e).lower()
+    backend_install_map = {
+        "duckdb": "pip install 'ibis-framework[duckdb]'",
+        "postgresql": "pip install 'ibis-framework[postgres]'",
+        "postgres": "pip install 'ibis-framework[postgres]'",
+        "mysql": "pip install 'ibis-framework[mysql]'",
+        "sqlite": "pip install 'ibis-framework[sqlite]'",
+        "bigquery": "pip install 'ibis-framework[bigquery]'",
+        "snowflake": "pip install 'ibis-framework[snowflake]'",
+    }
+
+    # Check if this is a missing backend dependency
+    for backend, install_cmd in backend_install_map.items():
+        if backend in error_str and ("not found" in error_str or "no module" in error_str):
+            raise ConnectionError(
+                f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
+                f"  {install_cmd}\n\n"
+                f"Original error: {e}"
+            ) from e
+
+    # Generic connection error
+    raise ConnectionError(  # pragma: no cover
+        f"Failed to connect using: {connection_string}\n"
+        f"Error: {e}\n\n"
+        f"Supported connection string formats:\n"
+        f"- DuckDB: 'duckdb:///path/to/file.ddb'\n"
+        f"- SQLite: 'sqlite:///path/to/file.db'\n"
+        f"- PostgreSQL: 'postgresql://user:pass@host:port/db'\n"
+        f"- MySQL: 'mysql://user:pass@host:port/db'\n"
+        f"- BigQuery: 'bigquery://project/dataset'\n"
+        f"- Snowflake: 'snowflake://user:pass@account/db/schema'"
+    ) from e
 
 
 def connect_to_table(connection_string: str) -> Any:
@@ -2846,7 +4922,11 @@ def connect_to_table(connection_string: str) -> Any:
     pip install 'ibis-framework[duckdb]'    # for DuckDB
     pip install 'ibis-framework[postgres]'  # for PostgreSQL
     ```
+    See Also
+    --------
+    print_database_tables : List all available tables in a database for discovery
     """
+
     # Check if Ibis is available
     if not _is_lib_present(lib_name="ibis"):
         raise ImportError(
@@ -2860,16 +4940,12 @@ def connect_to_table(connection_string: str) -> Any:
     if "::" not in connection_string:
         # Try to connect to get available tables for helpful error message
         try:
-            # Extract the base connection string (without table name)
             base_connection = connection_string
-
-            # Connect to the database
             conn = ibis.connect(base_connection)
 
-            # Get list of available tables
-            try:
+            try:  # pragma: no cover
                 available_tables = conn.list_tables()
-            except Exception:
+            except Exception:  # pragma: no cover
                 available_tables = []
 
             conn.disconnect()
@@ -2884,7 +4960,6 @@ def connect_to_table(connection_string: str) -> Any:
                     f"  {connection_string}::TABLE_NAME\n\n"
                     f"Examples:\n"
                 )
-                # Add examples with first few table names
                 for table in available_tables[:3]:
                     error_msg += f"  {connection_string}::{table}\n"
             else:
@@ -2899,48 +4974,13 @@ def connect_to_table(connection_string: str) -> Any:
 
         except Exception as e:
             if isinstance(e, ValueError):
-                raise  # Re-raise our custom ValueError
-
-            # Check for backend-specific errors and provide installation guidance
-            error_str = str(e).lower()
-            backend_install_map = {
-                "duckdb": "pip install 'ibis-framework[duckdb]'",
-                "postgresql": "pip install 'ibis-framework[postgres]'",
-                "postgres": "pip install 'ibis-framework[postgres]'",
-                "mysql": "pip install 'ibis-framework[mysql]'",
-                "sqlite": "pip install 'ibis-framework[sqlite]'",
-                "bigquery": "pip install 'ibis-framework[bigquery]'",
-                "snowflake": "pip install 'ibis-framework[snowflake]'",
-            }
-
-            # Check if this is a missing backend dependency
-            for backend, install_cmd in backend_install_map.items():
-                if backend in error_str and ("not found" in error_str or "no module" in error_str):
-                    raise ConnectionError(
-                        f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
-                        f"  {install_cmd}\n\n"
-                        f"Original error: {e}\n\n"
-                        f"Supported connection string formats:\n"
-                        f"- DuckDB: 'duckdb:///path/to/file.ddb::table_name'\n"
-                        f"- SQLite: 'sqlite:///path/to/file.db::table_name'\n"
-                        f"- PostgreSQL: 'postgresql://user:pass@host:port/db::table_name'\n"
-                        f"- MySQL: 'mysql://user:pass@host:port/db::table_name'\n"
-                        f"- BigQuery: 'bigquery://project/dataset::table_name'\n"
-                        f"- Snowflake: 'snowflake://user:pass@account/db/schema::table_name'\n"
-                        f"\nNote: Use '::table_name' to specify the table within the database."
-                    ) from e
-
-            # Generic connection error
-            raise ConnectionError(
-                f"Failed to connect to database using connection string: {connection_string}\n"
-                f"Error: {e}\n\n"
-                f"No table specified. Use the format: {connection_string}::TABLE_NAME"
-            ) from e
+                raise
+            _handle_connection_errors(e, connection_string)
 
     # Split connection string and table name
     try:
         base_connection, table_name = connection_string.rsplit("::", 1)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         raise ValueError(f"Invalid connection string format: {connection_string}")
 
     # Connect to database and get table
@@ -2948,56 +4988,128 @@ def connect_to_table(connection_string: str) -> Any:
         conn = ibis.connect(base_connection)
         table = conn.table(table_name)
         return table
-
     except Exception as e:
-        # Check for backend-specific errors and provide installation guidance
         error_str = str(e).lower()
-        backend_install_map = {
-            "duckdb": "pip install 'ibis-framework[duckdb]'",
-            "postgresql": "pip install 'ibis-framework[postgres]'",
-            "postgres": "pip install 'ibis-framework[postgres]'",
-            "mysql": "pip install 'ibis-framework[mysql]'",
-            "sqlite": "pip install 'ibis-framework[sqlite]'",
-            "bigquery": "pip install 'ibis-framework[bigquery]'",
-            "snowflake": "pip install 'ibis-framework[snowflake]'",
-        }
 
-        # Check if this is a missing backend dependency
-        for backend, install_cmd in backend_install_map.items():
-            if backend in error_str and ("not found" in error_str or "no module" in error_str):
-                raise ConnectionError(
-                    f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
-                    f"  {install_cmd}\n\n"
-                    f"Original error: {e}"
-                ) from e
-
-        # Check if table doesn't exist
-        if "table" in error_str and ("not found" in error_str or "does not exist" in error_str):
-            # Try to get available tables for helpful message
-            try:
+        # Check if this is a "table not found" error
+        if "table" in error_str and (
+            "not found" in error_str or "does not exist" in error_str or "not exist" in error_str
+        ):
+            # Try to get available tables for a helpful error message
+            try:  # pragma: no cover
                 available_tables = conn.list_tables()
                 if available_tables:
                     table_list = "\n".join(f"  - {table}" for table in available_tables)
                     raise ValueError(
                         f"Table '{table_name}' not found in database.\n\n"
                         f"Available tables:\n{table_list}\n\n"
-                        f"Check the table name and try again with:\n"
-                        f"  {base_connection}::CORRECT_TABLE_NAME"
+                        f"Connection: {base_connection}"
                     ) from e
-                else:
-                    raise ValueError(
-                        f"Table '{table_name}' not found and no tables available in database."
-                    ) from e
+            except ValueError:
+                # Re-raise the table-specific ValueError
+                raise
             except Exception:
-                raise ValueError(
-                    f"Table '{table_name}' not found in database. "
-                    f"Check the table name and connection string."
-                ) from e
+                # If we can't list tables, just raise a simple error
+                pass
 
-        # Generic connection error
-        raise ConnectionError(
-            f"Failed to connect to table '{table_name}' using: {base_connection}\nError: {e}"
-        ) from e
+            raise ValueError(
+                f"Table '{table_name}' not found in database.\n"
+                f"Connection: {base_connection}\n\n"
+                f"Original error: {e}"
+            ) from e
+
+        # For other errors, use the generic connection error handler
+        _handle_connection_errors(e, base_connection)
+
+
+def print_database_tables(connection_string: str) -> list[str]:
+    """
+    List all tables in a database from a connection string.
+
+    The `print_database_tables()` function connects to a database and returns a list of all
+    available tables. This is particularly useful for discovering what tables exist in a database
+    before connecting to a specific table with `connect_to_table(). The function automatically
+    filters out temporary Ibis tables (memtables) to show only user tables. It supports all database
+    backends available through Ibis, including DuckDB, SQLite, PostgreSQL, MySQL, BigQuery, and
+    Snowflake.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string *without* the `::table_name` suffix. Example:
+        `"duckdb:///path/to/database.ddb"`.
+
+    Returns
+    -------
+    list[str]
+        List of table names, excluding temporary Ibis tables.
+
+    See Also
+    --------
+    connect_to_table : Connect to a database table with full connection string documentation
+    """
+    # Check if connection string includes table specification (which is not allowed)
+    if "::" in connection_string:
+        raise ValueError(
+            "Connection string should not include table specification (::table_name).\n"
+            f"You've supplied: {connection_string}\n"
+            f"Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)"
+        )
+
+    # Check if Ibis is available
+    if not _is_lib_present(lib_name="ibis"):
+        raise ImportError(
+            "The Ibis library is not installed but is required for database connection strings.\n"
+            "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
+        )
+
+    import ibis
+
+    try:
+        # Connect to database
+        conn = ibis.connect(connection_string)
+        # Get all tables and filter out temporary Ibis tables
+        all_tables = conn.list_tables()
+        user_tables = [t for t in all_tables if "memtable" not in t]
+
+        return user_tables
+
+    except Exception as e:
+        _handle_connection_errors(e, connection_string)
+
+
+def _extract_steps_from_validate(validation: Validate) -> list:
+    from pointblank.contract import Step
+
+    steps = []
+    for vi in validation.validation_info:
+        kwargs: dict[str, Any] = {}
+        if vi.column is not None:
+            kwargs["columns"] = vi.column
+        if vi.values is not None:
+            kwargs["value"] = vi.values
+        if vi.inclusive is not None:
+            kwargs["inclusive"] = vi.inclusive
+        if vi.na_pass is not None:
+            kwargs["na_pass"] = vi.na_pass
+        if vi.missing is not None:
+            kwargs["missing"] = vi.missing
+        if vi.pre is not None:
+            kwargs["pre"] = vi.pre
+        if vi.segments is not None:
+            kwargs["segments"] = vi.segments
+        if vi.thresholds is not None:
+            kwargs["thresholds"] = vi.thresholds
+        if vi.actions is not None:
+            kwargs["actions"] = vi.actions
+        if vi.brief is not None:
+            kwargs["brief"] = vi.brief
+        if vi.active is not None and vi.active is not True:
+            kwargs["active"] = vi.active
+        if vi.dimension is not None:
+            kwargs["dimension"] = vi.dimension
+        steps.append(Step(vi.assertion_type, **kwargs))
+    return steps
 
 
 @dataclass
@@ -3089,6 +5201,18 @@ class Validate:
         locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for
         French (France). More simply, this can be a language identifier without a designation of
         territory, like `"es"` for Spanish.
+    owner
+        An optional string identifying the owner of the data being validated. This is useful for
+        governance purposes, indicating who is responsible for the quality and maintenance of the
+        data. For example, `"data-platform-team"` or `"analytics-engineering"`.
+    consumers
+        An optional string or list of strings identifying who depends on or consumes this data.
+        This helps document data dependencies and can be useful for impact analysis when data
+        quality issues are detected. For example, `"ml-team"` or `["ml-team", "analytics"]`.
+    version
+        An optional string representing the version of the validation plan or data contract. This
+        supports semantic versioning (e.g., `"1.0.0"`, `"2.1.0"`) and is useful for tracking changes
+        to validation rules over time and for organizational governance.
 
     Returns
     -------
@@ -3101,6 +5225,7 @@ class Validate:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -3108,7 +5233,6 @@ class Validate:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -3229,7 +5353,7 @@ class Validate:
         summary = pb.get_validation_summary()
         if summary["status"] == "CRITICAL":
             send_alert_email(
-                subject=f"CRITICAL validation failures in {summary['table_name']}",
+                subject=f"CRITICAL validation failures in {summary['tbl_name']}",
                 body=f"{summary['critical_steps']} steps failed with critical severity."
             )
 
@@ -3277,6 +5401,21 @@ class Validate:
     - Japanese (`"ja"`)
     - Korean (`"ko"`)
     - Vietnamese (`"vi"`)
+    - Indonesian (`"id"`)
+    - Ukrainian (`"uk"`)
+    - Bulgarian (`"bg"`)
+    - Croatian (`"hr"`)
+    - Estonian (`"et"`)
+    - Hungarian (`"hu"`)
+    - Irish (`"ga"`)
+    - Latvian (`"lv"`)
+    - Lithuanian (`"lt"`)
+    - Maltese (`"mt"`)
+    - Slovak (`"sk"`)
+    - Slovenian (`"sl"`)
+    - Hebrew (`"he"`)
+    - Thai (`"th"`)
+    - Persian (`"fa"`)
 
     Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will
     be written in the selected language. The language setting will also used when generating the
@@ -3550,7 +5689,8 @@ class Validate:
     when table specifications are missing or backend dependencies are not installed.
     """
 
-    data: FrameT | Any
+    data: IntoDataFrame
+    reference: IntoFrame | None = None
     tbl_name: str | None = None
     label: str | None = None
     thresholds: int | float | bool | tuple | dict | Thresholds | None = None
@@ -3559,10 +5699,17 @@ class Validate:
     brief: str | bool | None = None
     lang: str | None = None
     locale: str | None = None
+    owner: str | None = None
+    consumers: str | list[str] | None = None
+    version: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
+
+        # Process reference data if provided
+        if self.reference is not None:
+            self.reference = _process_data(self.reference)
 
         # Check input of the `thresholds=` argument
         _check_thresholds(thresholds=self.thresholds)
@@ -3599,6 +5746,36 @@ class Validate:
         # Transform any shorthands of `brief` to string representations
         self.brief = _transform_auto_brief(brief=self.brief)
 
+        # Validate and normalize the `owner` parameter
+        if self.owner is not None and not isinstance(self.owner, str):
+            raise TypeError(
+                "The `owner=` parameter must be a string representing the owner of the data. "
+                f"Received type: {type(self.owner).__name__}"
+            )
+
+        # Validate and normalize the `consumers` parameter
+        if self.consumers is not None:
+            if isinstance(self.consumers, str):
+                self.consumers = [self.consumers]
+            elif isinstance(self.consumers, list):
+                if not all(isinstance(c, str) for c in self.consumers):
+                    raise TypeError(
+                        "The `consumers=` parameter must be a string or a list of strings. "
+                        "All elements in the list must be strings."
+                    )
+            else:
+                raise TypeError(
+                    "The `consumers=` parameter must be a string or a list of strings. "
+                    f"Received type: {type(self.consumers).__name__}"
+                )
+
+        # Validate the `version` parameter
+        if self.version is not None and not isinstance(self.version, str):
+            raise TypeError(
+                "The `version=` parameter must be a string representing the version. "
+                f"Received type: {type(self.version).__name__}"
+            )
+
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
         self.col_types = None
@@ -3608,20 +5785,395 @@ class Validate:
 
         self.validation_info = []
 
+    def _add_agg_validation(
+        self,
+        *,
+        assertion_type: str,
+        columns: str | Collection[str],
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+        dimension: str | None = None,
+    ):
+        """
+        Add an aggregation-based validation step to the validation plan.
+
+        This internal method is used by all aggregation-based column validation methods
+        (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`) to create and register validation
+        steps. It relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+
+        Automatic Reference Inference
+        -----------------------------
+        When `value` is None and reference data has been set on the Validate object,
+        this method automatically creates a `ReferenceColumn` pointing to the same
+        column name in the reference data. This enables a convenient shorthand:
+
+        .. code-block:: python
+
+            # Instead of writing:
+            Validate(data=df, reference=ref_df).col_sum_eq("a", ref("a"))
+
+            # You can simply write:
+            Validate(data=df, reference=ref_df).col_sum_eq("a")
+
+        If `value` is None and no reference data is set, a `ValueError` is raised
+        immediately to provide clear feedback to the user.
+
+        Parameters
+        ----------
+        assertion_type
+            The type of assertion (e.g., "col_sum_eq", "col_avg_gt").
+        columns
+            Column name or collection of column names to validate.
+        value
+            The target value to compare against. Can be:
+            - A numeric literal (int or float)
+            - A `Column` object for cross-column comparison
+            - A `ReferenceColumn` object for reference data comparison
+            - None to automatically use `ref(column)` when reference data is set
+        tol
+            Tolerance for the comparison. Defaults to 0.
+        thresholds
+            Custom thresholds for the validation step.
+        brief
+            Brief description or auto-generate flag.
+        actions
+            Actions to take based on validation results.
+        active
+            Whether this validation step is active.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The Validate instance for method chaining.
+
+        Raises
+        ------
+        ValueError
+            If `value` is None and no reference data is set on the Validate object.
+        """
+        if isinstance(columns, str):
+            columns = [columns]
+        for column in columns:
+            # If value is None, default to referencing the same column from reference data
+            resolved_value = value
+            if value is None:
+                if self.reference is None:
+                    raise ValueError(
+                        f"The 'value' parameter is required for {assertion_type}() "
+                        "when no reference data is set. Either provide a value, or "
+                        "set reference data on the Validate object using "
+                        "Validate(data=..., reference=...)."
+                    )
+                resolved_value = ReferenceColumn(column_name=column)
+
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=assertion_type,
+                columns=column,
+                value=resolved_value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+                dimension=dimension,
+            )
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def set_tbl(
+        self,
+        tbl: Any,
+        tbl_name: str | None = None,
+        label: str | None = None,
+    ) -> Validate:
+        """
+        Set or replace the table associated with the Validate object.
+
+        This method allows you to replace the table associated with a Validate object with a
+        different (but presumably similar) table. This is useful when you want to apply the same
+        validation plan to multiple tables or when you have a validation workflow defined but want
+        to swap in a different data source.
+
+        Parameters
+        ----------
+        tbl
+            The table to replace the existing table with. This can be any supported table type
+            including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths,
+            GitHub URLs, or database connection strings. The same table type constraints apply as in
+            the `Validate` constructor.
+        tbl_name
+            An optional name to assign to the new input table object. If no value is provided, the
+            existing table name will be retained.
+        label
+            An optional label for the validation plan. If no value is provided, the existing label
+            will be retained.
+
+        Returns
+        -------
+        Validate
+            A new `Validate` object with the replacement table.
+
+        When to Use
+        -----------
+        The `set_tbl()` method is particularly useful in scenarios where you have:
+
+        - multiple similar tables that need the same validation checks
+        - a template validation workflow that should be applied to different data sources
+        - YAML-defined validations where you want to override the table specified in the YAML
+
+        The `set_tbl()` method creates a copy of the validation object with the new table, so the
+        original validation object remains unchanged. This allows you to reuse validation plans
+        across multiple tables without interference.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        We will first create two similar tables for our future validation plans.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        # Create two similar tables
+        table_1 = pl.DataFrame({
+            "x": [1, 2, 3, 4, 5],
+            "y": [5, 4, 3, 2, 1],
+            "z": ["a", "b", "c", "d", "e"]
+        })
+
+        table_2 = pl.DataFrame({
+            "x": [2, 4, 6, 8, 10],
+            "y": [10, 8, 6, 4, 2],
+            "z": ["f", "g", "h", "i", "j"]
+        })
+        ```
+
+        Create a validation plan with the first table.
+
+        ```{python}
+        validation_table_1 = (
+            pb.Validate(
+                data=table_1,
+                tbl_name="Table 1",
+                label="Validation applied to the first table"
+            )
+            .col_vals_gt(columns="x", value=0)
+            .col_vals_lt(columns="y", value=10)
+        )
+        ```
+
+        Now apply the same validation plan to the second table.
+
+        ```{python}
+        validation_table_2 = (
+            validation_table_1
+            .set_tbl(
+                tbl=table_2,
+                tbl_name="Table 2",
+                label="Validation applied to the second table"
+            )
+        )
+        ```
+
+        Here is the interrogation of the first table:
+
+        ```{python}
+        validation_table_1.interrogate()
+        ```
+
+        And the second table:
+
+        ```{python}
+        validation_table_2.interrogate()
+        ```
+        """
+        from copy import deepcopy
+
+        # Create a deep copy of the current Validate object
+        new_validate = deepcopy(self)
+
+        # Process the new table through the centralized data processing pipeline
+        new_validate.data = _process_data(tbl)
+
+        # Update table name if provided, otherwise keep existing
+        if tbl_name is not None:
+            new_validate.tbl_name = tbl_name
+
+        # Update label if provided, otherwise keep existing
+        if label is not None:
+            new_validate.label = label
+
+        # Reset interrogation state since we have a new table, but preserve validation steps
+        new_validate.time_start = None
+        new_validate.time_end = None
+        # Note: We keep validation_info as it contains the defined validation steps
+
+        return new_validate
+
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
+
+    def add_steps(
+        self,
+        *steps: Steps | Validate,
+        active: bool | Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        exclude: list[str | int] | None = None,
+        columns_map: dict[str, str] | None = None,
+    ) -> Validate:
+        """
+        Add validation steps from one or more Steps or Validate objects.
+
+        This method appends step definitions from the supplied objects to this validation plan.
+        When a [`Steps`](`pointblank.Steps`) object is provided, its recorded step definitions are
+        applied as method calls on this `Validate` instance. When a `Validate` object is provided,
+        its step definitions are extracted and applied the same way. This enables composing
+        validation plans from reusable step libraries.
+
+        Parameters
+        ----------
+        *steps
+            One or more [`Steps`](`pointblank.Steps`) or `Validate` objects whose step definitions
+            should be appended to this validation plan.
+        active
+            Override the `active=` setting for all imported steps. If `None` (the default), each
+            step's own `active=` setting is preserved. If `False`, all imported steps are deactivated.
+            A callable can also be provided to dynamically determine activation.
+        thresholds
+            Override the `thresholds=` setting for all imported steps. If `None` (the default), each
+            step's own `thresholds=` setting is preserved.
+        exclude
+            A list of step method names (strings) or 1-based step indices (integers) to skip when
+            importing. For example, `exclude=["col_vals_regex"]` skips all regex steps, and
+            `exclude=[2]` skips the second step.
+        columns_map
+            A dictionary mapping original column names to replacement column names. This allows the
+            same step definitions to work on tables with different column naming conventions.
+
+        Returns
+        -------
+        Validate
+            The Validate object with the imported steps appended (for method chaining).
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        completeness = (
+            pb.Steps()
+            .col_vals_not_null(columns="order_id")
+            .col_vals_not_null(columns="email")
+        )
+
+        positive_amounts = (
+            pb.Steps()
+            .col_vals_ge(columns="amount", value=0)
+        )
+
+        validation = (
+            pb.Validate(data=orders)
+            .add_steps(completeness, positive_amounts)
+            .interrogate()
+        )
+        ```
+        """
+        from pointblank.steps import Steps
+
+        if not steps:
+            raise ValueError("At least one Steps or Validate object must be provided.")
+
+        exclude_set: set[str] = set()
+        exclude_indices: set[int] = set()
+        if exclude is not None:
+            for item in exclude:
+                if isinstance(item, str):
+                    exclude_set.add(item)
+                elif isinstance(item, int):
+                    exclude_indices.add(item)
+                else:
+                    raise TypeError(
+                        f"Items in `exclude=` must be strings (method names) or integers "
+                        f"(1-based step indices), got {type(item).__name__}."
+                    )
+
+        for step_source in steps:
+            if isinstance(step_source, Steps):
+                step_list = step_source._steps
+            elif isinstance(step_source, Validate):
+                step_list = _extract_steps_from_validate(step_source)
+            else:
+                raise TypeError(
+                    f"`add_steps()` accepts Steps or Validate objects, "
+                    f"got {type(step_source).__name__}."
+                )
+
+            for i, step in enumerate(step_list, start=1):
+                if step.method in exclude_set or i in exclude_indices:
+                    continue
+
+                kwargs = dict(step.kwargs)
+
+                if active is not None:
+                    kwargs["active"] = active
+                if thresholds is not None:
+                    kwargs["thresholds"] = thresholds
+                if columns_map is not None:
+                    for param in ("columns", "column", "columns_subset"):
+                        if param in kwargs and kwargs[param] is not None:
+                            val = kwargs[param]
+                            if isinstance(val, str) and val in columns_map:
+                                kwargs[param] = columns_map[val]
+                            elif isinstance(val, list):
+                                kwargs[param] = [
+                                    columns_map.get(c, c) if isinstance(c, str) else c for c in val
+                                ]
+
+                method = getattr(self, step.method, None)
+                if method is None:
+                    raise AttributeError(
+                        f"Validate has no method '{step.method}'. "
+                        f"Check that the step definitions are compatible with this version."
+                    )
+
+                # conjointly uses *exprs positionally
+                if step.method == "conjointly" and "exprs" in kwargs:
+                    exprs = kwargs.pop("exprs")
+                    method(*exprs, **kwargs)
+                else:
+                    method(**kwargs)
+
+        return self
 
     def col_vals_gt(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data greater than a fixed value or data in another column?
@@ -3675,10 +6227,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -3794,7 +6357,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -3852,7 +6415,6 @@ class Validate:
         - Row 1: `c` is `1` and `b` is `2`.
         - Row 3: `c` is `2` and `b` is `2`.
         """
-
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
@@ -3862,7 +6424,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -3872,14 +6434,7 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
-        # resolve the columns
-        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
-            columns = col(columns)
-
-        # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -3891,12 +6446,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -3908,12 +6465,14 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data less than a fixed value or data in another column?
@@ -3967,10 +6526,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4086,7 +6656,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -4153,7 +6723,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -4182,12 +6752,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -4199,12 +6771,14 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data equal to a fixed value or data in another column?
@@ -4258,10 +6832,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4377,7 +6962,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -4443,10 +7028,11 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
-        value = _string_date_dttm_conversion(value=value)
+        # Allow regular strings to pass through for string comparisons
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -4472,12 +7058,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -4489,12 +7077,14 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data not equal to a fixed value or data in another column?
@@ -4548,10 +7138,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4667,7 +7268,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -4731,10 +7332,11 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
-        value = _string_date_dttm_conversion(value=value)
+        # Allow regular strings to pass through for string comparisons
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -4760,12 +7362,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -4777,12 +7381,14 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data greater than or equal to a fixed value or data in another column?
@@ -4836,10 +7442,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4955,7 +7572,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -5023,7 +7640,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -5052,12 +7669,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -5069,12 +7688,14 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column,
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Are column data less than or equal to a fixed value or data in another column?
@@ -5128,10 +7749,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -5247,7 +7879,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -5315,7 +7947,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -5344,12 +7976,14 @@ class Validate:
                 column=column,
                 values=value,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -5363,12 +7997,14 @@ class Validate:
         right: float | int | Column,
         inclusive: tuple[bool, bool] = (True, True),
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do column data lie between two specified values or data in other columns?
@@ -5432,10 +8068,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -5553,7 +8200,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -5630,7 +8277,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -5664,12 +8311,14 @@ class Validate:
                 values=value,
                 inclusive=inclusive,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -5683,12 +8332,14 @@ class Validate:
         right: float | int | Column,
         inclusive: tuple[bool, bool] = (True, True),
         na_pass: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do column data lie outside of two specified values or data in other columns?
@@ -5752,10 +8403,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -5873,7 +8535,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -5950,7 +8612,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -5984,12 +8646,14 @@ class Validate:
                 values=value,
                 inclusive=inclusive,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6000,12 +8664,14 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         set: Collection[Any],
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values are in a set of values.
@@ -6023,7 +8689,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6051,10 +8720,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6149,7 +8829,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -6200,11 +8880,68 @@ class Validate:
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `8` and `1`, which are not in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        The `col_vals_in_set()` method also supports Python Enum classes and instances, which can
+        make validations more readable and maintainable:
+
+        ```{python}
+        from enum import Enum
+
+        class Color(Enum):
+            RED = "red"
+            GREEN = "green"
+            BLUE = "blue"
+
+        # Create a table with color data
+        tbl_colors = pl.DataFrame({
+            "product": ["shirt", "pants", "hat", "shoes"],
+            "color": ["red", "blue", "green", "yellow"]
+        })
+
+        # Validate using an Enum class (all enum values are allowed)
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=Color)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation will fail for the `"yellow"` value since it's not in the `Color` enum.
+
+        You can also use specific Enum instances or mix them with regular values:
+
+        ```{python}
+        # Validate using specific Enum instances
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE])
+            .interrogate()
+        )
+
+        # Mix Enum instances with regular values
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE, "yellow"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this case, the `"green"` value will cause a failing test unit since it's not part of the
+        specified set.
         """
 
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
+
+        # Extract values from Enum classes or Enum instances if present
+        set = _extract_enum_values(set)
 
         for val in set:
             if val is None:
@@ -6216,7 +8953,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -6241,12 +8978,14 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=set,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6256,13 +8995,15 @@ class Validate:
     def col_vals_not_in_set(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
-        set: list[float | int],
+        set: Collection[Any],
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values are not in a set of values.
@@ -6280,7 +9021,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6308,10 +9052,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6406,7 +9161,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -6458,17 +9213,51 @@ class Validate:
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+
+        ```{python}
+        from enum import Enum
+
+        class InvalidStatus(Enum):
+            DELETED = "deleted"
+            ARCHIVED = "archived"
+
+        # Create a table with status data
+        status_table = pl.DataFrame({
+            "product": ["widget", "gadget", "tool", "device"],
+            "status": ["active", "pending", "deleted", "active"]
+        })
+
+        # Validate that no values are in the invalid status set
+        validation = (
+            pb.Validate(data=status_table)
+            .col_vals_not_in_set(columns="status", set=InvalidStatus)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This `"deleted"` value in the `status` column will fail since it matches one of the invalid
+        statuses in the `InvalidStatus` enum.
         """
 
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
+
+        # Extract values from Enum classes or Enum instances if present
+        set = _extract_enum_values(set)
+
         _check_set_types(set=set)
         _check_pre(pre=pre)
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -6493,12 +9282,434 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=set,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_increasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        decreasing_tol: float | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Are column data increasing by row?
+
+        The `col_vals_increasing()` validation method checks whether column values in a table are
+        increasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing decreasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in increasing values. For example, if the values for the test
+            units are `[80, 82, 82, 85, 88]` then the third unit (`82`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[80, 82, 82, 85, 88]` to
+            be marked as passing.
+        decreasing_tol
+            An optional threshold value that allows for movement of numerical values in the negative
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of negative travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6],
+                "b": [1, 2, 2, 3, 4, 5],
+                "c": [1, 2, 1, 3, 4, 5],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are increasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are increasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `2` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = "col_vals_increasing"
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values="",
+                na_pass=na_pass,
+                missing=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+                val_info={
+                    "allow_stationary": allow_stationary,
+                    "decreasing_tol": decreasing_tol if decreasing_tol else 0.0,
+                },
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_decreasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        increasing_tol: float | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Are column data decreasing by row?
+
+        The `col_vals_decreasing()` validation method checks whether column values in a table are
+        decreasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing increasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in decreasing values. For example, if the values for the test
+            units are `[88, 85, 85, 82, 80]` then the third unit (`85`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[88, 85, 85, 82, 80]` to
+            be marked as passing.
+        increasing_tol
+            An optional threshold value that allows for movement of numerical values in the positive
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of positive travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [6, 5, 4, 3, 2, 1],
+                "b": [5, 4, 4, 3, 2, 1],
+                "c": [5, 4, 5, 3, 2, 1],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are decreasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are decreasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `4` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = "col_vals_decreasing"
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values="",
+                na_pass=na_pass,
+                missing=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+                val_info={
+                    "allow_stationary": allow_stationary,
+                    "increasing_tol": increasing_tol if increasing_tol else 0.0,
+                },
             )
 
             self._add_validation(validation_info=val_info)
@@ -6510,10 +9721,11 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether values in a column are Null.
@@ -6556,10 +9768,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6654,7 +9877,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -6712,7 +9935,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -6742,6 +9965,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6753,10 +9977,11 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether values in a column are not Null.
@@ -6799,10 +10024,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -6897,7 +10133,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two numeric columns (`a` and
         `b`). The table is shown below:
@@ -6955,7 +10191,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -6985,6 +10221,7 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -6996,12 +10233,15 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pattern: str,
         na_pass: bool = False,
+        inverse: bool = False,
+        missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether column values match a regular expression pattern.
@@ -7023,6 +10263,9 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        inverse
+            Should the validation step be inverted? If `True`, then the expectation is that column
+            values should *not* match the specified `pattern=` regex.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7050,10 +10293,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7148,7 +10402,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with two string columns (`a` and
         `b`). The table is shown below:
@@ -7209,7 +10463,8 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_boolean_input(param=inverse, param_name="inverse")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -7228,19 +10483,523 @@ class Validate:
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
+        # Package up the `pattern=` and boolean params into a dictionary for later interrogation
+        values = {"pattern": pattern, "inverse": inverse}
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
-                values=pattern,
+                values=values,
                 na_pass=na_pass,
+                missing=missing,
                 pre=pre,
                 segments=segments,
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_within_spec(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        spec: str,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether column values fit within a specification.
+
+        The `col_vals_within_spec()` validation method checks whether column values in a table
+        correspond to a specification (`spec=`) type (details of which are available in the
+        *Specifications* section). Specifications include common data types like email addresses,
+        URLs, postal codes, vehicle identification numbers (VINs), International Bank Account
+        Numbers (IBANs), and more. This validation will operate over the number of test units that
+        is equal to the number of rows in the table.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        spec
+            A specification string for defining the specification type. Examples are `"email"`,
+            `"url"`, and `"postal_code[USA]"`. See the *Specifications* section for all available
+            options.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Specifications
+        --------------
+        A specification type must be used with the `spec=` argument. This is a string-based keyword
+        that corresponds to the type of data in the specified columns. The following keywords can
+        be used:
+
+        - `"isbn"`: The International Standard Book Number (ISBN) is a unique numerical identifier
+          for books. This keyword validates both 10-digit and 13-digit ISBNs.
+
+        - `"vin"`: A vehicle identification number (VIN) is a unique code used by the automotive
+          industry to identify individual motor vehicles.
+
+        - `"postal_code[<country_code>]"`: A postal code (also known as postcodes, PIN, or ZIP
+          codes) is a series of letters, digits, or both included in a postal address. Because the
+          coding varies by country, a country code in either the 2-letter (ISO 3166-1 alpha-2) or
+          3-letter (ISO 3166-1 alpha-3) format needs to be supplied (e.g., `"postal_code[US]"` or
+          `"postal_code[USA]"`). The keyword alias `"zip"` can be used for US ZIP codes.
+
+        - `"credit_card"`: A credit card number can be validated across a variety of issuers. The
+          validation uses the Luhn algorithm.
+
+        - `"iban[<country_code>]"`: The International Bank Account Number (IBAN) is a system of
+          identifying bank accounts across countries. Because the length and coding varies by
+          country, a country code needs to be supplied (e.g., `"iban[DE]"` or `"iban[DEU]"`).
+
+        - `"swift"`: Business Identifier Codes (also known as SWIFT-BIC, BIC, or SWIFT code) are
+          unique identifiers for financial and non-financial institutions.
+
+        - `"phone"`, `"email"`, `"url"`, `"ipv4"`, `"ipv6"`, `"mac"`: Phone numbers, email
+          addresses, Internet URLs, IPv4 or IPv6 addresses, and MAC addresses can be validated with
+          their respective keywords.
+
+        Only a single `spec=` value should be provided per function call.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that you can refer to
+        a column via `columns=` that is expected to be present in the transformed table, but may not
+        exist in the table before preprocessing. Regarding the lifetime of the transformed table, it
+        only exists during the validation step and is not stored in the `Validate` object or used in
+        subsequent validation steps.
+
+        Segmentation
+        ------------
+        The `segments=` argument allows for the segmentation of a validation step into multiple
+        segments. This is useful for applying the same validation step to different subsets of the
+        data. The segmentation can be done based on a single column or specific fields within a
+        column.
+
+        Providing a single column name will result in a separate validation step for each unique
+        value in that column. For example, if you have a column called `"region"` with values
+        `"North"`, `"South"`, and `"East"`, the validation step will be applied separately to each
+        region.
+
+        Alternatively, you can provide a tuple that specifies a column name and its corresponding
+        values to segment on. For example, if you have a column called `"date"` and you want to
+        segment on only specific dates, you can provide a tuple like
+        `("date", ["2023-01-01", "2023-01-02"])`. Any other values in the column will be disregarded
+        (i.e., no validation steps will be created for them).
+
+        A list with a combination of column names and tuples can be provided as well. This allows
+        for more complex segmentation scenarios. The following inputs are both valid:
+
+        ```
+        # Segments from all unique values in the `region` column
+        # and specific dates in the `date` column
+        segments=["region", ("date", ["2023-01-01", "2023-01-02"])]
+
+        # Segments from all unique values in the `region` and `date` columns
+        segments=["region", "date"]
+        ```
+
+        The segmentation is performed during interrogation, and the resulting validation steps will
+        be numbered sequentially. Each segment will have its own validation step, and the results
+        will be reported separately. This allows for a more granular analysis of the data and helps
+        identify issues within specific segments.
+
+        Importantly, the segmentation process will be performed after any preprocessing of the data
+        table. Because of this, one can conceivably use the `pre=` argument to generate a column
+        that can be used for segmentation. For example, you could create a new column called
+        `"segment"` through use of `pre=` and then use that column for segmentation.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a simple Polars DataFrame with an email column. The table
+        is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "email": [
+                    "user@example.com",
+                    "admin@test.org",
+                    "invalid-email",
+                    "contact@company.co.uk",
+                ],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that all of the values in the `email` column are valid email addresses.
+        We'll determine if this validation had any failing test units (there are four test units,
+        one for each row).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_within_spec(columns="email", spec="email")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that one test unit failed (the invalid email address in row 3).
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        # TODO: add check for segments
+        # _check_segments(segments=segments)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=na_pass, param_name="na_pass")
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Package up the `spec=` param into a dictionary for later interrogation
+        values = {"spec": spec}
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=values,
+                na_pass=na_pass,
+                missing=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_str_len(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the length of string values falls within specified bounds.
+
+        The `col_vals_str_len()` validation method checks whether the character length of string
+        values in a column meets the specified minimum and/or maximum bounds. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        min_val
+            The minimum acceptable string length (inclusive). If `None`, no lower bound is applied.
+            At least one of `min_val=` or `max_val=` must be provided.
+        max_val
+            The maximum acceptable string length (inclusive). If `None`, no upper bound is applied.
+            At least one of `min_val=` or `max_val=` must be provided.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        ValueError
+            If neither `min_val=` nor `max_val=` is provided.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        For the examples here, we'll use a simple Polars DataFrame with a string column (`a`).
+        The table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": ["short", "medium str", "a very long string value", "ok"],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that all values in column `a` have a string length between 2 and 10
+        characters.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_str_len(columns="a", min_val=2, max_val=10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows one failing test unit: `"a very long string value"` (24 chars)
+        exceeds `max_val=10`. The value `"ok"` (2 chars) passes since the lower bound is inclusive.
+
+        We can also validate with only a minimum length:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_str_len(columns="a", min_val=3)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        if min_val is None and max_val is None:
+            raise ValueError(
+                "At least one of `min_val=` or `max_val=` must be provided for "
+                "`col_vals_str_len()`."
+            )
+
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=na_pass, param_name="na_pass")
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):  # pragma: no cover
+            columns = col(columns)  # pragma: no cover
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Package up `min_val=` and `max_val=` into a dictionary for later interrogation
+        values = {"min_val": min_val, "max_val": max_val}
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=values,
+                na_pass=na_pass,
+                missing=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -7249,13 +11008,14 @@ class Validate:
 
     def col_vals_expr(
         self,
-        expr: any,
+        expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate column values using a custom expression.
@@ -7299,14 +11059,31 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. The internal implementation
+        uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this
+        method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
 
         Preprocessing
         -------------
@@ -7395,7 +11172,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three columns (`a`, `b`, and
         `c`). The table is shown below:
@@ -7441,7 +11218,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -7461,6 +11238,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -7470,10 +11248,11 @@ class Validate:
     def col_exists(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether one or more columns exist in the table.
@@ -7506,10 +11285,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7549,7 +11339,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with a string columns (`a`) and a
         numeric column (`b`). The table is shown below:
@@ -7606,7 +11396,7 @@ class Validate:
 
         _check_column(column=columns)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -7635,6 +11425,924 @@ class Validate:
                 actions=actions,
                 brief=brief,
                 active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether a column has a specific percentage of Null values.
+
+        The `col_pct_null()` validation method checks whether the percentage of Null values in a
+        column matches a specified percentage `p=` (within an optional tolerance `tol=`). This
+        validation operates at the column level, generating a single validation step per column that
+        passes or fails based on whether the actual percentage of Null values falls within the
+        acceptable range defined by `p ± tol`.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        p
+            The expected percentage of Null values in the column, expressed as a decimal between
+            `0.0` and `1.0`. For example, `p=0.5` means 50% of values should be Null.
+        tol
+            The tolerance allowed when comparing the actual percentage of Null values to the
+            expected percentage `p=`. The validation passes if the actual percentage falls within
+            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required. See
+            the *Tolerance* section for details on all supported formats (absolute, relative,
+            symmetric, and asymmetric bounds).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Tolerance
+        ---------
+        The `tol=` parameter accepts several different formats to specify the acceptable deviation
+        from the expected percentage `p=`. The tolerance can be expressed as:
+
+        1. *single integer* (absolute tolerance): the exact number of test units that can deviate.
+        For example, `tol=2` means the actual count can differ from the expected count by up to 2
+        units in either direction.
+
+        2. *single float between 0 and 1* (relative tolerance): a proportion of the expected
+        count. For example, if the expected count is 50 and `tol=0.1`, the acceptable range is
+        45 to 55 (50 ± 10% of 50 = 50 ± 5).
+
+        3. *tuple of two integers* (absolute bounds): explicitly specify the lower and upper
+        bounds as absolute deviations. For example, `tol=(1, 3)` means the actual count can be
+        1 unit below or 3 units above the expected count.
+
+        4. *tuple of two floats between 0 and 1* (relative bounds): explicitly specify the lower
+        and upper bounds as proportional deviations. For example, `tol=(0.05, 0.15)` means the
+        lower bound is 5% below and the upper bound is 15% above the expected count.
+
+        When using a single value (integer or float), the tolerance is applied symmetrically in both
+        directions. When using a tuple, you can specify asymmetric tolerances where the lower and
+        upper bounds differ.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        For the examples here, we'll use a simple Polars DataFrame with three columns (`a`, `b`,
+        and `c`) that have different percentages of Null values. The table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                "b": [1, None, 3, None, 5, None, 7, None],
+                "c": [None, None, None, None, None, None, 1, 2],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that column `a` has 0% Null values (i.e., no Null values at all).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="a", p=0.0)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows the single entry that corresponds to the validation step created
+        by using `col_pct_null()`. The validation passed since column `a` has no Null values.
+
+        Now, let's check that column `b` has exactly 50% Null values.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.5)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation also passes, as column `b` has exactly 4 out of 8 values as Null (50%).
+
+        Finally, let's validate column `c` with a tolerance. Column `c` has 75% Null values, so
+        we'll check if it's approximately 70% Null with a tolerance of 10%.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="c", p=0.70, tol=0.10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation passes because the actual percentage (75%) falls within the acceptable
+        range of 60% to 80% (70% ± 10%).
+
+        The `tol=` parameter supports multiple formats to express tolerance. Let's explore all the
+        different ways to specify tolerance using column `b`, which has exactly 50% Null values
+        (4 out of 8 values).
+
+        *Using an absolute tolerance (integer)*: Specify the exact number of rows that can
+        deviate. With `tol=1`, we allow the count to differ by 1 row in either direction.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=1)  # Expect 3 nulls, allow ±1 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because column `b` has 4 Null values, which falls within the acceptable range
+        of 2 to 4 (3 ± 1).
+
+        *Using a relative tolerance (float)*: Specify the tolerance as a proportion of the
+        expected count. With `tol=0.25`, we allow a 25% deviation from the expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=0.25)  # Expect 3 nulls, allow ±25% (range: 2.25-3.75)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates
+        to 2.25 to 3.75, which rounds down to 2 to 3 rows).
+
+        *Using asymmetric absolute bounds (tuple of integers)*: Specify different lower and
+        upper bounds as absolute values. With `tol=(0, 2)`, we allow no deviation below but up
+        to 2 rows above the expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.25, tol=(0, 2))  # Expect 2 Nulls, allow +0/-2 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range of 2 to 4.
+
+        *Using asymmetric relative bounds (tuple of floats)*: Specify different lower and upper
+        bounds as proportions. With `tol=(0.1, 0.3)`, we allow 10% below and 30% above the
+        expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3))  # Expect 3 Nulls, allow -10%/+30%
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9
+        calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={"p": p, "bound_finder": bound_finder},
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_pct_missing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        max_pct: float,
+        reason: str | None = None,
+        category: str | None = None,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that the percentage of *structured* missing values stays within a limit.
+
+        The `col_pct_missing()` validation method checks whether the percentage of missing values
+        in a column is at most `max_pct=`. Unlike [`col_pct_null()`](`pointblank.Validate.col_pct_null`),
+        which only considers actual null values, this method uses a
+        [`MissingSpec`](`pointblank.MissingSpec`) to define which values count as missing: declared
+        sentinel values (e.g., `-99` for `"refused"`) and, when `null_is_missing=True`, actual null
+        values. This validation operates at the column level, generating a single validation step
+        per column that passes when the missing percentage does not exceed `max_pct=`.
+
+        You can narrow the check to a single reason (via `reason=`) or a category of reasons (via
+        `category=`), making it possible to assert things like "at most 10% of values were refused"
+        or "at most 15% are item nonresponse".
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values (and their
+            reasons) that encode missingness for this column.
+        max_pct
+            The maximum allowable percentage of missing values, expressed as a decimal between
+            `0.0` and `1.0`. For example, `max_pct=0.20` means at most 20% of values may be missing.
+        reason
+            If provided, only count missing values whose reason matches this label. Cannot be
+            combined with `category=`.
+        category
+            If provided, only count missing values whose reason falls in this category (as defined
+            in `MissingSpec.categories`). Cannot be combined with `reason=`.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Survey data often encodes missingness with sentinel values rather than nulls. Here, the
+        `age` column uses `-99` (`"not_asked"`), `-98` (`"refused"`), and `-97` (`"dont_know"`):
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {"age": [34, -98, 41, -99, 29, -98, 55, 38]},
+        )
+
+        age_missing = pb.MissingSpec(
+            reasons={-99: "not_asked", -98: "refused", -97: "dont_know"},
+            categories={"item_nonresponse": ["refused", "dont_know"]},
+        )
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_missing(columns="age", missing=age_missing, max_pct=0.5)
+            .col_pct_missing(columns="age", missing=age_missing, reason="refused", max_pct=0.30)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
+
+        if reason is not None and category is not None:
+            raise ValueError("Only one of `reason=` or `category=` can be specified.")
+
+        if not 0.0 <= max_pct <= 1.0:
+            raise ValueError(f"`max_pct=` must be between 0.0 and 1.0, got {max_pct}.")
+
+        # Resolve which sentinel values (and whether nulls) count as missing for this step
+        if reason is not None:
+            sentinels = missing.values_for_reason(reason)
+            count_null = missing.null_is_missing and missing.null_reason == reason
+        elif category is not None:
+            sentinels = missing.values_for_category(category)
+            cat_reasons = (missing.categories or {}).get(category, [])
+            count_null = missing.null_is_missing and missing.null_reason in cat_reasons
+        else:
+            sentinels = missing.sentinel_values()
+            count_null = missing.null_is_missing
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):  # pragma: no cover
+            columns = col(columns)  # pragma: no cover
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={
+                    "sentinels": sentinels,
+                    "count_null": count_null,
+                    "max_pct": max_pct,
+                    "reason": reason,
+                    "category": category,
+                    "spec": missing,
+                },
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_missing_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that all missing values in a column are *coded* (no uncoded nulls).
+
+        The `col_missing_coded()` validation method checks that every absent value in a column is
+        expressed with an explicit missing-value code, rather than a raw null. Under the structured
+        missingness model (see [`MissingSpec`](`pointblank.MissingSpec`)), every absence should
+        carry a *reason* — encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null
+        represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing
+        test units while declared sentinel values and real values pass.
+
+        This validation operates over the number of test units equal to the number of rows in the
+        table (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values (and their
+            reasons) that encode missingness for this column. The spec documents which codes are
+            considered valid expressions of missingness.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        Segmentation
+        ------------
+        The `segments=` argument allows for the segmentation of a validation step into multiple
+        segments. This is useful for applying the same validation step to different subsets of the
+        data. The segmentation can be done based on a single column or specific fields within a
+        column. Providing a single column name results in a separate validation step for each unique
+        value in that column; a tuple of `(column, values)` restricts segmentation to the listed
+        values. The segmentation is performed after any `pre=` preprocessing.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Here, the `age` column codes its missingness with sentinel values, except for one row that
+        has a raw null (an uncoded absence):
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame({"age": [34, -98, 41, None, 29, -99, 55, 38]})
+
+        age_missing = pb.MissingSpec(
+            reasons={-99: "not_asked", -98: "refused", -97: "dont_know"},
+        )
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_coded(columns="age", missing=age_missing)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports a single failing test unit: the row where `age` is a raw null, which
+        represents missingness without a documented reason.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        columns = _resolve_columns(columns)
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=missing,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_missing_only_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        allowed: Collection[Any] | None = None,
+        min_val: float | int | None = None,
+        max_val: float | int | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that a column contains only documented codes and legitimate values.
+
+        The `col_missing_only_coded()` method checks that every value in a column is *accounted
+        for*: it is either a declared missing-value code (a sentinel in the
+        [`MissingSpec`](`pointblank.MissingSpec`), or a null when `null_is_missing=True`), or a
+        legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set)
+        and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a
+        legitimate real value is flagged — this catches *undocumented* sentinel codes (e.g., a
+        stray `-95`) that aren't part of the spec.
+
+        At least one of `allowed=`, `min_val=`, or `max_val=` must be provided so that legitimate
+        real values can be distinguished from undocumented codes. This validation operates over the
+        number of test units equal to the number of rows in the table.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) declaring the documented sentinel codes.
+        allowed
+            An explicit set of legitimate real values. A value in this set passes. Can be combined
+            with `min_val=`/`max_val=` (a value passes if it satisfies either constraint).
+        min_val
+            Lower bound (inclusive) of the legitimate real-value range.
+        max_val
+            Upper bound (inclusive) of the legitimate real-value range.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        Segmentation
+        ------------
+        The `segments=` argument allows for the segmentation of a validation step into multiple
+        segments. This is useful for applying the same validation step to different subsets of the
+        data. The segmentation can be done based on a single column or specific fields within a
+        column. Providing a single column name results in a separate validation step for each unique
+        value in that column; a tuple of `(column, values)` restricts segmentation to the listed
+        values. The segmentation is performed after any `pre=` preprocessing.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        The `age` column should contain real ages in `[0, 120]` or the documented codes `-99`/`-98`.
+        The value `-95` is an *undocumented* code and should be flagged:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame({"age": [34, -98, 41, -95, 29, -99, 55]})
+
+        age_missing = pb.MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_only_coded(columns="age", missing=age_missing, min_val=0, max_val=120)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports one failing test unit: the row where `age` is `-95`, which is
+        neither a real age in range nor a declared sentinel.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
+
+        if allowed is None and min_val is None and max_val is None:
+            raise ValueError(
+                "`col_missing_only_coded()` requires at least one of `allowed=`, `min_val=`, or "
+                "`max_val=` so that legitimate real values can be distinguished from undocumented "
+                "codes."
+            )
+
+        sentinels = missing.sentinel_values()
+        count_null = missing.null_is_missing
+        allowed_list = list(allowed) if allowed is not None else None
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        columns = _resolve_columns(columns)
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={
+                    "sentinels": sentinels,
+                    "count_null": count_null,
+                    "allowed": allowed_list,
+                    "min_val": min_val,
+                    "max_val": max_val,
+                    "spec": missing,
+                },
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
             )
 
             self._add_validation(validation_info=val_info)
@@ -7646,10 +12354,11 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether rows in the table are distinct.
@@ -7692,10 +12401,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7790,7 +12510,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three string columns
         (`col_1`, `col_2`, and `col_3`). The table is shown below:
@@ -7852,7 +12572,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -7876,6 +12596,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -7887,10 +12608,11 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether row data are complete by having no missing values.
@@ -7933,10 +12655,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8031,7 +12764,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three string columns
         (`col_1`, `col_2`, and `col_3`). The table is shown below:
@@ -8093,15 +12826,15 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(columns_subset, str):
-            columns_subset = [columns_subset]
+        if columns_subset is not None and isinstance(columns_subset, str):  # pragma: no cover
+            columns_subset = [columns_subset]  # pragma: no cover
 
         # TODO: incorporate Column object
 
@@ -8117,6 +12850,703 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_missing_consistent(
+        self,
+        columns: list[str],
+        missing: MissingSpec,
+        when_reason: str,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that related columns share a consistent missingness pattern for a given reason.
+
+        The `col_missing_consistent()` method checks that, across a set of related columns, the
+        "missing for a specific reason" status is *consistent*: for each row, either *none* of the
+        columns are missing for `when_reason=`, or *all* of them are. This is useful for structured
+        survey or clinical data where a skip pattern should propagate across related fields — for
+        example, if a question wasn't asked (`"not_asked"`) then all of its dependent fields should
+        also be coded `"not_asked"`.
+
+        A value is considered "missing for the reason" when it is one of the sentinel values mapped
+        to `when_reason=` in the [`MissingSpec`](`pointblank.MissingSpec`) (and, when the reason is
+        the spec's `null_reason` and `null_is_missing=True`, an actual null). This validation
+        operates over the number of test units equal to the number of rows in the table. A row fails
+        when some — but not all — of the columns are missing for the given reason.
+
+        Parameters
+        ----------
+        columns
+            A list of related columns to check for consistent missingness.
+        missing
+            A [`MissingSpec`](`pointblank.MissingSpec`) describing the sentinel values and their
+            reasons for the columns.
+        when_reason
+            The reason label whose presence should be consistent across `columns=`. If one column
+            in a row is missing for this reason, all of them should be.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged).
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        Segmentation
+        ------------
+        The `segments=` argument allows for the segmentation of a validation step into multiple
+        segments. This is useful for applying the same validation step to different subsets of the
+        data. The segmentation can be done based on a single column or specific fields within a
+        column. Providing a single column name results in a separate validation step for each unique
+        value in that column; a tuple of `(column, values)` restricts segmentation to the listed
+        values. The segmentation is performed after any `pre=` preprocessing.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        Here, `income_source` and `income_amount` should both be coded `"not_asked"` (`-99`) together
+        when the income question wasn't asked. The last row is inconsistent — only one field is
+        coded `-99`:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "income_source": [1, -99, 2, -99],
+                "income_amount": [50000, -99, 42000, 38000],
+            }
+        )
+
+        income_missing = pb.MissingSpec(reasons={-99: "not_asked", -98: "refused"})
+
+        validation = (
+            pb.Validate(data=tbl)
+            .col_missing_consistent(
+                columns=["income_source", "income_amount"],
+                missing=income_missing,
+                when_reason="not_asked",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation reports one failing test unit: the final row, where `income_source` is coded
+        `-99` (`"not_asked"`) but `income_amount` is a real value.
+        """
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        if not isinstance(missing, MissingSpec):
+            raise TypeError(f"`missing=` must be a MissingSpec, got {type(missing).__name__}.")
+
+        if isinstance(columns, str):
+            columns = [columns]
+        columns = list(columns)
+        if len(columns) < 2:
+            raise ValueError("`col_missing_consistent()` requires at least two columns to compare.")
+
+        # Resolve which sentinel values (and whether nulls) represent `when_reason`
+        sentinels = missing.values_for_reason(when_reason)
+        count_null = missing.null_is_missing and missing.null_reason == when_reason
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=columns,
+            values={
+                "sentinels": sentinels,
+                "count_null": count_null,
+                "when_reason": when_reason,
+                "spec": missing,
+            },
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def prompt(
+        self,
+        prompt: str,
+        model: str,
+        columns_subset: str | list[str] | None = None,
+        attachments: list | None = None,
+        batch_size: int = 1000,
+        max_concurrent: int = 3,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate rows using AI/LLM-powered analysis.
+
+        The `prompt()` validation method uses Large Language Models (LLMs) to validate rows of data
+        based on natural language criteria. Similar to other Pointblank validation methods, this
+        generates binary test results (pass/fail) that integrate seamlessly with the standard
+        reporting framework.
+
+        Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
+        instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
+        Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
+        specify a subset of columns for evaluation using `columns_subset=`.
+
+        The system automatically combines your validation criteria from the `prompt=` parameter with
+        the necessary technical context, data formatting instructions, and response structure
+        requirements. This is all so you only need to focus on describing your validation logic in
+        plain language.
+
+        Each row becomes a test unit that either passes or fails the validation criteria, producing
+        the familiar True/False results that appear in Pointblank validation reports. This method
+        is particularly useful for complex validation rules that are difficult to express with
+        traditional validation methods, such as semantic checks, context-dependent validation, or
+        subjective quality assessments.
+
+        Parameters
+        ----------
+        prompt
+            A natural language description of the validation criteria. This prompt should clearly
+            describe what constitutes valid vs invalid rows. Some examples:
+            `"Each row should contain a valid email address and a realistic person name"`,
+            `"Values should indicate positive sentiment"`,
+            `"The description should mention a country name"`.
+        columns_subset
+            A single column or list of columns to include in the validation. If `None`, all columns
+            will be included. Specifying fewer columns can improve performance and reduce API costs
+            so try to include only the columns necessary for the validation.
+        attachments
+            An optional list of reference files (images or PDFs) to attach as global context for
+            every batch. Each item can be a local file path, a URL (`http://` / `https://`), a
+            `pathlib.Path`, or a pre-built chatlas `Content` object. Supported extensions are
+            `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and `.pdf`. The attachments apply to the whole
+            validation step, not per-row, so they are well-suited for things like brand guides,
+            schema diagrams, or sample documents the LLM should consult when scoring each row.
+            **Cost note**: attachments are re-sent on every batch — see the *Multi-modal
+            attachments* section below for cost-management tips.
+        model
+            The model to be used. This should be in the form of `provider:model` (e.g.,
+            `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
+            `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific
+            model to be used from the provider (for `"azure-openai"`, the value after the colon is
+            the Azure *deployment id*). Model names are subject to change so consult the provider's
+            documentation for the most up-to-date model names.
+        batch_size
+            Number of rows to process in each batch. Larger batches are more efficient but may hit
+            API limits. Default is `1000`.
+        max_concurrent
+            Maximum number of concurrent API requests. Higher values speed up processing but may
+            hit rate limits. Default is `3`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Constructing the `model` Argument
+        ---------------------------------
+        The `model=` argument should be constructed using the provider and model name separated by a
+        colon (`provider:model`). The provider text can any of:
+
+        - `"anthropic"` (Anthropic)
+        - `"openai"` (OpenAI)
+        - `"ollama"` (Ollama)
+        - `"bedrock"` (Amazon Bedrock)
+        - `"azure-openai"` (Azure OpenAI)
+
+        The model name should be the specific model to be used from the provider. Model names are
+        subject to change so consult the provider's documentation for the most up-to-date model
+        names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the
+        name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI
+        model id.
+
+        Notes on Authentication
+        -----------------------
+        API keys are automatically loaded from environment variables or `.env` files and are **not**
+        stored in the validation object for security reasons. You should consider using a secure
+        method for handling API keys.
+
+        One way to do this is to load the API key from an environment variable and retrieve it using
+        the `os` module (specifically the `os.getenv()` function). Places to store the API key might
+        include `.bashrc`, `.bash_profile`, `.zshrc`, or `.zsh_profile`.
+
+        Another solution is to store one or more model provider API keys in an `.env` file (in the
+        root of your project). If the API keys have correct names (e.g., `ANTHROPIC_API_KEY` or
+        `OPENAI_API_KEY`) then the AI validation will automatically load the API key from the `.env`
+        file. An `.env` file might look like this:
+
+        ```plaintext
+        ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+        OPENAI_API_KEY="your_openai_api_key_here"
+        ```
+
+        There's no need to have the `python-dotenv` package installed when using `.env` files in
+        this way.
+
+        **Provider-specific setup**:
+
+        - **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file
+        - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
+        - **Ollama**: no API key required, just ensure Ollama is running locally
+        - **Bedrock**: configure AWS credentials through standard AWS methods
+        - **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+          `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
+
+        AI Validation Process
+        ---------------------
+        The AI validation process works as follows:
+
+        1. data batching: the data is split into batches of the specified size
+        2. row deduplication: duplicate rows (based on selected columns) are identified and only
+        unique combinations are sent to the LLM for analysis
+        3. json conversion: each batch of unique rows is converted to JSON format for the LLM
+        4. prompt construction: the user prompt is embedded in a structured system prompt
+        5. llm processing: each batch is sent to the LLM for analysis
+        6. response parsing: LLM responses are parsed to extract validation results
+        7. result projection: results are mapped back to all original rows using row signatures
+        8. result aggregation: results from all batches are combined
+
+        **Performance Optimization**: the process uses row signature memoization to avoid redundant
+        LLM calls. When multiple rows have identical values in the selected columns, only one
+        representative row is validated, and the result is applied to all matching rows. This can
+        dramatically reduce API costs and processing time for datasets with repetitive patterns.
+
+        The LLM receives data in this JSON format:
+
+        ```json
+        {
+          "columns": ["col1", "col2", "col3"],
+          "rows": [
+            {"col1": "value1", "col2": "value2", "col3": "value3", "_pb_row_index": 0},
+            {"col1": "value4", "col2": "value5", "col3": "value6", "_pb_row_index": 1}
+          ]
+        }
+        ```
+
+        The LLM returns validation results in this format:
+        ```json
+        [
+          {"index": 0, "result": true},
+          {"index": 1, "result": false}
+        ]
+        ```
+
+        Prompt Design Tips
+        ------------------
+        For best results, design prompts that are:
+
+        - boolean-oriented: frame validation criteria to elicit clear valid/invalid responses
+        - specific: clearly define what makes a row valid/invalid
+        - unambiguous: avoid subjective language that could be interpreted differently
+        - context-aware: include relevant business rules or domain knowledge
+        - example-driven: consider providing examples in the prompt when helpful
+
+        **Critical**: Prompts must be designed so the LLM can determine whether each row passes or
+        fails the validation criteria. The system expects binary validation responses, so avoid
+        open-ended questions or prompts that might generate explanatory text instead of clear
+        pass/fail judgments.
+
+        Good prompt examples:
+
+        - "Each row should contain a valid email address in the 'email' column and a non-empty name
+        in the 'name' column"
+        - "The 'sentiment' column should contain positive sentiment words (happy, good, excellent,
+        etc.)"
+        - "Product descriptions should mention at least one technical specification"
+
+        Poor prompt examples (avoid these):
+
+        - "What do you think about this data?" (too open-ended)
+        - "Describe the quality of each row" (asks for description, not validation)
+        - "How would you improve this data?" (asks for suggestions, not pass/fail)
+
+        Multi-modal Attachments
+        -----------------------
+        Use `attachments=` to give the LLM a reference image or PDF that applies to every row. The
+        attachment is sent as global context, while each row's values are still serialized as JSON
+        and validated against your `prompt=`. Useful patterns:
+
+        - validating descriptions against a brand-style image: `attachments=["brand_guide.pdf"]`
+        - cross-referencing rows with a schema diagram: `attachments=["schema.png"]`
+        - matching free-text fields to a sample document: `attachments=["sample_invoice.pdf"]`
+
+        Accepted values per list item:
+
+        - local path strings or `pathlib.Path` objects (e.g., `"docs/diagram.png"`)
+        - URLs (e.g., `"https://example.com/diagram.png"`)
+        - pre-built chatlas `Content` objects (e.g., `chatlas.content_image_plot()`)
+
+        Supported extensions: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.pdf`.
+
+        Note: local image paths auto-coerced through `attachments=` use `resize="low"` (chatlas's
+        default downscale to 512x512) to keep token costs predictable. For higher fidelity,
+        pre-build the content yourself with `chatlas.content_image_file(path, resize="high")`
+        (or `"none"`) and pass that object inside `attachments=`.
+
+        **Cost / batching note**: attachments are re-sent on *every* batch (one batch = one LLM API
+        call). For a table that requires N batches, each attachment's input tokens are billed N
+        times. To control costs:
+
+        - keep attachments small (downscale images, crop PDFs to the relevant page)
+        - use `columns_subset=` aggressively to maximize row-signature memoization (fewer unique
+          rows means fewer batches)
+        - raise `batch_size=` when the combined system prompt, attachment, and row JSON fit
+          comfortably under the model's context window
+
+        Performance Considerations
+        --------------------------
+        AI validation is significantly slower than traditional validation methods due to API calls
+        to LLM providers. However, performance varies dramatically based on data characteristics:
+
+        **High Memoization Scenarios** (seconds to minutes):
+
+        - data with many duplicate rows in the selected columns
+        - low cardinality data (repeated patterns)
+        - small number of unique row combinations
+
+        **Low Memoization Scenarios** (minutes to hours):
+
+        - high cardinality data with mostly unique rows
+        - large datasets with few repeated patterns
+        - all or most rows requiring individual LLM evaluation
+
+        The row signature memoization optimization can reduce processing time significantly when
+        data has repetitive patterns. For datasets where every row is unique, expect longer
+        processing times similar to validating each row individually.
+
+        **Strategies to Reduce Processing Time**:
+
+        - test on data slices: define a sampling function like `def sample_1000(df): return df.head(1000)`
+        and use `pre=sample_1000` to validate on smaller samples
+        - filter relevant data: define filter functions like `def active_only(df): return df.filter(df["status"] == "active")`
+        and use `pre=active_only` to focus on a specific subset
+        - optimize column selection: use `columns_subset=` to include only the columns necessary
+        for validation
+        - start with smaller batches: begin with `batch_size=100` for testing, then increase
+        gradually
+        - reduce concurrency: lower `max_concurrent=1` if hitting rate limits
+        - use faster/cheaper models: consider using smaller or more efficient models for initial
+        testing before switching to more capable models
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+        The following examples demonstrate how to use AI validation for different types of data
+        quality checks. These examples show both basic usage and more advanced configurations with
+        custom thresholds and actions.
+
+        **Basic AI validation example:**
+
+        This first example shows a simple validation scenario where we want to check that customer
+        records have both valid email addresses and non-empty names. Notice how we use
+        `columns_subset=` to focus only on the relevant columns, which improves both performance
+        and cost-effectiveness.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Sample data with email and name columns
+        tbl = pl.DataFrame({
+            "email": ["john@example.com", "invalid-email", "jane@test.org"],
+            "name": ["John Doe", "", "Jane Smith"],
+            "age": [25, 30, 35]
+        })
+
+        # Validate using AI
+        validation = (
+            pb.Validate(data=tbl)
+            .prompt(
+                prompt="Each row should have a valid email address and a non-empty name",
+                columns_subset=["email", "name"],  # Only check these columns
+                model="openai:gpt-4o-mini",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this example, the AI will identify that the second row fails validation because it has
+        an invalid email format (`"invalid-email"`) and the third row also fails because it has an
+        empty name field. The validation results will show 2 out of 3 rows failing the criteria.
+
+        **Advanced example with custom thresholds:**
+
+        This more sophisticated example demonstrates how to use AI validation with custom thresholds
+        and actions. Here we're validating phone number formats to ensure they include area codes,
+        which is a common data quality requirement for customer contact information.
+
+        ```python
+        customer_data = pl.DataFrame({
+            "customer_id": [1, 2, 3, 4, 5],
+            "name": ["John Doe", "Jane Smith", "Bob Johnson", "Alice Brown", "Charlie Davis"],
+            "phone_number": [
+                "(555) 123-4567",  # Valid with area code
+                "555-987-6543",    # Valid with area code
+                "123-4567",        # Missing area code
+                "(800) 555-1234",  # Valid with area code
+                "987-6543"         # Missing area code
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=customer_data)
+            .prompt(
+                prompt="Do all the phone numbers include an area code?",
+                columns_subset="phone_number",  # Only check the `phone_number` column
+                model="openai:gpt-4o",
+                batch_size=500,
+                max_concurrent=5,
+                thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
+                actions=pb.Actions(error="Too many phone numbers missing area codes.")
+            )
+            .interrogate()
+        )
+        ```
+
+        This validation will identify that 2 out of 5 phone numbers (40%) are missing area codes,
+        which exceeds all threshold levels. The validation will trigger the specified error action
+        since the failure rate (40%) is above the error threshold (20%). The AI can recognize
+        various phone number formats and determine whether they include area codes.
+
+        **Multi-modal example with `attachments=`:**
+
+        Suppose you have a table of product descriptions and a brand-style PDF that describes the
+        approved tone and vocabulary. Pass the PDF as a global attachment so the LLM can compare
+        each description against it.
+
+        ```python
+        validation = (
+            pb.Validate(data=products)
+            .prompt(
+                prompt="Each product description must match the tone and vocabulary in the brand guide.",
+                columns_subset=["description"],
+                attachments=["docs/brand_guide.pdf"],
+                model="anthropic:claude-opus-4-6",
+            )
+            .interrogate()
+        )
+        ```
+
+        The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each
+        description with the same reference document in view.
+        """
+
+        assertion_type = _get_fn_name()
+
+        # Validation of inputs
+        if not isinstance(prompt, str) or not prompt.strip():
+            raise ValueError("prompt must be a non-empty string")
+
+        # Parse the provider and model name from the `model=` argument
+        try:
+            provider, model_name = model.split(sep=":", maxsplit=1)
+        except ValueError:
+            raise ValueError(f"Model must be in format 'provider:model_name', got: {model}")
+
+        # Error if an unsupported provider is used
+        if provider not in MODEL_PROVIDERS:
+            raise ValueError(
+                f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
+            )
+
+        # Ensure that `batch_size` and `max_concurrent` are positive integers
+        if not isinstance(batch_size, int) or batch_size < 1:
+            raise ValueError("batch_size must be a positive integer")
+        if not isinstance(max_concurrent, int) or max_concurrent < 1:
+            raise ValueError("max_concurrent must be a positive integer")
+
+        # Coerce `attachments=` into a list of chatlas Content objects. Fails fast
+        # on unsupported extensions so users see the error at step definition time,
+        # not deep inside interrogation.
+        from pointblank._utils_ai import _prepare_attachments
+
+        prepared_attachments = _prepare_attachments(attachments)
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Promote a single column given as a string to a list
+        if columns_subset is not None and isinstance(columns_subset, str):
+            columns_subset = [columns_subset]
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Package up the AI-specific parameters as a dictionary for later use
+        ai_config = {
+            "prompt": prompt,
+            "llm_provider": provider,
+            "llm_model": model_name,
+            "batch_size": batch_size,
+            "max_concurrent": max_concurrent,
+            "attachments": prepared_attachments,
+        }
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=columns_subset,
+            values=ai_config,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -8132,10 +13562,11 @@ class Validate:
         case_sensitive_dtypes: bool = True,
         full_match_dtypes: bool = True,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Do columns in the table (and their types) match a predefined schema?
@@ -8194,10 +13625,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8249,7 +13691,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
 
         For the examples here, we'll use a simple Polars DataFrame with three columns (string,
@@ -8307,7 +13749,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=complete, param_name="complete")
         _check_boolean_input(param=in_order, param_name="in_order")
         _check_boolean_input(param=case_sensitive_colnames, param_name="case_sensitive_colnames")
@@ -8340,6 +13782,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -8348,14 +13791,15 @@ class Validate:
 
     def row_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         tol: Tolerance = 0,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether the row count of the table matches a specified count.
@@ -8407,10 +13851,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8463,7 +13918,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
         For the examples here, we'll use the built in dataset `"small_table"`. The table can be
@@ -8529,7 +13984,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=inverse, param_name="inverse")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
@@ -8559,6 +14014,383 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def data_freshness(
+        self,
+        column: str,
+        max_age: str | datetime.timedelta,
+        reference_time: datetime.datetime | str | None = None,
+        timezone: str | None = None,
+        allow_tz_mismatch: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that data in a datetime column is not older than a specified maximum age.
+
+        The `data_freshness()` validation method checks whether the most recent timestamp in the
+        specified datetime column is within the allowed `max_age=` from the `reference_time=` (which
+        defaults to the current time). This is useful for ensuring data pipelines are delivering
+        fresh data and for enforcing data SLAs.
+
+        This method helps detect stale data by comparing the maximum (most recent) value in a
+        datetime column against an expected freshness threshold.
+
+        Parameters
+        ----------
+        column
+            The name of the datetime column to check for freshness. This column should contain
+            date or datetime values.
+        max_age
+            The maximum allowed age of the data. Can be specified as: (1) a string with a
+            human-readable duration like `"24 hours"`, `"1 day"`, `"30 minutes"`, `"2 weeks"`, etc.
+            (supported units: `seconds`, `minutes`, `hours`, `days`, `weeks`), or (2) a
+            `datetime.timedelta` object for precise control.
+        reference_time
+            The reference point in time to compare against. Defaults to `None`, which uses the
+            current time (UTC if `timezone=` is not specified). Can be: (1) a `datetime.datetime`
+            object (timezone-aware recommended), (2) a string in ISO 8601 format (e.g.,
+            `"2024-01-15T10:30:00"` or `"2024-01-15T10:30:00+05:30"`), or (3) `None` to use the
+            current time.
+        timezone
+            The timezone to use for interpreting the data and reference time. Accepts IANA
+            timezone names (e.g., `"America/New_York"`), hour offsets (e.g., `"-7"`), or ISO 8601
+            offsets (e.g., `"-07:00"`). When `None` (default), naive datetimes are treated as UTC.
+            See the *The `timezone=` Parameter* section for details.
+        allow_tz_mismatch
+            Whether to allow timezone mismatches between the column data and reference time.
+            By default (`False`), a warning note is added when comparing timezone-naive with
+            timezone-aware datetimes. Set to `True` to suppress these warnings.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        How Timezones Affect Freshness Checks
+        -------------------------------------
+        Freshness validation involves comparing two times: the **data time** (the most recent
+        timestamp in your column) and the **execution time** (when and where the validation runs).
+        Timezone confusion typically arises because these two times may originate from different
+        contexts.
+
+        Consider these common scenarios:
+
+        - your data timestamps are stored in UTC (common for databases), but you're running
+          validation on your laptop in New York (Eastern Time)
+        - you develop and test validation locally, then deploy it to a cloud workflow that runs
+          in UTC—suddenly your 'same' validation behaves differently
+        - your data comes from servers in multiple regions, each recording timestamps in their
+          local timezone
+
+        The `timezone=` parameter exists to solve this problem by establishing a single, explicit
+        timezone context for the freshness comparison. When you specify a timezone, Pointblank
+        interprets both the data timestamps (if naive) and the execution time in that timezone,
+        ensuring consistent behavior whether you run validation on your laptop or in a cloud
+        workflow.
+
+        **Scenario 1: Data has timezone-aware datetimes**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00+00:00 (UTC)
+        # Comparison is straightforward as both sides have explicit timezones
+        .data_freshness(column="updated_at", max_age="24 hours")
+        ```
+
+        **Scenario 2: Data has naive datetimes (no timezone)**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00 (no timezone)
+        # Specify the timezone the data was recorded in:
+        .data_freshness(column="updated_at", max_age="24 hours", timezone="America/New_York")
+        ```
+
+        **Scenario 3: Ensuring consistent behavior across environments**
+
+        ```python
+        # Pin the timezone to ensure identical results whether running locally or in the cloud
+        .data_freshness(
+            column="updated_at",
+            max_age="24 hours",
+            timezone="UTC",  # Explicit timezone removes environment dependence
+        )
+        ```
+
+        The `timezone=` Parameter
+        ---------------------------
+        The `timezone=` parameter accepts several convenient formats, making it easy to specify
+        timezones in whatever way is most natural for your use case. The following examples
+        illustrate the three supported input styles.
+
+        **IANA Timezone Names** (recommended for regions with daylight saving time):
+
+        ```python
+        timezone="America/New_York"   # Eastern Time (handles DST automatically)
+        timezone="Europe/London"      # UK time
+        timezone="Asia/Tokyo"         # Japan Standard Time
+        timezone="Australia/Sydney"   # Australian Eastern Time
+        timezone="UTC"                # Coordinated Universal Time
+        ```
+
+        **Simple Hour Offsets** (quick and easy):
+
+        ```python
+        timezone="-7"    # UTC-7 (e.g., Mountain Standard Time)
+        timezone="+5"    # UTC+5 (e.g., Pakistan Standard Time)
+        timezone="0"     # UTC
+        timezone="-12"   # UTC-12
+        ```
+
+        **ISO 8601 Offset Format** (precise, including fractional hours):
+
+        ```python
+        timezone="-07:00"   # UTC-7
+        timezone="+05:30"   # UTC+5:30 (e.g., India Standard Time)
+        timezone="+00:00"   # UTC
+        timezone="-09:30"   # UTC-9:30
+        ```
+
+        When a timezone is specified:
+
+        - naive datetime values in the column are assumed to be in this timezone.
+        - the reference time (if naive) is assumed to be in this timezone.
+        - the validation report will show times in this timezone.
+
+        When `None` (default):
+
+        - if your column has timezone-aware datetimes, those timezones are used
+        - if your column has naive datetimes, they're treated as UTC
+        - the current time reference uses UTC
+
+        Note that IANA timezone names are preferred when daylight saving time transitions matter, as
+        they automatically handle the offset changes. Fixed offsets like `"-7"` or `"-07:00"` do not
+        account for DST.
+
+        Recommendations for Working with Timestamps
+        -------------------------------------------
+        When working with datetime data, storing timestamps in UTC in your databases is strongly
+        recommended since it provides a consistent reference point regardless of where your data
+        originates or where it's consumed. Using timezone-aware datetimes whenever possible helps
+        avoid ambiguity—when a datetime has an explicit timezone, there's no guessing about what
+        time it actually represents.
+
+        If you're working with naive datetimes (which lack timezone information), always specify the
+        `timezone=` parameter so Pointblank knows how to interpret those values. When providing
+        `reference_time=` as a string, use ISO 8601 format with the timezone offset included (e.g.,
+        `"2024-01-15T10:30:00+00:00"`) to ensure unambiguous parsing. Finally, prefer IANA timezone
+        names (like `"America/New_York"`) over fixed offsets (like `"-05:00"`) when daylight saving
+        time transitions matter, since IANA names automatically handle the twice-yearly offset
+        changes. To see all available IANA timezone names in Python, use
+        `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        The simplest use of `data_freshness()` requires just two arguments: the `column=` containing
+        your timestamps and `max_age=` specifying how old the data can be. In this first example,
+        we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and
+        20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent
+        timestamp should be within 24 hours of the current time. Since the newest record is only
+        1 hour old, this validation passes.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+        from datetime import datetime, timedelta
+
+        # Create sample data with recent timestamps
+        recent_data = pl.DataFrame({
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.now() - timedelta(hours=1),
+                datetime.now() - timedelta(hours=12),
+                datetime.now() - timedelta(hours=20),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="24 hours")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The `max_age=` parameter accepts human-readable strings with various time units. You can
+        chain multiple `data_freshness()` calls to check different freshness thresholds
+        simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but
+        errors at 2 days.
+
+        ```{python}
+        # Check data is fresh within different time windows
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="30 minutes")  # Very fresh
+            .data_freshness(column="updated_at", max_age="2 days")      # Reasonably fresh
+            .data_freshness(column="updated_at", max_age="1 week")      # Within a week
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        When your data contains naive datetimes (timestamps without timezone information), use the
+        `timezone=` parameter to specify what timezone those values represent. Here we have event
+        data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
+        freshness comparison is done correctly.
+
+        ```{python}
+        # Data with naive datetimes (assume they're in Eastern Time)
+        eastern_data = pl.DataFrame({
+            "event_time": [
+                datetime.now() - timedelta(hours=2),
+                datetime.now() - timedelta(hours=5),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=eastern_data)
+            .data_freshness(
+                column="event_time",
+                max_age="12 hours",
+                timezone="America/New_York"  # Interpret times as Eastern
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        For reproducible validations or historical checks, you can use `reference_time=` to compare
+        against a specific point in time instead of the current time. This is particularly useful
+        for testing or when validating data snapshots. The reference time should include a timezone
+        offset (like `+00:00` for UTC) to avoid ambiguity.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T12:00:00+00:00"
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+        _check_boolean_input(param=allow_tz_mismatch, param_name="allow_tz_mismatch")
+
+        # Validate and parse the max_age parameter
+        max_age_td = _parse_max_age(max_age)
+
+        # Validate the column parameter
+        if not isinstance(column, str):
+            raise TypeError(
+                f"The `column` parameter must be a string, got {type(column).__name__}."
+            )
+
+        # Validate the timezone parameter if provided
+        if timezone is not None:
+            _validate_timezone(timezone)
+
+        # Parse reference_time if it's a string
+        parsed_reference_time = None
+        if reference_time is not None:
+            if isinstance(reference_time, str):
+                parsed_reference_time = _parse_reference_time(reference_time)
+            elif isinstance(reference_time, datetime.datetime):
+                parsed_reference_time = reference_time
+            else:
+                raise TypeError(
+                    f"The `reference_time` parameter must be a string or datetime object, "
+                    f"got {type(reference_time).__name__}."
+                )
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package up the parameters for later interrogation
+        values = {
+            "max_age": max_age_td,
+            "max_age_str": max_age if isinstance(max_age, str) else str(max_age),
+            "reference_time": parsed_reference_time,
+            "timezone": timezone,
+            "allow_tz_mismatch": allow_tz_mismatch,
+        }
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=column,
+            values=values,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -8567,13 +14399,14 @@ class Validate:
 
     def col_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Validate whether the column count of the table matches a specified count.
@@ -8617,10 +14450,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8673,7 +14517,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
         For the examples here, we'll use the built in dataset `"game_revenue"`. The table can be
@@ -8708,7 +14552,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=inverse, param_name="inverse")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
@@ -8735,6 +14579,464 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_in_table(
+        self,
+        columns: str | list[str],
+        ref_table: Any,
+        ref_column: str | list[str],
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that column values exist in a reference table (referential integrity).
+
+        The `col_vals_in_table()` validation method checks whether each value (or composite key) in
+        the specified column(s) of this table exists in the corresponding column(s) of a reference
+        table. This is a referential integrity check: it catches orphaned foreign keys, broken
+        references, and values that fall outside a controlled vocabulary maintained in another
+        table.
+
+        Each row is a test unit. Rows whose key values are found in the reference table pass. Rows
+        with orphaned values fail. Failing rows are extractable via `get_data_extracts()` just like
+        any other column-level validation.
+
+        Cross-backend matching is supported: the reference table can be from a different backend
+        (e.g., a Polars DataFrame checked against a DuckDB table, or a MySQL table checked against a
+        SQLite table). The lighter table is automatically materialized to match the heavier table's
+        backend before comparison.
+
+        Parameters
+        ----------
+        columns
+            The column (or list of columns for composite keys) in this table that should reference
+            the other table. For composite keys, supply a list of column names.
+        ref_table
+            The reference table containing the valid values. Can be a DataFrame, database table, or
+            a callable that returns one (resolved at interrogation time).
+        ref_column
+            The column (or list of columns for composite keys) in the reference table to check
+            against. Must have the same length as ``columns``.
+        na_pass
+            If `True`, rows where the key column(s) are null will pass. If `False` (default), null
+            key values are treated as failing (not found in reference).
+        pre
+            An optional preprocessing function to apply to the data table before validation.
+        thresholds
+            Failure-condition thresholds for this step (overrides global thresholds).
+        actions
+            Actions to take when thresholds are exceeded.
+        brief
+            A brief description for this validation step.
+        active
+            Whether this step is active (can be a bool or callable returning bool).
+        dimension
+            The data quality dimension tag for this step.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with this step added (for method chaining).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Check that every `customer_id` in orders exists in the customers table:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        customers = pl.DataFrame({"id": [1, 2, 3, 4, 5]})
+        orders = pl.DataFrame({
+            "order_id": [101, 102, 103, 104],
+            "customer_id": [1, 2, 3, 99],
+        })
+
+        validation = (
+            pb.Validate(data=orders)
+            .col_vals_in_table(
+                columns="customer_id",
+                ref_table=customers,
+                ref_column="id",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The last row fails because `customer_id=99` does not exist in the customers table.
+
+        Composite foreign keys are also supported:
+
+        ```{python}
+        catalog = pl.DataFrame({
+            "region": ["US", "US", "EU"],
+            "sku": ["A1", "B2", "A1"],
+        })
+
+        orders = pl.DataFrame({
+            "region": ["US", "EU", "US"],
+            "sku": ["A1", "A1", "C3"],
+        })
+
+        validation = (
+            pb.Validate(data=orders)
+            .col_vals_in_table(
+                columns=["region", "sku"],
+                ref_table=catalog,
+                ref_column=["region", "sku"],
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Validate columns/ref_column length agreement
+        cols = [columns] if isinstance(columns, str) else list(columns)
+        ref_cols = [ref_column] if isinstance(ref_column, str) else list(ref_column)
+        if len(cols) != len(ref_cols):
+            raise ValueError(
+                f"columns and ref_column must have the same length, "
+                f"got {len(cols)} and {len(ref_cols)}."
+            )
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package ref_table, ref_column, and target columns into values dict
+        values = {
+            "ref_table": ref_table,
+            "ref_column": ref_column,
+            "columns": columns,
+        }
+
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Store the column(s) for display; for composite keys store the first column
+        # (the full list is in values for the interrogation function)
+        display_column = columns if isinstance(columns, str) else columns[0]
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=display_column,
+            values=values,
+            na_pass=na_pass,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def tbl_match(
+        self,
+        tbl_compare: Any,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the target table matches a comparison table.
+
+        The `tbl_match()` method checks whether the target table's composition matches that of a
+        comparison table. The validation performs a comprehensive comparison using progressively
+        stricter checks (from least to most stringent):
+
+        1. **Column count match**: both tables must have the same number of columns
+        2. **Row count match**: both tables must have the same number of rows
+        3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
+        4. **Schema match (order)**: columns in the correct order (case-insensitive names)
+        5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
+        6. **Data match**: values in corresponding cells must be identical
+
+        This progressive approach helps identify exactly where tables differ. The validation will
+        fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
+        validation operates over a single test unit (pass/fail for complete table match).
+
+        Parameters
+        ----------
+        tbl_compare
+            The comparison table to validate against. This can be a DataFrame object (Polars or
+            Pandas), an Ibis table object, or a callable that returns a table. If a callable is
+            provided, it will be executed during interrogation to obtain the comparison table.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that the same preprocessing
+        is **not** applied to the comparison table; only the target table is preprocessed. Regarding
+        the lifetime of the transformed table, it only exists during the validation step and is not
+        stored in the `Validate` object or used in subsequent validation steps.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Cross-Backend Validation
+        ------------------------
+        The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
+        different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
+        comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
+        different backends are detected, the comparison table is automatically converted to match the
+        data table's backend before validation proceeds.
+
+        **Certified Backend Combinations:**
+
+        All combinations of the following backends have been tested and certified to work (in both
+        directions):
+
+        - Pandas DataFrame
+        - Polars DataFrame
+        - DuckDB (native)
+        - DuckDB (as Ibis table)
+        - SQLite (via Ibis)
+
+        Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
+        automatically materialized during validation:
+
+        - if comparing **against Polars**: materialized to Polars
+        - if comparing **against Pandas**: materialized to Pandas
+        - if **both tables are database backends**: both materialized to Polars
+
+        This ensures optimal performance and type consistency.
+
+        **Data Types That Work Best in Cross-Backend Validation:**
+
+        - numeric types: int, float columns (including proper NaN handling)
+        - string types: text columns with consistent encodings
+        - boolean types: True/False values
+        - null values: `None` and `NaN` are treated as equivalent across backends
+        - list columns: nested list structures (with basic types)
+
+        **Known Limitations:**
+
+        While many data types work well in cross-backend validation, there are some known
+        limitations to be aware of:
+
+        - date/datetime types: When converting between Polars and Pandas, date objects may be
+          represented differently. For example, `datetime.date` objects in Pandas may become
+          `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
+          around this, ensure both tables use the same datetime representation before comparison.
+        - custom types: User-defined types or complex nested structures may not convert cleanly
+          between backends and could cause unexpected comparison failures.
+        - categorical types: Categorical/factor columns may have different internal
+          representations across backends.
+        - timezone-aware datetimes: Timezone handling differs between backends and may cause
+          comparison issues.
+
+        Here are some ideas to overcome such limitations:
+
+        - for date/datetime columns, consider using `pre=` preprocessing to normalize representations
+          before comparison.
+        - when working with custom types, manually convert tables to the same backend before using
+          `tbl_match()`.
+        - use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        For the examples here, we'll create two simple tables to demonstrate the `tbl_match()`
+        validation.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        # Create the first table
+        tbl_1 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        # Create an identical table
+        tbl_2 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        pb.preview(tbl_1)
+        ```
+
+        Let's validate that `tbl_1` matches `tbl_2`. Since these tables are identical, the
+        validation should pass.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_2)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the single test unit passed, indicating that the two tables
+        match completely.
+
+        Now, let's create a table with a slight difference and see what happens.
+
+        ```{python}
+        # Create a table with one different value
+        tbl_3 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+        })
+
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_3)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the single test unit failed because the tables don't match
+        (one value is different in column `c`).
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package up the `tbl_compare` into a dictionary for later interrogation
+        values = {"tbl_compare": tbl_compare}
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            values=values,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -8745,10 +15047,11 @@ class Validate:
         self,
         *exprs: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Perform multiple row-wise validations for joint validity.
@@ -8792,10 +15095,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8848,7 +15162,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         For the examples here, we'll use a simple Polars DataFrame with three numeric columns (`a`,
         `b`, and `c`). The table is shown below:
@@ -8896,13 +15210,17 @@ class Validate:
         We can also use preprocessing to filter the data before applying the conjoint validation:
 
         ```{python}
+        # Define preprocessing function for serialization compatibility
+        def filter_by_c_gt_5(df):
+            return df.filter(pl.col("c") > 5)
+
         validation = (
             pb.Validate(data=tbl)
             .conjointly(
                 lambda df: pl.col("a") > 2,
                 lambda df: pl.col("b") < 7,
                 lambda df: pl.col("a") + pl.col("b") < pl.col("c"),
-                pre=lambda df: df.filter(pl.col("c") > 5)
+                pre=filter_by_c_gt_5
             )
             .interrogate()
         )
@@ -8957,7 +15275,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -8979,6 +15297,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -8989,10 +15308,11 @@ class Validate:
         self,
         expr: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
+        dimension: str | None = None,
     ) -> Validate:
         """
         Perform a specialized validation with customized logic.
@@ -9051,10 +15371,21 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9107,7 +15438,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         The `specially()` method offers maximum flexibility for validation, allowing you to create
         custom validation logic that fits your specific needs. The following examples demonstrate
@@ -9305,7 +15636,7 @@ class Validate:
         # _check_expr_specially(expr=expr)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9324,6 +15655,7 @@ class Validate:
             actions=actions,
             brief=brief,
             active=active,
+            dimension=dimension,
         )
 
         self._add_validation(validation_info=val_info)
@@ -9482,8 +15814,8 @@ class Validate:
             threshold = validation.thresholds
             segment = validation.segments
 
-            assertion_method = ASSERTION_TYPE_METHOD_MAP[assertion_type]
-            assertion_category = METHOD_CATEGORY_MAP[assertion_method]
+            # Get compatible data types for this assertion type
+            assertion_method = ASSERTION_TYPE_METHOD_MAP.get(assertion_type, assertion_type)
             compatible_dtypes = COMPATIBLE_DTYPES.get(assertion_method, [])
 
             # Process the `brief` text for the validation step by including template variables to
@@ -9500,22 +15832,155 @@ class Validate:
             # Generate the autobrief description for the validation step; it's important to perform
             # that here since text components like the column and the value(s) have been resolved
             # at this point
+            # Get row count for col_pct_null to properly calculate absolute tolerance percentages
+            n_rows = None
+            if assertion_type == "col_pct_null":
+                n_rows = get_row_count(data_tbl)
+
             autobrief = _create_autobrief_or_failure_text(
                 assertion_type=assertion_type,
                 lang=self.lang,
                 column=column,
                 values=value,
                 for_failure=False,
+                locale=self.locale,
+                n_rows=n_rows,
             )
 
             validation.autobrief = autobrief
+
+            # If the step carries structured-missingness context (a `missing=` spec or a dedicated
+            # missing method), attach a one-line note summarizing the codes and any reason/range
+            # filter. This keeps the VALUES cell minimal while surfacing detail in the Notes section.
+            missing_note = _build_missing_note(validation)
+            if missing_note is not None:
+                validation._add_note(
+                    key="missing_spec", markdown=missing_note[0], text=missing_note[1]
+                )
 
             # ------------------------------------------------
             # Bypassing the validation step if conditions met
             # ------------------------------------------------
 
+            # Resolve callable `active` values by evaluating them against the original table;
+            # this evaluation occurs *before* any `pre` processing so that inspection functions
+            # like `has_columns()` see the raw input data
+            if callable(validation.active):
+                active_fn = validation.active
+                active_exc: Exception | None = None
+                try:
+                    validation.active = bool(active_fn(data_tbl))
+                except Exception as exc:
+                    validation.active = False
+                    active_exc = exc
+
+                # If the callable deactivated the step, attach a note so the validation
+                # report explains *why* the step was skipped. Inspection helpers like
+                # `has_columns()` set a `_reason` dict with a translation key and params;
+                # for arbitrary callables we fall back to a generic translated message.
+                if not validation.active:
+                    reason_info = getattr(active_fn, "_reason", None)
+
+                    # --- "Step skipped" prefix (translated) ---
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+
+                    if isinstance(reason_info, dict):
+                        # Structured reason from an inspection helper
+                        reason_key = reason_info.get("key", "")
+                        reason_params = reason_info.get("params", {})
+
+                        # Format numeric params with comma separator for display
+                        fmt_params = {}
+                        for k, v in reason_params.items():
+                            if k == "columns" and isinstance(v, list):
+                                fmt_params[k] = ", ".join(f"`{c}`" for c in v)
+                            elif isinstance(v, int):
+                                fmt_params[k] = f"`{v:,}`"
+                            else:
+                                fmt_params[k] = str(v)  # pragma: no cover
+
+                        template = NOTES_TEXT.get(reason_key, {}).get(
+                            self.locale,
+                            NOTES_TEXT.get(reason_key, {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(**fmt_params)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_escaped = html_module.escape(reason_text_body)
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_escaped}"
+
+                    elif active_exc is not None:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        exc_msg = str(active_exc)
+                        template = NOTES_TEXT.get("active_check_callable_raised_error", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_raised_error", {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", exc_msg=exc_msg)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            exc_msg=html_module.escape(exc_msg),
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    else:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        template = NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                                "en", ""
+                            ),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", value="`False`")
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            value="<code>False</code>",
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    validation._add_note(
+                        key="active_check",
+                        markdown=reason_html,
+                        text=reason_text,
+                    )
+
             # Skip the validation step if it is not active but still record the time of processing
             if not validation.active:
+                # If no note was already set by callable resolution above, this is a
+                # plain `active=False` — attach a note explaining the explicit deactivation
+                if not validation.notes or "active_check" not in validation.notes:
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+                    body_template = NOTES_TEXT.get("step_set_inactive", {}).get(
+                        self.locale,
+                        NOTES_TEXT.get("step_set_inactive", {}).get("en", ""),
+                    )
+                    body_text = body_template.format(param="`active=`", value="`False`")
+                    body_html = body_template.format(
+                        param="<code>active=</code>", value="<code>False</code>"
+                    )
+                    note_text = f"{step_skipped} \u2014 {body_text}"
+                    note_html = f"{html_module.escape(step_skipped)} &mdash; {body_html}"
+                    validation._add_note(
+                        key="active_check",
+                        markdown=note_html,
+                        text=note_text,
+                    )
+
                 end_time = datetime.datetime.now(datetime.timezone.utc)
                 validation.proc_duration_s = (end_time - start_time).total_seconds()
                 validation.time_processed = end_time.isoformat(timespec="milliseconds")
@@ -9529,8 +15994,19 @@ class Validate:
                 validation.active = False
                 continue
 
-            # Make a copy of the table for this step
-            data_tbl_step = data_tbl
+            # Make a deep copy of the table for this step to ensure proper isolation
+            # This prevents modifications from one validation step affecting others
+            try:
+                # TODO: This copying should be scrutinized further
+                data_tbl_step: IntoDataFrame = _copy_dataframe(data_tbl)
+            except Exception as e:  # pragma: no cover
+                data_tbl_step: IntoDataFrame = data_tbl  # pragma: no cover
+
+            # Capture original table dimensions and columns before preprocessing
+            # (only if preprocessing is present - we'll set these inside the preprocessing block)
+            original_rows = None
+            original_cols = None
+            original_column_names = None
 
             # ------------------------------------------------
             # Preprocessing stage
@@ -9539,6 +16015,15 @@ class Validate:
             # Determine whether any preprocessing functions are to be applied to the table
             if validation.pre is not None:
                 try:
+                    # Capture original table dimensions before preprocessing
+                    original_rows = get_row_count(data_tbl_step)
+                    original_cols = get_column_count(data_tbl_step)
+                    original_column_names = set(
+                        data_tbl_step.columns
+                        if hasattr(data_tbl_step, "columns")
+                        else list(data_tbl_step.columns)
+                    )
+
                     # Read the text of the preprocessing function
                     pre_text = _pre_processing_funcs_to_str(validation.pre)
 
@@ -9571,6 +16056,63 @@ class Validate:
                     elif isinstance(validation.pre, Callable):
                         data_tbl_step = validation.pre(data_tbl_step)
 
+                    # After successful preprocessing, check dimensions and create notes
+                    # Use get_row_count() and get_column_count() for compatibility
+                    processed_rows = get_row_count(data_tbl_step)
+                    processed_cols = get_column_count(data_tbl_step)
+
+                    # Always add a note when preprocessing is applied
+                    if original_rows != processed_rows or original_cols != processed_cols:
+                        # Dimensions changed - show the change
+                        note_html = _create_preprocessing_note_html(
+                            original_rows=original_rows,
+                            original_cols=original_cols,
+                            processed_rows=processed_rows,
+                            processed_cols=processed_cols,
+                            locale=self.locale,
+                        )
+                        note_text = _create_preprocessing_note_text(
+                            original_rows=original_rows,
+                            original_cols=original_cols,
+                            processed_rows=processed_rows,
+                            processed_cols=processed_cols,
+                        )
+
+                    else:
+                        # No dimension change - just indicate preprocessing was applied
+                        note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
+                        note_text = _create_preprocessing_no_change_note_text()
+
+                    validation._add_note(
+                        key="pre_applied",
+                        markdown=note_html,
+                        text=note_text,
+                    )
+
+                    # Check if target column is synthetic (exists in processed but not original)
+                    # Only check for single column names (not lists used in rows_distinct, etc.)
+                    if column is not None and isinstance(column, str):
+                        processed_column_names = set(
+                            data_tbl_step.columns
+                            if hasattr(data_tbl_step, "columns")
+                            else list(data_tbl_step.columns)
+                        )
+
+                        # Check if the target column is in the processed table but not in original
+                        if column in processed_column_names and column not in original_column_names:
+                            note_html = _create_synthetic_target_column_note_html(
+                                column_name=column,
+                                locale=self.locale,
+                            )
+                            note_text = _create_synthetic_target_column_note_text(
+                                column_name=column,
+                            )
+                            validation._add_note(
+                                key="syn_target_col",
+                                markdown=note_html,
+                                text=note_text,
+                            )
+
                 except Exception:
                     # If preprocessing fails, mark the validation as having an eval_error
                     validation.eval_error = True
@@ -9592,15 +16134,11 @@ class Validate:
                 )
 
             # ------------------------------------------------
-            # Determine table type and `collect()` if needed
+            # Determine table type
             # ------------------------------------------------
 
             if tbl_type not in IBIS_BACKENDS:
                 tbl_type = "local"
-
-            # If the table is a lazy frame, we need to collect it
-            if _is_lazy_frame(data_tbl_step):
-                data_tbl_step = data_tbl_step.collect()
 
             # ------------------------------------------------
             # Set the number of test units
@@ -9610,222 +16148,692 @@ class Validate:
                 tbl_type=tbl_type
             )
 
+            # Check if preprocessing or segmentation resulted in zero rows
+            # Only apply this check to row-based validations, not table-level validations
+            # (table-level validations like row_count_match(), col_count_match(), etc.,
+            # operate on the table as a whole, so zero rows is a valid input)
+            table_level_assertions = [
+                "col_exists",
+                "col_schema_match",
+                "row_count_match",
+                "col_count_match",
+                "data_freshness",
+                "tbl_match",
+            ]
+
+            if validation.n == 0 and assertion_type not in table_level_assertions:
+                # Mark the validation as having an eval_error
+                validation.eval_error = True
+                end_time = datetime.datetime.now(datetime.timezone.utc)
+                validation.proc_duration_s = (end_time - start_time).total_seconds()
+                validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                validation.active = False
+                continue
+
             # ------------------------------------------------
             # Validation stage
             # ------------------------------------------------
 
-            if assertion_category == "COMPARE_ONE":
-                results_tbl = ColValsCompareOne(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    value=value,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    assertion_method=assertion_method,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+            # Apply error handling only to data quality validations, not programming error validations
+            if assertion_type != "specially":
+                try:
+                    # validations requiring `_column_test_prep()`
+                    if assertion_type in [
+                        "col_vals_gt",
+                        "col_vals_lt",
+                        "col_vals_eq",
+                        "col_vals_ne",
+                        "col_vals_ge",
+                        "col_vals_le",
+                        "col_vals_null",
+                        "col_vals_not_null",
+                        "col_missing_coded",
+                        "col_missing_only_coded",
+                        "col_vals_increasing",
+                        "col_vals_decreasing",
+                        "col_vals_between",
+                        "col_vals_outside",
+                        "col_vals_in_set",
+                        "col_vals_not_in_set",
+                        "col_vals_regex",
+                        "col_vals_within_spec",
+                        "col_vals_str_len",
+                    ]:
+                        # Process table for column validation
+                        tbl = _column_test_prep(
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                        )
 
-            if assertion_category == "COMPARE_TWO":
-                results_tbl = ColValsCompareTwo(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    value1=value[0],
-                    value2=value[1],
-                    inclusive=inclusive,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    assertion_method=assertion_method,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        if assertion_method == "gt":
+                            results_tbl = interrogate_gt(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "lt":
+                            results_tbl = interrogate_lt(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "eq":
+                            results_tbl = interrogate_eq(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "ne":
+                            results_tbl = interrogate_ne(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "ge":
+                            results_tbl = interrogate_ge(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "le":
+                            results_tbl = interrogate_le(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
+                        elif assertion_method == "null":
+                            results_tbl = interrogate_null(tbl=tbl, column=column)
+                        elif assertion_method == "not_null":
+                            results_tbl = interrogate_not_null(tbl=tbl, column=column)
+                        elif assertion_method == "missing_coded":
+                            results_tbl = interrogate_missing_coded(tbl=tbl, column=column)
+                        elif assertion_method == "missing_only_coded":
+                            results_tbl = interrogate_missing_only_coded(
+                                tbl=tbl,
+                                column=column,
+                                sentinels=value["sentinels"],
+                                count_null=value["count_null"],
+                                allowed=value["allowed"],
+                                min_val=value["min_val"],
+                                max_val=value["max_val"],
+                            )
 
-            if assertion_category == "COMPARE_SET":
-                inside = True if assertion_method == "in_set" else False
+                        elif assertion_type == "col_vals_increasing":
+                            from pointblank._interrogation import interrogate_increasing
 
-                results_tbl = ColValsCompareSet(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    values=value,
-                    threshold=threshold,
-                    inside=inside,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                            # Extract direction options from val_info
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            decreasing_tol = validation.val_info.get("decreasing_tol", 0.0)
 
-            if assertion_category == "COMPARE_REGEX":
-                results_tbl = ColValsRegex(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    pattern=value,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                            results_tbl = interrogate_increasing(
+                                tbl=tbl,
+                                column=column,
+                                allow_stationary=allow_stationary,
+                                decreasing_tol=decreasing_tol,
+                                na_pass=na_pass,
+                            )
 
-            if assertion_category == "COMPARE_EXPR":
-                results_tbl = ColValsExpr(
-                    data_tbl=data_tbl_step,
-                    expr=value,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        elif assertion_type == "col_vals_decreasing":
+                            from pointblank._interrogation import interrogate_decreasing
 
-            if assertion_category == "ROWS_DISTINCT":
-                results_tbl = RowsDistinct(
-                    data_tbl=data_tbl_step,
-                    columns_subset=column,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                            # Extract direction options from val_info
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            increasing_tol = validation.val_info.get("increasing_tol", 0.0)
 
-            if assertion_category == "ROWS_COMPLETE":
-                results_tbl = RowsComplete(
-                    data_tbl=data_tbl_step,
-                    columns_subset=column,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                            results_tbl = interrogate_decreasing(
+                                tbl=tbl,
+                                column=column,
+                                allow_stationary=allow_stationary,
+                                increasing_tol=increasing_tol,
+                                na_pass=na_pass,
+                            )
 
-            if assertion_category == "COL_EXISTS_HAS_TYPE":
-                result_bool = ColExistsHasType(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    threshold=threshold,
-                    assertion_method="exists",
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        elif assertion_type == "col_vals_between":
+                            results_tbl = interrogate_between(
+                                tbl=tbl,
+                                column=column,
+                                low=value[0],
+                                high=value[1],
+                                inclusive=inclusive,
+                                na_pass=na_pass,
+                            )
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = result_bool
-                validation.n_failed = 1 - result_bool
+                        elif assertion_type == "col_vals_outside":
+                            results_tbl = interrogate_outside(
+                                tbl=tbl,
+                                column=column,
+                                low=value[0],
+                                high=value[1],
+                                inclusive=inclusive,
+                                na_pass=na_pass,
+                            )
 
-                results_tbl = None
+                        elif assertion_type == "col_vals_in_set":
+                            results_tbl = interrogate_isin(tbl=tbl, column=column, set_values=value)
 
-            if assertion_category == "COL_SCHEMA_MATCH":
-                result_bool = ColSchemaMatch(
-                    data_tbl=data_tbl_step,
-                    schema=value["schema"],
-                    complete=value["complete"],
-                    in_order=value["in_order"],
-                    case_sensitive_colnames=value["case_sensitive_colnames"],
-                    case_sensitive_dtypes=value["case_sensitive_dtypes"],
-                    full_match_dtypes=value["full_match_dtypes"],
-                    threshold=threshold,
-                ).get_test_results()
+                        elif assertion_type == "col_vals_not_in_set":
+                            results_tbl = interrogate_notin(
+                                tbl=tbl, column=column, set_values=value
+                            )
 
-                schema_validation_info = _get_schema_validation_info(
-                    data_tbl=data_tbl,
-                    schema=value["schema"],
-                    passed=result_bool,
-                    complete=value["complete"],
-                    in_order=value["in_order"],
-                    case_sensitive_colnames=value["case_sensitive_colnames"],
-                    case_sensitive_dtypes=value["case_sensitive_dtypes"],
-                    full_match_dtypes=value["full_match_dtypes"],
-                )
+                        elif assertion_type == "col_vals_regex":
+                            results_tbl = interrogate_regex(
+                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                            )
 
-                # Add the schema validation info to the validation object
-                validation.val_info = schema_validation_info
+                        elif assertion_type == "col_vals_within_spec":
+                            from pointblank._interrogation import interrogate_within_spec
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                            results_tbl = interrogate_within_spec(
+                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                            )
 
-                results_tbl = None
+                        elif assertion_type == "col_vals_str_len":
+                            results_tbl = interrogate_str_len(
+                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                            )
 
-            if assertion_category == "ROW_COUNT_MATCH":
-                result_bool = RowCountMatch(
-                    data_tbl=data_tbl_step,
-                    count=value["count"],
-                    inverse=value["inverse"],
-                    threshold=threshold,
-                    abs_tol_bounds=value["abs_tol_bounds"],
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        # Apply structured-missingness exclusion: any row whose value is a
+                        # declared sentinel (or a null when `null_is_missing=True`) is treated
+                        # as a passing test unit, so only the "real" values are validated
+                        if validation.missing is not None and results_tbl is not None:
+                            results_tbl = apply_missing_exclusion(
+                                results_tbl=results_tbl, column=column, spec=validation.missing
+                            )
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                    elif assertion_type == "col_pct_null":
+                        result_bool = col_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
 
-                results_tbl = None
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
 
-            if assertion_category == "COL_COUNT_MATCH":
-                result_bool = ColCountMatch(
-                    data_tbl=data_tbl_step,
-                    count=value["count"],
-                    inverse=value["inverse"],
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        results_tbl = None
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                    elif assertion_type == "col_pct_missing":
+                        result_bool = col_pct_missing(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            sentinels=value["sentinels"],
+                            count_null=value["count_null"],
+                            max_pct=value["max_pct"],
+                        )
 
-                results_tbl = None
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
 
-            if assertion_category == "CONJOINTLY":
-                results_tbl = ConjointlyValidation(
-                    data_tbl=data_tbl_step,
-                    expressions=value["expressions"],
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        results_tbl = None
 
-            if assertion_category == "SPECIALLY":
-                results_tbl_list = SpeciallyValidation(
-                    data_tbl=data_tbl_step,
-                    expression=value,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    elif assertion_type == "col_vals_expr":
+                        results_tbl = col_vals_expr(
+                            data_tbl=data_tbl_step, expr=value, tbl_type=tbl_type
+                        )
 
-                #
-                # The result from this could either be a table in the conventional form, or,
-                # a list of boolean values; handle both cases
-                #
+                    elif assertion_type == "rows_distinct":
+                        results_tbl = interrogate_rows_distinct(
+                            data_tbl=data_tbl_step, columns_subset=column
+                        )
 
-                if isinstance(results_tbl_list, list):
-                    # If the result is a list of boolean values, then we need to convert it to a
-                    # set the validation results from the list
-                    validation.all_passed = all(results_tbl_list)
-                    validation.n = len(results_tbl_list)
-                    validation.n_passed = results_tbl_list.count(True)
-                    validation.n_failed = results_tbl_list.count(False)
+                    elif assertion_type == "rows_complete":
+                        results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
 
-                    results_tbl = None
+                    elif assertion_type == "col_missing_consistent":
+                        results_tbl = interrogate_missing_consistent(
+                            tbl=data_tbl_step,
+                            columns=column,
+                            sentinels=value["sentinels"],
+                            count_null=value["count_null"],
+                        )
 
-                else:
-                    # If the result is not a list, then we assume it's a table in the conventional
-                    # form (where the column is `pb_is_good_` exists, with boolean values
-                    results_tbl = results_tbl_list
+                    elif assertion_type == "prompt":
+                        from pointblank._interrogation import interrogate_prompt
+
+                        results_tbl = interrogate_prompt(
+                            tbl=data_tbl_step, columns_subset=column, ai_config=value
+                        )
+
+                    elif assertion_type == "col_exists":
+                        result_bool = col_exists(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "col_schema_match":
+                        result_bool = col_schema_match(
+                            data_tbl=data_tbl_step,
+                            schema=value["schema"],
+                            complete=value["complete"],
+                            in_order=value["in_order"],
+                            case_sensitive_colnames=value["case_sensitive_colnames"],
+                            case_sensitive_dtypes=value["case_sensitive_dtypes"],
+                            full_match_dtypes=value["full_match_dtypes"],
+                            threshold=threshold,
+                        )
+
+                        schema_validation_info = _get_schema_validation_info(
+                            data_tbl=data_tbl,
+                            schema=value["schema"],
+                            passed=result_bool,
+                            complete=value["complete"],
+                            in_order=value["in_order"],
+                            case_sensitive_colnames=value["case_sensitive_colnames"],
+                            case_sensitive_dtypes=value["case_sensitive_dtypes"],
+                            full_match_dtypes=value["full_match_dtypes"],
+                        )
+
+                        # Add the schema validation info to the validation object
+                        validation.val_info = schema_validation_info
+
+                        # Add a note with the schema expectation and results
+                        schema_note_html = _create_col_schema_match_note_html(
+                            schema_info=schema_validation_info, locale=self.locale
+                        )
+                        schema_note_text = _create_col_schema_match_note_text(
+                            schema_info=schema_validation_info
+                        )
+                        validation._add_note(
+                            key="schema_check", markdown=schema_note_html, text=schema_note_text
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "row_count_match":
+                        result_bool = row_count_match(
+                            data_tbl=data_tbl_step,
+                            count=value["count"],
+                            inverse=value["inverse"],
+                            abs_tol_bounds=value["abs_tol_bounds"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "col_count_match":
+                        result_bool = col_count_match(
+                            data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "data_freshness":
+                        from pointblank._interrogation import data_freshness as data_freshness_check
+
+                        freshness_result = data_freshness_check(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            max_age=value["max_age"],
+                            reference_time=value["reference_time"],
+                            timezone=value["timezone"],
+                            allow_tz_mismatch=value["allow_tz_mismatch"],
+                        )
+
+                        result_bool = freshness_result["passed"]
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        # Store the freshness check details for reporting
+                        validation.val_info = freshness_result
+
+                        # Update the values dict with actual computed values for failure text
+                        if freshness_result.get("age") is not None:
+                            value["age"] = freshness_result["age"]
+
+                        # Add timezone warning note if applicable
+                        if freshness_result.get("tz_warning_key"):  # pragma: no cover
+                            tz_key = freshness_result["tz_warning_key"]  # pragma: no cover
+                            tz_warning_text = NOTES_TEXT.get(tz_key, {}).get(  # pragma: no cover
+                                self.locale, NOTES_TEXT.get(tz_key, {}).get("en", "")
+                            )
+                            validation._add_note(  # pragma: no cover
+                                key="tz_warning",
+                                markdown=f"⚠️ {tz_warning_text}",
+                                text=tz_warning_text,
+                            )
+
+                        # Add note about column being empty if applicable
+                        if freshness_result.get("column_empty"):
+                            column_empty_text = NOTES_TEXT.get(
+                                "data_freshness_column_empty", {}
+                            ).get(
+                                self.locale,
+                                NOTES_TEXT.get("data_freshness_column_empty", {}).get(
+                                    "en", "The datetime column is empty (no values to check)."
+                                ),
+                            )
+                            validation._add_note(
+                                key="column_empty",
+                                markdown=f"⚠️ {column_empty_text}",
+                                text=column_empty_text,
+                            )
+
+                        # Add informational note about the freshness check
+                        if freshness_result.get("max_datetime") and freshness_result.get("age"):
+                            max_dt = freshness_result["max_datetime"]
+                            # Format datetime without microseconds for cleaner display
+                            if hasattr(max_dt, "replace"):
+                                max_dt_display = max_dt.replace(microsecond=0)
+                            else:  # pragma: no cover
+                                max_dt_display = max_dt  # pragma: no cover
+                            age = freshness_result["age"]
+                            age_str = _format_timedelta(age)
+                            max_age_str = _format_timedelta(value["max_age"])
+
+                            # Get translated template for pass/fail
+                            if result_bool:
+                                details_key = "data_freshness_details_pass"
+                                prefix = "✓"
+                            else:
+                                details_key = "data_freshness_details_fail"
+                                prefix = "✗"
+
+                            details_template = NOTES_TEXT.get(details_key, {}).get(
+                                self.locale,
+                                NOTES_TEXT.get(details_key, {}).get(
+                                    "en",
+                                    "Most recent data: `{max_dt}` (age: {age}, max allowed: {max_age})",
+                                ),
+                            )
+
+                            # Format the template with values
+                            note_text = details_template.format(
+                                max_dt=max_dt_display, age=age_str, max_age=max_age_str
+                            )
+                            # For markdown, make the age bold
+                            note_md_template = details_template.replace(
+                                "(age: {age}", "(age: **{age}**"
+                            )
+                            note_md = f"{prefix} {note_md_template.format(max_dt=max_dt_display, age=age_str, max_age=max_age_str)}"
+
+                            validation._add_note(
+                                key="freshness_details",
+                                markdown=note_md,
+                                text=note_text,
+                            )
+
+                        results_tbl = None
+
+                    elif assertion_type == "tbl_match":
+                        from pointblank._interrogation import tbl_match
+
+                        # Get the comparison table (could be callable or actual table)
+                        tbl_compare = value["tbl_compare"]
+
+                        # If tbl_compare is callable, execute it to get the table
+                        if callable(tbl_compare):
+                            tbl_compare = tbl_compare()
+
+                        result_bool = tbl_match(data_tbl=data_tbl_step, tbl_compare=tbl_compare)
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "col_vals_in_table":
+                        from pointblank._interrogation import interrogate_in_table
+
+                        ref_table = value["ref_table"]
+                        ref_column = value["ref_column"]
+                        in_table_columns = value["columns"]
+
+                        if callable(ref_table):
+                            ref_table = ref_table()
+
+                        results_tbl = interrogate_in_table(
+                            tbl=data_tbl_step,
+                            columns=in_table_columns,
+                            ref_tbl=ref_table,
+                            ref_columns=ref_column,
+                            na_pass=na_pass,
+                        )
+
+                    elif assertion_type == "conjointly":
+                        results_tbl = conjointly_validation(
+                            data_tbl=data_tbl_step,
+                            expressions=value["expressions"],
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        )
+
+                    elif is_valid_agg(assertion_type):
+                        agg, comp = resolve_agg_registries(assertion_type)
+
+                        # Produce a 1-column Narwhals DataFrame
+                        # Note: lazy frames are materialized in agg() to compute aggregates
+                        vec = nw.from_native(data_tbl_step).select(column)
+                        real = agg(vec)
+
+                        raw_value = value["value"]
+                        tol = value["tol"]
+
+                        # Handle ReferenceColumn: compute target from reference data
+                        if isinstance(raw_value, ReferenceColumn):
+                            if self.reference is None:
+                                raise ValueError(
+                                    f"Cannot use ref('{raw_value.column_name}') without "
+                                    "setting reference data on the Validate object. "
+                                    "Use Validate(data=..., reference=...) to set reference data."
+                                )
+                            ref_vec = nw.from_native(self.reference).select(raw_value.column_name)
+                            target: float | int = agg(ref_vec)
+                        else:
+                            target = raw_value
+
+                        lower_diff, upper_diff = _derive_bounds(target, tol)
+
+                        lower_bound = target - lower_diff
+                        upper_bound = target + upper_diff
+                        result_bool: bool = comp(real, lower_bound, upper_bound)
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
+
+                        # Store computed values for step reports
+                        validation.val_info = {
+                            "actual": real,
+                            "target": target,
+                            "tol": tol,
+                            "lower_bound": lower_bound,
+                            "upper_bound": upper_bound,
+                        }
+
+                        results_tbl = None
+                    else:
+                        raise ValueError(
+                            f"Unknown assertion type: {assertion_type}"
+                        )  # pragma: no cover
+
+                except Exception as e:
+                    # Catch data quality errors and column not found errors
+                    error_msg = str(e).lower()
+
+                    is_comparison_error = (
+                        "boolean value of na is ambiguous" in error_msg
+                        or "cannot compare" in error_msg
+                        or (
+                            "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        )
+                        or ("dtype" in error_msg and "compare" in error_msg)
+                    )
+
+                    is_column_not_found = "column" in error_msg and "not found" in error_msg
+
+                    # Older Polars versions (< ~1.33) raise KeyError instead of
+                    # ColumnNotFoundError for missing columns in expressions, so we
+                    # need to catch both error shapes.
+                    is_comparison_column_not_found = (
+                        "unable to find column" in error_msg and "valid columns" in error_msg
+                    ) or isinstance(e, KeyError)
+
+                    if (
+                        is_comparison_error or is_column_not_found or is_comparison_column_not_found
+                    ):  # pragma: no cover
+                        # If data quality comparison fails or column not found, mark as eval_error
+                        validation.eval_error = True  # pragma: no cover
+
+                        # Add a note for column not found errors (target column)
+                        if is_column_not_found:
+                            note_html = _create_column_not_found_note_html(
+                                column_name=column,
+                                available_columns=list(data_tbl_step.columns)
+                                if hasattr(data_tbl_step, "columns")
+                                else [],
+                                locale=self.locale,
+                            )
+                            note_text = _create_column_not_found_note_text(
+                                column_name=column,
+                                available_columns=list(data_tbl_step.columns)
+                                if hasattr(data_tbl_step, "columns")
+                                else [],
+                            )
+                            validation._add_note(
+                                key="column_not_found",
+                                markdown=note_html,
+                                text=note_text,
+                            )
+
+                        # Add a note for comparison column not found errors
+                        elif is_comparison_column_not_found:
+                            # Extract column name from error message
+                            # ColumnNotFoundError: 'unable to find column "col_name"; valid columns: ...'
+                            # KeyError (older Polars): "'col_name'"
+                            match = re.search(r'unable to find column "([^"]+)"', str(e))
+                            missing_col_name = None
+                            if match:
+                                missing_col_name = match.group(1)
+                            elif isinstance(e, KeyError) and e.args:
+                                missing_col_name = e.args[0]
+
+                            if missing_col_name is not None:
+                                # Determine position for between/outside validations
+                                position = None
+                                if assertion_type in ["col_vals_between", "col_vals_outside"]:
+                                    # Check if missing column is in left or right position
+                                    from pointblank.column import Column
+
+                                    if (
+                                        isinstance(value[0], Column)
+                                        and value[0].exprs == missing_col_name
+                                    ):
+                                        position = "left"
+                                    elif (
+                                        isinstance(value[1], Column)
+                                        and value[1].exprs == missing_col_name
+                                    ):
+                                        position = "right"
+
+                                note_html = _create_comparison_column_not_found_note_html(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
+                                    locale=self.locale,
+                                )
+                                note_text = _create_comparison_column_not_found_note_text(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
+                                )
+                                validation._add_note(
+                                    key="comparison_column_not_found",
+                                    markdown=note_html,
+                                    text=note_text,
+                                )
+
+                        end_time = datetime.datetime.now(datetime.timezone.utc)  # pragma: no cover
+
+                        validation.proc_duration_s = (
+                            end_time - start_time
+                        ).total_seconds()  # pragma: no cover
+
+                        validation.time_processed = end_time.isoformat(
+                            timespec="milliseconds"
+                        )  # pragma: no cover
+
+                        validation.active = False  # pragma: no cover
+
+                        continue  # pragma: no cover
+                    else:
+                        # For other unexpected errors, let them propagate
+                        raise
+
+            else:
+                # For "specially" validations, let programming errors propagate as exceptions
+                if assertion_type == "specially":
+                    results_tbl_list = SpeciallyValidation(
+                        data_tbl=data_tbl_step,
+                        expression=value,
+                        threshold=threshold,
+                        tbl_type=tbl_type,
+                    ).get_test_results()
+
+                    #
+                    # The result from this could either be a table in the conventional form, or,
+                    # a list of boolean values; handle both cases
+                    #
+
+                    if isinstance(results_tbl_list, list):
+                        # If the result is a list of boolean values, then we need to convert it to a
+                        # set the validation results from the list
+                        validation.all_passed = all(results_tbl_list)
+                        validation.n = len(results_tbl_list)
+                        validation.n_passed = results_tbl_list.count(True)
+                        validation.n_failed = results_tbl_list.count(False)
+
+                        results_tbl = None
+
+                    else:
+                        # If the result is not a list, then we assume it's a table in the conventional
+                        # form (where the column is `pb_is_good_` exists, with boolean values
+                        results_tbl = results_tbl_list
 
             # If the results table is not `None`, then we assume there is a table with a column
             # called `pb_is_good_` that contains boolean values; we can then use this table to
             # determine the number of test units that passed and failed
             if results_tbl is not None:
-                # Count the number of passing and failing test units
-                validation.n_passed = _count_true_values_in_column(
+                # Count passing/failing test units and the total row count in a single pass.
+                # Doing this together avoids re-executing the (possibly lazy) results-table plan
+                # multiple times, which would otherwise scan the data once per count.
+                n_units, n_passed, n_failed, n_null = _count_validation_units(
                     tbl=results_tbl, column="pb_is_good_"
                 )
-                validation.n_failed = _count_true_values_in_column(
-                    tbl=results_tbl, column="pb_is_good_", inverse=True
-                )
 
-                # Solely for the col_vals_in_set assertion type, any Null values in the
-                # `pb_is_good_` column are counted as failing test units
-                if assertion_type == "col_vals_in_set":
-                    null_count = _count_null_values_in_column(tbl=results_tbl, column="pb_is_good_")
-                    validation.n_failed += null_count
+                validation.n_passed = n_passed
+                validation.n_failed = n_failed
+
+                # For set-membership checks, any Null values in the `pb_is_good_` column
+                # are counted as failing test units
+                if assertion_type in ("col_vals_in_set", "col_vals_in_table"):
+                    validation.n_failed += n_null
 
                 # For column-value validations, the number of test units is the number of rows
-                validation.n = get_row_count(data=results_tbl)
+                validation.n = n_units
 
                 # Set the `all_passed` attribute based on whether there are any failing test units
                 validation.all_passed = validation.n_failed == 0
@@ -9856,6 +16864,34 @@ class Validate:
                     ),
                 )
 
+            # Add note for local thresholds (if they differ from global thresholds)
+            if threshold != self.thresholds:
+                if threshold != Thresholds():
+                    # Local thresholds are set - generate threshold note
+                    threshold_note_html = _create_local_threshold_note_html(
+                        thresholds=threshold, locale=self.locale
+                    )
+                    threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
+
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_thresholds",
+                        markdown=threshold_note_html,
+                        text=threshold_note_text,
+                    )
+
+                elif self.thresholds != Thresholds():
+                    # Thresholds explicitly reset to empty when global thresholds exist
+                    reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
+                    reset_note_text = _create_threshold_reset_note_text()
+
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_threshold_reset",
+                        markdown=reset_note_html,
+                        text=reset_note_text,
+                    )
+
             # If there is any threshold level that has been exceeded, then produce and
             # set the general failure text for the validation step
             if validation.warning or validation.error or validation.critical:
@@ -9866,6 +16902,8 @@ class Validate:
                     column=column,
                     values=value,
                     for_failure=True,
+                    locale=self.locale,
+                    n_rows=n_rows,
                 )
 
                 # Set the failure text in the validation step
@@ -9982,16 +17020,16 @@ class Validate:
             if (
                 collect_extracts
                 and assertion_type
-                in ROW_BASED_VALIDATION_TYPES + ["rows_distinct", "rows_complete"]
+                in ROW_BASED_VALIDATION_TYPES
+                + ["rows_distinct", "rows_complete", "col_missing_consistent"]
                 and tbl_type not in IBIS_BACKENDS
             ):
                 # Add row numbers to the results table
-                validation_extract_nw = (
-                    nw.from_native(results_tbl)
-                    .with_row_index(name="_row_num_")
-                    .filter(nw.col("pb_is_good_") == False)  # noqa
-                    .drop("pb_is_good_")
-                )
+                validation_extract_nw = _with_row_index(results_tbl, name="_row_num_")
+
+                validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
+                    "pb_is_good_"
+                )  # noqa
 
                 # Add 1 to the row numbers to make them 1-indexed
                 validation_extract_nw = validation_extract_nw.with_columns(nw.col("_row_num_") + 1)
@@ -10000,12 +17038,66 @@ class Validate:
                 if get_first_n is not None:
                     validation_extract_nw = validation_extract_nw.head(get_first_n)
                 elif sample_n is not None:
-                    validation_extract_nw = validation_extract_nw.sample(n=sample_n)
+                    # Narwhals LazyFrame doesn't have sample method, use head after shuffling
+                    try:
+                        validation_extract_nw = validation_extract_nw.sample(n=sample_n)
+                    except AttributeError:
+                        # For LazyFrames without sample method, collect first then sample
+                        validation_extract_native = validation_extract_nw.collect().to_native()
+                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
+                            # PySpark DataFrame has sample method
+                            validation_extract_native = (
+                                validation_extract_native.sample(  # pragma: no cover
+                                    fraction=min(
+                                        1.0, sample_n / validation_extract_native.count()
+                                    )  # pragma: no cover
+                                ).limit(sample_n)
+                            )  # pragma: no cover
+                            validation_extract_nw = nw.from_native(
+                                validation_extract_native
+                            )  # pragma: no cover
+                        else:
+                            # Fallback: just take first n rows after collecting
+                            validation_extract_nw = validation_extract_nw.collect().head(
+                                sample_n
+                            )  # pragma: no cover
                 elif sample_frac is not None:
-                    validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
+                    try:
+                        validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
+                    except AttributeError:  # pragma: no cover
+                        # For LazyFrames without sample method, collect first then sample
+                        validation_extract_native = (
+                            validation_extract_nw.collect().to_native()
+                        )  # pragma: no cover
+                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
+                            # PySpark DataFrame has sample method
+                            validation_extract_native = validation_extract_native.sample(
+                                fraction=sample_frac
+                            )  # pragma: no cover
+                            validation_extract_nw = nw.from_native(
+                                validation_extract_native
+                            )  # pragma: no cover
+                        else:
+                            # Fallback: use fraction to calculate head size
+                            collected = validation_extract_nw.collect()  # pragma: no cover
+                            sample_size = max(
+                                1, int(len(collected) * sample_frac)
+                            )  # pragma: no cover
+                            validation_extract_nw = collected.head(sample_size)  # pragma: no cover
 
                 # Ensure a limit is set on the number of rows to extract
-                if len(validation_extract_nw) > extract_limit:
+                try:
+                    # For DataFrames, use len()
+                    extract_length = len(validation_extract_nw)
+                except TypeError:
+                    # For LazyFrames, collect to get length (or use a reasonable default)
+                    try:
+                        extract_length = len(validation_extract_nw.collect())
+                    except Exception:  # pragma: no cover
+                        # If collection fails, apply limit anyway as a safety measure
+                        extract_length = extract_limit + 1  # pragma: no cover
+
+                if extract_length > extract_limit:
                     validation_extract_nw = validation_extract_nw.head(extract_limit)
 
                 # If a 'rows_distinct' validation step, then the extract should have the
@@ -10022,18 +17114,34 @@ class Validate:
                         column_names_subset = ["_row_num_"] + column
                         validation_extract_nw = validation_extract_nw.select(column_names_subset)
 
+                    # Use cast-to-string + fill_null before grouping to avoid issues with
+                    # null values in over() on pandas backends (nulls don't group properly
+                    # in window functions on pandas). We add temporary filled columns for
+                    # grouping only. Casting to string first avoids type mismatch errors
+                    # on backends like PySpark where fill_null requires matching types.
+                    fill_cols = [
+                        nw.col(c)
+                        .cast(nw.String)
+                        .fill_null(value="__pb_null__")
+                        .alias(f"__pb_filled_{c}__")
+                        for c in column_names
+                    ]
+                    filled_names = [f"__pb_filled_{c}__" for c in column_names]
+
                     validation_extract_nw = (
-                        validation_extract_nw.with_columns(
-                            group_min_row=nw.min("_row_num_").over(*column_names)
-                        )
+                        validation_extract_nw.with_columns(*fill_cols)
+                        .with_columns(group_min_row=nw.min("_row_num_").over(*filled_names))
                         # First sort by the columns to group duplicates and by row numbers
                         # within groups; this type of sorting will preserve the original order in a
                         # single operation
-                        .sort(by=["group_min_row"] + column_names + ["_row_num_"])
-                        .drop("group_min_row")
+                        .sort(by=["group_min_row"] + filled_names + ["_row_num_"])
+                        .drop("group_min_row", *filled_names)
                     )
 
-                # Ensure that the extract is set to its native format
+                # Ensure that the extract is collected and set to its native format
+                # For LazyFrames (like PySpark), we need to collect before converting to native
+                if is_narwhals_lazyframe(validation_extract_nw):
+                    validation_extract_nw = validation_extract_nw.collect()
                 validation.extract = nw.to_native(validation_extract_nw)
 
             # Get the end time for this step
@@ -10220,7 +17328,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         Below are some examples of how to use the `assert_below_threshold()` method. First, we'll
         create a simple Polars DataFrame with two columns (`a` and `b`).
@@ -10305,12 +17413,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Find any steps that exceeded the threshold
         failures = []
@@ -10376,7 +17486,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         Below are some examples of how to use the `above_threshold()` method. First, we'll create a
         simple Polars DataFrame with a single column (`values`).
@@ -10464,12 +17574,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Return True if any steps exceeded the threshold
         return any(status.values())
@@ -10525,11 +17637,15 @@ class Validate:
             }
         )
 
+        # Define a preprocessing function
+        def filter_by_a_gt_1(df):
+            return df.filter(pl.col("a") > 1)
+
         validation = (
             pb.Validate(data=tbl)
             .col_vals_gt(columns="a", value=0)
             .col_exists(columns="b")
-            .col_vals_lt(columns="b", value=9, pre=lambda df: df.filter(pl.col("a") > 1))
+            .col_vals_lt(columns="b", value=9, pre=filter_by_a_gt_1)
             .interrogate()
         )
         ```
@@ -11238,7 +18354,7 @@ class Validate:
 
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
-    ) -> dict[int, FrameT | None] | FrameT | None:
+    ) -> dict[int, Any] | Any:
         """
         Get the rows that failed for each validation step.
 
@@ -11261,7 +18377,7 @@ class Validate:
 
         Returns
         -------
-        dict[int, FrameT | None] | FrameT | None
+        dict[int, Any] | Any
             A dictionary of tables containing the rows that failed in every compatible validation
             step. Alternatively, it can be a DataFrame if `frame=True` and `i=` is a scalar.
 
@@ -11280,11 +18396,15 @@ class Validate:
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
 
         An extracted row for these validation methods means that a test unit failed for that row in
         the validation step.
@@ -11377,6 +18497,873 @@ class Validate:
         if frame and isinstance(i, int):
             return result[i]
         return result
+
+    def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]:
+        """Build the coalesced `(method, kwargs)` list for this plan (shared by to_code/to_yaml)."""
+        steps: list[tuple[str, dict[str, Any]]] = []
+        for vi in self.validation_info:
+            step = _validation_info_to_step(
+                vi,
+                global_thresholds=self.thresholds,
+                global_actions=self.actions,
+                warnings_out=warnings_out,
+            )
+            if step is not None:
+                steps.append(step)
+        return _coalesce_plan_steps(steps)
+
+    def to_code(self) -> str:
+        """
+        Render this validation plan as canonical Pointblank Python code.
+
+        The `to_code()` method walks the validation plan and reconstructs the equivalent
+        `pb.Validate(...).col_vals_*()...` method chain as a string. This is the inverse of
+        writing the plan by hand: it takes an in-memory `Validate` object and produces source
+        code that, when executed, recreates the same plan.
+
+        This is useful for sharing a plan, reviewing it in a diff, persisting it alongside
+        results, and it is the foundation for the AI edit/iterate flow (see
+        [`EditValidation`](`pointblank.EditValidation`)), which sends the current plan to a model
+        as editable code.
+
+        Returns
+        -------
+        str
+            The validation plan as a block of Python code. The data source is rendered as the
+            placeholder `your_data`, since the original data variable name is not known to the
+            plan.
+
+        Notes on Fidelity
+        -----------------
+        Most validation steps round-trip exactly. Steps that carry non-serializable Python
+        objects, such as `pre=` preprocessing callables, `actions=`, callable `active=`
+        conditions, or the expressions used by
+        [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`),
+        [`conjointly()`](`pointblank.Validate.conjointly`), and
+        [`specially()`](`pointblank.Validate.specially`), cannot be reproduced from memory. For
+        those, a syntactically valid placeholder is emitted and a warning is raised so the code
+        still parses and the loss is visible.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+            .rows_distinct()
+        )
+
+        print(validation.to_code())
+        ```
+        """
+        import warnings
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        # Assemble the top-level `pb.Validate(...)` arguments (data first, with a hint comment).
+        validate_args: list[tuple[str, str | None]] = [
+            ("data=your_data", "  # Replace your_data with the actual data variable")
+        ]
+        if self.tbl_name is not None:
+            validate_args.append((f"tbl_name={json.dumps(self.tbl_name)}", None))
+        if self.label is not None:
+            validate_args.append((f"label={json.dumps(self.label)}", None))
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            validate_args.append((f"thresholds={_render_thresholds_code(self.thresholds)}", None))
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to code and were omitted."
+            )
+        if self.brief is not None and self.brief is not False:
+            brief_val = True if self.brief == "{auto}" else self.brief
+            validate_args.append((f"brief={_render_code_value(brief_val)}", None))
+        if self.lang is not None and self.lang != "en":
+            validate_args.append((f"lang={json.dumps(self.lang)}", None))
+        if self.locale is not None and self.locale != self.lang:
+            validate_args.append((f"locale={json.dumps(self.locale)}", None))
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                validate_args.append((f"{attr}={json.dumps(value)}", None))
+        if self.consumers is not None:
+            validate_args.append((f"consumers={_render_code_value(self.consumers)}", None))
+
+        lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate("]
+        for arg, comment in validate_args:
+            lines.append(f"        {arg}," + (comment or ""))
+        lines.append("    )")
+        for method, params in steps:
+            lines.append(_render_step_code(method, params))
+        lines.append(")")
+        lines.append("")
+        lines.append("validation")
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to code:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        return "\n".join(lines)
+
+    def to_yaml(self, path: str | Path | None = None) -> str:
+        """
+        Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config.
+
+        The `to_yaml()` method renders the validation plan as a YAML document using the same
+        schema consumed by [`yaml_interrogate()`](`pointblank.yaml_interrogate`). This enables
+        storing plans as configuration, sharing them across projects, and round-tripping a plan
+        through YAML.
+
+        Parameters
+        ----------
+        path
+            An optional file path. If provided, the YAML is written to this file (parent
+            directories are created as needed) in addition to being returned.
+
+        Returns
+        -------
+        str
+            The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
+            available, otherwise to the placeholder `your_data`; set it to a loadable data
+            source before passing the YAML to `yaml_interrogate()`.
+
+        Notes on Fidelity
+        -----------------
+        As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-serializable
+        Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
+        `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
+        placeholder is emitted and a warning is raised.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_not_null(columns="a")
+        )
+
+        print(validation.to_yaml())
+        ```
+        """
+        import warnings
+
+        import yaml as yaml_module
+
+        warnings_out: list[str] = []
+        steps = self._serialize_steps(warnings_out)
+
+        config: dict[str, Any] = {}
+        config["tbl"] = self.tbl_name if self.tbl_name is not None else "your_data"
+        if self.tbl_name is not None:
+            config["tbl_name"] = self.tbl_name
+        if self.label is not None:
+            config["label"] = self.label
+        global_thresholds = _thresholds_as_dict(self.thresholds)
+        if global_thresholds:
+            config["thresholds"] = global_thresholds
+        if self.brief is not None and self.brief is not False:
+            config["brief"] = True if self.brief == "{auto}" else self.brief
+        if self.lang is not None and self.lang != "en":
+            config["lang"] = self.lang
+        if self.locale is not None and self.locale != self.lang:
+            config["locale"] = self.locale
+        for attr in ("owner", "version"):
+            value = getattr(self, attr)
+            if value is not None:
+                config[attr] = value
+        if self.consumers is not None:
+            config["consumers"] = self.consumers
+        if self.actions is not None:
+            warnings_out.append(
+                "Table-level `actions=` cannot be serialized to YAML and were omitted."
+            )
+
+        yaml_steps: list[Any] = []
+        for method, params in steps:
+            if not params:
+                yaml_steps.append(method)
+                continue
+            yaml_params = {
+                key: _value_to_yaml(value, warnings_out) for key, value in params.items()
+            }
+            yaml_steps.append({method: yaml_params})
+        config["steps"] = yaml_steps
+
+        yaml_str = yaml_module.dump(config, default_flow_style=False, sort_keys=False)
+
+        if warnings_out:
+            warnings.warn(
+                "Some parts of the validation plan could not be fully serialized to YAML:\n- "
+                + "\n- ".join(dict.fromkeys(warnings_out)),
+                stacklevel=2,
+            )
+
+        if path is not None:
+            yaml_path = Path(path)
+            if yaml_path.parent != Path(""):
+                yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            yaml_path.write_text(yaml_str, encoding="utf-8")
+
+        return yaml_str
+
+    def to_json_schema(self, path: str | Path | None = None) -> dict[str, Any]:
+        """
+        Export this validation plan as a JSON Schema document.
+
+        The `to_json_schema()` method walks the validation steps and maps each one to its closest
+        JSON Schema equivalent. This lets you share your validation rules as a portable,
+        language-neutral schema that tools across many ecosystems can consume.
+
+        When the `Validate` object has data attached, the schema is enriched with column type
+        information inferred from the data (e.g., `"type": "integer"` for Int64 columns).
+
+        Parameters
+        ----------
+        path
+            An optional file path. If provided, the JSON Schema is written to this file (parent
+            directories are created as needed) in addition to being returned.
+
+        Returns
+        -------
+        dict[str, Any]
+            The JSON Schema document as a dictionary. This is a valid JSON Schema that can be
+            serialized with `json.dumps()` or consumed by any JSON Schema validator.
+
+        Supported Mappings
+        ------------------
+        The following validation methods have direct JSON Schema equivalents:
+
+        | Pointblank method | JSON Schema keyword |
+        |---|---|
+        | `col_vals_not_null()` | `required` |
+        | `col_vals_gt()` | `exclusiveMinimum` |
+        | `col_vals_ge()` | `minimum` |
+        | `col_vals_lt()` | `exclusiveMaximum` |
+        | `col_vals_le()` | `maximum` |
+        | `col_vals_eq()` | `const` |
+        | `col_vals_in_set()` | `enum` |
+        | `col_vals_between()` | `minimum` + `maximum` |
+        | `col_vals_regex()` | `pattern`  |
+        | `col_vals_within_spec()` | `format` |
+
+        Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`,
+        `col_vals_outside()`) are silently skipped.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=df)
+            .col_vals_gt(columns="age", value=0)
+            .col_vals_not_null(columns="name")
+            .col_vals_in_set(columns="status", set=["active", "inactive"])
+        )
+
+        schema = validation.to_json_schema()
+        # {'$schema': 'https://json-schema.org/draft/2020-12/schema',
+        #  'type': 'object',
+        #  'properties': {
+        #      'age': {'exclusiveMinimum': 0, 'type': 'integer'},
+        #      'name': {'type': 'string'},
+        #      'status': {'enum': ['active', 'inactive'], 'type': 'string'}
+        #  },
+        #  'required': ['name']}
+
+        # Write to a file
+        validation.to_json_schema("output.schema.json")
+        ```
+        """
+        from pointblank.adapters._api import export_contract
+
+        destination = str(path) if path is not None else None
+        schema_doc = export_contract(self, destination=destination, format="json_schema")
+
+        # Enrich with column type information from the data when available
+        if self.data is not None and "properties" in schema_doc:
+            self._enrich_schema_types(schema_doc)
+
+        # Write the enriched version if a path was given and we enriched it
+        if path is not None and self.data is not None:
+            import json
+
+            out_path = Path(path)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_path, "w") as f:
+                json.dump(schema_doc, f, indent=2)
+
+        return schema_doc
+
+    def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None:  # pragma: no cover
+        """Add JSON Schema ``type`` fields inferred from the data's column types."""
+        try:  # pragma: no cover
+            nw_frame = nw.from_native(self.data)  # pragma: no cover
+            col_schema = nw_frame.collect_schema()  # pragma: no cover
+        except Exception:  # pragma: no cover
+            return  # pragma: no cover
+
+        type_map = {  # pragma: no cover
+            "int": "integer",
+            "float": "number",
+            "double": "number",
+            "decimal": "number",
+            "str": "string",
+            "utf8": "string",
+            "object": "string",
+            "bool": "boolean",
+        }
+
+        properties = schema_doc.get("properties", {})  # pragma: no cover
+        for col_name, dtype in col_schema.items():  # pragma: no cover
+            if col_name not in properties:  # pragma: no cover
+                continue  # pragma: no cover
+            if "type" in properties[col_name]:  # pragma: no cover
+                continue  # pragma: no cover
+
+            dtype_lower = str(dtype).lower()  # pragma: no cover
+            for key, json_type in type_map.items():  # pragma: no cover
+                if key in dtype_lower:  # pragma: no cover
+                    properties[col_name]["type"] = json_type  # pragma: no cover
+                    break  # pragma: no cover
+
+    def _covered_columns(self) -> set[str]:  # pragma: no cover
+        """Return the set of simple column names referenced by this plan's steps."""
+        covered: set[str] = set()  # pragma: no cover
+        for vi in self.validation_info:  # pragma: no cover
+            name = _column_to_name(vi.column)  # pragma: no cover
+            if name is not None:  # pragma: no cover
+                covered.add(name)  # pragma: no cover
+            elif isinstance(vi.column, (list, tuple)):  # pragma: no cover
+                covered.update(c for c in vi.column if isinstance(c, str))  # pragma: no cover
+        return covered  # pragma: no cover
+
+    def _auto_improvement_instruction(self) -> str:
+        """Build a natural-language "improve this plan" instruction from the data profile."""
+        try:
+            all_columns = _get_column_names_safe(self.data)
+        except Exception:  # pragma: no cover
+            all_columns = []
+        uncovered = [c for c in all_columns if c not in self._covered_columns()]
+
+        lines = [
+            "Improve this validation plan to increase data quality coverage. Use the table's "
+            "data profile to choose realistic, well-targeted checks."
+        ]
+        if uncovered:
+            lines.append(
+                "These columns currently have no validation coverage: "
+                f"{', '.join(uncovered)}. Add appropriate checks for them (for example, "
+                "not-null checks for columns with no missing values, range checks for numeric "
+                "columns, and set-membership checks for low-cardinality columns)."
+            )
+        else:
+            lines.append(  # pragma: no cover
+                "All columns already have some coverage; look for additional high-value checks "
+                "such as uniqueness of key columns, tighter ranges, or row/column count checks."
+            )
+        if _thresholds_as_dict(self.thresholds) == {}:
+            lines.append(
+                "No failure thresholds are set on the plan; add sensible warning/error "
+                "thresholds via `pb.Thresholds(...)`."
+            )
+        lines.append("Preserve all existing steps unless they are clearly redundant.")
+        return " ".join(lines)
+
+    def suggest_improvements(
+        self,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Propose AI-generated improvements to this validation plan.
+
+        This is a thin, convenience wrapper over
+        [`EditValidation`](`pointblank.EditValidation`): it profiles the table with
+        [`DataScan`](`pointblank.DataScan`), derives an instruction that targets gaps in the
+        current plan (columns with no coverage, missing thresholds), and asks the model to extend
+        the plan accordingly. As with `EditValidation`, you review the proposed change as a diff
+        and explicitly accept it.
+
+        Parameters
+        ----------
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) with the proposed improvements,
+            ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(
+            columns="d", value=100
+        )
+
+        proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
+        print(proposal.diff())
+        improved = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        return EditValidation(
+            validation=self,
+            instruction=self._auto_improvement_instruction(),
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
+
+    def from_prompt(
+        self,
+        prompt: str,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any:
+        """
+        Build a validation plan for this table from a natural-language prompt.
+
+        This is the same AI edit flow as [`EditValidation`](`pointblank.EditValidation`) but
+        starting from an *empty* plan: the model is given a bare `pb.Validate(...)` (carrying this
+        object's table name, label, and thresholds) plus a `DataScan` profile of the data, and is
+        asked to author steps that satisfy the prompt.
+
+        Parameters
+        ----------
+        prompt
+            A plain-English description of the checks the plan should perform (e.g., "ensure no
+            nulls in any id column and that ids are unique").
+        model
+            The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
+        api_key
+            The API key for the model provider.
+        verify_ssl
+            Whether to verify SSL certificates for provider requests. Defaults to `True`.
+        max_reprompts
+            Maximum automatic re-prompts if the returned plan fails the syntax check.
+
+        Returns
+        -------
+        EditValidation
+            An [`EditValidation`](`pointblank.EditValidation`) whose revised plan realizes the
+            prompt; inspect it with `.diff()`/`.to_code()` and finalize with `.accept()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        base = pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+        proposal = base.from_prompt(
+            "ensure column a has no nulls and column d is always positive",
+            model="anthropic:claude-opus-4-8",
+        )
+        plan = proposal.accept()
+        ```
+        """
+        from pointblank.edit import EditValidation
+
+        # Start from an empty plan that preserves this object's top-level configuration
+        empty_plan = Validate(
+            data=self.data,
+            tbl_name=self.tbl_name,
+            label=self.label,
+            thresholds=self.thresholds,
+        )
+        empty_code = empty_plan.to_code()
+
+        return EditValidation(
+            validation=empty_code,
+            instruction=prompt,
+            model=model,
+            data=self.data,
+            api_key=api_key,
+            verify_ssl=verify_ssl,
+            max_reprompts=max_reprompts,
+        )
+
+    def get_dimension_scores(self) -> dict[str, float]:
+        """
+        Get per-dimension health scores from the validation results.
+
+        Each validation step is associated with a data quality dimension (e.g., `"completeness"`,
+        `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"`), either
+        inferred automatically from the assertion type or set explicitly via the `dimension=`
+        parameter on a validation method. This method rolls the per-step results up into a
+        test-unit-weighted pass rate (`0`-`100`) for each dimension present in the plan.
+
+        Scores are weighted by test units, so larger tables and steps with more test units
+        contribute proportionally more to each dimension's score. Only steps that have been
+        interrogated contribute; inactive steps are excluded.
+
+        Returns
+        -------
+        dict[str, float]
+            A dictionary mapping each dimension name to its score (a percentage from `0` to `100`).
+            Returns an empty dictionary if the validation has not been interrogated.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .rows_distinct()
+            .interrogate()
+        )
+
+        validation.get_dimension_scores()
+        ```
+
+        See Also
+        --------
+        Use [`get_health_score()`](`pointblank.Validate.get_health_score`) for a single overall
+        score across all dimensions.
+        """
+        return _compute_dimension_scores(self.validation_info)
+
+    def get_health_score(self) -> float:
+        """
+        Get the overall data quality health score from the validation results.
+
+        The health score is a single number (a percentage from `0` to `100`) that summarizes the
+        overall quality of the data across all validation steps. It is computed as a test-unit
+        weighted pass rate: the total number of passing test units divided by the total number of
+        test units. This means larger tables and steps operating over more rows contribute
+        proportionally more to the score, so it tracks data volume rather than mere step count.
+
+        Per-dimension weights can be set globally via
+        [`config(dimension_weights=...)`](`pointblank.config`) for organizations that consider some
+        dimensions (e.g., completeness) more critical than others. A weight scales that dimension's
+        test-unit contribution to the score (so a dimension's influence is its weight times its
+        test-unit count); the returned score is always within `[0, 100]`.
+
+        Returns
+        -------
+        float
+            The overall health score as a percentage from `0` to `100`. Returns `100.0` if the
+            validation has not been interrogated or contains no scorable steps.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .interrogate()
+        )
+
+        validation.get_health_score()
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) for a per-dimension
+        breakdown of the score.
+        """
+        weights = getattr(global_config, "dimension_weights", None)
+        return _compute_health_score(self.validation_info, dimension_weights=weights)
+
+    def assert_dimension_scores(
+        self,
+        thresholds: dict[str, float] | None = None,
+        message: str | None = None,
+    ) -> None:
+        """
+        Raise an `AssertionError` if any dimension's health score falls below a minimum.
+
+        The `assert_dimension_scores()` method checks each data quality dimension's score (from
+        [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`)) against a minimum
+        acceptable value. This is useful in automated testing and CI environments where you want to
+        fail the run when, say, the completeness score drops below `95`.
+
+        Parameters
+        ----------
+        thresholds
+            A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`, the
+            minimums set via [`config(dimension_thresholds=...)`](`pointblank.config`) are used. A
+            dimension present in the thresholds but absent from the validation is ignored.
+        message
+            Custom error message to use if the assertion fails. If `None`, a default message that
+            lists the offending dimensions (with actual vs. required scores) is generated.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        AssertionError
+            If any dimension's score is below its specified minimum.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"))
+            .col_vals_not_null(columns="c")
+            .interrogate()
+        )
+
+        # Fail if the completeness score is below 95
+        validation.assert_dimension_scores(thresholds={"completeness": 95})
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) to retrieve the
+        scores without raising, and [`config()`](`pointblank.config`) to set default per-dimension
+        thresholds globally.
+        """
+        if thresholds is None:
+            thresholds = getattr(global_config, "dimension_thresholds", None) or {}
+
+        if not thresholds:
+            return
+
+        # Auto-interrogate with default parameters if not already done (matches the behavior of
+        # `assert_below_threshold()`), so scores reflect actual results rather than an empty plan
+        if not hasattr(self, "time_start") or self.time_start is None:
+            self.interrogate()
+
+        dimension_scores = self.get_dimension_scores()
+
+        failures = []
+        for dimension, minimum in thresholds.items():
+            score = dimension_scores.get(dimension)
+            if score is not None and score < minimum:
+                failures.append((dimension, score, minimum))
+
+        if failures:
+            if message is None:
+                parts = [
+                    f"{dimension} ({score:g}% < {minimum:g}%)"
+                    for dimension, score, minimum in failures
+                ]
+                message = "Dimension health score(s) below the required minimum: " + ", ".join(
+                    parts
+                )
+            raise AssertionError(message)
+
+    def get_scorecard(self, title: str | None = ":default:") -> GT:
+        """
+        Get a data quality scorecard as a GT table.
+
+        The `get_scorecard()` method produces a compact, standalone scorecard that summarizes data
+        quality across dimensions. It shows the overall health score prominently, along with a
+        per-dimension breakdown (a color-coded bar, the dimension's score, and its passing/total
+        test units). Unlike the full validation report, the scorecard focuses purely on the
+        aggregate health picture, making it well-suited for dashboards and executive summaries.
+
+        The returned object is a Great Tables `GT` object, so it can be displayed directly, exported
+        to HTML (via `.as_raw_html()`), or saved to an image file (via `.save()`).
+
+        Parameters
+        ----------
+        title
+            Options for customizing the title of the scorecard. The default `":default:"` produces
+            a generic title (optionally including the table name). Use `":tbl_name:"` to show just
+            the table name, `":none:"` for no title, or provide your own Markdown text.
+
+        Returns
+        -------
+        GT
+            A `GT` object representing the scorecard.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=0)
+            .rows_distinct()
+            .interrogate()
+        )
+
+        validation.get_scorecard()
+        ```
+
+        See Also
+        --------
+        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) and
+        [`get_health_score()`](`pointblank.Validate.get_health_score`) for the underlying numbers,
+        and [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) for the full per-step
+        validation report.
+        """
+        # Do we have a DataFrame library to work with?
+        _check_any_df_lib(method_used="get_scorecard")
+
+        # Select the DataFrame library
+        df_lib = _select_df_lib(preference="polars")
+
+        lang = self.lang or "en"
+
+        dimension_scores = _compute_dimension_scores(self.validation_info)
+        scorecard_title = _get_report_text("report_dimension_scores", lang)
+
+        # Resolve the title text
+        if title == ":default:":
+            if self.tbl_name:
+                title_text = f"{scorecard_title} &mdash; <code>{self.tbl_name}</code>"
+            else:
+                title_text = scorecard_title
+        elif title == ":tbl_name:":
+            title_text = (
+                f"<code>{self.tbl_name}</code>" if self.tbl_name else scorecard_title
+            )  # pragma: no cover
+        elif title in (":none:", None):
+            title_text = None
+        else:
+            title_text = commonmark.commonmark(title)  # pragma: no cover
+
+        # If there are no scorable steps, return a minimal table with an informative message.
+        # Distinguish "not interrogated yet" from "interrogated but nothing scorable" (an empty
+        # plan, or all steps inactive/errored) so the message is accurate in each case.
+        if not dimension_scores:
+            interrogated = getattr(self, "time_start", None) is not None
+            msg_key = (
+                "no_validation_steps_text" if interrogated else "no_interrogation_performed_text"
+            )
+            no_steps_text = VALIDATION_REPORT_TEXT[msg_key].get(
+                lang, VALIDATION_REPORT_TEXT[msg_key]["en"]
+            )
+            df = df_lib.DataFrame({"scorecard": [no_steps_text]})
+            gt_tbl = (
+                GT(df, id="pb_scorecard")
+                .opt_table_font(font=google_font(name="IBM Plex Sans"))
+                .cols_label(cases={"scorecard": ""})
+                .tab_style(style=style.text(color="#666666", weight="bold"), locations=loc.body())
+            )
+            if title_text is not None:
+                gt_tbl = gt_tbl.tab_header(title=html(title_text))
+            if version("great_tables") >= "0.17.0":
+                gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+            return gt_tbl
+
+        weights = getattr(global_config, "dimension_weights", None)
+        overall = _compute_health_score(self.validation_info, dimension_weights=weights)
+
+        agg = _aggregate_dimension_units(self.validation_info)
+
+        # Order dimensions using the canonical order, appending any custom dimensions at the end
+        ordered_dimensions = [d for d in DIMENSION_NAMES if d in dimension_scores]
+        ordered_dimensions += [d for d in dimension_scores if d not in DIMENSION_NAMES]
+
+        dimension_cells: list[str] = []
+        score_cells: list[str] = []
+        units_cells: list[str] = []
+        for dimension in ordered_dimensions:
+            n_passed, n = agg[dimension]
+            score = dimension_scores[dimension]
+            color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
+            label = html_module.escape(_get_dimension_label(dimension, lang))
+            dimension_cells.append(
+                f'<span style="background-color: {color}; color: #FFFFFF; padding: 3px 9px; '
+                "border-radius: 9px; font-size: 11px; font-weight: 600; white-space: nowrap; "
+                'line-height: 1; display: inline-block; vertical-align: middle;">'
+                f"{label}</span>"
+            )
+            score_cells.append(
+                '<div style="display: flex; align-items: center; gap: 8px;">'
+                '<div style="background: #EEEEEE; border-radius: 4px; width: 110px; height: 14px; '
+                'overflow: hidden;">'
+                f'<div style="background: {color}; width: {score:g}%; height: 100%;"></div></div>'
+                "<span style=\"font-family: 'IBM Plex Mono', monospace; font-size: 12px; "
+                f'color: #444444; font-weight: 600;">{score:g}%</span>'
+                "</div>"
+            )
+            units_cells.append(f"{n_passed} / {n}")
+
+        df = df_lib.DataFrame(
+            {
+                "dimension": dimension_cells,
+                "score": score_cells,
+                "test_units": units_cells,
+            }
+        )
+
+        health_label = _get_report_text("report_health_score", lang)
+        subtitle_html = (
+            '<div style="padding-top: 4px;">'
+            f'<span style="font-weight: 600; color: #444444; font-size: 13px;">{health_label}:'
+            "</span> "
+            f'<span style="font-weight: 700; font-size: 22px; color: {_health_score_color(overall)};">'
+            f"{overall:.0f}%</span>"
+            "</div>"
+        )
+
+        gt_tbl = (
+            _fmt_raw_html(GT(df, id="pb_scorecard"), columns=["dimension", "score"])
+            .opt_table_font(font=google_font(name="IBM Plex Sans"))
+            .cols_label(
+                cases={
+                    "dimension": _get_report_text("report_col_dimension", lang),
+                    "score": _get_report_text("report_col_score", lang),
+                    "test_units": _get_report_text("report_col_units", lang),
+                }
+            )
+            .cols_align(align="left", columns=["dimension", "score"])
+            .cols_align(align="right", columns=["test_units"])
+            .cols_width(cases={"dimension": "130px", "score": "200px", "test_units": "90px"})
+            .tab_style(
+                style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
+            )
+            .tab_style(style=style.css("height: 34px;"), locations=loc.body())
+            .tab_style(
+                style=style.text(
+                    color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+                ),
+                locations=loc.body(columns="test_units"),
+            )
+            .tab_options(table_font_size="90%")
+        )
+
+        if title_text is not None:
+            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(subtitle_html))
+
+        if version("great_tables") >= "0.17.0":
+            gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+
+        return gt_tbl
 
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
@@ -11547,7 +19534,7 @@ class Validate:
 
         return json.dumps(report, indent=4, default=str)
 
-    def get_sundered_data(self, type="pass") -> FrameT:
+    def get_sundered_data(self, type: str = "pass") -> Any:
         """
         Get the data that passed or failed the validation steps.
 
@@ -11583,7 +19570,7 @@ class Validate:
 
         Returns
         -------
-        FrameT
+        Any
             A table containing the data that passed or failed the validation steps.
 
         Examples
@@ -11659,16 +19646,15 @@ class Validate:
         # TODO: add argument for user to specify the index column name
         index_name = "pb_index_"
 
-        data_nw = nw.from_native(self.data).with_row_index(name=index_name)
+        data_nw = _with_row_index(self.data, name=index_name)
 
         # Get all validation step result tables and join together the `pb_is_good_` columns
         # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
         # and that the index is reset
+        labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
         for i, validation in enumerate(validation_info):
-            results_tbl = nw.from_native(validation.tbl_checked)
-
             # Add row numbers to the results table
-            results_tbl = results_tbl.with_row_index(name=index_name)
+            results_tbl = _with_row_index(validation.tbl_checked, name=index_name)
 
             # Add numerical suffix to the `pb_is_good_` column to make it unique
             results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
@@ -11676,7 +19662,7 @@ class Validate:
             )
 
             # Add the results table to the list of tables
-            if i == 0:
+            if labeled_tbl_nw is None:
                 labeled_tbl_nw = results_tbl
             else:
                 labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
@@ -11685,10 +19671,14 @@ class Validate:
         pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
 
         # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
-        # columns are `True`
+        # columns are `True`; joins don't guarantee row order (e.g., Polars >= 2.0 collects
+        # LazyFrames with the streaming engine), so the original order is restored via the index
         labeled_tbl_nw = (
-            labeled_tbl_nw.with_columns(pb_is_good_all=nw.all_horizontal(pb_is_good_cols))
+            labeled_tbl_nw.with_columns(
+                pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
+            )
             .join(data_nw, on=index_name, how="left")
+            .sort(index_name)
             .drop(index_name)
         )
 
@@ -11702,8 +19692,159 @@ class Validate:
 
         return sundered_tbl
 
+    def get_notes(
+        self, i: int, format: str = "dict"
+    ) -> dict[str, dict[str, str]] | list[str] | None:
+        """
+        Get notes from a validation step by its step number.
+
+        This is a convenience method that retrieves notes from a specific validation step using
+        the step number (1-indexed). It provides easier access to step notes without having to
+        navigate through the `validation_info` list.
+
+        Parameters
+        ----------
+        i
+            The step number (1-indexed) to retrieve notes from. This corresponds to the step
+            numbers shown in validation reports.
+        format
+            The format to return notes in:
+            - `"dict"`: Returns the full notes dictionary (default)
+            - `"markdown"`: Returns a list of markdown-formatted note values
+            - `"text"`: Returns a list of plain text note values
+            - `"keys"`: Returns a list of note keys
+
+        Returns
+        -------
+        dict, list, or None
+            The notes in the requested format, or `None` if the step doesn't exist or has no notes.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create validation with notes
+        validation = pb.Validate(pl.DataFrame({"x": [1, 2, 3]}))
+        validation.col_vals_gt(columns="x", value=0)
+
+        # Add a note to step 1
+        validation.validation_info[0]._add_note(
+            key="info",
+            markdown="This is a **test** note",
+            text="This is a test note"
+        )
+
+        # Interrogate
+        validation.interrogate()
+
+        # Get notes from step 1 using the step number
+        notes = validation.get_notes(1)
+        # Returns: {'info': {'markdown': 'This is a **test** note', 'text': '...'}}
+
+        # Get just the markdown versions
+        markdown_notes = validation.get_notes(1, format="markdown")
+        # Returns: ['This is a **test** note']
+
+        # Get just the keys
+        keys = validation.get_notes(1, format="keys")
+        # Returns: ['info']
+        ```
+        """
+        # Validate step number
+        if not isinstance(i, int) or i < 1:
+            raise ValueError(f"Step number must be a positive integer, got: {i}")
+
+        # Find the validation step with the matching step number
+        # Note: validation_info may contain multiple steps after segmentation,
+        # so we need to find the one with the matching `i` value
+        for validation in self.validation_info:
+            if validation.i == i:
+                return validation._get_notes(format=format)
+
+        # Step not found
+        return None
+
+    def get_note(self, i: int, key: str, format: str = "dict") -> dict[str, str] | str | None:
+        """
+        Get a specific note from a validation step by its step number and note key.
+
+        This method retrieves a specific note from a validation step using the step number
+        (1-indexed) and the note key. It provides easier access to individual notes without having
+        to navigate through the `validation_info` list or retrieve all notes.
+
+        Parameters
+        ----------
+        i
+            The step number (1-indexed) to retrieve the note from. This corresponds to the step
+            numbers shown in validation reports.
+        key
+            The key of the note to retrieve.
+        format
+            The format to return the note in:
+            - `"dict"`: Returns the note as a dictionary with 'markdown' and 'text' keys (default)
+            - `"markdown"`: Returns just the markdown-formatted note value
+            - `"text"`: Returns just the plain text note value
+
+        Returns
+        -------
+        dict, str, or None
+            The note in the requested format, or `None` if the step or note doesn't exist.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create validation with notes
+        validation = pb.Validate(pl.DataFrame({"x": [1, 2, 3]}))
+        validation.col_vals_gt(columns="x", value=0)
+
+        # Add a note to step 1
+        validation.validation_info[0]._add_note(
+            key="threshold_info",
+            markdown="Using **default** thresholds",
+            text="Using default thresholds"
+        )
+
+        # Interrogate
+        validation.interrogate()
+
+        # Get a specific note from step 1 using step number and key
+        note = validation.get_note(1, "threshold_info")
+        # Returns: {'markdown': 'Using **default** thresholds', 'text': '...'}
+
+        # Get just the markdown version
+        markdown = validation.get_note(1, "threshold_info", format="markdown")
+        # Returns: 'Using **default** thresholds'
+
+        # Get just the text version
+        text = validation.get_note(1, "threshold_info", format="text")
+        # Returns: 'Using default thresholds'
+        ```
+        """
+        # Validate step number
+        if not isinstance(i, int) or i < 1:
+            raise ValueError(f"Step number must be a positive integer, got: {i}")
+
+        # Find the validation step with the matching step number
+        for validation in self.validation_info:
+            if validation.i == i:
+                return validation._get_note(key=key, format=format)
+
+        # Step not found
+        return None
+
     def get_tabular_report(
-        self, title: str | None = ":default:", incl_header: bool = None, incl_footer: bool = None
+        self,
+        title: str | None = ":default:",
+        incl_header: bool | None = None,
+        incl_footer: bool | None = None,
+        incl_footer_timings: bool | None = None,
+        incl_footer_notes: bool | None = None,
+        incl_dimensions: bool | None = None,
     ) -> GT:
         """
         Validation report as a GT table.
@@ -11726,6 +19867,25 @@ class Validate:
             name of the table as the title for the report. If no title is wanted, then `":none:"`
             can be used. Aside from keyword options, text can be provided for the title. This will
             be interpreted as Markdown text and transformed internally to HTML.
+        incl_header
+            Controls whether the header section should be displayed. If `None`, uses the global
+            configuration setting. The header contains the table name, label, and threshold
+            information.
+        incl_footer
+            Controls whether the footer section should be displayed. If `None`, uses the global
+            configuration setting. The footer can contain validation timing information and notes.
+        incl_footer_timings
+            Controls whether validation timing information (start time, duration, end time) should
+            be displayed in the footer. If `None`, uses the global configuration setting. Only
+            applies when `incl_footer=True`.
+        incl_footer_notes
+            Controls whether notes from validation steps should be displayed in the footer. If
+            `None`, uses the global configuration setting. Only applies when `incl_footer=True`.
+        incl_dimensions
+            Controls whether the data quality dimension display is shown: a color-coded dimension
+            badge on each step number and a health-score summary block in the footer. If `None`,
+            uses the global configuration setting (which defaults to `False`, i.e., opt-in). Set to
+            `True` to include it for this report.
 
         Returns
         -------
@@ -11785,6 +19945,12 @@ class Validate:
             incl_header = global_config.report_incl_header
         if incl_footer is None:
             incl_footer = global_config.report_incl_footer
+        if incl_footer_timings is None:
+            incl_footer_timings = global_config.report_incl_footer_timings
+        if incl_footer_notes is None:
+            incl_footer_notes = global_config.report_incl_footer_notes
+        if incl_dimensions is None:
+            incl_dimensions = global_config.report_incl_dimensions
 
         # Do we have a DataFrame library to work with?
         _check_any_df_lib(method_used="get_tabular_report")
@@ -11798,15 +19964,15 @@ class Validate:
         # If the table is a Polars one, determine if it's a LazyFrame
         if tbl_info == "polars":
             if _is_lazy_frame(self.data):
-                tbl_info = "polars-lazy"
+                tbl_info = "polars-lazy"  # pragma: no cover
 
         # Determine if the input table is a Narwhals DF
         if _is_narwhals_table(self.data):
             # Determine if the Narwhals table is a LazyFrame
-            if _is_lazy_frame(self.data):
-                tbl_info = "narwhals-lazy"
+            if _is_lazy_frame(self.data):  # pragma: no cover
+                tbl_info = "narwhals-lazy"  # pragma: no cover
             else:
-                tbl_info = "narwhals"
+                tbl_info = "narwhals"  # pragma: no cover
 
         # Get the thresholds object
         thresholds = self.thresholds
@@ -11895,7 +20061,7 @@ class Validate:
             )
 
             gt_tbl = (
-                GT(df, id="pb_tbl")
+                _fmt_raw_html(GT(df, id="pb_tbl"))
                 .fmt_markdown(columns=["pass", "fail", "extract_upd"])
                 .opt_table_font(font=google_font(name="IBM Plex Sans"))
                 .opt_align_table_header(align=before)
@@ -11971,7 +20137,7 @@ class Validate:
             if lang in RTL_LANGUAGES:
                 gt_tbl = gt_tbl.tab_style(
                     style=style.css("direction: rtl;"), locations=loc.source_notes()
-                )
+                )  # pragma: no cover
 
             if incl_header:
                 gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
@@ -12023,30 +20189,59 @@ class Validate:
         columns_upd = []
 
         columns = validation_info_dict["column"]
+        notes = validation_info_dict["notes"]
 
         assertion_type = validation_info_dict["assertion_type"]
 
         # Iterate over the values in the `column` entry
         for i, column in enumerate(columns):
+            # Check if this validation has a synthetic target column note
+            has_synthetic_column = (
+                notes[i] is not None and isinstance(notes[i], dict) and "syn_target_col" in notes[i]
+            )
+
+            column_text = None
+
             if assertion_type[i] in [
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
                 "col_vals_expr",
             ]:
-                columns_upd.append("&mdash;")
-            elif assertion_type[i] in ["rows_distinct", "rows_complete"]:
+                column_text = "&mdash;"
+            elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
                 if not column:
                     # If there is no column subset, then all columns are used
-                    columns_upd.append("ALL COLUMNS")
+                    column_text = "ALL COLUMNS"
                 else:
                     # With a column subset list, format with commas between the column names
-                    columns_upd.append(", ".join(column))
-
+                    column_text = ", ".join(column)
             elif assertion_type[i] in ["conjointly", "specially"]:
-                columns_upd.append("")
+                column_text = ""
             else:
-                columns_upd.append(str(column))
+                # Handle both string columns and list columns
+                # For single-element lists like ['a'], display as 'a'
+                # For multi-element lists, display as comma-separated values
+                if isinstance(column, list):
+                    column_text = ", ".join(str(c) for c in column)
+                else:
+                    column_text = str(column)
+
+            # Apply underline styling for synthetic columns; only apply styling if column_text is
+            # not empty and not a special marker
+            if (
+                has_synthetic_column
+                and column_text
+                and column_text not in ["&mdash;", "ALL COLUMNS", ""]
+            ):
+                column_text = (
+                    f'<span style="text-decoration: underline; '
+                    f"text-decoration-color: #9A7CB4; text-decoration-thickness: 1px; "
+                    f'text-underline-offset: 3px;">'
+                    f"{column_text}</span>"
+                )
+
+            columns_upd.append(column_text)
 
         # Add the `columns_upd` entry to the dictionary
         validation_info_dict["columns_upd"] = columns_upd
@@ -12096,17 +20291,116 @@ class Validate:
             elif assertion_type[i] in [
                 "col_vals_null",
                 "col_vals_not_null",
+                "col_missing_coded",
                 "col_exists",
                 "rows_distinct",
                 "rows_complete",
             ]:
                 values_upd.append("&mdash;")
 
+            elif assertion_type[i] in ["col_missing_consistent"]:
+                # Minimal cell: a compact badge (the reason and columns live in the step note)
+                values_upd.append(
+                    "<span style='font-weight: 600; letter-spacing: 0.5px;'>CONSISTENT</span>"
+                )
+
+            elif assertion_type[i] in ["col_missing_only_coded"]:
+                # Minimal cell: a compact badge (allowed values/range live in the step note)
+                values_upd.append(
+                    "<span style='font-weight: 600; letter-spacing: 0.5px;'>ONLY CODED</span>"
+                )
+
+            elif assertion_type[i] in ["col_pct_null"]:
+                # Extract p and tol from the values dict for nice formatting
+                p_value = value["p"]
+
+                # Extract tol from the bound_finder partial function
+                bound_finder = value.get("bound_finder")
+                tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+                values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
+
+            elif assertion_type[i] in ["col_pct_missing"]:
+                # Minimal cell: just the threshold (reason/category detail lives in the step note)
+                values_upd.append(f"&le; {value['max_pct']}")
+
+            elif assertion_type[i] in ["data_freshness"]:  # pragma: no cover
+                # Format max_age nicely for display
+                max_age = value.get("max_age")  # pragma: no cover
+                max_age_str = (
+                    _format_timedelta(max_age) if max_age else "&mdash;"
+                )  # pragma: no cover
+
+                # Build additional lines with non-default parameters
+                extra_lines = []  # pragma: no cover
+
+                if value.get("reference_time") is not None:  # pragma: no cover
+                    ref_time = value["reference_time"]  # pragma: no cover
+
+                    # Format datetime across two lines: date and time+tz
+                    if hasattr(ref_time, "strftime"):  # pragma: no cover
+                        date_str = ref_time.strftime("@%Y-%m-%d")  # pragma: no cover
+                        time_str = " " + ref_time.strftime("%H:%M:%S")  # pragma: no cover
+
+                        # Add timezone offset if present
+                        if (
+                            hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None
+                        ):  # pragma: no cover
+                            tz_offset = ref_time.strftime("%z")  # pragma: no cover
+                            if tz_offset:  # pragma: no cover
+                                time_str += tz_offset  # pragma: no cover
+                        extra_lines.append(date_str)  # pragma: no cover
+                        extra_lines.append(time_str)  # pragma: no cover
+                    else:  # pragma: no cover
+                        extra_lines.append(f"@{ref_time}")  # pragma: no cover
+
+                # Timezone and allow_tz_mismatch on same line
+                tz_line_parts = []  # pragma: no cover
+                if value.get("timezone") is not None:  # pragma: no cover
+                    # Convert timezone name to ISO 8601 offset format
+                    tz_name = value["timezone"]  # pragma: no cover
+
+                    try:  # pragma: no cover
+                        tz_obj = ZoneInfo(tz_name)  # pragma: no cover
+
+                        # Get the current offset for this timezone
+                        now = datetime.datetime.now(tz_obj)  # pragma: no cover
+                        offset = now.strftime("%z")  # pragma: no cover
+
+                        # Format as ISO 8601 extended: -07:00 (insert colon)
+                        if len(offset) == 5:  # pragma: no cover
+                            tz_display = f"{offset[:3]}:{offset[3:]}"  # pragma: no cover
+                        else:  # pragma: no cover
+                            tz_display = offset  # pragma: no cover
+
+                    except Exception:  # pragma: no cover
+                        tz_display = tz_name  # pragma: no cover
+                    tz_line_parts.append(tz_display)  # pragma: no cover
+
+                if value.get("allow_tz_mismatch"):  # pragma: no cover
+                    tz_line_parts.append("~tz")  # pragma: no cover
+
+                if tz_line_parts:  # pragma: no cover
+                    extra_lines.append(" ".join(tz_line_parts))  # pragma: no cover
+
+                if extra_lines:  # pragma: no cover
+                    extra_html = "<br/>".join(extra_lines)  # pragma: no cover
+                    values_upd.append(  # pragma: no cover
+                        f'{max_age_str}<br/><span style="font-size: 9px;">{extra_html}</span>'
+                    )
+                else:  # pragma: no cover
+                    values_upd.append(max_age_str)  # pragma: no cover
+
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
 
             elif assertion_type[i] in ["col_vals_expr", "conjointly"]:
                 values_upd.append("COLUMN EXPR")
+
+            elif assertion_type[i] in [
+                "col_vals_increasing",
+                "col_vals_decreasing",
+            ]:  # pragma: no cover
+                values_upd.append("")  # pragma: no cover
 
             elif assertion_type[i] in ["row_count_match", "col_count_match"]:
                 count = values[i]["count"]
@@ -12117,12 +20411,82 @@ class Validate:
 
                 values_upd.append(str(count))
 
+            elif assertion_type[i] in ["tbl_match"]:  # pragma: no cover
+                values_upd.append("EXTERNAL TABLE")  # pragma: no cover
+
             elif assertion_type[i] in ["specially"]:
                 values_upd.append("EXPR")
 
+            elif assertion_type[i] in ["col_vals_regex"]:
+                pattern = value["pattern"]
+
+                values_upd.append(str(pattern))
+
+            elif assertion_type[i] in ["col_vals_within_spec"]:  # pragma: no cover
+                spec = value["spec"]  # pragma: no cover
+
+                values_upd.append(str(spec))  # pragma: no cover
+
+            elif assertion_type[i] in ["col_vals_str_len"]:  # pragma: no cover
+                min_v = value.get("min_val")  # pragma: no cover
+                max_v = value.get("max_val")  # pragma: no cover
+                if min_v is not None and max_v is not None:  # pragma: no cover
+                    values_upd.append(f"{min_v}–{max_v}")  # pragma: no cover
+                elif min_v is not None:  # pragma: no cover
+                    values_upd.append(f"≥{min_v}")  # pragma: no cover
+                else:  # pragma: no cover
+                    values_upd.append(f"≤{max_v}")  # pragma: no cover
+
+            elif assertion_type[i] in ["prompt"]:  # pragma: no cover
+                # For AI validation, show only the prompt, not the full config
+                if isinstance(value, dict) and "prompt" in value:  # pragma: no cover
+                    values_upd.append(value["prompt"])  # pragma: no cover
+                else:  # pragma: no cover
+                    values_upd.append(str(value))  # pragma: no cover
+
+            # Handle aggregation methods (col_sum_gt, col_avg_eq, etc.)
+            elif is_valid_agg(assertion_type[i]):  # pragma: no cover
+                # Extract the value and tolerance from the values dict
+                agg_value = value.get("value")  # pragma: no cover
+                tol_value = value.get("tol", 0)  # pragma: no cover
+
+                # Format the value (could be a number, Column, or ReferenceColumn)
+                if hasattr(agg_value, "__repr__"):  # pragma: no cover
+                    # For Column or ReferenceColumn objects, use their repr
+                    value_str = repr(agg_value)  # pragma: no cover
+                else:  # pragma: no cover
+                    value_str = str(agg_value)  # pragma: no cover
+
+                # Format tolerance - only show on second line if non-zero
+                if tol_value != 0:  # pragma: no cover
+                    # Format tolerance based on its type
+                    if isinstance(tol_value, tuple):  # pragma: no cover
+                        # Asymmetric bounds: (lower, upper)
+                        tol_str = f"tol=({tol_value[0]}, {tol_value[1]})"  # pragma: no cover
+                    else:  # pragma: no cover
+                        # Symmetric tolerance
+                        tol_str = f"tol={tol_value}"  # pragma: no cover
+                    values_upd.append(f"{value_str}<br/>{tol_str}")  # pragma: no cover
+                else:  # pragma: no cover
+                    values_upd.append(value_str)  # pragma: no cover
+
             # If the assertion type is not recognized, add the value as a string
-            else:
-                values_upd.append(str(value))
+            else:  # pragma: no cover
+                values_upd.append(str(value))  # pragma: no cover
+
+        # Annotate `col_vals_*` steps that carry a `missing=` MissingSpec so the report shows that
+        # structured-missing values (sentinels and, optionally, nulls) were excluded from the check.
+        # The `missing` spec is fetched directly from the validation steps (it isn't a report field).
+        missing_specs = [getattr(v, "missing", None) for v in self.validation_info]
+        for i, spec in enumerate(missing_specs):
+            if spec is None or i >= len(values_upd):
+                continue
+            # Keep the cell minimal: a compact badge. The reason/code detail lives in the step note.
+            annotation = (
+                "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+                "color: #7B68A6;'>MISSING-AWARE</span>"
+            )
+            values_upd[i] = f"{values_upd[i]}{annotation}"
 
         # Remove the `inclusive` entry from the dictionary
         validation_info_dict.pop("inclusive")
@@ -12285,15 +20649,23 @@ class Validate:
             # Transform to Narwhals DataFrame
             extract_nw = nw.from_native(extract)
 
-            # Get the number of rows in the extract
-            n_rows = len(extract_nw)
+            # Get the number of rows in the extract (safe for LazyFrames)
+            try:
+                n_rows = len(extract_nw)
+            except TypeError:  # pragma: no cover
+                # For LazyFrames, collect() first to get length
+                n_rows = (
+                    len(extract_nw.collect()) if is_narwhals_lazyframe(extract_nw) else 0
+                )  # pragma: no cover
 
             # If the number of rows is zero, then produce an em dash then go to the next iteration
             if n_rows == 0:
                 extract_upd.append("&mdash;")
                 continue
 
-            # Write the CSV text
+            # Write the CSV text (ensure LazyFrames are collected first)
+            if is_narwhals_lazyframe(extract_nw):  # pragma: no cover
+                extract_nw = extract_nw.collect()
             csv_text = extract_nw.write_csv()
 
             # Use Base64 encoding to encode the CSV text
@@ -12361,11 +20733,25 @@ class Validate:
         validation_info_dict.pop("label")
         validation_info_dict.pop("active")
         validation_info_dict.pop("all_passed")
+        validation_info_dict.pop("notes")
 
         # If no interrogation performed, populate the `i` entry with a sequence of integers
         # from `1` to the number of validation steps
         if not interrogation_performed:
             validation_info_dict["i"] = list(range(1, len(validation_info_dict["type_upd"]) + 1))
+
+        # Overlay a small, color-coded two-letter dimension badge on the top-left of each step
+        # number cell (opt-in via `incl_dimensions`). This is positioned absolutely so it doesn't
+        # affect the layout of the numeral (regardless of digit count); the full dimension name is
+        # shown via a tooltip. This is done after the `i` values are finalized (they are regenerated
+        # above when not interrogated).
+        if incl_dimensions:
+            validation_info_dict["i"] = _transform_step_number_with_dimension(
+                i_values=validation_info_dict["i"],
+                dimensions=validation_info_dict["dimension"],
+                lang=lang,
+            )
+        validation_info_dict.pop("dimension")
 
         # Create a table time string
         table_time = _create_table_time_html(time_start=self.time_start, time_end=self.time_end)
@@ -12402,7 +20788,7 @@ class Validate:
 
         # Return the DataFrame as a Great Tables table
         gt_tbl = (
-            GT(df, id="pb_tbl")
+            _fmt_raw_html(GT(df, id="pb_tbl"))
             .fmt_markdown(columns=["pass", "fail", "extract_upd"])
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .opt_align_table_header(align=before)
@@ -12545,7 +20931,38 @@ class Validate:
             gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
         if incl_footer:
-            gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
+            # Add the health-score summary block (overall + per-dimension) as the first source
+            # note when the dimension display is enabled, the interrogation has been performed, and
+            # there are scorable steps. The block's dotted divider is only drawn when the timings
+            # row follows it (otherwise it would double up with the next footer separator).
+            if incl_dimensions and interrogation_performed:
+                health_score_html = _create_health_score_html(
+                    validation_info=self.validation_info,
+                    lang=lang,
+                    dimension_weights=getattr(global_config, "dimension_weights", None),
+                    show_divider=incl_footer_timings,
+                )
+                if health_score_html:
+                    gt_tbl = gt_tbl.tab_source_note(source_note=html(health_score_html))
+
+            # Add table time as HTML source note if enabled
+            if incl_footer_timings:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
+
+            # Add governance metadata as source note if any metadata is present
+            governance_html = _create_governance_metadata_html(
+                owner=self.owner,
+                consumers=self.consumers,
+                version=self.version,
+            )
+            if governance_html:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(governance_html))
+
+            # Create notes markdown from validation steps and add as separate source note if enabled
+            if incl_footer_notes:
+                notes_markdown = _create_notes_html(self.validation_info)
+                if notes_markdown:
+                    gt_tbl = gt_tbl.tab_source_note(source_note=md(notes_markdown))
 
         # If the interrogation has not been performed, then style the table columns dealing with
         # interrogation data as grayed out
@@ -12654,11 +21071,15 @@ class Validate:
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
 
         The [`rows_distinct()`](`pointblank.Validate.rows_distinct`) validation step will produce a
@@ -12675,7 +21096,7 @@ class Validate:
         #| echo: false
         #| output: false
         import pointblank as pb
-        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
         ```
         Let's create a validation plan with a few validation steps and interrogate the data. With
         that, we'll have a look at the validation reporting table for the entire collection of
@@ -12794,7 +21215,7 @@ class Validate:
             elif isinstance(column, list):
                 column_position = [list(self.data.columns).index(col) + 1 for col in column]
             else:
-                column_position = None
+                column_position = None  # pragma: no cover
         else:
             column_position = None
 
@@ -12818,7 +21239,10 @@ class Validate:
         # if get_row_count(extract) == 0:
         #    return "No rows were extracted."
 
-        if assertion_type in ROW_BASED_VALIDATION_TYPES + ["rows_complete"]:
+        if assertion_type in ROW_BASED_VALIDATION_TYPES + [
+            "rows_complete",
+            "col_missing_consistent",
+        ]:
             # Get the extracted data for the step
             extract = self.get_data_extracts(i=i, frame=True)
 
@@ -12885,10 +21309,348 @@ class Validate:
                     debug_return_df=debug_return_df,
                 )
 
+        elif is_valid_agg(assertion_type):
+            step_report = _step_report_aggregate(
+                assertion_type=assertion_type,
+                i=i,
+                column=column,
+                values=values,
+                all_passed=all_passed,
+                val_info=val_info,
+                header=header,
+                lang=lang,
+            )
+
         else:
-            step_report = None
+            step_report = None  # pragma: no cover
+
+        # If the step is associated with a MissingSpec, append a legend of the missing-value codes
+        # and their reasons so that sentinel values appearing in the failing rows can be interpreted
+        step_spec = getattr(self.validation_info[i - 1], "missing", None)
+        if step_spec is None and isinstance(values, MissingSpec):
+            # col_missing_coded stores the spec directly in `values`
+            step_spec = values
+        if (
+            step_spec is None
+            and isinstance(values, dict)
+            and isinstance(values.get("spec"), MissingSpec)
+        ):
+            # col_missing_only_coded and col_missing_consistent stash the spec under `values["spec"]`
+            step_spec = values["spec"]
+        if step_spec is not None and step_report is not None:
+            legend_html = _missing_legend_html(step_spec)
+            if legend_html and hasattr(step_report, "tab_source_note"):
+                step_report = step_report.tab_source_note(source_note=html(legend_html))
 
         return step_report
+
+    def get_dataframe_report(
+        self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"
+    ) -> Any:
+        """
+        Get a report of the validation results as a DataFrame.
+
+        The `get_dataframe_report()` method returns a compact, row-wise summary of validation step
+        results as a DataFrame. Each row corresponds to a single validation step. This is useful for
+        logging, exporting (e.g., writing to CSV or Parquet), and programmatic analysis of
+        validation outcomes.
+
+        The output format depends on `tbl_type=`: Polars DataFrame (default), Pandas DataFrame, or
+        DuckDB via an Ibis memtable.
+
+        Parameters
+        ----------
+        tbl_type
+            The output backend. One of `"polars"` (default), `"pandas"`, or `"duckdb"`.
+
+        Returns
+        -------
+        polars.DataFrame | pandas.DataFrame | ibis.expr.types.relations.Table
+            A tabular summary of validation results. When `tbl_type="duckdb"`, the return value is
+            an Ibis memtable (a `Table` expression).
+
+        Raises
+        ------
+        ValueError
+            If `tbl_type=` is not one of `"polars"`, `"pandas"`, or `"duckdb"`.
+        ImportError
+            If the required library for the chosen `tbl_type=` is not installed.
+
+        Output Columns
+        --------------
+        The returned DataFrame contains the following columns:
+
+        - `active`: Whether the validation step was active (`True`/`False`).
+        - `step_number`: The 1-indexed step number.
+        - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
+        - `columns`: The column name validated.
+        - `values`: The comparison value used in the validation. For regex validations, just the
+          pattern string is included.
+        - `step_evaluated`: Whether the step was evaluated without error.
+        - `units`: Total number of test units.
+        - `all_units_passed`: Whether every test unit passed.
+        - `pass_n`: Number of passing test units.
+        - `pass_pct`: Fraction of test units that passed (`0.0`-`1.0`).
+        - `failed_n`: Number of failing test units.
+        - `failed_pct`: Fraction of test units that failed (`0.0`-`1.0`).
+        - `warning`, `error`, `critical`: Whether the respective threshold was exceeded.
+        - `brief`: A coalesced description of the step (from manual brief or auto-generated brief).
+        - `preprocessed`: Whether a preprocessing function was applied.
+        - `segmented`: Whether the step used segmented validation.
+
+        For inactive steps (`active=False`), the result columns (`step_evaluated` through
+        `critical`) are set to `None`/`null`.
+
+        Examples
+        --------
+        Create a validation, interrogate, and get the results as a Polars DataFrame:
+
+        ```{python}
+        import pointblank as pb
+
+        validation = (
+            pb.Validate(
+                data=pb.load_dataset("small_table", tbl_type="polars"),
+                label="My validation",
+            )
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+            .interrogate()
+        )
+
+        validation.get_dataframe_report()
+        ```
+
+        Get the results as a Pandas DataFrame instead:
+
+        ```{python}
+        validation.get_dataframe_report(tbl_type="pandas")
+        ```
+        """
+        allowed_tbl_types = ("polars", "pandas", "duckdb")
+        if tbl_type not in allowed_tbl_types:
+            raise ValueError(
+                f"The DataFrame type `{tbl_type}` is not valid. Choose one of the following:\n"
+                "- `polars`\n"
+                "- `pandas`\n"
+                "- `duckdb`"
+            )
+
+        report_original = _validation_info_as_dict(self.validation_info)
+
+        # Remove extracts (can be large / nested; not intended for summary logging)
+        report_original.pop("extract", None)
+
+        names_dict = {
+            "active": "active",
+            "i": "step_number",
+            "assertion_type": "step_description",
+            "column": "columns",
+            "values": "values",
+            "pre": "original_pre",
+            "segments": "original_segments",
+            "eval_error": "step_evaluated",
+            "n": "units",
+            "all_passed": "all_units_passed",
+            "n_passed": "pass_n",
+            "f_passed": "pass_pct",
+            "n_failed": "failed_n",
+            "f_failed": "failed_pct",
+            "warning": "warning",
+            "error": "error",
+            "critical": "critical",
+            "brief": "input_brief",
+            "autobrief": "autobrief",
+        }
+
+        final_report = {k: report_original[k] for k in names_dict if k in report_original}
+
+        # Normalize `values`: if a dict contains a regex `pattern`, log just that pattern.
+        values = final_report.get("values")
+        if isinstance(values, list):
+            final_report = {
+                **final_report,
+                "values": [
+                    v.get("pattern") if isinstance(v, dict) and "pattern" in v else v
+                    for v in values
+                ],
+            }
+
+        if tbl_type == "polars":
+            if not _is_lib_present(lib_name="polars"):
+                raise ImportError(
+                    "The Polars library is not installed but is required when specifying "
+                    '`tbl_type="polars".'
+                )
+
+            import polars as pl
+
+            pl_schema = pl.Schema(
+                {
+                    "active": pl.Boolean,
+                    "i": pl.Int64,
+                    "assertion_type": pl.String,
+                    "column": pl.String,
+                    "values": pl.Object,
+                    "pre": pl.Object,
+                    "segments": pl.String,
+                    "eval_error": pl.Boolean,
+                    "n": pl.Int64,
+                    "all_passed": pl.Boolean,
+                    "n_passed": pl.Int64,
+                    "f_passed": pl.Float64,
+                    "n_failed": pl.Int64,
+                    "f_failed": pl.Float64,
+                    "warning": pl.Boolean,
+                    "error": pl.Boolean,
+                    "critical": pl.Boolean,
+                    "brief": pl.String,
+                    "autobrief": pl.String,
+                }
+            )
+
+            inactive_null_cols = [
+                "step_evaluated",
+                "units",
+                "all_units_passed",
+                "pass_n",
+                "pass_pct",
+                "failed_n",
+                "failed_pct",
+                "warning",
+                "error",
+                "critical",
+            ]
+
+            df_validation_results = (
+                pl.DataFrame(data=final_report, schema=pl_schema)
+                .rename(names_dict)
+                .with_columns(
+                    brief=pl.coalesce(pl.col("input_brief"), pl.col("autobrief")),
+                    preprocessed=pl.col("original_pre").is_not_null(),
+                    segmented=pl.col("original_segments").is_not_null(),
+                )
+                .with_columns(
+                    [
+                        pl.when(~pl.col("active"))
+                        .then(pl.lit(None))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                        for col in inactive_null_cols
+                    ]
+                )
+                .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
+            )
+
+            return df_validation_results
+
+        elif tbl_type == "pandas":
+            if not _is_lib_present(lib_name="pandas"):
+                raise ImportError(
+                    "The Pandas library is not installed but is required when specifying "
+                    '`tbl_type="pandas".'
+                )
+
+            import pandas as pd
+
+            def transform_validation_results(df: pd.DataFrame) -> pd.DataFrame:
+                df = df.assign(brief=df["input_brief"].fillna(df["autobrief"]))
+                df = df.assign(
+                    preprocessed=df["original_pre"].notna(),
+                    segmented=df["original_segments"].notna(),
+                )
+
+                inactive_null_cols = [
+                    "step_evaluated",
+                    "units",
+                    "all_units_passed",
+                    "pass_n",
+                    "pass_pct",
+                    "failed_n",
+                    "failed_pct",
+                    "warning",
+                    "error",
+                    "critical",
+                ]
+                for col in inactive_null_cols:
+                    df[col] = df[col].where(df["active"], pd.NA)
+
+                return df.drop(
+                    columns=["input_brief", "autobrief", "original_pre", "original_segments"]
+                )
+
+            df_validation_results = (
+                pd.DataFrame(data=final_report)
+                .rename(columns=names_dict)
+                .pipe(transform_validation_results)
+            )
+
+            return df_validation_results
+
+        else:  # tbl_type == "duckdb"
+            if not _is_lib_present(lib_name="ibis"):
+                raise ImportError(
+                    "The Ibis library is not installed but is required when specifying "
+                    '`tbl_type="duckdb".'
+                )
+
+            import ibis
+            import ibis.expr.datatypes as dt
+
+            ibis_schema = {
+                "active": dt.Boolean(),
+                "i": dt.Int64(),
+                "assertion_type": dt.String(),
+                "column": dt.String(),
+                "values": dt.json(),
+                "pre": dt.json(),
+                "segments": dt.String(),
+                "eval_error": dt.Boolean(),
+                "n": dt.Int64(),
+                "all_passed": dt.Boolean(),
+                "n_passed": dt.Int64(),
+                "f_passed": dt.Float64(),
+                "n_failed": dt.Int64(),
+                "f_failed": dt.Float64(),
+                "warning": dt.Boolean(),
+                "error": dt.Boolean(),
+                "critical": dt.Boolean(),
+                "brief": dt.String(),
+                "autobrief": dt.String(),
+            }
+
+            report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
+                {v: k for k, v in names_dict.items() if k != v}
+            )
+
+            inactive_null_cols = [
+                "step_evaluated",
+                "units",
+                "all_units_passed",
+                "pass_n",
+                "pass_pct",
+                "failed_n",
+                "failed_pct",
+                "warning",
+                "error",
+                "critical",
+            ]
+
+            df_validation_results = report_table.mutate(
+                brief=ibis.coalesce(report_table.input_brief, report_table.autobrief),
+                preprocessed=report_table.original_pre.notnull(),
+                segmented=report_table.original_segments.notnull(),
+                **{
+                    col: ibis.ifelse(
+                        ~report_table.active,
+                        ibis.null().cast(report_table[col].type()),
+                        report_table[col],
+                    )
+                    for col in inactive_null_cols
+                },
+            ).drop("input_brief", "autobrief", "original_pre", "original_segments")
+
+            return df_validation_results
 
     def _add_validation(self, validation_info):
         """
@@ -12905,6 +21667,13 @@ class Validate:
 
         # Set the `i_o` attribute to the largest value of `i_o` plus 1
         validation_info.i_o = max_i_o + 1
+
+        # Automatically infer the data quality dimension from the assertion type if it was not
+        # set explicitly via the `dimension=` parameter on the validation method
+        if validation_info.dimension is None:
+            validation_info.dimension = _infer_dimension_from_assertion_type(
+                validation_info.assertion_type
+            )
 
         self.validation_info.append(validation_info)
 
@@ -12958,12 +21727,34 @@ class Validate:
 
             except Exception:  # pragma: no cover
                 validation.eval_error = True
+                columns_resolved = []
+                # Store columns list for note generation
+                try:
+                    columns = list(table.columns) if "table" in locals() else []
+                except Exception:
+                    columns = []
 
             # If no columns were resolved, then create a patched validation step with the
             # `eval_error` and `column` attributes set
             if not columns_resolved:
                 validation.eval_error = True
                 validation.column = str(column_expr)
+
+                # Add a helpful note explaining that no columns were resolved
+                note_html = _create_no_columns_resolved_note_html(
+                    column_expr=str(column_expr),
+                    available_columns=columns,
+                    locale=self.locale,
+                )
+                note_text = _create_no_columns_resolved_note_text(
+                    column_expr=str(column_expr),
+                    available_columns=columns,
+                )
+                validation._add_note(
+                    key="no_columns_resolved",
+                    markdown=note_html,
+                    text=note_text,
+                )
 
                 expanded_validation_info.append(validation)
                 continue
@@ -13011,6 +21802,8 @@ class Validate:
                 continue
 
             # Evaluate the segments expression
+            seg_tuples = []
+
             try:
                 # Get the table for this step, it can either be:
                 # 1. the target table itself
@@ -13056,6 +21849,8 @@ class Validate:
 
             except Exception:  # pragma: no cover
                 validation.eval_error = True
+                expanded_validation_info.append(validation)
+                continue
 
             # For each segmentation resolved, create a new validation step and add it to the list of
             # expanded validation steps
@@ -13100,7 +21895,7 @@ class Validate:
             if validation.i in i
         }
 
-    def _execute_final_actions(self):
+    def _execute_final_actions(self) -> None:
         """Execute any final actions after interrogation is complete."""
         if self.final_actions is None:
             return
@@ -13115,6 +21910,7 @@ class Validate:
         column_count = get_column_count(self.data)
 
         # Get the validation duration
+        assert self.time_start is not None and self.time_end is not None
         validation_duration = self.validation_duration = (
             self.time_end - self.time_start
         ).total_seconds()
@@ -13143,6 +21939,8 @@ class Validate:
             "tbl_column_count": column_count,
             "tbl_name": self.tbl_name or "Unknown",
             "validation_duration": validation_duration,
+            "dimension_scores": _compute_dimension_scores(self.validation_info),
+            "overall_health_score": self.get_health_score(),
         }
 
         # Extract the actions from FinalActions object and execute
@@ -13161,7 +21959,7 @@ class Validate:
                     elif callable(single_action):
                         single_action()
 
-    def _get_highest_severity_level(self):
+    def _get_highest_severity_level(self) -> str:
         """Get the highest severity level reached across all validation steps."""
         if any(step.critical for step in self.validation_info):
             return "critical"
@@ -13304,7 +22102,7 @@ def _convert_string_to_datetime(value: str) -> datetime.datetime:
             return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
 
-def _string_date_dttm_conversion(value: any) -> any:
+def _string_date_dttm_conversion(value: Any) -> Any:
     """
     Convert a string to a date or datetime object if it is in the correct format.
     If the value is not a string, it is returned as is.
@@ -13338,13 +22136,55 @@ def _string_date_dttm_conversion(value: any) -> any:
     return value
 
 
+def _conditional_string_date_dttm_conversion(
+    value: Any, allow_regular_strings: bool = False
+) -> Any:
+    """
+    Conditionally convert a string to a date or datetime object if it is in the correct format. If
+    `allow_regular_strings=` is `True`, regular strings are allowed to pass through unchanged. If
+    the value is not a string, it is returned as is.
+
+    Parameters
+    ----------
+    value
+        The value to convert. It can be a string, date, or datetime object.
+    allow_regular_strings
+        If `True`, regular strings (non-date/datetime) are allowed to pass through unchanged. If
+        `False`, behaves like `_string_date_dttm_conversion()` and raises `ValueError` for regular
+        strings.
+
+    Returns
+    -------
+    any
+        The converted date or datetime object, or the original value.
+
+    Raises
+    ------
+    ValueError
+        If allow_regular_strings is False and the string cannot be converted to a date or datetime.
+    """
+
+    if isinstance(value, str):
+        if _is_string_date(value):
+            value = _convert_string_to_date(value)
+        elif _is_string_datetime(value):
+            value = _convert_string_to_datetime(value)
+        elif not allow_regular_strings:
+            raise ValueError(
+                "If `value=` is provided as a string it must be a date or datetime string."
+            )  # pragma: no cover
+        # If allow_regular_strings is True, regular strings pass through unchanged
+
+    return value
+
+
 def _process_brief(
     brief: str | None,
     step: int,
     col: str | list[str] | None,
-    values: any | None,
-    thresholds: any | None,
-    segment: any | None,
+    values: Any | None,
+    thresholds: Any | None,
+    segment: Any | None,
 ) -> str:
     # If there is no brief, return `None`
     if brief is None:
@@ -13386,14 +22226,294 @@ def _process_brief(
 
     if segment is not None:
         # The segment is always a tuple of the form ("{column}", "{value}")
+        # Handle both regular lists and Segment objects (from seg_group())
 
-        segment_fmt = f"{segment[0]} / {segment[1]}"
+        segment_column = segment[0]
+        segment_value = segment[1]
+
+        # If segment_value is a Segment object (from seg_group()), format it appropriately
+        if isinstance(segment_value, Segment):
+            # For Segment objects, format the segments as a readable string
+            segments = segment_value.segments
+            if len(segments) == 1:
+                # Single segment: join the values with commas
+                segment_value_str = ", ".join(str(v) for v in segments[0])
+            else:
+                # Multiple segments: join each segment with commas, separate segments with " | "
+                segment_value_str = " | ".join([", ".join(str(v) for v in seg) for seg in segments])
+        else:
+            # For regular lists or other types, convert to string
+            if isinstance(segment_value, list):
+                segment_value_str = ", ".join(str(v) for v in segment_value)
+            else:
+                segment_value_str = str(segment_value)
+
+        segment_fmt = f"{segment_column} / {segment_value_str}"
 
         brief = brief.replace("{segment}", segment_fmt)
-        brief = brief.replace("{segment_column}", segment[0])
-        brief = brief.replace("{segment_value}", segment[1])
+        brief = brief.replace("{segment_column}", segment_column)
+        brief = brief.replace("{segment_value}", segment_value_str)
 
     return brief
+
+
+def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
+    """
+    Parse a max_age specification into a timedelta.
+
+    Parameters
+    ----------
+    max_age
+        Either a timedelta object or a string like "24 hours", "1 day", "30 minutes",
+        or compound expressions like "2 hours 15 minutes", "1 day 6 hours", etc.
+
+    Returns
+    -------
+    datetime.timedelta
+        The parsed timedelta.
+
+    Raises
+    ------
+    ValueError
+        If the string format is invalid or the unit is not recognized.
+    """
+    if isinstance(max_age, datetime.timedelta):
+        return max_age
+
+    if not isinstance(max_age, str):
+        raise TypeError(
+            f"The `max_age` parameter must be a string or timedelta, got {type(max_age).__name__}."
+        )
+
+    # Parse string format like "24 hours", "1 day", "30 minutes", etc.
+    max_age_str = max_age.strip().lower()
+
+    # Define unit mappings (singular and plural forms)
+    unit_mappings = {
+        "second": "seconds",
+        "seconds": "seconds",
+        "sec": "seconds",
+        "secs": "seconds",
+        "s": "seconds",
+        "minute": "minutes",
+        "minutes": "minutes",
+        "min": "minutes",
+        "mins": "minutes",
+        "m": "minutes",
+        "hour": "hours",
+        "hours": "hours",
+        "hr": "hours",
+        "hrs": "hours",
+        "h": "hours",
+        "day": "days",
+        "days": "days",
+        "d": "days",
+        "week": "weeks",
+        "weeks": "weeks",
+        "wk": "weeks",
+        "wks": "weeks",
+        "w": "weeks",
+    }
+
+    import re
+
+    # Pattern to find all number+unit pairs (supports compound expressions)
+    # Matches: "2 hours 15 minutes", "1day6h", "30 min", etc.
+    compound_pattern = r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)"
+    matches = re.findall(compound_pattern, max_age_str)
+
+    if not matches:
+        raise ValueError(
+            f"Invalid max_age format: '{max_age}'. Expected format like '24 hours', "
+            f"'1 day', '30 minutes', '2 hours 15 minutes', etc."
+        )
+
+    # Accumulate timedelta from all matched components
+    total_td = datetime.timedelta()
+    valid_units = ["seconds", "minutes", "hours", "days", "weeks"]
+
+    for value_str, unit in matches:
+        value = float(value_str)
+
+        # Normalize the unit
+        unit_lower = unit.lower()
+        if unit_lower not in unit_mappings:
+            raise ValueError(
+                f"Unknown time unit '{unit}' in max_age '{max_age}'. "
+                f"Valid units are: {', '.join(valid_units)} (or their abbreviations)."
+            )
+
+        normalized_unit = unit_mappings[unit_lower]
+
+        # Add to total timedelta
+        if normalized_unit == "seconds":
+            total_td += datetime.timedelta(seconds=value)
+        elif normalized_unit == "minutes":
+            total_td += datetime.timedelta(minutes=value)
+        elif normalized_unit == "hours":
+            total_td += datetime.timedelta(hours=value)
+        elif normalized_unit == "days":
+            total_td += datetime.timedelta(days=value)
+        elif normalized_unit == "weeks":
+            total_td += datetime.timedelta(weeks=value)
+
+    return total_td
+
+
+def _parse_timezone(timezone: str) -> datetime.tzinfo:
+    """
+    Parse a timezone string into a tzinfo object.
+
+    Supports:
+    - IANA timezone names: "America/New_York", "Europe/London", "UTC"
+    - Offset strings: "-7", "+5", "-07:00", "+05:30"
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to parse.
+
+    Returns
+    -------
+    datetime.tzinfo
+        The parsed timezone object.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    import re
+
+    # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+    # Match: optional sign, 1-2 digits, optional colon and 2 more digits
+    offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+    match = re.match(offset_pattern, timezone.strip())
+
+    if match:
+        sign_str, hours_str, minutes_str = match.groups()
+        hours = int(hours_str)
+        minutes = int(minutes_str) if minutes_str else 0
+
+        # Apply sign (default positive if not specified)
+        total_minutes = hours * 60 + minutes
+        if sign_str == "-":
+            total_minutes = -total_minutes
+
+        return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+    # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+    try:
+        return ZoneInfo(timezone)
+    except KeyError:
+        pass
+
+    raise ValueError(
+        f"Invalid timezone: '{timezone}'. Use an IANA timezone name "
+        f"(e.g., 'America/New_York', 'UTC') or an offset (e.g., '-7', '+05:30')."
+    )
+
+
+def _validate_timezone(timezone: str) -> None:
+    """
+    Validate that a timezone string is valid.
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to validate.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    # Use _parse_timezone to validate - it will raise ValueError if invalid
+    _parse_timezone(timezone)
+
+
+def _parse_reference_time(reference_time: str) -> datetime.datetime:
+    """
+    Parse a reference time string into a datetime object.
+
+    Parameters
+    ----------
+    reference_time
+        An ISO 8601 formatted datetime string.
+
+    Returns
+    -------
+    datetime.datetime
+        The parsed datetime object.
+
+    Raises
+    ------
+    ValueError
+        If the string cannot be parsed.
+    """
+    # Try parsing with fromisoformat (handles most ISO 8601 formats)
+    try:
+        return datetime.datetime.fromisoformat(reference_time)
+    except ValueError:
+        pass
+
+    # Try parsing common formats
+    formats = [
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.datetime.strptime(reference_time, fmt)
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Could not parse reference_time '{reference_time}'. "
+        f"Please use ISO 8601 format like '2024-01-15T10:30:00' or '2024-01-15T10:30:00+00:00'."
+    )
+
+
+def _format_timedelta(td: datetime.timedelta) -> str:
+    """
+    Format a timedelta into a human-readable string.
+
+    Parameters
+    ----------
+    td
+        The timedelta to format.
+
+    Returns
+    -------
+    str
+        A human-readable string like "24 hours", "2 days 5 hours", etc.
+    """
+    total_seconds = td.total_seconds()
+
+    if total_seconds < 60:
+        val = round(total_seconds, 1)
+        return f"{val}s"
+    elif total_seconds < 3600:
+        val = round(total_seconds / 60, 1)
+        return f"{val}m"
+    elif total_seconds < 86400:
+        val = round(total_seconds / 3600, 1)
+        return f"{val}h"
+    elif total_seconds < 604800:
+        # For days, show "xd yh" format for better readability
+        days = int(total_seconds // 86400)
+        remaining_hours = round((total_seconds % 86400) / 3600, 1)
+        if remaining_hours == 0:
+            return f"{days}d"
+        else:
+            return f"{days}d {remaining_hours}h"
+    else:
+        val = round(total_seconds / 604800)
+        return f"{val}w"
 
 
 def _transform_auto_brief(brief: str | bool | None) -> str | None:
@@ -13410,7 +22530,7 @@ def _process_action_str(
     action_str: str,
     step: int,
     col: str | None,
-    value: any,
+    value: Any,
     type: str,
     level: str,
     time: str,
@@ -13425,7 +22545,7 @@ def _process_action_str(
     if col is not None:
         # If a list of columns is provided, then join the columns into a comma-separated string
         if isinstance(col, list):
-            col = ", ".join(col)
+            col = ", ".join(col)  # pragma: no cover
 
         action_str = action_str.replace("{col}", col)
         action_str = action_str.replace("{column}", col)
@@ -13460,7 +22580,13 @@ def _process_action_str(
 
 
 def _create_autobrief_or_failure_text(
-    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
+    assertion_type: str,
+    lang: str,
+    column: str,
+    values: Any,
+    for_failure: bool,
+    locale: str | None = None,
+    n_rows: int | None = None,
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -13537,6 +22663,14 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "col_vals_str_len":
+        return _create_text_str_len(
+            lang=lang,
+            column=column,
+            values=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "col_vals_expr":
         return _create_text_expr(
             lang=lang,
@@ -13584,13 +22718,80 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "data_freshness":
+        return _create_text_data_freshness(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+        )
+
+    if assertion_type == "col_pct_null":
+        return _create_text_col_pct_null(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
+            n_rows=n_rows,
+        )
+
+    if assertion_type == "col_pct_missing":
+        return _create_text_col_pct_missing(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
+        )
+
+    if assertion_type == "col_missing_coded":
+        return _create_text_col_missing_coded(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
+        )
+
+    if assertion_type == "col_missing_only_coded":
+        return _create_text_col_missing_only_coded(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
+        )
+
+    if assertion_type == "col_missing_consistent":
+        return _create_text_col_missing_consistent(
+            lang=lang,
+            columns=column,
+            value=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "conjointly":
         return _create_text_conjointly(lang=lang, for_failure=for_failure)
 
     if assertion_type == "specially":
         return _create_text_specially(lang=lang, for_failure=for_failure)
 
-    return None  # pragma: no cover
+    if assertion_type == "prompt":
+        return _create_text_prompt(
+            lang=lang,
+            prompt=values["prompt"]
+            if isinstance(values, dict) and "prompt" in values
+            else str(values),
+            for_failure=for_failure,
+        )
+
+    if is_valid_agg(assertion_type):
+        return _create_text_agg(
+            lang=lang,
+            assertion_type=assertion_type,
+            column=column,
+            values=values,
+            for_failure=for_failure,
+        )
+
+    return None
 
 
 def _expect_failure_type(for_failure: bool) -> str:
@@ -13600,7 +22801,7 @@ def _expect_failure_type(for_failure: bool) -> str:
 def _create_text_comparison(
     assertion_type: str,
     lang: str,
-    column: str | list[str] | None,
+    column: str | list[str],
     values: str | None,
     for_failure: bool = False,
 ) -> str:
@@ -13624,9 +22825,55 @@ def _create_text_comparison(
     )
 
 
+def _create_text_agg(
+    lang: str,
+    assertion_type: str,
+    column: str | list[str],
+    values: dict[str, Any],
+    for_failure: bool = False,
+) -> str:
+    """Create autobrief text for aggregation methods like col_sum_eq, col_avg_gt, etc."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    agg_type, comp_type = split_agg_name(assertion_type)
+
+    # this is covered by the test `test_brief_auto_all_agg_methods` to make sure we don't
+    # create any weird secret agg constants.
+    agg_display_names: dict[str, str] = {
+        "sum": "sum",
+        "avg": "average",
+        "sd": "standard deviation",
+    }
+    try:
+        agg_display: str = agg_display_names[agg_type]
+    except KeyError as ke:  # pragma: no cover
+        raise AssertionError from ke  # This should never happen in prod, it's caught in CI.
+
+    # Get the operator
+    comparison_assertion = f"col_vals_{comp_type}"
+    if lang == "ar":  # pragma: no cover
+        operator = COMPARISON_OPERATORS_AR.get(comparison_assertion, comp_type)
+    else:
+        operator = COMPARISON_OPERATORS.get(comparison_assertion, comp_type)
+
+    column_text = _prep_column_text(column=column)
+
+    value = values.get("value", values) if isinstance(values, dict) else values
+    values_text = _prep_values_text(values=str(value), lang=lang, limit=3)
+
+    # "Expect that the {agg} of {column} should be {operator} {value}."
+    agg_expectation_text = EXPECT_FAIL_TEXT[f"compare_{type_}_text"][lang]
+
+    return agg_expectation_text.format(
+        column_text=f"the {agg_display} of {column_text}",
+        operator=operator,
+        values_text=values_text,
+    )
+
+
 def _create_text_between(
     lang: str,
-    column: str | None,
+    column: str,
     value_1: str,
     value_2: str,
     not_: bool = False,
@@ -13656,7 +22903,7 @@ def _create_text_between(
 
 
 def _create_text_set(
-    lang: str, column: str | None, values: list[any], not_: bool = False, for_failure: bool = False
+    lang: str, column: str, values: list[Any], not_: bool = False, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -13678,9 +22925,7 @@ def _create_text_set(
     return text
 
 
-def _create_text_null(
-    lang: str, column: str | None, not_: bool = False, for_failure: bool = False
-) -> str:
+def _create_text_null(lang: str, column: str, not_: bool = False, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -13697,16 +22942,50 @@ def _create_text_null(
     return text
 
 
-def _create_text_regex(
-    lang: str, column: str | None, pattern: str, for_failure: bool = False
-) -> str:
+def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
-    return EXPECT_FAIL_TEXT[f"regex_{type_}_text"][lang].format(
+    # Handle case where pattern is a dictionary containing `pattern` and `inverse`
+    if isinstance(pattern, dict):
+        pattern_str = pattern["pattern"]
+        inverse = pattern.get("inverse", False)
+    else:  # pragma: no cover
+        # For backward compatibility, assume it's just the pattern string
+        pattern_str = pattern  # pragma: no cover
+        inverse = False  # pragma: no cover
+
+    # Use inverse-specific translations if inverse=True
+    if inverse:
+        text_key = f"regex_inverse_{type_}_text"
+    else:
+        text_key = f"regex_{type_}_text"
+
+    return EXPECT_FAIL_TEXT[text_key][lang].format(
         column_text=column_text,
-        values_text=pattern,
+        values_text=pattern_str,
+    )
+
+
+def _create_text_str_len(lang: str, column: str, values: dict, for_failure: bool = False) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    min_val = values.get("min_val") if isinstance(values, dict) else None
+    max_val = values.get("max_val") if isinstance(values, dict) else None
+
+    if min_val is not None and max_val is not None:
+        values_text = f"between {min_val} and {max_val} characters"
+    elif min_val is not None:
+        values_text = f"at least {min_val} characters"
+    else:
+        values_text = f"at most {max_val} characters"
+
+    return EXPECT_FAIL_TEXT[f"str_len_{type_}_text"][lang].format(
+        column_text=column_text,
+        values_text=values_text,
     )
 
 
@@ -13716,7 +22995,7 @@ def _create_text_expr(lang: str, for_failure: bool) -> str:
     return EXPECT_FAIL_TEXT[f"col_vals_expr_{type_}_text"][lang]
 
 
-def _create_text_col_exists(lang: str, column: str | None, for_failure: bool = False) -> str:
+def _create_text_col_exists(lang: str, column: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -13766,7 +23045,7 @@ def _create_text_rows_complete(
     return text
 
 
-def _create_text_row_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_row_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
@@ -13774,12 +23053,214 @@ def _create_text_row_count_match(lang: str, value: int, for_failure: bool = Fals
     return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _create_text_col_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_data_freshness(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+) -> str:
+    """Create text for data_freshness validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+    max_age_text = _format_timedelta(value.get("max_age"))
+
+    if for_failure:
+        age = value.get("age")
+        age_text = _format_timedelta(age) if age else "unknown"
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+            age_text=age_text,
+        )
+    else:
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+        )
+
+
+def _create_text_col_pct_null(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+    locale: str | None = None,
+    n_rows: int | None = None,
+) -> str:
+    """Create text for col_pct_null validation with tolerance handling."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    # Use locale for number formatting, defaulting to lang if not provided
+    fmt_locale = locale if locale else lang
+
+    # Extract p and tol from the values dict
+    p_value = value.get("p", 0) * 100  # Convert to percentage
+    p_value_original = value.get("p", 0)  # Keep original value for deviation format
+
+    # Extract tol from the bound_finder partial function
+    bound_finder = value.get("bound_finder")
+    tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+
+    # Handle different tolerance types
+    has_tolerance = False
+    is_asymmetric = False
+
+    if isinstance(tol_value, tuple):
+        # Tuple tolerance: can be (lower, upper) in absolute or relative terms
+        tol_lower, tol_upper = tol_value
+
+        # Check if we have any non-zero tolerance
+        has_tolerance = tol_lower != 0 or tol_upper != 0
+        is_asymmetric = tol_lower != tol_upper
+
+        # For relative tolerances (floats < 1), we can compute exact percentage bounds
+        # For absolute tolerances (ints >= 1), calculate based on actual row count if available
+        if tol_lower < 1:
+            # Relative tolerance (float)
+            lower_pct_delta = tol_lower * 100
+        else:
+            # Absolute tolerance (int); uses actual row count if available
+            if n_rows is not None and n_rows > 0:
+                lower_pct_delta = (tol_lower / n_rows) * 100
+            else:
+                lower_pct_delta = tol_lower  # Fallback approximation
+
+        if tol_upper < 1:
+            # Relative tolerance (float)
+            upper_pct_delta = tol_upper * 100
+        else:
+            # Absolute tolerance (int); uses actual row count if available
+            if n_rows is not None and n_rows > 0:
+                upper_pct_delta = (tol_upper / n_rows) * 100
+            else:
+                upper_pct_delta = tol_upper  # Fallback approximation
+    else:
+        # Single value tolerance: symmetric
+        has_tolerance = tol_value != 0
+
+        if tol_value < 1:
+            # Relative tolerance (float)
+            tol_pct = tol_value * 100
+        else:
+            # Absolute tolerance (int) - use actual row count if available
+            if n_rows is not None and n_rows > 0:
+                tol_pct = (tol_value / n_rows) * 100
+            else:
+                tol_pct = tol_value  # Fallback approximation
+
+        lower_pct_delta = tol_pct
+        upper_pct_delta = tol_pct
+
+    # Format numbers with locale-aware formatting
+    p_formatted = _format_number_safe(p_value, decimals=1, locale=fmt_locale)
+    p_original_formatted = _format_number_safe(p_value_original, decimals=2, locale=fmt_locale)
+
+    # Choose the appropriate translation key based on tolerance
+    if not has_tolerance:
+        # No tolerance - use simple text
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+    elif is_asymmetric or isinstance(tol_value, tuple):
+        # Use deviation format for tuple tolerances (including symmetric ones)
+        # Format the deviation values with signs (using proper minus sign U+2212)
+        lower_dev = f"−{_format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)}%"
+        upper_dev = f"+{_format_number_safe(upper_pct_delta, decimals=1, locale=fmt_locale)}%"
+
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_deviation"][lang].format(
+            column_text=column_text,
+            lower_dev=lower_dev,
+            upper_dev=upper_dev,
+            p=p_original_formatted,
+        )
+    else:
+        # Single value tolerance - use the symmetric ± format
+        tol_formatted = _format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+            tol=tol_formatted,
+        )
+
+    return text
+
+
+def _create_text_col_pct_missing(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+    locale: str | None = None,
+) -> str:
+    """Create autobrief/failure text for col_pct_missing validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    fmt_locale = locale if locale else lang
+
+    max_pct_value = value.get("max_pct", 0) * 100  # Convert to percentage
+    max_pct_formatted = _format_number_safe(max_pct_value, decimals=1, locale=fmt_locale)
+
+    return EXPECT_FAIL_TEXT[f"col_pct_missing_{type_}_text"][lang].format(
+        column_text=column_text,
+        max_pct=max_pct_formatted,
+    )
+
+
+def _create_text_col_missing_coded(lang: str, column: str | None, for_failure: bool = False) -> str:
+    """Create autobrief/failure text for col_missing_coded validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    return EXPECT_FAIL_TEXT[f"col_missing_coded_{type_}_text"][lang].format(
+        column_text=column_text,
+    )
+
+
+def _create_text_col_missing_only_coded(
+    lang: str, column: str | None, for_failure: bool = False
+) -> str:
+    """Create autobrief/failure text for col_missing_only_coded validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    return EXPECT_FAIL_TEXT[f"col_missing_only_coded_{type_}_text"][lang].format(
+        column_text=column_text,
+    )
+
+
+def _create_text_col_missing_consistent(
+    lang: str, columns: Any, value: dict, for_failure: bool = False
+) -> str:
+    """Create autobrief/failure text for col_missing_consistent validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    if isinstance(columns, (list, tuple)):
+        columns_text = _prep_values_text(values=list(columns), lang=lang, limit=5)
+    else:
+        columns_text = _prep_column_text(column=columns)
+
+    reason = value.get("when_reason") if isinstance(value, dict) else None
+
+    return EXPECT_FAIL_TEXT[f"col_missing_consistent_{type_}_text"][lang].format(
+        columns_text=columns_text,
+        reason=reason,
+    )
 
 
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
@@ -13794,22 +23275,21 @@ def _create_text_specially(lang: str, for_failure: bool = False) -> str:
     return EXPECT_FAIL_TEXT[f"specially_{type_}_text"][lang]
 
 
+def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> str:
+    """Create text for prompt validation: just return the prompt."""
+    return prompt
+
+
 def _prep_column_text(column: str | list[str]) -> str:
     if isinstance(column, list):
         return "`" + str(column[0]) + "`"
-    elif isinstance(column, str):
+    if isinstance(column, str):
         return "`" + column + "`"
-    else:
-        return ""
+    raise AssertionError
 
 
 def _prep_values_text(
-    values: str
-    | int
-    | float
-    | datetime.datetime
-    | datetime.date
-    | list[str | int | float | datetime.datetime | datetime.date],
+    values: _CompliantValue | _CompliantValues,
     lang: str,
     limit: int = 3,
 ) -> str:
@@ -13822,7 +23302,7 @@ def _prep_values_text(
     length_values = len(values)
 
     if length_values == 0:
-        return ""
+        return ""  # pragma: no cover
 
     if length_values > limit:
         num_omitted = length_values - limit
@@ -13831,7 +23311,7 @@ def _prep_values_text(
         formatted_values = []
         for value in values[:limit]:
             if isinstance(value, (datetime.datetime, datetime.date)):
-                formatted_values.append(f"`{value.isoformat()}`")
+                formatted_values.append(f"`{value.isoformat()}`")  # pragma: no cover
             else:
                 formatted_values.append(f"`{value}`")
 
@@ -13857,7 +23337,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
+def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -13882,22 +23362,31 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     list[tuple[str, str]]
         A list of tuples representing pairings of a column name and a value in the column.
     """
+    import narwhals as nw
+
     # Determine if the table is a DataFrame or a DB table
     tbl_type = _get_tbl_type(data=data_tbl)
 
     # Obtain the segmentation categories from the table column given as `segments_expr`
-    if tbl_type == "polars":
-        seg_categories = data_tbl[segments_expr].unique().to_list()
-    elif tbl_type == "pandas":
-        seg_categories = data_tbl[segments_expr].unique().tolist()
+    if tbl_type in ["polars", "pandas", "pyspark"]:
+        # Use Narwhals for supported DataFrame types
+        data_nw = nw.from_native(data_tbl)
+        unique_vals = data_nw.select(nw.col(segments_expr)).unique()
+
+        # LazyFrames must be collected before item indexing
+        if is_narwhals_lazyframe(unique_vals):
+            unique_vals = unique_vals.collect()
+
+        # Convert to list of values
+        seg_categories = unique_vals[segments_expr].to_list()
     elif tbl_type in IBIS_BACKENDS:
         distinct_col_vals = data_tbl.select(segments_expr).distinct()
         seg_categories = distinct_col_vals[segments_expr].to_list()
     else:  # pragma: no cover
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
-    # Ensure that the categories are sorted
-    seg_categories.sort()
+    # Ensure that the categories are sorted, and allow for None values
+    seg_categories.sort(key=lambda x: (x is None, x))
 
     # Place each category and each value in a list of tuples as: `(column, value)`
     seg_tuples = [(segments_expr, category) for category in seg_categories]
@@ -13905,7 +23394,7 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     return seg_tuples
 
 
-def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
+def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
     """
     Normalize the segments expression to a list of tuples, given a single tuple.
 
@@ -13931,17 +23420,23 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
 
     Returns
     -------
-    list[tuple[str, str]]
+    list[tuple[str, Any]]
         A list of tuples representing pairings of a column name and a value in the column.
+        Values can be any type, including None.
     """
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, segment = segments_expr
+
     # Check if the first element is a string
-    if isinstance(segments_expr[0], str):
-        # If the second element is a list, create a list of tuples
-        if isinstance(segments_expr[1], list):
-            seg_tuples = [(segments_expr[0], value) for value in segments_expr[1]]
+    if isinstance(column, str):
+        if isinstance(segment, Segment):
+            seg_tuples = [(column, seg) for seg in segment.segments]
+        # If the second element is a collection, expand into a list of tuples
+        elif isinstance(segment, (list, set, tuple)):
+            seg_tuples = [(column, seg) for seg in segment]
         # If the second element is not a list, create a single tuple
         else:
-            seg_tuples = [(segments_expr[0], segments_expr[1])]
+            seg_tuples = [(column, segment)]
     # If the first element is not a string, raise an error
     else:  # pragma: no cover
         raise ValueError("The first element of the segments expression must be a string.")
@@ -13949,7 +23444,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
     return seg_tuples
 
 
-def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
+def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
     """
     Apply the segments expression to the data table.
 
@@ -13972,15 +23467,135 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
     # Get the table type
     tbl_type = _get_tbl_type(data=data_tbl)
 
-    if tbl_type in ["pandas", "polars"]:
-        # If the table is a Pandas or Polars DataFrame, transforming to a Narwhals table
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, segment = segments_expr
+
+    if tbl_type in ["pandas", "polars", "pyspark"]:
+        # If the table is a Pandas, Polars, or PySpark DataFrame, transform to a Narwhals table
         # and perform the filtering operation
 
         # Transform to Narwhals table if a DataFrame
         data_tbl_nw = nw.from_native(data_tbl)
 
-        # Filter the data table based on the column name and value
-        data_tbl_nw = data_tbl_nw.filter(nw.col(segments_expr[0]) == segments_expr[1])
+        # Handle Polars expressions by attempting to extract literal values
+        # This is a compatibility measure for cases where `pl.datetime()`, `pl.lit()`, etc.,
+        # are accidentally used instead of native Python types
+        if (
+            hasattr(segment, "__class__")
+            and "polars" in segment.__class__.__module__
+            and segment.__class__.__name__ == "Expr"
+        ):
+            # This is a Polars expression so we should warn about this and suggest native types
+            import warnings
+            from datetime import date, datetime
+
+            warnings.warn(
+                "Polars expressions in segments are deprecated. Please use native Python types instead. "
+                "For example, use datetime.date(2016, 1, 4) instead of pl.datetime(2016, 1, 4).",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
+            # Try to extract the literal value from various Polars expression patterns
+            segment_str = str(segment)
+            parsed_value = None
+
+            # Handle different Polars expression string formats
+            # Format 1: Direct date strings like "2016-01-04"
+            if len(segment_str) == 10 and segment_str.count("-") == 2:
+                try:
+                    parsed_value = date.fromisoformat(segment_str)
+                except ValueError:  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # Format 2: Direct datetime strings like "2016-01-04 00:00:01" (Polars 1.36+)
+            # These don't have UTC suffix anymore
+            elif (
+                " " in segment_str
+                and "UTC" not in segment_str
+                and "[" not in segment_str
+                and ".alias" not in segment_str
+            ):
+                try:  # pragma: no cover
+                    parsed_dt = datetime.fromisoformat(segment_str)  # pragma: no cover
+                    # Convert midnight datetimes to dates for consistency
+                    if parsed_dt.time() == datetime.min.time():  # pragma: no cover
+                        parsed_value = parsed_dt.date()  # pragma: no cover
+                    else:  # pragma: no cover
+                        parsed_value = parsed_dt  # pragma: no cover
+                except ValueError:  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # Format 3: Datetime strings with UTC timezone like
+            # "2016-01-04 00:00:01 UTC.strict_cast(...)" (Polars < 1.36)
+            elif " UTC" in segment_str:
+                try:
+                    # Extract just the datetime part before "UTC"
+                    datetime_part = segment_str.split(" UTC")[0]
+                    if len(datetime_part) >= 10:
+                        parsed_dt = datetime.fromisoformat(datetime_part)
+                        # Convert midnight datetimes to dates for consistency
+                        if parsed_dt.time() == datetime.min.time():
+                            parsed_value = parsed_dt.date()  # pragma: no cover
+                        else:
+                            parsed_value = parsed_dt
+                except (ValueError, IndexError):  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # Format 4: Bracketed expressions like ['2016-01-04']
+            elif segment_str.startswith("[") and segment_str.endswith("]"):
+                try:  # pragma: no cover
+                    # Remove [' and ']
+                    content = segment_str[2:-2]  # pragma: no cover
+
+                    # Try parsing as date first
+                    if len(content) == 10 and content.count("-") == 2:  # pragma: no cover
+                        try:  # pragma: no cover
+                            parsed_value = date.fromisoformat(content)  # pragma: no cover
+                        except ValueError:  # pragma: no cover
+                            pass  # pragma: no cover
+
+                    # Try parsing as datetime
+                    if parsed_value is None:  # pragma: no cover
+                        try:  # pragma: no cover
+                            parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
+                            if parsed_dt.time() == datetime.min.time():
+                                parsed_value = parsed_dt.date()
+                            else:
+                                parsed_value = parsed_dt
+                        except ValueError:
+                            pass
+
+                except (ValueError, IndexError):  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # Handle `pl.datetime()` expressions with .alias("datetime")
+            elif "datetime" in segment_str and '.alias("datetime")' in segment_str:
+                try:
+                    datetime_part = segment_str.split('.alias("datetime")')[0]
+                    parsed_dt = datetime.fromisoformat(datetime_part)
+
+                    if parsed_dt.time() == datetime.min.time():
+                        parsed_value = parsed_dt.date()
+                    else:
+                        parsed_value = parsed_dt  # pragma: no cover
+
+                except (ValueError, AttributeError):  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # If we successfully parsed a value, use it; otherwise leave segment as is
+            if parsed_value is not None:
+                segment = parsed_value
+
+        # Filter the data table based on the column name and segment
+        if segment is None:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
+        elif isinstance(segment, list):
+            # Check if the segment is a segment group
+            dtype = data_tbl_nw.collect_schema()[column]
+            data_tbl_nw = data_tbl_nw.filter(_is_in(column, segment, dtype))
+        else:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column) == segment)
 
         # Transform back to the original table type
         data_tbl = data_tbl_nw.to_native()
@@ -13988,10 +23603,103 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
     elif tbl_type in IBIS_BACKENDS:
         # If the table is an Ibis backend table, perform the filtering operation directly
 
-        # Filter the data table based on the column name and value
-        data_tbl = data_tbl[data_tbl[segments_expr[0]] == segments_expr[1]]
+        # Filter the data table based on the column name and segment
+        # Use the new Ibis API methods to avoid deprecation warnings
+        if segment is None:
+            data_tbl = data_tbl.filter(data_tbl[column].isnull())  # pragma: no cover
+        elif isinstance(segment, list):
+            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))  # pragma: no cover
+        else:
+            data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
     return data_tbl
+
+
+def _resolve_step_missing_spec(validation: Any) -> Any:
+    """Return the `MissingSpec` associated with a validation step, if any.
+
+    The spec lives in different places depending on the method: on `validation.missing` for
+    `col_vals_*` steps that used `missing=`; directly in `validation.values` for `col_missing_coded`;
+    and under `validation.values["spec"]` for `col_pct_missing`, `col_missing_only_coded`, and
+    `col_missing_consistent`.
+    """
+    spec = getattr(validation, "missing", None)
+    if spec is not None:
+        return spec
+    vals = getattr(validation, "values", None)
+    if isinstance(vals, MissingSpec):
+        return vals
+    if isinstance(vals, dict) and isinstance(vals.get("spec"), MissingSpec):
+        return vals["spec"]
+    return None
+
+
+def _build_missing_note(validation: Any) -> tuple[str, str] | None:
+    """Build a one-line (markdown, text) note summarizing a step's structured-missingness context.
+
+    Returns `None` when the step has no associated `MissingSpec`.
+    """
+    spec = _resolve_step_missing_spec(validation)
+    if spec is None or not hasattr(spec, "reasons"):
+        return None
+
+    codes_md = ", ".join(f"`{value}`&rarr;{reason}" for value, reason in spec.reasons.items())
+    codes_tx = ", ".join(f"{value}->{reason}" for value, reason in spec.reasons.items())
+    if getattr(spec, "null_is_missing", False):
+        codes_md += f", `null`&rarr;{spec.null_reason}"
+        codes_tx += f", null->{spec.null_reason}"
+
+    md = f"**Missing codes:** {codes_md}"
+    tx = f"Missing codes: {codes_tx}"
+
+    # Method-specific context appended to the one-line summary
+    assertion_type = getattr(validation, "assertion_type", None)
+    vals = getattr(validation, "values", None)
+
+    if assertion_type == "col_pct_missing" and isinstance(vals, dict):
+        if vals.get("reason") is not None:
+            md += f". Counting reason `{vals['reason']}`"
+            tx += f". Counting reason {vals['reason']}"
+        elif vals.get("category") is not None:
+            md += f". Counting category `{vals['category']}`"
+            tx += f". Counting category {vals['category']}"
+    elif assertion_type == "col_missing_only_coded" and isinstance(vals, dict):
+        bits_md = []
+        bits_tx = []
+        if vals.get("allowed") is not None:
+            allowed_str = ", ".join(str(a) for a in vals["allowed"])
+            bits_md.append(f"allowed {{{allowed_str}}}")
+            bits_tx.append(f"allowed {{{allowed_str}}}")
+        if vals.get("min_val") is not None or vals.get("max_val") is not None:
+            rng = f"[{vals.get('min_val')}, {vals.get('max_val')}]"
+            bits_md.append(f"range {rng}")
+            bits_tx.append(f"range {rng}")
+        if bits_md:
+            md += f". Legitimate values: {', '.join(bits_md)}"
+            tx += f". Legitimate values: {', '.join(bits_tx)}"
+    elif assertion_type == "col_missing_consistent" and isinstance(vals, dict):
+        if vals.get("when_reason") is not None:
+            md += f". Consistency required for reason `{vals['when_reason']}`"
+            tx += f". Consistency required for reason {vals['when_reason']}"
+
+    return md, tx
+
+
+def _missing_legend_html(spec: Any) -> str:  # pragma: no cover
+    """Build an HTML legend of a MissingSpec's sentinel codes and their reasons, for step reports."""
+    if not hasattr(spec, "reasons"):  # pragma: no cover
+        return ""  # pragma: no cover
+    items = [
+        f"<code>{value}</code> &rarr; {reason}" for value, reason in spec.reasons.items()
+    ]  # pragma: no cover
+    if getattr(spec, "null_is_missing", False):  # pragma: no cover
+        items.append(f"<code>null</code> &rarr; {spec.null_reason}")  # pragma: no cover
+    if not items:  # pragma: no cover
+        return ""  # pragma: no cover
+    return (
+        "<div style='font-size: 10px; color: #555555; padding-top: 4px;'>"
+        "<strong>Missing codes:</strong> " + "; ".join(items) + "</div>"
+    )
 
 
 def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
@@ -14022,6 +23730,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
@@ -14035,6 +23744,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
         "critical",
         "extract",
         "proc_duration_s",
+        "notes",
     ]
 
     # Filter the validation information to include only the selected fields
@@ -14054,9 +23764,82 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
     return validation_info_dict
 
 
+def _aggregate_dimension_units(validation_info: list[_ValidationInfo]) -> dict[str, list[int]]:
+    """
+    Aggregate passing/total test units per data quality dimension.
+
+    Only steps that produced a pass/fail result contribute to the aggregation. Steps that were not
+    interrogated, inactive steps (`active=False`), and steps that could not be evaluated
+    (`eval_error`) all have `n_passed` unset and are therefore excluded, so a broken check (e.g., a
+    reference to a nonexistent column) doesn't distort the score. Steps with no assigned dimension
+    are grouped under `"unknown"`.
+
+    Returns
+    -------
+    dict[str, list[int]]
+        A mapping of dimension name to a two-element list `[n_passed, n]` (summed test units).
+    """
+    agg: dict[str, list[int]] = {}
+    for step in validation_info:
+        # Skip steps without a computed result: not interrogated, inactive, or `eval_error`
+        # (these have `n_passed` as `None`)
+        if step.n is None or step.n_passed is None:
+            continue
+        dimension = step.dimension or "unknown"
+        entry = agg.setdefault(dimension, [0, 0])
+        entry[0] += step.n_passed
+        entry[1] += step.n
+    return agg
+
+
+def _compute_dimension_scores(validation_info: list[_ValidationInfo]) -> dict[str, float]:
+    """
+    Compute the test-unit-weighted pass rate (0-100) for each data quality dimension.
+
+    A dimension's score is the total number of passing test units divided by the total number of
+    test units across all of its steps, expressed as a percentage. Dimensions with zero test units
+    score `100.0`.
+    """
+    agg = _aggregate_dimension_units(validation_info)
+    return {
+        dimension: (round(n_passed / n * 100, 2) if n else 100.0)
+        for dimension, (n_passed, n) in agg.items()
+    }
+
+
+def _compute_health_score(
+    validation_info: list[_ValidationInfo],
+    dimension_weights: dict[str, float] | None = None,
+) -> float:
+    """
+    Compute the overall, test-unit-weighted health score (0-100) across all dimensions.
+
+    With uniform weights this reduces to the overall pass rate (total passing test units over
+    total test units). Optional per-dimension weights scale each dimension's test-unit
+    contribution; a dimension not present in `dimension_weights` uses a weight of `1.0`. Weights
+    are expected to be positive; negative weights are treated as `0` (the dimension is dropped from
+    the overall score), and the returned score is always clamped to the `[0, 100]` range.
+    """
+    agg = _aggregate_dimension_units(validation_info)
+    if not agg:
+        return 100.0
+    weights = dimension_weights or {}
+    numerator = 0.0
+    denominator = 0.0
+    for dimension, (n_passed, n) in agg.items():
+        # Guard against invalid (negative) weights, which could otherwise push the score
+        # out of the [0, 100] range
+        weight = max(0.0, weights.get(dimension, 1.0))
+        numerator += weight * n_passed
+        denominator += weight * n
+    if not denominator:
+        return 100.0
+    return round(min(100.0, max(0.0, numerator / denominator * 100)), 2)
+
+
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
-    icon_svg = [SVG_ICONS_FOR_ASSERTION_TYPES.get(icon) for icon in icon]
+    icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
 
     # Replace the width and height in the SVG string
     for i in range(len(icon_svg)):
@@ -14065,11 +23848,9 @@ def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     return icon_svg
 
 
-def _replace_svg_dimensions(svg: list[str], height_width: int | float) -> list[str]:
+def _replace_svg_dimensions(svg: str, height_width: int | float) -> str:
     svg = re.sub(r'width="[0-9]*?px', f'width="{height_width}px', svg)
-    svg = re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
-
-    return svg
+    return re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
 
 
 def _get_title_text(
@@ -14108,7 +23889,7 @@ def _get_title_text(
             "</span>"
             f'<span style="float: right;">{title}</span>'
             "</div>"
-        )
+        )  # pragma: no cover
 
     return html_str
 
@@ -14133,7 +23914,7 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
     return title_text
 
 
-def _transform_tbl_preprocessed(pre: any, seg: any, interrogation_performed: bool) -> list[str]:
+def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: bool) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
         return ["" for _ in range(len(pre))]
@@ -14155,9 +23936,7 @@ def _transform_tbl_preprocessed(pre: any, seg: any, interrogation_performed: boo
 
 def _get_preprocessed_table_icon(icon: list[str]) -> list[str]:
     # For each icon, get the SVG icon from the SVG_ICONS_FOR_TBL_STATUS dictionary
-    icon_svg = [SVG_ICONS_FOR_TBL_STATUS.get(icon) for icon in icon]
-
-    return icon_svg
+    return [SVG_ICONS_FOR_TBL_STATUS[icon] for icon in icon]
 
 
 def _transform_eval(
@@ -14186,24 +23965,6 @@ def _transform_eval(
     return symbol_list
 
 
-def _format_numbers_with_gt(
-    values: list[int], n_sigfig: int = 3, compact: bool = True, locale: str = "en"
-) -> list[str]:
-    """Format numbers using Great Tables GT object to avoid pandas dependency."""
-    import polars as pl
-
-    # Create a single-column DataFrame with all values
-    df = pl.DataFrame({"values": values})
-
-    # Create GT object and format the column
-    gt_obj = GT(df).fmt_number(columns="values", n_sigfig=n_sigfig, compact=compact, locale=locale)
-
-    # Extract the formatted values using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="values", context="html")
-
-    return formatted_values
-
-
 def _format_single_number_with_gt(
     value: int, n_sigfig: int = 3, compact: bool = True, locale: str = "en", df_lib=None
 ) -> str:
@@ -14214,12 +23975,14 @@ def _format_single_number_with_gt(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
-        else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            df_lib = pd  # pragma: no cover
+        else:  # pragma: no cover
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting"
+            )  # pragma: no cover
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14251,9 +24014,9 @@ def _transform_test_units(
             return _format_single_number_with_gt(
                 value, n_sigfig=3, compact=True, locale=locale, df_lib=df_lib
             )
-        else:
-            # Fallback to the original behavior
-            return str(vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0])
+        formatted = vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)
+        assert isinstance(formatted, list)
+        return formatted[0]
 
     return [
         (
@@ -14285,12 +24048,14 @@ def _format_single_float_with_gt(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
-        else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            df_lib = pd  # pragma: no cover
+        else:  # pragma: no cover
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting"
+            )  # pragma: no cover
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14322,7 +24087,7 @@ def _transform_passed_failed(
             return _format_single_float_with_gt(value, decimals=2, locale=locale, df_lib=df_lib)
         else:
             # Fallback to the original behavior
-            return vals.fmt_number(value, decimals=2, locale=locale)[0]
+            return vals.fmt_number(value, decimals=2, locale=locale)[0]  # pragma: no cover
 
     passed_failed = [
         (
@@ -14358,6 +24123,172 @@ def _transform_w_e_c(values, color, interrogation_performed):
     ]
 
 
+def _get_dimension_label(dimension: str | None, lang: str) -> str:
+    """
+    Get the localized display label for a data quality dimension.
+
+    Falls back to English (and finally to a title-cased version of the raw dimension name for
+    custom/unmapped dimensions) when a translation is not available for the requested language.
+    """
+    key = dimension or "unknown"
+    entry = VALIDATION_REPORT_TEXT.get(f"dimension_{key}")
+    if entry:
+        return entry.get(lang, entry.get("en", key))
+    # Custom or unmapped dimension: present the raw name in a readable form
+    return str(key).replace("_", " ").title()
+
+
+def _transform_step_number_with_dimension(
+    i_values: list, dimensions: list[str | None], lang: str
+) -> list[str]:
+    """
+    Render each step number with a small, color-coded two-letter dimension badge in its top-left
+    corner.
+
+    The badge is absolutely positioned so it does not shift the step numeral (regardless of how
+    many digits it has). The full dimension name is exposed via a `title` tooltip, and the badge
+    color matches the per-dimension colors used in the report's health-score summary.
+    """
+    # Right-align the numeral (GT auto-aligns integer columns to the right, but treats these HTML
+    # strings as text); place the badge on the leading edge, nudged inward to clear the status bar
+    is_rtl = lang in RTL_LANGUAGES
+    text_align = "left" if is_rtl else "right"
+    badge_side = "right" if is_rtl else "left"
+
+    cells: list[str] = []
+    for i_value, dimension in zip(i_values, dimensions):
+        key = dimension or "unknown"
+        color = DIMENSION_COLORS.get(key, DIMENSION_COLORS["unknown"])
+        if key in DIMENSION_ABBR:
+            abbr = DIMENSION_ABBR[key]
+        else:
+            # Derive a two-letter code from a custom dimension name (first two letters)
+            letters = "".join(c for c in key if c.isalpha())
+            abbr = (letters[:2].upper()) or DIMENSION_ABBR["unknown"]
+        # Escape the tooltip text since a custom dimension name is user-provided
+        name = html_module.escape(_get_dimension_label(key, lang))
+        badge = (
+            f'<span title="{name}" style="position: absolute; top: -11px; {badge_side}: 3px; '
+            f"background-color: {color}; color: #FFFFFF; font-size: 7px; font-weight: 700; "
+            "padding: 1px 3px; border-radius: 3px; line-height: 1; letter-spacing: 0.5px; "
+            f"font-family: 'IBM Plex Sans', sans-serif;\">{abbr}</span>"
+        )
+        cells.append(
+            f'<div style="position: relative; text-align: {text_align};">{badge}{i_value}</div>'
+        )
+    return cells
+
+
+def _get_report_text(key: str, lang: str) -> str:
+    """Safely look up a validation report string with English fallback."""
+    entry = VALIDATION_REPORT_TEXT.get(key, {})
+    return entry.get(lang, entry.get("en", key))
+
+
+def _health_score_color(score: float) -> str:
+    """Map a health score (0-100) to a status color for display.
+
+    Uses darker shades than the warning/error/critical severity palette so the score reads with
+    sufficient contrast against a white background.
+    """
+    if score >= 90:
+        return "#2E7D32"  # green
+    if score >= 75:
+        return "#A15C00"  # amber
+    return "#C62828"  # red
+
+
+def _create_health_score_html(
+    validation_info: list[_ValidationInfo],
+    lang: str,
+    dimension_weights: dict[str, float] | None = None,
+    show_divider: bool = True,
+) -> str:
+    """
+    Build the health-score summary block (overall score + per-dimension breakdown) for the
+    validation report footer. Returns an empty string when there are no scorable steps.
+
+    When `show_divider` is `True`, a dotted bottom border is drawn to separate the block from the
+    timings row that follows it. It should be `False` when no timings row is displayed, so the
+    divider doesn't double up with the next footer separator.
+    """
+    dimension_scores = _compute_dimension_scores(validation_info)
+    if not dimension_scores:  # pragma: no cover
+        return ""  # pragma: no cover
+
+    overall = _compute_health_score(validation_info, dimension_weights=dimension_weights)
+    health_label = _get_report_text("report_health_score", lang)
+    dimensions_label = _get_report_text("report_dimension_scores", lang)
+
+    # Order the per-dimension chips using the canonical dimension order, appending any custom
+    # dimensions (not in the canonical list) at the end
+    ordered_dimensions = [d for d in DIMENSION_NAMES if d in dimension_scores]
+    ordered_dimensions += [d for d in dimension_scores if d not in DIMENSION_NAMES]
+
+    chips: list[str] = []
+    for dimension in ordered_dimensions:
+        score = dimension_scores[dimension]
+        color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
+        label = html_module.escape(_get_dimension_label(dimension, lang))
+        chips.append(
+            '<span style="display: inline-block; margin: 2px 10px 2px 0; white-space: nowrap;">'
+            f'<span style="background-color: {color}; color: #FFFFFF; padding: 2px 7px; '
+            "border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 1; "
+            'display: inline-block; vertical-align: middle;">'
+            f"{label}</span>"
+            "<span style=\"font-family: 'IBM Plex Mono', monospace; font-size: 11px; "
+            f'color: #444444; padding-left: 5px; vertical-align: middle;">{score:g}%</span>'
+            "</span>"
+        )
+
+    # A shared caption style so the "HEALTH SCORE" and "DIMENSION SCORES" lines sit in parallel
+    caption_style = (
+        "font-weight: 600; color: #888888; font-size: 10px; text-transform: uppercase; "
+        "letter-spacing: 0.5px; padding-right: 8px; vertical-align: middle;"
+    )
+
+    # The score sits in a box that pulses (glow + scale). The animation gets more vigorous — faster
+    # and with a larger pulse/glow — as the score approaches 100%. The keyframes reference CSS
+    # custom properties so a single definition adapts to the per-report values set inline.
+    color = _health_score_color(overall)
+    intensity = max(0.0, min(1.0, overall / 100))
+    duration = round(2.3 - 1.6 * intensity, 2)  # 2.3s (low) -> 0.7s (100%)
+    scale = round(1 + 0.09 * intensity, 3)  # up to 1.09x
+    glow = round(3 + 15 * intensity)  # 3px -> 18px halo
+
+    style_block = (
+        "<style>@keyframes pb-health-pulse{"
+        "0%,100%{transform:scale(1);box-shadow:0 0 0 0 var(--pb-glow-color);}"
+        "50%{transform:scale(var(--pb-scale));"
+        "box-shadow:0 0 var(--pb-glow) 1px var(--pb-glow-color);}}</style>"
+    )
+    score_box = (
+        f'<span style="display: inline-block; padding: 1px 9px; border-radius: 5px; '
+        f"background-color: {color}; color: #FFFFFF; font-weight: 700; font-size: 13px; "
+        f"vertical-align: middle; --pb-scale: {scale}; --pb-glow: {glow}px; "
+        f"--pb-glow-color: {color}; animation: pb-health-pulse {duration}s ease-in-out "
+        f'infinite;">{overall:.0f}%</span>'
+    )
+
+    # Only draw the dotted divider when a timings row follows this block
+    outer_style = (
+        "padding: 3px 2px 8px 2px; border-bottom: 1px dotted #D3D3D3;"
+        if show_divider
+        else "padding: 3px 2px;"
+    )
+    return (
+        f"{style_block}"
+        f'<div style="{outer_style}">'
+        f'<span style="{caption_style}">{health_label}</span>'
+        f"{score_box}"
+        '<div style="padding-top: 3px;">'
+        f'<span style="{caption_style}">{dimensions_label}</span>'
+        f"{''.join(chips)}"
+        "</div>"
+        "</div>"
+    )
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
@@ -14391,6 +24322,14 @@ def _transform_assertion_str(
 
         # Use Markdown-to-HTML conversion to format the `brief_str` text
         brief_str = [commonmark.commonmark(x) for x in brief_str]
+
+        # Add inline styles to <p> tags for proper rendering in all environments
+        # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
+        # font-size from parent divs, so we add inline styles directly to the <p> tags
+        brief_str = [
+            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
+            for x in brief_str
+        ]
 
     # Obtain the number of characters contained in the assertion
     # string; this is important for sizing components appropriately
@@ -14447,22 +24386,21 @@ def _transform_assertion_str(
     return type_upd
 
 
-def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str]:
+def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str] | None:
     if isinstance(pre, Callable):
         return _get_callable_source(fn=pre)
+    return None
 
 
 def _get_callable_source(fn: Callable) -> str:
-    if isinstance(fn, Callable):
-        try:
-            source_lines, _ = inspect.getsourcelines(fn)
-            source = "".join(source_lines).strip()
-            # Extract the `pre` argument from the source code
-            pre_arg = _extract_pre_argument(source)
-            return pre_arg
-        except (OSError, TypeError):  # pragma: no cover
-            return fn.__name__
-    return fn
+    try:
+        source_lines, _ = inspect.getsourcelines(fn)
+        source = "".join(source_lines).strip()
+        # Extract the `pre` argument from the source code
+        pre_arg = _extract_pre_argument(source)
+        return pre_arg
+    except (OSError, TypeError):  # pragma: no cover
+        return fn.__name__  # ty: ignore
 
 
 def _extract_pre_argument(source: str) -> str:
@@ -14482,12 +24420,78 @@ def _extract_pre_argument(source: str) -> str:
     return pre_arg
 
 
+def _create_governance_metadata_html(
+    owner: str | None,
+    consumers: list[str] | None,
+    version: str | None,
+) -> str:
+    """
+    Create HTML for governance metadata display in the report footer.
+
+    Parameters
+    ----------
+    owner
+        The owner of the data being validated.
+    consumers
+        List of consumers who depend on the data.
+    version
+        The version of the validation plan.
+
+    Returns
+    -------
+    str
+        HTML string containing formatted governance metadata, or empty string if no metadata.
+    """
+    if owner is None and consumers is None and version is None:
+        return ""
+
+    metadata_parts = []
+
+    # Common style for the metadata badges (similar to timing style but slightly smaller font)
+    badge_style = (
+        "background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; "
+        "margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; "
+        "border-radius: 0; padding: 2px 10px 2px 10px; font-size: 11px;"
+    )
+    label_style = (
+        "color: #777; font-weight: bold; font-size: 9px; text-transform: uppercase; "
+        "margin-right: 3px;"
+    )
+
+    if owner is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'><span style='{label_style}'>Owner:</span> {owner}</span>"
+        )
+
+    if consumers is not None and len(consumers) > 0:
+        consumers_str = ", ".join(consumers)
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Consumers:</span> {consumers_str}"
+            f"</span>"
+        )
+
+    if version is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Version:</span> {version}"
+            f"</span>"
+        )
+
+    return (
+        f"<div style='margin-top: 5px; margin-bottom: 5px; margin-left: 10px;'>"
+        f"{''.join(metadata_parts)}"
+        f"</div>"
+    )
+
+
 def _create_table_time_html(
     time_start: datetime.datetime | None, time_end: datetime.datetime | None
 ) -> str:
     if time_start is None:
         return ""
 
+    assert time_end is not None  # typing
     # Get the time duration (difference between `time_end` and `time_start`) in seconds
     time_duration = (time_end - time_start).total_seconds()
 
@@ -14520,6 +24524,86 @@ def _create_table_time_html(
     )
 
 
+def _create_notes_html(validation_info: list) -> str:
+    """
+    Create markdown text for validation notes/footnotes.
+
+    This function collects notes from all validation steps and formats them as footnotes
+    for display in the report footer. Each note is prefixed with the step number in
+    uppercase small caps bold formatting, and the note content is rendered as markdown.
+
+    Parameters
+    ----------
+    validation_info
+        List of _ValidationInfo objects from which to extract notes.
+
+    Returns
+    -------
+    str
+        Markdown string containing formatted footnotes, or empty string if no notes exist.
+    """
+    # Collect all notes from validation steps
+    all_notes = []
+    for step in validation_info:
+        if step.notes:
+            for key, content in step.notes.items():
+                # Store note with step number for context
+                all_notes.append(
+                    {
+                        "step": step.i,
+                        "key": key,
+                        "markdown": content["markdown"],
+                        "text": content["text"],
+                    }
+                )
+
+    # If no notes, return empty string
+    if not all_notes:
+        return ""
+
+    # Build markdown for notes section
+    # Start with a styled horizontal rule and bold "Notes" header
+    notes_parts = [
+        (
+            "<hr style='border: none; border-top-width: 1px; border-top-style: dotted; "
+            "border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;'>"
+        ),
+        "<strong>Notes</strong>",
+        "",
+    ]
+
+    previous_step = None
+    for note in all_notes:
+        # Determine if this is the first note for this step
+        is_first_for_step = note["step"] != previous_step
+        previous_step = note["step"]
+
+        # Format step label with HTML for uppercase small caps bold
+        # Use lighter color for subsequent notes of the same step
+        step_color = "#333333" if is_first_for_step else "#999999"
+        step_label = (
+            f"<span style='font-variant: small-caps; font-weight: bold; font-size: smaller; "
+            f"text-transform: uppercase; color: {step_color};'>Step {note['step']}</span>"
+        )
+
+        # Format note key in monospaced font with smaller size
+        note_key = f"<span style='font-family: \"IBM Plex Mono\", monospace; font-size: smaller;'>({note['key']})</span>"
+
+        # Combine step label, note key, and markdown content
+        note_text = f"{step_label} {note_key} {note['markdown']}"
+        notes_parts.append(note_text)
+        notes_parts.append("")  # Add blank line between notes
+
+    # Remove trailing blank line
+    if notes_parts[-1] == "":
+        notes_parts.pop()
+
+    # Join with newlines to create markdown text
+    notes_markdown = "\n".join(notes_parts)
+
+    return notes_markdown
+
+
 def _create_label_html(label: str | None, start_time: str) -> str:
     if label is None:
         # Remove the decimal and everything beyond that
@@ -14546,12 +24630,14 @@ def _format_single_integer_with_gt(value: int, locale: str = "en", df_lib=None) 
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
-        else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            df_lib = pd  # pragma: no cover
+        else:  # pragma: no cover
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting"
+            )  # pragma: no cover
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14579,12 +24665,14 @@ def _format_single_float_with_gt_custom(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
-        else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            df_lib = pd  # pragma: no cover
+        else:  # pragma: no cover
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting"
+            )  # pragma: no cover
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14600,60 +24688,94 @@ def _format_single_float_with_gt_custom(
     return formatted_values[0]  # Return the single formatted value
 
 
+def _format_number_safe(
+    value: float, decimals: int, drop_trailing_zeros: bool = False, locale: str = "en", df_lib=None
+) -> str:
+    """
+    Safely format a float value with locale support.
+
+    Uses GT-based formatting when a DataFrame library is available, otherwise falls back to
+    vals.fmt_number. This helper is used by threshold formatting functions.
+    """
+    if df_lib is not None and value is not None:
+        # Use GT-based formatting to avoid Pandas dependency completely
+        return _format_single_float_with_gt_custom(
+            value,
+            decimals=decimals,
+            drop_trailing_zeros=drop_trailing_zeros,
+            locale=locale,
+            df_lib=df_lib,
+        )
+    ints = fmt_number(
+        value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+    )
+    assert isinstance(ints, list)
+    return ints[0]
+
+
+def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
+    """
+    Safely format an integer value with locale support.
+
+    Uses GT-based formatting when a DataFrame library is available, otherwise falls back to
+    vals.fmt_integer. This helper is used by threshold formatting functions.
+    """
+    if df_lib is not None and value is not None:
+        # Use GT-based formatting to avoid Pandas dependency completely
+        return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
+
+    ints = fmt_integer(value, locale=locale)
+    assert isinstance(ints, list)
+    return ints[0]
+
+
 def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) -> str:
     if thresholds == Thresholds():
         return ""
 
-    # Helper functions to format numbers safely
-    def _format_number_safe(value: float, decimals: int, drop_trailing_zeros: bool = False) -> str:
-        if df_lib is not None and value is not None:
-            # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_float_with_gt_custom(
-                value,
-                decimals=decimals,
-                drop_trailing_zeros=drop_trailing_zeros,
-                locale=locale,
-                df_lib=df_lib,
-            )
-        else:
-            # Fallback to the original behavior
-            return fmt_number(
-                value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
-            )[0]
-
-    def _format_integer_safe(value: int) -> str:
-        if df_lib is not None and value is not None:
-            # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
-        else:
-            # Fallback to the original behavior
-            return fmt_integer(value, locale=locale)[0]
-
     warning = (
-        _format_number_safe(thresholds.warning_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.warning_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.warning_fraction is not None
         else (
-            _format_integer_safe(thresholds.warning_count)
+            _format_integer_safe(thresholds.warning_count, locale=locale, df_lib=df_lib)
             if thresholds.warning_count is not None
             else "&mdash;"
         )
     )
 
     error = (
-        _format_number_safe(thresholds.error_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.error_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.error_fraction is not None
         else (
-            _format_integer_safe(thresholds.error_count)
+            _format_integer_safe(thresholds.error_count, locale=locale, df_lib=df_lib)
             if thresholds.error_count is not None
             else "&mdash;"
         )
     )
 
     critical = (
-        _format_number_safe(thresholds.critical_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.critical_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.critical_fraction is not None
         else (
-            _format_integer_safe(thresholds.critical_count)
+            _format_integer_safe(thresholds.critical_count, locale=locale, df_lib=df_lib)
             if thresholds.critical_count is not None
             else "&mdash;"
         )
@@ -14699,18 +24821,798 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
     )
 
 
+def _create_local_threshold_note_html(thresholds: Thresholds, locale: str = "en") -> str:
+    """
+    Create a miniature HTML representation of local thresholds for display in notes.
+
+    This function generates a compact HTML representation of threshold values that is suitable for
+    display in validation step notes/footnotes. It follows a similar visual style to the global
+    thresholds shown in the header, but with a more compact format.
+
+    Parameters
+    ----------
+    thresholds
+        The Thresholds object containing the local threshold values.
+    locale
+        The locale to use for formatting numbers (default: "en").
+
+    Returns
+    -------
+    str
+        HTML string containing the formatted threshold information.
+    """
+    if thresholds == Thresholds():
+        return ""  # pragma: no cover
+
+    # Get df_lib for formatting
+    df_lib = None
+    if _is_lib_present("polars"):
+        import polars as pl
+
+        df_lib = pl
+    elif _is_lib_present("pandas"):  # pragma: no cover
+        import pandas as pd  # pragma: no cover
+
+        df_lib = pd  # pragma: no cover
+
+    # Helper function to format threshold values using the shared formatting functions
+    def _format_threshold_value(fraction: float | None, count: int | None) -> str:
+        if fraction is not None:
+            # Format as fraction/percentage with locale formatting
+            if fraction == 0:
+                return "0"
+            elif fraction < 0.01:  # pragma: no cover
+                # For very small fractions, show "<0.01" with locale formatting
+                formatted = _format_number_safe(
+                    0.01, decimals=2, locale=locale, df_lib=df_lib
+                )  # pragma: no cover
+                return f"&lt;{formatted}"  # pragma: no cover
+            else:
+                # Use shared formatting function with drop_trailing_zeros
+                formatted = _format_number_safe(
+                    fraction, decimals=2, drop_trailing_zeros=True, locale=locale, df_lib=df_lib
+                )
+                return formatted
+        elif count is not None:
+            # Format integer count using shared formatting function
+            return _format_integer_safe(count, locale=locale, df_lib=df_lib)
+        else:
+            return "&mdash;"
+
+    warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
+    error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
+    critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
+
+    warning_color = SEVERITY_LEVEL_COLORS["warning"]
+    error_color = SEVERITY_LEVEL_COLORS["error"]
+    critical_color = SEVERITY_LEVEL_COLORS["critical"]
+
+    # Build threshold parts with colored letters in monospace font
+    threshold_parts = []
+
+    # Add warning threshold if set
+    if thresholds.warning is not None:
+        threshold_parts.append(
+            f'<span style="color: {warning_color}; font-weight: bold;">W</span>:{warning}'
+        )
+
+    # Add error threshold if set
+    if thresholds.error is not None:
+        threshold_parts.append(
+            f'<span style="color: {error_color}; font-weight: bold;">E</span>:{error}'
+        )
+
+    # Add critical threshold if set
+    if thresholds.critical is not None:
+        threshold_parts.append(
+            f'<span style="color: {critical_color}; font-weight: bold;">C</span>:{critical}'
+        )
+
+    # Join with "|" separator (only between multiple thresholds)
+    thresholds_html = f'<span style="font-family: monospace;">{"|".join(threshold_parts)}</span>'
+
+    # Get localized text and format with threshold HTML
+    localized_text = NOTES_TEXT["local_threshold"].get(locale, NOTES_TEXT["local_threshold"]["en"])
+    note_html = localized_text.replace("{thresholds}", thresholds_html)
+
+    return note_html
+
+
+def _create_local_threshold_note_text(thresholds: Thresholds) -> str:
+    """
+    Create a plain text representation of local thresholds for display in logs.
+
+    This function generates a plain text representation of threshold values that is
+    suitable for display in text-based output such as logs or console output.
+
+    Parameters
+    ----------
+    thresholds
+        The Thresholds object containing the local threshold values.
+
+    Returns
+    -------
+    str
+        Plain text string containing the formatted threshold information.
+    """
+    if thresholds == Thresholds():
+        return ""
+
+    # Helper function to format threshold values
+    def _format_threshold_value(fraction: float | None, count: int | None) -> str:
+        if fraction is not None:
+            if fraction == 0:
+                return "0"
+            elif fraction < 0.01:  # pragma: no cover
+                return "<0.01"  # pragma: no cover
+            else:
+                return f"{fraction:.2f}".rstrip("0").rstrip(".")
+        elif count is not None:
+            return str(count)
+        else:
+            return "—"  # pragma: no cover
+
+    parts = []
+
+    if thresholds.warning is not None:
+        warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
+        parts.append(f"W: {warning}")
+
+    if thresholds.error is not None:
+        error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
+        parts.append(f"E: {error}")
+
+    if thresholds.critical is not None:
+        critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
+        parts.append(f"C: {critical}")
+
+    if parts:
+        return "Step-specific thresholds set: " + ", ".join(parts)
+    else:
+        return ""  # pragma: no cover
+
+
+def _create_threshold_reset_note_html(locale: str = "en") -> str:
+    """
+    Create an HTML note for when thresholds are explicitly reset to empty.
+
+    Parameters
+    ----------
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    text = NOTES_TEXT.get("local_threshold_reset", {}).get(
+        locale, NOTES_TEXT.get("local_threshold_reset", {}).get("en", "")
+    )
+    return text
+
+
+def _create_threshold_reset_note_text() -> str:
+    """
+    Create a plain text note for when thresholds are explicitly reset to empty.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return "Global thresholds explicitly not used for this step."
+
+
+def _create_no_columns_resolved_note_html(
+    column_expr: str, available_columns: list[str], locale: str = "en"
+) -> str:
+    """
+    Create an HTML note explaining that a column expression resolved to no columns.
+
+    Parameters
+    ----------
+    column_expr
+        The column expression that failed to resolve columns (as a string).
+    available_columns
+        List of available column names in the table.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    intro = NOTES_TEXT.get("column_not_found_intro", {}).get(
+        locale, NOTES_TEXT.get("column_not_found_intro", {}).get("en", "The column expression")
+    )
+    no_resolve = NOTES_TEXT.get("column_not_found_no_resolve", {}).get(
+        locale,
+        NOTES_TEXT.get("column_not_found_no_resolve", {}).get(
+            "en", "does not resolve to any columns"
+        ),
+    )
+
+    # Format the column expression with monospace font
+    col_expr_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_expr}</code>"
+
+    # Build the HTML note
+    html = f"{intro} {col_expr_html} {no_resolve}."
+
+    return html
+
+
+def _create_no_columns_resolved_note_text(column_expr: str, available_columns: list[str]) -> str:
+    """
+    Create a plain text note explaining that a column expression resolved to no columns.
+
+    Parameters
+    ----------
+    column_expr
+        The column expression that failed to resolve columns (as a string).
+    available_columns
+        List of available column names in the table.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return f"The column expression `{column_expr}` does not resolve to any columns."
+
+
+def _create_column_not_found_note_html(
+    column_name: str, available_columns: list[str], locale: str = "en"
+) -> str:
+    """
+    Create an HTML note explaining that a specific column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The column name that was not found.
+    available_columns
+        List of available column names in the table.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    intro = NOTES_TEXT.get("target_column_provided", {}).get(
+        locale, NOTES_TEXT.get("target_column_provided", {}).get("en", "The target column provided")
+    )
+    not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+        locale,
+        NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+            "en", "does not match any columns in the table"
+        ),
+    )
+
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
+
+    # Build the HTML note
+    html = f"{intro} ({col_name_html}) {not_found}."
+
+    return html
+
+
+def _create_column_not_found_note_text(column_name: str, available_columns: list[str]) -> str:
+    """
+    Create a plain text note explaining that a specific column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The column name that was not found.
+    available_columns
+        List of available column names in the table.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return f"The target column provided ({column_name}) does not match any columns in the table."
+
+
+def _create_comparison_column_not_found_note_html(
+    column_name: str, position: str | None, available_columns: list[str], locale: str = "en"
+) -> str:
+    """
+    Create an HTML note explaining that a comparison column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The comparison column name that was not found.
+    position
+        Optional position indicator ("left", "right") for between/outside validations.
+    available_columns
+        List of available column names in the table.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    intro = NOTES_TEXT.get("comparison_column_provided", {}).get(
+        locale,
+        NOTES_TEXT.get("comparison_column_provided", {}).get(
+            "en", "The comparison column provided"
+        ),
+    )
+    intro_with_for = NOTES_TEXT.get("comparison_column_for", {}).get(
+        locale,
+        NOTES_TEXT.get("comparison_column_for", {}).get("en", "The comparison column provided for"),
+    )
+    not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+        locale,
+        NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+            "en", "does not match any columns in the table"
+        ),
+    )
+
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
+
+    # Add position if provided (for between/outside validations)
+    if position:
+        # Format position parameter with monospace font (e.g., "left=", "right=")
+        position_param = (
+            f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{position}=</code>"
+        )
+        # Use the "for" version of the intro text
+        html = f"{intro_with_for} {position_param} ({col_name_html}) {not_found}."
+    else:
+        # Use the standard intro text without "for"
+        html = f"{intro} ({col_name_html}) {not_found}."
+
+    return html
+
+
+def _create_comparison_column_not_found_note_text(
+    column_name: str, position: str | None, available_columns: list[str]
+) -> str:
+    """
+    Create a plain text note explaining that a comparison column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The comparison column name that was not found.
+    position
+        Optional position indicator ("left", "right") for between/outside validations.
+    available_columns
+        List of available column names in the table.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    if position:
+        position_text = f" for {position}="
+    else:
+        position_text = ""
+
+    return (
+        f"The comparison column provided{position_text} ({column_name}) "
+        f"does not match any columns in the table."
+    )
+
+
+def _create_preprocessing_note_html(
+    original_rows: int,
+    original_cols: int,
+    processed_rows: int,
+    processed_cols: int,
+    locale: str = "en",
+) -> str:
+    """
+    Create an HTML note showing table dimension changes from preprocessing.
+
+    Parameters
+    ----------
+    original_rows
+        Number of rows in the original table.
+    original_cols
+        Number of columns in the original table.
+    processed_rows
+        Number of rows after preprocessing.
+    processed_cols
+        Number of columns after preprocessing.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    precondition_text = NOTES_TEXT.get("precondition_applied", {}).get(
+        locale, NOTES_TEXT.get("precondition_applied", {}).get("en", "Precondition applied")
+    )
+    table_dims_text = NOTES_TEXT.get("table_dimensions", {}).get(
+        locale, NOTES_TEXT.get("table_dimensions", {}).get("en", "table dimensions")
+    )
+
+    # Helper function to get singular or plural form
+    def get_row_text(count: int) -> str:
+        if count == 1:
+            return NOTES_TEXT.get("row", {}).get(locale, NOTES_TEXT.get("row", {}).get("en", "row"))
+        return NOTES_TEXT.get("rows", {}).get(locale, NOTES_TEXT.get("rows", {}).get("en", "rows"))
+
+    def get_col_text(count: int) -> str:
+        if count == 1:
+            return NOTES_TEXT.get("column", {}).get(
+                locale, NOTES_TEXT.get("column", {}).get("en", "column")
+            )
+        return NOTES_TEXT.get("columns", {}).get(
+            locale, NOTES_TEXT.get("columns", {}).get("en", "columns")
+        )
+
+    # Determine which dimensions changed
+    rows_changed = original_rows != processed_rows
+    cols_changed = original_cols != processed_cols
+
+    # Format original dimensions
+    original_rows_text = get_row_text(original_rows)
+    original_cols_text = get_col_text(original_cols)
+    original_dim = (
+        f'<span style="font-family: monospace;">'
+        f"[{original_rows:,} {original_rows_text}, {original_cols} {original_cols_text}]"
+        f"</span>"
+    )
+
+    # Format processed dimensions with bold for changed values
+    processed_rows_text = get_row_text(processed_rows)
+    processed_cols_text = get_col_text(processed_cols)
+
+    if rows_changed:
+        rows_display = f"<strong>{processed_rows:,}</strong> {processed_rows_text}"
+    else:
+        rows_display = f"{processed_rows:,} {processed_rows_text}"
+
+    if cols_changed:
+        cols_display = f"<strong>{processed_cols}</strong> {processed_cols_text}"
+    else:
+        cols_display = f"{processed_cols} {processed_cols_text}"
+
+    processed_dim = f'<span style="font-family: monospace;">[{rows_display}, {cols_display}]</span>'
+
+    # Build the HTML note
+    html = f"{precondition_text}: {table_dims_text} {original_dim} → {processed_dim}."
+
+    return html
+
+
+def _create_preprocessing_note_text(
+    original_rows: int,
+    original_cols: int,
+    processed_rows: int,
+    processed_cols: int,
+) -> str:
+    """
+    Create a plain text note showing table dimension changes from preprocessing.
+
+    Parameters
+    ----------
+    original_rows
+        Number of rows in the original table.
+    original_cols
+        Number of columns in the original table.
+    processed_rows
+        Number of rows after preprocessing.
+    processed_cols
+        Number of columns after preprocessing.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    # Get singular or plural forms
+    original_rows_text = "row" if original_rows == 1 else "rows"
+    original_cols_text = "column" if original_cols == 1 else "columns"
+    processed_rows_text = "row" if processed_rows == 1 else "rows"
+    processed_cols_text = "column" if processed_cols == 1 else "columns"
+
+    return (
+        f"Precondition applied: table dimensions "
+        f"[{original_rows:,} {original_rows_text}, {original_cols} {original_cols_text}] → "
+        f"[{processed_rows:,} {processed_rows_text}, {processed_cols} {processed_cols_text}]."
+    )
+
+
+def _create_preprocessing_no_change_note_html(locale: str = "en") -> str:
+    """
+    Create an HTML note indicating preprocessing was applied with no dimension change.
+
+    Parameters
+    ----------
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated string
+    note_text = NOTES_TEXT.get("precondition_applied_no_change", {}).get(
+        locale,
+        NOTES_TEXT.get("precondition_applied_no_change", {}).get(
+            "en", "Precondition applied: no table dimension change"
+        ),
+    )
+
+    return f"{note_text}."
+
+
+def _create_preprocessing_no_change_note_text() -> str:
+    """
+    Create a plain text note indicating preprocessing was applied with no dimension change.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return "Precondition applied: no table dimension change."
+
+
+def _create_synthetic_target_column_note_html(column_name: str, locale: str = "en") -> str:
+    """
+    Create an HTML note indicating that the target column was created via preprocessing.
+
+    Parameters
+    ----------
+    column_name
+        The name of the synthetic target column.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    synthetic_text = NOTES_TEXT.get("synthetic_target_column", {}).get(
+        locale, NOTES_TEXT.get("synthetic_target_column", {}).get("en", "Synthetic target column")
+    )
+    created_via_text = NOTES_TEXT.get("created_via_preprocessing", {}).get(
+        locale,
+        NOTES_TEXT.get("created_via_preprocessing", {}).get("en", "created via preprocessing"),
+    )
+
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
+
+    # Build the HTML note
+    html = f"{synthetic_text} {col_name_html} {created_via_text}."
+
+    return html
+
+
+def _create_synthetic_target_column_note_text(column_name: str) -> str:
+    """
+    Create a plain text note indicating that the target column was created via preprocessing.
+
+    Parameters
+    ----------
+    column_name
+        The name of the synthetic target column.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return f"Synthetic target column ({column_name}) created via preprocessing."
+
+
+def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
+    """
+    Create an HTML note with collapsible schema expectation and results.
+
+    This generates a disclosure-style note showing:
+    1. A summary of what failed (if anything)
+    2. The full step report table (collapsible)
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note with collapsible schema details.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+    params = schema_info["params"]
+    columns_dict = schema_info["columns"]
+    in_order = params["in_order"]
+
+    # Get translations for the locale
+    passed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_passed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_passed"]["en"]
+    )
+    failed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_failed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_failed"]["en"]
+    )
+    disclosure_text = VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"]["en"]
+    )
+    settings_title_text = VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"]
+    )
+
+    # Build summary message
+    if passed:
+        summary = f'<span style="color:#4CA64C;">✓</span> {passed_text}.'
+    else:
+        # Analyze what failed
+        failures = []
+
+        # Check column count mismatch
+        n_expect = len(expect_schema)
+        n_target = len(target_schema)
+        if n_expect != n_target:
+            count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"]
+            )
+            failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
+
+        # Check for unmatched columns
+        unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
+        if unmatched_cols:
+            unmatched_text = VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"]
+            )
+            failures.append(unmatched_text.format(n=len(unmatched_cols)))
+
+        # Check for wrong order (if in_order=True)
+        if params["in_order"]:
+            wrong_order = [
+                col
+                for col, info in columns_dict.items()
+                if info["colname_matched"] and not info["index_matched"]
+            ]
+            if wrong_order:
+                wrong_order_text = VALIDATION_REPORT_TEXT["note_schema_wrong_order"].get(
+                    locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"]
+                )
+                failures.append(wrong_order_text.format(n=len(wrong_order)))
+
+        # Check for dtype mismatches
+        dtype_mismatches = [
+            col
+            for col, info in columns_dict.items()
+            if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
+        ]
+        if dtype_mismatches:
+            dtype_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"]["en"]
+            )
+            failures.append(dtype_mismatch_text.format(n=len(dtype_mismatches)))
+
+        if failures:
+            summary = (
+                f'<span style="color:#FF3300;">✗</span> {failed_text}: ' + ", ".join(failures) + "."
+            )
+        else:
+            summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'  # pragma: no cover
+
+    # Generate the step report table using the existing function
+    # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
+    # depending on the in_order parameter
+    if in_order:  # pragma: no cover
+        step_report_gt = _step_report_schema_in_order(  # pragma: no cover
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+    else:
+        step_report_gt = _step_report_schema_any_order(
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+
+    # Generate the settings HTML using the existing function
+    settings_html = _create_col_schema_match_params_html(
+        lang=locale,
+        complete=params["complete"],
+        in_order=params["in_order"],
+        case_sensitive_colnames=params["case_sensitive_colnames"],
+        case_sensitive_dtypes=params["case_sensitive_dtypes"],
+        full_match_dtypes=params["full_match_dtypes"],
+    )
+
+    # Remove the inner div containing column_schema_match_str
+    settings_html = re.sub(r'<div style="margin-right: 5px;">.*?</div>', "", settings_html, count=1)
+
+    # Change padding-top from 7px to 2px
+    settings_html = settings_html.replace("padding-top: 7px;", "padding-top: 2px;")
+
+    # Create new source note HTML that includes both settings and schema
+    source_note_html = f"""
+<div style='padding-bottom: 2px;'>{settings_title_text}</div>
+<div style='padding-bottom: 4px;'>{settings_html}</div>
+"""
+
+    # Add the settings as an additional source note to the step report
+    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))  # type: ignore[union-attr]
+
+    # Extract the HTML from the GT object
+    step_report_html = step_report_gt._repr_html_()
+
+    # Create collapsible section with the step report
+    note_html = f"""
+{summary}
+
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555; margin-bottom: -5px;">{disclosure_text}</summary>
+<div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
+
+{step_report_html}
+
+</div>
+</details>
+"""
+
+    return note_html.strip()
+
+
+def _create_col_schema_match_note_text(schema_info: dict) -> str:
+    """
+    Create a plain text note for schema validation.
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+
+    if passed:
+        return f"Schema validation passed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
+    else:
+        return f"Schema validation failed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
+
+
 def _step_report_row_based(
     assertion_type: str,
     i: int,
     column: str,
     column_position: int,
     columns_subset: list[str] | None,
-    values: any,
+    values: Any,
     inclusive: tuple[bool, bool] | None,
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -14737,10 +25639,12 @@ def _step_report_row_based(
     elif assertion_type == "col_vals_le":
         text = f"{column} &le; {values}"
     elif assertion_type == "col_vals_between":
+        assert inclusive is not None
         symbol_left = "&le;" if inclusive[0] else "&lt;"
         symbol_right = "&le;" if inclusive[1] else "&lt;"
         text = f"{values[0]} {symbol_left} {column} {symbol_right} {values[1]}"
     elif assertion_type == "col_vals_outside":
+        assert inclusive is not None
         symbol_left = "&lt;" if inclusive[0] else "&le;"
         symbol_right = "&gt;" if inclusive[1] else "&ge;"
         text = f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
@@ -14751,16 +25655,30 @@ def _step_report_row_based(
         elements = ", ".join(values)
         text = f"{column} &NotElement; {{{elements}}}"
     elif assertion_type == "col_vals_regex":
-        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=values)
+        pattern = values["pattern"]
+        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=pattern)
     elif assertion_type == "col_vals_null":
         text = STEP_REPORT_TEXT["column_is_null"][lang].format(column=column)
     elif assertion_type == "col_vals_not_null":
         text = STEP_REPORT_TEXT["column_is_not_null"][lang].format(column=column)
+    elif assertion_type == "col_vals_expr":
+        text = STEP_REPORT_TEXT["column_expr"][lang].format(values=values)
     elif assertion_type == "rows_complete":
         if column is None:
             text = STEP_REPORT_TEXT["rows_complete_all"][lang]
         else:
             text = STEP_REPORT_TEXT["rows_complete_subset"][lang]
+    elif assertion_type == "col_missing_coded":
+        text = f"{column} is missing-coded"
+    elif assertion_type == "col_missing_only_coded":
+        text = f"{column} only documented codes"
+    elif assertion_type == "col_missing_consistent":
+        cols = ", ".join(column) if isinstance(column, (list, tuple)) else str(column)
+        reason = values.get("when_reason") if isinstance(values, dict) else None
+        text = f"consistent &ldquo;{reason}&rdquo; across {{{cols}}}"
+    else:
+        # Fallback for any other assertion type: show the assertion type name
+        text = str(assertion_type)  # pragma: no cover
 
     # Wrap assertion text in a <code> tag
     text = (
@@ -14802,10 +25720,17 @@ def _step_report_row_based(
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
-        success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
-            n=n,
-            column_position=column_position,
-        )
+        # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
+        # a specific column
+        if assertion_type == "col_vals_expr":
+            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
+                n=n
+            )  # pragma: no cover
+        else:
+            success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
+                n=n,
+                column_position=column_position,
+            )
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
         details = (
@@ -14885,10 +25810,16 @@ def _step_report_row_based(
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
-        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
-            failure_rate=failure_rate_metrics,
-            column_position=column_position,
-        )
+        # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
+        if assertion_type == "col_vals_expr":
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
+                failure_rate=failure_rate_metrics
+            )
+        else:
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
+                failure_rate=failure_rate_metrics,
+                column_position=column_position,
+            )
 
         if limit < extract_length:
             extract_length_resolved = limit
@@ -14945,7 +25876,7 @@ def _step_report_rows_distinct(
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -15071,9 +26002,311 @@ def _step_report_rows_distinct(
     return step_report
 
 
+def _step_report_aggregate(
+    assertion_type: str,
+    i: int,
+    column: str,
+    values: dict,
+    all_passed: bool,
+    val_info: dict | None,
+    header: str,
+    lang: str,
+) -> GT:
+    """
+    Generate a step report for aggregate validation methods (col_sum_*, col_avg_*, col_sd_*).
+
+    This creates a 1-row table showing the computed aggregate value vs. the target value,
+    along with tolerance and pass/fail status.
+    """
+
+    # Determine whether the `lang` value represents a right-to-left language
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Parse assertion type to get aggregate function and comparison operator
+    # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
+    parts = assertion_type.split("_")
+    agg_type = parts[1]  # sum, avg, sd
+    comp_type = parts[2]  # eq, gt, ge, lt, le
+
+    # Map aggregate type to display name
+    agg_display = {"sum": "SUM", "avg": "AVG", "sd": "SD"}.get(agg_type, agg_type.upper())
+
+    # Map comparison type to symbol
+    comp_symbols = {
+        "eq": "=",
+        "gt": "&gt;",
+        "ge": "&ge;",
+        "lt": "&lt;",
+        "le": "&le;",
+    }
+    comp_symbol = comp_symbols.get(comp_type, comp_type)
+
+    # Get computed values from val_info (stored during interrogation)
+    if val_info is not None:
+        actual = val_info.get("actual", None)
+        target = val_info.get("target", None)
+        tol = val_info.get("tol", 0)
+        lower_bound = val_info.get("lower_bound", target)
+        upper_bound = val_info.get("upper_bound", target)
+    else:
+        # Fallback if val_info is not available
+        actual = None  # pragma: no cover
+        target = values.get("value", None)  # pragma: no cover
+        tol = values.get("tol", 0)  # pragma: no cover
+        lower_bound = target  # pragma: no cover
+        upper_bound = target  # pragma: no cover
+
+    # Format column name for display (handle list vs string)
+    if isinstance(column, list):
+        column_display = column[0] if len(column) == 1 else ", ".join(column)
+    else:
+        column_display = str(column)  # pragma: no cover
+
+    # Generate assertion text for header
+    if target is not None:
+        target_display = f"{target:,.6g}" if isinstance(target, float) else f"{target:,}"
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} {target_display}"
+    else:
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} ?"  # pragma: no cover
+
+    # Calculate difference from boundary
+    if actual is not None and target is not None:
+        if comp_type == "eq":
+            # For equality, show distance from target (considering tolerance)
+            if lower_bound == upper_bound:
+                difference = actual - target
+            else:
+                # With tolerance, show distance from nearest bound
+                if actual < lower_bound:
+                    difference = actual - lower_bound  # pragma: no cover
+                elif actual > upper_bound:
+                    difference = actual - upper_bound  # pragma: no cover
+                else:
+                    difference = 0  # Within bounds
+        elif comp_type in ["gt", "ge"]:
+            # Distance from lower bound (positive if passing)
+            difference = actual - lower_bound
+        elif comp_type in ["lt", "le"]:
+            # Distance from upper bound (negative if passing)
+            difference = actual - upper_bound
+        else:
+            difference = actual - target  # pragma: no cover
+    else:
+        difference = None  # pragma: no cover
+
+    # Format values for display
+    def format_value(v) -> str:  # pragma: no cover
+        if v is None:  # pragma: no cover
+            return "&mdash;"  # pragma: no cover
+        if isinstance(v, float):  # pragma: no cover
+            return f"{v:,.6g}"  # pragma: no cover
+        return f"{v:,}"  # pragma: no cover
+
+    # Format tolerance for display
+    if tol == 0:
+        tol_display = "&mdash;"
+    elif isinstance(tol, tuple):
+        tol_display = f"(-{tol[0]}, +{tol[1]})"  # pragma: no cover
+    else:
+        tol_display = f"&plusmn;{tol}"
+
+    # Format difference with sign
+    if difference is not None:
+        if difference == 0:
+            diff_display = "0"
+        elif difference > 0:
+            diff_display = (
+                f"+{difference:,.6g}" if isinstance(difference, float) else f"+{difference:,}"
+            )
+        else:
+            diff_display = (
+                f"{difference:,.6g}" if isinstance(difference, float) else f"{difference:,}"
+            )
+    else:
+        diff_display = "&mdash;"  # pragma: no cover
+
+    # Create pass/fail indicator
+    if all_passed:
+        status_html = CHECK_MARK_SPAN
+        status_color = "#4CA64C"
+    else:
+        status_html = CROSS_MARK_SPAN
+        status_color = "#CF142B"
+
+    # Select DataFrame library (prefer Polars, fall back to Pandas)
+    if _is_lib_present("polars"):
+        import polars as pl
+
+        df_lib = pl
+    elif _is_lib_present("pandas"):  # pragma: no cover
+        import pandas as pd  # pragma: no cover
+
+        df_lib = pd  # pragma: no cover
+    else:  # pragma: no cover
+        raise ImportError(
+            "Neither Polars nor Pandas is available for step report generation"
+        )  # pragma: no cover
+
+    # Create the data for the 1-row table
+    report_data = df_lib.DataFrame(
+        {
+            "actual": [format_value(actual)],
+            "target": [format_value(target)],
+            "tolerance": [tol_display],
+            "difference": [diff_display],
+            "status": [status_html],
+        }
+    )
+
+    # Create GT table with styling matching preview() and other step reports
+    step_report = (
+        GT(report_data, id="pb_step_tbl")
+        .opt_table_font(font=google_font(name="IBM Plex Sans"))
+        .opt_align_table_header(align="left")
+        .cols_label(
+            actual="ACTUAL",
+            target="EXPECTED",
+            tolerance="TOL",
+            difference="DIFFERENCE",
+            status="",
+        )
+        .cols_align(align="center")
+        .fmt_markdown(columns=["actual", "target", "tolerance", "difference", "status"])
+        .tab_style(
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
+            locations=loc.body(columns=["actual", "target", "tolerance", "difference"]),
+        )
+        .tab_style(
+            style=style.text(size="13px"),
+            locations=loc.body(columns="status"),
+        )
+        .tab_style(
+            style=style.text(color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"),
+            locations=loc.column_labels(),
+        )
+        .tab_style(
+            style=style.borders(
+                sides=["top", "bottom"], color="#E9E9E9", style="solid", weight="1px"
+            ),
+            locations=loc.body(),
+        )
+        .tab_options(
+            table_body_vlines_style="solid",
+            table_body_vlines_width="1px",
+            table_body_vlines_color="#E9E9E9",
+            column_labels_vlines_style="solid",
+            column_labels_vlines_width="1px",
+            column_labels_vlines_color="#F2F2F2",
+        )
+        .cols_width(
+            cases={
+                "actual": "200px",
+                "target": "200px",
+                "tolerance": "150px",
+                "difference": "200px",
+                "status": "50px",
+            }
+        )
+    )
+
+    # Apply styling based on pass/fail
+    if all_passed:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#006400"),
+                style.fill(color="#4CA64C33"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+    else:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#B22222"),
+                style.fill(color="#FFC1C159"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+
+    # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
+    if version("great_tables") >= "0.17.0":
+        step_report = step_report.tab_options(quarto_disable_processing=True)
+
+    # If no header requested, return the table as-is
+    if header is None:
+        return step_report
+
+    # Create header content
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+
+    # Wrap assertion text in styled code tag
+    assertion_code = (
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>"
+        f"{assertion_text}</code>"
+    )
+
+    if all_passed:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+    else:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+
+    details = (
+        f"<div style='font-size: 13.6px; {direction_rtl}'>"
+        "<div style='padding-top: 7px;'>"
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        f"position: relative; bottom: 1px;'>{assertion_code}</code></span>"
+        "</div>"
+        "<div style='padding-top: 7px;'>"
+        f"{result_stmt}"
+        "</div>"
+        "</div>"
+    )
+
+    # Generate the default template text for the header when `":default:"` is used
+    if header == ":default:":
+        header = "{title}{details}"
+
+    # Use commonmark to convert the header text to HTML
+    header = commonmark.commonmark(header)
+
+    # Place any templated text in the header
+    header = header.format(title=title, details=details)
+
+    # Create the header with `header` string
+    step_report = step_report.tab_header(title=md(header))
+
+    return step_report
+
+
+def _pl_concat_horizontal(frames: list[Any]) -> Any:
+    """Concatenate Polars DataFrames horizontally, padding shorter frames with nulls."""
+    # NOTE: Polars 2.0 made `how="horizontal"` require equal heights; `"horizontal_extend"`
+    # (added in 1.42.1) pads shorter frames, which is what `"horizontal"` did before.
+    # See https://docs.pola.rs/releases/upgrade/2/#update-the-strict-behavior-of-plconcatplunion
+    import polars as pl
+
+    polars_version = tuple(int(part) for part in re.findall(r"\d+", version("polars"))[:3])
+    how = "horizontal_extend" if polars_version >= (1, 42, 1) else "horizontal"
+    return pl.concat(frames, how=how)
+
+
 def _step_report_schema_in_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
+) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
     order as the target table.
@@ -15130,16 +26363,33 @@ def _step_report_schema_in_order(
     dtype_exp = []
     dtype_exp_correct = []
 
-    for i in range(len(exp_columns_dict)):
+    for i in range(len(expect_schema)):
         #
         # `col_name_exp` values
         #
 
-        # The column name is the key in the dictionary, get the column name and
-        # append it to the `col_name_exp` list
-        col_name_exp.append(list(exp_columns_dict.keys())[i])
+        # Get the column name from expect_schema (which can have duplicates)
+        column_name_exp_i = expect_schema[i][0]
+        col_name_exp.append(column_name_exp_i)
 
-        column_name_exp_i = col_name_exp[i]
+        # Check if this column exists in exp_columns_dict (it might not if it's a duplicate)
+        # For duplicates, we need to handle them specially
+        if column_name_exp_i not in exp_columns_dict:  # pragma: no cover
+            # This is a duplicate or invalid column, mark it as incorrect
+            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
+
+            # For dtype, check if there's a dtype specified in the schema
+            if len(expect_schema[i]) > 1:  # pragma: no cover
+                dtype_value = expect_schema[i][1]  # pragma: no cover
+                if isinstance(dtype_value, list):  # pragma: no cover
+                    dtype_exp.append(" | ".join(dtype_value))  # pragma: no cover
+                else:  # pragma: no cover
+                    dtype_exp.append(str(dtype_value))  # pragma: no cover
+            else:  # pragma: no cover
+                dtype_exp.append("&mdash;")  # pragma: no cover
+
+            dtype_exp_correct.append("&mdash;")  # pragma: no cover
+            continue  # pragma: no cover
 
         #
         # `col_exp_correct` values
@@ -15229,7 +26479,7 @@ def _step_report_schema_in_order(
     )
 
     # Concatenate the tables horizontally
-    schema_combined = pl.concat([schema_tbl, schema_exp], how="horizontal")
+    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
 
     # Return the DataFrame if the `debug_return_df` parameter is set to True
     if debug_return_df:
@@ -15362,7 +26612,9 @@ def _step_report_schema_in_order(
         # Add a border below the row that terminates the target table schema
         step_report = step_report.tab_style(
             style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
-            locations=loc.body(rows=len(colnames_tgt) - 1),
+            locations=loc.body(
+                rows=len(colnames_tgt) - 1  # ty: ignore (bug in GT, should allow an int)
+            ),
         )
 
     # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
@@ -15411,8 +26663,8 @@ def _step_report_schema_in_order(
 
 
 def _step_report_schema_any_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
+) -> GT | pl.DataFrame:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
     same column order as the target table.
@@ -15507,14 +26759,14 @@ def _step_report_schema_any_order(
         if exp_columns_dict[column_name_exp_i]["colname_matched"]:
             col_exp_correct.append(CHECK_MARK_SPAN)
         else:
-            col_exp_correct.append(CROSS_MARK_SPAN)
+            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
 
         #
         # `dtype_exp` values
         #
 
         if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp.append("")
+            dtype_exp.append("")  # pragma: no cover
 
         elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
             dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
@@ -15549,9 +26801,9 @@ def _step_report_schema_any_order(
         #
 
         if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
-            dtype_exp_correct.append("&mdash;")
+            dtype_exp_correct.append("&mdash;")  # pragma: no cover
         elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp_correct.append("")
+            dtype_exp_correct.append("")  # pragma: no cover
         elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
             dtype_exp_correct.append(CHECK_MARK_SPAN)
         else:
@@ -15597,13 +26849,17 @@ def _step_report_schema_any_order(
             #
 
             if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-                dtype_exp.append("")
+                dtype_exp.append("")  # pragma: no cover
 
             elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
+                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]  # pragma: no cover
 
-                if exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None:
-                    pos = exp_columns_dict[column_name_exp_i]["dtype_matched_pos"]
+                if (
+                    exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
+                ):  # pragma: no cover
+                    pos = exp_columns_dict[column_name_exp_i][
+                        "dtype_matched_pos"
+                    ]  # pragma: no cover
 
                     # Combine the dtypes together with pipes but underline the matched dtype in
                     # green with an HTML span tag and style attribute
@@ -15615,13 +26871,13 @@ def _step_report_schema_any_order(
                             else dtype[i]
                         )
                         for i in range(len(dtype))
-                    ]
-                    dtype = " | ".join(dtype)
-                    dtype_exp.append(dtype)
+                    ]  # pragma: no cover
+                    dtype = " | ".join(dtype)  # pragma: no cover
+                    dtype_exp.append(dtype)  # pragma: no cover
 
                 else:
-                    dtype = " | ".join(dtype)
-                    dtype_exp.append(dtype)
+                    dtype = " | ".join(dtype)  # pragma: no cover
+                    dtype_exp.append(dtype)  # pragma: no cover
 
             else:
                 dtype = exp_columns_dict[column_name_exp_i]["dtype_input"][0]
@@ -15633,12 +26889,12 @@ def _step_report_schema_any_order(
 
             if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
                 dtype_exp_correct.append("&mdash;")
-            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-                dtype_exp_correct.append("")
-            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
-                dtype_exp_correct.append(CHECK_MARK_SPAN)
-            else:
-                dtype_exp_correct.append(CROSS_MARK_SPAN)
+            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:  # pragma: no cover
+                dtype_exp_correct.append("")  # pragma: no cover
+            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:  # pragma: no cover
+                dtype_exp_correct.append(CHECK_MARK_SPAN)  # pragma: no cover
+            else:  # pragma: no cover
+                dtype_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
 
         if len(columns_found) > 0:
             # Get the last index of the columns found
@@ -15654,7 +26910,9 @@ def _step_report_schema_any_order(
             ]
 
         else:
-            index_exp = [str(i) for i in range(1, len(colnames_exp_unmatched) + 1)]
+            index_exp = [
+                str(i) for i in range(1, len(colnames_exp_unmatched) + 1)
+            ]  # pragma: no cover
 
         schema_exp_unmatched = pl.DataFrame(
             {
@@ -15670,7 +26928,7 @@ def _step_report_schema_any_order(
         schema_exp = pl.concat([schema_exp, schema_exp_unmatched], how="vertical")
 
     # Concatenate the tables horizontally
-    schema_combined = pl.concat([schema_tbl, schema_exp], how="horizontal")
+    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
 
     # Return the DataFrame if the `debug_return_df` parameter is set to True
     if debug_return_df:
@@ -15825,9 +27083,7 @@ def _step_report_schema_any_order(
     header = header.format(title=title, details=details)
 
     # Create the header with `header` string
-    step_report = step_report.tab_header(title=md(header))
-
-    return step_report
+    return step_report.tab_header(title=md(header))
 
 
 def _create_label_text_html(
@@ -15916,3 +27172,328 @@ def _create_col_schema_match_params_html(
         f"{full_match_dtypes_text}"
         "</div>"
     )
+
+
+def _generate_agg_docstring(name: str) -> str:
+    """Generate a comprehensive docstring for an aggregation validation method.
+
+    This function creates detailed documentation for dynamically generated methods like
+    `col_sum_eq()`, `col_avg_gt()`, `col_sd_le()`, etc. The docstrings follow the same
+    structure and quality as manually written validation methods like `col_vals_gt()`.
+
+    Parameters
+    ----------
+    name
+        The method name (e.g., "col_sum_eq", "col_avg_gt", "col_sd_le").
+
+    Returns
+    -------
+    str
+        A complete docstring for the method.
+    """
+    # Parse the method name to extract aggregation type and comparison operator
+    # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
+    parts = name.split("_")
+    agg_type = parts[1]  # sum, avg, sd
+    comp_type = parts[2]  # eq, gt, ge, lt, le
+
+    # Human-readable names for aggregation types
+    agg_names = {
+        "sum": ("sum", "summed"),
+        "avg": ("average", "averaged"),
+        "sd": ("standard deviation", "computed for standard deviation"),
+    }
+
+    # Human-readable descriptions for comparison operators (with article for title)
+    comp_descriptions = {
+        "eq": ("equal to", "equals", "an"),
+        "gt": ("greater than", "is greater than", "a"),
+        "ge": ("greater than or equal to", "is at least", "a"),
+        "lt": ("less than", "is less than", "a"),
+        "le": ("less than or equal to", "is at most", "a"),
+    }
+
+    # Mathematical symbols for comparison operators
+    comp_symbols = {
+        "eq": "==",
+        "gt": ">",
+        "ge": ">=",
+        "lt": "<",
+        "le": "<=",
+    }
+
+    agg_name, agg_verb = agg_names[agg_type]
+    comp_desc, comp_phrase, comp_article = comp_descriptions[comp_type]
+    comp_symbol = comp_symbols[comp_type]
+
+    # Determine the appropriate example values based on the aggregation and comparison
+    if agg_type == "sum":
+        example_value = "15"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "15"  # sum of a
+        example_ref_sum = "10"  # sum of b
+    elif agg_type == "avg":
+        example_value = "3"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "3.0"  # avg of a
+        example_ref_sum = "2.0"  # avg of b
+    else:  # sd
+        example_value = "2"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "~1.58"  # sd of a
+        example_ref_sum = "0.0"  # sd of b
+
+    # Build appropriate tolerance explanation based on comparison type
+    if comp_type == "eq":
+        tol_explanation = f"""The `tol=` parameter is particularly useful with `{name}()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic."""
+    else:
+        tol_explanation = f"""The `tol=` parameter expands the acceptable range for the comparison. For
+        `{name}()`, a tolerance of `tol=0.5` would mean the {agg_name} can be within `0.5` of the
+        target value and still pass validation."""
+
+    docstring = f"""
+    Does the column {agg_name} satisfy {comp_article} {comp_desc} comparison?
+
+    The `{name}()` validation method checks whether the {agg_name} of values in a column
+    {comp_phrase} a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single {agg_name} value that is then compared against the target. The
+    comparison used in this function is `{agg_name}(column) {comp_symbol} value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the {agg_name} to be computed.
+    value
+        The value to compare the column {agg_name} against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose {agg_name} will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a {agg_name} that differs from the target by up to `0.5` will still pass. {tol_explanation}
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{{step}}"` to insert
+        the step number, or `"{{auto}}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `{name}()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .{name}(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .{name}(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    {tol_explanation}
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    ```{{python}}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```{{python}}
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {{
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }}
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the {agg_name} of column `a` {comp_phrase} `{example_value}`:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns="a", value={example_value})
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the {agg_name} comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns=["a", "b"], value={example_value})
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns="a", value={example_value}, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+    """
+
+    return docstring.strip()
+
+
+def make_agg_validator(name: str):
+    """Factory for dynamically generated aggregate validation methods.
+
+    Why this exists:
+    Aggregate validators all share identical behavior. The only thing that differs
+    between them is the semantic assertion type (their name). The implementation
+    of each aggregate validator is fetched from `from_agg_validator`.
+
+    Instead of copy/pasting dozens of identical methods, we generate
+    them dynamically and attach them to the Validate class. The types are generated
+    at build time with `make pyi` to allow the methods to be visible to the type checker,
+    documentation builders and the IDEs/LSPs.
+
+    The returned function is a thin adapter that forwards all arguments to
+    `_add_agg_validation`, supplying the assertion type explicitly.
+    """
+
+    def agg_validator(
+        self: Validate,
+        columns: str | Collection[str],
+        value: float | int | Column | ReferenceColumn | None = None,
+        tol: float = 0,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool | None = None,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        # Dynamically generated aggregate validator.
+        # This method is generated per assertion type and forwards all arguments
+        # to the shared aggregate validation implementation.
+        return self._add_agg_validation(
+            assertion_type=name,
+            columns=columns,
+            value=value,
+            tol=tol,
+            thresholds=thresholds,
+            brief=brief,
+            actions=actions,
+            active=active,
+            dimension=dimension,
+        )
+
+    # Manually set function identity so this behaves like a real method.
+    # These must be set before attaching the function to the class.
+    agg_validator.__name__ = name
+    agg_validator.__qualname__ = f"Validate.{name}"
+    agg_validator.__doc__ = _generate_agg_docstring(name)
+
+    return agg_validator
+
+
+# Finally, we grab all the valid aggregation method names and attach them to
+# the Validate class, registering each one appropriately.
+for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, etc.
+    setattr(Validate, method, make_agg_validator(method))

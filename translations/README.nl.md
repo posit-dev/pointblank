@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_Datavalidatie gemaakt mooi en krachtig_
+_Datavalidatie toolkit voor het beoordelen en monitoren van datakwaliteit_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _Datavalidatie gemaakt mooi en krachtig_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Wat is Pointblank?
+Pointblank hanteert een andere benadering voor datakwaliteit. Het hoeft geen vervelende technische taak te zijn. Het kan juist een proces worden dat gericht is op duidelijke communicatie tussen teamleden. Terwijl andere validatiebibliotheken zich uitsluitend richten op het vangen van fouten, blinkt Pointblank uit in zowel **het vinden van problemen als het delen van inzichten**. Onze mooie, aanpasbare rapporten maken van validatieresultaten gesprekken met belanghebbenden, waardoor datakwaliteitsproblemen onmiddellijk begrijpelijk en uitvoerbaar worden voor je hele team.
 
-Pointblank is een krachtig maar elegant datavalidatieframework voor Python dat verandert hoe je datakwaliteit waarborgt. Met de intuïtieve, aaneenschakelbare API kun je je data snel valideren tegen uitgebreide kwaliteitscontroles en de resultaten visualiseren via prachtige, interactieve rapporten die dataproblemen onmiddellijk actiegericht maken.
+**Begin in minuten, niet in uren.** Pointblank's AI-aangedreven [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) functie analyseert je data en stelt automatisch intelligente validatieregels voor. Dus je hoeft niet meer naar een leeg validatiescript te staren en je af te vragen waar je moet beginnen. Pointblank kan je datakwaliteitsreis een kickstart geven zodat je je kunt concentreren op wat er het meest toe doet.
 
-Of je nu een
+Of je nu een data scientist bent die snel datakwaliteitsresultaten moet communiceren, een data engineer die robuuste pipelines bouwt, of een analist die datakwaliteitsresultaten presenteert aan zakelijke belanghebbenden, Pointblank helpt je datakwaliteit te veranderen van een nagedachte in een concurrentievoordeel.
 
-## In 30 seconden aan de slag
+## Aan de slag met AI-aangedreven Validatie Ontwerp
+
+De `DraftValidation` klasse gebruikt LLM's om je data te analyseren en een volledig validatieplan te genereren met intelligente suggesties. Dit helpt je snel te beginnen met datavalidatie of een nieuw project op te starten.
+
+```python
+import pointblank as pb
+
+# Laad je data
+data = pb.load_dataset("game_revenue")              # Een voorbeeld dataset
+
+# Gebruik DraftValidation om een validatieplan te genereren
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+De uitvoer is een volledig validatieplan met intelligente suggesties gebaseerd op je data:
+
+```python
+import pointblank as pb
+
+# Het validatieplan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Kopieer, plak en pas het gegenereerde validatieplan aan naar je behoeften.
+
+## Aaneenschakelbare Validatie API
+
+Pointblank's aaneenschakelbare API maakt validatie eenvoudig en leesbaar. Hetzelfde patroon geldt altijd: (1) begin met `Validate`, (2) voeg validatiestappen toe, en (3) eindig met `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+Zodra je een ondervraagd `validation` object hebt, kun je verschillende methoden gebruiken om inzichten te extraheren zoals:
+
+- gedetailleerde rapporten krijgen voor individuele stappen om te zien wat er mis ging
+- tabellen filteren gebaseerd op validatieresultaten
+- problematische data extraheren voor debugging
 
 ## Waarom kiezen voor Pointblank?
 
@@ -149,6 +203,48 @@ validation.get_step_report(i=3).show("browser")  # Krijg falende records van sta
 
 <br>
 
+## YAML-configuratie
+
+Voor teams die draagbare, versiegecontroleerde validatieworkflows nodig hebben, ondersteunt Pointblank YAML-configuratiebestanden. Dit maakt het gemakkelijk om validatielogica te delen tussen verschillende omgevingen en teamleden, zodat iedereen op dezelfde lijn zit.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Aan de slag validatie"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Voer de YAML-validatie uit**
+
+```python
+import pointblank as pb
+
+# Voer validatie uit vanuit YAML-configuratie
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Krijg de resultaten net zoals elke andere validatie
+validation.get_tabular_report().show()
+```
+
+Deze benadering is perfect voor:
+
+- **CI/CD-pipelines**: Bewaar validatieregels samen met je code
+- **Teamsamenwerking**: Deel validatielogica in een leesbaar formaat
+- **Omgevingsconsistentie**: Gebruik dezelfde validatie in ontwikkeling, staging en productie
+- **Documentatie**: YAML-bestanden dienen als levende documentatie van je datakwaliteitsvereisten
+
 ## Commandoregelinterface (CLI)
 
 Pointblank bevat een krachtig CLI-hulpprogramma genaamd `pb` waarmee je datavalidatieworkflows direct vanaf de commandoregel kunt uitvoeren. Perfect voor CI/CD-pipelines, geplande datakwaliteitscontroles of snelle validatietaken.
@@ -176,6 +272,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Voer essentiële validaties uit**
 
 ```bash
+# Voer validatie uit vanuit YAML-configuratiebestand
+pb run validation.yaml
+
+# Voer validatie uit vanuit Python-bestand
+pb run validation.py
+
 # Controleer op dubbele rijen
 pb validate small_table --check rows-distinct
 
@@ -192,9 +294,49 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integreer met CI/CD**
 
 ```bash
-# Gebruik exit-codes voor automatisering (0 = slagen, 1 = falen)
+# Gebruik exit-codes voor automatisering in eenregelige validaties (0 = slagen, 1 = falen)
 pb validate small_table --check rows-distinct --exit-code
+
+# Voer validatieworkflows uit met exit-codes
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
+
+## Genereer Realistische Testdata
+
+Testdata nodig voor je validatieworkflows? De functie `generate_dataset()` creëert realistische, locale-bewuste synthetische data op basis van schemadefinities. Zeer nuttig voor het ontwikkelen van pipelines zonder productiedata, het uitvoeren van CI/CD-tests met reproduceerbare scenario's, of het prototypen van workflows voordat productiedata beschikbaar is.
+
+```python
+import pointblank as pb
+
+# Definieer een schema met veldbeperkingen
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Genereer 10 rijen realistische testdata
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
+
+- **Realistische data met presets**: Gebruik ingebouwde presets zoals `"name"`, `"email"`, `"address"`, `"phone"`, enz.
+- **User agent strings**: Genereer zeer gevarieerde, realistische browser user agent strings uit 17 browsercategorieën met meer dan 42.000 unieke combinaties
+- **Ondersteuning voor 100 landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
+- **Veldbeperkingen**: Beheer bereiken, patronen, uniciteit en toegestane waarden
+- **Meerdere uitvoerformaten**: Retourneert standaard Polars DataFrames, maar ondersteunt ook Pandas (`output="pandas"`) of dictionaries (`output="dict"`)
 
 ## Kenmerken die Pointblank onderscheiden
 
@@ -202,8 +344,9 @@ pb validate small_table --check rows-distinct --exit-code
 - **Gebouwd voor samenwerking**: Deel resultaten met collega's via mooie interactieve rapporten
 - **Praktische uitvoer**: Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
 - **Flexibele implementatie**: Gebruik in notebooks, scripts of datapipelines
+- **Synthetische datageneratie**: Creëer realistische testdata met meer dan 30 presets, user agent strings, locale-bewuste opmaak en ondersteuning voor 100 landen
 - **Aanpasbaar**: Stem validatiestappen en rapportage af op jouw specifieke behoeften
-- **Internationalisatie**: Rapporten kunnen worden gegenereerd in meer dan 20 talen, waaronder Engels, Spaans, Frans en Duits
+- **Internationalisatie**: Rapporten kunnen worden gegenereerd in 40 talen, waaronder Engels, Spaans, Frans en Duits
 
 ## Documentatie en voorbeelden
 

@@ -15,7 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        # `locked` uses the versions in `uv.lock` (which pins the minimum supported Polars);
+        # `latest` upgrades Polars and Narwhals so that new releases are tested as they land
+        deps: ["locked"]
+        include:
+          - python-version: "3.13"
+            deps: "latest"
       fail-fast: false
 
     steps:
@@ -24,15 +30,31 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Set up Java for PySpark
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "11"
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+      - name: Upgrade Polars and Narwhals to their latest releases
+        if: matrix.deps == 'latest'
+        run: |
+          uv lock --upgrade-package polars --upgrade-package narwhals
+          uv run --frozen python -c "import narwhals, polars; print(f'polars {polars.__version__}, narwhals {narwhals.__version__}')"
       - name: pytest unit tests
         run: |
           make test
+        env:
+          # Optimize PySpark for CI environment
+          PYSPARK_DRIVER_MEMORY: 1g
+          PYSPARK_EXECUTOR_MEMORY: 1g
+          SPARK_LOCAL_IP: 127.0.0.1
+
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
-          name: "py${{ matrix.python-version }}"
+          name: "py${{ matrix.python-version }}-${{ matrix.deps }}"
           token: ${{ secrets.CODECOV_TOKEN }}
 
   release-pypi:

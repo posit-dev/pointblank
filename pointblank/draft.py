@@ -4,9 +4,14 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from importlib_resources import files
-from narwhals.typing import FrameT
 
 from pointblank._constants import MODEL_PROVIDERS
+from pointblank._utils_ai import (
+    _check_syntax,
+    _create_chat_instance,
+    _extract_chain_steps,
+    _extract_code,
+)
 from pointblank.datascan import DataScan
 
 __all__ = [
@@ -23,9 +28,9 @@ class DraftValidation:
     starting point for validating a table. This can be useful when you have a new table and you
     want to get a sense of how to validate it (and adjustments could always be made later). The
     `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-    using an LLM from either the `"anthropic"`, `"openai"`, `"ollama"` or `"bedrock"` provider. You
-    can install all requirements for the class through an optional 'generate' install of Pointblank
-    via `pip install pointblank[generate]`.
+    using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"`
+    provider. You can install all requirements for the class through an optional 'generate' install
+    of Pointblank via `pip install pointblank[generate]`.
 
     :::{.callout-warning}
     The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -38,10 +43,16 @@ class DraftValidation:
         The data to be used for drafting a validation plan.
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, and `"bedrock"`.
+        `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the
+        colon is the Azure *deployment id*, not an OpenAI model id.
     api_key
         The API key to be used for the model.
+    verify_ssl
+        Whether to verify SSL certificates when making requests to the LLM provider. Set to `False`
+        to disable SSL verification (e.g., when behind a corporate firewall with self-signed
+        certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose
+        security risks.
 
     Returns
     -------
@@ -57,9 +68,15 @@ class DraftValidation:
     - `"openai"` (OpenAI)
     - `"ollama"` (Ollama)
     - `"bedrock"` (Amazon Bedrock)
+    - `"azure-openai"` (Azure OpenAI)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
+    For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you
+    assigned when deploying the model in your Azure OpenAI resource). It also requires the
+    environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+    `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
+    be set.
 
     Notes on Authentication
     -----------------------
@@ -82,6 +99,33 @@ class DraftValidation:
 
     There's no need to have the `python-dotenv` package installed when using `.env` files in this
     way.
+
+    Notes on SSL Certificate Verification
+    --------------------------------------
+    By default, SSL certificate verification is enabled for all requests to LLM providers. However,
+    in certain network environments (such as corporate networks with self-signed certificates or
+    firewall proxies), you may encounter SSL certificate verification errors.
+
+    To disable SSL verification, set the `verify_ssl` parameter to `False`:
+
+    ```python
+    import pointblank as pb
+
+    data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
+
+    # Disable SSL verification for networks with self-signed certificates
+    pb.DraftValidation(
+        data=data,
+        model="anthropic:claude-opus-4-6",
+        verify_ssl=False
+    )
+    ```
+
+    :::{.callout-warning}
+    Disabling SSL verification (through `verify_ssl=False`) can expose your API keys and data to
+    man-in-the-middle attacks. Only use this option in trusted network environments and when
+    absolutely necessary.
+    :::
 
     Notes on Data Sent to the Model Provider
     ----------------------------------------
@@ -109,7 +153,7 @@ class DraftValidation:
     Let's look at how the `DraftValidation` class can be used to draft a validation plan for a
     table. The table to be used is `"nycflights"`, which is available here via the
     [`load_dataset()`](`pointblank.load_dataset`) function. The model to be used is
-    `"anthropic:claude-3-5-sonnet-latest"` (which performs very well compared to other LLMs). The
+    `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The
     example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
     ```python
@@ -119,7 +163,7 @@ class DraftValidation:
     data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
     # Draft a validation plan for the "nycflights" table
-    pb.DraftValidation(data=data, model="anthropic:claude-3-5-sonnet-latest")
+    pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
     ```
 
     The output will be a drafted validation plan for the `"nycflights"` table and this will appear
@@ -191,12 +235,15 @@ class DraftValidation:
     be replaced with the actual data variable.
     """
 
-    data: FrameT | Any
+    data: Any
     model: str
     api_key: str | None = None
+    verify_ssl: bool = True
+    max_reprompts: int = 1
     response: str = field(init=False)
+    code: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # Check that the chatlas package is installed
         try:
             import chatlas  # noqa
@@ -209,8 +256,13 @@ class DraftValidation:
         # Generate a table summary in JSON format using the `DataScan` class
         tbl_json = DataScan(data=self.data).to_json()
 
-        # Get the LLM provider from the `model` value
-        provider = self.model.split(sep=":", maxsplit=1)[0]
+        # Validate the model string and extract the provider and model name
+        if ":" not in self.model:
+            raise ValueError(
+                f"`model=` must be in 'provider:model' form (e.g., "
+                f"'anthropic:claude-opus-4-8'); got {self.model!r}."
+            )
+        provider, model_name = self.model.split(sep=":", maxsplit=1)
 
         # Validate that the provider is supported
         if provider not in MODEL_PROVIDERS:
@@ -219,13 +271,10 @@ class DraftValidation:
             )
 
         # Read the API/examples text from a file
-        with files("pointblank.data").joinpath("api-docs.txt").open() as f:  # pragma: no cover
+        with files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f:
             api_and_examples_text = f.read()
 
-        # Get the model name from the `model` value
-        model_name = self.model.split(sep=":", maxsplit=1)[1]  # pragma: no cover
-
-        prompt = (  # pragma: no cover
+        prompt = (
             f"{api_and_examples_text}"
             "--------------------------"
             "Knowing what you now know about the Pointblank package in Python, can you write a "
@@ -280,68 +329,62 @@ class DraftValidation:
             "    per line)"
         )
 
-        if provider == "anthropic":  # pragma: no cover
-            # Check that the anthropic package is installed
-            try:
-                import anthropic  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `anthropic` package is required to use the `DraftValidation` class with "
-                    "the `anthropic` provider. Please install it using `pip install anthropic`."
-                )
+        # Create the chat client (shared provider abstraction, same one used by EditValidation)
+        # and generate the plan, applying a syntax/lint guardrail with an automatic re-prompt.
+        self._generate(provider=provider, model_name=model_name, prompt=prompt)
 
-            from chatlas import ChatAnthropic  # pragma: no cover
+    def _generate(self, provider: str, model_name: str, prompt: str) -> None:
+        chat = _create_chat_instance(
+            provider=provider,
+            model_name=model_name,
+            api_key=self.api_key,
+            verify_ssl=self.verify_ssl,
+            system_prompt="You are a terse assistant and a Python expert.",
+        )
 
-            chat = ChatAnthropic(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                api_key=self.api_key,
+        response = str(chat.chat(prompt, stream=False, echo="none"))
+        code = _extract_code(response)
+
+        # Syntax/lint guardrail: re-prompt on failure up to `max_reprompts` times
+        attempts = 0
+        ok, message = _check_syntax(code)
+        while not ok and attempts < self.max_reprompts:
+            attempts += 1
+            reprompt = (
+                f"The validation plan you returned has a problem: {message}. "
+                "Return the COMPLETE corrected plan again inside ```python + ``` code fences, "
+                "with no text outside the block."
             )
+            response = str(chat.chat(reprompt, stream=False, echo="none"))
+            code = _extract_code(response)
+            ok, message = _check_syntax(code)
 
-        if provider == "openai":  # pragma: no cover
-            # Check that the openai package is installed
-            try:
-                import openai  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `openai` package is required to use the `DraftValidation` class with the "
-                    "`openai` provider. Please install it using `pip install openai`."
-                )
+        self.response = response
+        self.code = code
 
-            from chatlas import ChatOpenAI  # pragma: no cover
+    def validate_syntax(self) -> bool:
+        """Return whether the drafted plan parses and uses only known validation methods."""
+        ok, _ = _check_syntax(self.code)
+        return ok
 
-            chat = ChatOpenAI(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-                api_key=self.api_key,
-            )
+    def changed_steps(self) -> list[dict[str, Any]]:
+        """
+        Return the drafted plan's steps as a structured "added" change list.
 
-        if provider == "ollama":  # pragma: no cover
-            # Check that the openai package is installed
-            try:
-                import openai  # noqa
-            except ImportError:  # pragma: no cover
-                raise ImportError(  # pragma: no cover
-                    "The `openai` package is required to use the `DraftValidation` class with "
-                    "`ollama`. Please install it using `pip install openai`."
-                )
+        Because `DraftValidation` generates a plan from scratch (there is no prior plan), every
+        step is reported as an addition. This mirrors
+        [`EditValidation.changed_steps()`](`pointblank.EditValidation.changed_steps`) so both
+        flows can share the same review UI.
 
-            from chatlas import ChatOllama
-
-            chat = ChatOllama(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-            )
-
-        if provider == "bedrock":  # pragma: no cover
-            from chatlas import ChatBedrockAnthropic  # pragma: no cover
-
-            chat = ChatBedrockAnthropic(  # pragma: no cover
-                model=model_name,
-                system_prompt="You are a terse assistant and a Python expert.",
-            )
-
-        self.response = str(chat.chat(prompt, stream=False, echo="none"))  # pragma: no cover
+        Returns
+        -------
+        list[dict]
+            One record per drafted step, each `{"action": "add", "method": str, "new": str}`.
+        """
+        return [
+            {"action": "add", "method": step["method"], "new": step["text"]}
+            for step in _extract_chain_steps(self.code)
+        ]
 
     def __str__(self) -> str:
         return self.response  # pragma: no cover

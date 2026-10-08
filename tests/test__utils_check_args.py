@@ -1,6 +1,7 @@
 import pytest
 
 from pointblank._utils_check_args import (
+    _check_active_input,
     _check_boolean_input,
     _check_column,
     _check_value_float_int,
@@ -17,6 +18,17 @@ def test_check_boolean_input():
 
     with pytest.raises(ValueError):
         _check_boolean_input(param="not a boolean", param_name="test")
+
+
+def test_check_active_input():
+    assert _check_active_input(param=True, param_name="active") is None
+    assert _check_active_input(param=False, param_name="active") is None
+    assert _check_active_input(param=lambda tbl: True, param_name="active") is None
+
+    with pytest.raises(ValueError):
+        _check_active_input(param="not valid", param_name="active")
+    with pytest.raises(ValueError):
+        _check_active_input(param=42, param_name="active")
 
 
 def test_check_column():

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 
 [tool.setuptools.packages.find]
-include = ["pointblank"]
+include = ["pointblank", "pointblank.*"]
 
 [project]
 name = "pointblank"
@@ -37,71 +37,104 @@ classifiers = [
 dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
-    "great_tables>=0.17.0",
-    "narwhals>=1.41.0",
+    "great-tables>=0.0.0",
+    "narwhals>=2.0.1",
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
     "click>=8.0.0",
     "rich>=13.0.0",
+    "pyyaml>=6.0.0",
 ]
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
 pd = ["pandas>=2.2.3"]
-pl = ["polars>=1.24.0"]
+pl = ["polars>=1.33.0"]
+pyspark = ["pyspark==3.5.6"]
 generate = [
     "chatlas>=0.3.0",
-    "anthropic[bedrock]>=0.45.2",
+    "anthropic[bedrock]>=0.68.0",
     "openai>=1.63.0",
+    "httpx>=0.28.0",
     "shiny>=1.3.0",
 ]
+# NOTE: No direct dependency on the `mcp` SDK.
+# See: https://github.com/posit-dev/pointblank/issues/415
+mcp = ["fastmcp>=2.14.2", "pytest-asyncio>=1.0.0"]
+otel = [
+    "opentelemetry-api>=1.22.0",
+    "opentelemetry-sdk>=1.22.0",
+]
+
+excel = ["openpyxl>=3.0.0"]
+cdisc = ["lxml>=4.9.0"]
+# For the CDISC CORE conformance engine wrapper (`validate_cdisc_submission`,
+# `SubmissionPackage.validate_conformance(engine="core")`): pyreadstat materializes in-memory
+# datasets to XPT for CORE. The CORE engine itself is an externally-installed executable / Docker
+# image, discovered at runtime and deliberately not a Python dependency of Pointblank.
+cdisc-core = ["pyreadstat>=1.2.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
-duckdb = ["ibis-framework[duckdb]>=9.5.0"]
+duckdb = ["ibis-framework[duckdb]>=9.5.0", "sqlglot>=23.4,<30.18"]  # sqlglot 30.18+ breaks DROP statements
 mysql = ["ibis-framework[mysql]>=9.5.0"]
 mssql = ["ibis-framework[mssql]>=9.5.0"]
 postgres = ["ibis-framework[postgres]>=9.5.0"]
-pyspark = ["ibis-framework[pyspark]>=9.5.0"]
 snowflake = ["ibis-framework[snowflake]>=9.5.0"]
-sqlite = ["ibis-framework[sqlite]>=9.5.0"]
+sqlite = ["ibis-framework[sqlite]>=9.5.0", "sqlglot>=23.4,<30.18"]  # sqlglot 30.18+ breaks DROP statements
 docs = [
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
-    "quartodoc>=0.8.1; python_version >= '3.9'",
-    "pandas>=2.2.3",
+    "pandas>=2.2.3,<3",  # <3: pandas 3.0's default `str` dtype is unsupported by the pinned duckdb (<1.3.3)
     "polars>=1.17.1",
+    "pyspark==3.5.6",
+    "openpyxl>=3.0.0",
+    "duckdb>=1.2.0,<1.3.3",                      # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
+    "lxml>=4.9.0",                               # CDISC Define-XML / Controlled Terminology examples
+    "pyreadstat>=1.2.0",                         # SAS Transport (XPT) metadata example
 ]
 
 [dependency-groups]
 dev = [
     "chatlas>=0.6.1",
-    "duckdb>=1.1.3",
-    "griffe==0.38.1",
+    "duckdb>=1.2.0,<1.3.3",                                # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0",
+    "sqlglot>=23.4,<30.18",                                 # 30.18+ omits table names in DROP statements (breaks DuckDB/SQLite)
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
-    "pandas>=2.2.3",
+    "pandas>=2.2.3,<3",  # <3: pandas 3.0's default `str` dtype is unsupported by the pinned duckdb (<1.3.3)
     "polars>=1.17.1",
     "pre-commit==2.15.0",
     "pyarrow",
     "pyarrow-stubs>=19.4",
-    "pytest>=3",
+    "pyspark==3.5.6",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
     "pytest-cov",
     "pytest-randomly>=3.16.0",
     "pytest-rerunfailures>=15.0",
     "pytest-snapshot",
     "pytest-xdist>=3.6.1",
-    "pytest-xdist>=3.6.1",
-    "quartodoc>=0.8.1; python_version >= '3.9'",
-    "ruff>=0.9.9",
+    "pyreadstat>=1.2.0",
+    "pytz>=2025.2",
+    "lxml>=4.9.0",
+    "ruff==0.14.10",  # NOTE: must match rev in .pre-commit-config.yaml
     "shiny>=1.4.0",
+    "openpyxl>=3.0.0",
+    "fastmcp>=2.14.2",
+    "ty>=0.0.23",
+    "mypy>=1.19.0",
+    "tox-uv>=1.33.4",
+    "tox>=4.49.1",
 ]
 
 [project.urls]
 homepage = "https://github.com/posit-dev/pointblank"
+
+[project.entry-points.pytest11]
+pointblank = "pointblank.pytest_plugin"
 
 [project.scripts]
 pb = "pointblank.cli:cli"
@@ -110,12 +143,16 @@ pb = "pointblank.cli:cli"
 minversion = "6.0"
 addopts = "-ra --cov=pointblank"
 testpaths = ["tests"]
+markers = [
+    "otel: OpenTelemetry integration tests",
+    "cdisc_core: Tests that require the CDISC CORE engine to be installed and discoverable (auto-skipped when CORE is absent).",
+]
 
 [tool.ruff]
 line-length = 100
 
 [tool.ruff.lint]
-exclude = ["docs", ".venv", "tests/*"]
+exclude = ["docs", ".venv", "tests/*", "pointblank/validate.pyi"]
 
 ignore = [
     "E402", # module level import not at top of file
@@ -128,3 +165,9 @@ ignore = [
 
 [tool.coverage.report]
 exclude_also = ["if TYPE_CHECKING:"]
+
+[tool.coverage.run]
+omit = [
+    "pointblank/_typing.py",
+    "pointblank/data/validations/preprocessing_functions.py",
+]

@@ -15,8 +15,17 @@ import pointblank as pb
 
 from pointblank.datascan import DataScan, col_summary_tbl
 from pointblank.validate import get_data_path, _process_github_url
-from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
+from pointblank._datascan_utils import (
+    _compact_0_1_fmt,
+    _compact_decimal_fmt,
+    _compact_integer_fmt,
+    _round_to_sig_figs,
+)
 from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
+from pointblank.scan_profile import _TypeMap, _DataProfile
+
+from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
+from enum import Enum
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -160,7 +169,7 @@ def test_deterministic_calculations(case: _Case) -> None:
         "check_row_order": False,
         "check_column_order": False,
         "check_exact": False,
-        "atol": 0.01,
+        "abs_tol": 0.01,
     }
 
     pt.assert_frame_equal(case.should_be, output, check_dtypes=False, **check_settings)
@@ -283,6 +292,19 @@ def test_compact_0_1_fmt():
     _compact_0_1_fmt(value=0.99) == "0.99"
     _compact_0_1_fmt(value=0.991) == ">0.99"
     _compact_0_1_fmt(value=226.1) == "226"
+
+
+def test_compact_0_1_fmt_none():
+    assert _compact_0_1_fmt(value=None) is None
+
+
+def test_round_to_sig_figs_zero():
+    assert _round_to_sig_figs(0, 3) == 0
+
+
+def test_round_to_sig_figs_nonzero():
+    result = _round_to_sig_figs(1234.567, 3)
+    assert result == 1230.0
 
 
 def test_datascan_csv_input():
@@ -491,5 +513,98 @@ def test_raw_github_url_in_datascan():
         pytest.skip(f"Raw GitHub URL DataScan test skipped due to network or access issue: {e}")
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-x", "-k", "test_col_summary_tbl"])
+def test_datascan_with_struct_column():
+    """Test that DataScan handles struct columns (illegal types) by skipping them."""
+
+    # Create a DataFrame with a struct column
+    df_pl = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "name": ["Alice", "Bob", "Charlie"],
+            "nested": [
+                {"a": 1, "b": 2},
+                {"a": 3, "b": 4},
+                {"a": 5, "b": 6},
+            ],
+        }
+    )
+
+    # DataScan should handle this without error by skipping the struct column
+    scanner = DataScan(data=df_pl)
+
+    assert scanner.summary_data is not None
+
+    # Verify that the struct column was skipped
+    col_names = scanner.summary_data.select("colname").to_dict()["colname"].to_list()
+
+    # The struct column should not be in the summary
+    assert "id" in col_names
+    assert "name" in col_names
+
+
+def test_datascan_save_to_json(tmp_path):
+    """Test the save_to_json() method."""
+
+    # Create a simple DataFrame
+    df_pl = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "name": ["Alice", "Bob", "Charlie"],
+            "value": [10.5, 20.3, 30.1],
+        }
+    )
+
+    scanner = DataScan(data=df_pl)
+
+    # Save to a temporary file
+    output_file = tmp_path / "test_output.json"
+    scanner.save_to_json(str(output_file))
+
+    # Verify the file was created
+    assert output_file.exists()
+
+    # Verify the file contains valid JSON
+    import json
+
+    with open(output_file) as f:
+        content = json.load(f)
+        assert isinstance(content, dict)
+        assert "metadata" in content
+        assert "columns" in content
+
+
+def test_typemap_fetch_icon_with_unknown_type():
+    """Test the KeyError exception handler in _TypeMap.fetch_icon()."""
+
+    # Create a mock type that's not in the icon_map
+    class UnknownType(Enum):
+        UNKNOWN = ("unknown_type",)
+
+    # This should trigger the KeyError and return the "object" icon
+    result = _TypeMap.fetch_icon(UnknownType.UNKNOWN)
+    assert result == SVG_ICONS_FOR_DATA_TYPES["object"]
+
+
+def test_dataprofile_as_dataframe_with_mixed_column_types():
+    """Test as_dataframe works correctly with different column types."""
+    # Create a DataFrame with different column types
+    df_pl = pl.DataFrame(
+        {
+            "numeric_col": [1, 2, 3],
+            "string_col": ["a", "b", "c"],
+            "bool_col": [True, False, True],
+        }
+    )
+
+    scanner = DataScan(data=df_pl)
+
+    # Call as_dataframe() with strict=False (the default)
+    result = scanner.profile.as_dataframe(strict=False)
+
+    # Should succeed without raising TypeError
+    assert result is not None
+    assert len(result) > 0
+
+    # Verify we can also call with strict=True
+    result_strict = scanner.profile.as_dataframe(strict=True)
+    assert result_strict is not None

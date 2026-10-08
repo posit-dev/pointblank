@@ -1,0 +1,579 @@
+{
+  "suffixes": [
+    "A.Ş.",
+    "Ltd. Şti.",
+    "Tic. A.Ş.",
+    "San. A.Ş.",
+    "Holding A.Ş."
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} ve {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Türk",
+    "Ulusal",
+    "Merkez",
+    "Avrupa",
+    "Yeni",
+    "Modern",
+    "Uluslararası",
+    "Bölgesel",
+    "Global",
+    "Dijital",
+    "Yenilikçi",
+    "Yeşil",
+    "Premium",
+    "Elit",
+    "Profesyonel",
+    "Akıllı",
+    "Yaratıcı",
+    "Dinamik",
+    "Stratejik",
+    "Anadolu"
+  ],
+  "nouns": [
+    "Teknoloji",
+    "Sanayi",
+    "Ticaret",
+    "İnşaat",
+    "Gayrimenkul",
+    "Enerji",
+    "Finans",
+    "Sigorta",
+    "Danışmanlık",
+    "Lojistik",
+    "İlaç",
+    "Medya",
+    "Bilişim",
+    "Hizmet",
+    "Çözüm",
+    "Sistem",
+    "Yatırım",
+    "Holding",
+    "Ortakları",
+    "Grup"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Koç Holding",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Sabancı Holding",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Türk Telekom",
+      "cities": [
+        "Ankara",
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Turkish Airlines",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Arçelik",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Vestel",
+      "cities": [
+        "Manisa"
+      ]
+    },
+    {
+      "name": "Ford Otosan",
+      "cities": [
+        "Kocaeli"
+      ]
+    },
+    {
+      "name": "Tofaş",
+      "cities": [
+        "Bursa"
+      ]
+    },
+    {
+      "name": "Ülker",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Eczacıbaşı",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Turkcell",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Garanti BBVA",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "İş Bankası",
+      "cities": [
+        "Ankara",
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Akbank",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Yapı Kredi",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Migros",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "BİM",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "LC Waikiki",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "TAV",
+      "cities": [
+        "İstanbul"
+      ]
+    },
+    {
+      "name": "Pegasus",
+      "cities": [
+        "İstanbul"
+      ]
+    }
+  ],
+  "jobs": [
+    "Yazılımcı",
+    "Mühendis",
+    "Öğretmen",
+    "Hemşire",
+    "Doktor",
+    "Avukat",
+    "Mimar",
+    "Tasarımcı",
+    "Gazeteci",
+    "Danışman",
+    "Muhasebeci",
+    "Satıcı",
+    "Proje Yöneticisi",
+    "Müdür",
+    "Emlakçı",
+    "Elektrikçi",
+    "Marangoz",
+    "Tamirci",
+    "Aşçı",
+    "Garson",
+    "Polis",
+    "İtfaiyeci",
+    "Kuaför",
+    "Diş Hekimi",
+    "Fizyoterapist"
+  ],
+  "catch_phrase_adjectives": [
+    "yenilikçi",
+    "sürdürülebilir",
+    "profesyonel",
+    "dinamik",
+    "yaratıcı",
+    "verimli",
+    "güvenilir",
+    "modern",
+    "Türk",
+    "yeşil",
+    "kaliteli",
+    "global",
+    "yerel",
+    "akıllı",
+    "dijital"
+  ],
+  "catch_phrase_nouns": [
+    "çözümler",
+    "hizmetler",
+    "kalite",
+    "yenilik",
+    "büyüme",
+    "ortaklık",
+    "sonuçlar",
+    "değerler",
+    "işbirliği",
+    "gelecek",
+    "teknoloji",
+    "tasarım",
+    "strateji",
+    "gelişim",
+    "başarı"
+  ],
+  "catch_phrase_verbs": [
+    "yaratır",
+    "sunar",
+    "geliştirir",
+    "yönlendirir",
+    "kurar",
+    "şekillendirir",
+    "ilham verir",
+    "bağlar",
+    "güçlendirir",
+    "dönüştürür",
+    "optimize eder",
+    "gerçekleştirir",
+    "sağlar",
+    "garanti eder",
+    "destekler"
+  ],
+  "catch_phrase_connector": "ile",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.09,
+      "jobs": [
+        "Danışman",
+        "Proje Yöneticisi"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Satıcı",
+        "Müdür",
+        "Polis",
+        "İtfaiyeci"
+      ],
+      "well_known": [
+        "Koç Holding",
+        "Sabancı Holding",
+        "Türk Telekom",
+        "Turkish Airlines",
+        "Arçelik",
+        "Vestel",
+        "Ülker",
+        "Eczacıbaşı",
+        "Turkcell",
+        "Garanti BBVA",
+        "Yapı Kredi",
+        "Migros",
+        "BİM",
+        "LC Waikiki",
+        "TAV",
+        "Pegasus"
+      ],
+      "company_suffixes": [
+        "A.Ş.",
+        "Ltd. Şti.",
+        "Holding",
+        "Grup"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Öğretmen"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Üniversitesi",
+        "{last_name} Lisesi",
+        "{city} Meslek Yüksekokulu"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Mühendis",
+        "Mimar"
+      ],
+      "well_known": [
+        "Ford Otosan",
+        "Tofaş"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Muhasebeci"
+      ],
+      "well_known": [
+        "İş Bankası",
+        "Akbank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.09,
+      "jobs": [
+        "Hemşire",
+        "Doktor",
+        "Diş Hekimi",
+        "Fizyoterapist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "{city} Hastanesi",
+        "{last_name} Kliniği",
+        "{city} Tıp Merkezi"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Aşçı",
+        "Garson"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "{last_name} Restoran",
+        "Otel {city}",
+        "{last_name} Lokantası"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Avukat"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Hukuk Bürosu",
+        "{last_name} & {last_name} Avukatlar"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.09,
+      "jobs": [
+        "Tasarımcı",
+        "Gazeteci"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.02,
+      "jobs": [
+        "Emlakçı"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.19,
+      "jobs": [
+        "Yazılımcı"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.04,
+      "jobs": [
+        "Elektrikçi",
+        "Marangoz",
+        "Tamirci",
+        "Kuaför"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Services",
+        "Co"
+      ],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Tesisat",
+        "{last_name} Elektrik",
+        "{city} Ev Hizmetleri"
+      ]
+    }
+  ]
+}
