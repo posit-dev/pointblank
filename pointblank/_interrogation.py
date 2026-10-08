@@ -853,7 +853,7 @@ def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any
         return data_tbl, tbl_compare
 
     # Define database backends (Ibis tables that need materialization)
-    database_backends = {"duckdb", "sqlite", "postgres", "mysql", "snowflake", "bigquery"}
+    database_backends = set(IBIS_BACKENDS)
 
     #
     # If backends differ, convert tbl_compare to match data_tbl's backend
