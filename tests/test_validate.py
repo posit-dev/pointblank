@@ -367,39 +367,43 @@ def tbl_dates_times_text_parquet() -> Table:
 
 
 @pytest.fixture
-def tbl_duckdb() -> Table:
+def tbl_duckdb(tmp_path: Path) -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz.ddb"
-    with tempfile.TemporaryDirectory() as tmp:
-        fpath: Path = Path(tmp) / "tab.ddb"
-        shutil.copy(file_path, fpath)
-        return ibis.connect(f"duckdb://{fpath!s}").table("tbl_xyz")
+    # Use pytest's `tmp_path` (not a `TemporaryDirectory()` that's removed on return) since
+    # the returned table keeps the DuckDB file open, which prevents deletion on Windows
+    fpath: Path = tmp_path / "tab.ddb"
+    shutil.copy(file_path, fpath)
+    return ibis.connect(f"duckdb://{fpath!s}").table("tbl_xyz")
 
 
 @pytest.fixture
-def tbl_missing_duckdb() -> Table:
+def tbl_missing_duckdb(tmp_path: Path) -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz_missing.ddb"
-    with tempfile.TemporaryDirectory() as tmp:
-        fpath: Path = Path(tmp) / "tab_missing.ddb"
-        shutil.copy(file_path, fpath)
-        return ibis.connect(f"duckdb://{fpath!s}").table("tbl_xyz_missing")
+    # Use pytest's `tmp_path` (not a `TemporaryDirectory()` that's removed on return) since
+    # the returned table keeps the DuckDB file open, which prevents deletion on Windows
+    fpath: Path = tmp_path / "tab_missing.ddb"
+    shutil.copy(file_path, fpath)
+    return ibis.connect(f"duckdb://{fpath!s}").table("tbl_xyz_missing")
 
 
 @pytest.fixture
-def tbl_dates_times_text_duckdb() -> Table:
+def tbl_dates_times_text_duckdb(tmp_path: Path) -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_dates_times_text.ddb"
-    with tempfile.TemporaryDirectory() as tmp:
-        fpath: Path = Path(tmp) / "tbl_dates_times_text.ddb"
-        shutil.copy(file_path, fpath)
-        return ibis.connect(f"duckdb://{fpath!s}").table("tbl_dates_times_text")
+    # Use pytest's `tmp_path` (not a `TemporaryDirectory()` that's removed on return) since
+    # the returned table keeps the DuckDB file open, which prevents deletion on Windows
+    fpath: Path = tmp_path / "tbl_dates_times_text.ddb"
+    shutil.copy(file_path, fpath)
+    return ibis.connect(f"duckdb://{fpath!s}").table("tbl_dates_times_text")
 
 
 @pytest.fixture
-def tbl_true_dates_times_duckdb() -> Table:
+def tbl_true_dates_times_duckdb(tmp_path: Path) -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_true_dates_times.ddb"
-    with tempfile.TemporaryDirectory() as tmp:
-        fpath: Path = Path(tmp) / "tbl_true_dates_times.ddb"
-        shutil.copy(file_path, fpath)
-        return ibis.connect(f"duckdb://{fpath!s}").table("tbl_true_dates_times")
+    # Use pytest's `tmp_path` (not a `TemporaryDirectory()` that's removed on return) since
+    # the returned table keeps the DuckDB file open, which prevents deletion on Windows
+    fpath: Path = tmp_path / "tbl_true_dates_times.ddb"
+    shutil.copy(file_path, fpath)
+    return ibis.connect(f"duckdb://{fpath!s}").table("tbl_true_dates_times")
 
 
 @pytest.fixture

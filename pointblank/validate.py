@@ -719,7 +719,14 @@ def load_dataset(
 
             data_path = f"{tmp}/{dataset}.ddb"
 
-            dataset = ibis.connect(f"duckdb://{data_path}").table(dataset)
+            # Copy the table into an in-memory DuckDB database and detach the file, so that no
+            # handle on it stays open (Windows can't delete the temporary directory otherwise)
+            conn = ibis.duckdb.connect()
+            conn.attach(data_path, name="pb_dataset_file", read_only=True)
+            conn.create_table(dataset, conn.table(dataset, database="pb_dataset_file"))
+            conn.detach("pb_dataset_file")
+
+            dataset = conn.table(dataset)
 
     return dataset
 
