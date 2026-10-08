@@ -1,0 +1,748 @@
+{
+  "locations": {
+    "very_common": [
+      {
+        "city": "Kuala Lumpur",
+        "state": "Kuala Lumpur",
+        "state_abbr": "KL",
+        "postcode_prefix": "50",
+        "lat_min": 3.13,
+        "lat_max": 3.18,
+        "lon_min": 101.68,
+        "lon_max": 101.72
+      },
+      {
+        "city": "George Town",
+        "state": "Penang",
+        "state_abbr": "PNG",
+        "postcode_prefix": "10",
+        "lat_min": 5.41,
+        "lat_max": 5.44,
+        "lon_min": 100.32,
+        "lon_max": 100.35
+      },
+      {
+        "city": "Johor Bahru",
+        "state": "Johor",
+        "state_abbr": "JHR",
+        "postcode_prefix": "80",
+        "lat_min": 1.46,
+        "lat_max": 1.5,
+        "lon_min": 103.74,
+        "lon_max": 103.78
+      }
+    ],
+    "common": [
+      {
+        "city": "Ipoh",
+        "state": "Perak",
+        "state_abbr": "PRK",
+        "postcode_prefix": "30",
+        "lat_min": 4.59,
+        "lat_max": 4.62,
+        "lon_min": 101.08,
+        "lon_max": 101.11
+      },
+      {
+        "city": "Shah Alam",
+        "state": "Selangor",
+        "state_abbr": "SGR",
+        "postcode_prefix": "40",
+        "lat_min": 3.07,
+        "lat_max": 3.1,
+        "lon_min": 101.52,
+        "lon_max": 101.55
+      },
+      {
+        "city": "Petaling Jaya",
+        "state": "Selangor",
+        "state_abbr": "SGR",
+        "postcode_prefix": "46",
+        "lat_min": 3.1,
+        "lat_max": 3.12,
+        "lon_min": 101.6,
+        "lon_max": 101.65
+      },
+      {
+        "city": "Kuching",
+        "state": "Sarawak",
+        "state_abbr": "SWK",
+        "postcode_prefix": "93",
+        "lat_min": 1.54,
+        "lat_max": 1.57,
+        "lon_min": 110.34,
+        "lon_max": 110.37
+      },
+      {
+        "city": "Kota Kinabalu",
+        "state": "Sabah",
+        "state_abbr": "SBH",
+        "postcode_prefix": "88",
+        "lat_min": 5.97,
+        "lat_max": 6.0,
+        "lon_min": 116.06,
+        "lon_max": 116.09
+      },
+      {
+        "city": "Subang Jaya",
+        "state": "Selangor",
+        "state_abbr": "SGR",
+        "postcode_prefix": "47",
+        "lat_min": 3.05,
+        "lat_max": 3.07,
+        "lon_min": 101.58,
+        "lon_max": 101.62
+      }
+    ],
+    "uncommon": [
+      {
+        "city": "Malacca City",
+        "state": "Malacca",
+        "state_abbr": "MLK",
+        "postcode_prefix": "75",
+        "lat_min": 2.19,
+        "lat_max": 2.21,
+        "lon_min": 102.25,
+        "lon_max": 102.27
+      },
+      {
+        "city": "Alor Setar",
+        "state": "Kedah",
+        "state_abbr": "KDH",
+        "postcode_prefix": "05",
+        "lat_min": 6.12,
+        "lat_max": 6.14,
+        "lon_min": 100.36,
+        "lon_max": 100.38
+      },
+      {
+        "city": "Kuantan",
+        "state": "Pahang",
+        "state_abbr": "PHG",
+        "postcode_prefix": "25",
+        "lat_min": 3.8,
+        "lat_max": 3.82,
+        "lon_min": 103.32,
+        "lon_max": 103.34
+      },
+      {
+        "city": "Seremban",
+        "state": "Negeri Sembilan",
+        "state_abbr": "NSN",
+        "postcode_prefix": "70",
+        "lat_min": 2.72,
+        "lat_max": 2.74,
+        "lon_min": 101.94,
+        "lon_max": 101.96
+      },
+      {
+        "city": "Kota Bharu",
+        "state": "Kelantan",
+        "state_abbr": "KTN",
+        "postcode_prefix": "15",
+        "lat_min": 6.12,
+        "lat_max": 6.14,
+        "lon_min": 102.23,
+        "lon_max": 102.25
+      },
+      {
+        "city": "Kuala Terengganu",
+        "state": "Terengganu",
+        "state_abbr": "TRG",
+        "postcode_prefix": "20",
+        "lat_min": 5.31,
+        "lat_max": 5.33,
+        "lon_min": 103.13,
+        "lon_max": 103.15
+      },
+      {
+        "city": "Miri",
+        "state": "Sarawak",
+        "state_abbr": "SWK",
+        "postcode_prefix": "98",
+        "lat_min": 4.39,
+        "lat_max": 4.41,
+        "lon_min": 114.0,
+        "lon_max": 114.02
+      },
+      {
+        "city": "Sandakan",
+        "state": "Sabah",
+        "state_abbr": "SBH",
+        "postcode_prefix": "90",
+        "lat_min": 5.83,
+        "lat_max": 5.85,
+        "lon_min": 118.11,
+        "lon_max": 118.13
+      },
+      {
+        "city": "Putrajaya",
+        "state": "Putrajaya",
+        "state_abbr": "PJY",
+        "postcode_prefix": "62",
+        "lat_min": 2.92,
+        "lat_max": 2.94,
+        "lon_min": 101.69,
+        "lon_max": 101.71
+      }
+    ],
+    "rare": [
+      {
+        "city": "Klang",
+        "state": "Selangor",
+        "state_abbr": "SGR",
+        "postcode_prefix": "41",
+        "lat_min": 3.04,
+        "lat_max": 3.06,
+        "lon_min": 101.44,
+        "lon_max": 101.46
+      },
+      {
+        "city": "Taiping",
+        "state": "Perak",
+        "state_abbr": "PRK",
+        "postcode_prefix": "34",
+        "lat_min": 4.85,
+        "lat_max": 4.87,
+        "lon_min": 100.73,
+        "lon_max": 100.75
+      },
+      {
+        "city": "Butterworth",
+        "state": "Penang",
+        "state_abbr": "PNG",
+        "postcode_prefix": "12",
+        "lat_min": 5.39,
+        "lat_max": 5.41,
+        "lon_min": 100.36,
+        "lon_max": 100.38
+      },
+      {
+        "city": "Tawau",
+        "state": "Sabah",
+        "state_abbr": "SBH",
+        "postcode_prefix": "91",
+        "lat_min": 4.24,
+        "lat_max": 4.26,
+        "lon_min": 117.89,
+        "lon_max": 117.91
+      },
+      {
+        "city": "Sibu",
+        "state": "Sarawak",
+        "state_abbr": "SWK",
+        "postcode_prefix": "96",
+        "lat_min": 2.28,
+        "lat_max": 2.3,
+        "lon_min": 111.83,
+        "lon_max": 111.85
+      },
+      {
+        "city": "Batu Pahat",
+        "state": "Johor",
+        "state_abbr": "JHR",
+        "postcode_prefix": "83",
+        "lat_min": 1.85,
+        "lat_max": 1.87,
+        "lon_min": 102.93,
+        "lon_max": 102.95
+      },
+      {
+        "city": "Sungai Petani",
+        "state": "Kedah",
+        "state_abbr": "KDH",
+        "postcode_prefix": "08",
+        "lat_min": 5.64,
+        "lat_max": 5.66,
+        "lon_min": 100.49,
+        "lon_max": 100.51
+      },
+      {
+        "city": "Kangar",
+        "state": "Perlis",
+        "state_abbr": "PLS",
+        "postcode_prefix": "01",
+        "lat_min": 6.43,
+        "lat_max": 6.45,
+        "lon_min": 100.19,
+        "lon_max": 100.21
+      },
+      {
+        "city": "Temerloh",
+        "state": "Pahang",
+        "state_abbr": "PHG",
+        "postcode_prefix": "28",
+        "lat_min": 3.45,
+        "lat_max": 3.47,
+        "lon_min": 102.42,
+        "lon_max": 102.44
+      },
+      {
+        "city": "Kulim",
+        "state": "Kedah",
+        "state_abbr": "KDH",
+        "postcode_prefix": "09",
+        "lat_min": 5.36,
+        "lat_max": 5.38,
+        "lon_min": 100.55,
+        "lon_max": 100.57
+      },
+      {
+        "city": "Bintulu",
+        "state": "Sarawak",
+        "state_abbr": "SWK",
+        "postcode_prefix": "97",
+        "lat_min": 3.16,
+        "lat_max": 3.18,
+        "lon_min": 113.03,
+        "lon_max": 113.05
+      },
+      {
+        "city": "Labuan",
+        "state": "Labuan",
+        "state_abbr": "LBN",
+        "postcode_prefix": "87",
+        "lat_min": 5.28,
+        "lat_max": 5.3,
+        "lon_min": 115.24,
+        "lon_max": 115.26
+      }
+    ]
+  },
+  "streets_by_city": {
+    "Kuala Lumpur": [
+      "Jalan Bukit Bintang",
+      "Jalan Sultan Ismail",
+      "Jalan Ampang",
+      "Jalan Tun Razak",
+      "Jalan Tuanku Abdul Rahman",
+      "Jalan Imbi",
+      "Jalan Raja Laut",
+      "Jalan Kuching",
+      "Jalan Cheras",
+      "Jalan Ipoh",
+      "Jalan Dang Wangi",
+      "Jalan Pudu",
+      "Jalan Hang Tuah",
+      "Jalan Maharajalela",
+      "Jalan Travers",
+      "Jalan Bangsar",
+      "Jalan Damansara",
+      "Jalan Gasing",
+      "Jalan Pahang",
+      "Jalan Sentul",
+      "Jalan Masjid India",
+      "Jalan Petaling",
+      "Jalan Tun Perak",
+      "Jalan Raja Chulan",
+      "Jalan P. Ramlee",
+      "Jalan Kia Peng",
+      "Jalan Stonor",
+      "Jalan Conlay",
+      "Jalan Yap Kwan Seng",
+      "Jalan U Thant",
+      "Jalan Tun Sambanthan",
+      "Jalan Parlimen",
+      "Jalan Kinabalu",
+      "Jalan Hang Jebat",
+      "Jalan Hang Kasturi",
+      "Jalan Sultan",
+      "Jalan Tun HS Lee",
+      "Jalan Bandar",
+      "Jalan Loke Yew",
+      "Persiaran KLCC",
+      "Jalan Alor",
+      "Jalan Changkat Bukit Bintang",
+      "Jalan TAR",
+      "Lorong Haji Taib",
+      "Jalan Chow Kit",
+      "Persiaran Mahameru",
+      "Jalan Cenderasari",
+      "Persiaran Stonor",
+      "Jalan Binjai",
+      "Jalan P Ramlee",
+      "Jalan Pinang",
+      "Lorong Ceylon",
+      "Jalan Maarof",
+      "Jalan Telawi",
+      "Lorong Maarof",
+      "Persiaran Bangsar",
+      "Jalan Syed Putra",
+      "Jalan Klang Lama",
+      "Jalan Istana",
+      "Jalan Duta",
+      "Persiaran Duta",
+      "Jalan Segambut",
+      "Jalan Ipoh KL",
+      "Jalan Gombak",
+      "Jalan Wangsa Maju",
+      "Jalan Titiwangsa",
+      "Lorong Titiwangsa",
+      "Jalan Stesen Sentral",
+      "Jalan Tun Razak Extension",
+      "Jalan Cochrane",
+      "Jalan San Peng",
+      "Jalan Hang Lekiu",
+      "Jalan Gereja",
+      "Jalan Tun Tan Siew Sin",
+      "Jalan Raja",
+      "Jalan Tuanku Abdul Rahman Extension",
+      "Jalan Bukit Bintang Extension",
+      "Jalan Sultan Ismail KL",
+      "Persiaran Raja Chulan",
+      "Jalan Ampang KL",
+      "Jalan Raja Muda Abdul Aziz",
+      "Jalan Tun Perak Extension",
+      "Jalan Hang Jebat KL",
+      "Jalan Pudu Ulu",
+      "Jalan Cheras KL",
+      "Jalan Miharja",
+      "Jalan Tun Razak South",
+      "Jalan Tun Razak North",
+      "Jalan Sultan Azlan Shah",
+      "Persiaran Bukit Kiara",
+      "Jalan Hartamas",
+      "Jalan Dutamas",
+      "Jalan Mont Kiara",
+      "Jalan Solaris",
+      "Jalan Desa Sri Hartamas",
+      "Jalan Sri Hartamas",
+      "Jalan Kepong",
+      "Jalan Kuching KL",
+      "Jalan Setapak",
+      "Jalan Genting Klang"
+    ],
+    "George Town": [
+      "Jalan Penang", "Lebuh Pantai", "Lebuh Chulia", "Jalan Magazine", "Jalan Masjid Kapitan Keling",
+      "Lebuh Armenian", "Lebuh Acheh", "Jalan Burma", "Jalan Macalister", "Jalan Dato Keramat",
+      "Lorong Love", "Lebuh Campbell", "Lebuh Kimberley", "Lebuh Carnarvon", "Jalan Air Itam",
+      "Jalan Perak", "Jalan Tanjung Tokong", "Jalan Gelugor", "Persiaran Gurney", "Jalan Sultan Ahmad Shah",
+      "Jalan Batu Ferringhi", "Jalan Tanjung Bungah", "Jalan Jelutong", "Jalan Paya Terubong", "Jalan Gottlieb"
+    ],
+    "Johor Bahru": [
+      "Jalan Wong Ah Fook",
+      "Jalan Abdullah Ibrahim",
+      "Jalan Tun Abdul Razak",
+      "Jalan Tebrau",
+      "Jalan Skudai",
+      "Jalan Datin Halimah",
+      "Jalan Gertak Merah",
+      "Jalan Trus",
+      "Jalan Stulang Laut",
+      "Jalan Tan Hiok Nee",
+      "Jalan Ngee Heng",
+      "Jalan Segget",
+      "Jalan Sungai Chat",
+      "Jalan Meldrum",
+      "Jalan Seri Pelangi",
+      "Jalan Sutera",
+      "Jalan Tampoi",
+      "Jalan Permas",
+      "Jalan Masai",
+      "Jalan Dato Onn",
+      "Jalan Ibrahim Sultan",
+      "Jalan Stulang Darat",
+      "Lorong Tiga",
+      "Persiaran Perling",
+      "Jalan Harmonium",
+      "Jalan Indah",
+      "Jalan Bakawali",
+      "Jalan Kempas",
+      "Jalan Larkin",
+      "Jalan Sultanah Aminah",
+      "Jalan Kebun Teh",
+      "Jalan Persiaran Sutera",
+      "Jalan Ros Merah",
+      "Jalan Kolam Air",
+      "Jalan Padi Emas",
+      "Jalan Taman Melodies",
+      "Jalan Taman Pelangi",
+      "Persiaran Tanjung",
+      "Jalan Sri Pelangi",
+      "Jalan Benoi",
+      "Jalan Serangoon",
+      "Jalan Bestari",
+      "Persiaran Danga",
+      "Lorong Danga",
+      "Jalan Bakar Batu",
+      "Jalan Setia Tropika",
+      "Jalan Cahaya",
+      "Jalan Bukit Meldrum",
+      "Lorong Abu Bakar",
+      "Persiaran Danga Utama",
+      "Jalan Austin Heights",
+      "Jalan Mount Austin",
+      "Jalan Molek",
+      "Jalan Adda Heights",
+      "Jalan Sri Saujana",
+      "Jalan Persiaran Mutiara",
+      "Jalan Pandan",
+      "Jalan Anggerik",
+      "Jalan Seroja",
+      "Jalan Cendana",
+      "Jalan Jelutong",
+      "Jalan Api Api",
+      "Jalan Mutiara Emas",
+      "Jalan Tanjung Puteri",
+      "Jalan Austin Perdana",
+      "Jalan Taman Sentosa",
+      "Jalan Taman Daya",
+      "Jalan Taman Johor Jaya",
+      "Jalan Mutiara Rini",
+      "Jalan Taman Mount Austin",
+      "Jalan Bandar Baru UDA",
+      "Persiaran Southkey",
+      "Jalan Midvalley Southkey",
+      "Jalan Taman Gaya",
+      "Jalan Taman Selesa Jaya",
+      "Jalan Taman Seri Alam",
+      "Jalan Taman Kota Masai",
+      "Jalan Taman Nusantara",
+      "Jalan Taman Nusa Bestari",
+      "Jalan Taman Bukit Indah",
+      "Persiaran Eco Botanic",
+      "Jalan Horizon Hills",
+      "Jalan Taman Iskandar",
+      "Jalan Taman Sri Pulai",
+      "Jalan Taman Universiti",
+      "Jalan Taman Perling Baru",
+      "Persiaran Perling Utama",
+      "Jalan Nusa Perintis",
+      "Jalan Nusa Idaman",
+      "Jalan Taman Danga Bay",
+      "Jalan Pantai Lido",
+      "Jalan Pasir Pelangi",
+      "Jalan Taman Century",
+      "Jalan Taman Sutera Utama Extension",
+      "Jalan Taman Flora Utama",
+      "Jalan Tampoi Indah",
+      "Jalan Taman Maju Jaya",
+      "Jalan Taman Pelangi Indah",
+      "Jalan Taman Sri Tebrau",
+      "Jalan Taman Desa Cemerlang"
+    ],
+    "Ipoh": [
+      "Jalan Sultan Idris Shah", "Jalan CM Yusuff", "Jalan Raja Musa Aziz", "Jalan Dato Maharajalela", "Jalan Pasir Puteh",
+      "Jalan Gopeng", "Jalan Kuala Kangsar", "Jalan Raja Dr Nazrin Shah", "Jalan Greentown", "Jalan Theatre",
+      "Jalan Bandar Timah", "Jalan Dato Onn Jaafar", "Jalan Sultan Azlan Shah", "Jalan Osborne", "Jalan Dato Tahwil Azar",
+      "Jalan Hale", "Jalan Keliling", "Jalan Labrooy", "Jalan Chamberlain", "Jalan Tiger Lane",
+      "Jalan Bercham", "Jalan Meru", "Jalan Silibin", "Jalan Gunung Rapat", "Jalan Pengkalan"
+    ],
+    "Kuching": [
+      "Jalan Tunku Abdul Rahman", "Jalan Padungan", "Jalan India", "Jalan Main Bazaar", "Jalan Carpenter",
+      "Jalan Wayang", "Jalan Ban Hock", "Jalan Tabuan", "Jalan Pending", "Jalan Rock",
+      "Jalan Green", "Jalan Abell", "Jalan Bishopsgate", "Jalan Temple", "Jalan Power",
+      "Jalan Satok", "Jalan Brooke", "Jalan Song", "Jalan Rubber", "Jalan Nanas",
+      "Jalan Datuk Abang Abdul Rahim", "Jalan Simpang Tiga", "Jalan Stutong", "Jalan Kota Samarahan", "Jalan Borneo"
+    ],
+    "Shah Alam": [
+      "Persiaran Sultan Salahuddin Abdul Aziz Shah", "Jalan Plumbum", "Jalan Jelutong", "Persiaran Kayangan", "Persiaran Selangor",
+      "Jalan Dato Muda Jaafar", "Jalan Kerja Ayer Lama", "Jalan Perbadanan", "Persiaran Sultan", "Jalan Kebun",
+      "Jalan Bukit Kemuning", "Persiaran Masjid", "Jalan Seksyen 7", "Jalan Seksyen 9", "Jalan Seksyen 13",
+      "Persiaran Raja Muda", "Jalan Seksyen 15", "Jalan Seksyen 18", "Persiaran Damai", "Jalan Kristal",
+      "Jalan Setia Alam", "Persiaran Industri", "Jalan Hicom", "Jalan Glenmarie", "Persiaran Permai"
+    ],
+    "Petaling Jaya": [
+      "Jalan Templer", "Jalan Gasing", "Jalan University", "Jalan 14/22", "Jalan SS 2/55",
+      "Jalan PJS 1/46", "Persiaran Barat", "Jalan Dato Abu Bakar", "Jalan Kemajuan", "Jalan SS 21/37",
+      "Jalan Utara", "Jalan SS 2/24", "Jalan SS 3/31", "Jalan SS 4/45", "Jalan SS 5/6",
+      "Jalan SS 6/12", "Jalan SS 7/26", "Jalan Damansara", "Persiaran Tropicana", "Jalan PJS 7/2",
+      "Jalan PJS 8/9", "Jalan PJS 10/32", "Jalan SS 22/11", "Jalan SS 23/15", "Persiaran Tropika"
+    ],
+    "Kota Kinabalu": [
+      "Jalan Gaya", "Jalan Pantai", "Jalan Haji Saman", "Jalan Tunku Abdul Rahman", "Jalan Coastal",
+      "Jalan Lintas", "Jalan Tuaran", "Jalan Penampang", "Jalan Mat Salleh", "Jalan Sulaman",
+      "Lorong Dewan", "Jalan Kemajuan", "Jalan Kolam", "Jalan Bundusan", "Jalan Kepayan",
+      "Jalan Putatan", "Jalan Sembulan", "Jalan Karamunsing", "Jalan Damai", "Jalan Likas",
+      "Jalan Foh Sang", "Jalan Luyang", "Jalan Inanam", "Jalan Signal Hill", "Jalan 1Borneo"
+    ],
+    "Subang Jaya": [
+      "Jalan SS 15/4", "Persiaran Subang Permai", "Jalan USJ 1/1", "Jalan SS 14/1", "Jalan Subang 3",
+      "Persiaran Kewajipan", "Jalan USJ 10/1", "Jalan SS 18/1", "Jalan Subang Utama", "Persiaran USJ",
+      "Jalan SS 12/1", "Jalan SS 13/1", "Jalan SS 16/1", "Jalan SS 17/1", "Jalan USJ 2/1",
+      "Jalan USJ 3/1", "Jalan USJ 4/1", "Jalan USJ 5/1", "Jalan USJ 6/1", "Jalan USJ 9/1",
+      "Persiaran Lagoon", "Jalan Putra Permai", "Jalan USJ 21/1", "Jalan USJ 25/1", "Persiaran Subang Mewah"
+    ],
+    "Malacca City": [
+      "Jalan Hang Tuah", "Jalan Laksamana", "Jalan Munshi Abdullah", "Jalan Merdeka", "Jalan Parameswara",
+      "Jalan Kota", "Jalan Temenggong", "Jalan Bendahara", "Jalan Bunga Raya", "Jalan Hang Jebat",
+      "Jalan Tun Tan Cheng Lock", "Jalan Syed Abdul Aziz", "Jalan Tengkera", "Jalan Ong Kim Wee", "Jalan Banda Kaba",
+      "Jalan Taman Melaka Raya", "Jalan Melaka Raya", "Jalan Limbongan", "Jalan Kubu", "Jalan Tokong",
+      "Jalan Banda Hilir", "Jalan Portugis", "Jalan Ujong Pasir", "Jalan Chan Koon Cheng", "Jalan Ayer Keroh"
+    ],
+    "Alor Setar": [
+      "Jalan Putra", "Jalan Sultan Badlishah", "Jalan Stadium", "Jalan Langgar", "Jalan Telok Wanjah",
+      "Jalan Tunku Ibrahim", "Jalan Pegawai", "Jalan Pintu Sepuluh", "Jalan Raja", "Jalan Datuk Kumbar",
+      "Jalan Kuala Kedah", "Jalan Sultanah Sambungan", "Jalan Gangsa", "Jalan Pumpong", "Jalan Tunku Yaakob",
+      "Jalan Pekan Melayu", "Jalan Kota", "Jalan Limbong Kapal", "Jalan Ibrahim", "Jalan Kolam Air",
+      "Jalan Pengkalan", "Jalan Pekan Cina", "Jalan Seberang Perak", "Jalan Sultanah", "Jalan Negeri"
+    ],
+    "Kuantan": [
+      "Jalan Besar", "Jalan Tun Ismail", "Jalan Beserah", "Jalan Teluk Sisek", "Jalan Haji Abdul Aziz",
+      "Jalan Gambut", "Jalan Bukit Ubi", "Jalan Wong Ah Jang", "Jalan Tanah Putih", "Jalan Mahkota",
+      "Jalan Dato Lim Hoe Lek", "Jalan Putra Square", "Jalan Air Putih", "Jalan Stadium", "Jalan Pelindung",
+      "Jalan Alor Akar", "Jalan Tanjung Lumpur", "Jalan Pandan", "Jalan Sungai Karang", "Jalan Indera Mahkota",
+      "Jalan Kuantan-Kemaman", "Jalan Kuala Pahang", "Jalan Balok", "Jalan Gebeng", "Jalan Sri Dagangan"
+    ],
+    "Seremban": [
+      "Jalan Dato Bandar Tunggal", "Jalan Sungai Ujong", "Jalan Tuanku Munawir", "Jalan Dato Sheikh Ahmad", "Jalan Tun Dr Ismail",
+      "Jalan Yam Tuan", "Jalan Lee Sam", "Jalan Tuanku Antah", "Jalan Rasah", "Jalan Labu",
+      "Jalan Rahang", "Jalan Taman Seremban Jaya", "Jalan Lobak", "Jalan Mambau", "Jalan Sikamat",
+      "Jalan Dato Klana Petra", "Jalan Senawang", "Jalan Ampangan", "Jalan Paroi", "Jalan Temiang",
+      "Jalan Tok Ungku", "Jalan Zaaba", "Jalan Seremban-Rembau", "Jalan Palm Mall", "Jalan Negeri Sembilan"
+    ],
+    "Kota Bharu": [
+      "Jalan Sultan Ismail", "Jalan Hilir Kota", "Jalan Tok Hakim", "Jalan Sultanah Zainab", "Jalan Sultan Ibrahim",
+      "Jalan Kebun Sultan", "Jalan Mahmood", "Jalan Post Office Lama", "Jalan Pengkalan Chepa", "Jalan Hamzah",
+      "Jalan Doktor", "Jalan Kuala Krai", "Jalan Bayam", "Jalan Telipot", "Jalan Tengku Petra Semerak",
+      "Jalan Tengku Chik", "Jalan Merbau", "Jalan Hospital", "Jalan Pasar Baru", "Jalan Padang Garong",
+      "Jalan Temenggong", "Jalan Wakaf Bharu", "Jalan Kubang Kerian", "Jalan Long Yunus", "Jalan Kota"
+    ],
+    "Kuala Terengganu": [
+      "Jalan Sultan Ismail", "Jalan Paya Bunga", "Jalan Tok Lam", "Jalan Sultan Sulaiman", "Jalan Hiliran",
+      "Jalan Bandar", "Jalan Sultan Zainal Abidin", "Jalan Kampung Cina", "Jalan Air Jernih", "Jalan Pantai Batu Buruk",
+      "Jalan Cherong Lanjut", "Jalan Sultan Mahmud", "Jalan Lapangan Terbang", "Jalan Bukit Kecil", "Jalan Bukit Besar",
+      "Jalan Maras", "Jalan Dato Isaac", "Jalan Engku Pengiran Anom", "Jalan Sultan Omar", "Jalan Tengku Ampuan Mariam",
+      "Jalan Pulau Kambing", "Jalan Ladang", "Jalan Sulaiman", "Jalan Pasir Panjang", "Jalan Primula"
+    ],
+    "Miri": [
+      "Jalan Miri-Pujut", "Jalan Brooke", "Jalan Melayu", "Jalan Padang Kerbau", "Jalan Bendahara",
+      "Jalan Merbau", "Jalan Yu Seng", "Jalan North Yu Seng", "Jalan Permaisuri", "Jalan Lopeng",
+      "Jalan Krokop", "Jalan Pelita", "Jalan Lutong", "Jalan Taman Selera", "Jalan Pujut",
+      "Jalan Piasau", "Jalan Tanjong Lobang", "Jalan Parkcity", "Jalan Cahaya", "Jalan Airport",
+      "Jalan Kuala Baram", "Jalan Miri Bypass", "Jalan Senadin", "Jalan Marina", "Jalan Bulatan"
+    ],
+    "Sandakan": [
+      "Jalan Utara", "Jalan Pryer", "Lebuh Tiga", "Jalan Pelabuhan", "Jalan Buli Sim Sim",
+      "Jalan Leila", "Jalan Satu", "Jalan Airport", "Jalan Labuk", "Jalan Empat",
+      "Jalan Dua", "Jalan Rimba", "Jalan Sibuga", "Jalan Gum Gum", "Jalan Mile 4",
+      "Jalan Mile 7", "Jalan Batu Sapi", "Jalan Tanah Merah", "Jalan Karamunting", "Jalan Bandar Indah",
+      "Jalan Lintas Sibuga", "Jalan Fajar", "Jalan Elopura", "Jalan Sepilok", "Jalan Kinabatangan"
+    ],
+    "Putrajaya": [
+      "Persiaran Perdana", "Persiaran Sultan Salahuddin Abdul Aziz Shah", "Lebuh Sentosa", "Persiaran Timur", "Persiaran Barat",
+      "Lebuh Wawasan", "Persiaran Utara", "Lebuh Ehsan", "Persiaran Selatan", "Lebuh Bestari",
+      "Persiaran Persekutuan", "Lebuh Gemilang", "Persiaran Tunku", "Lebuh IRC", "Persiaran Diplomat",
+      "Jalan P1", "Jalan P2", "Jalan P3", "Jalan P5", "Jalan P8",
+      "Jalan P9", "Jalan P10", "Persiaran Multimedia", "Lebuh Merbah", "Persiaran Ceria"
+    ],
+    "Klang": [
+      "Jalan Tengku Kelana", "Jalan Meru", "Jalan Goh Hock Huat", "Jalan Stesen", "Persiaran Raja Muda Musa",
+      "Jalan Kapar", "Jalan Batu Tiga", "Jalan Dato Hamzah", "Jalan Istana", "Jalan Bukit Kuda",
+      "Jalan Tiara", "Jalan Batu Unjur", "Jalan Kebun", "Jalan Pasar", "Jalan Raja",
+      "Jalan Raya Barat", "Jalan Raya Timur", "Jalan Klang-Teluk Pulai", "Jalan Johan Setia", "Jalan Pekan Baru",
+      "Jalan Sungai Binjai", "Jalan Pandamaran", "Jalan Pelabuhan", "Jalan Angsa", "Jalan Teluk Gadong"
+    ],
+    "Taiping": [
+      "Jalan Kota", "Jalan Barrack", "Jalan Pasar", "Jalan Main", "Jalan Stesen",
+      "Jalan Tupai", "Jalan Taming Sari", "Jalan Sultan Mansor", "Jalan Pekeliling", "Jalan Simpang",
+      "Jalan Iskandar", "Jalan Panggung Wayang", "Jalan Maharajalela", "Jalan Long Jaafar", "Jalan Menteri",
+      "Jalan Kamunting", "Jalan Assam Kumbang", "Jalan Bukit Larut", "Jalan Lake Garden", "Jalan Chung Thye Phin",
+      "Jalan Rimba", "Jalan Aulong", "Jalan Taman", "Jalan Pokok Assam", "Jalan Zoo"
+    ],
+    "Butterworth": [
+      "Jalan Bagan Luar", "Jalan Chain Ferry", "Jalan Pantai", "Jalan Raja Uda", "Jalan Bagan Dalam",
+      "Jalan Ong Yi How", "Jalan Telaga Air", "Jalan Todak", "Lorong Bertam", "Jalan Jubilee",
+      "Jalan Permatang Pauh", "Jalan Kampung Jawa", "Jalan Baru", "Jalan Seberang Jaya", "Jalan Perai",
+      "Jalan Sungai Puyu", "Jalan Tasek Gelugor", "Jalan Mak Mandin", "Jalan Harbour", "Jalan Raja Abdul Hamid",
+      "Jalan Song Ban Kheng", "Jalan Juru", "Jalan Prai", "Jalan Machang Bubok", "Jalan Bagan Ajam"
+    ],
+    "Tawau": [
+      "Jalan Dunlop", "Jalan Habib Hussin", "Jalan Utara", "Jalan Stephen Tan", "Jalan Kuhara",
+      "Jalan Bunga", "Jalan Masjid", "Jalan Chester", "Jalan Sin Onn", "Jalan Belunu",
+      "Jalan Kampung Baru", "Jalan Abaca", "Jalan Apas", "Jalan Bombalai", "Jalan Kabota",
+      "Jalan Kastam", "Jalan Kubota", "Jalan Persekutuan", "Jalan Fajar", "Jalan Sabindo",
+      "Jalan TB Makmur", "Jalan Kinabutan", "Jalan Airport", "Jalan Brewery", "Jalan Jambatan"
+    ],
+    "Sibu": [
+      "Jalan Kampung Nyabor", "Jalan Central", "Jalan Pedada", "Jalan Lanang", "Jalan Channel",
+      "Jalan Cross", "Jalan Tukang Besi", "Jalan Bengkel", "Jalan Wong Nai Siong", "Jalan Salim",
+      "Jalan Bukit Assek", "Jalan Oya", "Jalan Durin", "Jalan Upper Lanang", "Jalan Tiong Hua",
+      "Jalan Mission", "Jalan Foochow", "Jalan Market", "Jalan Khoo Peng Loong", "Jalan Maju",
+      "Jalan Tun Abang Haji Openg", "Jalan Salim Sambungan", "Jalan Rejang", "Jalan Delta", "Jalan Pulau"
+    ],
+    "Batu Pahat": [
+      "Jalan Rahmat", "Jalan Zabedah", "Jalan Sultanah", "Jalan Jenang", "Jalan Kluang",
+      "Jalan Tasik Utama", "Jalan Muar", "Jalan Bukit Pasir", "Jalan Hassan", "Jalan Stadium",
+      "Jalan Bakri", "Jalan Mengkibol", "Jalan Parit Raja", "Jalan Perdana", "Jalan Temenggong",
+      "Jalan Tongkang Pecah", "Jalan Penggaram", "Jalan Yong Peng", "Jalan Dato Onn", "Jalan Hospital",
+      "Jalan Abu Bakar", "Jalan Kota", "Jalan Sungai Ayam", "Jalan Peserai", "Jalan Bentayan"
+    ],
+    "Sungai Petani": [
+      "Jalan Kuala Ketil", "Jalan Ibrahim", "Jalan Badlishah", "Jalan Patani", "Jalan Petri",
+      "Jalan Kampung Baru", "Jalan Sultan", "Pekan Simpang Empat Road", "Jalan Hospital", "Jalan Lagenda",
+      "Jalan Stadium", "Jalan Laguna", "Jalan Taman Ria", "Jalan Pekan Lama", "Jalan Kolam",
+      "Jalan Bakar Arang", "Jalan Pengkalan", "Jalan Berjaya", "Jalan Perdana", "Jalan Bandar Baru",
+      "Jalan Sungai Lalang", "Jalan Bedong", "Jalan Bukit", "Jalan Persiaran", "Jalan Pekan"
+    ],
+    "Kangar": [
+      "Jalan Raja", "Jalan Jubli Emas", "Jalan Kangar-Alor Setar", "Jalan Hospital", "Jalan Bukit Lagi",
+      "Jalan Besar", "Jalan Penjara", "Jalan Kolam", "Jalan Padang Besar", "Jalan Utan Aji",
+      "Jalan Kuala Perlis", "Jalan Santan", "Jalan Arau", "Jalan Wang Kelian", "Jalan Jejawi",
+      "Jalan Pauh", "Jalan Sena", "Jalan Simpang Empat", "Jalan Stadium", "Jalan Dato Sheikh Ahmad",
+      "Jalan Paya", "Jalan Sungai Baru", "Jalan Tok Bedu", "Jalan Pekan Baru", "Jalan Taman Perlis"
+    ],
+    "Temerloh": [
+      "Jalan Ahmad Shah", "Jalan Dato Bahaman", "Jalan Tengku Panglima", "Jalan Pahang", "Jalan Semantan",
+      "Jalan Kuantan", "Jalan Sultan Ahmad", "Jalan Besar", "Jalan Mentakab", "Jalan Tun Razak",
+      "Jalan Che Latiff", "Jalan Hospital", "Jalan Padang", "Jalan Triang", "Jalan Kerdau",
+      "Jalan Pekan", "Jalan Sungai Cenua", "Jalan Lanchang", "Jalan Karak", "Jalan Bandar",
+      "Jalan Jengka", "Jalan Maran", "Jalan Chenor", "Jalan Bera", "Jalan Bukit Ceraka"
+    ],
+    "Kulim": [
+      "Jalan Lunas", "Jalan Raya", "Jalan Tunku Abdul Rahman", "Jalan Mahang", "Jalan Hospital",
+      "Jalan Kelang Lama", "Jalan Kulim-Butterworth", "Jalan Besar", "Jalan Sungai Kluang", "Jalan Stadium",
+      "Jalan Padang Serai", "Jalan Banda Baharu", "Jalan Karangan", "Jalan Jeniang", "Jalan Sik",
+      "Jalan Bandar Baharu", "Jalan Hi-Tech", "Jalan Padang Meha", "Jalan Terap", "Jalan Selama",
+      "Jalan Kilang", "Jalan Tok Bedu", "Jalan Raja", "Jalan Pekan", "Jalan Persiaran Kulim"
+    ],
+    "Bintulu": [
+      "Jalan Tanjung Batu", "Jalan Abang Galau", "Jalan Keppel", "Jalan Somerville", "Jalan Tun Hussein Onn",
+      "Jalan Kidurong", "Jalan Masjid", "Jalan Pedada", "Jalan Main Bazaar", "Jalan Temple",
+      "Jalan Tun Razak", "Jalan Airport", "Jalan Kemena", "Jalan Sultan Iskandar", "Jalan Kuala Tatau",
+      "Jalan Esplanade", "Jalan Stadium", "Jalan Nyabau", "Jalan Sebiris", "Jalan Commerce Square",
+      "Jalan Tun Ahmad Zaidi", "Jalan Similajau", "Jalan Assyakirin", "Jalan Parkcity", "Jalan Medan Jaya"
+    ],
+    "Labuan": [
+      "Jalan Merdeka", "Jalan Bunga Raya", "Jalan Tun Mustapha", "Jalan OKK Awang Besar", "Jalan Dewan",
+      "Jalan Bunga Kesuma", "Jalan Patau-Patau", "Jalan Tanjung Purun", "Jalan Kemajuan", "Jalan Ranggu",
+      "Jalan Pohon Batu", "Jalan Kibaran", "Jalan Taman Selera", "Jalan Pantai", "Jalan Airport",
+      "Jalan Persiaran", "Jalan Batu Manikar", "Jalan Kerupang", "Jalan Layang", "Jalan Kg Saguking",
+      "Jalan Bebuloh", "Jalan Perpaduan", "Jalan Bunga Tanjung", "Jalan Durian", "Jalan Victoria"
+    ]
+  },
+  "postcode_format": "#####",
+  "address_formats": [
+    "{building_number}, {street}, {postcode} {city}, {state}",
+    "No. {building_number}, {street}, {city} {postcode}"
+  ],
+  "country": "Malaysia",
+  "country_code": "MY",
+  "phone_area_codes": {
+    "Kuala Lumpur": [
+      "03"
+    ],
+    "Selangor": [
+      "03"
+    ],
+    "Johor": [
+      "07"
+    ],
+    "Penang": [
+      "04"
+    ],
+    "Perak": [
+      "05"
+    ],
+    "Sarawak": [
+      "082"
+    ],
+    "Sabah": [
+      "088"
+    ],
+    "Pahang": [
+      "09"
+    ]
+  },
+  "phone_format": "{area_code}-#### ####"
+}

@@ -17,4 +17,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v2
+      - name: Check validate.pyi is up to date
+        run: |
+          uv run make pyi
+          git diff --exit-code pointblank/validate.pyi || \
+            (echo "validate.pyi is out of date — run 'make pyi' and commit the result" && exit 1)
       - uses: pre-commit/action@v3.0.1

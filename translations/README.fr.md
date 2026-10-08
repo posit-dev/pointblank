@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # Un jeu de données d'exemple
 
 # Utilisez DraftValidation pour générer un plan de validation
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 La sortie est un plan de validation complet avec des suggestions intelligentes basées sur vos données :
@@ -302,12 +302,49 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## Générer des Données de Test Réalistes
+
+Besoin de données de test pour vos workflows de validation ? La fonction `generate_dataset()` crée des données synthétiques réalistes et adaptées à la locale, basées sur des définitions de schéma. C'est très utile pour développer des pipelines sans données de production, exécuter des tests CI/CD avec des scénarios reproductibles, ou prototyper des workflows avant que les données de production ne soient disponibles.
+
+```python
+import pointblank as pb
+
+# Définir un schéma avec des contraintes de champs
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Générer 10 lignes de données de test réalistes
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+Le générateur prend en charge une génération de données sophistiquée avec ces capacités :
+
+- **Données réalistes avec presets** : Utilisez des presets intégrés comme `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **Chaînes user agent** : Générez des chaînes user agent de navigateur très variées et réalistes à partir de 17 catégories de navigateurs avec plus de 42 000 combinaisons uniques
+- **Support de 100 pays** : Générez des données spécifiques à la locale (par ex., `country="DE"` pour des adresses allemandes)
+- **Contraintes de champs** : Contrôlez les plages, patterns, unicité et valeurs autorisées
+- **Formats de sortie multiples** : Retourne des DataFrames Polars par défaut, mais supporte aussi Pandas (`output="pandas"`) ou dictionnaires (`output="dict"`)
+
 ## Caractéristiques qui distinguent Pointblank
 
 - **Flux de travail de validation complet** : De l'accès aux données à la validation jusqu'au reporting dans un seul pipeline
 - **Conçu pour la collaboration** : Partagez les résultats avec vos collègues grâce à des rapports interactifs ben stylés
 - **Sorties pratiques** : Obtenez exactement ce que vous avez besoin: comptages, extraits, résumés ou rapports complets
 - **Déploiement flexible** : Utilisez-le dans des notebooks, des scripts ou des pipelines de données
+- **Génération de données synthétiques** : Créez des données de test réalistes avec plus de 30 presets, chaînes user agent, formatage adapté aux locales, et support de 100 pays
 - **Personnalisable** : Adaptez les étapes de validation et les rapports selon vos besoins spécifiques
 - **Internationalisation** : Les rapports peuvent être générés dans 40 langues, incluant l'anglais, l'espagnol, le français et l'allemand
 

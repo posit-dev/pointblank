@@ -211,6 +211,35 @@ def test_segments_with_multiple_seg_groups(tbl_type):
         )
         .interrogate()
     )
+
     assert validation.n_passed(i=1, scalar=True) == 7
     assert validation.n_passed(i=2, scalar=True) == 3
     assert validation.n_passed(i=3, scalar=True) == 2
+
+
+def test_segments_str_lazyframe():
+    df = pl.DataFrame({"x": [1.0, -1.0, 2.0], "region": ["US", "US", "EU"]})
+    validation_lazy = Validate(data=df.lazy()).col_vals_gt("x", 0, segments="region").interrogate()
+    validation_eager = Validate(data=df).col_vals_gt("x", 0, segments="region").interrogate()
+
+    # Both should produce the same number of expanded steps
+    assert len(validation_lazy.validation_info) == len(validation_eager.validation_info)
+
+    # EU: 1 row, 1 passes; US: 2 rows, 1 passes
+    assert validation_lazy.n_passed(i=1, scalar=True) == validation_eager.n_passed(i=1, scalar=True)
+    assert validation_lazy.n_passed(i=2, scalar=True) == validation_eager.n_passed(i=2, scalar=True)
+
+
+@pytest.mark.parametrize("lazy", [False, True])
+def test_seg_group_float_column_int_values(lazy):
+    # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+    df = pl.DataFrame({"x": [1, -1, 2, 3], "g": [1.0, 2.0, 3.0, 4.0]})
+    validation = (
+        Validate(data=df.lazy() if lazy else df)
+        .col_vals_gt("x", 0, segments=("g", seg_group([[1, 2], [3, 4]])))
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_passed(i=2, scalar=True) == 2

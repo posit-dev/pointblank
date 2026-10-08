@@ -1,0 +1,53 @@
+{
+  "words": [
+    "el", "la", "los", "las", "de", "en", "un", "una", "que", "por",
+    "con", "no", "es", "se", "su", "para", "al", "del", "son", "como",
+    "mas", "pero", "fue", "ser", "hay", "tan", "muy", "ya", "sin", "sobre",
+    "todo", "entre", "desde", "hasta", "donde", "quien", "cada", "otro", "bien", "tiene",
+    "puede", "parte", "tiempo", "mucho", "hacer", "mismo", "mejor", "nuevo", "poco", "solo",
+    "decir", "estar", "poder", "tener", "haber", "saber", "querer", "deber", "poner", "venir",
+    "casa", "ciudad", "pais", "persona", "vida", "dia", "mundo", "trabajo", "hombre", "mujer",
+    "tiempo", "ahora", "agua", "tierra", "forma", "aqui", "bueno", "grande", "primero", "ultimo",
+    "bien", "mal", "antes", "despues", "dentro", "fuera", "lejos", "cerca", "arriba", "abajo"
+  ],
+  "sentence_patterns": [
+    "El {adjective} {noun} {verb} el {adjective} {noun}.",
+    "Un {noun} {verb} {adverb} en el {noun}.",
+    "{proper_noun} {verb} el {adjective} {noun} {adverb}."
+  ],
+  "adjectives": [
+    "rapido", "lento", "grande", "pequeño", "viejo", "nuevo", "joven",
+    "brillante", "oscuro", "ruidoso", "silencioso", "caliente", "frio",
+    "suave", "duro", "limpio", "sucio", "feliz", "triste", "amable",
+    "fuerte", "debil", "alto", "bajo", "ancho", "estrecho", "profundo",
+    "lleno", "vacio", "abierto", "cerrado", "mojado", "seco",
+    "fresco", "rico", "pobre", "largo", "corto", "gordo", "flaco",
+    "bonito", "feo", "claro", "valiente", "timido", "sabio", "tonto"
+  ],
+  "nouns": [
+    "perro", "gato", "pajaro", "pez", "arbol", "casa", "carro", "libro",
+    "mesa", "silla", "puerta", "ventana", "calle", "rio", "montaña",
+    "mar", "cielo", "sol", "luna", "estrella", "nube", "lluvia", "nieve",
+    "viento", "fuego", "agua", "tierra", "aire", "piedra", "madera",
+    "metal", "vidrio", "papel", "tela", "comida", "dinero", "tiempo",
+    "lugar", "persona", "niño", "hombre", "mujer", "amigo", "familia",
+    "escuela", "trabajo", "ciudad", "pais", "mundo", "vida", "dia",
+    "noche", "mañana", "tarde", "semana", "mes", "año", "historia",
+    "cancion", "juego", "deporte"
+  ],
+  "verbs": [
+    "corre", "salta", "camina", "habla", "ve", "oye", "siente", "piensa",
+    "sabe", "quiere", "necesita", "gusta", "ama", "odia", "encuentra",
+    "da", "toma", "hace", "dice", "cuenta", "pregunta", "responde",
+    "ayuda", "trabaja", "juega", "lee", "escribe", "dibuja", "canta",
+    "baila", "cocina", "come", "bebe", "duerme", "despierta", "abre",
+    "cierra", "empieza", "termina", "atrapa", "para", "mueve", "queda",
+    "viene", "va"
+  ],
+  "adverbs": [
+    "rapido", "lento", "cuidadosamente", "felizmente", "tristemente",
+    "ruidosamente", "silenciosamente", "facilmente", "dificilmente",
+    "siempre", "nunca", "a menudo", "a veces", "generalmente",
+    "realmente", "muy", "bastante", "casi", "ya", "todavia", "solo", "apenas"
+  ]
+}

@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # 예제 데이터셋
 
 # DraftValidation을 사용하여 검증 계획 생성
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 결과는 데이터에 기반한 지능적 제안이 포함된 완전한 검증 계획입니다:
@@ -302,12 +302,49 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## 현실적인 테스트 데이터 생성
+
+검증 워크플로우를 위한 테스트 데이터가 필요하신가요? `generate_dataset()` 함수는 스키마 정의를 기반으로 현실적이고 로케일 인식 합성 데이터를 생성합니다. 프로덕션 데이터 없이 파이프라인을 개발하거나, 재현 가능한 시나리오로 CI/CD 테스트를 실행하거나, 프로덕션 데이터가 준비되기 전에 워크플로우를 프로토타입하는 데 매우 유용합니다.
+
+```python
+import pointblank as pb
+
+# 필드 제약 조건이 있는 스키마 정의
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 10개의 현실적인 테스트 데이터 행 생성
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+생성기는 다음 기능으로 정교한 데이터 생성을 지원합니다:
+
+- **프리셋을 사용한 현실적인 데이터**: `"name"`, `"email"`, `"address"`, `"phone"` 등의 내장 프리셋 사용
+- **유저 에이전트 문자열**: 17개 브라우저 카테고리에서 42,000개 이상의 고유한 조합으로 매우 다양하고 사실적인 브라우저 유저 에이전트 문자열 생성
+- **100개국 지원**: 로케일별 데이터 생성 (예: `country="DE"`로 독일 주소)
+- **필드 제약 조건**: 범위, 패턴, 고유성 및 허용 값 제어
+- **다중 출력 형식**: 기본적으로 Polars DataFrame을 반환하지만, Pandas (`output="pandas"`) 또는 딕셔너리 (`output="dict"`)도 지원
+
 ## Pointblank을 차별화하는 기능
 
 - **완전한 검증 워크플로우**: 단일 파이프라인에서 데이터 액세스부터 검증, 보고까지
 - **협업을 위한 설계**: 아름다운 대화형 보고서를 통해 동료들과 결과 공유
 - **실용적인 출력**: 필요한 것을 정확히 얻기: 개수, 추출, 요약 또는 완전한 보고서
 - **유연한 배포**: 노트북, 스크립트 또는 데이터 파이프라인에서 사용
+- **합성 데이터 생성**: 30개 이상의 프리셋, 유저 에이전트 문자열, 로케일 인식 포맷팅, 100개국 지원으로 사실적인 테스트 데이터 생성
 - **맞춤형 설정**: 특정 요구에 맞게 검증 단계와 보고 조정
 - **국제화**: 보고서는 영어, 스페인어, 프랑스어, 독일어 등 40개의 언어로 생성 가능
 

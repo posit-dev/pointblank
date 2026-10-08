@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # 示例数据集
 
 # 使用 DraftValidation 生成验证计划
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 输出是基于您的数据的具有智能建议的完整验证计划：
@@ -299,12 +299,49 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## 生成真实的测试数据
+
+需要测试数据来验证您的工作流程？`generate_dataset()` 函数基于模式定义创建真实的、支持本地化的合成数据。对于在没有生产数据的情况下开发管道、使用可重现的场景运行 CI/CD 测试，或在生产数据可用之前进行工作流原型设计非常有用。
+
+```python
+import pointblank as pb
+
+# 定义带有字段约束的模式
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 生成 10 行真实的测试数据
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+该生成器支持具有以下功能的复杂数据生成：
+
+- **使用预设的真实数据**：使用内置预设，如 `"name"`、`"email"`、`"address"`、`"phone"` 等
+- **用户代理字符串**：从 17 个浏览器类别生成高度多样化、真实的浏览器用户代理字符串，超过 42,000 种唯一组合
+- **支持 100 个国家/地区**：生成特定区域的数据（例如，`country="DE"` 用于德国地址）
+- **字段约束**：控制范围、模式、唯一性和允许的值
+- **多种输出格式**：默认返回 Polars DataFrame，也支持 Pandas（`output="pandas"`）或字典（`output="dict"`）
+
 ## Pointblank 的突出特点
 
 - **完整的验证工作流**: 在单个管道中从数据访问到验证再到报告
 - **为协作而构建**: 通过精美的交互式报告与同事分享结果
 - **实用的输出**: 获取您所需的内容：计数、提取、摘要或完整报告
 - **灵活部署**: 可用于笔记本、脚本或数据管道
+- **合成数据生成**: 使用超过 30 个预设、用户代理字符串、区域感知格式化和 100 个国家支持创建真实的测试数据
 - **可定制**: 根据您的特定需求定制验证步骤和报告
 - **国际化**: 报告可以用 40 种语言生成，包括英语、西班牙语、法语和德语
 

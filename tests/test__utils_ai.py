@@ -119,6 +119,46 @@ def test_create_chat_instance_invalid_provider():
         _create_chat_instance("invalid", "model")
 
 
+def test_create_chat_instance_azure_openai_missing_endpoint(monkeypatch):
+    """Azure OpenAI provider raises if AZURE_OPENAI_ENDPOINT is unset."""
+    pytest.importorskip("openai")
+    monkeypatch.delenv("AZURE_OPENAI_ENDPOINT", raising=False)
+    monkeypatch.setenv("OPENAI_API_VERSION", "2024-06-01")
+    with pytest.raises(ValueError, match="AZURE_OPENAI_ENDPOINT"):
+        _create_chat_instance("azure-openai", "my-deployment")
+
+
+def test_create_chat_instance_azure_openai_missing_api_version(monkeypatch):
+    """Azure OpenAI provider raises if OPENAI_API_VERSION is unset."""
+    pytest.importorskip("openai")
+    monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com")
+    monkeypatch.delenv("OPENAI_API_VERSION", raising=False)
+    with pytest.raises(ValueError, match="OPENAI_API_VERSION"):
+        _create_chat_instance("azure-openai", "my-deployment")
+
+
+def test_create_chat_instance_azure_openai_forwards_params(monkeypatch):
+    """Azure OpenAI provider forwards env vars + deployment id to ChatAzureOpenAI."""
+    pytest.importorskip("openai")
+    chatlas = pytest.importorskip("chatlas")
+    monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com")
+    monkeypatch.setenv("OPENAI_API_VERSION", "2024-06-01")
+
+    sentinel = object()
+    with patch.object(chatlas, "ChatAzureOpenAI", return_value=sentinel) as mock_cls:
+        result = _create_chat_instance("azure-openai", "my-deployment", api_key="secret")
+
+    assert result is sentinel
+    mock_cls.assert_called_once()
+    kwargs = mock_cls.call_args.kwargs
+    assert kwargs["endpoint"] == "https://example.openai.azure.com"
+    assert kwargs["deployment_id"] == "my-deployment"
+    assert kwargs["api_version"] == "2024-06-01"
+    assert kwargs["api_key"] == "secret"
+    assert "system_prompt" in kwargs
+    assert "http_client" in kwargs["kwargs"]
+
+
 # ============================================================================
 # Test BatchConfig
 # ============================================================================

@@ -1,0 +1,769 @@
+{
+  "suffixes": [
+    "S.R.L.",
+    "S.A.",
+    "Ltd.",
+    "Group",
+    "Corp."
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Moldovan",
+    "Euro",
+    "Trans",
+    "Global",
+    "National",
+    "United",
+    "Central",
+    "Premium",
+    "Dynamic",
+    "Modern",
+    "Smart",
+    "Digital",
+    "Green",
+    "Golden",
+    "Silver",
+    "Royal",
+    "Grand",
+    "Elite",
+    "Pro",
+    "Nova"
+  ],
+  "nouns": [
+    "Energy",
+    "Gas",
+    "Power",
+    "Telecom",
+    "Bank",
+    "Insurance",
+    "Finance",
+    "Construction",
+    "Engineering",
+    "Manufacturing",
+    "Software",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Retail",
+    "Food",
+    "Pharma",
+    "Agro",
+    "Wine",
+    "Tech"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Moldtelecom",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Moldova Agroindbank",
+      "cities": [
+        "Chișinău",
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Moldovagaz",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Orange Moldova",
+      "cities": [
+        "Chișinău",
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Purcari Wineries",
+      "cities": [
+        "Chișinău",
+        "Purcari"
+      ]
+    },
+    {
+      "name": "Victoriabank",
+      "cities": [
+        "Chișinău",
+        "Bălți",
+        "Cahul"
+      ]
+    },
+    {
+      "name": "Moldcell",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Sudzucker Moldova",
+      "cities": [
+        "Chișinău",
+        "Drochia"
+      ]
+    },
+    {
+      "name": "Franzeluța",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Cricova",
+      "cities": [
+        "Cricova",
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Mileștii Mici",
+      "cities": [
+        "Mileștii Mici",
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Moldindconbank",
+      "cities": [
+        "Chișinău",
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Energocom",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Premier Energy",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Floare Carpet",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Bucuria",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Banca de Economii",
+      "cities": [
+        "Chișinău",
+        "Bălți",
+        "Cahul"
+      ]
+    },
+    {
+      "name": "Air Moldova",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Moldcarton",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Tutun CTC",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Glass Container Company",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Acorex Wine Holding",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Dionysos Mereni",
+      "cities": [
+        "Mereni"
+      ]
+    },
+    {
+      "name": "Kvint",
+      "cities": [
+        "Tiraspol"
+      ]
+    },
+    {
+      "name": "Sheriff",
+      "cities": [
+        "Tiraspol",
+        "Bender"
+      ]
+    },
+    {
+      "name": "Moldpresa",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Arax",
+      "cities": [
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Incomlac",
+      "cities": [
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Topaz",
+      "cities": [
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Floarea Soarelui",
+      "cities": [
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Farmaco",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Endava Moldova",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Pentalog Moldova",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Simpals",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Starnet",
+      "cities": [
+        "Chișinău",
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Moldelectrica",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Cahul Pan",
+      "cities": [
+        "Cahul"
+      ]
+    },
+    {
+      "name": "Barza Albă",
+      "cities": [
+        "Bălți"
+      ]
+    },
+    {
+      "name": "Fabrica de Conserve Cahul",
+      "cities": [
+        "Cahul"
+      ]
+    },
+    {
+      "name": "Efes Vitanta Moldova",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Natur Bravo",
+      "cities": [
+        "Chișinău"
+      ]
+    },
+    {
+      "name": "Metro Cash & Carry Moldova",
+      "cities": [
+        "Chișinău"
+      ]
+    }
+  ],
+  "jobs": [
+    "Inginer software",
+    "Manager de proiect",
+    "Analist de date",
+    "Manager de marketing",
+    "Reprezentant de vânzări",
+    "Manager resurse umane",
+    "Analist financiar",
+    "Manager operațional",
+    "Designer UI/UX",
+    "Dezvoltator frontend",
+    "Dezvoltator backend",
+    "Inginer DevOps",
+    "Inginer QA",
+    "Contabil",
+    "Analist de afaceri",
+    "Coordonator logistică",
+    "Specialist achiziții",
+    "Inginer mecanic",
+    "Inginer electrician",
+    "Inginer constructor",
+    "Manager de producție",
+    "Manager calitate",
+    "Agronom",
+    "Enolog",
+    "Viticultor",
+    "Profesor",
+    "Medic",
+    "Farmacist",
+    "Economist",
+    "Jurist",
+    "Asistent social",
+    "Ziarist",
+    "Traducător",
+    "Bibliotecar",
+    "Electrician",
+    "Sudor",
+    "Instalator",
+    "Strungar",
+    "Șofer",
+    "Brutar",
+    "Cofetar",
+    "Bucătar"
+  ],
+  "catch_phrase_adjectives": [
+    "Inovativ",
+    "Fiabil",
+    "Profesional",
+    "Dinamic",
+    "De încredere",
+    "Lider",
+    "Modern",
+    "Sustenabil",
+    "Orientat spre client",
+    "Avansat",
+    "Strategic",
+    "Premium"
+  ],
+  "catch_phrase_nouns": [
+    "soluții",
+    "servicii",
+    "inovații",
+    "valori",
+    "parteneriate",
+    "strategii",
+    "rezultate",
+    "principii",
+    "succes",
+    "angajamente"
+  ],
+  "catch_phrase_verbs": [
+    "livrăm",
+    "creăm",
+    "construim",
+    "oferim",
+    "realizăm",
+    "transformăm",
+    "conectăm",
+    "inovăm",
+    "conducem",
+    "dezvoltăm",
+    "optimizăm"
+  ],
+  "catch_phrase_connector": [
+    "și",
+    "cu",
+    "pentru"
+  ],
+  "industries": [
+    {
+      "name": "agriculture",
+      "weight": 0.14,
+      "jobs": [
+        "Agronom",
+        "Manager de producție",
+        "Coordonator logistică"
+      ],
+      "well_known": [
+        "Sudzucker Moldova",
+        "Floarea Soarelui",
+        "Natur Bravo"
+      ],
+      "company_suffixes": [
+        "Agro",
+        "S.R.L.",
+        "S.A.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Agro",
+        "Farm",
+        "Harvest",
+        "Land",
+        "Grain"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Agro {suffix}"
+      ]
+    },
+    {
+      "name": "winemaking",
+      "weight": 0.10,
+      "jobs": [
+        "Enolog",
+        "Viticultor",
+        "Manager calitate"
+      ],
+      "well_known": [
+        "Purcari Wineries",
+        "Cricova",
+        "Mileștii Mici",
+        "Dionysos Mereni",
+        "Acorex Wine Holding"
+      ],
+      "company_suffixes": [
+        "Vin",
+        "Wines",
+        "Winery",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Vin",
+        "Strugure",
+        "Crama",
+        "Podgorie"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Winery"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.10,
+      "jobs": [
+        "Inginer mecanic",
+        "Manager de producție",
+        "Manager calitate",
+        "Strungar",
+        "Sudor"
+      ],
+      "well_known": [
+        "Floare Carpet",
+        "Bucuria",
+        "Franzeluța",
+        "Glass Container Company",
+        "Moldcarton"
+      ],
+      "company_suffixes": [
+        "Industries",
+        "Manufacturing",
+        "S.A.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Manufacturing",
+        "Industries",
+        "Production",
+        "Factory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Manufacturing {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.10,
+      "jobs": [
+        "Analist financiar",
+        "Contabil",
+        "Economist"
+      ],
+      "well_known": [
+        "Moldova Agroindbank",
+        "Victoriabank",
+        "Moldindconbank",
+        "Banca de Economii"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "S.A.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Banking"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.09,
+      "jobs": [
+        "Inginer constructor",
+        "Manager de proiect",
+        "Instalator",
+        "Electrician"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Construct",
+        "Building",
+        "S.R.L.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Building",
+        "Development",
+        "Housing"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Construct {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08,
+      "jobs": [
+        "Inginer electrician",
+        "Inginer software",
+        "Manager operațional"
+      ],
+      "well_known": [
+        "Moldtelecom",
+        "Orange Moldova",
+        "Moldcell",
+        "Starnet"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "S.A.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Communications",
+        "Networks",
+        "Connect"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Telecom"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.10,
+      "jobs": [
+        "Inginer software",
+        "Dezvoltator frontend",
+        "Dezvoltator backend",
+        "Inginer DevOps",
+        "Inginer QA",
+        "Designer UI/UX",
+        "Analist de date"
+      ],
+      "well_known": [
+        "Endava Moldova",
+        "Pentalog Moldova",
+        "Simpals"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Medic",
+        "Farmacist",
+        "Asistent social"
+      ],
+      "well_known": [
+        "Farmaco"
+      ],
+      "company_suffixes": [
+        "Med",
+        "Pharma",
+        "Health",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Medical",
+        "Pharma",
+        "Health",
+        "Clinic"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Medical Center"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Profesor",
+        "Bibliotecar",
+        "Traducător"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Education",
+        "Academy",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Education",
+        "Academy",
+        "Learning",
+        "School"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{city} Academy",
+        "{last_name} Education {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.07,
+      "jobs": [
+        "Inginer electrician",
+        "Manager operațional"
+      ],
+      "well_known": [
+        "Moldovagaz",
+        "Energocom",
+        "Premier Energy",
+        "Moldelectrica"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Power",
+        "S.A.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Power",
+        "Electric",
+        "Gas"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Energy {suffix}"
+      ]
+    },
+    {
+      "name": "retail",
+      "weight": 0.07,
+      "jobs": [
+        "Reprezentant de vânzări",
+        "Manager de marketing",
+        "Șofer",
+        "Brutar",
+        "Bucătar"
+      ],
+      "well_known": [
+        "Metro Cash & Carry Moldova",
+        "Efes Vitanta Moldova",
+        "Cahul Pan",
+        "Barza Albă"
+      ],
+      "company_suffixes": [
+        "Market",
+        "Store",
+        "S.R.L.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Market",
+        "Store",
+        "Retail",
+        "Trade",
+        "Commerce"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Market"
+      ]
+    }
+  ]
+}

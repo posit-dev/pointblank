@@ -547,3 +547,35 @@ def test_check_schema_match_in_order_option():
         )
         is True
     )
+
+
+def test_get_column_list_none_columns():
+    schema = Schema(columns=["a", "b"])
+    schema.columns = None
+    assert schema.get_column_list() == []
+
+
+def test_get_dtype_list_none_columns():
+    schema = Schema(columns=["a", "b"])
+    schema.columns = None
+    assert schema.get_dtype_list() == []
+
+
+def test_schema_str_empty():
+    schema = Schema(tbl=pl.DataFrame({"x": [1]}))
+    schema.columns = None
+    assert str(schema) == "Pointblank Schema (empty)"
+
+
+def test_schema_repr():
+    schema = Schema(columns=["a", "b"])
+    r = repr(schema)
+    assert "Schema" in r
+    assert "columns" in r
+
+
+def test_get_schema_coerced_unsupported_type():
+    df = pl.DataFrame({"a": [1, 2, 3]})
+    schema = Schema(tbl=df)
+    with pytest.raises(ValueError, match="Cannot coerce schema"):
+        schema.get_schema_coerced(to="dask")

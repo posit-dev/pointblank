@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, Literal
 
 import narwhals as nw
 
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._utils import _get_tbl_type, _is_lazy_frame, _is_lib_present, _is_narwhals_table
 
-__all__ = ["Schema", "_check_schema_match"]
+if TYPE_CHECKING:
+    from typing import Any
+
+    from pointblank.field import Field
+
+__all__ = ["Schema", "generate_dataset", "schema_from_tbl", "_check_schema_match"]
 
 
 @dataclass
@@ -127,7 +133,7 @@ class Schema:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     A schema can be constructed via the `Schema` class in multiple ways. Let's use the following
     Polars DataFrame as a basis for constructing a schema:
@@ -269,19 +275,17 @@ class Schema:
     `Schema` object is used in a validation workflow.
     """
 
-    columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None = (
-        None
-    )
-    tbl: any | None = None
+    columns: list[tuple[str, ...]] | None = None
+    tbl: Any | None = None
 
     def __init__(
         self,
         columns: (
             str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None
         ) = None,
-        tbl: any | None = None,
+        tbl: Any | None = None,
         **kwargs,
-    ):
+    ) -> None:
         if tbl is None and columns is None and not kwargs:
             raise ValueError(
                 "Either `columns`, `tbl`, or individual column arguments must be provided."
@@ -300,7 +304,7 @@ class Schema:
 
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.columns is not None:
             self._validate_schema_inputs()
         if self.tbl is not None:
@@ -310,14 +314,91 @@ class Schema:
         if self.tbl is not None:
             self.tbl_type = _get_tbl_type(self.tbl)
 
-    def _validate_schema_inputs(self):
+    @classmethod
+    def from_table(
+        cls,
+        tbl: Any,
+        *,
+        infer_constraints: bool = True,
+        categorical_threshold: int | float = 20,
+        detect_presets: bool = True,
+        sample_size: int | None = None,
+    ) -> "Schema":
+        """
+        Create a Schema from an existing table with inferred Field constraints.
+
+        Unlike `Schema(tbl=df)` which only captures column names and dtypes, this method
+        inspects the actual values in the table to infer rich constraints suitable for
+        synthetic data generation via `schema.generate()`.
+
+        Parameters
+        ----------
+        tbl
+            A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+        infer_constraints
+            When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc.
+            When `False`, behave like `Schema(tbl=df)` (dtype only).
+        categorical_threshold
+            If a column has <= this many unique values (int) or this fraction of total rows (float
+            between 0 and 1), treat it as categorical and populate `allowed=`. Default is `20`.
+        detect_presets
+            Attempt to match string columns to known generation presets (e.g., email, url,
+            phone_number) based on column name heuristics and value validation. Default is `True`.
+        sample_size
+            If set, sample this many rows before analysis (useful for very large tables).
+            `None` means use all rows.
+
+        Returns
+        -------
+        Schema
+            A Schema populated with Field objects containing inferred constraints, ready for use
+            with `schema.generate()` or `generate_dataset()`.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        df = pl.DataFrame({
+            "user_id": [1, 2, 3, 4, 5],
+            "email": ["a@b.com", "c@d.com", "e@f.com", "g@h.com", "i@j.com"],
+            "age": [25, 30, 35, 40, 45],
+            "status": ["active", "active", "pending", "inactive", "active"],
+        })
+
+        schema = pb.Schema.from_table(df)
+
+        # Generate synthetic data matching the original's characteristics
+        synthetic = schema.generate(n=100, seed=23)
+        ```
+        """
+        if not infer_constraints:
+            return cls(tbl=tbl)
+
+        from pointblank.generate.inference import infer_fields_from_table
+
+        field_tuples = infer_fields_from_table(
+            tbl,
+            categorical_threshold=categorical_threshold,
+            detect_presets=detect_presets,
+            sample_size=sample_size,
+        )
+
+        # Build Schema with Field objects as column values
+        instance = cls.__new__(cls)
+        instance.tbl = None
+        instance.columns = [(name, field_obj) for name, field_obj in field_tuples]
+        return instance
+
+    def _validate_schema_inputs(self) -> None:
         if not isinstance(self.columns, list):
             raise ValueError("`columns` must be a list.")
 
         if not all(isinstance(col, tuple) for col in self.columns):
             raise ValueError("All elements of `columns` must be tuples.")
 
-    def _collect_schema_from_table(self):
+    def _collect_schema_from_table(self) -> None:
         # Determine if this table can be converted to a Narwhals DataFrame
         table_type = _get_tbl_type(self.tbl)
 
@@ -387,6 +468,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -463,6 +546,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -547,6 +632,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -633,6 +720,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -702,6 +791,8 @@ class Schema:
         list[str]
             A list of column names.
         """
+        if self.columns is None:
+            return []
         return [col[0] for col in self.columns]
 
     def get_dtype_list(self) -> list[str]:
@@ -713,9 +804,11 @@ class Schema:
         list[str]
             A list of data types.
         """
+        if self.columns is None:
+            return []
         return [col[1] for col in self.columns]
 
-    def get_schema_coerced(self, to: str | None = None) -> dict[str, str]:
+    def get_schema_coerced(self, to: str | None = None) -> Schema:
         # If a table isn't provided, we cannot use this method
         if self.tbl is None:
             raise ValueError(
@@ -755,8 +848,15 @@ class Schema:
                 new_schema = copy.deepcopy(Schema(tbl=(self.tbl.to_pandas())))
                 return new_schema
 
-    def __str__(self):
+        raise ValueError(
+            f"Cannot coerce schema from '{self.tbl_type}' to '{to}'. "
+            "Supported conversions: pandas->polars, polars->pandas."
+        )
+
+    def __str__(self) -> str:
         formatted_columns = []
+        if self.columns is None:
+            return "Pointblank Schema (empty)"
         for col in self.columns:
             if len(col) == 1:  # Only column name provided (no data type)
                 formatted_columns.append(f"  {col[0]}: <ANY>")
@@ -765,13 +865,293 @@ class Schema:
 
         return "Pointblank Schema\n" + "\n".join(formatted_columns)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Schema(columns={self.columns})"
+
+    def generate(
+        self,
+        n: int = 100,
+        seed: int | None = None,
+        output: Literal["polars", "pandas", "dict"] = "polars",
+        country: str | list[str] | dict[str, float] = "US",
+        shuffle: bool = True,
+        weighted: bool = True,
+    ) -> Any:
+        """
+        Generate synthetic test data conforming to this schema.
+
+        This method generates random data that matches the schema's column definitions. When the
+        schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
+        `pattern`, `preset`), the generated data will respect those constraints.
+
+        Parameters
+        ----------
+        n
+            Number of rows to generate. Default is `100`.
+        seed
+            Random seed for reproducibility. If provided, the same seed will produce
+            the same data. Default is `None` (non-deterministic).
+        output
+            Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+            Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
+            a dictionary of lists.
+        country
+            Country code(s) for realistic data generation when using presets. Accepts a single ISO
+            3166-1 alpha-2 or alpha-3 code (e.g., `"US"`, `"DEU"`), a list of codes for uniform
+            mixing (e.g., `["US", "DE", "JP"]`), or a dict mapping codes to positive weights (e.g.,
+            `{"US": 60, "DE": 25, "JP": 15}`). See the *Locale Mixing* section below for details.
+            Default is `"US"`.
+        shuffle
+            When `country=` specifies multiple countries, controls whether the output rows are
+            randomly interleaved (`True`, the default) or grouped in contiguous country blocks
+            (`False`). The shuffle is deterministic with the seed. Has no effect when `country` is
+            a single string. Default is `True`.
+        weighted
+            When `True`, names and locations are sampled according to real-world frequency tiers.
+            Common names like "James" and "Smith" appear far more often than rare names. Large
+            cities like New York and Los Angeles dominate over small towns. Only affects data files
+            that have been migrated to the tiered format; flat-list data always uses uniform
+            sampling. Default is `True`.
+
+        Returns
+        -------
+        DataFrame or dict
+            Generated data in the requested format.
+
+        Raises
+        ------
+        ValueError
+            If the schema has no columns or if constraints cannot be satisfied.
+        ImportError
+            If required optional dependencies are not installed.
+
+        Locale Mixing
+        -------------
+        The `country=` parameter accepts three input forms for flexible locale control:
+
+        (1) a **single string** (the default), such as `"US"` or `"DEU"`, which generates all rows
+        from one locale; (2) a **list of strings**, such as `["US", "DE", "JP"]`, which splits rows
+        equally across the listed countries; and (3) a **dict of weights**, such as
+        `{"US": 0.6, "DE": 0.3, "FR": 0.1}`, which allocates rows proportionally (weights are
+        auto-normalized, so `{"US": 6, "DE": 3, "FR": 1}` is equivalent).
+
+        Row counts are distributed using largest-remainder apportionment so they always sum to
+        exactly `n=`. Each country's rows are generated as an independent batch (preserving all
+        cross-column coherence within each batch), then either interleaved randomly (`shuffle=True`,
+        the default) or left in contiguous country blocks (`shuffle=False`).
+
+        Supported Countries
+        -------------------
+        The `country=` parameter controls the country used for generating realistic data with
+        presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific formats
+        like addresses, phone numbers, and postal codes. Currently, **100 countries** are supported
+        with full locale data:
+
+        **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+        Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+        Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+        France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+        Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+        Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+        Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
+        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+        Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
+
+        **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+        Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+        Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+        Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+        Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+        Uruguay (`"UY"`)
+
+        **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+        Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+        Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+        Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+        Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+        Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+        Vietnam (`"VN"`)
+
+        **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+        Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`), Jordan (`"JO"`),
+        Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`), Mozambique (`"MZ"`),
+        Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`), Senegal (`"SN"`),
+        South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`), Turkey (`"TR"`),
+        Uganda (`"UG"`), United Arab Emirates (`"AE"`)
+
+        Examples
+        --------
+        Using `pb.Schema` we first put together a schema with field constraints:
+
+        ```{python}
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(min_val=1, unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+            status=pb.string_field(allowed=["active", "pending", "inactive"]),
+        )
+        ```
+
+        With the `generate()` method, we can obtain a set number of rows of generated data:
+
+        ```{python}
+        # Generate 100 rows of test data
+        pb.preview(schema.generate(n=100, seed=23))
+        ```
+
+        It's possible to generate data from a simple dtype-only schema:
+
+        ```{python}
+        schema = pb.Schema(name="String", age="Int64", active="Boolean")
+
+        pb.preview(schema.generate(n=50, seed=123, output="pandas"))
+        ```
+
+        We can obtain synthetic data with German addresses using presets for person name and city of
+        residence. Note the use of `country="DE"` in the `generate()` call:
+
+        ```{python}
+        schema = pb.Schema(
+            name=pb.string_field(preset="name"),
+            city=pb.string_field(preset="city"),
+        )
+
+        pb.preview(schema.generate(n=20, seed=23, country="DE"))
+        ```
+        """
+        from pointblank.field import Field
+        from pointblank.generate import GeneratorConfig, generate_dataframe
+
+        if self.columns is None or len(self.columns) == 0:
+            raise ValueError("Cannot generate data from an empty schema.")
+
+        # Convert schema columns to Field objects
+        fields: dict[str, Field] = {}
+
+        for col_tuple in self.columns:
+            col_name = col_tuple[0]
+
+            # Check if the value is already a Field object
+            if len(col_tuple) > 1 and isinstance(col_tuple[1], Field):
+                fields[col_name] = col_tuple[1]
+            elif len(col_tuple) > 1:
+                # Simple dtype string - convert to basic Field
+                dtype_str = col_tuple[1]
+                fields[col_name] = _dtype_string_to_field(dtype_str)
+            else:
+                # No dtype specified - default to String
+                fields[col_name] = Field(dtype="String")
+
+        # Create generator config
+        config = GeneratorConfig(
+            n=n,
+            seed=seed,
+            output=output,
+            country=country,
+            shuffle=shuffle,
+            weighted=weighted,
+        )
+
+        return generate_dataframe(fields, config)
+
+
+def _dtype_string_to_field(dtype_str: str) -> "Field":
+    """
+    Convert a dtype string to a basic Field object.
+
+    This handles the mapping from various dtype string formats to
+    standardized Field dtypes.
+    """
+    from pointblank.field import (
+        BoolField,
+        DateField,
+        DatetimeField,
+        DurationField,
+        FloatField,
+        IntField,
+        StringField,
+        TimeField,
+    )
+
+    # Normalize dtype string
+    dtype_lower = dtype_str.lower()
+
+    # Map common dtype strings to Field classes and dtypes
+    dtype_mapping = {
+        # Integer types
+        "int8": ("int", "Int8"),
+        "int16": ("int", "Int16"),
+        "int32": ("int", "Int32"),
+        "int64": ("int", "Int64"),
+        "int": ("int", "Int64"),
+        "integer": ("int", "Int64"),
+        "uint8": ("int", "UInt8"),
+        "uint16": ("int", "UInt16"),
+        "uint32": ("int", "UInt32"),
+        "uint64": ("int", "UInt64"),
+        # Float types
+        "float32": ("float", "Float32"),
+        "float64": ("float", "Float64"),
+        "float": ("float", "Float64"),
+        "double": ("float", "Float64"),
+        # String types
+        "string": ("string", "String"),
+        "str": ("string", "String"),
+        "utf8": ("string", "String"),
+        "object": ("string", "String"),
+        # Boolean
+        "bool": ("bool", "Boolean"),
+        "boolean": ("bool", "Boolean"),
+        # Date/time types
+        "date": ("date", "Date"),
+        "datetime": ("datetime", "Datetime"),
+        "timestamp": ("datetime", "Datetime"),
+        "time": ("time", "Time"),
+        "duration": ("duration", "Duration"),
+        "timedelta": ("duration", "Duration"),
+    }
+
+    # Field class mapping
+    field_classes = {
+        "int": IntField,
+        "float": FloatField,
+        "string": StringField,
+        "bool": BoolField,
+        "date": DateField,
+        "datetime": DatetimeField,
+        "time": TimeField,
+        "duration": DurationField,
+    }
+
+    # Try direct mapping first
+    if dtype_lower in dtype_mapping:
+        field_type, dtype = dtype_mapping[dtype_lower]
+        field_class = field_classes[field_type]
+        return field_class(dtype=dtype)
+
+    # Try to match partial strings (e.g., "datetime64[ns]" -> "Datetime")
+    for key, (field_type, dtype) in dtype_mapping.items():
+        if key in dtype_lower:
+            field_class = field_classes[field_type]
+            return field_class(dtype=dtype)
+
+    # Default to StringField for unknown types
+    return StringField()
 
 
 def _process_columns(
-    *, columns: str | list[str] | list[tuple[str, str]] | dict[str, str] | None = None, **kwargs
-) -> list[tuple[str, str]]:
+    *,
+    columns: str
+    | list[str]
+    | list[tuple[str, str]]
+    | list[tuple[str]]
+    | dict[str, str]
+    | None = None,
+    **kwargs,
+) -> list[tuple[str, ...]]:
     """
     Process column information provided as individual arguments or as a list of
     tuples/dictionary.
@@ -785,15 +1165,18 @@ def _process_columns(
 
     Returns
     -------
-    list[tuple[str, str]]
-        A list of tuples containing column information.
+    list[tuple[str, ...]]
+        A list of tuples containing column information (name only or name and dtype).
     """
     if columns is not None:
         if isinstance(columns, list):
             if all(isinstance(col, str) for col in columns):
-                return [(col,) for col in columns]
+                # Type narrowing: after the all() check, columns contains only strings
+                str_columns: list[str] = columns  # type: ignore[assignment]
+                return [(col,) for col in str_columns]
             else:
-                return columns
+                # Type narrowing: columns contains tuples
+                return columns  # type: ignore[return-value]
 
         if isinstance(columns, str):
             return [(columns,)]
@@ -810,11 +1193,11 @@ def _schema_info_generate_colname_dict(
     index_matched: bool,
     matched_to: str | None,
     dtype_present: bool,
-    dtype_input: str | list[str],
+    dtype_input: str | list[str] | None,
     dtype_matched: bool,
     dtype_multiple: bool,
-    dtype_matched_pos: int,
-) -> dict[str, any]:
+    dtype_matched_pos: int | None,
+) -> dict[str, Any]:
     return {
         "colname_matched": colname_matched,
         "index_matched": index_matched,
@@ -829,8 +1212,8 @@ def _schema_info_generate_colname_dict(
 
 def _schema_info_generate_columns_dict(
     colnames: list[str] | None,
-    colname_dict: list[dict[str, any]] | None,
-) -> dict[str, dict[str, any]]:
+    colname_dict: list[dict[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
     """
     Generate the columns dictionary for the schema information dictionary.
 
@@ -847,6 +1230,7 @@ def _schema_info_generate_columns_dict(
     dict[str, dict[str, any]]
         The columns dictionary.
     """
+    assert colnames is not None and colname_dict is not None
     return {colnames[i]: colname_dict[i] for i in range(len(colnames))}
 
 
@@ -856,7 +1240,7 @@ def _schema_info_generate_params_dict(
     case_sensitive_colnames: bool,
     case_sensitive_dtypes: bool,
     full_match_dtypes: bool,
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Generate the parameters dictionary for the schema information dictionary.
 
@@ -889,7 +1273,7 @@ def _schema_info_generate_params_dict(
 
 
 def _get_schema_validation_info(
-    data_tbl: any,
+    data_tbl: Any,
     schema: Schema,
     passed: bool,
     complete: bool,
@@ -897,7 +1281,7 @@ def _get_schema_validation_info(
     case_sensitive_colnames: bool,
     case_sensitive_dtypes: bool,
     full_match_dtypes: bool,
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Get the schema validation information dictionary.
 
@@ -948,6 +1332,10 @@ def _get_schema_validation_info(
 
     schema_exp = schema
     schema_tgt = Schema(tbl=data_tbl)
+
+    # Both schemas must have columns for validation
+    assert schema_exp.columns is not None, "Expected schema must have columns"
+    assert schema_tgt.columns is not None, "Target schema must have columns"
 
     # Initialize the schema information dictionary
     schema_info = {
@@ -1122,6 +1510,11 @@ def _get_schema_validation_info(
         #
 
         if colname_matched and dtype_present:
+            # Type narrowing: matched_to is not None when colname_matched is True
+            # and dtype_input is not None when dtype_present is True
+            assert matched_to is not None
+            assert dtype_input is not None
+
             # Get the dtype of the column in the target table
             dtype_tgt = schema_tgt.columns[tgt_colnames.index(matched_to)][1]
 
@@ -1261,3 +1654,345 @@ def _check_schema_match(
         )
 
     return res
+
+
+def generate_dataset(
+    schema: Schema,
+    n: int = 100,
+    seed: int | None = None,
+    output: Literal["polars", "pandas", "dict"] = "polars",
+    country: str | list[str] | dict[str, float] = "US",
+    shuffle: bool = True,
+    weighted: bool = True,
+) -> Any:
+    """
+    Generate synthetic test data from a schema.
+
+    This function generates random data that conforms to a schema's column definitions. When the
+    schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`,
+    `pattern=`, `preset=`), the generated data will respect those constraints.
+
+    Parameters
+    ----------
+    schema
+        The schema object defining the structure and constraints of the data to generate. Each
+        column can be specified using a field helper function (e.g., `int_field()`,
+        `string_field()`) for fine-grained control, or as a simple dtype string (e.g.,
+        `"Int64"`, `"String"`) for unconstrained generation.
+    n
+        Number of rows to generate. The default is `100`.
+    seed
+        Random seed for reproducibility. If provided, the same seed will produce
+        the same data. Default is `None` (non-deterministic).
+    output
+        Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
+        Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
+        a dictionary of lists.
+    country
+        Country code(s) for locale-aware generation when using presets. Accepts a single
+        ISO 3166-1 alpha-2 or alpha-3 code (e.g., `"US"`, `"DEU"`), a list of codes for
+        uniform mixing (e.g., `["US", "DE", "JP"]`), or a dict mapping codes to positive
+        weights (e.g., `{"US": 60, "DE": 25, "JP": 15}`). See the *Locale Mixing* section
+        below for details. The default is `"US"`.
+    shuffle
+        When `country=` is a list or dict (multi-country mixing), controls whether rows from
+        different countries are interleaved randomly (`True`, the default) or grouped by country
+        in the order the countries are specified (`False`). Ignored when `country=` is a single
+        string.
+    weighted
+        When `True`, names and locations are sampled according to real-world frequency tiers.
+        Common names like "James" and "Smith" appear far more often than rare names. Large
+        cities like New York and Los Angeles dominate over small towns. Only affects data files
+        that have been migrated to the tiered format; flat-list data always uses uniform
+        sampling. Default is `True`.
+
+    Returns
+    -------
+    DataFrame or dict
+        Generated data in the requested format.
+
+    Raises
+    ------
+    ValueError
+        If the schema has no columns or if constraints cannot be satisfied.
+    ImportError
+        If required optional dependencies are not installed.
+
+    Presets and the `country=` Parameter
+    ------------------------------------
+    Several `string_field()` presets produce locale-aware data that varies depending on the
+    `country=` parameter. The following presets are particularly affected:
+
+    - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
+      `"phone_number"`, `"latitude"`, `"longitude"`, `"license_plate"`): produce addresses,
+      cities, postal codes, phone numbers, and license plates formatted for the specified
+      country. For example, `country="DE"` yields German street names and PLZ postal codes,
+      while `country="JP"` yields Japanese addresses. License plates for CA, US, DE, AU, and
+      GB use province/state-specific formats when location fields are present.
+    - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
+      `"email"`, `"user_name"`) produce culturally appropriate names for the specified country.
+      For example, `country="FR"` produces French names, while `country="KR"` produces Korean
+      names.
+    - **Business-related presets** (`"job"`, `"company"`): when both are present, the job and
+      company are drawn from the same industry for realism. The `"name_full"` preset will also
+      add profession-matched titles (e.g., "Dr." for doctors, "Prof." for professors), and
+      integer columns named `age` are automatically constrained to working-age range (22--65).
+    - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
+      format used by the specified country.
+    - **Locale preset** (`"locale_code"`): returns a locale identifier (e.g., `"en_US"`,
+      `"de_DE"`) derived from the country. Multilingual countries randomly select among their
+      official locale codes (e.g., `"CH"` yields `"de_CH"`, `"fr_CH"`, or `"it_CH"`).
+
+    When multiple columns in the same schema use related presets, the generated data is
+    automatically coherent across those columns within each row. Person-related presets will share
+    the same identity (e.g., the email is derived from the name), address-related presets will
+    share the same location (e.g., the city matches the address), and business-related presets
+    will share the same industry context.
+
+    Locale Mixing
+    -------------
+    The `country=` parameter accepts three input forms for flexible locale control:
+
+    (1) a **single string** (the default), such as `"US"` or `"DEU"`, which generates
+    all rows from one locale; (2) a **list of strings**, such as `["US", "DE", "JP"]`,
+    which splits rows equally across the listed countries; and (3) a **dict of weights**,
+    such as `{"US": 0.6, "DE": 0.3, "FR": 0.1}`, which allocates rows proportionally
+    (weights are auto-normalized, so `{"US": 6, "DE": 3, "FR": 1}` is equivalent).
+
+    Row counts are distributed using largest-remainder apportionment so they always sum
+    to exactly `n=`. Each country's rows are generated as an independent batch (preserving
+    all cross-column coherence within each batch), then either interleaved randomly
+    (`shuffle=True`, the default) or left in contiguous country blocks
+    (`shuffle=False`).
+
+    Supported Countries
+    -------------------
+    The `country=` parameter currently supports 100 countries with full locale data:
+
+    **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+    Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+    Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+    France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+    Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+    Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+    Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
+    Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+    Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
+
+    **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+    Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+    Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+    Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+    Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+    Uruguay (`"UY"`)
+
+    **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+    Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+    Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+    Vietnam (`"VN"`)
+
+    **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+    Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`),
+    Jordan (`"JO"`), Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`),
+    Mozambique (`"MZ"`), Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`),
+    Senegal (`"SN"`), South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`),
+    Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
+
+    Pytest Fixture
+    --------------
+    When Pointblank is installed, a `generate_dataset` pytest fixture is automatically
+    available in all test files: no imports or `conftest.py` setup required. The fixture
+    behaves identically to this function, but derives a deterministic seed from the test's
+    fully-qualified name when `seed=` is not provided.
+
+    This means:
+
+    - the **same test** always produces the **same data**, with no manual seed management.
+    - **different tests** get different seeds, so they exercise different data.
+    - **you** can still pass an explicit `seed=` to override the automatic seed.
+    - **calling** the fixture **multiple times** within one test produces different (but still
+    deterministic) data on each call.
+    - the fixture exposes `.default_seed` and `.last_seed` attributes for debugging.
+
+    ```python
+    def test_my_pipeline(generate_dataset):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+        )
+        df = generate_dataset(schema, n=500, country="DE")
+        # seed is derived from "test_my_pipeline" — same data every run
+        result = my_pipeline(df)
+        assert result.shape[0] == 500
+    ```
+
+    Multiple datasets can be generated within the same test, each with its own
+    deterministic seed:
+
+    ```python
+    def test_merge(generate_dataset):
+        customers = generate_dataset(customer_schema, n=1000, country="US")
+        orders = generate_dataset(order_schema, n=5000)
+        # Both DataFrames are deterministic; each call gets a unique seed
+    ```
+
+    When a test fails, include the seed in the assertion message so the failure is easy to
+    reproduce:
+
+    ```python
+    def test_age_range(generate_dataset):
+        df = generate_dataset(schema, n=100)
+        assert df["age"].min() >= 18, f"Failed with seed {generate_dataset.last_seed}"
+    ```
+
+    Seed Stability
+    --------------
+    A given seed (whether explicit or auto-derived) is guaranteed to produce identical output
+    **within the same Pointblank version**. Across versions, changes to country data files or
+    generator logic may alter the output for a given seed.
+
+    For CI pipelines that require bit-exact data across library upgrades, save generated
+    DataFrames as Parquet or CSV snapshot files rather than relying on cross-version seed
+    stability. This is the same approach used by snapshot-testing tools like `pytest-snapshot`
+    and `syrupy`.
+
+    Examples
+    --------
+    Here we define a schema with field constraints and generate test data from it:
+
+    ```{python}
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        email=pb.string_field(preset="email"),
+        age=pb.int_field(min_val=18, max_val=100),
+        status=pb.string_field(allowed=["active", "pending", "inactive"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    It's also possible to generate data from a simple, dtype-only schema. Setting
+    `output="pandas"` returns a Pandas DataFrame:
+
+    ```{python}
+    schema = pb.Schema(name="String", age="Int64", active="Boolean")
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
+    ```
+
+    When using presets, the `country=` parameter controls the locale. Here, `country="DE"`
+    produces German names and addresses:
+
+    ```{python}
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        address=pb.string_field(preset="address"),
+        city=pb.string_field(preset="city"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
+    ```
+
+    We can combine several field types with nullable columns in a mixed-type dataset:
+
+    ```{python}
+    from datetime import date, timedelta
+
+    schema = pb.Schema(
+        id=pb.int_field(min_val=1, unique=True),
+        name=pb.string_field(preset="name"),
+        score=pb.float_field(min_val=0.0, max_val=100.0),
+        is_active=pb.bool_field(p_true=0.75),
+        joined=pb.date_field(min_date=date(2020, 1, 1), max_date=date(2024, 12, 31)),
+        session_time=pb.duration_field(
+            min_duration=timedelta(minutes=1),
+            max_duration=timedelta(hours=3),
+            nullable=True, null_probability=0.2,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+    """
+    return schema.generate(
+        n=n, seed=seed, output=output, country=country, shuffle=shuffle, weighted=weighted
+    )
+
+
+def schema_from_tbl(
+    tbl: Any,
+    *,
+    infer_constraints: bool = True,
+    categorical_threshold: int | float = 20,
+    detect_presets: bool = True,
+    sample_size: int | None = None,
+) -> Schema:
+    """
+    Create a Schema from an existing table with inferred Field constraints.
+
+    This is the functional form of `Schema.from_table()`. It inspects the actual values in the
+    table to infer rich constraints (min/max, uniqueness, null rates, allowed values, presets)
+    suitable for synthetic data generation via `schema.generate()` or `generate_dataset()`.
+
+    Parameters
+    ----------
+    tbl
+        A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+    infer_constraints
+        When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc. When
+        `False`, behave like `Schema(tbl=df)` (dtype only).
+    categorical_threshold
+        If a column has <= this many unique values (int) or this fraction of total rows (float
+        between `0` and `1`), treat it as categorical and populate `allowed=`. Default is `20`.
+    detect_presets
+        Attempt to match string columns to known generation presets (e.g., email, url, phone_number)
+        based on column name heuristics and value validation. Default is `True`.
+    sample_size
+        If set, sample this many rows before analysis (useful for very large tables). `None` means
+        use all rows.
+
+    Returns
+    -------
+    Schema
+        A Schema populated with Field objects containing inferred constraints, ready for use with
+        `schema.generate()` or `generate_dataset()`.
+
+    Examples
+    --------
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    df = pl.DataFrame({
+        "user_id": list(range(1, 51)),
+        "email": [f"user{i}@example.com" for i in range(50)],
+        "age": [20 + i % 50 for i in range(50)],
+        "status": ["active", "pending", "inactive"] * 16 + ["active", "pending"],
+    })
+
+    schema = pb.schema_from_tbl(df)
+    print(schema)
+    ```
+
+    Generate synthetic data matching the original's characteristics:
+
+    ```{python}
+    pb.preview(schema.generate(n=10, seed=23))
+    ```
+    """
+    return Schema.from_table(
+        tbl,
+        infer_constraints=infer_constraints,
+        categorical_threshold=categorical_threshold,
+        detect_presets=detect_presets,
+        sample_size=sample_size,
+    )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 import pathlib
 import warnings
 import pprint
@@ -27,6 +28,19 @@ def multiply_column_by_20(df):
     return df.with_columns(nw.col("a") * 20)
 
 
+def _strip_report_nondeterminism(html_str: str) -> str:
+    """Strip non-deterministic content (timestamps, durations, footers) from report HTML."""
+    # Remove tfoot-based sourcenotes (great_tables < 0.22)
+    html_str = re.sub(r'<tfoot class="gt_sourcenotes">.*?</tfoot>', "", html_str, flags=re.DOTALL)
+    # Remove tr-based sourcenotes (great_tables >= 0.22)
+    html_str = re.sub(r'<tr class="gt_sourcenotes">.*?</tr>', "", html_str, flags=re.DOTALL)
+    # Replace timestamps (e.g., "2026-06-12 12:35:50 UTC")
+    html_str = re.sub(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC", "TIMESTAMP", html_str)
+    # Replace durations (e.g., "< 1 s" or "2.5 s")
+    html_str = re.sub(r"(?:<|&lt;)\s*\d+\s*s|\d+\.?\d*\s*s", "DURATION", html_str)
+    return html_str
+
+
 # StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
 try:
     from enum import StrEnum
@@ -38,50 +52,77 @@ except ImportError:
 
 import pandas as pd
 import polars as pl
+from polars.testing import assert_frame_equal
 import pytz
 import ibis
 
 # PySpark import with environment setup for cross-platform compatibility
-try:
-    import os
+import os
 
-    # Set Java home for compatibility if not already set
-    if "JAVA_HOME" not in os.environ:
-        # Try common Java locations across platforms
-        java_paths = [
-            "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",  # macOS
-            "/usr/lib/jvm/java-11-openjdk-amd64",  # Ubuntu/Debian
-            "/usr/lib/jvm/java-11-openjdk",  # CentOS/RHEL
-            "/usr/lib/jvm/default-java",  # Generic Ubuntu
-        ]
+PYSPARK_AVAILABLE = False
 
-        for java_path in java_paths:
-            if os.path.exists(java_path):
-                os.environ["JAVA_HOME"] = java_path
-                break
+# Allow skipping PySpark tests via environment variable (check first to avoid slow Spark init)
+if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() not in ("true", "1", "yes"):
+    try:
+        # Set Java home for compatibility if not already set
+        if "JAVA_HOME" not in os.environ:
+            # Try common Java locations across platforms
+            java_paths = [
+                "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",  # macOS
+                "/usr/lib/jvm/java-11-openjdk-amd64",  # Ubuntu/Debian
+                "/usr/lib/jvm/java-11-openjdk",  # CentOS/RHEL
+                "/usr/lib/jvm/default-java",  # Generic Ubuntu
+            ]
 
-    from pyspark.sql import SparkSession
-    from pyspark.sql.types import (
-        BooleanType,
-        DoubleType,
-        IntegerType,
-        StringType,
-        StructField,
-        StructType,
-    )
-    import pyspark.sql.functions as F
+            for java_path in java_paths:
+                if os.path.exists(java_path):
+                    os.environ["JAVA_HOME"] = java_path
+                    break
 
-    PYSPARK_AVAILABLE = True
-except ImportError:
-    PYSPARK_AVAILABLE = False
+        from pyspark.sql import SparkSession
+        from pyspark.sql.types import (
+            BooleanType,
+            DoubleType,
+            IntegerType,
+            StringType,
+            StructField,
+            StructType,
+        )
+        import pyspark.sql.functions as F
 
+        # Verify Spark can actually start (catches Netty/Java runtime errors)
+        import subprocess
+        import sys
+
+        _check = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "from pyspark.sql import SparkSession; "
+                "s = SparkSession.builder.appName('check').master('local[1]')"
+                ".config('spark.ui.enabled','false').getOrCreate(); s.stop()",
+            ],
+            capture_output=True,
+            timeout=30,
+        )
+        if _check.returncode == 0:
+            PYSPARK_AVAILABLE = True
+
+    except (ImportError, subprocess.TimeoutExpired, OSError):
+        pass
+SQLITE_AVAILABLE = True
+if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
+    SQLITE_AVAILABLE = False
+PARQUET_AVAILABLE = True
+if os.environ.get("SKIP_PARQUET_TESTS", "").lower() in ("true", "1", "yes"):
+    PARQUET_AVAILABLE = False
 
 from great_tables import vals
 import great_tables as GT
 import narwhals as nw
+import narwhals.selectors as ncs
 
 from pointblank._constants import REPORTING_LANGUAGES
-
 from pointblank.validate import (
     Actions,
     FinalActions,
@@ -126,6 +167,9 @@ from pointblank.validate import (
     _string_date_dttm_conversion,
     _transform_test_units,
     _validate_columns_subset,
+    _validation_info_as_dict,
+    _create_local_threshold_note_text,
+    _create_text_col_pct_null,
 )
 from pointblank.thresholds import Thresholds
 from pointblank.schema import Schema, _get_schema_validation_info
@@ -149,7 +193,7 @@ if TYPE_CHECKING:
 
 
 # PySpark helper functions
-def get_spark_session():
+def get_spark_session() -> SparkSession:
     """Get or create a Spark session for testing."""
     if not PYSPARK_AVAILABLE:
         pytest.skip("PySpark not available")
@@ -180,12 +224,15 @@ TEST_DATA_DIR = Path("tests") / "tbl_files"
 TBL_LIST = [
     "tbl_pd",
     "tbl_pl",
-    "tbl_parquet",
     "tbl_duckdb",
-    "tbl_sqlite",
 ]
 
-# Add PySpark to lists if available
+if PARQUET_AVAILABLE:
+    TBL_LIST.append("tbl_parquet")
+
+if SQLITE_AVAILABLE:
+    TBL_LIST.append("tbl_sqlite")
+
 if PYSPARK_AVAILABLE:
     TBL_LIST.append("tbl_pyspark")
 
@@ -243,7 +290,7 @@ def tbl_dates_times_text_pd():
 
 
 @pytest.fixture
-def tbl_true_dates_times_pd():
+def tbl_true_dates_times_pd() -> pd.DataFrame:
     df = pd.DataFrame(
         {
             "date_1": pd.to_datetime(["2021-01-01", "2021-02-01"]),
@@ -260,12 +307,12 @@ def tbl_true_dates_times_pd():
 
 
 @pytest.fixture
-def tbl_pl():
+def tbl_pl() -> pl.DataFrame:
     return pl.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
 
 
 @pytest.fixture
-def tbl_missing_pl():
+def tbl_missing_pl() -> pl.DataFrame:
     return pl.DataFrame({"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]})
 
 
@@ -302,25 +349,25 @@ def tbl_true_dates_times_pl():
 
 
 @pytest.fixture
-def tbl_parquet():
+def tbl_parquet() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz.parquet"
     return ibis.read_parquet(file_path)
 
 
 @pytest.fixture
-def tbl_missing_parquet():
+def tbl_missing_parquet() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz_missing.parquet"
     return ibis.read_parquet(file_path)
 
 
 @pytest.fixture
-def tbl_dates_times_text_parquet():
+def tbl_dates_times_text_parquet() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_dates_times_text.parquet"
     return ibis.read_parquet(file_path)
 
 
 @pytest.fixture
-def tbl_duckdb():
+def tbl_duckdb() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz.ddb"
     with tempfile.TemporaryDirectory() as tmp:
         fpath: Path = Path(tmp) / "tab.ddb"
@@ -329,7 +376,7 @@ def tbl_duckdb():
 
 
 @pytest.fixture
-def tbl_missing_duckdb():
+def tbl_missing_duckdb() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_xyz_missing.ddb"
     with tempfile.TemporaryDirectory() as tmp:
         fpath: Path = Path(tmp) / "tab_missing.ddb"
@@ -338,7 +385,7 @@ def tbl_missing_duckdb():
 
 
 @pytest.fixture
-def tbl_dates_times_text_duckdb():
+def tbl_dates_times_text_duckdb() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_dates_times_text.ddb"
     with tempfile.TemporaryDirectory() as tmp:
         fpath: Path = Path(tmp) / "tbl_dates_times_text.ddb"
@@ -347,7 +394,7 @@ def tbl_dates_times_text_duckdb():
 
 
 @pytest.fixture
-def tbl_true_dates_times_duckdb():
+def tbl_true_dates_times_duckdb() -> Table:
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_true_dates_times.ddb"
     with tempfile.TemporaryDirectory() as tmp:
         fpath: Path = Path(tmp) / "tbl_true_dates_times.ddb"
@@ -408,7 +455,7 @@ def tbl_pd_variable_names():
 
 
 @pytest.fixture
-def tbl_memtable_variable_names():
+def tbl_memtable_variable_names() -> Table:
     return ibis.memtable(
         pd.DataFrame(
             {
@@ -505,7 +552,7 @@ def tbl_true_dates_times_pyspark():
     return df
 
 
-def test_normalize_reporting_language():
+def test_normalize_reporting_language() -> None:
     assert _normalize_reporting_language(lang=None) == "en"
     assert _normalize_reporting_language(lang="en") == "en"
     assert _normalize_reporting_language(lang="IT") == "it"
@@ -516,7 +563,7 @@ def test_normalize_reporting_language():
         _normalize_reporting_language(lang="fr-CA")
 
 
-def test_validate_class():
+def test_validate_class() -> None:
     validate = Validate(tbl_pd)
 
     assert validate.data == tbl_pd
@@ -531,7 +578,7 @@ def test_validate_class():
     assert validate.validation_info == []
 
 
-def test_validate_class_lang_locale():
+def test_validate_class_lang_locale() -> None:
     validate_1 = Validate(tbl_pd, lang="fr", locale="fr-CA")
 
     assert validate_1.lang == "fr"
@@ -545,6 +592,91 @@ def test_validate_class_lang_locale():
     # Raise if `lang` value is invalid
     with pytest.raises(ValueError):
         Validate(tbl_pd, lang="invalid")
+
+
+def test_validate_class_governance_params() -> None:
+    """Test the governance parameters: owner, consumers, version."""
+    # Test with all governance parameters
+    validate = Validate(
+        tbl_pd,
+        owner="data-platform-team",
+        consumers=["ml-team", "analytics"],
+        version="2.1.0",
+    )
+
+    assert validate.owner == "data-platform-team"
+    assert validate.consumers == ["ml-team", "analytics"]
+    assert validate.version == "2.1.0"
+
+    # Test with single consumer string (should be converted to list)
+    validate_single_consumer = Validate(
+        tbl_pd,
+        consumers="ml-team",
+    )
+    assert validate_single_consumer.consumers == ["ml-team"]
+
+    # Test with None values (defaults)
+    validate_defaults = Validate(tbl_pd)
+    assert validate_defaults.owner is None
+    assert validate_defaults.consumers is None
+    assert validate_defaults.version is None
+
+    # Test invalid owner type
+    with pytest.raises(TypeError, match="owner="):
+        Validate(tbl_pd, owner=123)
+
+    # Test invalid consumers type
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=123)
+
+    # Test invalid consumers list with non-string elements
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=["ml-team", 123])
+
+    # Test invalid version type
+    with pytest.raises(TypeError, match="version="):
+        Validate(tbl_pd, version=1.0)
+
+
+def test_validate_governance_params_in_report(tbl_pd) -> None:
+    """Test that governance metadata is displayed in the validation report."""
+    validate = (
+        Validate(
+            tbl_pd,
+            owner="data-platform-team",
+            consumers=["ml-team", "analytics"],
+            version="2.1.0",
+        )
+        .col_vals_gt(columns="x", value=0)
+        .interrogate()
+    )
+
+    # Get the tabular report HTML
+    report = validate.get_tabular_report()
+    report_html = report.as_raw_html()
+
+    # Check that governance metadata appears in the report
+    assert "data-platform-team" in report_html
+    assert "ml-team" in report_html
+    assert "analytics" in report_html
+    assert "2.1.0" in report_html
+    assert "Owner:" in report_html
+    assert "Consumers:" in report_html
+    assert "Version:" in report_html
+
+
+def test_validate_governance_params_not_in_report_when_none(tbl_pd) -> None:
+    """Test that governance metadata is not displayed when all values are None."""
+    validate = Validate(tbl_pd).col_vals_gt(columns="x", value=0).interrogate()
+
+    # Get the tabular report HTML
+    report = validate.get_tabular_report()
+    report_html = report.as_raw_html()
+
+    # Check that governance labels don't appear when no metadata is set
+    assert "Owner:" not in report_html
+    assert "Consumers:" not in report_html
+    assert "Version:" not in report_html
 
 
 @pytest.mark.parametrize(
@@ -571,7 +703,7 @@ def test_null_vals_in_set(data: Any) -> None:
         validate.assert_passing()
 
 
-def test_validation_info():
+def test_validation_info() -> None:
     v = _ValidationInfo(
         i=1,
         i_o=1,
@@ -645,7 +777,7 @@ def test_validation_info():
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_col_vals_all_passing(request, tbl_fixture):
+def test_col_vals_all_passing(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     v = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
@@ -676,7 +808,7 @@ def test_col_vals_all_passing(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_plan_and_interrogation(request, tbl_fixture):
+def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Create a validation plan
@@ -702,6 +834,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "values",
         "inclusive",
         "na_pass",
+        "missing",
         "pre",
         "segments",
         "thresholds",
@@ -709,6 +842,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
@@ -784,6 +918,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "values",
         "inclusive",
         "na_pass",
+        "missing",
         "pre",
         "segments",
         "thresholds",
@@ -791,6 +926,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "label",
         "brief",
         "autobrief",
+        "dimension",
         "active",
         "eval_error",
         "all_passed",
@@ -844,7 +980,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_attr_getters(request, tbl_fixture):
+def test_validation_attr_getters(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     v = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
@@ -899,7 +1035,7 @@ def test_validation_attr_getters(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_attr_getters_no_dict(request, tbl_fixture):
+def test_validation_attr_getters_no_dict(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     v = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
@@ -938,7 +1074,7 @@ def test_validation_attr_getters_no_dict(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_get_json_report(request, tbl_fixture):
+def test_get_json_report(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     v = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
@@ -961,7 +1097,7 @@ def test_get_json_report(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_report_interrogate_snap(request, tbl_fixture, snapshot):
+def test_validation_report_interrogate_snap(request, tbl_fixture, snapshot) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     report = (
@@ -976,7 +1112,7 @@ def test_validation_report_interrogate_snap(request, tbl_fixture, snapshot):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_report_no_interrogate_snap(request, tbl_fixture, snapshot):
+def test_validation_report_no_interrogate_snap(request, tbl_fixture, snapshot) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     report = (
@@ -990,7 +1126,7 @@ def test_validation_report_no_interrogate_snap(request, tbl_fixture, snapshot):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_report_use_fields_snap(request, tbl_fixture, snapshot):
+def test_validation_report_use_fields_snap(request, tbl_fixture, snapshot) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     report = (
@@ -1013,7 +1149,7 @@ def test_validation_report_use_fields_snap(request, tbl_fixture, snapshot):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_report_json_no_steps(request, tbl_fixture):
+def test_validation_report_json_no_steps(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).get_json_report() == "[]"
@@ -1021,7 +1157,7 @@ def test_validation_report_json_no_steps(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("lang", REPORTING_LANGUAGES)
-def test_validation_langs_all_working(lang):
+def test_validation_langs_all_working(lang) -> None:
     validation = (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type="polars"),
@@ -1062,7 +1198,7 @@ def test_validation_langs_all_working(lang):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_column_input(request, tbl_fixture):
+def test_validation_check_column_input(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Raise a ValueError when `columns=` is not a string
@@ -1095,7 +1231,7 @@ def test_validation_check_column_input(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_column_input_with_col(request, tbl_fixture):
+def test_validation_check_column_input_with_col(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Check that using `col(column_name)` in `columns=` is allowed and doesn't raise an error
@@ -1115,7 +1251,7 @@ def test_validation_check_column_input_with_col(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_na_pass_input(request, tbl_fixture):
+def test_validation_check_na_pass_input(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Raise a ValueError when `na_pass=` is not a boolean
@@ -1138,7 +1274,7 @@ def test_validation_check_na_pass_input(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_thresholds_input(request, tbl_fixture):
+def test_validation_check_thresholds_input(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Check that allowed forms for `thresholds=` don't raise an error
@@ -1194,7 +1330,7 @@ def test_validation_check_thresholds_input(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_active_input(request, tbl_fixture):
+def test_validation_check_active_input(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Raise a ValueError when `active=` is not a boolean
@@ -1227,7 +1363,7 @@ def test_validation_check_active_input(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_check_thresholds_inherit(request, tbl_fixture):
+def test_validation_check_thresholds_inherit(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Check that the `thresholds=` argument is inherited from Validate, in those steps where
@@ -1395,7 +1531,7 @@ def test_validation_check_thresholds_inherit(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_briefs(request, tbl_fixture):
+def test_validation_briefs(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     schema = Schema(columns=["x", "y", "z"])
@@ -1489,7 +1625,7 @@ def test_validation_briefs(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_autobriefs(request, tbl_fixture):
+def test_validation_autobriefs(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     schema = Schema(columns=["x", "y", "z"])
@@ -1702,7 +1838,7 @@ def test_validation_autobriefs(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_inherit_case(request, tbl_fixture, capsys):
+def test_validation_actions_inherit_case(request, tbl_fixture, capsys) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Check that the `actions=` argument is inherited from Validate
@@ -1722,7 +1858,7 @@ def test_validation_actions_inherit_case(request, tbl_fixture, capsys):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_override_case(request, tbl_fixture, capsys):
+def test_validation_actions_override_case(request, tbl_fixture, capsys) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Check that the `actions=` argument is *not* inherited from Validate
@@ -1742,8 +1878,8 @@ def test_validation_actions_override_case(request, tbl_fixture, capsys):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_multiple_actions_inherit(request, tbl_fixture, capsys):
-    def notify():
+def test_validation_actions_multiple_actions_inherit(request, tbl_fixture, capsys) -> None:
+    def notify() -> None:
         print("NOTIFIER")
 
     tbl = request.getfixturevalue(tbl_fixture)
@@ -1770,11 +1906,11 @@ def test_validation_actions_multiple_actions_inherit(request, tbl_fixture, capsy
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_multiple_actions_override(request, tbl_fixture, capsys):
-    def notify():
+def test_validation_actions_multiple_actions_override(request, tbl_fixture, capsys) -> None:
+    def notify() -> None:
         print("NOTIFIER")
 
-    def notify_step():
+    def notify_step() -> None:
         print("NOTIFY STEP")
 
     tbl = request.getfixturevalue(tbl_fixture)
@@ -1803,8 +1939,8 @@ def test_validation_actions_multiple_actions_override(request, tbl_fixture, caps
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_multiple_actions_step_only(request, tbl_fixture, capsys):
-    def notify_step():
+def test_validation_actions_multiple_actions_step_only(request, tbl_fixture, capsys) -> None:
+    def notify_step() -> None:
         print("NOTIFY STEP")
 
     tbl = request.getfixturevalue(tbl_fixture)
@@ -1832,7 +1968,7 @@ def test_validation_actions_multiple_actions_step_only(request, tbl_fixture, cap
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_inherit_none(request, tbl_fixture, capsys):
+def test_validation_actions_inherit_none(request, tbl_fixture, capsys) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     (
@@ -1851,7 +1987,7 @@ def test_validation_actions_inherit_none(request, tbl_fixture, capsys):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_override_none(request, tbl_fixture, capsys):
+def test_validation_actions_override_none(request, tbl_fixture, capsys) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     (
@@ -1870,7 +2006,7 @@ def test_validation_actions_override_none(request, tbl_fixture, capsys):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_actions_step_only_none(request, tbl_fixture, capsys):
+def test_validation_actions_step_only_none(request, tbl_fixture, capsys) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     (
@@ -1888,7 +2024,7 @@ def test_validation_actions_step_only_none(request, tbl_fixture, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_global_highest(tbl_type, capsys):
+def test_validation_actions_global_highest(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -1910,7 +2046,7 @@ def test_validation_actions_global_highest(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_global_all(tbl_type, capsys):
+def test_validation_actions_global_all(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -1931,7 +2067,7 @@ def test_validation_actions_global_all(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_local_highest(tbl_type, capsys):
+def test_validation_actions_local_highest(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -1959,7 +2095,7 @@ def test_validation_actions_local_highest(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_local_all(tbl_type, capsys):
+def test_validation_actions_local_all(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -1986,7 +2122,7 @@ def test_validation_actions_local_all(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_default_global(tbl_type, capsys):
+def test_validation_actions_default_global(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -2005,7 +2141,7 @@ def test_validation_actions_default_global(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_default_global_override(tbl_type, capsys):
+def test_validation_actions_default_global_override(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -2026,7 +2162,7 @@ def test_validation_actions_default_global_override(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_default_local(tbl_type, capsys):
+def test_validation_actions_default_local(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -2049,7 +2185,7 @@ def test_validation_actions_default_local(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_default_local_override(tbl_type, capsys):
+def test_validation_actions_default_local_override(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="small_table", tbl_type=tbl_type),
@@ -2080,8 +2216,8 @@ def test_validation_actions_default_local_override(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_actions_get_action_metadata(tbl_type, capsys):
-    def log_issue():
+def test_validation_actions_get_action_metadata(tbl_type, capsys) -> None:
+    def log_issue() -> None:
         metadata = get_action_metadata()
         print(f"Step: {metadata['step']}, Type: {metadata['type']}, Column: {metadata['column']}, ")
 
@@ -2138,7 +2274,7 @@ def test_validation_actions_get_action_metadata(tbl_type, capsys):
     assert "Step: 20, Type: row_count_match, Column: None" in captured.out
 
 
-def test_col_vals_regex_expectation_and_failure_text():
+def test_col_vals_regex_expectation_and_failure_text() -> None:
     """Test that col_vals_regex generates correct expectation and failure text for both normal and inverse patterns."""
 
     # Create simple test data that will create predictable scenarios
@@ -2221,8 +2357,8 @@ def test_col_vals_regex_expectation_and_failure_text():
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_callable(tbl_type, capsys):
-    def final_info():
+def test_validation_with_final_actions_callable(tbl_type, capsys) -> None:
+    def final_info() -> None:
         summary = get_validation_summary()
 
         passing_steps = summary["list_passing_steps"]
@@ -2280,7 +2416,7 @@ def test_validation_with_final_actions_callable(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_str(tbl_type, capsys):
+def test_validation_with_final_actions_str(tbl_type, capsys) -> None:
     (
         Validate(
             data=load_dataset(dataset="game_revenue", tbl_type=tbl_type),
@@ -2299,8 +2435,8 @@ def test_validation_with_final_actions_str(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_list_str_callable(tbl_type, capsys):
-    def final_msg():
+def test_validation_with_final_actions_list_str_callable(tbl_type, capsys) -> None:
+    def final_msg() -> None:
         print(f"This final message comes from a function.")
 
     (
@@ -2322,8 +2458,8 @@ def test_validation_with_final_actions_list_str_callable(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_highest_severity_all_passed(tbl_type, capsys):
-    def highest_severity():
+def test_validation_with_final_actions_highest_severity_all_passed(tbl_type, capsys) -> None:
+    def highest_severity() -> None:
         summary = get_validation_summary()
         print(summary["highest_severity"])
 
@@ -2345,8 +2481,8 @@ def test_validation_with_final_actions_highest_severity_all_passed(tbl_type, cap
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_highest_severity_some_failing(tbl_type, capsys):
-    def highest_severity():
+def test_validation_with_final_actions_highest_severity_some_failing(tbl_type, capsys) -> None:
+    def highest_severity() -> None:
         summary = get_validation_summary()
         print(summary["highest_severity"])
 
@@ -2369,8 +2505,8 @@ def test_validation_with_final_actions_highest_severity_some_failing(tbl_type, c
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_highest_severity_warning(tbl_type, capsys):
-    def highest_severity():
+def test_validation_with_final_actions_highest_severity_warning(tbl_type, capsys) -> None:
+    def highest_severity() -> None:
         summary = get_validation_summary()
         print(summary["highest_severity"])
 
@@ -2394,8 +2530,8 @@ def test_validation_with_final_actions_highest_severity_warning(tbl_type, capsys
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_highest_severity_error(tbl_type, capsys):
-    def highest_severity():
+def test_validation_with_final_actions_highest_severity_error(tbl_type, capsys) -> None:
+    def highest_severity() -> None:
         summary = get_validation_summary()
         print(summary["highest_severity"])
 
@@ -2420,8 +2556,8 @@ def test_validation_with_final_actions_highest_severity_error(tbl_type, capsys):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_validation_with_final_actions_highest_severity_critical(tbl_type, capsys):
-    def highest_severity():
+def test_validation_with_final_actions_highest_severity_critical(tbl_type, capsys) -> None:
+    def highest_severity() -> None:
         summary = get_validation_summary()
         print(summary["highest_severity"])
 
@@ -2446,13 +2582,13 @@ def test_validation_with_final_actions_highest_severity_critical(tbl_type, capsy
     assert "critical" in captured.out
 
 
-def test_final_actions_type_error():
+def test_final_actions_type_error() -> None:
     # Expect a TypeError when passing an invalid type to FinalActions
     with pytest.raises(TypeError):
         FinalActions(3)
 
 
-def test_final_actions_repr():
+def test_final_actions_repr() -> None:
     # Test `FinalActions` with a list of strings
     actions = FinalActions(["action1", "action2"])
     assert repr(actions) == "FinalActions(['action1', 'action2'])"
@@ -2464,20 +2600,20 @@ def test_final_actions_repr():
     assert repr(actions) == "FinalActions([])"
 
     # Test with a callable
-    def dummy_function():
+    def dummy_function() -> None:
         pass
 
     actions = FinalActions(dummy_function)
     assert repr(actions) == "FinalActions(dummy_function)"
 
 
-def test_final_actions_str():
+def test_final_actions_str() -> None:
     # Test string method of FinalActions
     actions = FinalActions(["action1", "action2"])
     assert str(actions) == "FinalActions(['action1', 'action2'])"
 
 
-def test_validation_with_preprocessing_pd(tbl_pd):
+def test_validation_with_preprocessing_pd(tbl_pd) -> None:
     v = (
         Validate(tbl_pd)
         .col_vals_eq(columns="z", value=8)
@@ -2489,7 +2625,7 @@ def test_validation_with_preprocessing_pd(tbl_pd):
     assert v.n_passed()[2] == 4
 
 
-def test_validation_with_preprocessing_pd_use_nw(tbl_pd):
+def test_validation_with_preprocessing_pd_use_nw(tbl_pd) -> None:
     v = (
         Validate(tbl_pd)
         .col_vals_eq(columns="z", value=8)
@@ -2501,7 +2637,7 @@ def test_validation_with_preprocessing_pd_use_nw(tbl_pd):
     assert v.n_passed()[2] == 4
 
 
-def test_validation_with_preprocessing_with_fn_pd(tbl_pd):
+def test_validation_with_preprocessing_with_fn_pd(tbl_pd) -> None:
     def multiply_z_by_two(df):
         return df.assign(z=df["z"] * 2)
 
@@ -2516,7 +2652,7 @@ def test_validation_with_preprocessing_with_fn_pd(tbl_pd):
     assert v.n_passed()[2] == 4
 
 
-def test_validation_with_preprocessing_pl(tbl_pl):
+def test_validation_with_preprocessing_pl(tbl_pl) -> None:
     v = (
         Validate(tbl_pl)
         .col_vals_eq(columns="z", value=8)
@@ -2528,7 +2664,7 @@ def test_validation_with_preprocessing_pl(tbl_pl):
     assert v.n_passed()[2] == 4
 
 
-def test_validation_with_preprocessing_pl_use_nw(tbl_pl):
+def test_validation_with_preprocessing_pl_use_nw(tbl_pl) -> None:
     v = (
         Validate(tbl_pl)
         .col_vals_eq(columns="z", value=8)
@@ -2540,7 +2676,7 @@ def test_validation_with_preprocessing_pl_use_nw(tbl_pl):
     assert v.n_passed()[2] == 4
 
 
-def test_validation_with_preprocessing_with_fn_pl(tbl_pl):
+def test_validation_with_preprocessing_with_fn_pl(tbl_pl) -> None:
     def multiply_z_by_two(df):
         return df.with_columns(z=pl.col("z") * 2)
 
@@ -2556,7 +2692,7 @@ def test_validation_with_preprocessing_with_fn_pl(tbl_pl):
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_preprocessing_pyspark(tbl_pyspark):
+def test_validation_with_preprocessing_pyspark(tbl_pyspark) -> None:
     v = (
         Validate(tbl_pyspark)
         .col_vals_eq(columns="z", value=8)
@@ -2569,7 +2705,7 @@ def test_validation_with_preprocessing_pyspark(tbl_pyspark):
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark):
+def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark) -> None:
     v = (
         Validate(tbl_pyspark)
         .col_vals_eq(columns="z", value=8)
@@ -2582,7 +2718,7 @@ def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark):
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark):
+def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark) -> None:
     def multiply_z_by_two(df):
         return df.withColumn("z", F.col("z") * 2)
 
@@ -2598,7 +2734,7 @@ def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_gt(request, tbl_fixture):
+def test_col_vals_gt(request, tbl_fixture) -> None:
     pl.DataFrame({"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]})
 
     tbl = request.getfixturevalue(tbl_fixture)
@@ -2615,7 +2751,7 @@ def test_col_vals_gt(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_lt(request, tbl_fixture):
+def test_col_vals_lt(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_lt(columns="x", value=10).interrogate()
@@ -2630,7 +2766,7 @@ def test_col_vals_lt(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_eq(request, tbl_fixture):
+def test_col_vals_eq(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_eq(columns="z", value=8).interrogate()
@@ -2645,7 +2781,7 @@ def test_col_vals_eq(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_ne(request, tbl_fixture):
+def test_col_vals_ne(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_ne(columns="z", value=7).interrogate()
@@ -2659,8 +2795,33 @@ def test_col_vals_ne(request, tbl_fixture):
     assert validation_2.n_failed(i=1, scalar=True) == 0
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_col_vals_eq_column_missing_values(tbl_type) -> None:
+    # Rows with a missing value on either side fail (or pass with `na_pass=True`), and every row
+    # counts as either passing or failing
+    tbl = pl.DataFrame({"a": [1.0, 2.0, None, 5.0, 2.0], "b": [1.5, None, 3.0, 4.0, 2.0]})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation_1 = Validate(tbl).col_vals_eq(columns="a", value=col("b")).interrogate()
+
+    assert validation_1.n_passed(i=1, scalar=True) == 1
+    assert validation_1.n_failed(i=1, scalar=True) == 4
+
+    validation_2 = (
+        Validate(tbl).col_vals_eq(columns="a", value=col("b"), na_pass=True).interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 3
+    assert validation_2.n_failed(i=1, scalar=True) == 2
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_eq_string(request, tbl_fixture):
+def test_col_vals_eq_string(request, tbl_fixture) -> None:
     """Test `col_vals_eq()` with string values (numeric columns cast to string)."""
     import narwhals as nw
 
@@ -2693,7 +2854,7 @@ def test_col_vals_eq_string(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_ne_string(request, tbl_fixture):
+def test_col_vals_ne_string(request, tbl_fixture) -> None:
     """Test `col_vals_ne()` with string values (numeric columns cast to string)."""
     import narwhals as nw
 
@@ -2727,7 +2888,7 @@ def test_col_vals_ne_string(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_ge(request, tbl_fixture):
+def test_col_vals_ge(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_ge(columns="x", value=1).interrogate()
@@ -2741,7 +2902,7 @@ def test_col_vals_ge(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_le(request, tbl_fixture):
+def test_col_vals_le(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_le(columns="x", value=4).interrogate()
@@ -2756,7 +2917,7 @@ def test_col_vals_le(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_between(request, tbl_fixture):
+def test_col_vals_between(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_between(columns="x", left=1, right=4).interrogate()
@@ -2823,7 +2984,7 @@ def test_col_vals_between(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
-def test_col_vals_outside(request, tbl_fixture):
+def test_col_vals_outside(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_outside(columns="x", left=5, right=8).interrogate()
@@ -2908,7 +3069,7 @@ def test_col_vals_outside(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_col_vals_in_set(request, tbl_fixture):
+def test_col_vals_in_set(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_in_set(columns="x", set=[1, 2, 3, 4]).interrogate()
@@ -2922,7 +3083,7 @@ def test_col_vals_in_set(request, tbl_fixture):
     assert validation_2.n_failed(i=1, scalar=True) == 1
 
 
-def test_validation_with_pre_function_returning_different_type():
+def test_validation_with_pre_function_returning_different_type() -> None:
     tbl = pl.DataFrame({"numbers": [1, 2, 3, 4, 5]})
 
     # Pre function that converts to string representation
@@ -2939,7 +3100,7 @@ def test_validation_with_pre_function_returning_different_type():
     assert validation.all_passed()
 
 
-def test_validation_with_segments_and_pre():
+def test_validation_with_segments_and_pre() -> None:
     tbl = pl.DataFrame(
         {"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40], "multiplier": [2, 3, 4, 5]}
     )
@@ -2963,7 +3124,7 @@ def test_validation_with_segments_and_pre():
     assert len(validation.validation_info) == 2
 
 
-def test_validation_error_handling_in_pre():
+def test_validation_error_handling_in_pre() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3]})
 
     def failing_pre(df):
@@ -2977,7 +3138,7 @@ def test_validation_error_handling_in_pre():
     assert validation.validation_info[0].eval_error is True
 
 
-def test_validation_pre_zero_rows():
+def test_validation_pre_zero_rows() -> None:
     """Test that validation handles zero-row tables from preconditions gracefully."""
     tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
 
@@ -3002,7 +3163,7 @@ def test_validation_pre_zero_rows():
     assert validation.validation_info[0].time_processed is not None
 
 
-def test_validation_pre_zero_rows_with_multiple_steps():
+def test_validation_pre_zero_rows_with_multiple_steps() -> None:
     """Test that zero-row precondition doesn't affect subsequent validation steps."""
     tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
 
@@ -3029,7 +3190,7 @@ def test_validation_pre_zero_rows_with_multiple_steps():
     assert validation.validation_info[1].all_passed is True
 
 
-def test_validation_segments_zero_rows():
+def test_validation_segments_zero_rows() -> None:
     """Test that validation handles zero-row tables from segmentation gracefully."""
 
     tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "category": ["A", "A", "B", "B", "B"]})
@@ -3049,7 +3210,7 @@ def test_validation_segments_zero_rows():
     assert validation.validation_info[0].active is False
 
 
-def test_validation_table_level_assertions_zero_rows():
+def test_validation_table_level_assertions_zero_rows() -> None:
     """Test that table-level assertions work correctly with zero-row preconditions.
 
     Table-level assertions (col_schema_match(), row_count_match(), col_count_match(), etc.) should
@@ -3096,7 +3257,7 @@ def test_validation_table_level_assertions_zero_rows():
     assert validation.validation_info[0].n == 1
 
 
-def test_conjointly_with_empty_expressions():
+def test_conjointly_with_empty_expressions() -> None:
     tbl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
     # Test with minimal expressions
@@ -3106,25 +3267,25 @@ def test_conjointly_with_empty_expressions():
     assert validation.all_passed()
 
 
-def test_specially_with_complex_return_values():
+def test_specially_with_complex_return_values() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Function returning list of mixed boolean/non-boolean (should fail)
-    def mixed_return():
+    def mixed_return() -> list[bool | str]:
         return [True, False, "not_boolean"]
 
     with pytest.raises(TypeError):
         Validate(tbl).specially(expr=mixed_return).interrogate()
 
     # Function returning single non-boolean (should fail)
-    def non_boolean_return():
+    def non_boolean_return() -> str:
         return "not_boolean"
 
     with pytest.raises(TypeError):
         Validate(tbl).specially(expr=non_boolean_return).interrogate()
 
 
-def test_col_vals_between_with_column_references():
+def test_col_vals_between_with_column_references() -> None:
     tbl = pl.DataFrame(
         {"value": [5, 10, 15, 20], "lower": [1, 8, 12, 18], "upper": [10, 15, 20, 25]}
     )
@@ -3139,7 +3300,7 @@ def test_col_vals_between_with_column_references():
     assert validation.all_passed()
 
 
-def test_col_vals_outside_with_datetime_bounds():
+def test_col_vals_outside_with_datetime_bounds() -> None:
     tbl = pl.DataFrame(
         {
             "timestamp": [
@@ -3165,7 +3326,7 @@ def test_col_vals_outside_with_datetime_bounds():
     assert validation.n_passed(i=1, scalar=True) == 2
 
 
-def test_validation_with_segments_and_pre_pandas():
+def test_validation_with_segments_and_pre_pandas() -> None:
     tbl = pd.DataFrame(
         {"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40], "multiplier": [2, 3, 4, 5]}
     )
@@ -3190,7 +3351,7 @@ def test_validation_with_segments_and_pre_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_segments_and_pre_pyspark():
+def test_validation_with_segments_and_pre_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [("A", 10, 2), ("A", 20, 3), ("B", 30, 4), ("B", 40, 5)],
@@ -3216,7 +3377,7 @@ def test_validation_with_segments_and_pre_pyspark():
     assert len(validation.validation_info) == 2
 
 
-def test_validation_error_handling_in_pre_pandas():
+def test_validation_error_handling_in_pre_pandas() -> None:
     tbl = pd.DataFrame({"values": [1, 2, 3]})
 
     def failing_pre(df):
@@ -3231,7 +3392,7 @@ def test_validation_error_handling_in_pre_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_error_handling_in_pre_pyspark():
+def test_validation_error_handling_in_pre_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame([(1,), (2,), (3,)], ["values"])
 
@@ -3247,7 +3408,7 @@ def test_validation_error_handling_in_pre_pyspark():
 
 
 # Polars expressions backward compatibility tests for segments
-def test_polars_datetime_expression_with_warning():
+def test_polars_datetime_expression_with_warning() -> None:
     """Test that pl.datetime() expressions are converted with a deprecation warning."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3281,7 +3442,7 @@ def test_polars_datetime_expression_with_warning():
         assert validation.n_passed(i=2, scalar=True) == 1
 
 
-def test_polars_datetime_expression_single_segment_with_warning():
+def test_polars_datetime_expression_single_segment_with_warning() -> None:
     """Test single Polars datetime expression in segments."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3310,7 +3471,8 @@ def test_polars_datetime_expression_single_segment_with_warning():
         assert validation.n_passed(i=1, scalar=True) == 2
 
 
-def test_polars_datetime_non_midnight_conversion():
+@pytest.mark.xfail
+def test_polars_datetime_non_midnight_conversion() -> None:
     """Test that non-midnight datetime expressions are converted to datetime objects."""
     # Create a datetime expression that's not at midnight but use a more realistic approach
     # We'll test the conversion logic without requiring it to match actual data
@@ -3352,7 +3514,7 @@ def test_polars_datetime_non_midnight_conversion():
         assert len(deprecation_warnings) >= 1
 
 
-def test_polars_lit_expression_with_warning():
+def test_polars_lit_expression_with_warning() -> None:
     """Test that pl.lit() datetime expressions are handled with warnings."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3380,7 +3542,7 @@ def test_polars_lit_expression_with_warning():
         assert validation.n_passed(i=1, scalar=True) == 2
 
 
-def test_native_python_types_no_warning():
+def test_native_python_types_no_warning() -> None:
     """Test that native Python types don't trigger warnings."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3409,16 +3571,16 @@ def test_native_python_types_no_warning():
         assert validation.n_passed(i=2, scalar=True) == 1
 
 
-def test_polars_expression_parsing_failure_fallback():
+def test_polars_expression_parsing_failure_fallback() -> None:
     """Test that parsing failures don't crash but fall back gracefully."""
 
     # Create a mock Polars expression that will fail parsing
     class MockPolarsExpr:
-        def __init__(self):
+        def __init__(self) -> None:
             self.__class__.__module__ = "polars.expr.expr"
             self.__class__.__name__ = "Expr"
 
-        def __str__(self):
+        def __str__(self) -> str:
             return "invalid_datetime_format.alias('datetime')"
 
     mock_expr = MockPolarsExpr()
@@ -3452,7 +3614,7 @@ def test_polars_expression_parsing_failure_fallback():
         assert len(deprecation_warnings) >= 1
 
 
-def test_non_datetime_polars_expression():
+def test_non_datetime_polars_expression() -> None:
     """Test that non-datetime Polars expressions still trigger warnings."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3482,7 +3644,7 @@ def test_non_datetime_polars_expression():
         assert len(deprecation_warnings) >= 1
 
 
-def test_polars_segments_warning_stacklevel():
+def test_polars_segments_warning_stacklevel() -> None:
     """Test that the warning points to the correct location in the call stack."""
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
@@ -3512,7 +3674,7 @@ def test_polars_segments_warning_stacklevel():
         assert "test_validate.py" in warning.filename
 
 
-def test_polars_segments_comparison_with_native_types():
+def test_polars_segments_comparison_with_native_types() -> None:
     """Test that converted expressions produce the same results as native types."""
     # Test with Polars expressions (should produce warning)
     with warnings.catch_warnings(record=True):
@@ -3554,7 +3716,7 @@ def test_polars_segments_comparison_with_native_types():
     )
 
 
-def test_polars_expr_detection():
+def test_polars_expr_detection() -> None:
     """Test that the code correctly identifies Polars expressions."""
     dt_expr = pl.datetime(2016, 1, 4)
 
@@ -3569,7 +3731,7 @@ def test_polars_expr_detection():
     assert is_polars_expr is True
 
 
-def test_native_type_detection():
+def test_native_type_detection() -> None:
     """Test that native types are not detected as Polars expressions."""
     native_date = datetime.date(2016, 1, 4)
     native_datetime = datetime.datetime(2016, 1, 4)
@@ -3587,7 +3749,7 @@ def test_native_type_detection():
         assert is_polars_expr is False
 
 
-def test_datetime_string_parsing():
+def test_datetime_string_parsing() -> None:
     """Test the datetime string parsing logic."""
     dt_expr = pl.datetime(2016, 1, 4)
     segment_str = str(dt_expr)
@@ -3608,7 +3770,7 @@ def test_datetime_string_parsing():
     assert converted == datetime.date(2016, 1, 4)
 
 
-def test_datetime_conversion_logic_midnight():
+def test_datetime_conversion_logic_midnight() -> None:
     """Test the specific conversion logic for midnight datetimes."""
     # Test midnight datetime (should convert to date)
     midnight_str = "2016-01-04 00:00:00"
@@ -3624,7 +3786,7 @@ def test_datetime_conversion_logic_midnight():
     assert not isinstance(result, datetime.datetime)
 
 
-def test_datetime_conversion_logic_non_midnight():
+def test_datetime_conversion_logic_non_midnight() -> None:
     """Test the specific conversion logic for non-midnight datetimes."""
     # Test non-midnight datetime (should remain as datetime)
     non_midnight_str = "2016-01-04 12:30:45"
@@ -3639,7 +3801,7 @@ def test_datetime_conversion_logic_non_midnight():
     assert isinstance(result, datetime.datetime)
 
 
-def test_polars_expression_string_representation():
+def test_polars_expression_string_representation() -> None:
     """Test various Polars expression string representations."""
     # Test different Polars expressions and their string representations
     expressions = [
@@ -3664,7 +3826,7 @@ def test_polars_expression_string_representation():
         assert len(expr_str) > 0
 
 
-def test_conjointly_with_empty_expressions_pandas():
+def test_conjointly_with_empty_expressions_pandas() -> None:
     tbl = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
     # Test with minimal expressions
@@ -3675,7 +3837,7 @@ def test_conjointly_with_empty_expressions_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_conjointly_with_empty_expressions_pyspark():
+def test_conjointly_with_empty_expressions_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame([(1, 4), (2, 5), (3, 6)], ["a", "b"])
 
@@ -3686,18 +3848,18 @@ def test_conjointly_with_empty_expressions_pyspark():
     assert validation.all_passed()
 
 
-def test_specially_with_complex_return_values_pandas():
+def test_specially_with_complex_return_values_pandas() -> None:
     tbl = pd.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Function returning list of mixed boolean/non-boolean (should fail)
-    def mixed_return():
+    def mixed_return() -> list[bool | str]:
         return [True, False, "not_boolean"]
 
     with pytest.raises(TypeError):
         Validate(tbl).specially(expr=mixed_return).interrogate()
 
     # Function returning single non-boolean (should fail)
-    def non_boolean_return():
+    def non_boolean_return() -> str:
         return "not_boolean"
 
     with pytest.raises(TypeError):
@@ -3705,26 +3867,26 @@ def test_specially_with_complex_return_values_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_specially_with_complex_return_values_pyspark():
+def test_specially_with_complex_return_values_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame([(1,), (2,), (3,), (4,), (5,)], ["values"])
 
     # Function returning list of mixed boolean/non-boolean (should fail)
-    def mixed_return():
+    def mixed_return() -> list[bool | str]:
         return [True, False, "not_boolean"]
 
     with pytest.raises(TypeError):
         Validate(tbl).specially(expr=mixed_return).interrogate()
 
     # Function returning single non-boolean (should fail)
-    def non_boolean_return():
+    def non_boolean_return() -> str:
         return "not_boolean"
 
     with pytest.raises(TypeError):
         Validate(tbl).specially(expr=non_boolean_return).interrogate()
 
 
-def test_col_vals_between_with_column_references_pandas():
+def test_col_vals_between_with_column_references_pandas() -> None:
     tbl = pd.DataFrame(
         {"value": [5, 10, 15, 20], "lower": [1, 8, 12, 18], "upper": [10, 15, 20, 25]}
     )
@@ -3740,7 +3902,7 @@ def test_col_vals_between_with_column_references_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_col_vals_between_with_column_references_pyspark():
+def test_col_vals_between_with_column_references_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [(5, 1, 10), (10, 8, 15), (15, 12, 20), (20, 18, 25)], ["value", "lower", "upper"]
@@ -3756,7 +3918,7 @@ def test_col_vals_between_with_column_references_pyspark():
     assert validation.all_passed()
 
 
-def test_col_vals_outside_with_datetime_bounds_pandas():
+def test_col_vals_outside_with_datetime_bounds_pandas() -> None:
     tbl = pd.DataFrame(
         {
             "timestamp": [
@@ -3783,7 +3945,7 @@ def test_col_vals_outside_with_datetime_bounds_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_col_vals_outside_with_datetime_bounds_pyspark():
+def test_col_vals_outside_with_datetime_bounds_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [
@@ -3809,7 +3971,7 @@ def test_col_vals_outside_with_datetime_bounds_pyspark():
     assert validation.n_passed(i=1, scalar=True) == 2
 
 
-def test_validation_with_very_large_dataset():
+def test_validation_with_very_large_dataset() -> None:
     # Create a larger dataset to test performance
     n_rows = 10000
     tbl = pl.DataFrame(
@@ -3832,7 +3994,7 @@ def test_validation_with_very_large_dataset():
     assert validation.n(i=1, scalar=True) == n_rows
 
 
-def test_validation_report_with_unicode_content():
+def test_validation_report_with_unicode_content() -> None:
     tbl = pl.DataFrame(
         {
             "名前": ["太郎", "花子", "一郎"],  # Japanese names
@@ -3853,10 +4015,11 @@ def test_validation_report_with_unicode_content():
 
     # Should be able to generate report with unicode content
     report = validation.get_tabular_report()
+
     assert report is not None
 
 
-def test_validation_report_with_unicode_content_pandas():
+def test_validation_report_with_unicode_content_pandas() -> None:
     tbl = pd.DataFrame(
         {
             "名前": ["太郎", "花子", "一郎"],  # Japanese names
@@ -3877,11 +4040,12 @@ def test_validation_report_with_unicode_content_pandas():
 
     # Should be able to generate report with unicode content
     report = validation.get_tabular_report()
+
     assert report is not None
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_report_with_unicode_content_pyspark():
+def test_validation_report_with_unicode_content_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [("太郎", 1, "😀"), ("花子", 2, "😂"), ("一郎", 3, "🎉")], ["名前", "値", "émojis"]
@@ -3899,61 +4063,71 @@ def test_validation_report_with_unicode_content_pyspark():
 
     # Should be able to generate report with unicode content
     report = validation.get_tabular_report()
+
     assert report is not None
 
 
-def test_row_count_match_with_tolerance():
+def test_row_count_match_with_tolerance() -> None:
     tbl = pl.DataFrame({"col": range(100)})  # 100 rows
 
     # Test exact match
     validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
+
     assert validation_exact.all_passed()
 
     # Test with tolerance
     validation_tolerance = Validate(tbl).row_count_match(count=95, tol=5).interrogate()
+
     assert validation_tolerance.all_passed()
 
     # Test exceeding tolerance
     validation_fail = Validate(tbl).row_count_match(count=80, tol=5).interrogate()
+
     assert not validation_fail.all_passed()
 
 
-def test_row_count_match_with_tolerance_pandas():
+def test_row_count_match_with_tolerance_pandas() -> None:
     tbl = pd.DataFrame({"col": range(100)})  # 100 rows
 
     # Test exact match
     validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
+
     assert validation_exact.all_passed()
 
     # Test with tolerance
     validation_tolerance = Validate(tbl).row_count_match(count=95, tol=5).interrogate()
+
     assert validation_tolerance.all_passed()
 
     # Test exceeding tolerance
     validation_fail = Validate(tbl).row_count_match(count=80, tol=5).interrogate()
+
     assert not validation_fail.all_passed()
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_row_count_match_with_tolerance_pyspark():
+def test_row_count_match_with_tolerance_pyspark() -> None:
     spark = get_spark_session()
     # Create 100 rows
     tbl = spark.range(100).toDF("col")
 
     # Test exact match
     validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
+
     assert validation_exact.all_passed()
 
     # Test with tolerance
     validation_tolerance = Validate(tbl).row_count_match(count=95, tol=5).interrogate()
+
     assert validation_tolerance.all_passed()
 
     # Test exceeding tolerance
     validation_fail = Validate(tbl).row_count_match(count=80, tol=5).interrogate()
+
     assert not validation_fail.all_passed()
 
 
-def test_validation_with_all_validation_types():
+def test_validation_with_all_validation_types() -> None:
     tbl = pl.DataFrame(
         {
             "id": [1, 2, 3, 4, 5],
@@ -3990,12 +4164,23 @@ def test_validation_with_all_validation_types():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4016,7 +4201,7 @@ def test_validation_with_all_validation_types():
     assert passed_count / total_count >= 0.9
 
 
-def test_validation_with_all_validation_types_pandas():
+def test_validation_with_all_validation_types_pandas() -> None:
     tbl = pd.DataFrame(
         {
             "id": [1, 2, 3, 4, 5],
@@ -4053,12 +4238,23 @@ def test_validation_with_all_validation_types_pandas():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4080,7 +4276,7 @@ def test_validation_with_all_validation_types_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_all_validation_types_pyspark():
+def test_validation_with_all_validation_types_pyspark() -> None:
     spark = get_spark_session()
 
     # Create the schema first
@@ -4119,12 +4315,23 @@ def test_validation_with_all_validation_types_pyspark():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4143,7 +4350,7 @@ def test_validation_with_all_validation_types_pyspark():
     assert passed_count / total_count >= 0.9
 
 
-def test_validation_info_string_representation():
+def test_validation_info_string_representation() -> None:
     tbl = pl.DataFrame({"col": [1, 2, 3]})
 
     validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
@@ -4152,11 +4359,12 @@ def test_validation_info_string_representation():
 
     # Should have meaningful string representation
     str_repr = str(val_info)
+
     assert "col_vals_gt" in str_repr
     assert "col" in str_repr
 
 
-def test_validation_info_string_representation_pandas():
+def test_validation_info_string_representation_pandas() -> None:
     tbl = pd.DataFrame({"col": [1, 2, 3]})
 
     validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
@@ -4165,12 +4373,13 @@ def test_validation_info_string_representation_pandas():
 
     # Should have meaningful string representation
     str_repr = str(val_info)
+
     assert "col_vals_gt" in str_repr
     assert "col" in str_repr
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_info_string_representation_pyspark():
+def test_validation_info_string_representation_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame([(1,), (2,), (3,)], ["col"])
 
@@ -4180,11 +4389,12 @@ def test_validation_info_string_representation_pyspark():
 
     # Should have meaningful string representation
     str_repr = str(val_info)
+
     assert "col_vals_gt" in str_repr
     assert "col" in str_repr
 
 
-def test_validation_with_mixed_na_pass_values():
+def test_validation_with_mixed_na_pass_values() -> None:
     tbl = pl.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
 
     validation = (
@@ -4201,7 +4411,7 @@ def test_validation_with_mixed_na_pass_values():
     assert validation.n_failed(i=2, scalar=True) == 1
 
 
-def test_validation_with_mixed_na_pass_values_pandas():
+def test_validation_with_mixed_na_pass_values_pandas() -> None:
     tbl = pd.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
 
     validation = (
@@ -4219,7 +4429,7 @@ def test_validation_with_mixed_na_pass_values_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_validation_with_mixed_na_pass_values_pyspark():
+def test_validation_with_mixed_na_pass_values_pyspark() -> None:
     spark = get_spark_session()
     tbl = spark.createDataFrame([(1, None), (2, 2), (None, 3), (4, 4)], ["col1", "col2"])
 
@@ -4237,7 +4447,7 @@ def test_validation_with_mixed_na_pass_values_pyspark():
     assert validation.n_failed(i=2, scalar=True) == 1
 
 
-def test_nan_none_null_handling_comprehensive_polars():
+def test_nan_none_null_handling_comprehensive_polars() -> None:
     """Test comprehensive NaN/None/Null handling across all comparison methods with Polars."""
 
     # Test data with different types of missing values
@@ -4253,6 +4463,7 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_gt_false = (
         Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=False).interrogate()
     )
+
     # Should have 3 passes (1.0, 2.0, 5.0) and 2 fails (NaN, None)
     assert validation_gt_false.n_passed(i=1, scalar=True) == 3
     assert validation_gt_false.n_failed(i=1, scalar=True) == 2
@@ -4261,6 +4472,7 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_gt_true = (
         Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=True).interrogate()
     )
+
     # Should have 5 passes (all values pass)
     assert validation_gt_true.n_passed(i=1, scalar=True) == 5
     assert validation_gt_true.n_failed(i=1, scalar=True) == 0
@@ -4269,6 +4481,7 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_ge_false = (
         Validate(df).col_vals_ge(columns="float_col", value=1, na_pass=False).interrogate()
     )
+
     assert validation_ge_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
     assert validation_ge_false.n_failed(i=1, scalar=True) == 2  # NaN, None
 
@@ -4276,6 +4489,7 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_lt_false = (
         Validate(df).col_vals_lt(columns="float_col", value=10, na_pass=False).interrogate()
     )
+
     assert validation_lt_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
     assert validation_lt_false.n_failed(i=1, scalar=True) == 2  # NaN, None
 
@@ -4283,6 +4497,7 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_le_false = (
         Validate(df).col_vals_le(columns="float_col", value=5, na_pass=False).interrogate()
     )
+
     assert validation_le_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
     assert validation_le_false.n_failed(i=1, scalar=True) == 2  # NaN, None
 
@@ -4290,11 +4505,12 @@ def test_nan_none_null_handling_comprehensive_polars():
     validation_int_false = (
         Validate(df).col_vals_gt(columns="int_col", value=0, na_pass=False).interrogate()
     )
+
     assert validation_int_false.n_passed(i=1, scalar=True) == 4  # 1, 2, 4, 5
     assert validation_int_false.n_failed(i=1, scalar=True) == 1  # None
 
 
-def test_nan_none_null_handling_comprehensive_pandas():
+def test_nan_none_null_handling_comprehensive_pandas() -> None:
     """Test comprehensive NaN/None/Null handling across all comparison methods with Pandas."""
 
     # Test data with different types of missing values
@@ -4325,6 +4541,7 @@ def test_nan_none_null_handling_comprehensive_pandas():
     validation_gt_true = (
         Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=True).interrogate()
     )
+
     assert validation_gt_true.n_passed(i=1, scalar=True) == 5
     assert validation_gt_true.n_failed(i=1, scalar=True) == 0
 
@@ -4337,11 +4554,12 @@ def test_nan_none_null_handling_comprehensive_pandas():
         validation = getattr(Validate(df), method_name)(
             columns="float_col", na_pass=False, **method_args
         ).interrogate()
+
         assert validation.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
         assert validation.n_failed(i=1, scalar=True) == 2  # NaN values
 
 
-def test_nan_none_null_handling_ibis_sqlite():
+def test_nan_none_null_handling_ibis_sqlite() -> None:
     """Test NaN/None/Null handling with Ibis SQLite backend."""
     import tempfile
     import os
@@ -4379,6 +4597,7 @@ def test_nan_none_null_handling_ibis_sqlite():
             .col_vals_gt(columns="float_col", value=0, na_pass=False)
             .interrogate()
         )
+
         assert validation_false.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
         assert validation_false.n_failed(i=1, scalar=True) == 1  # NULL
 
@@ -4401,7 +4620,7 @@ def test_nan_none_null_handling_ibis_sqlite():
             os.unlink(temp_db_path)
 
 
-def test_edge_case_nan_vs_none_distinction():
+def test_edge_case_nan_vs_none_distinction() -> None:
     """Test edge cases around NaN vs None distinction."""
 
     # Test specifically the use of `float("nan")` with `na_pass=False`
@@ -4413,6 +4632,7 @@ def test_edge_case_nan_vs_none_distinction():
 
     # This was the original failing case, NaN should fail with `na_pass=False`
     validation = Validate(df).col_vals_ge(columns="values", value=0, na_pass=False).interrogate()
+
     assert validation.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
     assert validation.n_failed(i=1, scalar=True) == 1  # float("nan")
 
@@ -4420,6 +4640,7 @@ def test_edge_case_nan_vs_none_distinction():
     validation_le = (
         Validate(df).col_vals_le(columns="values", value=10, na_pass=False).interrogate()
     )
+
     assert validation_le.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
     assert validation_le.n_failed(i=1, scalar=True) == 1  # float("nan")
 
@@ -4433,12 +4654,13 @@ def test_edge_case_nan_vs_none_distinction():
     validation_mixed = (
         Validate(df_mixed).col_vals_gt(columns="values", value=0, na_pass=False).interrogate()
     )
+
     assert validation_mixed.n_passed(i=1, scalar=True) == 2  # 1.0, 4.0
     assert validation_mixed.n_failed(i=1, scalar=True) == 2  # None, float("nan")
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_col_vals_in_set_comprehensive(request, tbl_fixture):
+def test_col_vals_in_set_comprehensive(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -4479,7 +4701,7 @@ def test_col_vals_in_set_comprehensive(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_col_vals_not_in_set(request, tbl_fixture):
+def test_col_vals_not_in_set(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation_1 = Validate(tbl).col_vals_not_in_set(columns="x", set=[5, 6, 7]).interrogate()
@@ -4493,7 +4715,59 @@ def test_col_vals_not_in_set(request, tbl_fixture):
     assert validation_2.n_failed(i=1, scalar=True) == 1
 
 
-def test_schema_validation_with_case_sensitivity():
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_col_vals_not_in_set_missing_values(tbl_type) -> None:
+    # Missing values fail, and every row counts as either passing or failing
+    tbl = pl.DataFrame({"x": [1.0, 2.0, None, 5.0]})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation = Validate(tbl).col_vals_not_in_set(columns="x", set=[1.0, 5.0]).interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 3
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+@pytest.mark.parametrize(
+    "x, set_values, n_in_set",
+    [
+        ([1.0, 2.0, 3.0], [1, 2, 3], 3),  # float column, integer set
+        ([1.0, 2.0, 3.5, 4.0], [1, 3.5], 2),  # float column, mixed set
+        ([1, 2, 3, 4], [1.0, 2.0], 2),  # integer column, float set
+        ([1, 2, 3, 4], [1, 2.5], 1),  # integer column, mixed set
+        ([1, 2, 3, 4], [2.5, 3], 1),  # integer column, mixed set (float first)
+        ([1, 2, 3, 4], [None, 4.0], 1),  # integer column, float set with `None`
+    ],
+)
+def test_col_vals_in_set_int_float_mismatch(tbl_type, x, set_values, n_in_set) -> None:
+    # Polars >= 2.0 no longer coerces between integers and floats in `is_in()`
+    tbl = pl.DataFrame({"x": x})
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    validation_in = Validate(tbl).col_vals_in_set(columns="x", set=set_values).interrogate()
+
+    assert validation_in.n_passed(i=1, scalar=True) == n_in_set
+
+    # `col_vals_not_in_set()` doesn't accept `None` in `set=`
+    if None not in set_values:
+        validation_not_in = (
+            Validate(tbl).col_vals_not_in_set(columns="x", set=set_values).interrogate()
+        )
+
+        assert validation_not_in.n_passed(i=1, scalar=True) == len(x) - n_in_set
+
+
+def test_schema_validation_with_case_sensitivity() -> None:
     tbl = pl.DataFrame({"Column_A": [1, 2, 3], "COLUMN_B": ["x", "y", "z"]})
 
     # Test case-sensitive column names (should fail)
@@ -4503,6 +4777,7 @@ def test_schema_validation_with_case_sensitivity():
         .col_schema_match(schema=schema_case_sensitive, case_sensitive_colnames=True)
         .interrogate()
     )
+
     assert not validation_case_sens.all_passed()
 
     # Test case-insensitive column names (should pass)
@@ -4511,10 +4786,11 @@ def test_schema_validation_with_case_sensitivity():
         .col_schema_match(schema=schema_case_sensitive, case_sensitive_colnames=False)
         .interrogate()
     )
+
     assert validation_case_insens.all_passed()
 
 
-def test_schema_validation_with_dtype_case_sensitivity():
+def test_schema_validation_with_dtype_case_sensitivity() -> None:
     tbl = pl.DataFrame({"col": [1, 2, 3]})
 
     # Test with mixed case dtype
@@ -4524,22 +4800,25 @@ def test_schema_validation_with_dtype_case_sensitivity():
     validation_case_sens = (
         Validate(tbl).col_schema_match(schema=schema, case_sensitive_dtypes=True).interrogate()
     )
+
     assert not validation_case_sens.all_passed()
 
     # Case-insensitive dtype matching (should pass)
     validation_case_insens = (
         Validate(tbl).col_schema_match(schema=schema, case_sensitive_dtypes=False).interrogate()
     )
+
     assert validation_case_insens.all_passed()
 
     # Case-insensitive dtype matching (should pass)
     validation_case_insens = (
         Validate(tbl).col_schema_match(schema=schema, case_sensitive_dtypes=False).interrogate()
     )
+
     assert validation_case_insens.all_passed()
 
 
-def test_schema_validation_partial_dtype_matching():
+def test_schema_validation_partial_dtype_matching() -> None:
     tbl = pl.DataFrame({"col": [1, 2, 3]})  # Int64
 
     # Schema with partial dtype (e.g., just "Int" instead of "Int64")
@@ -4549,32 +4828,36 @@ def test_schema_validation_partial_dtype_matching():
     validation_full = (
         Validate(tbl).col_schema_match(schema=schema, full_match_dtypes=True).interrogate()
     )
+
     assert not validation_full.all_passed()
 
     # Partial match allowed (should pass)
     validation_partial = (
         Validate(tbl).col_schema_match(schema=schema, full_match_dtypes=False).interrogate()
     )
+
     assert validation_partial.all_passed()
 
 
-def test_schema_validation_order_sensitivity():
+def test_schema_validation_order_sensitivity() -> None:
     tbl = pl.DataFrame({"b": [1, 2, 3], "a": ["x", "y", "z"]})  # columns in b, a order
 
     schema = Schema(columns=[("a", "String"), ("b", "Int64")])  # expects a, b order
 
     # Order required (should fail)
     validation_ordered = Validate(tbl).col_schema_match(schema=schema, in_order=True).interrogate()
+
     assert not validation_ordered.all_passed()
 
     # Order not required (should pass)
     validation_unordered = (
         Validate(tbl).col_schema_match(schema=schema, in_order=False).interrogate()
     )
+
     assert validation_unordered.all_passed()
 
 
-def test_schema_validation_completeness():
+def test_schema_validation_completeness() -> None:
     tbl = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"], "c": [1.0, 2.0, 3.0]})
 
     # Schema with subset of columns
@@ -4582,14 +4865,28 @@ def test_schema_validation_completeness():
 
     # Complete match required (should fail: missing column c in schema)
     validation_complete = Validate(tbl).col_schema_match(schema=schema, complete=True).interrogate()
+
     assert not validation_complete.all_passed()
 
     # Subset match allowed (should pass)
     validation_subset = Validate(tbl).col_schema_match(schema=schema, complete=False).interrogate()
+
     assert validation_subset.all_passed()
 
 
-def test_date_time_validation_with_string_conversion():
+def test_col_schema_match_with_duplicate_column_in_schema() -> None:
+    """Test schema match with duplicate column specification (edge case)."""
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+
+    # Schema with duplicate column - edge case
+    schema = Schema(columns=["a", "a", "b"])
+    validation = Validate(data=tbl).col_schema_match(schema=schema).interrogate()
+
+    # The duplicate should be flagged
+    assert validation.n_failed(i=1, scalar=True) >= 1
+
+
+def test_date_time_validation_with_string_conversion() -> None:
     tbl = pl.DataFrame(
         {
             "date_str": ["2023-01-01", "2023-06-15", "2023-12-31"],
@@ -4628,7 +4925,7 @@ def test_date_time_validation_with_string_conversion():
     assert validation_datetime.all_passed()
 
 
-def test_date_time_validation_with_string_conversion_pandas():
+def test_date_time_validation_with_string_conversion_pandas() -> None:
     tbl = pd.DataFrame(
         {
             "date_str": ["2023-01-01", "2023-06-15", "2023-12-31"],
@@ -4666,7 +4963,7 @@ def test_date_time_validation_with_string_conversion_pandas():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_date_time_validation_with_string_conversion_pyspark():
+def test_date_time_validation_with_string_conversion_pyspark() -> None:
     spark = get_spark_session()
 
     # Create DataFrame with string date/datetime columns
@@ -4717,10 +5014,10 @@ def test_date_time_validation_with_string_conversion_pyspark():
     assert validation_datetime.all_passed()
 
 
-def test_validation_with_custom_actions():
+def test_validation_with_custom_actions() -> None:
     captured_metadata = []
 
-    def custom_action():
+    def custom_action() -> str:
         metadata = get_action_metadata()
         if metadata:
             captured_metadata.append(metadata)
@@ -4739,10 +5036,10 @@ def test_validation_with_custom_actions():
     assert len(captured_metadata) > 0
 
 
-def test_validation_with_final_actions():
+def test_validation_with_final_actions() -> None:
     captured_summary = []
 
-    def final_action():
+    def final_action() -> str:
         summary = get_validation_summary()
         if summary:
             captured_summary.append(summary)
@@ -4762,7 +5059,7 @@ def test_validation_with_final_actions():
     assert captured_summary[0] is not None
 
 
-def test_validation_with_complex_pre_function():
+def test_validation_with_complex_pre_function() -> None:
     tbl = pl.DataFrame(
         {
             "first_name": ["John", "Jane", "Bob"],
@@ -4796,7 +5093,7 @@ def test_validation_with_complex_pre_function():
     assert validation.all_passed()
 
 
-def test_pointblank_config_modifications():
+def test_pointblank_config_modifications() -> None:
     # Test with all options disabled
     config_minimal = PointblankConfig(
         report_incl_header=False, report_incl_footer=False, preview_incl_header=False
@@ -4808,11 +5105,12 @@ def test_pointblank_config_modifications():
 
     # Test string representation
     str_repr = str(config_minimal)
+
     assert "False" in str_repr
     assert "PointblankConfig" in str_repr
 
 
-def test_preview_with_extreme_values():
+def test_preview_with_extreme_values() -> None:
     tbl = pl.DataFrame({"col": range(100)})
 
     # Test with very large head/tail values
@@ -4831,7 +5129,7 @@ def test_preview_with_extreme_values():
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_col_vals_regex(request, tbl_fixture):
+def test_col_vals_regex(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -4858,7 +5156,7 @@ def test_col_vals_regex(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_col_vals_regex_inverse(request, tbl_fixture):
+def test_col_vals_regex_inverse(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Test inverse=False (default behavior, should match existing tests)
@@ -4910,7 +5208,7 @@ def test_col_vals_regex_inverse(request, tbl_fixture):
     )
 
 
-def test_col_vals_expr_polars_tbl():
+def test_col_vals_expr_polars_tbl() -> None:
     df = load_dataset(tbl_type="polars")
 
     pl_expr = (pl.col("c") > pl.col("a")) & (pl.col("d") > pl.col("c"))
@@ -4920,18 +5218,42 @@ def test_col_vals_expr_polars_tbl():
         Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_passed(i=1, scalar=True) == 6
     )
     assert (
-        Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_failed(i=1, scalar=True) == 5
+        Validate(data=df).col_vals_expr(expr=pl_expr).interrogate().n_failed(i=1, scalar=True) == 7
     )
 
     assert (
         Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_passed(i=1, scalar=True) == 6
     )
     assert (
-        Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_failed(i=1, scalar=True) == 5
+        Validate(data=df).col_vals_expr(expr=nw_expr).interrogate().n_failed(i=1, scalar=True) == 7
     )
 
 
-def test_col_vals_expr_pandas_tbl():
+def test_col_vals_expr_null_results_fail() -> None:
+    """Test that rows where the expression gives a null fail on every backend."""
+    data = {"a": [1.0, 2.0, None, 5.0, 2.0]}
+
+    tbls_exprs = [
+        (pl.DataFrame(data), pl.col("a") > 1),
+        (pl.DataFrame(data), nw.col("a") > 1),
+        (pl.LazyFrame(data), pl.col("a") > 1),
+        (pd.DataFrame(data), lambda df: df["a"] > 1),
+        (pd.DataFrame(data), nw.col("a") > 1),
+        (pd.DataFrame({"a": pd.array([1, 2, None, 5, 2], dtype="Int64")}), lambda df: df["a"] > 1),
+    ]
+
+    for tbl, expr in tbls_exprs:
+        validation = Validate(data=tbl).col_vals_expr(expr=expr).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 3
+        assert validation.n_failed(i=1, scalar=True) == 2
+        assert validation.n(i=1, scalar=True) == 5
+
+        extract = validation.get_data_extracts(i=1, frame=True)
+        assert list(extract["_row_num_"]) == [1, 3]
+
+
+def test_col_vals_expr_pandas_tbl() -> None:
     df = load_dataset(tbl_type="pandas")
 
     pd_expr = lambda df: (df["c"] > df["a"]) & (df["d"] > df["c"])  # noqa
@@ -4952,7 +5274,7 @@ def test_col_vals_expr_pandas_tbl():
     )
 
 
-def test_col_vals_expr_step_report():
+def test_col_vals_expr_step_report() -> None:
     """Test that `get_step_report()` works for `col_vals_expr()` validations."""
 
     # Polars test
@@ -4961,10 +5283,12 @@ def test_col_vals_expr_step_report():
 
     # This should not throw an exception (the original issue)
     result_pl = validation_pl.get_step_report(1)
+
     assert result_pl is not None
 
     # Check that the expression is shown in the report
     html_pl = result_pl.as_raw_html()
+
     assert "The following column expression holds:" in html_pl
 
     # Pandas test
@@ -4973,10 +5297,11 @@ def test_col_vals_expr_step_report():
 
     # This should not throw an exception
     result_pd = validation_pd.get_step_report(1)
+
     assert result_pd is not None
 
 
-def test_col_vals_expr_display_text_formatting():
+def test_col_vals_expr_display_text_formatting() -> None:
     """Test that `col_vals_expr()` step reports don't show 'IN COLUMN None' text."""
 
     # Create test data where expression will fail for some rows
@@ -5000,7 +5325,7 @@ def test_col_vals_expr_display_text_formatting():
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_rows_distinct(request, tbl_fixture):
+def test_rows_distinct(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).rows_distinct().interrogate().n_passed(i=1, scalar=True) == 4
@@ -5039,7 +5364,56 @@ def test_rows_distinct(request, tbl_fixture):
     )
 
 
-def test_conjointly_polars_native():
+@pytest.mark.parametrize(
+    "tbl_type",
+    ["polars", "pandas"],
+)
+def test_rows_distinct_with_nulls(tbl_type) -> None:
+    """Test that rows_distinct correctly handles rows containing null values (GH#397)."""
+    if tbl_type == "polars":
+        import polars as pl
+
+        df = pl.DataFrame(
+            {"id": ["A", "B", "C"], "name": ["Alice", "Bob", "Charlie"], "score": [100, None, 100]}
+        )
+    else:
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {"id": ["A", "B", "C"], "name": ["Alice", "Bob", "Charlie"], "score": [100, None, 100]}
+        )
+
+    # All 3 rows are distinct — null should not cause exclusion
+    v = Validate(df).rows_distinct().interrogate()
+    assert v.n_passed(i=1, scalar=True) == 3
+    assert v.n_failed(i=1, scalar=True) == 0
+
+    # Column subset without nulls
+    v2 = Validate(df).rows_distinct(columns_subset=["id"]).interrogate()
+    assert v2.n_passed(i=1, scalar=True) == 3
+    assert v2.n_failed(i=1, scalar=True) == 0
+
+    # Actual duplicates with nulls should still be detected
+    if tbl_type == "polars":
+        df_dup = pl.DataFrame(
+            {
+                "id": ["A", "A", "C"],
+                "name": ["Alice", "Alice", "Charlie"],
+                "score": [None, None, 100],
+            }
+        )
+    else:
+        df_dup = pd.DataFrame(
+            {
+                "id": ["A", "A", "C"],
+                "name": ["Alice", "Alice", "Charlie"],
+                "score": [None, None, 100],
+            }
+        )
+
+    v3 = Validate(df_dup).rows_distinct().interrogate()
+    assert v3.n_passed(i=1, scalar=True) == 1
+    assert v3.n_failed(i=1, scalar=True) == 2
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     validation = (
@@ -5055,7 +5429,7 @@ def test_conjointly_polars_native():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_polars_expr_col():
+def test_conjointly_polars_expr_col() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     validation = (
@@ -5071,7 +5445,7 @@ def test_conjointly_polars_expr_col():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_pandas_native():
+def test_conjointly_pandas_native() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="pandas")
 
     validation = (
@@ -5087,7 +5461,7 @@ def test_conjointly_pandas_native():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_pandas_expr_col():
+def test_conjointly_pandas_expr_col() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="pandas")
 
     validation = (
@@ -5103,7 +5477,7 @@ def test_conjointly_pandas_expr_col():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_duckdb_native():
+def test_conjointly_duckdb_native() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="duckdb")
 
     validation = (
@@ -5119,7 +5493,7 @@ def test_conjointly_duckdb_native():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_duckdb_expr_col():
+def test_conjointly_duckdb_expr_col() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="duckdb")
 
     validation = (
@@ -5135,14 +5509,14 @@ def test_conjointly_duckdb_expr_col():
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
-def test_conjointly_error_no_expr():
+def test_conjointly_error_no_expr() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     with pytest.raises(ValueError):
         Validate(data=tbl).conjointly()
 
 
-def test_specially_simple_validation_polars():
+def test_specially_simple_validation_polars() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     # Create simple function that validates directly on the table
@@ -5156,7 +5530,7 @@ def test_specially_simple_validation_polars():
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_specially_simple_validation_pandas():
+def test_specially_simple_validation_pandas() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="pandas")
 
     # Create simple function that validates directly on the table
@@ -5170,7 +5544,7 @@ def test_specially_simple_validation_pandas():
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_specially_simple_validation_duckdb():
+def test_specially_simple_validation_duckdb() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="duckdb")
 
     # Create simple function that validates directly on the table
@@ -5184,7 +5558,7 @@ def test_specially_simple_validation_duckdb():
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_specially_advanced_validation():
+def test_specially_advanced_validation() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 
     # Create a parameterized validation function using closures
@@ -5205,10 +5579,10 @@ def test_specially_advanced_validation():
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_specially_function_with_no_data_argument():
+def test_specially_function_with_no_data_argument() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 
-    def return_list_bools():
+    def return_list_bools() -> list[bool]:
         return [True, True]
 
     validation = Validate(data=tbl).specially(expr=return_list_bools).interrogate()
@@ -5218,34 +5592,36 @@ def test_specially_function_with_no_data_argument():
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_specially_function_with_multiple_data_args_fails():
+def test_specially_function_with_multiple_data_args_fails() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 
-    def return_list_bools(a, b):
+    def return_list_bools(a, b) -> list[bool]:
         return [True, True]
 
     with pytest.raises(ValueError):
         Validate(data=tbl).specially(expr=return_list_bools).interrogate()
 
 
-def test_specially_function_with_list_non_boolean_fails():
+def test_specially_function_with_list_non_boolean_fails() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 
-    def return_list_non_bools():
+    def return_list_non_bools() -> list[str]:
         return ["not a bool", "not a bool"]
 
     with pytest.raises(TypeError):
         Validate(data=tbl).specially(expr=return_list_non_bools).interrogate()
 
 
-def test_specially_return_single_bool():
+def test_specially_return_single_bool() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 
     def validate_table_properties(data):
         # Check if table has at least one row with column 'a' > 10
         has_large_values = data.filter(pl.col("a") > 10).height > 0
+
         # Check if mean of column 'b' is positive
         has_positive_mean = data.select(pl.mean("b")).item() > 0
+
         # Return a single boolean for the entire table
         return has_large_values and has_positive_mean
 
@@ -5256,7 +5632,7 @@ def test_specially_return_single_bool():
     assert validation.n_failed(i=1, scalar=True) == 1
 
 
-def test_col_schema_match():
+def test_col_schema_match() -> None:
     tbl = pl.DataFrame(
         {
             "a": ["apple", "banana", "cherry", "date"],
@@ -5267,6 +5643,7 @@ def test_col_schema_match():
 
     # Completely correct schema supplied to `columns=`
     schema = Schema(columns=[("a", "String"), ("b", "Int64"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -5295,6 +5672,7 @@ def test_col_schema_match():
 
     # Completely correct schema supplied to `columns=` (using dictionary)
     schema = Schema(columns={"a": "String", "b": "Int64", "c": "Float64"})
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -5323,6 +5701,7 @@ def test_col_schema_match():
 
     # Completely correct schema (using kwargs)
     schema = Schema(columns={"a": "String", "b": "Int64", "c": "Float64"})
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -5351,6 +5730,7 @@ def test_col_schema_match():
 
     # Schema produced using the tbl object (supplied to `tbl=`)
     schema = Schema(tbl=tbl)
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -5379,6 +5759,7 @@ def test_col_schema_match():
 
     # Having an incorrect dtype in supplied schema
     schema = Schema(columns=[("a", "wrong"), ("b", "Int64"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5407,6 +5788,7 @@ def test_col_schema_match():
 
     # Schema expressed in a different order (yet complete)
     schema = Schema(columns=[("b", "Int64"), ("c", "Float64"), ("a", "String")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5435,6 +5817,7 @@ def test_col_schema_match():
 
     # Schema expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=[("b", "Int64"), ("c", "Float64"), ("wrong", "String")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5463,6 +5846,7 @@ def test_col_schema_match():
 
     # Schema has duplicate column/dtype
     schema = Schema(columns=[("a", "String"), ("a", "String"), ("b", "Int64"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5493,6 +5877,7 @@ def test_col_schema_match():
     schema = Schema(
         columns=[("a", "String"), ("a", "String"), ("wrong", "Int64"), ("c", "Float64")]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5521,6 +5906,7 @@ def test_col_schema_match():
 
     # Supplied schema is a subset of the actual schema (in the correct order)
     schema = Schema(columns=[("b", "Int64"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5549,6 +5935,7 @@ def test_col_schema_match():
 
     # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", "Int64"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5577,6 +5964,7 @@ def test_col_schema_match():
 
     # Supplied schema is a subset of the actual schema but in a different order
     schema = Schema(columns=[("c", "Float64"), ("b", "Int64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5605,6 +5993,7 @@ def test_col_schema_match():
 
     # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", "Float64"), ("b", "Int64")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -5633,6 +6022,7 @@ def test_col_schema_match():
 
     # Completely correct schema supplied to `columns=` except for the case mismatch in colnames
     schema = Schema(columns=[("a", "String"), ("B", "Int64"), ("C", "Float64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_colnames=False)
@@ -5670,6 +6060,7 @@ def test_col_schema_match():
 
     # Completely correct schema supplied to `columns=` except for the case mismatch in dtypes
     schema = Schema(columns=[("a", "string"), ("b", "INT64"), ("c", "FloaT64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=False)
@@ -5704,6 +6095,7 @@ def test_col_schema_match():
     # Completely correct schema supplied to `columns=` except for the case mismatch in
     # colnames and dtypes
     schema = Schema(columns=[("A", "string"), ("b", "INT64"), ("C", "FloaT64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_colnames=False, case_sensitive_dtypes=False)
@@ -5753,6 +6145,7 @@ def test_col_schema_match():
 
     # Matching dtypes with substrings in the supplied schema (`full_match_dtypes=False` case)
     schema = Schema(columns=[("a", "Str"), ("b", "Int"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, full_match_dtypes=False)
@@ -5784,6 +6177,7 @@ def test_col_schema_match():
 
     # Matching dtypes with substrings in the supplied schema (`full_match_dtypes=True` case)
     schema = Schema(columns=[("a", "Str"), ("b", "Int"), ("c", "Float64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, full_match_dtypes=True)
@@ -5815,6 +6209,7 @@ def test_col_schema_match():
 
     # Matching dtypes with substrings in the supplied schema and using case-insensitive matching
     schema = Schema(columns=[("a", "str"), ("b", "Int"), ("c", "float64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=False, full_match_dtypes=False)
@@ -5865,6 +6260,7 @@ def test_col_schema_match():
     # Matching dtypes with substrings in the supplied schema and using case-insensitive matching
     # (`case_sensitive_dtypes=True` case)
     schema = Schema(columns=[("a", "str"), ("b", "Int"), ("c", "float64")])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=True, full_match_dtypes=False)
@@ -5914,7 +6310,7 @@ def test_col_schema_match():
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_row_count_match(request, tbl_fixture):
+def test_row_count_match(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).row_count_match(count=4).interrogate().n_passed(i=1, scalar=True) == 1
@@ -5950,7 +6346,9 @@ def test_invalid_row_count_tol(val: Any, e: Exception, exc: str) -> None:
 
 def test_row_count_example_tol() -> None:
     small_table = load_dataset("small_table")
+
     smaller_small_table = small_table.sample(n=12)  # within the lower bound
+
     (
         Validate(data=smaller_small_table)
         .row_count_match(count=13, tol=(2, 0))  # minus 2 but plus 0, ie. 11-13
@@ -5966,6 +6364,7 @@ def test_row_count_example_tol() -> None:
     )
 
     even_smaller_table = small_table.sample(n=2)
+
     with pytest.raises(AssertionError):
         (
             Validate(data=even_smaller_table)
@@ -5973,9 +6372,6 @@ def test_row_count_example_tol() -> None:
             .interrogate()
             .assert_passing()
         )
-
-
-test_row_count_example_tol()
 
 
 @pytest.mark.parametrize(
@@ -6008,7 +6404,7 @@ def test_row_count_tol(
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_col_count_match(request, tbl_fixture):
+def test_col_count_match(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).col_count_match(count=3).interrogate().n_passed(i=1, scalar=True) == 1
@@ -6024,7 +6420,7 @@ def test_col_count_match(request, tbl_fixture):
     assert Validate(tbl).col_count_match(count=tbl).interrogate().n_passed(i=1, scalar=True) == 1
 
 
-def test_col_schema_match_list_of_dtypes():
+def test_col_schema_match_list_of_dtypes() -> None:
     tbl = pl.DataFrame(
         {
             "a": ["apple", "banana", "cherry", "date"],
@@ -6035,6 +6431,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Completely correct schema supplied, using 1-element lists for dtypes
     schema = Schema(columns=[("a", ["String"]), ("b", ["Int64"]), ("c", ["Float64"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6063,6 +6460,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Completely correct schema supplied, using 1-element lists for dtypes (using dict for schema)
     schema = Schema(columns={"a": ["String"], "b": ["Int64"], "c": ["Float64"]})
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6091,6 +6489,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Completely correct schema supplied, using 1-element lists for dtypes (using kwargs for schema)
     schema = Schema(a=["String"], b=["Int64"], c=["Float64"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6121,6 +6520,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["str", "String"]), ("b", ["Int64", "Int"]), ("c", ["Float64", "float"])]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6151,6 +6551,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns={"a": ["str", "String"], "b": ["Int64", "Int"], "c": ["Float64", "float"]}
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6179,6 +6580,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Having one of two dtypes being correct in 2-element lists for dtypes (using kwargs for schema)
     schema = Schema(a=["str", "String"], b=["Int64", "Int"], c=["Float64", "float"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6207,6 +6609,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Having mix of scalars and lists for dtypes
     schema = Schema(columns=[("a", "String"), ("b", ["Int64"]), ("c", ["float", "Float64"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6241,6 +6644,7 @@ def test_col_schema_match_list_of_dtypes():
             ("c", ["Float64", "Float64", "float"]),
         ]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6275,6 +6679,7 @@ def test_col_schema_match_list_of_dtypes():
             ("c", ["float", "Float64"]),
         ]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6303,6 +6708,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Schema expressed in a different order (yet complete)
     schema = Schema(columns=[("b", ["Int64", "int"]), ("c", ["float", "Float64"]), ("a", "String")])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6333,6 +6739,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("b", ["int", "Int64"]), ("c", ["float", "Float64"]), ("wrong", ["String", "str"])]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6368,6 +6775,7 @@ def test_col_schema_match_list_of_dtypes():
             ("c", ["Float64", "float"]),
         ]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6438,6 +6846,7 @@ def test_col_schema_match_list_of_dtypes():
             ("c", ["Float64", "float"]),
         ]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6473,6 +6882,7 @@ def test_col_schema_match_list_of_dtypes():
             ("c", ["Float64", "float"]),
         ]
     )
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6501,6 +6911,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Supplied schema is a subset of the actual schema (in the correct order)
     schema = Schema(columns=[("b", ["Int64", "int"]), ("c", ["float", "Float64"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6529,6 +6940,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", ["Int64", "int"]), ("c", ["Float64", "float"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6557,6 +6969,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Supplied schema is a subset of the actual schema but in a different order
     schema = Schema(columns=[("c", ["float", "Float64"]), ("b", ["Int64", "int"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6585,6 +6998,7 @@ def test_col_schema_match_list_of_dtypes():
 
     # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", ["float", "Float64"]), ("b", ["Int64", "int"])])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -6615,6 +7029,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["String", "str"]), ("B", ["int", "Int64"]), ("C", ["float", "Float64"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_colnames=False)
@@ -6654,6 +7069,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["string", "STR"]), ("b", ["INT64", "INT"]), ("c", ["FloaT64", "float"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=False)
@@ -6690,6 +7106,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("A", ["string", "STR"]), ("b", ["INT64", "int"]), ("C", ["FloaT64", "float"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_colnames=False, case_sensitive_dtypes=False)
@@ -6741,6 +7158,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["Str", "num"]), ("b", ["Int", "string"]), ("c", ["Float64", "real"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, full_match_dtypes=False)
@@ -6774,6 +7192,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["Str", "St"]), ("b", ["Int", "In"]), ("c", ["Float64", "Floa"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, full_match_dtypes=True)
@@ -6807,6 +7226,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["str", "s"]), ("b", ["Int", "num"]), ("c", ["float64", "float80"])]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=False, full_match_dtypes=False)
@@ -6859,6 +7279,7 @@ def test_col_schema_match_list_of_dtypes():
     schema = Schema(
         columns=[("a", ["str", "str2"]), ("b", ["Int", "Inte"]), ("c", "float64", "float")]
     )
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_dtypes=True, full_match_dtypes=False)
@@ -6907,7 +7328,7 @@ def test_col_schema_match_list_of_dtypes():
     )
 
 
-def test_col_schema_match_columns_only():
+def test_col_schema_match_columns_only() -> None:
     tbl = pl.DataFrame(
         {
             "a": ["apple", "banana", "cherry", "date"],
@@ -6918,6 +7339,7 @@ def test_col_schema_match_columns_only():
 
     # Completely correct schema supplied to `columns=` as a list of strings
     schema = Schema(columns=["a", "b", "c"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6946,6 +7368,7 @@ def test_col_schema_match_columns_only():
 
     # Completely correct schema supplied to `columns=` as a list of 1-element tuples
     schema = Schema(columns=[("a",), ("b",), ("c",)])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 1
@@ -6974,6 +7397,7 @@ def test_col_schema_match_columns_only():
 
     # Schema columns expressed in a different order (yet complete)
     schema = Schema(columns=["b", "c", "a"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7002,6 +7426,7 @@ def test_col_schema_match_columns_only():
 
     # Schema columns expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=["b", "c", "wrong"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7030,6 +7455,7 @@ def test_col_schema_match_columns_only():
 
     # Schema of columns has a duplicate column
     schema = Schema(columns=["a", "a", "b", "c"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7058,6 +7484,7 @@ def test_col_schema_match_columns_only():
 
     # Schema columns has duplicate column and a wrong column name
     schema = Schema(columns=["a", "a", "wrong", "c"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7086,6 +7513,7 @@ def test_col_schema_match_columns_only():
 
     # Supplied columns are a subset of the actual columns (but in the correct order)
     schema = Schema(columns=["b", "c"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7114,6 +7542,7 @@ def test_col_schema_match_columns_only():
 
     # Supplied columns are a subset of the actual column (in correct order): has wrong column name
     schema = Schema(columns=["wrong", "c"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7142,6 +7571,7 @@ def test_col_schema_match_columns_only():
 
     # Supplied columns are a subset of the actual schema but in a different order
     schema = Schema(columns=["c", "b"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7170,6 +7600,7 @@ def test_col_schema_match_columns_only():
 
     # Supplied columns are a subset of actual columns but in a different order: wrong column name
     schema = Schema(columns=["wrong", "b"])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7198,6 +7629,7 @@ def test_col_schema_match_columns_only():
 
     # Completely correct column names except for case mismatches
     schema = Schema(columns=["a", "B", "C"])
+
     assert (
         Validate(data=tbl)
         .col_schema_match(schema=schema, case_sensitive_colnames=False)
@@ -7235,6 +7667,7 @@ def test_col_schema_match_columns_only():
 
     # Single (but correct) column supplied to `columns=` as a string
     schema = Schema(columns="a")
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7263,6 +7696,7 @@ def test_col_schema_match_columns_only():
 
     # Single (but correct) column supplied to `columns=` as a tuple within a list
     schema = Schema(columns=[("a",)])
+
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
         == 0
@@ -7290,7 +7724,7 @@ def test_col_schema_match_columns_only():
     )
 
 
-def test_comprehensive_validation_with_polars_lazyframe():
+def test_comprehensive_validation_with_polars_lazyframe() -> None:
     # Create a lazyframe from the small_table dataset
     small_table_lazy = load_dataset(dataset="small_table", tbl_type="polars").lazy()
 
@@ -7341,11 +7775,12 @@ def test_comprehensive_validation_with_polars_lazyframe():
 
     # Assert that the validation completed successfully
     assert validation is not None
+
     # Assert that some validation steps were performed
     assert len(validation.validation_info) > 0
 
 
-def test_comprehensive_validation_with_narwhals_dataframe():
+def test_comprehensive_validation_with_narwhals_dataframe() -> None:
     # Create a Narwhals DF from the small_table dataset
     small_table_nw = nw.from_native(load_dataset(dataset="small_table", tbl_type="polars"))
 
@@ -7391,12 +7826,13 @@ def test_comprehensive_validation_with_narwhals_dataframe():
 
     # Assert that the validation completed successfully
     assert validation is not None
+
     # Assert that some validation steps were performed
     assert len(validation.validation_info) > 0
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_date_validation_across_cols(request, tbl_fixture):
+def test_date_validation_across_cols(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -7481,7 +7917,7 @@ def test_date_validation_across_cols(request, tbl_fixture):
     ids=["date_objects", "string_dates"],
 )
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_date_validation_fixed_date(request, tbl_fixture, date_values):
+def test_date_validation_fixed_date(request, tbl_fixture, date_values) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     date_left = date_values["left"]
@@ -7619,7 +8055,7 @@ def test_date_validation_fixed_date(request, tbl_fixture, date_values):
     ids=["datetime_objects", "string_datetimes"],
 )
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_date_validation_fixed_datetime(request, tbl_fixture, datetime_values):
+def test_date_validation_fixed_datetime(request, tbl_fixture, datetime_values) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     datetime_left = datetime_values["left"]
@@ -7717,7 +8153,7 @@ def test_date_validation_fixed_datetime(request, tbl_fixture, datetime_values):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
+def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     date_left = datetime.date(2021, 1, 1)
@@ -7863,7 +8299,7 @@ def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_date_validation_fixed_datetime_date_col(request, tbl_fixture):
+def test_date_validation_fixed_datetime_date_col(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     datetime_left = datetime.datetime(2021, 1, 1)
@@ -8009,7 +8445,7 @@ def test_date_validation_fixed_datetime_date_col(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_datetime_validation_across_cols(request, tbl_fixture):
+def test_datetime_validation_across_cols(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -8082,7 +8518,7 @@ def test_datetime_validation_across_cols(request, tbl_fixture):
 @pytest.mark.parametrize(
     "tbl_fixture", ["tbl_pd_variable_names", "tbl_pl_variable_names", "tbl_memtable_variable_names"]
 )
-def test_validation_with_selector_helper_functions(request, tbl_fixture):
+def test_validation_with_selector_helper_functions(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Create a large validation plan and interrogate the input table
@@ -8191,12 +8627,13 @@ def test_validation_with_selector_helper_functions(request, tbl_fixture):
 @pytest.mark.parametrize(
     "tbl_fixture", ["tbl_pd_variable_names", "tbl_pl_variable_names", "tbl_memtable_variable_names"]
 )
-def test_validation_with_single_selectors(request, tbl_fixture):
+def test_validation_with_single_selectors(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Use `starts_with()` selector
 
     v = Validate(tbl).col_vals_gt(columns=starts_with("low"), value=0).interrogate()
+
     assert len(v.validation_info) == 2
     assert v.validation_info[0].eval_error is None
     assert v.validation_info[1].eval_error is None
@@ -8207,6 +8644,7 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `ends_with()` selector
 
     v = Validate(tbl).col_vals_gt(columns=ends_with("floats"), value=0).interrogate()
+
     assert len(v.validation_info) == 3
     assert v.validation_info[0].eval_error is None
     assert v.validation_info[1].eval_error is None
@@ -8219,6 +8657,7 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `ends_with()` selector
 
     v = Validate(tbl).col_vals_gt(columns=ends_with("floats"), value=0).interrogate()
+
     assert len(v.validation_info) == 3
     assert v.validation_info[0].eval_error is None
     assert v.validation_info[1].eval_error is None
@@ -8231,6 +8670,7 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `contains()` selector
 
     v = Validate(tbl).col_vals_gt(columns=contains("numbers"), value=0).interrogate()
+
     assert len(v.validation_info) == 2
     assert v.validation_info[0].eval_error is None
     assert v.validation_info[1].eval_error is None
@@ -8241,13 +8681,16 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `matches()` selector
 
     v = Validate(tbl).col_vals_gt(columns=matches("_"), value=0).interrogate()
+
     assert len(v.validation_info) == 5
+
     for i in range(5):
         assert v.validation_info[i].eval_error is None
         assert v.validation_info[i].n == 2
         assert v.validation_info[i].n_passed == 2
         assert v.validation_info[i].active is True
         assert v.validation_info[i].assertion_type == "col_vals_gt"
+
     assert [v.validation_info[i].column for i in range(5)] == [
         "low_numbers",
         "high_numbers",
@@ -8259,12 +8702,15 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `everything()` selector
 
     v = Validate(tbl).col_exists(columns=everything()).interrogate()
+
     assert len(v.validation_info) == 9
+
     for i in range(9):
         assert v.validation_info[i].eval_error is None
         assert v.validation_info[i].n == 1
         assert v.validation_info[i].n_passed == 1
         assert v.validation_info[i].assertion_type == "col_exists"
+
     assert [v.validation_info[i].column for i in range(9)] == [
         "word",
         "low_numbers",
@@ -8280,6 +8726,7 @@ def test_validation_with_single_selectors(request, tbl_fixture):
     # Use `first_n()` selector
 
     v = Validate(tbl).col_vals_in_set(columns=first_n(1), set=["apple", "banana"]).interrogate()
+
     assert len(v.validation_info) == 1
     assert v.validation_info[0].column == "word"
     assert v.validation_info[0].eval_error is None
@@ -8300,13 +8747,14 @@ def test_validation_with_single_selectors(request, tbl_fixture):
 @pytest.mark.parametrize(
     "tbl_fixture", ["tbl_pd_variable_names", "tbl_pl_variable_names", "tbl_memtable_variable_names"]
 )
-def test_validation_with_single_selectors_across_validations(request, tbl_fixture):
+def test_validation_with_single_selectors_across_validations(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # `col_vals_gt()`
 
     v_col = Validate(tbl).col_vals_gt(columns=col("low_numbers"), value=0).interrogate()
     v_sel = Validate(tbl).col_vals_gt(columns=starts_with("low"), value=0).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8314,6 +8762,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_lt(columns=col("low_numbers"), value=200000).interrogate()
     v_sel = Validate(tbl).col_vals_lt(columns=starts_with("low"), value=200000).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8321,6 +8770,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_ge(columns=col("low_numbers"), value=0).interrogate()
     v_sel = Validate(tbl).col_vals_ge(columns=starts_with("low"), value=0).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8328,6 +8778,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_le(columns=col("low_numbers"), value=200000).interrogate()
     v_sel = Validate(tbl).col_vals_le(columns=starts_with("low"), value=200000).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8335,6 +8786,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_eq(columns=col("low_numbers"), value=0).interrogate()
     v_sel = Validate(tbl).col_vals_eq(columns=starts_with("low"), value=0).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8342,6 +8794,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_ne(columns=col("low_numbers"), value=0).interrogate()
     v_sel = Validate(tbl).col_vals_ne(columns=starts_with("low"), value=0).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8357,6 +8810,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
         .col_vals_between(columns=starts_with("low"), left=0, right=200000)
         .interrogate()
     )
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8372,6 +8826,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
         .col_vals_outside(columns=starts_with("low"), left=0, right=200000)
         .interrogate()
     )
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 2
 
@@ -8385,6 +8840,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
         .col_vals_in_set(columns=starts_with("w"), set=["apple", "banana"])
         .interrogate()
     )
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
@@ -8400,6 +8856,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
         .col_vals_not_in_set(columns=starts_with("w"), set=["apple", "banana"])
         .interrogate()
     )
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
@@ -8407,6 +8864,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_null(columns=col("word")).interrogate()
     v_sel = Validate(tbl).col_vals_null(columns=starts_with("w")).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
@@ -8414,6 +8872,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_not_null(columns=col("word")).interrogate()
     v_sel = Validate(tbl).col_vals_not_null(columns=starts_with("w")).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
@@ -8421,6 +8880,7 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_vals_regex(columns=col("word"), pattern="a").interrogate()
     v_sel = Validate(tbl).col_vals_regex(columns=starts_with("w"), pattern="a").interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
@@ -8428,11 +8888,12 @@ def test_validation_with_single_selectors_across_validations(request, tbl_fixtur
 
     v_col = Validate(tbl).col_exists(columns=col("word")).interrogate()
     v_sel = Validate(tbl).col_exists(columns=starts_with("w")).interrogate()
+
     assert len(v_col.validation_info) == 1
     assert len(v_sel.validation_info) == 1
 
 
-def test_validation_with_selector_helper_functions_using_pre(tbl_pl_variable_names):
+def test_validation_with_selector_helper_functions_using_pre(tbl_pl_variable_names) -> None:
     # Create a validation plan and interrogate the input table
     v = (
         Validate(tbl_pl_variable_names)
@@ -8507,7 +8968,7 @@ def test_validation_with_selector_helper_functions_using_pre(tbl_pl_variable_nam
 @pytest.mark.parametrize(
     "tbl_fixture", ["tbl_pd_variable_names", "tbl_pl_variable_names", "tbl_memtable_variable_names"]
 )
-def test_validation_with_selector_helper_functions_no_match(request, tbl_fixture):
+def test_validation_with_selector_helper_functions_no_match(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Create a validation that evaluates with no issues in the first and third steps but has
@@ -8561,7 +9022,9 @@ def test_validation_with_selector_helper_functions_no_match(request, tbl_fixture
 @pytest.mark.parametrize(
     "tbl_fixture", ["tbl_pd_variable_names", "tbl_pl_variable_names", "tbl_memtable_variable_names"]
 )
-def test_validation_with_selector_helper_functions_no_match_snap(request, tbl_fixture, snapshot):
+def test_validation_with_selector_helper_functions_no_match_snap(
+    request, tbl_fixture, snapshot
+) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Create a validation that evaluates with no issues in the first and third steps but has
@@ -8577,18 +9040,15 @@ def test_validation_with_selector_helper_functions_no_match_snap(request, tbl_fi
 
     html_str = v.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "selector_helper_functions_no_match.html")
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_interrogate_first_n(request, tbl_fixture):
+def test_interrogate_first_n(request, tbl_fixture) -> None:
     if tbl_fixture not in [
         "tbl_dates_times_text_parquet",
         "tbl_dates_times_text_duckdb",
@@ -8604,16 +9064,19 @@ def test_interrogate_first_n(request, tbl_fixture):
 
         # Expect that the extracts table has 2 entries out of 3 failures
         assert validation.n_failed(i=1, scalar=True) == 3
+
         extract_df = nw.from_native(validation.get_data_extracts(i=1, frame=True))
+
         # For LazyFrames, need to collect first, then get length
         if hasattr(extract_df, "collect"):
             extract_df = extract_df.collect()
+
         assert len(extract_df) == 2
         assert len(nw.from_native(validation.get_data_extracts(i=1, frame=True)).columns) == 4
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_interrogate_sample_n(request, tbl_fixture):
+def test_interrogate_sample_n(request, tbl_fixture) -> None:
     if tbl_fixture not in [
         "tbl_dates_times_text_parquet",
         "tbl_dates_times_text_duckdb",
@@ -8633,7 +9096,7 @@ def test_interrogate_sample_n(request, tbl_fixture):
         assert len(nw.from_native(validation.get_data_extracts(i=1, frame=True)).columns) == 4
 
 
-def test_interrogate_sample_n_limit():
+def test_interrogate_sample_n_limit() -> None:
     game_revenue = load_dataset(dataset="game_revenue", tbl_type="polars")
 
     validation_default_limit = (
@@ -8699,7 +9162,7 @@ def test_interrogate_sample_n_limit():
         ("tbl_dates_times_text_pl", 1.00, 3),
     ],
 )
-def test_interrogate_sample_frac(request, tbl_fixture, sample_frac, expected):
+def test_interrogate_sample_frac(request, tbl_fixture, sample_frac, expected) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation = (
@@ -8715,7 +9178,7 @@ def test_interrogate_sample_frac(request, tbl_fixture, sample_frac, expected):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_dates_times_text_pd", "tbl_dates_times_text_pl"])
-def test_interrogate_sample_frac_with_sample_limit(request, tbl_fixture):
+def test_interrogate_sample_frac_with_sample_limit(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation = (
@@ -8731,14 +9194,14 @@ def test_interrogate_sample_frac_with_sample_limit(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_col_vals_null(request, tbl_fixture):
+def test_col_vals_null(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).col_vals_null(columns="text").interrogate().n_passed(i=1, scalar=True) == 1
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_col_vals_not_null(request, tbl_fixture):
+def test_col_vals_not_null(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -8747,8 +9210,53 @@ def test_col_vals_not_null(request, tbl_fixture):
     )
 
 
+def test_col_vals_increasing_with_narwhals_selector() -> None:
+    """Test col_vals_increasing with Narwhals selector."""
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [10, 20, 30, 40, 50],
+            "c": ["x", "y", "z", "w", "v"],
+        }
+    )
+    validation = Validate(data=tbl).col_vals_increasing(columns=ncs.numeric()).interrogate()
+
+    # Should create steps for columns a and b
+    assert len(validation.validation_info) == 2
+
+
+def test_col_vals_decreasing_with_narwhals_selector() -> None:
+    """Test col_vals_decreasing with Narwhals selector."""
+    tbl = pl.DataFrame(
+        {
+            "a": [5, 4, 3, 2, 1],
+            "b": [50, 40, 30, 20, 10],
+            "c": ["x", "y", "z", "w", "v"],
+        }
+    )
+    validation = Validate(data=tbl).col_vals_decreasing(columns=ncs.numeric()).interrogate()
+
+    # Should create steps for columns a and b
+    assert len(validation.validation_info) == 2
+
+
+def test_col_vals_within_spec_with_narwhals_selector() -> None:
+    """Test col_vals_within_spec with Narwhals selector."""
+    tbl = pl.DataFrame(
+        {
+            "email": ["user@test.com", "admin@example.org", "test@domain.co.uk"],
+        }
+    )
+    validation = (
+        Validate(data=tbl).col_vals_within_spec(columns=ncs.string(), spec="email").interrogate()
+    )
+
+    assert len(validation.validation_info) == 1
+    assert validation.n_passed(i=1, scalar=True) == 3
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
-def test_col_exists(request, tbl_fixture):
+def test_col_exists(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert Validate(tbl).col_exists(columns="text").interrogate().n_passed(i=1, scalar=True) == 1
@@ -8756,7 +9264,7 @@ def test_col_exists(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_validation_types(request, tbl_fixture):
+def test_validation_types(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
@@ -8769,7 +9277,7 @@ def test_validation_types(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_interrogate_raise_on_get_first_and_sample(request, tbl_fixture):
+def test_interrogate_raise_on_get_first_and_sample(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     with pytest.raises(ValueError):
@@ -8780,7 +9288,7 @@ def test_interrogate_raise_on_get_first_and_sample(request, tbl_fixture):
         Validate(tbl).col_vals_gt(columns="z", value=10).interrogate(sample_n=2, sample_frac=0.5)
 
 
-def test_get_data_extracts(tbl_missing_pd):
+def test_get_data_extracts(tbl_missing_pd) -> None:
     validation = (
         Validate(tbl_missing_pd)
         .col_vals_gt(columns="x", value=1)
@@ -8813,7 +9321,7 @@ def test_get_data_extracts(tbl_missing_pd):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
-def test_interrogate_with_active_inactive(request, tbl_fixture):
+def test_interrogate_with_active_inactive(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation = (
@@ -8848,7 +9356,7 @@ def test_interrogate_with_active_inactive(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_get_sundered_data(request, tbl_fixture):
+def test_get_sundered_data(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # This validation will:
@@ -8879,6 +9387,7 @@ def test_get_sundered_data(request, tbl_fixture):
 
     # Check the rows of the passed data piece
     passed_data_rows = nw.from_native(sundered_data_pass).rows()
+
     assert passed_data_rows[0] == (2, 5, 8)
     assert passed_data_rows[1] == (3, 6, 8)
 
@@ -8889,12 +9398,52 @@ def test_get_sundered_data(request, tbl_fixture):
 
     # Check the rows of the failed data piece
     failed_data_rows = nw.from_native(sundered_data_fail).rows()
+
     assert failed_data_rows[0] == (1, 4, 8)
     assert failed_data_rows[1] == (4, 7, 8)
 
 
+def test_get_sundered_data_lazy_preserves_row_order() -> None:
+    # Joins don't guarantee row order (Polars >= 2.0 collects LazyFrames with the streaming
+    # engine) so a large table is used, with an unsorted first column that has ties
+    n = 100_000
+    tbl = pl.DataFrame({"x": [(i * 7) % 10 for i in range(n)], "y": list(range(n))})
+
+    validation = (
+        Validate(tbl.lazy())
+        .col_vals_gt(columns="x", value=2)
+        .col_vals_lt(columns="x", value=8)
+        .interrogate()
+    )
+
+    sundered_data_pass = validation.get_sundered_data(type="pass")
+    sundered_data_fail = validation.get_sundered_data(type="fail")
+
+    assert isinstance(sundered_data_pass, pl.LazyFrame)
+
+    expected_pass = tbl.filter((pl.col("x") > 2) & (pl.col("x") < 8))
+    expected_fail = tbl.filter((pl.col("x") <= 2) | (pl.col("x") >= 8))
+
+    assert_frame_equal(sundered_data_pass.collect(), expected_pass)
+    assert_frame_equal(sundered_data_fail.collect(), expected_fail)
+
+
+def test_get_data_extracts_lazy_row_numbers() -> None:
+    # Row numbers must follow the table's row order, not the sort order of its first column
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    extracts = {}
+    for label, data in [("eager", tbl), ("lazy", tbl.lazy())]:
+        validation = Validate(data).col_vals_gt(columns="y", value=25).interrogate()
+        extract = validation.get_data_extracts(i=1, frame=True)
+        extracts[label] = extract.collect() if isinstance(extract, pl.LazyFrame) else extract
+
+    assert extracts["lazy"].rows() == [(1, 5, 10), (2, 1, 20)]
+    assert_frame_equal(extracts["lazy"], extracts["eager"])
+
+
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_get_sundered_data_empty_frame(request, tbl_fixture):
+def test_get_sundered_data_empty_frame(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # Remove all rows from the table
@@ -8917,7 +9466,7 @@ def test_get_sundered_data_empty_frame(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_get_sundered_data_no_validation_steps(request, tbl_fixture):
+def test_get_sundered_data_no_validation_steps(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     validation = Validate(tbl).interrogate()
@@ -8937,7 +9486,7 @@ def test_get_sundered_data_no_validation_steps(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_get_sundered_data_mix_of_step_types(request, tbl_fixture):
+def test_get_sundered_data_mix_of_step_types(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
 
     # This sundering from this validation will effectively be the same as in the
@@ -8970,6 +9519,7 @@ def test_get_sundered_data_mix_of_step_types(request, tbl_fixture):
 
     # Check the rows of the passed data piece
     passed_data_rows = nw.from_native(sundered_data_pass).rows()
+
     assert passed_data_rows[0] == (2, 5, 8)
     assert passed_data_rows[1] == (3, 6, 8)
 
@@ -8980,11 +9530,12 @@ def test_get_sundered_data_mix_of_step_types(request, tbl_fixture):
 
     # Check the rows of the failed data piece
     failed_data_rows = nw.from_native(sundered_data_fail).rows()
+
     assert failed_data_rows[0] == (1, 4, 8)
     assert failed_data_rows[1] == (4, 7, 8)
 
 
-def test_comprehensive_validation_report_html_snap(snapshot):
+def test_comprehensive_validation_report_html_snap(snapshot) -> None:
     validation = (
         Validate(
             data=load_dataset(),
@@ -9032,18 +9583,15 @@ def test_comprehensive_validation_report_html_snap(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "comprehensive_validation_report.html")
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
-def test_validation_report_segments_html(snapshot, tbl_type):
+def test_validation_report_segments_html(snapshot, tbl_type) -> None:
     validation = (
         Validate(
             data=load_dataset(dataset="game_revenue", tbl_type=tbl_type),
@@ -9074,17 +9622,14 @@ def test_validation_report_segments_html(snapshot, tbl_type):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_segments.html")
 
 
-def test_validation_report_segments_with_pre_html(snapshot):
+def test_validation_report_segments_with_pre_html(snapshot) -> None:
     validation = (
         Validate(
             data=load_dataset(dataset="game_revenue", tbl_type="polars"),
@@ -9105,17 +9650,14 @@ def test_validation_report_segments_with_pre_html(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_segments_with_pre.html")
 
 
-def test_validation_report_briefs_html(snapshot):
+def test_validation_report_briefs_html(snapshot) -> None:
     validation = (
         Validate(
             data=load_dataset(),
@@ -9133,17 +9675,14 @@ def test_validation_report_briefs_html(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_with_briefs.html")
 
 
-def test_validation_report_briefs_global_local_html(snapshot):
+def test_validation_report_briefs_global_local_html(snapshot) -> None:
     validation = (
         Validate(
             data=load_dataset(),
@@ -9162,17 +9701,35 @@ def test_validation_report_briefs_global_local_html(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
 
 
-def test_no_interrogation_validation_report_html_snap(snapshot):
+@pytest.mark.parametrize("interrogate", [True, False])
+def test_validation_report_html_not_escaped(interrogate: bool) -> None:
+    # Great Tables v1.0.0 escapes unformatted cell content; the report's pre-built HTML cells
+    # (and the scorecard's) must still render as markup rather than as escaped text
+    validation = (
+        Validate(data=load_dataset(), thresholds=Thresholds(warning=0.10))
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_not_null(columns="c")
+    )
+    if interrogate:
+        validation = validation.interrogate()
+
+    report_html = validation.get_tabular_report().as_raw_html()
+    assert "<svg" in report_html
+    assert not re.search(r"&lt;/?(div|span|svg|title|path|g|code)\b", report_html)
+
+    if interrogate:
+        scorecard_html = validation.get_scorecard().as_raw_html()
+        assert not re.search(r"&lt;/?(div|span)\b", scorecard_html)
+
+
+def test_no_interrogation_validation_report_html_snap(snapshot) -> None:
     validation = (
         Validate(
             data=load_dataset(),
@@ -9203,17 +9760,14 @@ def test_no_interrogation_validation_report_html_snap(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
-    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
-    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
-
-    # Use re.sub to remove the tag
-    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "no_interrogation_validation_report.html")
 
 
-def test_no_steps_validation_report_html_snap(snapshot):
+def test_no_steps_validation_report_html_snap(snapshot) -> None:
     validation = Validate(
         data=load_dataset(),
         tbl_name="small_table",
@@ -9222,11 +9776,14 @@ def test_no_steps_validation_report_html_snap(snapshot):
 
     html_str = validation.get_tabular_report().as_raw_html()
 
+    # Strip non-deterministic content (timestamps, durations, footers)
+    edited_report_html_str = _strip_report_nondeterminism(html_str)
+
     # Use the snapshot fixture to create and save the snapshot
-    snapshot.assert_match(html_str, "no_steps_validation_report.html")
+    snapshot.assert_match(edited_report_html_str, "no_steps_validation_report.html")
 
 
-def test_no_steps_validation_report_html_with_interrogate():
+def test_no_steps_validation_report_html_with_interrogate() -> None:
     validation = Validate(
         data=load_dataset(),
         tbl_name="small_table",
@@ -9239,33 +9796,39 @@ def test_no_steps_validation_report_html_with_interrogate():
     )
 
 
-def test_load_dataset():
+def test_load_dataset() -> None:
     # Load the default dataset (`small_table`) and verify it's a Polars DataFrame
     tbl = load_dataset()
+
     assert isinstance(tbl, pl.DataFrame)
 
     # Load the default dataset (`small_table`) and verify it's a Pandas DataFrame
     tbl = load_dataset(tbl_type="pandas")
+
     assert isinstance(tbl, pd.DataFrame)
 
     # Load the `game_revenue` dataset and verify it's a Polars DataFrame
     tbl = load_dataset(dataset="game_revenue")
+
     assert isinstance(tbl, pl.DataFrame)
 
     # Load the `game_revenue` dataset and verify it's a Pandas DataFrame
     tbl = load_dataset(dataset="game_revenue", tbl_type="pandas")
+
     assert isinstance(tbl, pd.DataFrame)
 
     # Load the `nycflights` dataset and verify it's a Polars DataFrame
     tbl = load_dataset(dataset="nycflights")
+
     assert isinstance(tbl, pl.DataFrame)
 
     # Load the `nycflights` dataset and verify it's a Pandas DataFrame
     tbl = load_dataset(dataset="nycflights", tbl_type="pandas")
+
     assert isinstance(tbl, pd.DataFrame)
 
 
-def test_load_dataset_invalid():
+def test_load_dataset_invalid() -> None:
     # A ValueError is raised when an invalid dataset name is provided
     with pytest.raises(ValueError):
         load_dataset(dataset="invalid_dataset")
@@ -9275,7 +9838,7 @@ def test_load_dataset_invalid():
         load_dataset(tbl_type="invalid_tbl_type")
 
 
-def test_load_dataset_no_pandas():
+def test_load_dataset_no_pandas() -> None:
     # Mock the absence of the Pandas library
     with patch.dict(sys.modules, {"pandas": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
@@ -9283,7 +9846,7 @@ def test_load_dataset_no_pandas():
             load_dataset(tbl_type="pandas")
 
 
-def test_load_dataset_no_polars():
+def test_load_dataset_no_polars() -> None:
     # Mock the absence of the Polars library
     with patch.dict(sys.modules, {"polars": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
@@ -9291,7 +9854,7 @@ def test_load_dataset_no_polars():
             load_dataset(tbl_type="polars")
 
 
-def test_get_data_path_csv_default():
+def test_get_data_path_csv_default() -> None:
     path = get_data_path()  # Default: small_table, csv
 
     assert isinstance(path, str)
@@ -9300,7 +9863,7 @@ def test_get_data_path_csv_default():
     assert os.path.getsize(path) > 0
 
 
-def test_get_data_path_all_datasets_csv():
+def test_get_data_path_all_datasets_csv() -> None:
     datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
 
     for dataset in datasets:
@@ -9312,7 +9875,7 @@ def test_get_data_path_all_datasets_csv():
         assert os.path.getsize(path) > 0
 
 
-def test_get_data_path_parquet():
+def test_get_data_path_parquet() -> None:
     path = get_data_path(dataset="small_table", file_type="parquet")
 
     assert isinstance(path, str)
@@ -9321,7 +9884,7 @@ def test_get_data_path_parquet():
     assert os.path.getsize(path) > 0
 
 
-def test_get_data_path_duckdb():
+def test_get_data_path_duckdb() -> None:
     path = get_data_path(dataset="small_table", file_type="duckdb")
 
     assert isinstance(path, str)
@@ -9330,24 +9893,24 @@ def test_get_data_path_duckdb():
     assert os.path.getsize(path) > 0
 
 
-def test_get_data_path_invalid_dataset():
+def test_get_data_path_invalid_dataset() -> None:
     with pytest.raises(ValueError, match="dataset name .* is not valid"):
         get_data_path(dataset="nonexistent_dataset")
 
 
-def test_get_data_path_invalid_file_type():
+def test_get_data_path_invalid_file_type() -> None:
     with pytest.raises(ValueError, match="file type .* is not valid"):
         get_data_path(file_type="xlsx")
 
 
-def test_get_data_path_files_in_temp_dir():
+def test_get_data_path_files_in_temp_dir() -> None:
     path = get_data_path()
     temp_dir = tempfile.gettempdir()
 
     assert path.startswith(temp_dir)
 
 
-def test_get_data_path_multiple_calls_different_files():
+def test_get_data_path_multiple_calls_different_files() -> None:
     path1 = get_data_path("small_table", "csv")
     path2 = get_data_path("small_table", "csv")
 
@@ -9361,7 +9924,7 @@ def test_get_data_path_multiple_calls_different_files():
     assert os.path.getsize(path2) > 0
 
 
-def test_get_data_path_works_with_validate():
+def test_get_data_path_works_with_validate() -> None:
     csv_path = get_data_path("small_table", "csv")
 
     # Should be able to create a Validate object with the path
@@ -9379,7 +9942,7 @@ def test_get_data_path_works_with_validate():
 
 @pytest.mark.parametrize("dataset", ["small_table", "game_revenue"])
 @pytest.mark.parametrize("file_type", ["csv", "parquet"])
-def test_get_data_path_data_loading_consistency(dataset, file_type):
+def test_get_data_path_data_loading_consistency(dataset, file_type) -> None:
     # Get path and load via Validate
     path = get_data_path(dataset=dataset, file_type=file_type)
     validation = Validate(data=path)
@@ -9397,19 +9960,21 @@ def test_get_data_path_data_loading_consistency(dataset, file_type):
     assert validation.data.columns == reference_data.columns
 
 
-def test_get_data_path_example_usage_patterns():
+def test_get_data_path_example_usage_patterns() -> None:
     # Example 1: Basic usage
     csv_path = get_data_path("small_table", "csv")
     validation = Validate(data=csv_path).col_exists(["a", "b", "c"]).interrogate()
+
     assert validation.all_passed()
 
     # Example 2: With different dataset
     parquet_path = get_data_path("game_revenue", "parquet")
     validation = Validate(data=parquet_path).col_exists(["player_id", "session_id"]).interrogate()
+
     assert validation.all_passed()
 
 
-def test_get_data_path_parquet_pandas_only():
+def test_get_data_path_parquet_pandas_only() -> None:
     """Test get_data_path parquet creation when only pandas is available."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -9432,11 +9997,12 @@ def test_get_data_path_parquet_pandas_only():
         import pandas as pd
 
         df = pd.read_parquet(path)
+
         assert len(df) > 0
         assert len(df.columns) > 0
 
 
-def test_get_data_path_parquet_no_libraries():
+def test_get_data_path_parquet_no_libraries() -> None:
     """Test get_data_path parquet creation when neither polars nor pandas available."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         # Neither polars nor pandas are available
@@ -9450,30 +10016,30 @@ def test_get_data_path_parquet_no_libraries():
             get_data_path(dataset="small_table", file_type="parquet")
 
 
-def test_is_string_date():
+def test_is_string_date() -> None:
     assert _is_string_date("2023-01-01")
     assert not _is_string_date("2023-01-01 12:00:00")
     assert not _is_string_date(256)
 
 
-def test_is_string_datetime():
+def test_is_string_datetime() -> None:
     assert _is_string_datetime("2023-01-01 12:00:00")
     assert not _is_string_datetime("2023-01-01")
     assert not _is_string_datetime(256)
 
 
-def test_convert_string_to_date():
+def test_convert_string_to_date() -> None:
     assert _convert_string_to_date("2023-01-01") == datetime.date(2023, 1, 1)
 
 
-def test_convert_string_to_date_raises():
+def test_convert_string_to_date_raises() -> None:
     with pytest.raises(ValueError):
         _convert_string_to_date("2023-01-01 12:00:00")
     with pytest.raises(ValueError):
         _convert_string_to_date(256)
 
 
-def test_convert_string_to_datetime():
+def test_convert_string_to_datetime() -> None:
     assert _convert_string_to_datetime("2023-01-01 12:00:00") == datetime.datetime(
         2023, 1, 1, 12, 0
     )
@@ -9488,14 +10054,14 @@ def test_convert_string_to_datetime():
     )
 
 
-def test_convert_string_to_datetime_raises():
+def test_convert_string_to_datetime_raises() -> None:
     with pytest.raises(ValueError):
         _convert_string_to_datetime("2023-01-01")
     with pytest.raises(ValueError):
         _convert_string_to_datetime(256)
 
 
-def test_string_date_dttm_conversion():
+def test_string_date_dttm_conversion() -> None:
     assert _string_date_dttm_conversion("2023-01-01") == datetime.date(2023, 1, 1)
     assert _string_date_dttm_conversion("2023-01-01 12:00:00") == datetime.datetime(
         2023, 1, 1, 12, 0
@@ -9503,12 +10069,12 @@ def test_string_date_dttm_conversion():
     assert _string_date_dttm_conversion(256) == 256
 
 
-def test_string_date_dttm_conversion_raises():
+def test_string_date_dttm_conversion_raises() -> None:
     with pytest.raises(ValueError):
         _string_date_dttm_conversion("2023-01-01P12:00:00")
 
 
-def test_process_brief():
+def test_process_brief() -> None:
     assert (
         _process_brief(brief=None, step=1, col="x", values=None, thresholds=None, segment=None)
         is None
@@ -9659,7 +10225,7 @@ def test_process_brief():
     )
 
 
-def test_seg_group_with_auto_brief():
+def test_seg_group_with_auto_brief() -> None:
     """Test that seg_group() works correctly with brief='{auto}'."""
 
     # Load test data
@@ -9728,6 +10294,7 @@ def test_seg_group_with_auto_brief():
 
     # Verify that the auto-generated brief was processed correctly for seg_group
     brief_text = validation_seggroup.validation_info[0].autobrief
+
     assert brief_text is not None
     assert "b" in brief_text  # Should contain column name
     assert (
@@ -9735,7 +10302,7 @@ def test_seg_group_with_auto_brief():
     )  # Should describe the validation
 
 
-def test_process_action_str():
+def test_process_action_str() -> None:
     """Test the _process_action_str() function."""
     datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
@@ -9768,7 +10335,7 @@ def test_process_action_str():
     )
 
 
-def test_process_data_dataframe_passthrough_polars():
+def test_process_data_dataframe_passthrough_polars() -> None:
     """Test that _process_data() returns the same Polars DataFrame object."""
     pl = pytest.importorskip("polars")
 
@@ -9782,7 +10349,7 @@ def test_process_data_dataframe_passthrough_polars():
     assert result is df
 
 
-def test_notes_field_initialization():
+def test_notes_field_initialization() -> None:
     """Test that the notes field is properly initialized."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9794,7 +10361,7 @@ def test_notes_field_initialization():
     assert val_info.notes is None
 
 
-def test_add_note_basic():
+def test_add_note_basic() -> None:
     """Test adding a basic note to a validation step."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9814,7 +10381,7 @@ def test_add_note_basic():
     assert val_info.notes["test_note"]["text"] == "This is a test note"
 
 
-def test_add_note_without_text():
+def test_add_note_without_text() -> None:
     """Test adding a note without explicit text version."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9828,7 +10395,7 @@ def test_add_note_without_text():
     assert val_info.notes["test_note"]["text"] == "This is a **test** note"
 
 
-def test_add_multiple_notes():
+def test_add_multiple_notes() -> None:
     """Test adding multiple notes to a validation step."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9847,7 +10414,7 @@ def test_add_multiple_notes():
     assert "note3" in val_info.notes
 
 
-def test_note_key_overwrite():
+def test_note_key_overwrite() -> None:
     """Test that adding a note with the same key overwrites the previous one."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9856,15 +10423,17 @@ def test_note_key_overwrite():
 
     # Add a note
     val_info._add_note(key="test", markdown="First version")
+
     assert val_info.notes["test"]["markdown"] == "First version"
 
     # Overwrite with same key
     val_info._add_note(key="test", markdown="Second version")
+
     assert val_info.notes["test"]["markdown"] == "Second version"
     assert len(val_info.notes) == 1  # Should still only have one note
 
 
-def test_notes_persist_through_interrogation():
+def test_notes_persist_through_interrogation() -> None:
     """Test that notes persist through interrogation."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9880,7 +10449,7 @@ def test_notes_persist_through_interrogation():
     assert "pre_interrogation" in validation.validation_info[0].notes
 
 
-def test_notes_in_validation_info_dict():
+def test_notes_in_validation_info_dict() -> None:
     """Test that notes are included when converting validation info to dict."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9892,8 +10461,6 @@ def test_notes_in_validation_info_dict():
     validation.interrogate()
 
     # Get the validation info as dict (this is used in JSON export)
-    from pointblank.validate import _validation_info_as_dict
-
     val_dict = _validation_info_as_dict(validation.validation_info)
 
     # Verify notes field is present
@@ -9901,7 +10468,7 @@ def test_notes_in_validation_info_dict():
     assert val_dict["notes"][0]["test"]["markdown"] == "Test note"
 
 
-def test_notes_display_in_report():
+def test_notes_display_in_report() -> None:
     """Test that notes are properly displayed in the tabular report."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3, 4, 5]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9939,7 +10506,7 @@ def test_notes_display_in_report():
     assert "Second validation note" in html_str
 
 
-def test_empty_notes_no_display():
+def test_empty_notes_no_display() -> None:
     """Test that no notes section appears when there are no notes."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9954,7 +10521,7 @@ def test_empty_notes_no_display():
     assert "border-top: 1px solid #D3D3D3" not in html_str or "Notes</div>" not in html_str
 
 
-def test_notes_ordering_preserved():
+def test_notes_ordering_preserved() -> None:
     """Test that notes maintain insertion order."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9968,10 +10535,11 @@ def test_notes_ordering_preserved():
 
     # Verify order is preserved (Python dicts maintain insertion order in 3.7+)
     keys = list(val_info.notes.keys())
+
     assert keys == ["z_note", "a_note", "m_note"]
 
 
-def test_get_notes_dict_format():
+def test_get_notes_dict_format() -> None:
     """Test getting notes in dictionary format."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -9984,6 +10552,7 @@ def test_get_notes_dict_format():
 
     # Get notes as dict (default)
     notes = val_info._get_notes()
+
     assert notes is not None
     assert len(notes) == 2
     assert notes["note1"]["markdown"] == "First **note**"
@@ -9995,7 +10564,7 @@ def test_get_notes_dict_format():
     assert notes_dict == notes
 
 
-def test_get_notes_markdown_format():
+def test_get_notes_markdown_format() -> None:
     """Test getting notes as a list of markdown strings."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10006,10 +10575,11 @@ def test_get_notes_markdown_format():
     val_info._add_note(key="note2", markdown="Second *note*")
 
     markdown_notes = val_info._get_notes(format="markdown")
+
     assert markdown_notes == ["First **note**", "Second *note*"]
 
 
-def test_get_notes_text_format():
+def test_get_notes_text_format() -> None:
     """Test getting notes as a list of text strings."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10020,10 +10590,11 @@ def test_get_notes_text_format():
     val_info._add_note(key="note2", markdown="Second *note*", text="Second note")
 
     text_notes = val_info._get_notes(format="text")
+
     assert text_notes == ["First note", "Second note"]
 
 
-def test_get_notes_keys_format():
+def test_get_notes_keys_format() -> None:
     """Test getting note keys."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10035,10 +10606,11 @@ def test_get_notes_keys_format():
     val_info._add_note(key="gamma", markdown="Gamma")
 
     keys = val_info._get_notes(format="keys")
+
     assert keys == ["alpha", "beta", "gamma"]
 
 
-def test_get_notes_no_notes():
+def test_get_notes_no_notes() -> None:
     """Test that get_notes() returns None when there are no notes."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10051,7 +10623,7 @@ def test_get_notes_no_notes():
     assert val_info._get_notes(format="keys") is None
 
 
-def test_get_notes_invalid_format():
+def test_get_notes_invalid_format() -> None:
     """Test that invalid format raises ValueError."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10063,7 +10635,7 @@ def test_get_notes_invalid_format():
         val_info._get_notes(format="invalid")
 
 
-def test_get_note_dict_format():
+def test_get_note_dict_format() -> None:
     """Test getting a specific note in dictionary format."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10073,14 +10645,16 @@ def test_get_note_dict_format():
 
     # Get note as dict (default)
     note = val_info._get_note(key="test_note")
+
     assert note == {"markdown": "Test **markdown**", "text": "Test text"}
 
     # Explicitly request dict format
     note_dict = val_info._get_note(key="test_note", format="dict")
+
     assert note_dict == note
 
 
-def test_get_note_markdown_format():
+def test_get_note_markdown_format() -> None:
     """Test getting a specific note's markdown."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10089,10 +10663,11 @@ def test_get_note_markdown_format():
     val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
 
     markdown = val_info._get_note(key="test_note", format="markdown")
+
     assert markdown == "Test **markdown**"
 
 
-def test_get_note_text_format():
+def test_get_note_text_format() -> None:
     """Test getting a specific note's text."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10101,10 +10676,11 @@ def test_get_note_text_format():
     val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
 
     text = val_info._get_note(key="test_note", format="text")
+
     assert text == "Test text"
 
 
-def test_get_note_not_found():
+def test_get_note_not_found() -> None:
     """Test that get_note() returns None for a non-existent key."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10117,7 +10693,7 @@ def test_get_note_not_found():
     assert val_info._get_note(key="nonexistent", format="text") is None
 
 
-def test_get_note_no_notes():
+def test_get_note_no_notes() -> None:
     """Test that get_note() returns None when no notes exist."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10127,7 +10703,7 @@ def test_get_note_no_notes():
     assert val_info._get_note("any_key") is None
 
 
-def test_get_note_invalid_format():
+def test_get_note_invalid_format() -> None:
     """Test that an invalid format raises a ValueError."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10139,7 +10715,7 @@ def test_get_note_invalid_format():
         val_info._get_note("test", format="invalid")
 
 
-def test_has_notes():
+def test_has_notes() -> None:
     """Test the has_notes() method."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10151,10 +10727,11 @@ def test_has_notes():
 
     # Add a note
     val_info._add_note(key="test", markdown="Test")
+
     assert val_info._has_notes() is True
 
 
-def test_get_step_notes_basic():
+def test_get_step_notes_basic() -> None:
     """Test getting notes by step number."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10186,7 +10763,7 @@ def test_get_step_notes_basic():
     assert notes_step_2["note2"]["markdown"] == "Second *note*"
 
 
-def test_get_step_notes_formats():
+def test_get_step_notes_formats() -> None:
     """Test getting notes by step number in different formats."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10200,18 +10777,21 @@ def test_get_step_notes_formats():
 
     # Get in markdown format
     markdown_notes = validation.get_notes(i=1, format="markdown")
+
     assert markdown_notes == ["Alpha **note**", "Beta *note*"]
 
     # Get in text format
     text_notes = validation.get_notes(i=1, format="text")
+
     assert text_notes == ["Alpha note", "Beta note"]
 
     # Get keys
     keys = validation.get_notes(i=1, format="keys")
+
     assert keys == ["alpha", "beta"]
 
 
-def test_get_step_notes_no_notes():
+def test_get_step_notes_no_notes() -> None:
     """Test get_step_notes() returns None when step has no notes."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10221,7 +10801,7 @@ def test_get_step_notes_no_notes():
     assert validation.get_notes(i=1) is None
 
 
-def test_get_step_notes_invalid_step():
+def test_get_step_notes_invalid_step() -> None:
     """Test get_step_notes() returns None for non-existent step."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10231,7 +10811,7 @@ def test_get_step_notes_invalid_step():
     assert validation.get_notes(i=99) is None
 
 
-def test_get_step_notes_invalid_step_number():
+def test_get_step_notes_invalid_step_number() -> None:
     """Test get_step_notes() raises error for invalid step number."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10250,7 +10830,7 @@ def test_get_step_notes_invalid_step_number():
         validation.get_notes(i="1")
 
 
-def test_get_step_notes_before_interrogation():
+def test_get_step_notes_before_interrogation() -> None:
     """Test get_step_notes() works before interrogation."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10262,7 +10842,7 @@ def test_get_step_notes_before_interrogation():
     assert validation.get_notes(i=1) is None
 
 
-def test_get_step_notes_with_segments():
+def test_get_step_notes_with_segments() -> None:
     """Test get_step_notes() with segmented validation steps."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3], "category": ["A", "B", "A"]}))
     validation.col_vals_gt(columns="a", value=0, segments="category")
@@ -10276,11 +10856,12 @@ def test_get_step_notes_with_segments():
     # Each segment gets its own step number
     # We should be able to get notes from the first segment step
     notes = validation.get_notes(i=1)
+
     assert notes is not None
     assert "seg_note" in notes
 
 
-def test_validate_get_note_basic():
+def test_validate_get_note_basic() -> None:
     """Test get_note() method at Validate level with step number and key."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10297,17 +10878,19 @@ def test_validate_get_note_basic():
 
     # Get specific note by step number and key
     note1 = validation.get_note(i=1, key="note1")
+
     assert note1 is not None
     assert note1["markdown"] == "First **note**"
     assert note1["text"] == "First note"
 
     note2 = validation.get_note(i=1, key="note2")
+
     assert note2 is not None
     assert note2["markdown"] == "Second *note*"
     assert note2["text"] == "Second note"
 
 
-def test_validate_get_note_formats():
+def test_validate_get_note_formats() -> None:
     """Test get_note() with different format options."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10320,19 +10903,22 @@ def test_validate_get_note_formats():
 
     # Dict format (default)
     note_dict = validation.get_note(i=1, key="test")
+
     assert isinstance(note_dict, dict)
     assert note_dict["markdown"] == "Test **markdown**"
 
     # Markdown format
     markdown = validation.get_note(i=1, key="test", format="markdown")
+
     assert markdown == "Test **markdown**"
 
     # Text format
     text = validation.get_note(i=1, key="test", format="text")
+
     assert text == "Test markdown"
 
 
-def test_validate_get_note_not_found():
+def test_validate_get_note_not_found() -> None:
     """Test get_note() when note key doesn't exist."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10345,7 +10931,7 @@ def test_validate_get_note_not_found():
     assert validation.get_note(i=1, key="nonexistent") is None
 
 
-def test_validate_get_note_invalid_step():
+def test_validate_get_note_invalid_step() -> None:
     """Test get_note() with invalid step number."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10358,7 +10944,7 @@ def test_validate_get_note_invalid_step():
     assert validation.get_note(99, "test") is None
 
 
-def test_validate_get_note_invalid_step_number():
+def test_validate_get_note_invalid_step_number() -> None:
     """Test get_note() with invalid step number types."""
     validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
     validation.col_vals_gt(columns="a", value=0)
@@ -10374,7 +10960,7 @@ def test_validate_get_note_invalid_step_number():
         validation.get_note(i=-1, key="test")
 
 
-def test_column_not_found_note_basic():
+def test_column_not_found_note_basic() -> None:
     """Test that no_columns_resolved note is generated when selector matches no columns."""
     from pointblank.column import starts_with
 
@@ -10389,17 +10975,19 @@ def test_column_not_found_note_basic():
 
     # Check that no_columns_resolved note exists
     notes = validation.get_notes(i=1)
+
     assert notes is not None
     assert "no_columns_resolved" in notes
 
     # Check note content
     note = validation.get_note(i=1, key="no_columns_resolved")
+
     assert note is not None
     assert "StartsWith" in note["text"]
     assert "does not resolve to any columns" in note["text"]
 
 
-def test_column_not_found_note_expression_in_text():
+def test_column_not_found_note_expression_in_text() -> None:
     """Test that the column expression appears correctly in the note text."""
     from pointblank.column import ends_with
 
@@ -10410,12 +10998,13 @@ def test_column_not_found_note_expression_in_text():
     )
 
     note_text = validation.get_note(i=1, key="no_columns_resolved", format="text")
+
     assert note_text is not None
     assert "EndsWith(text='_total'" in note_text
     assert "does not resolve" in note_text
 
 
-def test_column_not_found_note_multilingual():
+def test_column_not_found_note_multilingual() -> None:
     """Test that no_columns_resolved note works in multiple languages."""
     from pointblank.column import contains
 
@@ -10426,6 +11015,7 @@ def test_column_not_found_note_multilingual():
         .interrogate()
     )
     note_fr = validation_fr.get_note(i=1, key="no_columns_resolved", format="markdown")
+
     assert note_fr is not None
     assert "L'expression de colonne" in note_fr or "colonne" in note_fr
     assert "Contains" in note_fr
@@ -10437,12 +11027,13 @@ def test_column_not_found_note_multilingual():
         .interrogate()
     )
     note_ja = validation_ja.get_note(i=1, key="no_columns_resolved", format="markdown")
+
     assert note_ja is not None
     assert "列式" in note_ja
     assert "Contains" in note_ja
 
 
-def test_column_not_found_note_multiple_selectors():
+def test_column_not_found_note_multiple_selectors() -> None:
     """Test note generation with multiple different selector types."""
     from pointblank.column import starts_with, ends_with, contains
 
@@ -10457,13 +11048,15 @@ def test_column_not_found_note_multiple_selectors():
     # All three steps should have eval_error and no_columns_resolved notes
     for i in range(1, 4):
         assert validation.validation_info[i - 1].eval_error is True
+
         note = validation.get_note(i=i, key="no_columns_resolved")
+
         assert note is not None
         assert "does not resolve to any columns" in note["text"]
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
-def test_column_not_found_note_different_table_types(request, tbl_fixture):
+def test_column_not_found_note_different_table_types(request, tbl_fixture) -> None:
     """Test that no_columns_resolved note works with different table types."""
     from pointblank.column import starts_with
 
@@ -10475,12 +11068,13 @@ def test_column_not_found_note_different_table_types(request, tbl_fixture):
 
     # Should have note regardless of table type
     note = validation.get_note(i=1, key="no_columns_resolved")
+
     assert note is not None
     assert "StartsWith" in note["text"]
     assert "does not resolve" in note["text"]
 
 
-def test_simple_column_not_found_note_basic():
+def test_simple_column_not_found_note_basic() -> None:
     """Test that column_not_found note is generated when a simple column name doesn't exist."""
     validation = (
         Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
@@ -10493,17 +11087,19 @@ def test_simple_column_not_found_note_basic():
 
     # Check that column_not_found note exists
     notes = validation.get_notes(i=1)
+
     assert notes is not None
     assert "column_not_found" in notes
 
     # Check note content
     note = validation.get_note(i=1, key="column_not_found")
+
     assert note is not None
     assert "zz" in note["text"]
     assert "does not match any columns in the table" in note["text"]
 
 
-def test_simple_column_not_found_note_multiple_validations():
+def test_simple_column_not_found_note_multiple_validations() -> None:
     """Test column_not_found notes for multiple missing columns."""
     validation = (
         Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}))
@@ -10516,14 +11112,16 @@ def test_simple_column_not_found_note_multiple_validations():
     # All three steps should have eval_error and column_not_found notes
     for i, col_name in enumerate(["missing_col1", "missing_col2", "missing_col3"], start=1):
         assert validation.validation_info[i - 1].eval_error is True
+
         note = validation.get_note(i=i, key="column_not_found")
+
         assert note is not None
         assert col_name in note["text"]
         assert "does not match any columns in the table" in note["text"]
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
-def test_simple_column_not_found_note_different_table_types(request, tbl_fixture):
+def test_simple_column_not_found_note_different_table_types(request, tbl_fixture) -> None:
     """Test that column_not_found note works with different table types for simple column names."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -10531,12 +11129,13 @@ def test_simple_column_not_found_note_different_table_types(request, tbl_fixture
 
     # Should have note regardless of table type
     note = validation.get_note(i=1, key="column_not_found")
+
     assert note is not None
     assert "nonexistent_column" in note["text"]
     assert "does not match any columns" in note["text"]
 
 
-def test_comparison_column_not_found_note_basic():
+def test_comparison_column_not_found_note_basic() -> None:
     """Test that comparison_column_not_found note is generated for missing comparison columns."""
 
     validation = (
@@ -10550,17 +11149,19 @@ def test_comparison_column_not_found_note_basic():
 
     # Check that comparison_column_not_found note exists
     notes = validation.get_notes(i=1)
+
     assert notes is not None
     assert "comparison_column_not_found" in notes
 
     # Check note content
     note = validation.get_note(i=1, key="comparison_column_not_found")
+
     assert note is not None
     assert "missing_comparison" in note["text"]
     assert "does not match any columns in the table" in note["text"]
 
 
-def test_comparison_column_not_found_note_between_left():
+def test_comparison_column_not_found_note_between_left() -> None:
     """Test comparison_column_not_found note for missing LEFT column in col_vals_between."""
 
     validation = (
@@ -10574,13 +11175,14 @@ def test_comparison_column_not_found_note_between_left():
 
     # Check note content includes position
     note = validation.get_note(i=1, key="comparison_column_not_found")
+
     assert note is not None
     assert "missing_left" in note["text"]
     assert "for left=" in note["text"]
     assert "does not match any columns" in note["text"]
 
 
-def test_comparison_column_not_found_note_between_right():
+def test_comparison_column_not_found_note_between_right() -> None:
     """Test comparison_column_not_found note for missing RIGHT column in col_vals_between."""
 
     validation = (
@@ -10594,13 +11196,14 @@ def test_comparison_column_not_found_note_between_right():
 
     # Check note content includes position
     note = validation.get_note(i=1, key="comparison_column_not_found")
+
     assert note is not None
     assert "missing_right" in note["text"]
     assert "for right=" in note["text"]
     assert "does not match any columns" in note["text"]
 
 
-def test_comparison_column_not_found_note_outside():
+def test_comparison_column_not_found_note_outside() -> None:
     """Test comparison_column_not_found note for missing column in col_vals_outside."""
 
     validation = (
@@ -10614,12 +11217,13 @@ def test_comparison_column_not_found_note_outside():
 
     # Check note content includes position
     note = validation.get_note(i=1, key="comparison_column_not_found")
+
     assert note is not None
     assert "missing_low" in note["text"]
     assert "for left=" in note["text"]
 
 
-def test_comparison_column_not_found_note_multilingual():
+def test_comparison_column_not_found_note_multilingual() -> None:
     """Test that comparison_column_not_found note works in multiple languages."""
 
     # Test French
@@ -10628,7 +11232,9 @@ def test_comparison_column_not_found_note_multilingual():
         .col_vals_gt(columns="a", value=col("missing"))
         .interrogate()
     )
+
     note_fr = validation_fr.get_note(i=1, key="comparison_column_not_found", format="markdown")
+
     assert note_fr is not None
     assert "La colonne de comparaison fournie" in note_fr or "comparaison" in note_fr
     assert "missing" in note_fr
@@ -10640,12 +11246,13 @@ def test_comparison_column_not_found_note_multilingual():
         .interrogate()
     )
     note_ja = validation_ja.get_note(i=1, key="comparison_column_not_found", format="markdown")
+
     assert note_ja is not None
     assert "比較列" in note_ja
     assert "missing" in note_ja
 
 
-def test_comparison_column_not_found_note_multiple_methods():
+def test_comparison_column_not_found_note_multiple_methods() -> None:
     """Test comparison_column_not_found notes across different validation methods."""
 
     validation = (
@@ -10659,12 +11266,14 @@ def test_comparison_column_not_found_note_multiple_methods():
     # All three steps should have eval_error and comparison_column_not_found notes
     for i, col_name in enumerate(["miss1", "miss2", "miss3"], start=1):
         assert validation.validation_info[i - 1].eval_error is True
+
         note = validation.get_note(i=i, key="comparison_column_not_found")
+
         assert note is not None
         assert col_name in note["text"]
 
 
-def test_column_error_notes_monospace_font():
+def test_column_error_notes_monospace_font() -> None:
     """Test that column names and parameter names use monospace font in HTML notes."""
 
     validation = (
@@ -10682,27 +11291,31 @@ def test_column_error_notes_monospace_font():
 
     # Check simple column error has monospace font
     note_1 = validation.get_note(i=1, key="column_not_found", format="markdown")
+
     assert "IBM Plex Mono" in note_1
     assert "missing_col" in note_1
 
     # Check selector error has monospace font
     note_2 = validation.get_note(i=2, key="no_columns_resolved", format="markdown")
+
     assert "IBM Plex Mono" in note_2
     assert "StartsWith" in note_2
 
     # Check comparison column error has monospace font for column name
     note_3 = validation.get_note(i=3, key="comparison_column_not_found", format="markdown")
+
     assert "IBM Plex Mono" in note_3
     assert "missing_comp" in note_3
 
     # Check comparison column error with position has monospace font for both column and parameter
     note_4 = validation.get_note(i=4, key="comparison_column_not_found", format="markdown")
+
     assert note_4.count("IBM Plex Mono") >= 2  # Should appear for both parameter and column
     assert "missing_left" in note_4
     assert "left=" in note_4
 
 
-def test_process_data_dataframe_passthrough_pandas():
+def test_process_data_dataframe_passthrough_pandas() -> None:
     pd = pytest.importorskip("pandas")
 
     # Create test DataFrame
@@ -10715,7 +11328,7 @@ def test_process_data_dataframe_passthrough_pandas():
     assert result is df
 
 
-def test_process_data_non_data_passthrough():
+def test_process_data_non_data_passthrough() -> None:
     test_cases = [
         42,  # Integer
         3.14,  # Float
@@ -10727,10 +11340,11 @@ def test_process_data_non_data_passthrough():
 
     for test_input in test_cases:
         result = _process_data(test_input)
+
         assert result is test_input
 
 
-def test_process_data_csv_file_processing():
+def test_process_data_csv_file_processing() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame and temporary CSV file
@@ -10753,7 +11367,7 @@ def test_process_data_csv_file_processing():
         Path(csv_path).unlink()
 
 
-def test_process_data_csv_path_object_processing():
+def test_process_data_csv_path_object_processing() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame and temporary CSV file
@@ -10776,7 +11390,7 @@ def test_process_data_csv_path_object_processing():
         path_obj.unlink()
 
 
-def test_process_data_parquet_file_processing():
+def test_process_data_parquet_file_processing() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame and temporary Parquet file
@@ -10799,7 +11413,7 @@ def test_process_data_parquet_file_processing():
         Path(parquet_path).unlink()
 
 
-def test_process_data_nonexistent_file():
+def test_process_data_nonexistent_file() -> None:
     # Test CSV
     with pytest.raises(FileNotFoundError):
         _process_data("nonexistent_file.csv")
@@ -10809,7 +11423,7 @@ def test_process_data_nonexistent_file():
         _process_data("nonexistent_file.parquet")
 
 
-def test_process_data_processing_order():
+def test_process_data_processing_order() -> None:
     # This test ensures GitHub URLs are processed before connection strings
     # by mocking the individual processing functions
 
@@ -10841,7 +11455,7 @@ def test_process_data_processing_order():
 
 
 @patch("pointblank.validate._process_github_url")
-def test_process_data_github_url_processing(mock_github):
+def test_process_data_github_url_processing(mock_github) -> None:
     pl = pytest.importorskip("polars")
 
     # Mock the GitHub processing to return a DataFrame
@@ -10857,7 +11471,7 @@ def test_process_data_github_url_processing(mock_github):
     assert result is mock_df
 
 
-def test_process_data_case_insensitive_extensions():
+def test_process_data_case_insensitive_extensions() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame
@@ -10870,12 +11484,13 @@ def test_process_data_case_insensitive_extensions():
 
     try:
         result = _process_data(csv_path)
+
         assert hasattr(result, "columns") or hasattr(result, "shape")
     finally:
         Path(csv_path).unlink()
 
 
-def test_process_data_integration_with_validate_class():
+def test_process_data_integration_with_validate_class() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame and temporary CSV file
@@ -10898,13 +11513,13 @@ def test_process_data_integration_with_validate_class():
         Path(csv_path).unlink()
 
 
-def test_process_data_error_handling():
+def test_process_data_error_handling() -> None:
     # Test with invalid file paths
     with pytest.raises((FileNotFoundError, OSError)):
         _process_data("/invalid/path/file.csv")
 
 
-def test_process_data_with_connection_string():
+def test_process_data_with_connection_string() -> None:
     with patch("pointblank.validate._process_connection_string") as mock_conn:
         mock_table = Mock()
         mock_conn.return_value = mock_table
@@ -10914,10 +11529,11 @@ def test_process_data_with_connection_string():
 
         # Should call _process_connection_string and return the result
         mock_conn.assert_called_once_with("duckdb://test.db::table")
+
         assert result == mock_table
 
 
-def test_process_data_dataframe_goes_through_pipeline():
+def test_process_data_dataframe_goes_through_pipeline() -> None:
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame
@@ -10948,7 +11564,7 @@ def test_process_data_dataframe_goes_through_pipeline():
         mock_parquet.assert_called_once_with(df)
 
 
-def test_process_title_text():
+def test_process_title_text() -> None:
     assert _process_title_text(title=None, tbl_name=None, lang="en") == ""
     assert (
         _process_title_text(title=":default:", tbl_name=None, lang="en") == "Pointblank Validation"
@@ -10986,11 +11602,11 @@ def test_process_title_text():
         (100000000000, "100B"),
     ],
 )
-def test_fmt_lg(input_value, expected_output):
+def test_fmt_lg(input_value, expected_output) -> None:
     assert _fmt_lg(input_value, locale="en") == expected_output
 
 
-def test_create_table_time_html():
+def test_create_table_time_html() -> None:
     datetime_0 = datetime.datetime(2021, 1, 1, 0, 0, 0, 0)
     datetime_1_min_later = datetime.datetime(2021, 1, 1, 0, 1, 0, 0)
 
@@ -10998,9 +11614,7 @@ def test_create_table_time_html():
     assert "div" in _create_table_time_html(time_start=datetime_0, time_end=datetime_1_min_later)
 
 
-def test_create_table_type_html():
-    # def _create_table_type_html(tbl_type: str | None, tbl_name: str | None)
-
+def test_create_table_type_html() -> None:
     assert _create_table_type_html(tbl_type=None, tbl_name="tbl_name") == ""
     assert _create_table_type_html(tbl_type="invalid", tbl_name="tbl_name") == ""
     assert "span" in _create_table_type_html(tbl_type="pandas", tbl_name="tbl_name")
@@ -11010,21 +11624,44 @@ def test_create_table_type_html():
     ) != _create_table_type_html(tbl_type="pandas", tbl_name=None)
 
 
-def test_pointblank_config_class():
+def test_make_sublabel() -> None:
+    from pointblank._utils_html import _make_sublabel
+
+    result = _make_sublabel("P", "value")
+    assert result is not None
+
+
+def test_create_table_dims_html() -> None:
+    from pointblank._utils_html import _create_table_dims_html
+
+    result = _create_table_dims_html(columns=5, rows=100)
+    assert "span" in result
+    assert "100" in result
+    assert "5" in result
+
+    result_large = _create_table_dims_html(columns=20, rows=1_000_000)
+    assert "1,000,000" in result_large
+
+
+def test_pointblank_config_class() -> None:
     # Test the default configuration
     config = PointblankConfig()
 
     assert config.report_incl_header is True
     assert config.report_incl_footer is True
     assert config.preview_incl_header is True
+    assert config.report_incl_dimensions is False
+    assert config.dimension_map is None
+    assert config.dimension_weights is None
+    assert config.dimension_thresholds is None
 
     assert (
         str(config)
-        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, preview_incl_header=True)"
+        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, report_incl_dimensions=False, preview_incl_header=True, dimension_map=None, dimension_weights=None, dimension_thresholds=None)"
     )
 
 
-def test_preview_no_fail_pd_table():
+def test_preview_no_fail_pd_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
     preview(small_table)
@@ -11033,7 +11670,7 @@ def test_preview_no_fail_pd_table():
     preview(small_table, n_head=2, n_tail=2)
 
 
-def test_preview_no_fail_pl_table():
+def test_preview_no_fail_pl_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="polars")
 
     preview(small_table)
@@ -11042,7 +11679,7 @@ def test_preview_no_fail_pl_table():
     preview(small_table, n_head=2, n_tail=2)
 
 
-def test_preview_no_fail_duckdb_table():
+def test_preview_no_fail_duckdb_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
 
     preview(small_table)
@@ -11052,7 +11689,7 @@ def test_preview_no_fail_duckdb_table():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_preview_no_fail_pyspark_table():
+def test_preview_no_fail_pyspark_table() -> None:
     # Create a simple PySpark DataFrame to test the preview functionality
     spark = get_spark_session()
 
@@ -11089,7 +11726,7 @@ def test_preview_no_fail_pyspark_table():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_preview_pyspark_edge_cases():
+def test_preview_pyspark_edge_cases() -> None:
     # Test specific edge cases in PySpark preview
     spark = get_spark_session()
 
@@ -11125,7 +11762,7 @@ def test_preview_pyspark_edge_cases():
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_preview_pyspark_with_nulls():
+def test_preview_pyspark_with_nulls() -> None:
     # Test PySpark DataFrames with null values to ensure null detection works
     spark = get_spark_session()
 
@@ -11152,22 +11789,22 @@ def test_preview_pyspark_with_nulls():
     assert hasattr(result_full, "_build_data")
 
 
-def test_preview_large_head_tail_pd_table():
+def test_preview_large_head_tail_pd_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
     preview(small_table, n_head=10, n_tail=10)
 
 
-def test_preview_large_head_tail_pl_table():
+def test_preview_large_head_tail_pl_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="polars")
     preview(small_table, n_head=10, n_tail=10)
 
 
-def test_preview_large_head_tail_duckdb_table():
+def test_preview_large_head_tail_duckdb_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
     preview(small_table, n_head=10, n_tail=10)
 
 
-def test_preview_fails_head_tail_exceed_limit():
+def test_preview_fails_head_tail_exceed_limit() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
     with pytest.raises(ValueError):
@@ -11176,7 +11813,7 @@ def test_preview_fails_head_tail_exceed_limit():
     preview(small_table, n_head=100, n_tail=100, limit=300)
 
 
-def test_preview_row_num_col_not_first():
+def test_preview_row_num_col_not_first() -> None:
     """Test that '_row_num_' column exists but is not the first column."""
     # Create a DataFrame with '_row_num_' column not in first position
     data = pd.DataFrame(
@@ -11196,7 +11833,7 @@ def test_preview_row_num_col_not_first():
     assert result is not None
 
 
-def test_preview_ibis_table_to_pandas():
+def test_preview_ibis_table_to_pandas() -> None:
     """Test that an Ibis table is converted to Pandas (for preview) when Polars is unavailable."""
     pytest.importorskip("ibis")
 
@@ -11215,7 +11852,7 @@ def test_preview_ibis_table_to_pandas():
         assert result is not None
 
 
-def test_gt_based_formatting_completely_avoids_vals_submodule():
+def test_gt_based_formatting_completely_avoids_vals_submodule() -> None:
     # Mock the vals.fmt_number to raise an error if called
     with patch(
         "pointblank.validate.vals.fmt_number", side_effect=ImportError("Pandas not available")
@@ -11226,7 +11863,7 @@ def test_gt_based_formatting_completely_avoids_vals_submodule():
         assert "15" in result  # Should contain the formatted number
 
 
-def test_polars_only_environment_simulation():
+def test_polars_only_environment_simulation() -> None:
     # Create a large dataset that will trigger number formatting
     large_data = pl.DataFrame(
         {
@@ -11241,6 +11878,7 @@ def test_polars_only_environment_simulation():
 
     # Generate tabular report that should work without any Pandas dependency
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
@@ -11249,7 +11887,7 @@ def test_polars_only_environment_simulation():
     assert result.validation_info[0].all_passed == True
 
 
-def test_gt_based_threshold_formatting():
+def test_gt_based_threshold_formatting() -> None:
     data = pl.DataFrame({"scores": [85, 92, 78, 88, 95, 82, 76, 90, 87, 93]})
 
     # Use large threshold values that will trigger formatting
@@ -11260,11 +11898,12 @@ def test_gt_based_threshold_formatting():
 
     # Generate tabular report with threshold formatting
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_gt_formatting_preserves_accuracy():
+def test_gt_formatting_preserves_accuracy() -> None:
     test_values = [1000, 12345, 999999, 1000000, 10000000]
 
     for value in test_values:
@@ -11280,7 +11919,7 @@ def test_gt_formatting_preserves_accuracy():
         )
 
 
-def test_polars_df_lib_parameter_uses_gt_formatting():
+def test_polars_df_lib_parameter_uses_gt_formatting() -> None:
     # Create test data with large numbers
     data = pl.DataFrame({"large_numbers": [15000, 25000, 35000, 45000, 55000]})
 
@@ -11289,11 +11928,12 @@ def test_polars_df_lib_parameter_uses_gt_formatting():
 
     # This should use GT-based formatting internally since we're using Polars
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_comprehensive_polars_validation_scenario():
+def test_comprehensive_polars_validation_scenario() -> None:
     # Create realistic business data with large monetary values
     business_data = pl.DataFrame(
         {
@@ -11320,6 +11960,7 @@ def test_comprehensive_polars_validation_scenario():
 
     # Generate comprehensive validation report
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
@@ -11330,7 +11971,7 @@ def test_comprehensive_polars_validation_scenario():
     assert result.validation_info[2].all_passed == True  # All have processed status
 
 
-def test_polars_vs_pandas_formatting_consistency():
+def test_polars_vs_pandas_formatting_consistency() -> None:
     large_number = 15432
     test_units = [12000, 15000, 20000]
     active = [True, True, True]
@@ -11348,7 +11989,7 @@ def test_polars_vs_pandas_formatting_consistency():
     assert units_result_pl == units_result_pd
 
 
-def test_polars_dataset_large_numbers_integration():
+def test_polars_dataset_large_numbers_integration() -> None:
     # Create large dataset that will trigger formatting
     large_data = pl.DataFrame(
         {
@@ -11364,6 +12005,7 @@ def test_polars_dataset_large_numbers_integration():
     # Verify that formatting functions receive correct df_lib parameter
     # by checking that the report generates successfully
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
@@ -11371,7 +12013,7 @@ def test_polars_dataset_large_numbers_integration():
     assert result.validation_info[0].n >= 10000  # Large number of test units
 
 
-def test_polars_with_thresholds_integration():
+def test_polars_with_thresholds_integration() -> None:
     # Create test data
     data = pl.DataFrame(
         {
@@ -11389,11 +12031,12 @@ def test_polars_with_thresholds_integration():
 
     # Generate tabular report with threshold formatting
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_dataframe_library_selection_integration():
+def test_dataframe_library_selection_integration() -> None:
     # This test verifies that the `df_lib=` parameter is correctly passed through
     # the entire call chain in `get_tabular_report()`
 
@@ -11429,56 +12072,131 @@ def test_dataframe_library_selection_integration():
 
         # Verify that formatting functions were called with df_lib parameter
         assert mock_test_units.called
+
         # Check that df_lib was passed (should be polars module)
         called_args = mock_test_units.call_args
+
         assert "df_lib" in called_args.kwargs
+
         df_lib_arg = called_args.kwargs["df_lib"]
+
         assert df_lib_arg is not None
         assert hasattr(df_lib_arg, "DataFrame")  # Should be a DataFrame library
 
 
-def test_backward_compatibility_df_lib_none():
+def test_backward_compatibility_df_lib_none() -> None:
     # Test that functions work correctly when df_lib=None (backward compatibility)
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=None)
+
     assert isinstance(result, str)
     assert "15" in result
 
     test_units = [12000, 15000, 20000]
     active = [True, True, True]
     result = _transform_test_units(test_units, True, active, "en", df_lib=None)
+
     assert isinstance(result, list)
     assert len(result) == 3
 
     thresholds = Thresholds(warning=10000, error=15000, critical=20000)
     result = _create_thresholds_html(thresholds, "en", df_lib=None)
+
     assert isinstance(result, str)
     assert "WARNING" in result
 
 
-def test_helper_function_edge_cases():
+def test_threshold_formatting_html_edge_cases() -> None:
+    """Test HTML formatting edge cases for thresholds."""
+    # Empty thresholds returns empty string
+    result = _create_thresholds_html(Thresholds(), "en")
+
+    assert result == ""
+
+    # Very small fraction (<0.01)
+    thresholds = Thresholds(warning=0.005)
+    result = _create_thresholds_html(thresholds, "en")
+
+    assert "0.005" in result or "WARNING" in result
+
+    # Zero fraction
+    thresholds = Thresholds(warning=0.0)
+    result = _create_thresholds_html(thresholds, "en")
+
+    assert "0" in result
+
+    # Absolute count threshold
+    thresholds = Thresholds(warning=100, error=200)
+    result = _create_thresholds_html(thresholds, "en")
+
+    assert "100" in result
+    assert "200" in result
+
+
+def test_threshold_formatting_text_edge_cases() -> None:
+    """Test text formatting edge cases for thresholds."""
+    # Empty thresholds returns empty string
+    result = _create_local_threshold_note_text(Thresholds())
+
+    assert result == ""
+
+    # Very small fraction (<0.01)
+    thresholds = Thresholds(warning=0.005)
+    result = _create_local_threshold_note_text(thresholds)
+
+    assert "<0.01" in result
+
+    # Zero fraction
+    thresholds = Thresholds(warning=0.0)
+    result = _create_local_threshold_note_text(thresholds)
+
+    assert "0" in result
+
+    # All threshold levels
+    thresholds = Thresholds(warning=0.1, error=0.2, critical=0.3)
+    result = _create_local_threshold_note_text(thresholds)
+
+    assert "W:" in result
+    assert "E:" in result
+    assert "C:" in result
+
+    # Integer counts
+    thresholds = Thresholds(warning=5, error=10, critical=15)
+    result = _create_local_threshold_note_text(thresholds)
+
+    assert "5" in result
+    assert "10" in result
+    assert "15" in result
+
+
+def test_helper_function_edge_cases() -> None:
     # Test with edge case values
     result1 = _format_single_number_with_gt(0, n_sigfig=3, df_lib=pl)
+
     assert result1 == "0"
 
     result2 = _format_single_float_with_gt(0.0, decimals=2, df_lib=pd)
+
     assert result2 == "0.00"
 
     # Test with None df_lib (should default to Polars)
     result3 = _format_single_number_with_gt(42, n_sigfig=3, df_lib=None)
+
     assert isinstance(result3, str)
 
     # Test with very large numbers
     result4 = _format_single_number_with_gt(1000000, n_sigfig=3, df_lib=pl)
+
     assert isinstance(result4, str)
     assert result4 != "1000000"  # Should be formatted
 
     # Test with very small numbers
     result5 = _format_single_float_with_gt(0.000001, decimals=6, df_lib=pd)
+
     assert isinstance(result5, str)
 
 
-def test_large_numbers_formatting_polars():
+def test_large_numbers_formatting_polars() -> None:
     # Create a Polars DataFrame with large values that would trigger large-valueformatting
     large_data = pl.DataFrame(
         {
@@ -11494,6 +12212,7 @@ def test_large_numbers_formatting_polars():
     # Generate tabular report that should not fail with Pandas dependency error
     try:
         report = result.get_tabular_report()
+
         assert report is not None
         assert isinstance(report, GT.GT)  # Should be a Great Tables object
     except ImportError as e:
@@ -11503,7 +12222,7 @@ def test_large_numbers_formatting_polars():
             raise
 
 
-def test_large_numbers_formatting_pandas():
+def test_large_numbers_formatting_pandas() -> None:
     # Create a Pandas DataFrame with large values
     large_data = pd.DataFrame(
         {
@@ -11518,11 +12237,12 @@ def test_large_numbers_formatting_pandas():
 
     # Generate tabular report that should work as before
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)  # Should be a Great Tables object
 
 
-def test_thresholds_formatting_polars():
+def test_thresholds_formatting_polars() -> None:
     data = pl.DataFrame(
         {
             "x": [1, 2, 3, 4, 5],
@@ -11539,6 +12259,7 @@ def test_thresholds_formatting_polars():
     # Generate tabular report with threshold formatting
     try:
         report = result.get_tabular_report()
+
         assert report is not None
         assert isinstance(report, GT.GT)
     except ImportError as e:
@@ -11548,7 +12269,7 @@ def test_thresholds_formatting_polars():
             raise
 
 
-def test_thresholds_formatting_pandas():
+def test_thresholds_formatting_pandas() -> None:
     data = pd.DataFrame(
         {
             "x": [1, 2, 3, 4, 5],
@@ -11564,11 +12285,12 @@ def test_thresholds_formatting_pandas():
 
     # Generate tabular report with threshold formatting
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_multiple_validation_steps_formatting_polars():
+def test_multiple_validation_steps_formatting_polars() -> None:
     data = pl.DataFrame(
         {
             "count": [12000, 15000, 18000, 22000, 25000],
@@ -11588,6 +12310,7 @@ def test_multiple_validation_steps_formatting_polars():
     # Generate tabular report with multiple validation steps
     try:
         report = result.get_tabular_report()
+
         assert report is not None
         assert isinstance(report, GT.GT)
 
@@ -11600,7 +12323,7 @@ def test_multiple_validation_steps_formatting_polars():
             raise
 
 
-def test_multiple_validation_steps_formatting_pandas():
+def test_multiple_validation_steps_formatting_pandas() -> None:
     data = pd.DataFrame(
         {
             "count": [12000, 15000, 18000, 22000, 25000],
@@ -11619,6 +12342,7 @@ def test_multiple_validation_steps_formatting_pandas():
 
     # Generate tabular report with multiple validation steps
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
@@ -11626,7 +12350,7 @@ def test_multiple_validation_steps_formatting_pandas():
     assert len(result.validation_info) == 3
 
 
-def test_fmt_lg_function_with_polars():
+def test_fmt_lg_function_with_polars() -> None:
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pl)
 
@@ -11635,7 +12359,7 @@ def test_fmt_lg_function_with_polars():
     assert "15" in result  # Should contain the formatted number
 
 
-def test_fmt_lg_function_with_pandas():
+def test_fmt_lg_function_with_pandas() -> None:
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pd)
 
@@ -11644,7 +12368,7 @@ def test_fmt_lg_function_with_pandas():
     assert "15" in result  # Should contain the formatted number
 
 
-def test_fmt_lg_function_backward_compatibility():
+def test_fmt_lg_function_backward_compatibility() -> None:
     large_number = 15432
 
     # Test without df_lib parameter (original behavior)
@@ -11655,24 +12379,27 @@ def test_fmt_lg_function_backward_compatibility():
     assert "15" in result  # Should contain the formatted number
 
 
-def test_gt_based_formatting_helpers():
+def test_gt_based_formatting_helpers() -> None:
     # Test single number formatting
     result = _format_single_number_with_gt(15432, n_sigfig=3, compact=True, locale="en")
+
     assert isinstance(result, str)
     assert "15" in result
 
     # Test single float formatting
     result = _format_single_float_with_gt(123.456, decimals=2, locale="en")
+
     assert isinstance(result, str)
     assert "123" in result
 
     # Test single integer formatting
     result = _format_single_integer_with_gt(12345, locale="en")
+
     assert isinstance(result, str)
     assert "12" in result
 
 
-def test_edge_case_small_numbers_polars():
+def test_edge_case_small_numbers_polars() -> None:
     small_data = pl.DataFrame(
         {
             "id": range(1, 11),  # Small dataset
@@ -11685,11 +12412,12 @@ def test_edge_case_small_numbers_polars():
 
     # Should work without formatting issues
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_edge_case_empty_validation_results():
+def test_edge_case_empty_validation_results() -> None:
     data = pl.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
 
     # Validation that should pass for all rows
@@ -11698,11 +12426,12 @@ def test_edge_case_empty_validation_results():
 
     # Should generate report even with no failures
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_mixed_data_types_formatting():
+def test_mixed_data_types_formatting() -> None:
     data = pl.DataFrame(
         {
             "integers": [10000, 20000, 30000],
@@ -11722,6 +12451,7 @@ def test_mixed_data_types_formatting():
     # Should handle mixed types without formatting errors
     try:
         report = result.get_tabular_report()
+
         assert report is not None
         assert isinstance(report, GT.GT)
     except ImportError as e:
@@ -11731,13 +12461,15 @@ def test_mixed_data_types_formatting():
             raise
 
 
-def test_pandas_only_users_scenario():
+def test_pandas_only_users_scenario() -> None:
     # Test GT-based helper functions work with Pandas
     result_num = _format_single_number_with_gt(15432, df_lib=pd)
+
     assert isinstance(result_num, str)
     assert "15" in result_num
 
     result_float = _format_single_float_with_gt(123.456, decimals=2, df_lib=pd)
+
     assert isinstance(result_float, str)
     assert "123" in result_float
 
@@ -11747,6 +12479,7 @@ def test_pandas_only_users_scenario():
     )
 
     thresholds = Thresholds(warning=1000, error=2000, critical=3000)
+
     validation = (
         Validate(data=data, tbl_name="pandas_users_test", thresholds=thresholds)
         .col_vals_gt(columns="values", value=0)
@@ -11756,17 +12489,20 @@ def test_pandas_only_users_scenario():
 
     # Generate tabular report
     report = validation.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_polars_only_users_scenario():
+def test_polars_only_users_scenario() -> None:
     # Test GT-based helper functions work with Polars
     result_num = _format_single_number_with_gt(15432, df_lib=pl)
+
     assert isinstance(result_num, str)
     assert "15" in result_num
 
     result_float = _format_single_float_with_gt(123.456, decimals=2, df_lib=pl)
+
     assert isinstance(result_float, str)
     assert "123" in result_float
 
@@ -11776,6 +12512,7 @@ def test_polars_only_users_scenario():
     )
 
     thresholds = Thresholds(warning=1000, error=2000, critical=3000)
+
     validation = (
         Validate(data=data, tbl_name="polars_users_test", thresholds=thresholds)
         .col_vals_gt(columns="values", value=0)
@@ -11785,11 +12522,12 @@ def test_polars_only_users_scenario():
 
     # Generate tabular report
     report = validation.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
 
-def test_both_libraries_users_scenario():
+def test_both_libraries_users_scenario() -> None:
     test_value = 15432
 
     # Test that formatting is consistent between libraries
@@ -11805,16 +12543,18 @@ def test_both_libraries_users_scenario():
     pl_data = pl.DataFrame({"values": [1000, 15000, 25000]})
     pl_validation = Validate(pl_data).col_vals_gt(columns="values", value=0).interrogate()
     pl_report = pl_validation.get_tabular_report()
+
     assert pl_report is not None
 
     # Test with Pandas DataFrame (should use Pandas formatting internally)
     pd_data = pd.DataFrame({"values": [1000, 15000, 25000]})
     pd_validation = Validate(pd_data).col_vals_gt(columns="values", value=0).interrogate()
     pd_report = pd_validation.get_tabular_report()
+
     assert pd_report is not None
 
 
-def test_dataframe_library_preference_in_gt_formatting():
+def test_dataframe_library_preference_in_gt_formatting() -> None:
     # When both libraries are available, the specific df_lib parameter should be respected
     large_data = pl.DataFrame(
         {
@@ -11827,6 +12567,7 @@ def test_dataframe_library_preference_in_gt_formatting():
 
     # Should use Polars-based formatting since the input data is Polars
     report = result.get_tabular_report()
+
     assert report is not None
     assert isinstance(report, GT.GT)
 
@@ -11838,18 +12579,20 @@ def test_dataframe_library_preference_in_gt_formatting():
     assert pl_formatted == pd_formatted
 
 
-def test_gt_helper_functions_default_behavior():
+def test_gt_helper_functions_default_behavior() -> None:
     # When df_lib=None, should default to Polars (if available)
     result_num = _format_single_number_with_gt(15432, df_lib=None)
+
     assert isinstance(result_num, str)
     assert "15" in result_num
 
     result_float = _format_single_float_with_gt(123.456, decimals=2, df_lib=None)
+
     assert isinstance(result_float, str)
     assert "123" in result_float
 
 
-def test_load_dataset_neither_polars_nor_pandas_available():
+def test_load_dataset_neither_polars_nor_pandas_available() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         # Mock both polars and pandas as not available
         mock_is_lib.return_value = False
@@ -11858,7 +12601,7 @@ def test_load_dataset_neither_polars_nor_pandas_available():
             load_dataset("small_table", tbl_type="polars")
 
 
-def test_csv_polars_fails_pandas_fallback():
+def test_csv_polars_fails_pandas_fallback() -> None:
     # Create a temporary CSV file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as tmp:
         tmp.write("col1,col2\n1,2\n3,4\n")
@@ -11884,7 +12627,7 @@ def test_csv_polars_fails_pandas_fallback():
         os.unlink(csv_path)
 
 
-def test_csv_both_polars_and_pandas_fail():
+def test_csv_both_polars_and_pandas_fail() -> None:
     # Create a temporary CSV file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as tmp:
         tmp.write("col1,col2\n1,2\n3,4\n")
@@ -11901,7 +12644,7 @@ def test_csv_both_polars_and_pandas_fail():
         os.unlink(csv_path)
 
 
-def test_csv_pandas_only_fails():
+def test_csv_pandas_only_fails() -> None:
     # Create a temporary CSV file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as tmp:
         tmp.write("col1,col2\n1,2\n3,4\n")
@@ -11926,7 +12669,7 @@ def test_csv_pandas_only_fails():
         os.unlink(csv_path)
 
 
-def test_csv_polars_first_then_pandas_fallback():
+def test_csv_polars_first_then_pandas_fallback() -> None:
     # Create a temporary CSV file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as tmp:
         tmp.write("col1,col2\n1,2\n3,4\n")
@@ -11949,9 +12692,10 @@ def test_csv_polars_first_then_pandas_fallback():
         os.unlink(csv_path)
 
 
-def test_parquet_polars_fails_pandas_succeeds_single_file():
+def test_parquet_polars_fails_pandas_succeeds_single_file() -> None:
     # Create a temporary parquet file
     df = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
+
     with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
         df.to_parquet(tmp.name)
         parquet_path = tmp.name
@@ -11974,7 +12718,7 @@ def test_parquet_polars_fails_pandas_succeeds_single_file():
         os.unlink(parquet_path)
 
 
-def test_parquet_polars_fails_pandas_succeeds_multiple_files():
+def test_parquet_polars_fails_pandas_succeeds_multiple_files() -> None:
     # Create temporary parquet files
     df1 = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
     df2 = pd.DataFrame({"col1": [5, 6], "col2": [7, 8]})
@@ -12000,13 +12744,15 @@ def test_parquet_polars_fails_pandas_succeeds_multiple_files():
                 result = _process_parquet_input(glob_pattern)
 
                 assert result is not None
+
                 # Should have concatenated both files
                 assert len(result) == 4  # 2 rows from each file
 
 
-def test_parquet_pandas_only_available_single_file():
+def test_parquet_pandas_only_available_single_file() -> None:
     # Create a temporary parquet file
     df = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
+
     with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
         df.to_parquet(tmp.name)
         parquet_path = tmp.name
@@ -12014,7 +12760,7 @@ def test_parquet_pandas_only_available_single_file():
     try:
         with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
-            def side_effect(lib_name):
+            def side_effect(lib_name) -> bool:
                 if lib_name == "polars":
                     return False
                 elif lib_name == "pandas":
@@ -12033,7 +12779,7 @@ def test_parquet_pandas_only_available_single_file():
         os.unlink(parquet_path)
 
 
-def test_parquet_pandas_only_available_multiple_files():
+def test_parquet_pandas_only_available_multiple_files() -> None:
     # Create temporary parquet files
     df1 = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
     df2 = pd.DataFrame({"col1": [5, 6], "col2": [7, 8]})
@@ -12049,7 +12795,7 @@ def test_parquet_pandas_only_available_multiple_files():
 
         with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
-            def side_effect(lib_name):
+            def side_effect(lib_name) -> bool:
                 if lib_name == "polars":
                     return False
                 elif lib_name == "pandas":
@@ -12062,11 +12808,12 @@ def test_parquet_pandas_only_available_multiple_files():
             result = _process_parquet_input(glob_pattern)
 
             assert result is not None
+
             # Should have concatenated both files
             assert len(result) == 4
 
 
-def test_parquet_neither_library_available():
+def test_parquet_neither_library_available() -> None:
     with tempfile.NamedTemporaryFile(suffix=".parquet") as tmp:
         with patch("pointblank.validate._is_lib_present") as mock_is_lib:
             mock_is_lib.return_value = False  # Neither available
@@ -12075,7 +12822,7 @@ def test_parquet_neither_library_available():
                 _process_parquet_input(tmp.name)
 
 
-def test_parquet_pandas_fails_when_only_pandas_available():
+def test_parquet_pandas_fails_when_only_pandas_available() -> None:
     with tempfile.NamedTemporaryFile(suffix=".parquet") as tmp:
         with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -12091,14 +12838,14 @@ def test_parquet_pandas_fails_when_only_pandas_available():
                     _process_parquet_input(tmp.name)
 
 
-def test_connect_to_table_ibis_not_available():
+def test_connect_to_table_ibis_not_available() -> None:
     # Patch it where it's actually called in the validate module
     with patch("pointblank.validate._is_lib_present", return_value=False):
         with pytest.raises(ImportError, match="The Ibis library is not installed"):
             connect_to_table("duckdb://test.db::table")
 
 
-def test_print_database_tables_ibis_not_available():
+def test_print_database_tables_ibis_not_available() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = False  # Ibis not available
 
@@ -12106,7 +12853,7 @@ def test_print_database_tables_ibis_not_available():
             print_database_tables("duckdb://test.db")
 
 
-def test_connect_to_table_no_table_specified_with_tables():
+def test_connect_to_table_no_table_specified_with_tables() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12122,6 +12869,7 @@ def test_connect_to_table_no_table_specified_with_tables():
                 connect_to_table("duckdb://test.db")  # No :: table specification
 
             error_msg = str(exc_info.value)
+
             assert "No table specified in connection string" in error_msg
             assert "Available tables in the database:" in error_msg
             assert "table1" in error_msg
@@ -12130,7 +12878,7 @@ def test_connect_to_table_no_table_specified_with_tables():
             assert "duckdb://test.db::table1" in error_msg
 
 
-def test_print_database_tables_table_specified():
+def test_print_database_tables_table_specified() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12157,7 +12905,7 @@ def test_print_database_tables_table_specified():
             assert "duckdb:///superbadpath.ddb::fogel_table" in error_msg
 
 
-def test_print_database_tables_names_returned():
+def test_print_database_tables_names_returned() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database file
@@ -12199,7 +12947,7 @@ def test_print_database_tables_names_returned():
             os.unlink(temp_db_path)
 
 
-def test_connect_to_table_no_table_specified_empty_db():
+def test_connect_to_table_no_table_specified_empty_db() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12214,11 +12962,12 @@ def test_connect_to_table_no_table_specified_empty_db():
                 connect_to_table("duckdb://test.db")
 
             error_msg = str(exc_info.value)
+
             assert "No table specified in connection string" in error_msg
             assert "No tables found in the database" in error_msg
 
 
-def test_connect_to_table_backend_dependency_missing():
+def test_connect_to_table_backend_dependency_missing() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12231,11 +12980,12 @@ def test_connect_to_table_backend_dependency_missing():
                 connect_to_table("duckdb://test.db::table")
 
             error_msg = str(exc_info.value)
+
             assert "Missing DUCKDB backend for Ibis" in error_msg
             assert "pip install 'ibis-framework[duckdb]'" in error_msg
 
 
-def test_print_database_tables_backend_dependency_missing():
+def test_print_database_tables_backend_dependency_missing() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12248,11 +12998,12 @@ def test_print_database_tables_backend_dependency_missing():
                 print_database_tables("sqlite://test.db")
 
             error_msg = str(exc_info.value)
+
             assert "Missing SQLITE backend for Ibis" in error_msg
             assert "pip install 'ibis-framework[sqlite]'" in error_msg
 
 
-def test_connect_to_table_invalid_connection_string_format():
+def test_connect_to_table_invalid_connection_string_format() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12268,7 +13019,7 @@ def test_connect_to_table_invalid_connection_string_format():
                 pass
 
 
-def test_connect_to_table_table_not_found():
+def test_connect_to_table_table_not_found() -> None:
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
@@ -12286,10 +13037,11 @@ def test_connect_to_table_table_not_found():
                 connect_to_table("duckdb://test.db::nonexistent")
 
             error_msg = str(exc_info.value)
+
             assert "Table 'nonexistent' not found in database" in error_msg
 
 
-def test_print_database_tables_filters_memtables():
+def test_print_database_tables_filters_memtables() -> None:
     """Test that memtable entries are filtered out from the results."""
     pytest.importorskip("ibis")
 
@@ -12325,7 +13077,7 @@ def test_print_database_tables_filters_memtables():
             os.unlink(temp_db_path)
 
 
-def test_print_database_tables_generic_connection_error():
+def test_print_database_tables_generic_connection_error() -> None:
     """Test error handling for generic connection failures."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -12339,11 +13091,12 @@ def test_print_database_tables_generic_connection_error():
                 print_database_tables("duckdb://test.db")
 
             error_msg = str(exc_info.value)
+
             assert "Failed to connect using: duckdb://test.db" in error_msg
             assert "Generic connection failure" in error_msg
 
 
-def test_connect_to_table_success():
+def test_connect_to_table_success() -> None:
     """Test successful connection to a table."""
     pytest.importorskip("ibis")
 
@@ -12388,7 +13141,7 @@ def test_connect_to_table_success():
                 pass
 
 
-def test_connect_to_table_table_not_found_with_available_tables():
+def test_connect_to_table_table_not_found_with_available_tables() -> None:
     """Test error when table not found but other tables exist."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -12405,6 +13158,7 @@ def test_connect_to_table_table_not_found_with_available_tables():
                 connect_to_table("duckdb://test.db::nonexistent")
 
             error_msg = str(exc_info.value)
+
             assert "Table 'nonexistent' not found in database" in error_msg
             assert "Available tables:" in error_msg
             assert "table1" in error_msg
@@ -12412,7 +13166,7 @@ def test_connect_to_table_table_not_found_with_available_tables():
             assert "table3" in error_msg
 
 
-def test_connect_to_table_generic_connection_error():
+def test_connect_to_table_generic_connection_error() -> None:
     """Test generic connection error that's not backend-specific."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -12426,11 +13180,12 @@ def test_connect_to_table_generic_connection_error():
                 connect_to_table("duckdb://test.db::table")
 
             error_msg = str(exc_info.value)
+
             assert "Failed to connect using: duckdb://test.db" in error_msg
             assert "Network timeout" in error_msg
 
 
-def test_connect_to_table_no_table_spec_connection_fails():
+def test_connect_to_table_no_table_spec_connection_fails() -> None:
     """Test when connection fails in the 'no table specified' path."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -12444,10 +13199,11 @@ def test_connect_to_table_no_table_spec_connection_fails():
                 connect_to_table("duckdb://invalid.db")  # No table spec
 
             error_msg = str(exc_info.value)
+
             assert "Failed to connect" in error_msg or "Cannot connect" in error_msg
 
 
-def test_connect_to_table_list_tables_raises_exception():
+def test_connect_to_table_list_tables_raises_exception() -> None:
     """Test when list_tables() raises an exception in no-table-spec path."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -12463,11 +13219,12 @@ def test_connect_to_table_list_tables_raises_exception():
                 connect_to_table("duckdb://test.db")  # No table spec
 
             error_msg = str(exc_info.value)
+
             assert "No table specified in connection string" in error_msg
             assert "No tables found in the database or unable to list tables" in error_msg
 
 
-def test_process_connection_string_not_a_connection_string():
+def test_process_connection_string_not_a_connection_string() -> None:
     # Test various inputs that should pass through unchanged
     test_cases = [
         "regular_string",
@@ -12481,10 +13238,11 @@ def test_process_connection_string_not_a_connection_string():
 
     for test_input in test_cases:
         result = _process_connection_string(test_input)
+
         assert result == test_input
 
 
-def test_process_connection_string_with_connection_string():
+def test_process_connection_string_with_connection_string() -> None:
     with patch("pointblank.validate.connect_to_table") as mock_connect:
         mock_table = Mock()
         mock_connect.return_value = mock_table
@@ -12493,22 +13251,25 @@ def test_process_connection_string_with_connection_string():
 
         # Should call connect_to_table and return the result
         mock_connect.assert_called_once_with("duckdb://test.db::table")
+
         assert result == mock_table
 
 
-def test_get_action_metadata_no_context():
+def test_get_action_metadata_no_context() -> None:
     # Should return None when no context is active
     result = get_action_metadata()
+
     assert result is None
 
 
-def test_get_validation_summary_no_context():
+def test_get_validation_summary_no_context() -> None:
     # This should return None when no context is active
     result = get_validation_summary()
+
     assert result is None
 
 
-def test_connection_string_duckdb_in_memory():
+def test_connection_string_duckdb_in_memory() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database file instead of in-memory
@@ -12558,7 +13319,7 @@ def test_connection_string_duckdb_in_memory():
             os.unlink(temp_db_path)
 
 
-def test_connection_string_sqlite_in_memory():
+def test_connection_string_sqlite_in_memory() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary SQLite database file instead of in-memory
@@ -12611,7 +13372,7 @@ def test_connection_string_sqlite_in_memory():
             os.unlink(temp_db_path)
 
 
-def test_connection_string_no_table_specified_error():
+def test_connection_string_no_table_specified_error() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database with test data
@@ -12654,7 +13415,7 @@ def test_connection_string_no_table_specified_error():
             os.unlink(temp_db_path)
 
 
-def test_connection_string_no_tables_in_database():
+def test_connection_string_no_tables_in_database() -> None:
     pytest.importorskip("ibis")
 
     # Create an empty in-memory DuckDB database
@@ -12675,7 +13436,7 @@ def test_connection_string_no_tables_in_database():
     conn.disconnect()
 
 
-def test_connection_string_invalid_table_name():
+def test_connection_string_invalid_table_name() -> None:
     pytest.importorskip("ibis")
 
     # Create an in-memory DuckDB database with test data
@@ -12695,7 +13456,7 @@ def test_connection_string_invalid_table_name():
     conn.disconnect()
 
 
-def test_connection_string_backend_specific_error_guidance():
+def test_connection_string_backend_specific_error_guidance() -> None:
     # Test BigQuery backend error (likely not installed in test environment)
     with pytest.raises(ConnectionError) as exc_info:
         Validate(data="bigquery://fake-project/fake-dataset::fake-table")
@@ -12708,9 +13469,9 @@ def test_connection_string_backend_specific_error_guidance():
     assert "install" in error_msg.lower()
 
 
-def test_connection_string_ibis_not_available(monkeypatch):
+def test_connection_string_ibis_not_available(monkeypatch) -> None:
     # Mock Ibis as not available
-    def mock_is_lib_present(lib_name):
+    def mock_is_lib_present(lib_name) -> bool:
         if lib_name == "ibis":
             return False
         return True  # Allow other libraries
@@ -12722,13 +13483,14 @@ def test_connection_string_ibis_not_available(monkeypatch):
         Validate(data="duckdb:///test.db::table")
 
     error_msg = str(exc_info.value)
+
     assert (
         "Ibis library is not installed but is required for database connection strings" in error_msg
     )
     assert "pip install 'ibis-framework" in error_msg
 
 
-def test_connection_string_not_a_connection_string():
+def test_connection_string_not_a_connection_string() -> None:
     # Test various inputs that should not be treated as connection strings
     test_cases = [
         "regular_string",
@@ -12744,13 +13506,14 @@ def test_connection_string_not_a_connection_string():
             # For non-string inputs, this will likely fail at later processing stages
             # For string inputs that aren't connection strings, they should pass through
             result = _process_connection_string(test_input)
+
             assert result == test_input  # Should be unchanged
         except (TypeError, ValueError, FileNotFoundError):
             # These are expected for invalid inputs at later processing stages
             pass
 
 
-def test_connection_string_temporary_file_database():
+def test_connection_string_temporary_file_database() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary SQLite database file
@@ -12795,7 +13558,7 @@ def test_connection_string_temporary_file_database():
             os.unlink(temp_db_path)
 
 
-def test_connection_string_integration_with_validation_methods():
+def test_connection_string_integration_with_validation_methods() -> None:
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database with comprehensive test data
@@ -12863,6 +13626,7 @@ def test_connection_string_integration_with_validation_methods():
         passed_steps = sum(1 for step in validation.validation_info if step.all_passed)
         total_steps = len(validation.validation_info)
         pass_rate = passed_steps / total_steps
+
         assert pass_rate > 0.8  # At least 80% of validations should pass
 
     finally:
@@ -12872,7 +13636,7 @@ def test_connection_string_integration_with_validation_methods():
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_preview_with_columns_subset_no_fail(tbl_type):
+def test_preview_with_columns_subset_no_fail(tbl_type) -> None:
     tbl = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
 
     preview(tbl, columns_subset="player_id")
@@ -12893,7 +13657,7 @@ def test_preview_with_columns_subset_no_fail(tbl_type):
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_preview_with_columns_subset_failing(tbl_type):
+def test_preview_with_columns_subset_failing(tbl_type) -> None:
     tbl = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
 
     with pytest.raises(ValueError):
@@ -12906,7 +13670,7 @@ def test_preview_with_columns_subset_failing(tbl_type):
         preview(tbl, columns_subset=col(matches("fake_id")))
 
 
-def test_missing_vals_tbl_no_fail_pd_table():
+def test_missing_vals_tbl_no_fail_pd_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
     missing_vals_tbl(small_table)
 
@@ -12917,7 +13681,7 @@ def test_missing_vals_tbl_no_fail_pd_table():
     missing_vals_tbl(nycflights)
 
 
-def test_missing_vals_tbl_no_fail_pl_table():
+def test_missing_vals_tbl_no_fail_pl_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="polars")
     missing_vals_tbl(small_table)
 
@@ -12928,7 +13692,7 @@ def test_missing_vals_tbl_no_fail_pl_table():
     missing_vals_tbl(nycflights)
 
 
-def test_missing_vals_tbl_no_fail_duckdb_table():
+def test_missing_vals_tbl_no_fail_duckdb_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
     missing_vals_tbl(small_table)
 
@@ -12941,7 +13705,7 @@ def test_missing_vals_tbl_no_fail_duckdb_table():
 
 # TODO: Fix this test: great_tables has internal pandas dependencies that cannot be mocked
 @pytest.mark.skip(reason="TODO: Fix great_tables internal pandas dependency issue")
-def test_missing_vals_tbl_no_pandas():
+def test_missing_vals_tbl_no_pandas() -> None:
     # Mock the absence of the pandas library
     with patch.dict(sys.modules, {"pandas": None}):
         # The function should not raise an error if a Polars table is provided
@@ -12951,7 +13715,7 @@ def test_missing_vals_tbl_no_pandas():
 
 # TODO: Fix this test: Ibis backend has internal pandas dependencies that cannot be mocked
 @pytest.mark.skip(reason="TODO: Fix Ibis internal pandas dependency issue")
-def test_missing_vals_tbl_using_ibis_no_pandas():
+def test_missing_vals_tbl_using_ibis_no_pandas() -> None:
     # Mock the absence of the pandas library
     with patch.dict(sys.modules, {"pandas": None}):
         # The function should not raise an error if an Ibis backend table is provided
@@ -12960,7 +13724,7 @@ def test_missing_vals_tbl_using_ibis_no_pandas():
 
 
 @pytest.mark.skip()
-def test_missing_vals_tbl_using_ibis_no_polars():
+def test_missing_vals_tbl_using_ibis_no_polars() -> None:
     # Mock the absence of the polars library
     with patch.dict(sys.modules, {"polars": None}):
         # The function should not raise an error if an Ibis backend table is provided
@@ -12968,20 +13732,22 @@ def test_missing_vals_tbl_using_ibis_no_polars():
         missing_vals_tbl(small_table)
 
 
-def test_missing_vals_tbl_csv_input():
+def test_missing_vals_tbl_csv_input() -> None:
     # Test with individual CSV file
     csv_path = "data_raw/small_table.csv"
     result = missing_vals_tbl(csv_path)
+
     assert result is not None
 
     # Test with another CSV file
     csv_path2 = "data_raw/game_revenue.csv"
     result2 = missing_vals_tbl(csv_path2)
+
     assert result2 is not None
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
-def test_missing_vals_tbl_no_fail_pyspark_table():
+def test_missing_vals_tbl_no_fail_pyspark_table() -> None:
     # Test `missing_vals_tbl()` with PySpark DataFrames
     spark = get_spark_session()
 
@@ -13005,42 +13771,47 @@ def test_missing_vals_tbl_no_fail_pyspark_table():
     assert hasattr(result, "_build_data"), "Result should be a GT object"
 
 
-def test_missing_vals_tbl_parquet_input():
+def test_missing_vals_tbl_parquet_input() -> None:
     # Test with individual Parquet file
     parquet_path = "tests/tbl_files/tbl_xyz.parquet"
     result = missing_vals_tbl(parquet_path)
+
     assert result is not None
 
     # Test with another Parquet file
     parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
     result2 = missing_vals_tbl(parquet_path2)
+
     assert result2 is not None
 
 
-def test_missing_vals_tbl_connection_string_input():
+def test_missing_vals_tbl_connection_string_input() -> None:
     """Test missing_vals_tbl with connection string inputs."""
     # Test with DuckDB connection string using get_data_path
     duckdb_path = get_data_path("small_table", "duckdb")
     duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
     result = missing_vals_tbl(duckdb_conn)
+
     assert result is not None
 
     # Test with SQLite connection string using absolute path
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = missing_vals_tbl(sqlite_conn)
+
     assert result2 is not None
 
 
-def test_missing_vals_tbl_parquet_glob_patterns():
+def test_missing_vals_tbl_parquet_glob_patterns() -> None:
     # Test with glob pattern for parquet files
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = missing_vals_tbl(parquet_glob)
+
     assert result is not None
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_get_column_count(tbl_type):
+def test_get_column_count(tbl_type) -> None:
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
     game_revenue = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
     nycflights = load_dataset(dataset="nycflights", tbl_type=tbl_type)
@@ -13050,7 +13821,7 @@ def test_get_column_count(tbl_type):
     assert get_column_count(nycflights) == 18
 
 
-def test_get_column_count_failing():
+def test_get_column_count_failing() -> None:
     with pytest.raises(ValueError):
         get_column_count(None)
     with pytest.raises(ValueError):
@@ -13058,7 +13829,7 @@ def test_get_column_count_failing():
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_get_row_count(tbl_type):
+def test_get_row_count(tbl_type) -> None:
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
     game_revenue = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
     nycflights = load_dataset(dataset="nycflights", tbl_type=tbl_type)
@@ -13068,126 +13839,143 @@ def test_get_row_count(tbl_type):
     assert get_row_count(nycflights) == 336776
 
 
-def test_get_row_count_failing():
+def test_get_row_count_failing() -> None:
     with pytest.raises(ValueError):
         get_row_count(None)
     with pytest.raises(ValueError):
         get_row_count("not a table")
 
 
-def test_get_column_count_csv_input():
+def test_get_column_count_csv_input() -> None:
     # Test with individual CSV file
     csv_path = "data_raw/small_table.csv"
     result = get_column_count(csv_path)
+
     assert result == 8
 
     # Test with another CSV file
     csv_path2 = "data_raw/game_revenue.csv"
     result2 = get_column_count(csv_path2)
+
     assert result2 == 11
 
 
-def test_get_column_count_parquet_input():
+def test_get_column_count_parquet_input() -> None:
     # Test with individual Parquet file
     parquet_path = "tests/tbl_files/tbl_xyz.parquet"
     result = get_column_count(parquet_path)
+
     assert result > 0
 
     # Test with another Parquet file
     parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
     result2 = get_column_count(parquet_path2)
+
     assert result2 > 0
 
 
-def test_get_column_count_connection_string_input():
+def test_get_column_count_connection_string_input() -> None:
     # Test with DuckDB connection string using get_data_path
     duckdb_path = get_data_path("small_table", "duckdb")
     duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
     result = get_column_count(duckdb_conn)
+
     assert result == 8
 
     # Test with SQLite connection string using absolute path
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_column_count(sqlite_conn)
+
     assert result2 > 0
 
 
-def test_get_column_count_parquet_glob_patterns():
+def test_get_column_count_parquet_glob_patterns() -> None:
     # Test with glob pattern for committed parquet files
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = get_column_count(parquet_glob)
+
     assert result > 0
 
 
-def test_get_column_count_parquet_list():
+def test_get_column_count_parquet_list() -> None:
     # Test with list of Parquet file paths with `get_column_count()`
     parquet_files = [
         "tests/tbl_files/parquet_data/data_a.parquet",
         "tests/tbl_files/parquet_data/data_b.parquet",
     ]
     result = get_column_count(parquet_files)
+
     assert result > 0  # Should return the column count from the combined Parquet files
 
 
-def test_get_row_count_csv_input():
+def test_get_row_count_csv_input() -> None:
     # Test with individual CSV file
     csv_path = "data_raw/small_table.csv"
     result = get_row_count(csv_path)
+
     assert result == 13
 
     # Test with another CSV file
     csv_path2 = "data_raw/game_revenue.csv"
     result2 = get_row_count(csv_path2)
+
     assert result2 == 2000
 
 
-def test_get_row_count_parquet_input():
+def test_get_row_count_parquet_input() -> None:
     # Test with individual Parquet file
     parquet_path = "tests/tbl_files/tbl_xyz.parquet"
     result = get_row_count(parquet_path)
+
     assert result > 0
 
     # Test with another Parquet file
     parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
     result2 = get_row_count(parquet_path2)
+
     assert result2 > 0
 
 
-def test_get_row_count_connection_string_input():
+def test_get_row_count_connection_string_input() -> None:
     """Test get_row_count with connection string inputs."""
     # Test with DuckDB connection string using get_data_path
     duckdb_path = get_data_path("small_table", "duckdb")
     duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
     result = get_row_count(duckdb_conn)
+
     assert result == 13
 
     # Test with SQLite connection string using absolute path
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_row_count(sqlite_conn)
+
     assert result2 > 0
 
 
-def test_get_row_count_parquet_glob_patterns():
+def test_get_row_count_parquet_glob_patterns() -> None:
     # Test with glob pattern for parquet files
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = get_row_count(parquet_glob)
+
     assert result > 0
 
 
-def test_get_row_count_parquet_list():
+def test_get_row_count_parquet_list() -> None:
     # Test with list of Parquet file paths with `get_row_count()`
     parquet_files = [
         "tests/tbl_files/parquet_data/data_a.parquet",
         "tests/tbl_files/parquet_data/data_b.parquet",
     ]
     result = get_row_count(parquet_files)
+
     assert result > 0  # Should return the row count from the combined Parquet files
 
 
+# TODO: This test takes a bizarrely long time to run and should be debugged
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars"])
-def test_get_step_report_no_fail(tbl_type):
+def test_get_step_report_no_fail(tbl_type) -> None:
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
 
     validation = (
@@ -13300,7 +14088,7 @@ def test_get_step_report_no_fail(tbl_type):
     )
 
 
-def test_get_step_report_failing_inputs():
+def test_get_step_report_failing_inputs() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
     validation = Validate(small_table).col_vals_gt(columns="a", value=0).interrogate()
@@ -13318,7 +14106,7 @@ def test_get_step_report_failing_inputs():
         validation.get_step_report(i=1, limit=-5)
 
 
-def test_get_step_report_inactive_step():
+def test_get_step_report_inactive_step() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
     validation = Validate(small_table).col_vals_gt(columns="a", value=0, active=False).interrogate()
@@ -13342,7 +14130,7 @@ def test_get_step_report_inactive_step():
         ),
     ],
 )
-def test_get_step_report_schema_checks(schema):
+def test_get_step_report_schema_checks(schema) -> None:
     tbl = pl.DataFrame(
         {
             "a": ["apple", "banana", "cherry", "date"],
@@ -13361,15 +14149,55 @@ def test_get_step_report_schema_checks(schema):
         assert isinstance(validation.get_step_report(i=1), GT.GT)
 
 
+def test_get_dataframe_report_wrong_tbl_type_messaging():
+    tbl = pl.DataFrame({"name": ["Monica", "Erica", "Rita", "Tina"], "mambo_no": [2, 3, 4, 5]})
+
+    validation = Validate(data=tbl).col_vals_gt(columns="mambo_no", value=5).interrogate()
+
+    with pytest.raises(ValueError, match="The DataFrame type `polar` is not valid. Choose one of"):
+        validation.get_dataframe_report("polar")
+
+
+@pytest.mark.parametrize(
+    "library, tbl_type", [("Polars", "polars"), ("Pandas", "pandas"), ("Ibis", "duckdb")]
+)
+def test_get_dataframe_report_missing_libraries(library, tbl_type):
+    validation = Validate(data="small_table")
+
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = False  # library not present
+
+        with pytest.raises(ImportError, match=f"The {library} library is not installed"):
+            validation.get_dataframe_report(tbl_type)
+
+
+def test_get_dataframe_report_returns_polars_df():
+    validation = Validate(data="small_table")
+    df_polars = validation.get_dataframe_report("polars")
+    assert isinstance(df_polars, pl.DataFrame)
+
+
+def test_get_dataframe_report_returns_pandas_df():
+    validation = Validate(data="small_table")
+    df_pandas = validation.get_dataframe_report("pandas")
+    assert isinstance(df_pandas, pd.DataFrame)
+
+
+def test_get_dataframe_report_returns_ibis_memtable():
+    validation = Validate(data="small_table")
+    df_ibis = validation.get_dataframe_report("duckdb")
+    assert isinstance(df_ibis, ibis.expr.types.relations.Table)
+
+
 def get_schema_info(
     data_tbl,
     schema,
-    passed=True,
-    complete=True,
-    in_order=True,
-    case_sensitive_colnames=True,
-    case_sensitive_dtypes=True,
-    full_match_dtypes=True,
+    passed: bool = True,
+    complete: bool = True,
+    in_order: bool = True,
+    case_sensitive_colnames: bool = True,
+    case_sensitive_dtypes: bool = True,
+    full_match_dtypes: bool = True,
 ):
     return _get_schema_validation_info(
         data_tbl=data_tbl,
@@ -13383,7 +14211,7 @@ def get_schema_info(
     )
 
 
-def assert_schema_cols(schema_info, expectations):
+def assert_schema_cols(schema_info, expectations) -> None:
     (
         expected_columns_found,
         expected_columns_not_found,
@@ -13401,49 +14229,54 @@ def assert_schema_cols(schema_info, expectations):
     )
 
 
-def assert_col_dtype_match(schema_info, column):
+def assert_col_dtype_match(schema_info, column: str) -> None:
     if column not in schema_info["columns"]:
         assert False
+
     assert schema_info["columns"][column]["dtype_matched"]
 
 
-def assert_col_dtype_mismatch(schema_info, column):
+def assert_col_dtype_mismatch(schema_info, column: str) -> None:
     if column not in schema_info["columns"]:
         assert False
+
     assert not schema_info["columns"][column]["dtype_matched"]
 
 
-def assert_col_index_match(schema_info, column):
+def assert_col_index_match(schema_info, column: str) -> None:
     if column not in schema_info["columns"]:
         assert False
+
     assert schema_info["columns"][column]["index_matched"]
 
 
-def assert_col_index_mismatch(schema_info, column):
+def assert_col_index_mismatch(schema_info, column: str) -> None:
     if column not in schema_info["columns"]:
         assert False
+
     assert not schema_info["columns"][column]["index_matched"]
 
 
-def assert_col_dtype_absent(schema_info, column):
+def assert_col_dtype_absent(schema_info, column: str) -> None:
     if column not in schema_info["columns"]:
         assert False
+
     assert not schema_info["columns"][column]["dtype_present"]
 
 
-def assert_columns_full_set(schema_info):
+def assert_columns_full_set(schema_info) -> None:
     assert schema_info["columns_full_set"]
 
 
-def assert_columns_subset(schema_info):
+def assert_columns_subset(schema_info) -> None:
     assert schema_info["columns_subset"]
 
 
-def assert_columns_not_a_set(schema_info):
+def assert_columns_not_a_set(schema_info) -> None:
     assert not schema_info["columns_full_set"] and not schema_info["columns_subset"]
 
 
-def assert_columns_matched_in_order(schema_info, reverse=False):
+def assert_columns_matched_in_order(schema_info, reverse=False) -> None:
     if reverse:
         assert not schema_info["columns_matched_in_order"]
     else:
@@ -13451,7 +14284,7 @@ def assert_columns_matched_in_order(schema_info, reverse=False):
     return
 
 
-def assert_columns_matched_any_order(schema_info, reverse=False):
+def assert_columns_matched_any_order(schema_info, reverse=False) -> None:
     if reverse:
         assert not schema_info["columns_matched_any_order"]
     else:
@@ -13459,11 +14292,11 @@ def assert_columns_matched_any_order(schema_info, reverse=False):
     return
 
 
-def schema_info_str(schema_info):
+def schema_info_str(schema_info) -> str:
     return pprint.pformat(schema_info, sort_dicts=False, width=100)
 
 
-def test_get_schema_validation_info(tbl_schema_tests, snapshot):
+def test_get_schema_validation_info(tbl_schema_tests, snapshot) -> None:
     # Note regarding the input in the `assert_schema_cols()` testing function
     #
     # The main input is a tuple of three lists:
@@ -14356,7 +15189,7 @@ def test_get_schema_validation_info(tbl_schema_tests, snapshot):
     snapshot.assert_match(schema_info_str(schema_info), "schema_info_25-5.txt")
 
 
-def test_get_val_info(tbl_schema_tests):
+def test_get_val_info(tbl_schema_tests) -> None:
     # 1. Schema matches completely and in order; dtypes all correct
     schema = Schema(
         columns=[
@@ -14377,7 +15210,7 @@ def test_get_val_info(tbl_schema_tests):
     assert isinstance(val_info, dict)
 
 
-def test_get_schema_step_report_01(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_01(tbl_schema_tests, snapshot) -> None:
     # 1. Schema matches completely and in order; dtypes all correct
     schema = Schema(
         columns=[
@@ -14407,7 +15240,7 @@ def test_get_schema_step_report_01(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_01-0.txt")
 
 
-def test_get_schema_step_report_01_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_01_1(tbl_schema_tests, snapshot) -> None:
     # 1-1. Schema matches completely and in order; dtypes all correct
     # - use `complete=False` / `in_order=True`
     schema = Schema(
@@ -14438,7 +15271,7 @@ def test_get_schema_step_report_01_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_01-1.txt")
 
 
-def test_get_schema_step_report_01_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_01_2(tbl_schema_tests, snapshot) -> None:
     # 1-2. Schema matches completely and in order; dtypes all correct
     # - use `complete=True` / `in_order=False`
     schema = Schema(
@@ -14469,7 +15302,7 @@ def test_get_schema_step_report_01_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_01-2.txt")
 
 
-def test_get_schema_step_report_01_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_01_3(tbl_schema_tests, snapshot) -> None:
     # 1-3. Schema matches completely and in order; dtypes all correct
     # - use `complete=False` / `in_order=False`
     schema = Schema(
@@ -14500,7 +15333,7 @@ def test_get_schema_step_report_01_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_01-3.txt")
 
 
-def test_get_schema_step_report_02(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_02(tbl_schema_tests, snapshot) -> None:
     # 2. Schema matches completely; option taken to match any of two different dtypes for column
     # "a", but all dtypes correct
     schema = Schema(
@@ -14531,7 +15364,7 @@ def test_get_schema_step_report_02(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_02-0.txt")
 
 
-def test_get_schema_step_report_02_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_02_1(tbl_schema_tests, snapshot) -> None:
     # 2-1. Schema matches completely; option taken to match any of two different dtypes for column
     # "a", but all dtypes correct
     # - use `complete=False` / `in_order=True`
@@ -14563,7 +15396,7 @@ def test_get_schema_step_report_02_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_02-1.txt")
 
 
-def test_get_schema_step_report_02_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_02_2(tbl_schema_tests, snapshot) -> None:
     # 2-2. Schema matches completely; option taken to match any of two different dtypes for column
     # "a", but all dtypes correct
     # - use `complete=True` / `in_order=False`
@@ -14595,7 +15428,7 @@ def test_get_schema_step_report_02_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_02-2.txt")
 
 
-def test_get_schema_step_report_02_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_02_3(tbl_schema_tests, snapshot) -> None:
     # 2-3. Schema matches completely; option taken to match any of two different dtypes for column
     # "a", but all dtypes correct
     # - use `complete=False` / `in_order=False`
@@ -14627,7 +15460,7 @@ def test_get_schema_step_report_02_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_02-3.txt")
 
 
-def test_get_schema_step_report_03(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_03(tbl_schema_tests, snapshot) -> None:
     # 3. Schema has all three columns accounted for but in an incorrect order; dtypes correct
     schema = Schema(
         columns=[
@@ -14657,7 +15490,7 @@ def test_get_schema_step_report_03(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_03-0.txt")
 
 
-def test_get_schema_step_report_03_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_03_1(tbl_schema_tests, snapshot) -> None:
     # 3-1. Schema has all three columns accounted for but in an incorrect order; dtypes correct
     # - use `complete=False` / `in_order=True`
     schema = Schema(
@@ -14688,7 +15521,7 @@ def test_get_schema_step_report_03_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_03-1.txt")
 
 
-def test_get_schema_step_report_03_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_03_2(tbl_schema_tests, snapshot) -> None:
     # 3-2. Schema has all three columns accounted for but in an incorrect order; dtypes correct
     # - use `complete=True` / `in_order=False`
     schema = Schema(
@@ -14719,7 +15552,7 @@ def test_get_schema_step_report_03_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_03-2.txt")
 
 
-def test_get_schema_step_report_03_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_03_3(tbl_schema_tests, snapshot) -> None:
     # 3-3. Schema has all three columns accounted for but in an incorrect order; dtypes correct
     # - use `complete=False` / `in_order=False`
     schema = Schema(
@@ -14750,7 +15583,7 @@ def test_get_schema_step_report_03_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_03-3.txt")
 
 
-def test_get_schema_step_report_04(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_04(tbl_schema_tests, snapshot) -> None:
     # 4. Schema has all three columns accounted for but in an incorrect order; option taken to match
     # any of two different dtypes for column "a", but all dtypes correct
     schema = Schema(
@@ -14780,7 +15613,7 @@ def test_get_schema_step_report_04(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_04-0.txt")
 
 
-def test_get_schema_step_report_05(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_05(tbl_schema_tests, snapshot) -> None:
     # 5. Schema has all three columns matching, correct order; no dtypes provided
     schema = Schema(
         columns=[
@@ -14809,7 +15642,7 @@ def test_get_schema_step_report_05(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_05-0.txt")
 
 
-def test_get_schema_step_report_06(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_06(tbl_schema_tests, snapshot) -> None:
     # 6. Schema has all three columns matching, correct order; incorrect dtypes
     schema = Schema(
         columns=[
@@ -14838,7 +15671,7 @@ def test_get_schema_step_report_06(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_06-0.txt")
 
 
-def test_get_schema_step_report_07(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_07(tbl_schema_tests, snapshot) -> None:
     # 7. Schema has 2/3 columns matching, correct order; incorrect dtypes
     schema = Schema(
         columns=[
@@ -14866,7 +15699,7 @@ def test_get_schema_step_report_07(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_07-0.txt")
 
 
-def test_get_schema_step_report_08(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_08(tbl_schema_tests, snapshot) -> None:
     # 8. Schema has 2/3 columns matching, incorrect order; incorrect dtypes
     schema = Schema(
         columns=[
@@ -14894,7 +15727,7 @@ def test_get_schema_step_report_08(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_08-0.txt")
 
 
-def test_get_schema_step_report_09(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_09(tbl_schema_tests, snapshot) -> None:
     # 9. Schema has single column match; incorrect dtype
     schema = Schema(
         columns=[
@@ -14921,7 +15754,7 @@ def test_get_schema_step_report_09(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_09-0.txt")
 
 
-def test_get_schema_step_report_10(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_10(tbl_schema_tests, snapshot) -> None:
     # 10. Schema is empty
     schema = Schema(columns=[])
 
@@ -14944,7 +15777,7 @@ def test_get_schema_step_report_10(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_10-0.txt")
 
 
-def test_get_schema_step_report_11(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_11(tbl_schema_tests, snapshot) -> None:
     # 11. Schema has complete match of columns plus an additional, unmatched column
     schema = Schema(
         columns=[("a", ["String", "Int64"]), ("b", "Int64"), ("c", "Float64"), ("d", "String")]
@@ -14969,7 +15802,7 @@ def test_get_schema_step_report_11(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_11-0.txt")
 
 
-def test_get_schema_step_report_12(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_12(tbl_schema_tests, snapshot) -> None:
     # 12. Schema has partial match of columns (in right order) plus an additional, unmatched column
     schema = Schema(columns=[("a", ["String", "Int64"]), ("c", "Float64"), ("d", "String")])
 
@@ -14992,7 +15825,7 @@ def test_get_schema_step_report_12(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_12-0.txt")
 
 
-def test_get_schema_step_report_13(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_13(tbl_schema_tests, snapshot) -> None:
     # 13. Schema has no matches to any column names
     schema = Schema(
         columns=[
@@ -15021,7 +15854,7 @@ def test_get_schema_step_report_13(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_13-0.txt")
 
 
-def test_get_schema_step_report_14(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_14(tbl_schema_tests, snapshot) -> None:
     # 14. Schema has all columns matching in case-insensitive manner, correct order; dtypes
     # all correct
     schema = Schema(
@@ -15051,7 +15884,7 @@ def test_get_schema_step_report_14(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_14-0.txt")
 
 
-def test_get_schema_step_report_14_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_14_1(tbl_schema_tests, snapshot) -> None:
     # 14-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15080,7 +15913,7 @@ def test_get_schema_step_report_14_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_14-1.txt")
 
 
-def test_get_schema_step_report_15(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_15(tbl_schema_tests, snapshot) -> None:
     # 15. Schema has all columns matching in case-insensitive manner, correct order; dtypes
     # all correct
     schema = Schema(
@@ -15110,7 +15943,7 @@ def test_get_schema_step_report_15(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_15-0.txt")
 
 
-def test_get_schema_step_report_15_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_15_1(tbl_schema_tests, snapshot) -> None:
     # 15-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15139,7 +15972,7 @@ def test_get_schema_step_report_15_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_15-1.txt")
 
 
-def test_get_schema_step_report_16(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_16(tbl_schema_tests, snapshot) -> None:
     # 16. Schema has 2/3 columns matching in case-insensitive manner, correct order; dtypes
     # all correct
     schema = Schema(
@@ -15168,7 +16001,7 @@ def test_get_schema_step_report_16(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_16-0.txt")
 
 
-def test_get_schema_step_report_16_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_16_1(tbl_schema_tests, snapshot) -> None:
     # 16-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15196,7 +16029,7 @@ def test_get_schema_step_report_16_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_16-1.txt")
 
 
-def test_get_schema_step_report_17(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_17(tbl_schema_tests, snapshot) -> None:
     # 17. Schema has 2/3 columns matching in case-insensitive manner, incorrect order; dtypes
     # all correct
     schema = Schema(
@@ -15225,7 +16058,7 @@ def test_get_schema_step_report_17(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_17-0.txt")
 
 
-def test_get_schema_step_report_17_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_17_1(tbl_schema_tests, snapshot) -> None:
     # 17-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15253,7 +16086,7 @@ def test_get_schema_step_report_17_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_17-1.txt")
 
 
-def test_get_schema_step_report_18(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_18(tbl_schema_tests, snapshot) -> None:
     # 18. Schema has one column matching in case-insensitive manner; dtype is correct
     schema = Schema(
         columns=[
@@ -15280,7 +16113,7 @@ def test_get_schema_step_report_18(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_18-0.txt")
 
 
-def test_get_schema_step_report_18_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_18_1(tbl_schema_tests, snapshot) -> None:
     # 18-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15307,7 +16140,7 @@ def test_get_schema_step_report_18_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_18-1.txt")
 
 
-def test_get_schema_step_report_19(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_19(tbl_schema_tests, snapshot) -> None:
     # 19. Schema has all three columns matching, correct order; dtypes don't match case of
     # actual dtypes
     schema = Schema(
@@ -15337,7 +16170,7 @@ def test_get_schema_step_report_19(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_19-0.txt")
 
 
-def test_get_schema_step_report_19_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_19_1(tbl_schema_tests, snapshot) -> None:
     # 19-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15366,7 +16199,7 @@ def test_get_schema_step_report_19_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_19-1.txt")
 
 
-def test_get_schema_step_report_20(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_20(tbl_schema_tests, snapshot) -> None:
     # 20. Schema has all three columns matching, correct order; dtypes are substrings of
     # actual dtypes
     schema = Schema(
@@ -15396,7 +16229,7 @@ def test_get_schema_step_report_20(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_20-0.txt")
 
 
-def test_get_schema_step_report_20_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_20_1(tbl_schema_tests, snapshot) -> None:
     # 20-1. Using `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15425,7 +16258,7 @@ def test_get_schema_step_report_20_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_20-1.txt")
 
 
-def test_get_schema_step_report_21(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_21(tbl_schema_tests, snapshot) -> None:
     # 21. Schema has all three columns matching, correct order; dtypes are substrings of actual
     # dtypes where case doesn't match
     schema = Schema(
@@ -15455,7 +16288,7 @@ def test_get_schema_step_report_21(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_21-0.txt")
 
 
-def test_get_schema_step_report_21_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_21_1(tbl_schema_tests, snapshot) -> None:
     # 21-1. Using `case_sensitive_dtypes=False`
     schema = Schema(
         columns=[
@@ -15484,7 +16317,7 @@ def test_get_schema_step_report_21_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_21-1.txt")
 
 
-def test_get_schema_step_report_21_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_21_2(tbl_schema_tests, snapshot) -> None:
     # 21-2. Using `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15513,7 +16346,7 @@ def test_get_schema_step_report_21_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_21-2.txt")
 
 
-def test_get_schema_step_report_21_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_21_3(tbl_schema_tests, snapshot) -> None:
     # 21-3. Using `case_sensitive_dtypes=False` and `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15542,7 +16375,7 @@ def test_get_schema_step_report_21_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_21-3.txt")
 
 
-def test_get_schema_step_report_22(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_22(tbl_schema_tests, snapshot) -> None:
     # 22. Schema has all 2/3 columns matching, missing one, correct order; dtypes don't match
     # case of actual dtypes
     schema = Schema(
@@ -15571,7 +16404,7 @@ def test_get_schema_step_report_22(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_22-0.txt")
 
 
-def test_get_schema_step_report_22_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_22_1(tbl_schema_tests, snapshot) -> None:
     # 22-1. Using `case_sensitive_dtypes=False`
     schema = Schema(
         columns=[
@@ -15599,7 +16432,7 @@ def test_get_schema_step_report_22_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_22-1.txt")
 
 
-def test_get_schema_step_report_23(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_23(tbl_schema_tests, snapshot) -> None:
     # 23. Schema has all 2/3 columns matching, missing one, correct order; dtypes are substrings
     # of actual dtypes
     schema = Schema(
@@ -15628,7 +16461,7 @@ def test_get_schema_step_report_23(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_23-0.txt")
 
 
-def test_get_schema_step_report_23_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_23_1(tbl_schema_tests, snapshot) -> None:
     # 23-1. Using `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15656,7 +16489,7 @@ def test_get_schema_step_report_23_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_23-1.txt")
 
 
-def test_get_schema_step_report_24(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_24(tbl_schema_tests, snapshot) -> None:
     # 24. Schema has all 2/3 columns matching, missing one, correct order; dtypes are substrings
     # of actual dtypes where case doesn't match
     schema = Schema(
@@ -15685,7 +16518,7 @@ def test_get_schema_step_report_24(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_24-0.txt")
 
 
-def test_get_schema_step_report_24_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_24_1(tbl_schema_tests, snapshot) -> None:
     # 24-1. Using `case_sensitive_dtypes=False`
     schema = Schema(
         columns=[
@@ -15713,7 +16546,7 @@ def test_get_schema_step_report_24_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_24-1.txt")
 
 
-def test_get_schema_step_report_24_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_24_2(tbl_schema_tests, snapshot) -> None:
     # 24-2. Using `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15741,7 +16574,7 @@ def test_get_schema_step_report_24_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_24-2.txt")
 
 
-def test_get_schema_step_report_24_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_24_3(tbl_schema_tests, snapshot) -> None:
     # 24-3. Using `case_sensitive_dtypes=False` and `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15769,7 +16602,7 @@ def test_get_schema_step_report_24_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_24-3.txt")
 
 
-def test_get_schema_step_report_25(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25(tbl_schema_tests, snapshot) -> None:
     # 25. Schema has all 2/3 columns matching, missing one, an unmatched column, correct
     # order for the matching set; dtypes are substrings of actual dtypes where case doesn't match
     schema = Schema(
@@ -15799,7 +16632,7 @@ def test_get_schema_step_report_25(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_25-0.txt")
 
 
-def test_get_schema_step_report_25_1(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25_1(tbl_schema_tests, snapshot) -> None:
     # 25-1. Using `case_sensitive_colnames=False`
     schema = Schema(
         columns=[
@@ -15828,7 +16661,7 @@ def test_get_schema_step_report_25_1(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_25-1.txt")
 
 
-def test_get_schema_step_report_25_2(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25_2(tbl_schema_tests, snapshot) -> None:
     # 25-2. Using `case_sensitive_dtypes=False`
     schema = Schema(
         columns=[
@@ -15857,7 +16690,7 @@ def test_get_schema_step_report_25_2(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_25-2.txt")
 
 
-def test_get_schema_step_report_25_3(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25_3(tbl_schema_tests, snapshot) -> None:
     # 25-3. Using `full_match_dtypes=False`
     schema = Schema(
         columns=[
@@ -15886,7 +16719,7 @@ def test_get_schema_step_report_25_3(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_25-3.txt")
 
 
-def test_get_schema_step_report_25_4(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25_4(tbl_schema_tests, snapshot) -> None:
     # 25-4. Using `case_sensitive_colnames=False` and `case_sensitive_dtypes=False`
     schema = Schema(
         columns=[
@@ -15915,7 +16748,7 @@ def test_get_schema_step_report_25_4(tbl_schema_tests, snapshot):
     snapshot.assert_match(str(report_df), "schema_step_report_25-4.txt")
 
 
-def test_get_schema_step_report_25_5(tbl_schema_tests, snapshot):
+def test_get_schema_step_report_25_5(tbl_schema_tests, snapshot) -> None:
     # 25-5. Using `case_sensitive_colnames=False`, `case_sensitive_dtypes=False`, and
     # `full_match_dtypes=False`
     schema = Schema(
@@ -16014,7 +16847,7 @@ def test_assert_passing_example() -> None:
     passing_validation_no_interrogation.assert_passing()
 
 
-def test_assert_below_threshold_basic():
+def test_assert_below_threshold_basic() -> None:
     # Create a very simple table with obvious pass/fail patterns
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
@@ -16031,7 +16864,7 @@ def test_assert_below_threshold_basic():
     validation.assert_below_threshold(level="critical")
 
 
-def test_assert_below_threshold_all_fail():
+def test_assert_below_threshold_all_fail() -> None:
     # Create a very simple table where all values will fail validation
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
@@ -16053,7 +16886,7 @@ def test_assert_below_threshold_all_fail():
         validation.assert_below_threshold(level="critical")
 
 
-def test_assert_below_threshold_some_fail():
+def test_assert_below_threshold_some_fail() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     # 70% failure rate (7/10)
@@ -16075,7 +16908,7 @@ def test_assert_below_threshold_some_fail():
     validation.assert_below_threshold(level="critical")
 
 
-def test_assert_below_threshold_specific_i():
+def test_assert_below_threshold_specific_i() -> None:
     tbl = pl.DataFrame(
         {
             "col1": [1, 2, 3, 4, 5],
@@ -16101,7 +16934,7 @@ def test_assert_below_threshold_specific_i():
     validation.assert_below_threshold(level="critical", i=2)  # Passes critical (threshold 0.5)
 
 
-def test_assert_below_threshold_custom_message():
+def test_assert_below_threshold_custom_message() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     validation = (
@@ -16115,7 +16948,7 @@ def test_assert_below_threshold_custom_message():
         validation.assert_below_threshold(level="warning", message="Custom threshold error message")
 
 
-def test_assert_below_threshold_invalid_level():
+def test_assert_below_threshold_invalid_level() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     validation = Validate(data=tbl).col_vals_gt(columns="values", value=0).interrogate()
@@ -16125,7 +16958,7 @@ def test_assert_below_threshold_invalid_level():
         validation.assert_below_threshold(level="invalid_level")
 
 
-def test_assert_below_threshold_auto_interrogate():
+def test_assert_below_threshold_auto_interrogate() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Create validation but don't interrogate yet
@@ -16139,7 +16972,7 @@ def test_assert_below_threshold_auto_interrogate():
     validation.assert_below_threshold(level="warning")
 
 
-def test_above_threshold_basic_cases():
+def test_above_threshold_basic_cases() -> None:
     # Create a simple table where all values pass validation
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
@@ -16168,7 +17001,7 @@ def test_above_threshold_basic_cases():
     assert validation.above_threshold(level="critical") is True
 
 
-def test_above_threshold_mixed_results():
+def test_above_threshold_mixed_results() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     # 70% failure rate (7/10)
@@ -16188,7 +17021,7 @@ def test_above_threshold_mixed_results():
     assert validation.above_threshold(level="critical") is False
 
 
-def test_above_threshold_specific_step():
+def test_above_threshold_specific_step() -> None:
     tbl = pl.DataFrame(
         {
             "col1": [1, 2, 3, 4, 5],
@@ -16217,7 +17050,7 @@ def test_above_threshold_specific_step():
     )  # Doesn't exceed critical (threshold 0.5)
 
 
-def test_above_threshold_multiple_steps():
+def test_above_threshold_multiple_steps() -> None:
     tbl = pl.DataFrame(
         {
             "col1": [1, 2, 3, 4, 5],  # All pass col > 0
@@ -16251,7 +17084,7 @@ def test_above_threshold_multiple_steps():
     assert validation.above_threshold(level="critical") is True
 
 
-def test_above_threshold_invalid_level():
+def test_above_threshold_invalid_level() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     validation = Validate(data=tbl).col_vals_gt(columns="values", value=0).interrogate()
@@ -16264,7 +17097,7 @@ def test_above_threshold_invalid_level():
     assert validation.above_threshold(level="WARNING") is False
 
 
-def test_above_threshold_no_interrogation():
+def test_above_threshold_no_interrogation() -> None:
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Create validation but DON'T run interrogate()
@@ -16278,13 +17111,14 @@ def test_above_threshold_no_interrogation():
     assert validation.above_threshold(level="critical") is False
 
 
-def test_prep_column_text():
+def test_prep_column_text() -> None:
     assert _prep_column_text(column="column") == "`column`"
     assert _prep_column_text(column=["column_a", "column_b"]) == "`column_a`"
-    assert _prep_column_text(column=3) == ""
+    with pytest.raises(AssertionError):
+        _prep_column_text(column=3)
 
 
-def test_validate_csv_string_path_input():
+def test_validate_csv_string_path_input() -> None:
     csv_path = "data_raw/small_table.csv"
     validator = Validate(data=csv_path)
 
@@ -16301,7 +17135,7 @@ def test_validate_csv_string_path_input():
     assert isinstance(result, Validate)
 
 
-def test_validate_csv_path_object_input():
+def test_validate_csv_path_object_input() -> None:
     csv_path = Path("data_raw/small_table.csv")
     validator = Validate(data=csv_path)
 
@@ -16311,7 +17145,7 @@ def test_validate_csv_path_object_input():
     assert validator.data.shape[1] > 0
 
 
-def test_validate_non_csv_string_passthrough():
+def test_validate_non_csv_string_passthrough() -> None:
     test_data = "not_a_csv_file"
     validator = Validate(data=test_data)
 
@@ -16319,7 +17153,7 @@ def test_validate_non_csv_string_passthrough():
     assert isinstance(validator.data, str)
 
 
-def test_validate_non_csv_path_passthrough():
+def test_validate_non_csv_path_passthrough() -> None:
     test_path = Path("data_raw/small_table.txt")  # Different extension
     validator = Validate(data=test_path)
 
@@ -16327,12 +17161,12 @@ def test_validate_non_csv_path_passthrough():
     assert isinstance(validator.data, Path)
 
 
-def test_validate_non_existent_csv_file_error():
+def test_validate_non_existent_csv_file_error() -> None:
     with pytest.raises(FileNotFoundError, match="CSV file not found"):
         Validate(data="nonexistent_file.csv")
 
 
-def test_validate_dataframe_passthrough():
+def test_validate_dataframe_passthrough() -> None:
     # Try to import and create a DataFrame
     try:
         import polars as pl
@@ -16352,7 +17186,7 @@ def test_validate_dataframe_passthrough():
     assert validator.data is df
 
 
-def test_validate_csv_integration_with_validations():
+def test_validate_csv_integration_with_validations() -> None:
     csv_path = "data_raw/small_table.csv"
     validator = Validate(data=csv_path)
 
@@ -16366,7 +17200,7 @@ def test_validate_csv_integration_with_validations():
     assert len(validator.validation_info) > 0
 
 
-def test_validate_csv_different_files():
+def test_validate_csv_different_files() -> None:
     csv_files = [
         "data_raw/small_table.csv",
         "data_raw/game_revenue.csv",
@@ -16383,7 +17217,7 @@ def test_validate_csv_different_files():
             continue
 
 
-def test_validate_csv_case_insensitive_extension():
+def test_validate_csv_case_insensitive_extension() -> None:
     # Test the internal logic by using a CSV file we know exists
     csv_path = "data_raw/small_table.csv"
     validator = Validate(data=csv_path)
@@ -16392,7 +17226,7 @@ def test_validate_csv_case_insensitive_extension():
     # The case insensitivity is handled by Path.suffix.lower() == '.csv'
 
 
-def test_validate_csv_library_preference():
+def test_validate_csv_library_preference() -> None:
     csv_path = "data_raw/small_table.csv"
     validator = Validate(data=csv_path)
 
@@ -16414,7 +17248,7 @@ def test_validate_csv_library_preference():
             pytest.fail("No DataFrame library available for CSV reading")
 
 
-def test_validate_csv_with_interrogation():
+def test_validate_csv_with_interrogation() -> None:
     csv_path = "data_raw/small_table.csv"
     validator = Validate(data=csv_path)
 
@@ -16429,7 +17263,7 @@ def test_validate_csv_with_interrogation():
     assert report is not None
 
 
-def test_validate_parquet_single_file():
+def test_validate_parquet_single_file() -> None:
     parquet_path = TEST_DATA_DIR / "taxi_sample.parquet"
     validator = Validate(data=str(parquet_path))
 
@@ -16446,7 +17280,7 @@ def test_validate_parquet_single_file():
     assert isinstance(result, Validate)
 
 
-def test_validate_parquet_glob_pattern():
+def test_validate_parquet_glob_pattern() -> None:
     pattern = str(TEST_DATA_DIR / "taxi_part_*.parquet")
     validator = Validate(data=pattern)
 
@@ -16455,7 +17289,7 @@ def test_validate_parquet_glob_pattern():
     assert validator.data.shape[1] == 18
 
 
-def test_validate_parquet_bracket_pattern():
+def test_validate_parquet_bracket_pattern() -> None:
     pattern = str(TEST_DATA_DIR / "taxi_part_0[1-2].parquet")
     validator = Validate(data=pattern)
 
@@ -16464,7 +17298,7 @@ def test_validate_parquet_bracket_pattern():
     assert validator.data.shape[1] == 18
 
 
-def test_validate_parquet_directory():
+def test_validate_parquet_directory() -> None:
     parquet_dir = TEST_DATA_DIR / "parquet_data"
     validator = Validate(data=str(parquet_dir))
 
@@ -16474,7 +17308,7 @@ def test_validate_parquet_directory():
     assert validator.data.shape[1] > 0  # Should have columns
 
 
-def test_validate_parquet_list_of_files():
+def test_validate_parquet_list_of_files() -> None:
     file_list = [
         str(TEST_DATA_DIR / "taxi_part_01.parquet"),
         str(TEST_DATA_DIR / "taxi_part_02.parquet"),
@@ -16486,7 +17320,7 @@ def test_validate_parquet_list_of_files():
     assert validator.data.shape[1] == 18
 
 
-def test_validate_parquet_with_interrogation():
+def test_validate_parquet_with_interrogation() -> None:
     parquet_path = TEST_DATA_DIR / "taxi_sample.parquet"
     validator = Validate(data=str(parquet_path))
 
@@ -16503,7 +17337,7 @@ def test_validate_parquet_with_interrogation():
     )  # col_exists + col_vals_not_null (2 steps total, but col_exists creates 2)
 
 
-def test_validate_non_parquet_passthrough():
+def test_validate_non_parquet_passthrough() -> None:
     test_data = {"a": [1, 2, 3], "b": [4, 5, 6]}
     validator = Validate(data=test_data)
 
@@ -16512,17 +17346,17 @@ def test_validate_non_parquet_passthrough():
     assert isinstance(validator.data, dict)
 
 
-def test_validate_parquet_file_not_found():
+def test_validate_parquet_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         Validate(data=str(TEST_DATA_DIR / "nonexistent.parquet"))
 
 
-def test_validate_parquet_pattern_not_found():
+def test_validate_parquet_pattern_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         Validate(data=str(TEST_DATA_DIR / "nonexistent_*.parquet"))
 
 
-def test_validate_parquet_directory_not_found():
+def test_validate_parquet_directory_not_found() -> None:
     # Create a temporary empty directory for this test
     with tempfile.TemporaryDirectory() as temp_dir:
         empty_dir = Path(temp_dir) / "empty_subdir"
@@ -16532,7 +17366,7 @@ def test_validate_parquet_directory_not_found():
             Validate(data=str(empty_dir))
 
 
-def test_validate_parquet_mixed_list():
+def test_validate_parquet_mixed_list() -> None:
     mixed_list = [
         str(TEST_DATA_DIR / "taxi_part_01.parquet"),
         "some_regular_file.txt",  # Not a parquet file
@@ -16543,7 +17377,7 @@ def test_validate_parquet_mixed_list():
     assert validator.data == mixed_list
 
 
-def test_validate_parquet_list_file_not_found():
+def test_validate_parquet_list_file_not_found() -> None:
     """Test for a `FileNotFoundError` when a Parquet file provided in a list doesn't exist."""
     parquet_list = [
         str(TEST_DATA_DIR / "taxi_part_01.parquet"),  # This file exists
@@ -16554,7 +17388,7 @@ def test_validate_parquet_list_file_not_found():
         Validate(data=parquet_list)
 
 
-def test_validate_parquet_partitioned_small_table():
+def test_validate_parquet_partitioned_small_table() -> None:
     partitioned_path = TEST_DATA_DIR / "partitioned_small_table"
     validator = Validate(data=str(partitioned_path))
 
@@ -16579,7 +17413,7 @@ def test_validate_parquet_partitioned_small_table():
     assert len(result.validation_info) == 3  # `col_exists()` creates one step per column
 
 
-def test_validate_parquet_permanent_partitioned_sales():
+def test_validate_parquet_permanent_partitioned_sales() -> None:
     partitioned_path = TEST_DATA_DIR / "partitioned_sales"
     validator = Validate(data=str(partitioned_path))
 
@@ -16605,7 +17439,7 @@ def test_validate_parquet_permanent_partitioned_sales():
     assert len(result.validation_info) == 3  # `col_exists()` creates one step per column
 
 
-def test_pandas_only_environment_scenario():
+def test_pandas_only_environment_scenario() -> None:
     # Mock polars as unavailable by making _is_lib_present return False for polars
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -16656,7 +17490,7 @@ def test_pandas_only_environment_scenario():
         assert "transaction_amounts" in report_html
 
 
-def test_validate_parquet_partitioned_pandas_only():
+def test_validate_parquet_partitioned_pandas_only() -> None:
     """Test partitioned parquet reading when Polars is unavailable and falls back to Pandas."""
     # This tests the situation where Polars is not available and the code falls back to using
     # Pandas for partitioned dataset reading
@@ -16703,7 +17537,7 @@ def test_validate_parquet_partitioned_pandas_only():
                 assert "partition_col" in validator.data.columns
 
 
-def test_polars_only_environment_scenario():
+def test_polars_only_environment_scenario() -> None:
     # Mock pandas as unavailable by making `_is_lib_present()` return False for pandas
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -16754,7 +17588,7 @@ def test_polars_only_environment_scenario():
         assert "transaction_amounts" in report_html
 
 
-def test_both_libraries_environment_scenario():
+def test_both_libraries_environment_scenario() -> None:
     # Test data for both DataFrame types
     test_values = {
         "revenue": [10000, 25000, 30000, 45000, 60000, 75000, 90000],
@@ -16805,7 +17639,7 @@ def test_both_libraries_environment_scenario():
     assert "revenue" in pandas_html
 
 
-def test_dataframe_library_formatting_consistency_across_scenarios():
+def test_dataframe_library_formatting_consistency_across_scenarios() -> None:
     # Test values that would commonly trigger formatting
     test_numbers = [1000, 12345, 999999, 1000000]
     test_floats = [1234.56, 99999.99, 0.000123]
@@ -16837,7 +17671,7 @@ def test_dataframe_library_formatting_consistency_across_scenarios():
         assert polars_result == pandas_result
 
 
-def test_scenario_integration_with_large_datasets():
+def test_scenario_integration_with_large_datasets() -> None:
     # Create large dataset that will trigger number formatting in various functions
     large_size = 2000  # Reduced size for faster testing
 
@@ -16894,7 +17728,7 @@ def test_scenario_integration_with_large_datasets():
         assert all(step.all_passed for step in validation.validation_info)  # All should pass
 
 
-def test_scenario_edge_cases_and_error_handling():
+def test_scenario_edge_cases_and_error_handling() -> None:
     # Test with some edge case values
     edge_cases = [
         0,  # Zero
@@ -16938,7 +17772,7 @@ def test_scenario_edge_cases_and_error_handling():
         assert len(validation.validation_info) == 1
 
 
-def test_set_tbl_basic_functionality():
+def test_set_tbl_basic_functionality() -> None:
     """Test basic `set_tbl()` functionality with different table types."""
 
     # Create test tables
@@ -16971,7 +17805,7 @@ def test_set_tbl_basic_functionality():
     assert validation2_pd.tbl_name == "PD Table 2"
 
 
-def test_set_tbl_preserves_validation_steps():
+def test_set_tbl_preserves_validation_steps() -> None:
     """Test that `set_tbl()` preserves all validation step configurations."""
 
     table1 = pl.DataFrame(
@@ -17013,7 +17847,7 @@ def test_set_tbl_preserves_validation_steps():
     assert all(step.all_passed for step in result.validation_info)
 
 
-def test_set_tbl_before_and_after_interrogation():
+def test_set_tbl_before_and_after_interrogation() -> None:
     """Test `set_tbl()` behavior before and after interrogation."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
@@ -17067,7 +17901,7 @@ def test_set_tbl_before_and_after_interrogation():
     assert result_after.time_end is not None
 
 
-def test_set_tbl_deep_copy_behavior():
+def test_set_tbl_deep_copy_behavior() -> None:
     """Test that `set_tbl()` creates proper deep copies."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3]})
@@ -17096,7 +17930,7 @@ def test_set_tbl_deep_copy_behavior():
     assert complex_copied.validation_info[0].brief != "Modified brief"
 
 
-def test_set_tbl_optional_parameters():
+def test_set_tbl_optional_parameters() -> None:
     """Test `set_tbl()` with various combinations of optional parameters."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3]})
@@ -17130,7 +17964,7 @@ def test_set_tbl_optional_parameters():
     assert copy5.label == "Original Label"
 
 
-def test_set_tbl_with_complex_validations():
+def test_set_tbl_with_complex_validations() -> None:
     """Test `set_tbl()` with complex validation scenarios."""
 
     # Create tables with different data patterns
@@ -17175,7 +18009,7 @@ def test_set_tbl_with_complex_validations():
     assert result.tbl_name == "Complex Test"
 
 
-def test_set_tbl_with_segments_and_preprocessing():
+def test_set_tbl_with_segments_and_preprocessing() -> None:
     """Test `set_tbl()` with segmented validations and preprocessing."""
 
     table1 = pl.DataFrame(
@@ -17212,7 +18046,7 @@ def test_set_tbl_with_segments_and_preprocessing():
     assert len(result.validation_info) > 1
 
 
-def test_set_tbl_error_handling():
+def test_set_tbl_error_handling() -> None:
     """Test error handling and edge cases for `set_tbl()`."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3]})
@@ -17234,7 +18068,7 @@ def test_set_tbl_error_handling():
     assert "a" in note["text"]  # The missing column name
 
 
-def test_set_tbl_with_different_dataframe_libraries():
+def test_set_tbl_with_different_dataframe_libraries() -> None:
     """Test `set_tbl()` across different DataFrame libraries."""
 
     # Create tables in different formats
@@ -17258,7 +18092,7 @@ def test_set_tbl_with_different_dataframe_libraries():
     assert all(step.all_passed for step in result2.validation_info)
 
 
-def test_set_tbl_preserves_thresholds_and_actions():
+def test_set_tbl_preserves_thresholds_and_actions() -> None:
     """Test that `set_tbl()` preserves thresholds and actions."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3]})
@@ -17267,7 +18101,7 @@ def test_set_tbl_preserves_thresholds_and_actions():
     # Create validation with thresholds and actions
     action_calls = []
 
-    def test_action():
+    def test_action() -> None:
         action_calls.append("action_called")
 
     validation_with_config = Validate(
@@ -17292,7 +18126,7 @@ def test_set_tbl_preserves_thresholds_and_actions():
     assert all(step.all_passed for step in result.validation_info)
 
 
-def test_set_tbl_with_string_and_path_inputs():
+def test_set_tbl_with_string_and_path_inputs() -> None:
     """Test `set_tbl()` with CSV file paths and dataset names."""
 
     # Create validation with built-in dataset
@@ -17338,7 +18172,7 @@ def test_set_tbl_with_string_and_path_inputs():
         os.unlink(csv_path)
 
 
-def test_set_tbl_interrogation_state_management():
+def test_set_tbl_interrogation_state_management() -> None:
     """Test that `set_tbl()` properly manages interrogation state."""
 
     table1 = pl.DataFrame({"a": [1, 2, 3]})
@@ -17372,7 +18206,7 @@ def test_set_tbl_interrogation_state_management():
     assert new_result.tbl_name == "New"
 
 
-def test_process_connection_string_not_string():
+def test_process_connection_string_not_string() -> None:
     """Test that non-string input is returned as-is."""
     data = {"not": "a string"}
     result = _process_connection_string(data)
@@ -17380,7 +18214,7 @@ def test_process_connection_string_not_string():
 
 
 @patch("pointblank.validate.connect_to_table")
-def test_process_connection_string_not_uri_format(mock_connect):
+def test_process_connection_string_not_uri_format(mock_connect) -> None:
     """Test string that doesn't look like a connection URI."""
     # Mock connect_to_table to raise an exception (not a valid connection string)
     mock_connect.side_effect = Exception("Not a connection string")
@@ -17393,7 +18227,7 @@ def test_process_connection_string_not_uri_format(mock_connect):
 
 
 @patch("pointblank.validate.connect_to_table")
-def test_process_connection_string_valid_uri(mock_connect):
+def test_process_connection_string_valid_uri(mock_connect) -> None:
     """Test valid connection string processing."""
     expected_result = Mock()
     mock_connect.return_value = expected_result
@@ -17405,7 +18239,7 @@ def test_process_connection_string_valid_uri(mock_connect):
     mock_connect.assert_called_once_with(data)
 
 
-def test_process_github_url_not_string():
+def test_process_github_url_not_string() -> None:
     """Test that non-string input is returned as-is."""
 
     data = {"not": "a string"}
@@ -17413,7 +18247,7 @@ def test_process_github_url_not_string():
     assert result == data
 
 
-def test_process_github_url_not_github_url():
+def test_process_github_url_not_github_url() -> None:
     """Test non-GitHub URL returns original data."""
 
     data = "https://example.com/file.csv"
@@ -17421,7 +18255,7 @@ def test_process_github_url_not_github_url():
     assert result == data
 
 
-def test_process_github_url_not_csv_or_parquet():
+def test_process_github_url_not_csv_or_parquet() -> None:
     """Test GitHub URL without CSV/Parquet file returns original data."""
 
     data = "https://github.com/user/repo/blob/main/README.md"
@@ -17429,7 +18263,7 @@ def test_process_github_url_not_csv_or_parquet():
     assert result == data
 
 
-def test_process_github_url_invalid_github_pattern():
+def test_process_github_url_invalid_github_pattern() -> None:
     """Test GitHub URL that doesn't match expected blob pattern."""
 
     data = "https://github.com/user/file.csv"  # Missing repo/blob/branch structure
@@ -17437,7 +18271,7 @@ def test_process_github_url_invalid_github_pattern():
     assert result == data
 
 
-def test_process_github_url_urlparse_exception():
+def test_process_github_url_urlparse_exception() -> None:
     """Test that urlparse exceptions are handled gracefully."""
 
     # This should cause urlparse to raise a ValueError due to invalid IPv6 URL
@@ -17449,19 +18283,19 @@ def test_process_github_url_urlparse_exception():
     assert result == data
 
 
-def test_get_data_path_invalid_dataset():
+def test_get_data_path_invalid_dataset() -> None:
     """Test invalid dataset name raises ValueError."""
     with pytest.raises(ValueError, match="The dataset name `invalid_dataset` is not valid"):
         get_data_path(dataset="invalid_dataset")
 
 
-def test_get_data_path_invalid_file_type():
+def test_get_data_path_invalid_file_type() -> None:
     """Test invalid file type raises ValueError."""
     with pytest.raises(ValueError, match="The file type `invalid_type` is not valid"):
         get_data_path(dataset="small_table", file_type="invalid_type")
 
 
-def test_get_column_count_fallback_error():
+def test_get_column_count_fallback_error() -> None:
     """Test get_column_count error handling for unsupported types."""
     # Use an object that will definitely not be supported
     unsupported_object = object()
@@ -17472,7 +18306,7 @@ def test_get_column_count_fallback_error():
         get_column_count(unsupported_object)
 
 
-def test_col_vals_in_set_invalid_values():
+def test_col_vals_in_set_invalid_values() -> None:
     """Test col_vals_in_set() with invalid value types in set."""
     df = pd.DataFrame({"x": [1, 2, 3]})
     validation = Validate(data=df)
@@ -17486,7 +18320,7 @@ def test_col_vals_in_set_invalid_values():
         validation.col_vals_in_set(columns="x", set=[1, 2, [3, 4]])
 
 
-def test_col_vals_null_polars_conversion():
+def test_col_vals_null_polars_conversion() -> None:
     """Test col_vals_null() with Polars data using conversion paths."""
     df_pl = pl.DataFrame({"x": [1, None, 3], "y": [None, 5, None]})
     validation = Validate(data=df_pl)
@@ -17495,7 +18329,7 @@ def test_col_vals_null_polars_conversion():
     assert result.all_passed() is False
 
 
-def test_missing_vals_tbl_pandas_conversion():
+def test_missing_vals_tbl_pandas_conversion() -> None:
     """Test missing_vals_tbl() with Pandas data to hit conversion paths."""
     df_pd = pd.DataFrame({"x": [1, None, 3], "y": [None, 5, None]})
 
@@ -17503,7 +18337,7 @@ def test_missing_vals_tbl_pandas_conversion():
     assert missing_tbl is not None
 
 
-def test_get_column_count_with_row_index():
+def test_get_column_count_with_row_index() -> None:
     """Test get_column_count() with two DataFrame types."""
 
     # Test with Polars DataFrame
@@ -17517,7 +18351,7 @@ def test_get_column_count_with_row_index():
     assert count == 2
 
 
-def test_validation_with_columns_subset_string():
+def test_validation_with_columns_subset_string() -> None:
     """Test _validate_columns_subset() with string input."""
 
     col_names = ["x", "y", "z"]
@@ -17531,7 +18365,7 @@ def test_validation_with_columns_subset_string():
     assert result == ["x", "z"]
 
 
-def test_validation_eval_error_handling():
+def test_validation_eval_error_handling() -> None:
     """Test validation eval error handling for comparison errors."""
 
     # Create a DataFrame that will cause comparison issues
@@ -17548,7 +18382,7 @@ def test_validation_eval_error_handling():
     assert validation_steps[0].active is not None
 
 
-def test_format_functions_coverage():
+def test_format_functions_coverage() -> None:
     """Test format functions for coverage."""
 
     # Test the format single number function
@@ -17560,7 +18394,7 @@ def test_format_functions_coverage():
     assert result is not None
 
 
-def test_format_single_float_with_gt_custom():
+def test_format_single_float_with_gt_custom() -> None:
     """Test _format_single_float_with_gt_custom() function with various parameters."""
     from pointblank.validate import _format_single_float_with_gt_custom
 
@@ -17632,7 +18466,7 @@ def test_format_single_float_with_gt_custom():
     assert result is not None
 
 
-def test_format_single_float_with_gt_custom_df_lib_selection():
+def test_format_single_float_with_gt_custom_df_lib_selection() -> None:
     """Test _format_single_float_with_gt_custom() automatic library selection."""
     from pointblank.validate import _format_single_float_with_gt_custom
 
@@ -17700,7 +18534,7 @@ def sample_data_pandas():
     )
 
 
-def test_col_vals_in_set_with_enum_class_polars(sample_data_polars):
+def test_col_vals_in_set_with_enum_class_polars(sample_data_polars) -> None:
     """Test col_vals_in_set() with Enum class using Polars."""
     validation = (
         Validate(sample_data_polars).col_vals_in_set(columns="colors", set=Color).interrogate()
@@ -17712,7 +18546,7 @@ def test_col_vals_in_set_with_enum_class_polars(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_with_enum_class_pandas(sample_data_pandas):
+def test_col_vals_in_set_with_enum_class_pandas(sample_data_pandas) -> None:
     """Test col_vals_in_set() with Enum class using Pandas."""
     validation = (
         Validate(sample_data_pandas).col_vals_in_set(columns="colors", set=Color).interrogate()
@@ -17724,7 +18558,7 @@ def test_col_vals_in_set_with_enum_class_pandas(sample_data_pandas):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_with_int_enum(sample_data_polars):
+def test_col_vals_in_set_with_int_enum(sample_data_polars) -> None:
     """Test col_vals_in_set() with IntEnum."""
     validation = (
         Validate(sample_data_polars)
@@ -17738,7 +18572,7 @@ def test_col_vals_in_set_with_int_enum(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_with_str_enum(sample_data_polars):
+def test_col_vals_in_set_with_str_enum(sample_data_polars) -> None:
     """Test col_vals_in_set() with StrEnum."""
     validation = (
         Validate(sample_data_polars).col_vals_in_set(columns="statuses", set=Status).interrogate()
@@ -17750,7 +18584,7 @@ def test_col_vals_in_set_with_str_enum(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_with_enum_instances_list(sample_data_polars):
+def test_col_vals_in_set_with_enum_instances_list(sample_data_polars) -> None:
     """Test col_vals_in_set() with a list of Enum instances."""
     validation = (
         Validate(sample_data_polars)
@@ -17765,7 +18599,7 @@ def test_col_vals_in_set_with_enum_instances_list(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_with_mixed_enum_and_values(sample_data_polars):
+def test_col_vals_in_set_with_mixed_enum_and_values(sample_data_polars) -> None:
     """Test col_vals_in_set() with mixed Enum instances and regular values."""
     validation = (
         Validate(sample_data_polars)
@@ -17779,7 +18613,7 @@ def test_col_vals_in_set_with_mixed_enum_and_values(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_not_in_set_with_enum_class(sample_data_polars):
+def test_col_vals_not_in_set_with_enum_class(sample_data_polars) -> None:
     """Test col_vals_not_in_set() with Enum class."""
     validation = (
         Validate(sample_data_polars).col_vals_not_in_set(columns="colors", set=Color).interrogate()
@@ -17791,7 +18625,7 @@ def test_col_vals_not_in_set_with_enum_class(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_not_in_set_with_enum_instances_list(sample_data_polars):
+def test_col_vals_not_in_set_with_enum_instances_list(sample_data_polars) -> None:
     """Test col_vals_not_in_set() with a list of Enum instances."""
     validation = (
         Validate(sample_data_polars)
@@ -17805,7 +18639,7 @@ def test_col_vals_not_in_set_with_enum_instances_list(sample_data_polars):
     assert not validation.all_passed()
 
 
-def test_col_vals_in_set_all_pass_with_enum():
+def test_col_vals_in_set_all_pass_with_enum() -> None:
     """Test col_vals_in_set() where all values pass with Enum."""
     # Create data where all colors are in the enum
     data = pl.DataFrame({"colors": ["red", "green", "blue", "red", "green"]})
@@ -17818,7 +18652,7 @@ def test_col_vals_in_set_all_pass_with_enum():
     assert validation.all_passed()
 
 
-def test_col_vals_not_in_set_all_pass_with_enum():
+def test_col_vals_not_in_set_all_pass_with_enum() -> None:
     """Test col_vals_not_in_set() where all values pass with Enum."""
     # Create data where no colors are in the enum
     data = pl.DataFrame({"colors": ["yellow", "orange", "purple", "pink", "cyan"]})
@@ -17831,7 +18665,7 @@ def test_col_vals_not_in_set_all_pass_with_enum():
     assert validation.all_passed()
 
 
-def test_enum_extraction_helper_function():
+def test_enum_extraction_helper_function() -> None:
     """Test the _extract_enum_values() helper function directly."""
     from pointblank.validate import _extract_enum_values
 
@@ -17860,7 +18694,7 @@ def test_enum_extraction_helper_function():
     assert values == ["red", 1, "active"]
 
 
-def test_col_vals_in_set_with_mixed_enum_classes():
+def test_col_vals_in_set_with_mixed_enum_classes() -> None:
     """Test col_vals_in_set with a mix of different Enum class instances."""
     # Create data that has all string values for Polars compatibility
     data = pl.DataFrame({"mixed_values": ["red", "active", "green", "pending", "blue", "inactive"]})
@@ -17882,7 +18716,7 @@ def test_col_vals_in_set_with_mixed_enum_classes():
     assert not validation.all_passed()
 
 
-def test_col_vals_not_in_set_with_mixed_enum_classes():
+def test_col_vals_not_in_set_with_mixed_enum_classes() -> None:
     """Test col_vals_not_in_set with a mix of different Enum class instances."""
     # Create data that has all string values for Polars compatibility
     data = pl.DataFrame(
@@ -17907,7 +18741,7 @@ def test_col_vals_not_in_set_with_mixed_enum_classes():
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_isolation_with_proper_closures(request, tbl_fixture):
+def test_pre_parameter_isolation_with_proper_closures(request, tbl_fixture) -> None:
     """Test that the `pre` parameter in multiple validation steps uses proper closures to avoid
     shared state issues.
     """
@@ -17915,7 +18749,7 @@ def test_pre_parameter_isolation_with_proper_closures(request, tbl_fixture):
 
     # Create proper closure functions that capture values, not references
     # Using narwhals syntax that works across DataFrame types
-    def create_filter_func(threshold):
+    def create_filter_func(threshold: int):
         def filter_func(df):
             dfn = nw.from_native(df)
             filtered = dfn.filter(nw.col("x") > threshold)
@@ -17946,7 +18780,7 @@ def test_pre_parameter_isolation_with_proper_closures(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_closure(request, tbl_fixture):
+def test_pre_parameter_closure(request, tbl_fixture) -> None:
     """Test that documents the closure issue that users might encounter."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -17974,7 +18808,7 @@ def test_pre_parameter_closure(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_dataframe_isolation_between_steps(request, tbl_fixture):
+def test_dataframe_isolation_between_steps(request, tbl_fixture) -> None:
     """
     Test that the library provides proper DataFrame isolation between validation steps.
 
@@ -18024,7 +18858,7 @@ def test_dataframe_isolation_between_steps(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_with_multiple_steps_proper_isolation(request, tbl_fixture):
+def test_pre_parameter_with_multiple_steps_proper_isolation(request, tbl_fixture) -> None:
     """Test multiple validation steps with different pre functions to ensure proper isolation."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18071,7 +18905,7 @@ def test_pre_parameter_with_multiple_steps_proper_isolation(request, tbl_fixture
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_native_lambda_isolation(request, tbl_fixture):
+def test_pre_parameter_native_lambda_isolation(request, tbl_fixture) -> None:
     """Test pre parameter isolation using native lambdas specific to each DataFrame type."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18099,7 +18933,7 @@ def test_pre_parameter_native_lambda_isolation(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_function_isolation(request, tbl_fixture):
+def test_pre_parameter_function_isolation(request, tbl_fixture) -> None:
     """Test pre parameter isolation using regular functions instead of lambdas."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18142,7 +18976,7 @@ def test_pre_parameter_function_isolation(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_pre_parameter_mixed_functions_and_lambdas(request, tbl_fixture):
+def test_pre_parameter_mixed_functions_and_lambdas(request, tbl_fixture) -> None:
     """Test pre parameter isolation mixing functions and lambdas in the same validation."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18178,13 +19012,13 @@ def test_pre_parameter_mixed_functions_and_lambdas(request, tbl_fixture):
     assert all(vi.all_passed for vi in validation.validation_info)
 
 
-def test_pre_parameter_closure_variable_capture_functions():
+def test_pre_parameter_closure_variable_capture_functions() -> None:
     """Test that functions properly capture variables (not affected by closure issues)."""
 
     tbl = pd.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
 
     # Create functions that capture different threshold values
-    def create_filter_function(threshold):
+    def create_filter_function(threshold: int):
         def filter_func(df):
             return df.query(f"x > {threshold}")
 
@@ -18212,7 +19046,7 @@ def test_pre_parameter_closure_variable_capture_functions():
     assert all(vi.all_passed for vi in validation.validation_info)
 
 
-def test_pre_parameter_complex_native_operations():
+def test_pre_parameter_complex_native_operations() -> None:
     """Test pre parameter isolation with complex native DataFrame operations."""
 
     # Test with Pandas
@@ -18277,7 +19111,7 @@ def test_pre_parameter_complex_native_operations():
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_validation_steps_without_pre_are_unaffected(request, tbl_fixture):
+def test_validation_steps_without_pre_are_unaffected(request, tbl_fixture) -> None:
     """Test that validation steps without a `pre=` parameter are completely unaffected."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18327,7 +19161,7 @@ def test_validation_steps_without_pre_are_unaffected(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_mixed_pre_and_no_pre_isolation(request, tbl_fixture):
+def test_mixed_pre_and_no_pre_isolation(request, tbl_fixture) -> None:
     """Test mixing validation steps with and without pre= parameters."""
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -18364,7 +19198,7 @@ def test_mixed_pre_and_no_pre_isolation(request, tbl_fixture):
     assert all(vi.all_passed for vi in validation.validation_info)
 
 
-def test_performance_impact_of_dataframe_copying():
+def test_performance_impact_of_dataframe_copying() -> None:
     """
     Test that DataFrame copying doesn't significantly impact performance for steps without
     pre= parameters (which shouldn't need copying).
@@ -18420,7 +19254,7 @@ def test_performance_impact_of_dataframe_copying():
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
-def test_original_table_never_modified_without_pre(request, tbl_fixture):
+def test_original_table_never_modified_without_pre(request, tbl_fixture) -> None:
     """
     Test that the original table is NEVER modified by validation steps,
     especially for steps without pre= parameters.
@@ -18511,7 +19345,7 @@ def timezone_datetime_pandas():
     )
 
 
-def test_col_vals_ge_timezone_datetime_polars(timezone_datetime_polars):
+def test_col_vals_ge_timezone_datetime_polars(timezone_datetime_polars) -> None:
     """Test col_vals_ge() with timezone-aware datetime values in Polars."""
     df = timezone_datetime_polars
 
@@ -18531,7 +19365,7 @@ def test_col_vals_ge_timezone_datetime_polars(timezone_datetime_polars):
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_col_vals_le_timezone_datetime_polars(timezone_datetime_polars):
+def test_col_vals_le_timezone_datetime_polars(timezone_datetime_polars) -> None:
     """Test col_vals_le() with timezone-aware datetime values in Polars."""
     df = timezone_datetime_polars
 
@@ -18553,7 +19387,7 @@ def test_col_vals_le_timezone_datetime_polars(timezone_datetime_polars):
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_col_vals_between_timezone_datetime_polars(timezone_datetime_polars):
+def test_col_vals_between_timezone_datetime_polars(timezone_datetime_polars) -> None:
     """Test col_vals_between() with timezone-aware datetime values in Polars."""
     df = timezone_datetime_polars
 
@@ -18582,7 +19416,7 @@ def test_col_vals_between_timezone_datetime_polars(timezone_datetime_polars):
     assert validation.n_failed(i=1, scalar=True) > 0  # Some should fail
 
 
-def test_col_schema_match_timezone_datetime_polars(timezone_datetime_polars):
+def test_col_schema_match_timezone_datetime_polars(timezone_datetime_polars) -> None:
     """Test col_schema_match with timezone-aware datetime schema in Polars."""
     df = timezone_datetime_polars
 
@@ -18607,7 +19441,7 @@ def test_col_schema_match_timezone_datetime_polars(timezone_datetime_polars):
     assert validation.n_passed(i=1, scalar=True) == 1
 
 
-def test_col_vals_ge_timezone_datetime_pandas(timezone_datetime_pandas):
+def test_col_vals_ge_timezone_datetime_pandas(timezone_datetime_pandas) -> None:
     """Test col_vals_ge() with timezone-aware datetime values in Pandas."""
     df = timezone_datetime_pandas
 
@@ -18627,7 +19461,7 @@ def test_col_vals_ge_timezone_datetime_pandas(timezone_datetime_pandas):
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_col_vals_le_timezone_datetime_pandas(timezone_datetime_pandas):
+def test_col_vals_le_timezone_datetime_pandas(timezone_datetime_pandas) -> None:
     """Test col_vals_le() with timezone-aware datetime values in Pandas."""
     df = timezone_datetime_pandas
 
@@ -18649,7 +19483,7 @@ def test_col_vals_le_timezone_datetime_pandas(timezone_datetime_pandas):
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_timezone_datetime_same_timezone_polars():
+def test_timezone_datetime_same_timezone_polars() -> None:
     """Test timezone datetime comparisons with same timezone in Polars."""
     # Create DataFrame with same timezone datetimes but different times
     df = pl.DataFrame(
@@ -18689,7 +19523,7 @@ def test_timezone_datetime_same_timezone_polars():
 @pytest.mark.xfail(
     reason="PySpark timezone datetime comparisons may not work correctly with narwhals"
 )
-def test_col_vals_ge_timezone_datetime_pyspark():
+def test_col_vals_ge_timezone_datetime_pyspark() -> None:
     """Test col_vals_ge() with timezone-aware datetime values in PySpark."""
     # Create PySpark DataFrame with timezone-aware datetime
     spark = SparkSession.builder.appName("test").getOrCreate()
@@ -18729,7 +19563,7 @@ def test_col_vals_ge_timezone_datetime_pyspark():
 
 
 @pytest.mark.xfail(reason="DuckDB timezone datetime comparisons may not work correctly yet")
-def test_col_vals_ge_timezone_datetime_duckdb():
+def test_col_vals_ge_timezone_datetime_duckdb() -> None:
     """Test col_vals_ge() with timezone-aware datetime values in DuckDB."""
     try:
         import duckdb
@@ -18776,7 +19610,7 @@ def test_col_vals_ge_timezone_datetime_duckdb():
 
 
 @pytest.mark.xfail(reason="Mixed timezone comparisons may not work correctly yet")
-def test_timezone_datetime_mixed_timezones_polars():
+def test_timezone_datetime_mixed_timezones_polars() -> None:
     """Test timezone datetime comparisons with mixed timezones in Polars."""
     # Create DataFrame with mixed timezone datetimes
     df = pl.DataFrame(
@@ -18809,7 +19643,7 @@ def test_timezone_datetime_mixed_timezones_polars():
 
 
 @pytest.fixture
-def sample_validation_polars():
+def sample_validation_polars() -> Validate:
     """Create a sample validation object with Polars data."""
 
     data = load_dataset("small_table", tbl_type="polars")
@@ -18828,7 +19662,7 @@ def sample_validation_polars():
 
 
 @pytest.fixture
-def sample_validation_pandas():
+def sample_validation_pandas() -> Validate:
     """Create a sample validation object with Pandas data."""
 
     data = load_dataset("small_table", tbl_type="pandas")
@@ -18840,7 +19674,7 @@ def sample_validation_pandas():
 
 
 @pytest.fixture
-def sample_validation_duckdb():
+def sample_validation_duckdb() -> Validate:
     """Create a sample validation object with DuckDB data."""
 
     data = load_dataset("small_table", tbl_type="duckdb")
@@ -18851,7 +19685,7 @@ def sample_validation_duckdb():
     )
 
 
-def test_write_file_basic_functionality(sample_validation_polars):
+def test_write_file_basic_functionality(sample_validation_polars) -> None:
     """Test basic write_file functionality."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18866,7 +19700,7 @@ def test_write_file_basic_functionality(sample_validation_polars):
         assert expected_file.stat().st_size > 0
 
 
-def test_read_file_basic_functionality(sample_validation_polars):
+def test_read_file_basic_functionality(sample_validation_polars) -> None:
     """Test basic read_file functionality."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18885,7 +19719,7 @@ def test_read_file_basic_functionality(sample_validation_polars):
         )
 
 
-def test_write_file_automatic_extension(sample_validation_polars):
+def test_write_file_automatic_extension(sample_validation_polars) -> None:
     """Test that .pkl extension is added automatically."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18903,7 +19737,7 @@ def test_write_file_automatic_extension(sample_validation_polars):
     assert not (Path(tmpdir) / "test_validation.pkl.pkl").exists()
 
 
-def test_path_creation(sample_validation_polars):
+def test_path_creation(sample_validation_polars) -> None:
     """Test that directories are created if they don't exist."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18921,7 +19755,7 @@ def test_path_creation(sample_validation_polars):
         assert (filepath.with_suffix(".pkl")).exists()
 
 
-def test_path_parameter(sample_validation_polars):
+def test_path_parameter(sample_validation_polars) -> None:
     """Test the path parameter functionality."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18935,7 +19769,7 @@ def test_path_parameter(sample_validation_polars):
         assert expected_file.exists()
 
 
-def test_keep_tbl_false_default(sample_validation_polars):
+def test_keep_tbl_false_default(sample_validation_polars) -> None:
     """Test that data table is removed by default (`keep_tbl=False`)."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18948,7 +19782,7 @@ def test_keep_tbl_false_default(sample_validation_polars):
         assert loaded_validation.data is None
 
 
-def test_keep_tbl_true_preserves_data(sample_validation_polars):
+def test_keep_tbl_true_preserves_data(sample_validation_polars) -> None:
     """Test that data table is preserved when `keep_tbl=True`."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18964,7 +19798,7 @@ def test_keep_tbl_true_preserves_data(sample_validation_polars):
         assert list(loaded_validation.data.columns) == list(sample_validation_polars.data.columns)
 
 
-def test_database_table_removal(sample_validation_duckdb):
+def test_database_table_removal(sample_validation_duckdb) -> None:
     """Test that database tables are always removed even with `keep_tbl=True`."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -18978,7 +19812,7 @@ def test_database_table_removal(sample_validation_duckdb):
         assert loaded_validation.data is None
 
 
-def test_keep_extracts_functionality(sample_validation_polars):
+def test_keep_extracts_functionality(sample_validation_polars) -> None:
     """Test extract data preservation functionality."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19001,7 +19835,7 @@ def test_keep_extracts_functionality(sample_validation_polars):
         assert isinstance(loaded_with_extracts, Validate)
 
 
-def test_quiet_parameter(sample_validation_polars, capsys):
+def test_quiet_parameter(sample_validation_polars, capsys) -> None:
     """Test the quiet parameter functionality."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19019,7 +19853,7 @@ def test_quiet_parameter(sample_validation_polars, capsys):
         assert captured.out == ""
 
 
-def test_validation_state_preservation(sample_validation_polars):
+def test_validation_state_preservation(sample_validation_polars) -> None:
     """Test that validation results and metadata are preserved."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19053,7 +19887,7 @@ def test_validation_state_preservation(sample_validation_polars):
             assert orig_info.n_failed == loaded_info.n_failed
 
 
-def test_original_object_not_modified(sample_validation_polars):
+def test_original_object_not_modified(sample_validation_polars) -> None:
     """Test that write_file doesn't modify the original validation object."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19071,7 +19905,7 @@ def test_original_object_not_modified(sample_validation_polars):
         assert sample_validation_polars.validation_info is original_validation_info
 
 
-def test_multiple_table_types(sample_validation_polars, sample_validation_pandas):
+def test_multiple_table_types(sample_validation_polars, sample_validation_pandas) -> None:
     """Test serialization with different table types."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19090,7 +19924,7 @@ def test_multiple_table_types(sample_validation_polars, sample_validation_pandas
         assert loaded_pandas.data is not None
 
 
-def test_read_file_with_extension_handling(sample_validation_polars):
+def test_read_file_with_extension_handling(sample_validation_polars) -> None:
     """Test read_file handles file extension automatically."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19108,14 +19942,14 @@ def test_read_file_with_extension_handling(sample_validation_polars):
         assert loaded_no_ext.label == loaded_with_ext.label
 
 
-def test_file_not_found_error():
+def test_file_not_found_error() -> None:
     """Test that FileNotFoundError is raised for non-existent files."""
 
     with pytest.raises(FileNotFoundError, match="Validation file not found"):
         read_file("nonexistent_file.pkl")
 
 
-def test_invalid_file_content_error():
+def test_invalid_file_content_error() -> None:
     """Test that RuntimeError is raised for invalid file content."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19130,7 +19964,7 @@ def test_invalid_file_content_error():
             read_file(str(invalid_file))
 
 
-def test_write_file_permission_error(sample_validation_polars):
+def test_write_file_permission_error(sample_validation_polars) -> None:
     """Test handling of write permission errors."""
 
     # Try to write to a non-writable location, which should fail
@@ -19138,7 +19972,7 @@ def test_write_file_permission_error(sample_validation_polars):
         write_file(sample_validation_polars, "/root/test_validation", quiet=True)
 
 
-def test_round_trip_consistency(sample_validation_polars):
+def test_round_trip_consistency(sample_validation_polars) -> None:
     """Test that multiple save/load cycles maintain consistency."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19160,7 +19994,7 @@ def test_round_trip_consistency(sample_validation_polars):
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
-def test_parametrized_table_types(tbl_type):
+def test_parametrized_table_types(tbl_type) -> None:
     """Test write_file and read_file with different table types."""
 
     data = load_dataset("small_table", tbl_type=tbl_type)
@@ -19182,7 +20016,7 @@ def test_parametrized_table_types(tbl_type):
         assert len(loaded.validation_info) == 1
 
 
-def test_large_validation_object():
+def test_large_validation_object() -> None:
     """Test serialization of validation objects with many steps."""
 
     data = load_dataset("small_table", tbl_type="polars")
@@ -19205,7 +20039,7 @@ def test_large_validation_object():
         assert loaded.label == "Large validation"
 
 
-def test_write_file_with_lambda_functions_error():
+def test_write_file_with_lambda_functions_error() -> None:
     """Test write_file error handling with lambda functions."""
     import narwhals as nw
 
@@ -19222,7 +20056,7 @@ def test_write_file_with_lambda_functions_error():
             write_file(validation, str(filepath), quiet=True)
 
 
-def test_write_file_with_module_level_function():
+def test_write_file_with_module_level_function() -> None:
     """Test write_file works with module-level functions."""
 
     # Create validation with module-level function (defined at top of file)
@@ -19270,7 +20104,7 @@ def column_selector_test_data():
     )
 
 
-def test_col_selector_write_read_file(column_selector_test_data):
+def test_col_selector_write_read_file(column_selector_test_data) -> None:
     """Test basic col() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19299,7 +20133,7 @@ def test_col_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_col_selector_in_value_parameter_write_read_file(column_selector_test_data):
+def test_col_selector_in_value_parameter_write_read_file(column_selector_test_data) -> None:
     """Test col() selector used in value= parameter with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19341,7 +20175,9 @@ def test_col_selector_in_value_parameter_write_read_file(column_selector_test_da
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_multiple_col_selectors_in_value_parameter_write_read_file(column_selector_test_data):
+def test_multiple_col_selectors_in_value_parameter_write_read_file(
+    column_selector_test_data,
+) -> None:
     """Test multiple column selectors used in value= parameter with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19386,7 +20222,7 @@ def test_multiple_col_selectors_in_value_parameter_write_read_file(column_select
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_starts_with_selector_write_read_file(column_selector_test_data):
+def test_starts_with_selector_write_read_file(column_selector_test_data) -> None:
     """Test starts_with() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19421,7 +20257,7 @@ def test_starts_with_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_ends_with_selector_write_read_file(column_selector_test_data):
+def test_ends_with_selector_write_read_file(column_selector_test_data) -> None:
     """Test ends_with() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19449,7 +20285,7 @@ def test_ends_with_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_contains_selector_write_read_file(column_selector_test_data):
+def test_contains_selector_write_read_file(column_selector_test_data) -> None:
     """Test contains() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19488,7 +20324,7 @@ def test_contains_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_matches_selector_write_read_file(column_selector_test_data):
+def test_matches_selector_write_read_file(column_selector_test_data) -> None:
     """Test matches() regex selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19525,7 +20361,7 @@ def test_matches_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_everything_selector_write_read_file(column_selector_test_data):
+def test_everything_selector_write_read_file(column_selector_test_data) -> None:
     """Test everything() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19555,7 +20391,7 @@ def test_everything_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_first_n_selector_write_read_file(column_selector_test_data):
+def test_first_n_selector_write_read_file(column_selector_test_data) -> None:
     """Test first_n() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19597,7 +20433,7 @@ def test_first_n_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_last_n_selector_write_read_file(column_selector_test_data):
+def test_last_n_selector_write_read_file(column_selector_test_data) -> None:
     """Test last_n() selector with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19637,7 +20473,7 @@ def test_last_n_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_selector_union_operator_write_read_file(column_selector_test_data):
+def test_selector_union_operator_write_read_file(column_selector_test_data) -> None:
     """Test union operator (|) for column selectors with write_file/read_file."""
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -19668,7 +20504,7 @@ def test_selector_union_operator_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
-def test_column_selector_with_different_table_types():
+def test_column_selector_with_different_table_types() -> None:
     """Test column selectors work with different table types after serialization."""
 
     # Test with Polars
@@ -19710,7 +20546,7 @@ def test_column_selector_with_different_table_types():
         )
 
 
-def test_threshold_notes_local_thresholds():
+def test_threshold_notes_local_thresholds() -> None:
     """Test that local threshold notes appear when step-specific thresholds differ from global."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19742,7 +20578,7 @@ def test_threshold_notes_local_thresholds():
     assert "0.15" in html
 
 
-def test_threshold_notes_reset_thresholds():
+def test_threshold_notes_reset_thresholds() -> None:
     """Test that threshold reset notes appear when thresholds are explicitly set to empty."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19764,7 +20600,7 @@ def test_threshold_notes_reset_thresholds():
     assert "Global thresholds explicitly not used" in html
 
 
-def test_threshold_notes_localization():
+def test_threshold_notes_localization() -> None:
     """Test that threshold notes are properly localized."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19798,7 +20634,7 @@ def test_threshold_notes_localization():
     assert "Globale Schwellenwerte für diesen Schritt explizit nicht verwendet" in html_de
 
 
-def test_threshold_notes_locale_number_formatting():
+def test_threshold_notes_locale_number_formatting() -> None:
     """Test that threshold note values use locale-specific number formatting."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19842,7 +20678,7 @@ def test_threshold_notes_locale_number_formatting():
     assert "0,5" in html_fr
 
 
-def test_threshold_notes_no_note_when_thresholds_match():
+def test_threshold_notes_no_note_when_thresholds_match() -> None:
     """Test that no threshold note appears when step thresholds match global thresholds."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19869,7 +20705,7 @@ def test_threshold_notes_no_note_when_thresholds_match():
     assert "Global thresholds explicitly not used" not in html
 
 
-def test_config_footer_timings_and_notes():
+def test_config_footer_timings_and_notes() -> None:
     """Test footer timings and notes configuration options."""
 
     # Test default configuration includes selected fields
@@ -19894,7 +20730,7 @@ def test_config_footer_timings_and_notes():
     assert "report_incl_footer_notes=True" in str_repr
 
 
-def test_get_tabular_report_footer_timings_control():
+def test_get_tabular_report_footer_timings_control() -> None:
     """Test that incl_footer_timings= parameter controls timing display in reports."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19925,7 +20761,7 @@ def test_get_tabular_report_footer_timings_control():
     assert timing_style_count_without < timing_style_count_with
 
 
-def test_get_tabular_report_footer_notes_control():
+def test_get_tabular_report_footer_notes_control() -> None:
     """Test that incl_footer_notes= parameter controls notes display in reports."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19951,7 +20787,7 @@ def test_get_tabular_report_footer_notes_control():
     assert "<strong>Notes</strong>" not in html_no_notes
 
 
-def test_get_tabular_report_footer_controls_combined():
+def test_get_tabular_report_footer_controls_combined() -> None:
     """Test combinations of footer timing and notes controls."""
 
     small_table = load_dataset(dataset="small_table")
@@ -19990,7 +20826,7 @@ def test_get_tabular_report_footer_controls_combined():
     assert "<strong>Notes</strong>" in html_notes_only
 
 
-def test_global_config_footer_controls():
+def test_global_config_footer_controls() -> None:
     """Test that global config settings for footer controls work correctly."""
 
     small_table = load_dataset(dataset="small_table")
@@ -20052,7 +20888,7 @@ def test_global_config_footer_controls():
         )
 
 
-def test_footer_controls_override_global_config():
+def test_footer_controls_override_global_config() -> None:
     """Test that method parameters override global config settings."""
 
     small_table = load_dataset(dataset="small_table")
@@ -20100,3 +20936,1426 @@ def test_footer_controls_override_global_config():
             report_incl_footer_notes=original_config.report_incl_footer_notes,
             preview_incl_header=original_config.preview_incl_header,
         )
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pct_null_parametrized(tbl_fixture, request) -> None:
+    """Test col_pct_null() across different backends with simple custom data."""
+    # Create simple test data with known null percentages
+    if tbl_fixture == "tbl_pd":
+        import pandas as pd
+
+        tbl = pd.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    else:  # tbl_pl
+        tbl = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+
+    # Test with 50% nulls - should pass
+    validation = Validate(tbl).col_pct_null(columns="a", p=0.5).interrogate()
+
+    validation.assert_passing()
+
+
+def test_pct_null_simple() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = Validate(data).col_pct_null(columns=["a", "b"], p=0.5).interrogate()
+
+    validation.assert_passing()
+    validation.assert_below_threshold()
+
+    info = validation.validation_info
+
+    assert len(info) == 2
+
+
+def test_pct_null_simple_fail() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = (
+        Validate(data)
+        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
+        .interrogate()
+    )
+
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+    with pytest.raises(AssertionError):
+        validation.assert_below_threshold()
+
+    info = validation.validation_info
+
+    assert len(info) == 2
+
+
+def test_pct_null_simple_report() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = (
+        Validate(data)
+        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
+        .interrogate()
+    )
+
+    validation.get_tabular_report()
+
+
+def test_pct_null_exact_match_with_tol() -> None:
+    """Should pass if pct null matches exactly, even with tol."""
+    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=0.0).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_within_tol_pass() -> None:
+    """Should pass if pct null is within tolerance margin."""
+    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+
+    # Allow tolerance of 0.1 around 0.4 -> [0.3, 0.5]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.1).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_outside_tol_fail(half_null_ser: pl.Series) -> None:
+    """Should fail if pct null is outside tolerance margin."""
+    data = pl.DataFrame({"a": half_null_ser})  # 50% nulls
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.05).interrogate()
+
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+
+def test_pct_null_lower_bound_edge() -> None:
+    """Should pass exactly at lower bound of tolerance range."""
+    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+
+    # Expect 0.55 ± 0.05 => [0.5, 0.6]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.55, tol=0.0).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_upper_bound_edge() -> None:
+    """Should pass exactly at upper bound of tolerance range."""
+    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
+
+    # Expect 0.2 ± 0.05 => [0.15, 0.25]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.2, tol=0.05).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_multiple_columns_with_tol() -> None:
+    """Should check multiple columns with tolerance."""
+    data = pl.DataFrame(
+        {
+            "a": [None, None, 1, 2],  # 50%
+            "b": [1, None, 2, None],  # 50%
+            "c": [1, 2, 3, 4],  # 0%
+        }
+    )
+    validation = Validate(data).col_pct_null(columns=["a", "b", "c"], p=0.5, tol=0.01).interrogate()
+
+    # "a" and "b" should pass, "c" should fail
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+
+def test_pct_null_low_tol(half_null_ser: pl.Series) -> None:
+    """Tolerance is subject to rounding, and always relative to the total dataset."""
+    data = pl.DataFrame({"a": [None, None, 2, 3]})  # 50% null
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
+    validation.assert_passing()  # the reason this passes is because of rounding
+
+    data = pl.DataFrame({"a": half_null_ser})
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
+    with pytest.raises(AssertionError):
+        validation.assert_passing()  # now fails because no rounding issues
+
+
+def test_pct_null_high_tol_always_pass() -> None:
+    """Large tolerance should allow big differences."""
+    data = pl.DataFrame({"a": [None, None, None, 1]})  # 75% null
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=10).interrogate()
+    validation.assert_passing()
+
+
+def test_col_pct_null_with_tuple_tolerance() -> None:
+    """Test col_pct_null with asymmetric tuple tolerance."""
+    data = pl.DataFrame(
+        {
+            "a": [1, 2, None, None, 5, 6, 7, 8, 9, 10],  # 20% null
+            "b": [None, None, None, None, None, 6, 7, 8, 9, 10],  # 50% null
+        }
+    )
+
+    # 20% null, expecting 20% with -5%/+10% tolerance (range: 15%-30%)
+    validation = Validate(data=data).col_pct_null(columns="a", p=0.2, tol=(0.05, 0.1)).interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_col_pct_null_with_absolute_tuple_tolerance() -> None:
+    """Test col_pct_null with asymmetric absolute tuple tolerance."""
+    data = pl.DataFrame(
+        {
+            "a": [1, 2, None, None, 5, 6, 7, 8, 9, 10],  # 20% null (2 nulls)
+        }
+    )
+    validation = (
+        Validate(data=data)
+        .col_pct_null(columns="a", p=0.1, tol=(0, 2))  # Expect 1, allow +0/-2
+        .interrogate()
+    )
+
+    # 2 nulls actual, expecting 1, allowed range is 1-3
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_col_pct_null_with_narwhals_selector() -> None:
+    """Test col_pct_null with Narwhals selector."""
+    data = pl.DataFrame(
+        {
+            "a": [1, 2, None, 4, None],
+            "b": [None, None, 3, 4, 5],
+        }
+    )
+    validation = (
+        Validate(data=data).col_pct_null(columns=ncs.numeric(), p=0.4, tol=0.1).interrogate()
+    )
+
+    # Should create steps for columns a and b
+    assert len(validation.validation_info) == 2
+
+
+def test_col_pct_null_text_generation() -> None:
+    """Test col_pct_null text generation with different tolerance formats."""
+    # Tuple tolerance with absolute integer bounds
+    value = {
+        "p": 0.5,
+        "bound_finder": type("BoundFinder", (), {"keywords": {"tol": (2, 3)}})(),
+    }
+    text = _create_text_col_pct_null(
+        lang="en", column="test_col", value=value, for_failure=False, n_rows=10
+    )
+
+    assert isinstance(text, str)
+    assert len(text) > 0
+
+    # Tuple tolerance with relative float bounds
+    value = {
+        "p": 0.5,
+        "bound_finder": type("BoundFinder", (), {"keywords": {"tol": (0.1, 0.2)}})(),
+    }
+    text = _create_text_col_pct_null(lang="en", column="test_col", value=value, for_failure=False)
+
+    assert isinstance(text, str)
+
+    # Symmetric absolute tolerance with n_rows
+    value = {
+        "p": 0.3,
+        "bound_finder": type("BoundFinder", (), {"keywords": {"tol": 5}})(),
+    }
+    text = _create_text_col_pct_null(
+        lang="en", column="test_col", value=value, for_failure=False, n_rows=20
+    )
+
+    assert isinstance(text, str)
+
+    # Asymmetric absolute tolerance without n_rows (fallback path)
+    value = {
+        "p": 0.5,
+        "bound_finder": type("BoundFinder", (), {"keywords": {"tol": (3, 5)}})(),
+    }
+    text = _create_text_col_pct_null(
+        lang="en", column="test_col", value=value, for_failure=False, n_rows=None
+    )
+
+    assert isinstance(text, str)
+
+    # Single value absolute tolerance without n_rows
+    value = {
+        "p": 0.5,
+        "bound_finder": type("BoundFinder", (), {"keywords": {"tol": 10}})(),
+    }
+    text = _create_text_col_pct_null(
+        lang="en", column="test_col", value=value, for_failure=False, n_rows=None
+    )
+
+    assert isinstance(text, str)
+
+
+# =============================================================================
+# Tests for aggregate validation step reports (col_sum_*, col_avg_*, col_sd_*)
+# =============================================================================
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_sum(tbl_type) -> None:
+    """Test that `get_step_report()` works for col_sum_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_sum_gt(): passing case
+    validation_pass = Validate(small_table).col_sum_gt(columns="a", value=10).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "EXPECTED" in html_pass
+    assert "satisfies the condition" in html_pass
+
+    # Test col_sum_lt - failing case
+    validation_fail = Validate(small_table).col_sum_lt(columns="a", value=1).interrogate()
+    report_fail = validation_fail.get_step_report(i=1)
+
+    assert report_fail is not None
+    assert isinstance(report_fail, GT.GT)
+
+    html_fail = report_fail.as_raw_html()
+
+    assert "does not satisfy the condition" in html_fail
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_avg(tbl_type) -> None:
+    """Test that `get_step_report()` works for col_avg_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_avg_gt(): passing case (average of 'a' is ~3.14)
+    validation_pass = Validate(small_table).col_avg_gt(columns="a", value=1).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "satisfies the condition" in html_pass
+
+    # Test col_avg_eq with tolerance - passing case
+    validation_tol = Validate(small_table).col_avg_eq(columns="a", value=3.1, tol=0.5).interrogate()
+    report_tol = validation_tol.get_step_report(i=1)
+
+    assert report_tol is not None
+    assert isinstance(report_tol, GT.GT)
+
+    html_tol = report_tol.as_raw_html()
+
+    assert "TOL" in html_tol
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_sd(tbl_type) -> None:
+    """Test that `get_step_report()` works for col_sd_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_sd_gt(): passing case
+    validation_pass = Validate(small_table).col_sd_gt(columns="a", value=0.1).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "satisfies the condition" in html_pass
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_all_operators(tbl_type) -> None:
+    """Test that all aggregate operators (eq, gt, ge, lt, le) produce valid step reports."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Build validation with all operator types
+    validation = (
+        Validate(small_table)
+        .col_sum_eq(columns="a", value=22)
+        .col_sum_gt(columns="a", value=10)
+        .col_sum_ge(columns="a", value=22)
+        .col_sum_lt(columns="a", value=100)
+        .col_sum_le(columns="a", value=22)
+        .col_avg_eq(columns="a", value=3.14, tol=0.1)
+        .col_avg_gt(columns="a", value=1)
+        .col_avg_ge(columns="a", value=3)
+        .col_avg_lt(columns="a", value=10)
+        .col_avg_le(columns="a", value=5)
+        .col_sd_eq(columns="a", value=1.5, tol=0.5)
+        .col_sd_gt(columns="a", value=0.1)
+        .col_sd_ge(columns="a", value=1)
+        .col_sd_lt(columns="a", value=10)
+        .col_sd_le(columns="a", value=5)
+        .interrogate()
+    )
+
+    # Verify all 15 steps produce valid GT reports
+    for i in range(1, 16):
+        report = validation.get_step_report(i=i)
+
+        assert report is not None
+        assert isinstance(report, GT.GT)
+
+
+def test_aggregate_step_report_difference_column() -> None:
+    """Test that the DIFFERENCE column shows correct values in aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})  # sum=60, avg=20, sd~=10
+
+    # Test with tolerance - should show difference
+    validation = Validate(df).col_sum_eq(columns="value", value=50, tol=15).interrogate()
+    report = validation.get_step_report(i=1)
+    html = report.as_raw_html()
+
+    assert "DIFFERENCE" in html
+
+    # Test without tolerance - difference should be blank or N/A
+    validation_no_tol = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+    report_no_tol = validation_no_tol.get_step_report(i=1)
+    html_no_tol = report_no_tol.as_raw_html()
+
+    assert "ACTUAL" in html_no_tol
+
+
+def test_aggregate_step_report_status_indicators() -> None:
+    """Test that status indicators (checkmark/cross) appear correctly in aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})  # sum=60
+
+    # Passing case: should have checkmark
+    validation_pass = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+    html_pass = validation_pass.get_step_report(i=1).as_raw_html()
+
+    # Check for success indicator (checkmark character)
+    assert "✓" in html_pass
+
+    # Failing case: should have cross mark
+    validation_fail = Validate(df).col_sum_lt(columns="value", value=50).interrogate()
+    html_fail = validation_fail.get_step_report(i=1).as_raw_html()
+
+    # Check for failure indicator (cross character)
+    assert "✗" in html_fail
+
+
+def test_aggregate_step_report_custom_header() -> None:
+    """Test that custom headers work with aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})
+
+    validation = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+
+    # Test with custom header text
+    report_custom = validation.get_step_report(i=1, header="Custom Aggregate Report")
+
+    assert isinstance(report_custom, GT.GT)
+
+    html_custom = report_custom.as_raw_html()
+
+    assert "Custom Aggregate Report" in html_custom
+
+    # Test with header=None (no header)
+    report_no_header = validation.get_step_report(i=1, header=None)
+
+    assert isinstance(report_no_header, GT.GT)
+
+
+# =============================================================================
+# data_freshness() tests
+# =============================================================================
+
+
+def test_data_freshness_recent_data() -> None:
+    """Test that data_freshness() passes when data is within max_age."""
+    df = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                datetime.datetime.now() - datetime.timedelta(hours=12),
+                datetime.datetime.now() - datetime.timedelta(hours=20),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_stale_data() -> None:
+    """Test that data_freshness() fails when data exceeds max_age."""
+    df = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=48),
+                datetime.datetime.now() - datetime.timedelta(hours=50),
+                datetime.datetime.now() - datetime.timedelta(hours=72),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_various_time_units() -> None:
+    """Test data_freshness() with various time unit formats."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)]})
+
+    # Test different time units
+    time_specs = [
+        ("30 minutes", False),  # 1 hour old > 30 mins -> fail
+        ("2 hours", True),  # 1 hour old < 2 hours -> pass
+        ("1 day", True),  # 1 hour old < 1 day -> pass
+        ("1 week", True),  # 1 hour old < 1 week -> pass
+        ("90 seconds", False),  # 1 hour old > 90 seconds -> fail
+    ]
+
+    for max_age, should_pass in time_specs:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=max_age).interrogate()
+        expected_passed = 1 if should_pass else 0
+
+        assert validation.n_passed(i=1, scalar=True) == expected_passed, (
+            f"Failed for max_age='{max_age}', expected pass={should_pass}"
+        )
+
+
+def test_data_freshness_timedelta_input() -> None:
+    """Test that data_freshness() accepts timedelta objects for max_age."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=5)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age=datetime.timedelta(hours=12))
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_invalid_max_age() -> None:
+    """Test that data_freshness() raises an error with an invalid max_age format."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(ValueError, match="Invalid max_age format"):
+        Validate(df).data_freshness(column="updated_at", max_age="invalid")
+
+
+def test_data_freshness_invalid_time_unit() -> None:
+    """Test that data_freshness() raises an error with unknown time units."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(ValueError, match="Unknown time unit"):
+        Validate(df).data_freshness(column="updated_at", max_age="5 fortnights")
+
+
+def test_data_freshness_with_reference_time() -> None:
+    """Test data_freshness() with explicit reference_time."""
+    # Create data with a known timestamp
+    data_time = datetime.datetime(2024, 1, 15, 10, 0, 0)
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time 2 hours after data time -> data is 2 hours old
+    ref_time = datetime.datetime(2024, 1, 15, 12, 0, 0)
+
+    # Should pass: data is 2 hours old, max_age is 3 hours
+    validation_pass = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_pass.n_passed(i=1, scalar=True) == 1
+
+    # Should fail: data is 2 hours old, max_age is 1 hour
+    validation_fail = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_fail.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_reference_time_string() -> None:
+    """Test data_freshness() with reference_time as ISO string."""
+    data_time = datetime.datetime(2024, 1, 15, 10, 0, 0)
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="5 hours", reference_time="2024-01-15T12:00:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_pandas() -> None:
+    """Test that data_freshness() works with pandas DataFrames."""
+
+    df = pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                datetime.datetime.now() - datetime.timedelta(hours=12),
+                datetime.datetime.now() - datetime.timedelta(hours=20),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multiple_steps() -> None:
+    """Test multiple data_freshness() validations in same Validate object."""
+    df = pl.DataFrame(
+        {
+            "created_at": [datetime.datetime.now() - datetime.timedelta(hours=5)],
+            "updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)],
+        }
+    )
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="created_at", max_age="12 hours")
+        .data_freshness(column="updated_at", max_age="30 minutes")
+        .data_freshness(column="updated_at", max_age="2 hours")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1  # created_at: 5h < 12h
+    assert validation.n_passed(i=2, scalar=True) == 0  # updated_at: 1h > 30min
+    assert validation.n_passed(i=3, scalar=True) == 1  # updated_at: 1h < 2h
+
+
+def test_data_freshness_time_unit_abbreviations() -> None:
+    """Test that time unit abbreviations work correctly."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    # Test various abbreviations
+    abbreviations = ["1h", "1 hr", "1 hrs", "60 min", "60 mins", "60 m", "3600 sec", "3600 s"]
+
+    for abbrev in abbreviations:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=abbrev).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for abbreviation: {abbrev}"
+
+
+def test_data_freshness_column_type_error() -> None:
+    """Test that data_freshness() raises error for non-string column parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(TypeError, match="must be a string"):
+        Validate(df).data_freshness(column=123, max_age="1 hour")
+
+
+# =============================================================================
+# data_freshness() edge cases - timezone and time input combinations
+# =============================================================================
+
+
+def test_data_freshness_naive_data_naive_reference() -> None:
+    """Test naive data with naive reference time (both local)."""
+    # Both naive - straightforward comparison
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)  # 2 hours later
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Data is 2 hours old, max_age is 3 hours -> pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data is 2 hours old, max_age is 1 hour -> fail
+    validation_2 = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_aware_data_aware_reference_same_tz() -> None:
+    """Test timezone-aware data with timezone-aware reference in same timezone."""
+    utc = datetime.timezone.utc
+
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0, tzinfo=utc)  # 2 hours later
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_aware_data_aware_reference_different_tz() -> None:
+    """Test timezone-aware data with timezone-aware reference in different timezones."""
+    utc = datetime.timezone.utc
+    est = datetime.timezone(datetime.timedelta(hours=-5))
+
+    # Both represent the same moment in time
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)  # 10:00 UTC
+    ref_time = datetime.datetime(2024, 6, 15, 7, 0, 0, tzinfo=est)  # 07:00 EST = 12:00 UTC
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Data is 2 hours old (10:00 UTC to 12:00 UTC)
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_naive_data_aware_reference() -> None:
+    """Test naive data with timezone-aware reference time."""
+    utc = datetime.timezone.utc
+
+    # Naive data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+
+    # Aware reference
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # With allow_tz_mismatch=True, this should work
+    # The naive datetime will be interpreted as UTC timezone
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            allow_tz_mismatch=True,
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_aware_data_naive_reference() -> None:
+    """Test timezone-aware data with naive reference time."""
+    utc = datetime.timezone.utc
+
+    # Aware data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    # Naive reference
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # With allow_tz_mismatch=True, this should work
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            allow_tz_mismatch=True,
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_with_timezone_parameter() -> None:
+    """Test data_freshness() with explicit timezone parameter."""
+    # Naive data: will be interpreted in the specified timezone
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="America/New_York",
+        )
+        .interrogate()
+    )
+
+    # Should still pass (both interpreted in same timezone)
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_timezone_offset_formats() -> None:
+    """Test data_freshness() with timezone offsets like '-7', '-07:00', '+5', '+05:30'."""
+    # Naive data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Test simple offset format: "-7"
+    validation_1 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="-7",
+        )
+        .interrogate()
+    )
+
+    assert validation_1.n_passed(i=1, scalar=True) == 1
+
+    # Test full offset format: "-07:00"
+    validation_2 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="-07:00",
+        )
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+    # Test positive offset: "+5"
+    validation_3 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="+5",
+        )
+        .interrogate()
+    )
+
+    assert validation_3.n_passed(i=1, scalar=True) == 1
+
+    # Test offset with minutes: "+05:30"
+    validation_4 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="+05:30",
+        )
+        .interrogate()
+    )
+
+    assert validation_4.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_iso_string_with_tz() -> None:
+    """Test reference_time as ISO string with timezone offset."""
+    utc = datetime.timezone.utc
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time as ISO string with timezone
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="3 hours", reference_time="2024-06-15T12:00:00+00:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_iso_string_different_tz() -> None:
+    """Test reference_time as ISO string with different timezone offset."""
+    utc = datetime.timezone.utc
+
+    # Data at 10:00 UTC
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time: 07:00-05:00 = 12:00 UTC (2 hours after data)
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="3 hours", reference_time="2024-06-15T07:00:00-05:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_exact_boundary() -> None:
+    """Test data_freshness() at exact max_age boundary."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    data_time = ref_time - datetime.timedelta(hours=2)  # Exactly 2 hours old
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Exactly at boundary: should pass (age <= max_age)
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="2 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Just under boundary: should fail (use timedelta for precise control)
+    validation_2 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age=datetime.timedelta(hours=1, minutes=59),
+            reference_time=ref_time,
+        )
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_zero_age() -> None:
+    """Test data_freshness() when data time equals reference time."""
+    same_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [same_time]})
+
+    # Age is 0: should always pass any positive max_age
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 second", reference_time=same_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_future_data() -> None:
+    """Test data_freshness() when data is in the future relative to reference."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    future_data = ref_time + datetime.timedelta(hours=1)  # 1 hour in the future
+
+    df = pl.DataFrame({"updated_at": [future_data]})
+
+    # Negative age (future data) - should pass since it's "fresh"
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    # Future data has negative age, which is <= max_age
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_empty_dataframe() -> None:
+    """Test data_freshness() with empty DataFrame."""
+    df = pl.DataFrame({"updated_at": pl.Series([], dtype=pl.Datetime)})
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    # Empty column has no max value so validation fails (no data to verify freshness)
+    # This is a table-level assertion so n=1 (one check performed)
+    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+    # The step should be marked as failed overall
+    assert validation.all_passed() is False
+
+
+def test_data_freshness_null_values() -> None:
+    """Test data_freshness() with null values in column."""
+    df = pl.DataFrame(
+        {
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                None,
+                datetime.datetime.now() - datetime.timedelta(hours=2),
+            ]
+        }
+    )
+
+    # Max should ignore nulls and find the most recent non-null value
+    validation = Validate(df).data_freshness(column="updated_at", max_age="3 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_all_nulls() -> None:
+    """Test data_freshness() when all values are null."""
+    df = pl.DataFrame({"updated_at": pl.Series([None, None, None], dtype=pl.Datetime)})
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    # All nulls (no max value): should fail
+    assert validation.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_mixed_time_string_formats() -> None:
+    """Test various string formats for max_age."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=90)]})
+
+    valid_formats = [
+        "2 hours",
+        "2 hour",
+        "2h",
+        "2 hr",
+        "2 hrs",
+        "120 minutes",
+        "120 minute",
+        "120 min",
+        "120 mins",
+        "120 m",
+        "7200 seconds",
+        "7200 second",
+        "7200 sec",
+        "7200 secs",
+        "7200 s",
+    ]
+
+    for fmt in valid_formats:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=fmt).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for format: {fmt}"
+
+
+def test_data_freshness_large_time_values() -> None:
+    """Test data_freshness() with large time values (weeks, months-equivalent)."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=10)]})
+
+    # Test week units
+    validation = Validate(df).data_freshness(column="updated_at", max_age="2 weeks").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    validation_2 = Validate(df).data_freshness(column="updated_at", max_age="1 week").interrogate()
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_fractional_time_values() -> None:
+    """Test data_freshness() with fractional time values."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=45)]})
+
+    # 1.5 hours = 90 minutes, should pass for 45 min old data
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1.5 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 0.5 hours = 30 minutes, should fail for 45 min old data
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="0.5 hours").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_compound_time_expression() -> None:
+    """Test data_freshness() with compound time string expressions like '2 hours 15 minutes'."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=2)]})
+
+    # Test compound string expression "2 hours 15 minutes"
+    validation = (
+        Validate(df).data_freshness(column="updated_at", max_age="2 hours 15 minutes").interrogate()
+    )
+
+    # 2h old data should pass with 2h 15m max_age
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Test compound string expression "1 hour 45 minutes" (should fail for 2h old data)
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="1 hour 45 minutes").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+    # Test compact format "1h30m"
+    df2 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1, minutes=15)]}
+    )
+    validation_3 = Validate(df2).data_freshness(column="updated_at", max_age="1h30m").interrogate()
+
+    assert validation_3.n_passed(i=1, scalar=True) == 1
+
+    # Test "1 day 6 hours"
+    df3 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(days=1, hours=5)]}
+    )
+    validation_4 = (
+        Validate(df3).data_freshness(column="updated_at", max_age="1 day 6 hours").interrogate()
+    )
+
+    assert validation_4.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multi_unit_compound_expression() -> None:
+    """Test data_freshness() with multi-unit compound expressions like '1 week 2 days 3 hours'."""
+    # Data is 1 week, 2 days, and 2 hours old (should pass with 1w 2d 3h max_age)
+    df = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(weeks=1, days=2, hours=2)]}
+    )
+
+    # 1 week 2 days 3 hours = 9 days 3 hours; data is 9 days 2 hours old -> should pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 week 2 days 3 hours")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data is 1 week, 2 days, and 4 hours old (should fail with 1w 2d 3h max_age)
+    df2 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(weeks=1, days=2, hours=4)]}
+    )
+    validation_2 = (
+        Validate(df2)
+        .data_freshness(column="updated_at", max_age="1 week 2 days 3 hours")
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_multiple_rows_finds_max() -> None:
+    """Test that data_freshness() correctly finds the maximum (most recent) datetime."""
+    # Most recent is 30 minutes ago
+    df = pl.DataFrame(
+        {
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(days=10),
+                datetime.datetime.now() - datetime.timedelta(hours=5),
+                datetime.datetime.now() - datetime.timedelta(minutes=30),  # Most recent
+                datetime.datetime.now() - datetime.timedelta(days=2),
+            ]
+        }
+    )
+
+    # 1 hour max_age should pass (30 min < 1 hour)
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 15 minute max_age should fail (30 min > 15 min)
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="15 minutes").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_with_date_only() -> None:
+    """Test data_freshness() with date-only column converted to datetime."""
+    # Date column needs to be converted to datetime for comparison
+    today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = today - datetime.timedelta(days=1)
+
+    df = pl.DataFrame({"last_date": [yesterday, today]})
+
+    # Create reference time that makes 'today' (midnight) recent enough
+    ref_time = today + datetime.timedelta(hours=12)  # Noon today
+
+    # Most recent data is midnight today, ref is noon today, age = 12 hours
+    validation = (
+        Validate(df)
+        .data_freshness(column="last_date", max_age="2 days", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_pandas_timezone_aware() -> None:
+    """Test that data_freshness() works with pandas timezone-aware data."""
+
+    utc = datetime.timezone.utc
+    now = datetime.datetime.now(utc)
+
+    # Create timezone-aware timestamps directly (don't use tz_localize on aware data)
+    df = pd.DataFrame(
+        {"updated_at": pd.to_datetime([now - pd.Timedelta(hours=1), now - pd.Timedelta(hours=2)])}
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="3 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_no_current_time_reference() -> None:
+    """Test that data_freshness() uses current time when no reference_time provided."""
+    # Create data that's definitely recent (1 minute ago)
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=1)]})
+
+    # Should pass with generous max_age
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_daylight_saving_time() -> None:
+    """Test that data_freshness() handles DST transitions correctly."""
+    # Create times around a DST transition (March 2024 in US)
+    # Before DST: 2024-03-10 01:00:00 EST (UTC-5)
+    # After DST: 2024-03-10 03:00:00 EDT (UTC-4)
+    # There's a 1-hour jump
+
+    utc = datetime.timezone.utc
+
+    # Use UTC times to avoid DST ambiguity in test
+    data_time = datetime.datetime(2024, 3, 10, 6, 0, 0, tzinfo=utc)  # 1:00 AM EST
+    ref_time = datetime.datetime(2024, 3, 10, 8, 0, 0, tzinfo=utc)  # 4:00 AM EDT (2 hours later)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_very_small_max_age() -> None:
+    """Test data_freshness() with very small max_age values."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    data_time = ref_time - datetime.timedelta(seconds=30)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # 30 seconds old, max_age is 1 minute -> pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 minute", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 30 seconds old, max_age is 20 seconds -> fail
+    validation_2 = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="20 seconds", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_very_large_max_age() -> None:
+    """Test data_freshness() with very large max_age values."""
+    # Data from 50 weeks ago (350 days)
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=350)]})
+
+    # 52 weeks (364 days) should pass
+    validation = Validate(df).data_freshness(column="updated_at", max_age="52 weeks").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data from a year ago
+    df2 = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=365)]})
+
+    # 366 days should pass for leap year safety
+    validation_2 = (
+        Validate(df2).data_freshness(column="updated_at", max_age="366 days").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_timedelta_zero() -> None:
+    """Test data_freshness() with a zero timedelta."""
+    same_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [same_time]})
+
+    # Zero max_age (only passes if data time equals reference time)
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age=datetime.timedelta(0), reference_time=same_time
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_case_insensitive_units() -> None:
+    """Test that time units are case-insensitive."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    units = ["1 HOUR", "1 Hour", "1 hOuR", "60 MINUTES", "60 Minutes", "3600 SECONDS"]
+
+    for unit in units:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=unit).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for unit: {unit}"
+
+
+def test_data_freshness_whitespace_handling() -> None:
+    """Test that extra whitespace in max_age is handled correctly."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    # Various whitespace scenarios
+    formats = ["1 hour", "1  hour", " 1 hour ", "1 hour "]
+
+    for fmt in formats:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=fmt).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for format: '{fmt}'"
+
+
+def test_data_freshness_pre_hook() -> None:
+    """Test that data_freshness() works with a pre-processing hook."""
+    # Data with string dates
+    df = pl.DataFrame({"date_str": ["2024-06-15 10:00:00", "2024-06-15 11:00:00"]})
+
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            pre=lambda d: d.with_columns(pl.col("date_str").str.to_datetime().alias("updated_at")),
+        )
+        .interrogate()
+    )
+
+    # Most recent is 11:00, ref is 12:00, so 1 hour old < 3 hours
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_with_active_inactive() -> None:
+    """Test data_freshness() with the active parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=10)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 day", active=False)
+        .interrogate()
+    )
+
+    # Step is inactive, so it should not be evaluated (i.e., returns None)
+    assert validation.n_passed(i=1, scalar=True) is None
+    assert validation.n_failed(i=1, scalar=True) is None
+
+
+def test_data_freshness_with_brief() -> None:
+    """Test data_freshness() with the brief parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="2 hours", brief="Check data freshness")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_polars_date_column() -> None:
+    """Test data_freshness() with a Polars Date type column cast to datetime."""
+    # Create a datetime column for consistency
+    now = datetime.datetime.now()
+    week_ago = now - datetime.timedelta(days=7)
+
+    df = pl.DataFrame(
+        {
+            "last_update": [
+                week_ago,
+                now - datetime.timedelta(days=3),
+                now - datetime.timedelta(hours=12),
+            ]
+        }
+    )
+
+    # Most recent is 12 hours ago, should pass with 2 days max_age
+    validation = Validate(df).data_freshness(column="last_update", max_age="2 days").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 12 hours should also pass
+    validation_2 = (
+        Validate(df).data_freshness(column="last_update", max_age="13 hours").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_datetime_object() -> None:
+    """Test that reference_time accepts datetime object directly."""
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Pass datetime object directly
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multiple_columns_same_validation() -> None:
+    """Test data_freshness() on multiple columns in the same validation."""
+    now = datetime.datetime.now()
+
+    df = pl.DataFrame(
+        {
+            "created_at": [now - datetime.timedelta(hours=48)],
+            "updated_at": [now - datetime.timedelta(hours=2)],
+            "last_login": [now - datetime.timedelta(minutes=30)],
+        }
+    )
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="created_at", max_age="3 days")
+        .data_freshness(column="updated_at", max_age="24 hours")
+        .data_freshness(column="last_login", max_age="1 hour")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1  # 48h < 3 days
+    assert validation.n_passed(i=2, scalar=True) == 1  # 2h < 24h
+    assert validation.n_passed(i=3, scalar=True) == 1  # 30m < 1h

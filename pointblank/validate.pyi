@@ -1,0 +1,1352 @@
+import datetime
+from _typeshed import Incomplete
+from collections.abc import Collection
+from dataclasses import dataclass
+from great_tables import GT
+from narwhals.typing import IntoDataFrame, IntoFrame
+from pathlib import Path
+from pointblank._typing import SegmentSpec, Tolerance
+from pointblank._utils import _PBUnresolvedColumn
+from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
+from pointblank.missing import MissingSpec
+from pointblank.schema import Schema
+from pointblank.steps import Steps
+from pointblank.thresholds import Actions, FinalActions, Thresholds
+from typing import Any, Callable, Literal, ParamSpec, TypeVar
+
+__all__ = [
+    "get_action_metadata",
+    "get_validation_summary",
+    "config",
+    "load_dataset",
+    "read_file",
+    "write_file",
+    "get_data_path",
+    "preview",
+    "missing_vals_tbl",
+    "get_column_count",
+    "get_row_count",
+    "connect_to_table",
+    "print_database_tables",
+    "Validate",
+]
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def get_action_metadata() -> dict | None: ...
+def get_validation_summary() -> dict | None: ...
+@dataclass
+class PointblankConfig:
+    report_incl_header: bool = ...
+    report_incl_footer: bool = ...
+    report_incl_footer_timings: bool = ...
+    report_incl_footer_notes: bool = ...
+    report_incl_dimensions: bool = ...
+    preview_incl_header: bool = ...
+    dimension_map: dict[str, str] | None = ...
+    dimension_weights: dict[str, float] | None = ...
+    dimension_thresholds: dict[str, float] | None = ...
+    def __repr__(self) -> str: ...
+
+def config(
+    report_incl_header: bool = True,
+    report_incl_footer: bool = True,
+    report_incl_footer_timings: bool = True,
+    report_incl_footer_notes: bool = True,
+    report_incl_dimensions: bool = False,
+    preview_incl_header: bool = True,
+    dimension_map: dict[str, str] | None = None,
+    dimension_weights: dict[str, float] | None = None,
+    dimension_thresholds: dict[str, float] | None = None,
+) -> PointblankConfig: ...
+def load_dataset(
+    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
+    tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
+) -> Any: ...
+def read_file(filepath: str | Path) -> Validate: ...
+def write_file(
+    validation: Validate,
+    filename: str,
+    path: str | None = None,
+    keep_tbl: bool = False,
+    keep_extracts: bool = False,
+    quiet: bool = False,
+) -> None: ...
+def get_data_path(
+    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
+    file_type: Literal["csv", "parquet", "duckdb"] = "csv",
+) -> str: ...
+def preview(
+    data: Any,
+    columns_subset: str | list[str] | Column | None = None,
+    n_head: int = 5,
+    n_tail: int = 5,
+    limit: int = 50,
+    show_row_numbers: bool = True,
+    max_col_width: int = 250,
+    min_tbl_width: int = 500,
+    incl_header: bool | None = None,
+) -> GT: ...
+def missing_vals_tbl(
+    data: Any, missing: dict[str, MissingSpec] | None = None, as_heatmap: bool = False
+) -> GT: ...
+def get_column_count(data: Any) -> int: ...
+def get_row_count(data: Any) -> int: ...
+@dataclass
+class _ValidationInfo:
+    @classmethod
+    def from_agg_validator(
+        cls,
+        assertion_type: str,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> _ValidationInfo: ...
+    i: int | None = ...
+    i_o: int | None = ...
+    step_id: str | None = ...
+    sha1: str | None = ...
+    assertion_type: str | None = ...
+    column: Any | None = ...
+    values: Any | list[Any] | tuple | None = ...
+    inclusive: tuple[bool, bool] | None = ...
+    na_pass: bool | None = ...
+    missing: Any | None = ...
+    pre: Callable | None = ...
+    segments: Any | None = ...
+    thresholds: Thresholds | None = ...
+    actions: Actions | None = ...
+    label: str | None = ...
+    brief: str | None = ...
+    autobrief: str | None = ...
+    dimension: str | None = ...
+    active: bool | Callable | None = ...
+    eval_error: bool | None = ...
+    all_passed: bool | None = ...
+    n: int | None = ...
+    n_passed: int | None = ...
+    n_failed: int | None = ...
+    f_passed: int | None = ...
+    f_failed: int | None = ...
+    warning: bool | None = ...
+    error: bool | None = ...
+    critical: bool | None = ...
+    failure_text: str | None = ...
+    tbl_checked: Any = ...
+    extract: Any = ...
+    val_info: dict[str, Any] | None = ...
+    time_processed: str | None = ...
+    proc_duration_s: float | None = ...
+    notes: dict[str, dict[str, str]] | None = ...
+    def get_val_info(self) -> dict[str, Any] | None: ...
+    def _add_note(self, key: str, markdown: str, text: str | None = None) -> None: ...
+    def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None: ...
+    def _get_note(self, key: str, format: str = "dict") -> dict[str, str] | str | None: ...
+    def _has_notes(self) -> bool: ...
+
+class _UnserializablePlaceholder:
+    __slots__: Incomplete
+    code: Incomplete
+    yaml_value: Incomplete
+    note: Incomplete
+    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...
+
+def connect_to_table(connection_string: str) -> Any: ...
+def print_database_tables(connection_string: str) -> list[str]: ...
+@dataclass
+class Validate:
+    data: IntoDataFrame
+    reference: IntoFrame | None = ...
+    tbl_name: str | None = ...
+    label: str | None = ...
+    thresholds: int | float | bool | tuple | dict | Thresholds | None = ...
+    actions: Actions | None = ...
+    final_actions: FinalActions | None = ...
+    brief: str | bool | None = ...
+    lang: str | None = ...
+    locale: str | None = ...
+    owner: str | None = ...
+    consumers: str | list[str] | None = ...
+    version: str | None = ...
+    col_names = ...
+    col_types = ...
+    time_start = ...
+    time_end = ...
+    validation_info = ...
+    def __post_init__(self) -> None: ...
+    def _add_agg_validation(
+        self,
+        *,
+        assertion_type: str,
+        columns: str | Collection[str],
+        value,
+        tol: int = 0,
+        thresholds=None,
+        brief: bool = False,
+        actions=None,
+        active: bool = True,
+        dimension: str | None = None,
+    ): ...
+    def set_tbl(
+        self, tbl: Any, tbl_name: str | None = None, label: str | None = None
+    ) -> Validate: ...
+    def _repr_html_(self) -> str: ...
+    def add_steps(
+        self,
+        *steps: Steps | Validate,
+        active: bool | Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        exclude: list[str | int] | None = None,
+        columns_map: dict[str, str] | None = None,
+    ) -> Validate: ...
+    def col_vals_gt(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_lt(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_eq(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_ne(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_ge(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_le(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        value: float | int | Column,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_between(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        left: float | int | Column,
+        right: float | int | Column,
+        inclusive: tuple[bool, bool] = (True, True),
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_outside(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        left: float | int | Column,
+        right: float | int | Column,
+        inclusive: tuple[bool, bool] = (True, True),
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_in_set(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        set: Collection[Any],
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_not_in_set(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        set: Collection[Any],
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_increasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        decreasing_tol: float | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_decreasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        increasing_tol: float | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_not_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_regex(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        pattern: str,
+        na_pass: bool = False,
+        inverse: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_within_spec(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        spec: str,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_str_len(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        missing: MissingSpec | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_expr(
+        self,
+        expr: Any,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_exists(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_pct_missing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        max_pct: float,
+        reason: str | None = None,
+        category: str | None = None,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_missing_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_missing_only_coded(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        missing: MissingSpec,
+        allowed: Collection[Any] | None = None,
+        min_val: float | int | None = None,
+        max_val: float | int | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def rows_distinct(
+        self,
+        columns_subset: str | list[str] | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def rows_complete(
+        self,
+        columns_subset: str | list[str] | None = None,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_missing_consistent(
+        self,
+        columns: list[str],
+        missing: MissingSpec,
+        when_reason: str,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def prompt(
+        self,
+        prompt: str,
+        model: str,
+        columns_subset: str | list[str] | None = None,
+        attachments: list | None = None,
+        batch_size: int = 1000,
+        max_concurrent: int = 3,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_schema_match(
+        self,
+        schema: Schema,
+        complete: bool = True,
+        in_order: bool = True,
+        case_sensitive_colnames: bool = True,
+        case_sensitive_dtypes: bool = True,
+        full_match_dtypes: bool = True,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def row_count_match(
+        self,
+        count: int | Any,
+        tol: Tolerance = 0,
+        inverse: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def data_freshness(
+        self,
+        column: str,
+        max_age: str | datetime.timedelta,
+        reference_time: datetime.datetime | str | None = None,
+        timezone: str | None = None,
+        allow_tz_mismatch: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_count_match(
+        self,
+        count: int | Any,
+        inverse: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_in_table(
+        self,
+        columns: str | list[str],
+        ref_table: Any,
+        ref_column: str | list[str],
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def tbl_match(
+        self,
+        tbl_compare: Any,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def conjointly(
+        self,
+        *exprs: Callable,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def specially(
+        self,
+        expr: Callable,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def interrogate(
+        self,
+        collect_extracts: bool = True,
+        collect_tbl_checked: bool = True,
+        get_first_n: int | None = None,
+        sample_n: int | None = None,
+        sample_frac: int | float | None = None,
+        extract_limit: int = 500,
+    ) -> Validate: ...
+    def all_passed(self) -> bool: ...
+    def assert_passing(self) -> None: ...
+    def assert_below_threshold(
+        self, level: str = "warning", i: int | None = None, message: str | None = None
+    ) -> None: ...
+    def above_threshold(self, level: str = "warning", i: int | None = None) -> bool: ...
+    def n(self, i: int | list[int] | None = None, scalar: bool = False) -> dict[int, int] | int: ...
+    def n_passed(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, int] | int: ...
+    def n_failed(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, int] | int: ...
+    def f_passed(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, float] | float: ...
+    def f_failed(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, float] | float: ...
+    def warning(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, bool] | bool: ...
+    def error(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, bool] | bool: ...
+    def critical(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, bool] | bool: ...
+    def get_data_extracts(
+        self, i: int | list[int] | None = None, frame: bool = False
+    ) -> dict[int, Any] | Any: ...
+    def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]: ...
+    def to_code(self) -> str: ...
+    def to_yaml(self, path: str | Path | None = None) -> str: ...
+    def to_json_schema(self, path: str | Path | None = None) -> dict[str, Any]: ...
+    def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None: ...
+    def _covered_columns(self) -> set[str]: ...
+    def _auto_improvement_instruction(self) -> str: ...
+    def suggest_improvements(
+        self,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any: ...
+    def from_prompt(
+        self,
+        prompt: str,
+        model: str,
+        api_key: str | None = None,
+        verify_ssl: bool = True,
+        max_reprompts: int = 1,
+    ) -> Any: ...
+    def get_dimension_scores(self) -> dict[str, float]: ...
+    def get_health_score(self) -> float: ...
+    def assert_dimension_scores(
+        self, thresholds: dict[str, float] | None = None, message: str | None = None
+    ) -> None: ...
+    def get_scorecard(self, title: str | None = ":default:") -> GT: ...
+    def get_json_report(
+        self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
+    ) -> str: ...
+    def get_sundered_data(self, type: str = "pass") -> Any: ...
+    def get_notes(
+        self, i: int, format: str = "dict"
+    ) -> dict[str, dict[str, str]] | list[str] | None: ...
+    def get_note(self, i: int, key: str, format: str = "dict") -> dict[str, str] | str | None: ...
+    def get_tabular_report(
+        self,
+        title: str | None = ":default:",
+        incl_header: bool | None = None,
+        incl_footer: bool | None = None,
+        incl_footer_timings: bool | None = None,
+        incl_footer_notes: bool | None = None,
+        incl_dimensions: bool | None = None,
+    ) -> GT: ...
+    def get_step_report(
+        self,
+        i: int,
+        columns_subset: str | list[str] | Column | None = None,
+        header: str = ":default:",
+        limit: int | None = 10,
+    ) -> GT: ...
+    def get_dataframe_report(
+        self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"
+    ) -> Any: ...
+    def _add_validation(self, validation_info): ...
+    def _evaluate_column_exprs(self, validation_info): ...
+    def _evaluate_segments(self, validation_info): ...
+    def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, int]: ...
+    def _execute_final_actions(self) -> None: ...
+    def _get_highest_severity_level(self) -> str: ...
+    # === GENERATED START ===
+    def col_sum_eq(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sum to a value eq some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_eq("a", 15)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sum_gt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sum to a value gt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_gt("a", 10)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sum_ge(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sum to a value ge some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_ge("a", 15)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sum_lt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sum to a value lt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_lt("a", 20)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sum_le(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sum to a value le some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_le("a", 15)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_avg_eq(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column avg to a value eq some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_eq("a", 3)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_avg_gt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column avg to a value gt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_gt("a", 2)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_avg_ge(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column avg to a value ge some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_ge("a", 3)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_avg_lt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column avg to a value lt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_lt("a", 5)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_avg_le(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column avg to a value le some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_le("a", 3)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sd_eq(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sd to a value eq some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 6, 8, 10]})
+        >>> v = Validate(data).col_sd_eq("a", 3.1622776601683795)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sd_gt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sd to a value gt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sd_gt("a", 1)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sd_ge(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sd to a value ge some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 4, 4, 6]})
+        >>> v = Validate(data).col_sd_ge("a", 1.4142135623730951)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sd_lt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sd to a value lt some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sd_lt("a", 2)
+        >>> v.assert_passing()
+        """
+        ...
+
+    def col_sd_le(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column | ReferenceColumn | None = None,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """Assert the values in a column sd to a value le some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+            dimension (str | None, optional): Data quality dimension for health scoring. If None,
+                inferred automatically from the assertion type. Defaults to None.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 4, 4, 6]})
+        >>> v = Validate(data).col_sd_le("a", 1.4142135623730951)
+        >>> v.assert_passing()
+        """
+        ...
+
+    # === GENERATED END ===

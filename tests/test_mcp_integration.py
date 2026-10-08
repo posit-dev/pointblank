@@ -4,9 +4,12 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
+pytest.importorskip("mcp", reason="mcp package not installed", exc_type=ImportError)
+
 from fastmcp import Client
 
-from pointblank_mcp_server.pointblank_server import mcp
+from pointblank.mcp.server import mcp
 
 
 @pytest.fixture(scope="module")

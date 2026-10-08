@@ -52,7 +52,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # サンプルデータセット
 
 # DraftValidation を使用して検証プランを生成
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 出力は、データに基づいた知的な提案を含む完全な検証プランです：
@@ -302,12 +302,49 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## リアルなテストデータの生成
+
+バリデーションワークフロー用のテストデータが必要ですか？`generate_dataset()` 関数は、スキーマ定義に基づいてリアルでロケール対応の合成データを作成します。本番データなしでパイプラインを開発したり、再現可能なシナリオで CI/CD テストを実行したり、本番データが利用可能になる前にワークフローのプロトタイプを作成するのにとても便利です。
+
+```python
+import pointblank as pb
+
+# フィールド制約付きのスキーマを定義
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 10行のリアルなテストデータを生成
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+ジェネレーターは以下の機能で高度なデータ生成をサポートしています：
+
+- **プリセットによるリアルなデータ**: `"name"`、`"email"`、`"address"`、`"phone"` などの組み込みプリセットを使用
+- **ユーザーエージェント文字列**: 17のブラウザカテゴリから42,000以上のユニークな組み合わせで、非常に多様でリアルなブラウザユーザーエージェント文字列を生成
+- **100カ国のサポート**: ロケール固有のデータを生成（例：`country="DE"` でドイツの住所）
+- **フィールド制約**: 範囲、パターン、一意性、許可値を制御
+- **複数の出力形式**: デフォルトで Polars DataFrame を返しますが、Pandas（`output="pandas"`）や辞書（`output="dict"`）もサポート
+
 ## Pointblank を際立たせる特徴
 
 - **完全な検証ワークフロー**: データアクセスから検証、レポート作成まで単一のパイプラインで
 - **コラボレーション向けに構築**: 美しいインタラクティブレポートを通じて同僚と結果を共有
 - **実用的な出力**: 必要なものを正確に取得：カウント、抽出、要約、または完全なレポート
 - **柔軟な展開**: ノートブック、スクリプト、またはデータパイプラインで使用
+- **合成データ生成**: 30以上のプリセット、ユーザーエージェント文字列、ロケール対応のフォーマット、100カ国のサポートでリアルなテストデータを作成
 - **カスタマイズ可能**: 特定のニーズに合わせて検証ステップとレポートを調整
 - **国際化**: レポートは英語、スペイン語、フランス語、ドイツ語を含む 40 の言語で生成可能
 

@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import functools
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from zoneinfo import ZoneInfo
 
 import narwhals as nw
-from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
-from narwhals.typing import FrameT
+from narwhals.dependencies import (
+    is_narwhals_dataframe,
+    is_narwhals_lazyframe,
+    is_pandas_dataframe,
+    is_polars_dataframe,
+    is_polars_lazyframe,
+)
 
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._spec_utils import (
@@ -16,12 +23,19 @@ from pointblank._spec_utils import (
     check_postal_code,
     check_vin,
 )
+from pointblank._typing import AbsoluteBounds
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
     _get_tbl_type,
+    _is_in,
+    _is_lazy_frame,
+    _with_row_index,
 )
 from pointblank.column import Column
+
+if TYPE_CHECKING:
+    from narwhals.typing import Frame, IntoFrame
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -35,10 +49,10 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
         # First try to get column dtype from schema for LazyFrames
         column_dtype = None
 
-        if hasattr(data_frame, "collect_schema"):
+        if is_narwhals_lazyframe(data_frame):
             schema = data_frame.collect_schema()
             column_dtype = schema.get(column)
-        elif hasattr(data_frame, "schema"):
+        elif is_narwhals_dataframe(data_frame):
             schema = data_frame.schema
             column_dtype = schema.get(column)
 
@@ -46,7 +60,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
         if column_dtype is not None:
             # Create a mock column object for _modify_datetime_compare_val
             class MockColumn:
-                def __init__(self, dtype):
+                def __init__(self, dtype) -> None:
                     self.dtype = dtype
 
             mock_column = MockColumn(column_dtype)
@@ -61,7 +75,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
                 if column_dtype:
 
                     class MockColumn:
-                        def __init__(self, dtype):
+                        def __init__(self, dtype) -> None:
                             self.dtype = dtype
 
                     mock_column = MockColumn(column_dtype)
@@ -77,7 +91,7 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
                 column_dtype = data_frame.dtypes[column]
 
                 class MockColumn:
-                    def __init__(self, dtype):
+                    def __init__(self, dtype) -> None:
                         self.dtype = dtype
 
                 mock_column = MockColumn(column_dtype)
@@ -85,14 +99,14 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
         except Exception:
             pass
 
-    except Exception:
+    except Exception:  # pragma: no cover
         pass
 
     # If all else fails, return the original compare_val
     return compare_val
 
 
-def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: str = None) -> Any:
+def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, column_name: str) -> Any:
     """
     Create an expression that safely checks for both Null and NaN values.
 
@@ -114,56 +128,26 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
     Any
         A narwhals expression that returns `True` for Null or NaN values.
     """
-    # Always check for null values
     null_check = column_expr.is_null()
 
-    # For Ibis backends, many don't support `is_nan()` so we stick to Null checks only;
-    # use `narwhals.get_native_namespace()` for reliable backend detection
-    try:
-        native_namespace = nw.get_native_namespace(data_frame)
+    df: Frame = nw.from_native(data_frame, allow_series=False)
 
-        # If it's an Ibis backend, only check for null values
-        # The namespace is the actual module, so we check its name
-        if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
-            return null_check
-    except Exception:  # pragma: no cover
-        pass  # pragma: no cover
+    # Ibis backends (e.g. SQLite) don't support is_nan(), so only check nulls
+    if df.implementation.is_ibis():
+        return null_check
 
-    # For non-Ibis backends, try to use `is_nan()` if the column type supports it
-    try:
-        if hasattr(data_frame, "collect_schema"):
-            schema = data_frame.collect_schema()
-        elif hasattr(data_frame, "schema"):
-            schema = data_frame.schema
-        else:  # pragma: no cover
-            schema = None  # pragma: no cover
+    schema: nw.Schema = df.collect_schema()
 
-        if schema and column_name:
-            column_dtype = schema.get(column_name)
-            if column_dtype:
-                dtype_str = str(column_dtype).lower()
+    dtype: nw.dtypes.DType = schema[column_name]
 
-                # Check if it's a numeric type that supports NaN
-                is_numeric = any(
-                    num_type in dtype_str for num_type in ["float", "double", "f32", "f64"]
-                )
+    if not dtype.is_numeric():
+        return null_check
 
-                if is_numeric:
-                    try:
-                        # For numeric types, try to check both Null and NaN
-                        return null_check | column_expr.is_nan()
-                    except Exception:
-                        # If `is_nan()` fails for any reason, fall back to Null only
-                        pass
-    except Exception:  # pragma: no cover
-        pass  # pragma: no cover
-
-    # Fallback: just check Null values
-    return null_check
+    return null_check | column_expr.is_nan()
 
 
 class ConjointlyValidation:
-    def __init__(self, data_tbl, expressions, threshold, tbl_type):
+    def __init__(self, data_tbl, expressions: type[nw.Expr], threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expressions = expressions
         self.threshold = threshold
@@ -174,6 +158,11 @@ class ConjointlyValidation:
             self.tbl_type = _get_tbl_type(data=data_tbl)
         else:
             self.tbl_type = tbl_type
+
+        # Conjointly validation requires eager frames (uses .to_series())
+        # Collect lazy frames here since this validation inherently needs materialized data
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
 
     def get_test_results(self):
         """Evaluate all expressions and combine them conjointly."""
@@ -384,7 +373,7 @@ class ConjointlyValidation:
                     # Try as a ColumnExpression (for pb.expr_col style)
                     col_expr = expr_fn(None)
 
-                    if hasattr(col_expr, "to_pyspark_expr"):
+                    if hasattr(col_expr, "to_pyspark_expr"):  # pragma: no cover
                         # Convert to PySpark expression
                         pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
                         pyspark_columns.append(pyspark_expr)
@@ -411,7 +400,7 @@ class ConjointlyValidation:
 
 
 class SpeciallyValidation:
-    def __init__(self, data_tbl, expression, threshold, tbl_type):
+    def __init__(self, data_tbl, expression, threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
         self.expression = expression
         self.threshold = threshold
@@ -423,7 +412,11 @@ class SpeciallyValidation:
         else:
             self.tbl_type = tbl_type
 
-    def get_test_results(self) -> any | list[bool]:
+        # User-defined specially() functions expect eager frames for backwards compatibility
+        if _is_lazy_frame(self.data_tbl):
+            self.data_tbl = self.data_tbl.collect()
+
+    def get_test_results(self) -> Any | list[bool]:
         """Evaluate the expression get either a list of booleans or a results table."""
 
         # Get the expression and inspect whether there is a `data` argument
@@ -517,7 +510,7 @@ class NumberOfTestUnits:
     Count the number of test units in a column.
     """
 
-    df: FrameT
+    df: Any  # Can be IntoFrame or Ibis table
     column: str
 
     def get_test_units(self, tbl_type: str) -> int:
@@ -533,16 +526,19 @@ class NumberOfTestUnits:
                 df=self.df, column=self.column, allowed_types=None, check_exists=False
             )
 
-            # Handle LazyFrames which don't have len()
-            if hasattr(dfn, "collect"):
-                dfn = dfn.collect()
+            # Use lazy-compatible row count (avoids collecting the entire frame)
+            if is_narwhals_lazyframe(dfn):
+                return dfn.select(nw.len()).collect().item()
 
+            assert is_narwhals_dataframe(dfn)
             return len(dfn)
 
         if tbl_type in IBIS_BACKENDS:
             # Get the count of test units and convert to a native format
             # TODO: check whether pandas or polars is available
             return self.df.count().to_polars()
+
+        raise ValueError(f"Unsupported table type: {tbl_type}")  # pragma: no cover
 
 
 def _get_compare_expr_nw(compare: Any) -> Any:
@@ -553,28 +549,19 @@ def _get_compare_expr_nw(compare: Any) -> Any:
     return compare
 
 
-def _column_has_null_values(table: FrameT, column: str) -> bool:
+def _column_has_null_values(table: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> bool:
     try:
-        # Try the standard null_count() method
-        null_count = (table.select(column).null_count())[column][0]
-    except AttributeError:
-        # For LazyFrames, collect first then get null count
-        try:
-            collected = table.select(column).collect()
-            null_count = (collected.null_count())[column][0]
-        except Exception:
-            # Fallback: check if any values are null
-            try:
-                result = table.select(nw.col(column).is_null().sum().alias("null_count")).collect()
-                null_count = result["null_count"][0]
-            except Exception:
-                # Last resort: return False (assume no nulls)
-                return False
-
-    if null_count is None or null_count == 0:
+        # Use lazy-compatible aggregation to count nulls
+        # Cast to Int32 before sum to support PySpark which can't sum booleans
+        result = table.select(nw.col(column).is_null().cast(nw.Int32).sum().alias("null_count"))
+        if is_narwhals_lazyframe(result):
+            result = result.collect()
+        null_count = result["null_count"][0]
+    except Exception:
+        # Last resort: return False (assume no nulls)
         return False
 
-    return True
+    return null_count is not None and null_count > 0
 
 
 def _check_nulls_across_columns_nw(table, columns_subset):
@@ -594,7 +581,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
     return result
 
 
-def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
+def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     tgt_col_dtype_str = str(tgt_column.dtype).lower()
 
     if compare_val is isinstance(compare_val, Column):  # pragma: no cover
@@ -638,7 +625,15 @@ def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
     return compare_expr
 
 
-def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
+def _fill_null_as_failing(tbl: Any) -> Any:
+    """Make a null `pb_is_good_` result (e.g., from an expression on a null value) fail."""
+    tbl_nw = nw.from_native(tbl)
+    return tbl_nw.with_columns(
+        pb_is_good_=nw.col("pb_is_good_").fill_null(False).cast(nw.Boolean)
+    ).to_native()
+
+
+def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
     """Check if values in a column evaluate to True for a given predicate expression."""
     if tbl_type == "local":
         # Check the type of expression provided
@@ -656,33 +651,31 @@ def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
         if expression_type == "narwhals":
             tbl_nw = _convert_to_narwhals(df=data_tbl)
             tbl_nw = tbl_nw.with_columns(pb_is_good_=expr)
-            return tbl_nw.to_native()
+            return _fill_null_as_failing(tbl_nw.to_native())
 
         if df_lib_name == "polars" and expression_type == "polars":
-            return data_tbl.with_columns(pb_is_good_=expr)
+            return _fill_null_as_failing(data_tbl.with_columns(pb_is_good_=expr))
 
         if df_lib_name == "pandas" and expression_type == "pandas":
-            return data_tbl.assign(pb_is_good_=expr)
+            return _fill_null_as_failing(data_tbl.assign(pb_is_good_=expr))
 
     # For remote backends, return original table (placeholder)
     return data_tbl  # pragma: no cover
 
 
-def rows_complete(data_tbl: FrameT, columns_subset: list[str] | None):
+def rows_complete(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """
     Check if rows in a DataFrame are complete (no null values).
 
     This function replaces the RowsComplete dataclass for direct usage.
     """
-    tbl = _convert_to_narwhals(df=data_tbl)
-
     return interrogate_rows_complete(
-        tbl=tbl,
+        tbl=data_tbl,
         columns_subset=columns_subset,
     )
 
 
-def col_exists(data_tbl: FrameT, column: str) -> bool:
+def col_exists(data_tbl: IntoFrame, column: str) -> bool:
     """
     Check if a column exists in a DataFrame.
 
@@ -703,8 +696,8 @@ def col_exists(data_tbl: FrameT, column: str) -> bool:
 
 
 def col_schema_match(
-    data_tbl: FrameT,
-    schema,
+    data_tbl: IntoFrame,
+    schema: Any,
     complete: bool,
     in_order: bool,
     case_sensitive_colnames: bool,
@@ -728,7 +721,9 @@ def col_schema_match(
     )
 
 
-def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> bool:
+def row_count_match(
+    data_tbl: IntoFrame, count: Any, inverse: bool, abs_tol_bounds: AbsoluteBounds
+) -> bool:
     """
     Check if DataFrame row count matches expected count.
     """
@@ -745,7 +740,79 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
         return row_count >= min_val and row_count <= max_val
 
 
-def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
+def col_pct_null(
+    data_tbl: IntoFrame, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+) -> bool:
+    """Check if the percentage of null vales are within p given the absolute bounds."""
+    nw_frame = nw.from_native(data_tbl)
+
+    # Use lazy-compatible aggregation to get total rows and null count
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_null=nw.col(column).is_null().cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_null: int = int(stats["n_null"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_null = int(nw_frame.select(nw.col(column).is_null().cast(nw.Int32).sum()).item())
+
+    abs_target: float = round(total_rows * p)
+    lower_bound, upper_bound = bound_finder(abs_target)
+
+    return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
+
+
+def col_pct_missing(
+    data_tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    max_pct: float,
+) -> bool:
+    """Check that the percentage of missing values in a column does not exceed `max_pct`.
+
+    Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
+    null values. The percentage is computed over the total number of rows.
+    """
+    nw_frame = nw.from_native(data_tbl)
+
+    # Build a boolean expression that flags missing values
+    missing_expr = None
+    if sentinels:
+        missing_expr = _is_in(column, sentinels, nw_frame.collect_schema()[column])
+    if count_null:
+        null_expr = nw.col(column).is_null()
+        missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
+
+    if missing_expr is None:
+        # Nothing counts as missing under this spec/filter
+        return 0.0 <= max_pct
+
+    # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
+    if is_narwhals_lazyframe(nw_frame):
+        stats = nw_frame.select(
+            total_rows=nw.len(),
+            n_missing=missing_expr.cast(nw.Int32).sum(),
+        ).collect()
+        total_rows: int = int(stats["total_rows"][0])
+        n_missing: int = int(stats["n_missing"][0])
+    else:
+        assert is_narwhals_dataframe(nw_frame)
+        total_rows = int(nw_frame.select(nw.len()).item())
+        n_missing = int(nw_frame.select(missing_expr.cast(nw.Int32).sum()).item())
+
+    if total_rows == 0:
+        return True
+
+    pct_missing = n_missing / total_rows
+    return pct_missing <= max_pct
+
+
+def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
     """
     Check if DataFrame column count matches expected count.
     """
@@ -757,7 +824,7 @@ def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
         return get_column_count(data=data_tbl) != count
 
 
-def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[FrameT, FrameT]:
+def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any]:
     """
     Coerce two tables to the same backend if they differ.
 
@@ -774,7 +841,7 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
 
     Returns
     -------
-    tuple[FrameT, FrameT]
+    tuple[Any, Any]
         Both tables, with tbl_compare potentially converted to data_tbl's backend.
     """
     # Get backend types for both tables
@@ -786,14 +853,14 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
         return data_tbl, tbl_compare
 
     # Define database backends (Ibis tables that need materialization)
-    database_backends = {"duckdb", "sqlite", "postgres", "mysql", "snowflake", "bigquery"}
+    database_backends = set(IBIS_BACKENDS)
 
     #
     # If backends differ, convert tbl_compare to match data_tbl's backend
     #
 
     # Handle Ibis/database tables: materialize them to match the target backend
-    if compare_backend in database_backends:
+    if compare_backend in database_backends:  # pragma: no cover
         # Materialize to Polars if data table is Polars, otherwise Pandas
         if data_backend == "polars":
             try:
@@ -822,7 +889,7 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
                 except Exception:
                     pass
 
-    if data_backend in database_backends:
+    if data_backend in database_backends:  # pragma: no cover
         # If data table itself is a database backend, materialize to Polars
         # (Polars is the default modern backend for optimal performance)
         try:
@@ -846,21 +913,21 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
             import polars as pl
 
             tbl_compare = pl.from_pandas(tbl_compare)
-        except Exception:
+        except Exception:  # pragma: no cover
             # If conversion fails, return original tables
             pass
 
     elif data_backend == "pandas" and compare_backend == "polars":
         try:
             tbl_compare = tbl_compare.to_pandas()
-        except Exception:
+        except Exception:  # pragma: no cover
             # If conversion fails, return original tables
             pass
 
     return data_tbl, tbl_compare
 
 
-def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
+def tbl_match(data_tbl: IntoFrame, tbl_compare: IntoFrame) -> bool:
     """
     Check if two tables match exactly in schema, row count, and data.
 
@@ -974,36 +1041,40 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
 
         # Convert to native format for comparison
         # We need to collect if lazy frames
-        if hasattr(col_data_1, "collect"):
+        if is_narwhals_lazyframe(col_data_1):  # pragma: no cover
             col_data_1 = col_data_1.collect()
 
-        if hasattr(col_data_2, "collect"):
+        if is_narwhals_lazyframe(col_data_2):  # pragma: no cover
             col_data_2 = col_data_2.collect()
 
         # Convert to native and then to lists for comparison
-        col_1_native = col_data_1.to_native()
-        col_2_native = col_data_2.to_native()
+        # Native frames could be Polars, Pandas, or Ibis - use Any for dynamic access
+        col_1_native: Any = col_data_1.to_native()
+        col_2_native: Any = col_data_2.to_native()
 
         # Extract values as lists for comparison
-        if hasattr(col_1_native, "to_list"):  # Polars Series
+        # Note: We use hasattr for runtime detection but maintain Any typing
+        values_1: list[Any]
+        values_2: list[Any]
+        if hasattr(col_1_native, "to_list"):  # pragma: no cover  # Polars DataFrame
             values_1 = col_1_native[col_name].to_list()
             values_2 = col_2_native[col_name].to_list()
 
-        elif hasattr(col_1_native, "tolist"):  # Pandas Series/DataFrame
+        elif hasattr(col_1_native, "tolist"):  # pragma: no cover  # Pandas DataFrame
             values_1 = col_1_native[col_name].tolist()
             values_2 = col_2_native[col_name].tolist()
 
-        elif hasattr(col_1_native, "collect"):  # Ibis
+        elif hasattr(col_1_native, "collect"):  # pragma: no cover  # Ibis
             values_1 = col_1_native[col_name].to_pandas().tolist()
             values_2 = col_2_native[col_name].to_pandas().tolist()
 
-        else:
+        else:  # pragma: no cover
             # Fallback: try direct comparison
             values_1 = list(col_1_native[col_name])
             values_2 = list(col_2_native[col_name])
 
         # Compare the two lists element by element, handling NaN/None
-        if len(values_1) != len(values_2):
+        if len(values_1) != len(values_2):  # pragma: no cover
             return False
 
         for v1, v2 in zip(values_1, values_2):
@@ -1044,7 +1115,7 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
             try:
                 if v1 != v2:
                     return False
-            except (TypeError, ValueError):
+            except (TypeError, ValueError):  # pragma: no cover
                 # If direct comparison fails (e.g., for lists/arrays), try element-wise comparison
                 try:
                     if isinstance(v1, list) and isinstance(v2, list):
@@ -1062,7 +1133,9 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     return True
 
 
-def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
+def conjointly_validation(
+    data_tbl: IntoFrame, expressions: Any, threshold: int, tbl_type: str = "local"
+) -> Any:
     """
     Perform conjoint validation using multiple expressions.
     """
@@ -1077,30 +1150,32 @@ def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_typ
     return conjointly_instance.get_test_results()
 
 
-def interrogate_gt(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+# TODO: we can certainly simplify this
+def interrogate_gt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Greater than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "gt")
 
 
-def interrogate_lt(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_lt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Less than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "lt")
 
 
-def interrogate_ge(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_ge(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Greater than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "ge")
 
 
-def interrogate_le(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_le(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Less than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "le")
 
 
-def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert is_narwhals_dataframe(nw_tbl) or is_narwhals_lazyframe(nw_tbl)
 
     if isinstance(compare, Column):
         compare_expr = _get_compare_expr_nw(compare=compare)
@@ -1124,7 +1199,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 result_tbl = result_tbl.with_columns(
                     pb_is_good_4=nw.col(column) == compare_expr,
                 )
-            except (TypeError, ValueError) as e:
+            except (TypeError, ValueError) as e:  # pragma: no cover
                 # Handle Pandas NA comparison issues
                 if "boolean value of NA is ambiguous" in str(e):
                     # Work around Pandas NA comparison issue by using Null checks first
@@ -1146,7 +1221,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                     )
                     result_tbl = result_tbl.rename({"pb_is_good_4_tmp": "pb_is_good_4"})
                 elif "cannot compare" in str(e).lower():
-                    # Handle genuine type incompatibility
+                    # Handle genuine type incompatibility - native_df type varies by backend
                     native_df = result_tbl.to_native()
                     col_dtype = str(native_df[column].dtype)
                     compare_dtype = str(native_df[compare.name].dtype)
@@ -1173,7 +1248,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 result_tbl = result_tbl.with_columns(
                     pb_is_good_4=nw.col(column) == compare_expr,
                 )
-            except (TypeError, ValueError, Exception) as e:
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                 # Handle type compatibility issues for all backends
                 error_msg = str(e).lower()
                 if (
@@ -1184,7 +1259,9 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                     or "conversion" in error_msg
                     and "failed" in error_msg
                 ):
-                    # Get column types for a descriptive error message
+                    # Get column types for a descriptive error message - native type varies by backend
+                    col_dtype = "unknown"
+                    compare_dtype = "unknown"
                     try:
                         native_df = result_tbl.to_native()
                         if hasattr(native_df, "dtypes"):
@@ -1193,12 +1270,8 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         elif hasattr(native_df, "schema"):
                             col_dtype = str(native_df.schema.get(column, "unknown"))
                             compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
-                        else:
-                            col_dtype = "unknown"
-                            compare_dtype = "unknown"
                     except Exception:
-                        col_dtype = "unknown"
-                        compare_dtype = "unknown"
+                        pass
 
                     raise TypeError(
                         f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
@@ -1210,10 +1283,18 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 else:
                     raise  # Re-raise unexpected errors
 
+            # The comparison is null when either value is missing, so only use it where both
+            # values are present (`pb_is_good_3`); otherwise the row would count as neither
+            # passing nor failing
             result_tbl = result_tbl.with_columns(
                 pb_is_good_=nw.col("pb_is_good_1")
                 | nw.col("pb_is_good_2")
-                | (nw.col("pb_is_good_4") & ~nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2"))
+                | (
+                    nw.col("pb_is_good_3")
+                    & nw.col("pb_is_good_4")
+                    & ~nw.col("pb_is_good_1")
+                    & ~nw.col("pb_is_good_2")
+                )
             )
 
         return result_tbl.drop(
@@ -1236,7 +1317,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
         # Handle type incompatibility for literal value comparisons
         try:
             result_tbl = result_tbl.with_columns(pb_is_good_3=nw.col(column) == compare_expr)
-        except (TypeError, ValueError, Exception) as e:
+        except (TypeError, ValueError, Exception) as e:  # pragma: no cover
             # Handle type compatibility issues for column vs literal comparisons
             error_msg = str(e).lower()
             if (
@@ -1247,17 +1328,16 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 or "conversion" in error_msg
                 and "failed" in error_msg
             ):
-                # Get column type for a descriptive error message
+                # Get column type for a descriptive error message - native type varies by backend
+                col_dtype = "unknown"
                 try:
                     native_df = result_tbl.to_native()
                     if hasattr(native_df, "dtypes"):
                         col_dtype = str(native_df.dtypes.get(column, "unknown"))
                     elif hasattr(native_df, "schema"):
                         col_dtype = str(native_df.schema.get(column, "unknown"))
-                    else:
-                        col_dtype = "unknown"
                 except Exception:
-                    col_dtype = "unknown"
+                    pass
 
                 compare_type = type(compare).__name__
                 compare_value = str(compare)
@@ -1287,10 +1367,11 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
         return result_tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
 
-def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_ne(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Not equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Determine if the reference and comparison columns have any null values
     ref_col_has_null_vals = _column_has_null_values(table=nw_tbl, column=column)
@@ -1312,7 +1393,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 return nw_tbl.with_columns(
                     pb_is_good_=nw.col(column) != compare_expr,
                 ).to_native()
-            except (TypeError, ValueError, Exception) as e:
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                 # Handle type compatibility issues for column vs column comparisons
                 error_msg = str(e).lower()
                 if (
@@ -1358,7 +1439,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                 return nw_tbl.with_columns(
                     pb_is_good_=nw.col(column) != nw.lit(compare_expr),
                 ).to_native()
-            except (TypeError, ValueError, Exception) as e:
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                 # Handle type compatibility issues for column vs literal comparisons
                 error_msg = str(e).lower()
                 if (
@@ -1409,7 +1490,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         pb_is_good_1=nw.col(column).is_null(),
                         pb_is_good_2=nw.col(column) != nw.col(compare.name),
                     )
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError) as e:  # pragma: no cover
                     # Handle Pandas type compatibility issues
                     if (
                         "boolean value of NA is ambiguous" in str(e)
@@ -1436,7 +1517,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         pb_is_good_1=nw.col(column).is_null(),
                         pb_is_good_2=nw.col(column) != nw.col(compare.name),
                     )
-                except (TypeError, ValueError, Exception) as e:
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                     # Handle type compatibility issues for non-Pandas backends
                     error_msg = str(e).lower()
                     if (
@@ -1513,7 +1594,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         pb_is_good_1=nw.col(column) != nw.lit(compare.name),
                         pb_is_good_2=nw.col(compare.name).is_null(),
                     )
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError) as e:  # pragma: no cover
                     # Handle Pandas type compatibility issues
                     if (
                         "boolean value of NA is ambiguous" in str(e)
@@ -1540,7 +1621,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         pb_is_good_1=nw.col(column) != nw.col(compare.name),
                         pb_is_good_2=nw.col(compare.name).is_null(),
                     )
-                except (TypeError, ValueError, Exception) as e:
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                     # Handle type compatibility issues for non-Pandas backends
                     error_msg = str(e).lower()
                     if (
@@ -1609,7 +1690,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                     pb_is_good_2=nw.col(compare.name).is_null(),
                     pb_is_good_3=nw.col(column) != nw.col(compare.name),
                 )
-            except (TypeError, ValueError, Exception) as e:
+            except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                 # Handle type compatibility issues for column vs column comparisons
                 error_msg = str(e).lower()
                 if (
@@ -1692,7 +1773,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                         pb_is_good_1=nw.col(column).is_null(),
                         pb_is_good_2=nw.col(column) != nw.lit(compare_expr),
                     )
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError) as e:  # pragma: no cover
                     # Handle Pandas type compatibility issues for literal comparisons
                     if (
                         "boolean value of NA is ambiguous" in str(e)
@@ -1735,7 +1816,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                     result_tbl = result_tbl.with_columns(
                         pb_is_good_3=nw.col(column) != nw.lit(compare_expr)
                     )
-                except (TypeError, ValueError, Exception) as e:
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                     # Handle type compatibility issues for literal comparisons
                     error_msg = str(e).lower()
                     if (
@@ -1796,7 +1877,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
                     result_tbl = result_tbl.with_columns(
                         pb_is_good_3=nw.col(column) != nw.lit(compare_expr)
                     )
-                except (TypeError, ValueError, Exception) as e:
+                except (TypeError, ValueError, Exception) as e:  # pragma: no cover
                     # Handle type compatibility issues for literal comparisons
                     error_msg = str(e).lower()
                     if (
@@ -1843,14 +1924,15 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
 
 
 def interrogate_between(
-    tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
     """Between interrogation."""
 
     low_val = _get_compare_expr_nw(compare=low)
     high_val = _get_compare_expr_nw(compare=high)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -1912,14 +1994,15 @@ def interrogate_between(
 
 
 def interrogate_outside(
-    tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
     """Outside range interrogation."""
 
     low_val = _get_compare_expr_nw(compare=low)
     high_val = _get_compare_expr_nw(compare=high)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -1978,13 +2061,14 @@ def interrogate_outside(
     return result_tbl.to_native()
 
 
-def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
+def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """In set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = nw.col(column).is_in(set_values)
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
@@ -1992,17 +2076,163 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_notin(tbl: FrameT, column: str, set_values: any) -> FrameT:
-    """Not in set interrogation."""
+def _dtype_kind(dtype: Any) -> str | None:
+    """Classify a Narwhals dtype as numeric, string, temporal, or boolean (`None` if other)."""
+    if dtype.is_numeric():
+        return "numeric"
+    if dtype.is_temporal():
+        return "temporal"
+    if dtype in (nw.String, nw.Categorical, nw.Enum):
+        return "string"
+    if dtype == nw.Boolean:
+        return "boolean"
+    return None
+
+
+def _check_key_dtypes_compatible(
+    columns: list[str], ref_columns: list[str], tbl_schema: Any, ref_schema: Any
+) -> None:
+    """Raise a `TypeError` if a key column can never match its reference column's values."""
+    for c, rc in zip(columns, ref_columns):
+        kind, ref_kind = _dtype_kind(tbl_schema[c]), _dtype_kind(ref_schema[rc])
+        if kind is not None and ref_kind is not None and kind != ref_kind:
+            raise TypeError(
+                f"Column '{c}' ({tbl_schema[c]}) and reference column '{rc}' "
+                f"({ref_schema[rc]}) have incompatible types."
+            )
+
+
+def _common_numeric_key_dtype(dtype: Any, ref_dtype: Any) -> Any:
+    """Get the dtype that mismatched numeric join keys should be cast to (`None` if no cast)."""
+    if dtype == ref_dtype or not (dtype.is_numeric() and ref_dtype.is_numeric()):
+        return None
+    if dtype.is_integer() and ref_dtype.is_integer():
+        # `UInt64` values can't all be represented by `Int64` (or vice versa), so such a pair is
+        # left to the backend
+        if dtype == nw.UInt64 or ref_dtype == nw.UInt64:
+            return None
+        return nw.Int64
+    return nw.Float64
+
+
+def interrogate_in_table(
+    tbl: IntoFrame,
+    columns: str | list[str],
+    ref_tbl: IntoFrame,
+    ref_columns: str | list[str],
+    na_pass: bool,
+) -> Any:
+    """Referential integrity interrogation.
+
+    Checks that each value (or composite key) in the target column(s) exists in the reference
+    table's column(s). Returns the table with a `pb_is_good_` boolean column.
+
+    Heterogeneous backends (e.g. MySQL table + Polars DataFrame) are handled via
+    `_coerce_to_common_backend()`, which materializes the lighter side to match the heavier side's
+    backend before comparison.
+    """
+    # Coerce both tables to the same backend
+    tbl, ref_tbl = _coerce_to_common_backend(tbl, ref_tbl)
 
     nw_tbl = nw.from_native(tbl)
-    result_tbl = nw_tbl.with_columns(
-        pb_is_good_=nw.col(column).is_in(set_values),
-    ).with_columns(pb_is_good_=~nw.col("pb_is_good_"))
+    nw_ref = nw.from_native(ref_tbl)
+
+    # Normalize to lists
+    single_col = isinstance(columns, str)
+    if isinstance(columns, str):
+        columns = [columns]
+    if isinstance(ref_columns, str):
+        ref_columns = [ref_columns]
+
+    if len(columns) != len(ref_columns):
+        raise ValueError(
+            f"columns and ref_column must have the same length, "
+            f"got {len(columns)} and {len(ref_columns)}."
+        )
+
+    tbl_schema = nw_tbl.collect_schema()
+    ref_schema = nw_ref.collect_schema()
+    _check_key_dtypes_compatible(columns, ref_columns, tbl_schema, ref_schema)
+
+    if single_col:
+        # Single-column path: extract distinct ref values, use is_in()
+        col_name = columns[0]
+        ref_col_name = ref_columns[0]
+
+        ref_unique = nw_ref.select(nw.col(ref_col_name)).unique()
+        if isinstance(ref_unique, nw.LazyFrame):  # pragma: no cover
+            ref_unique = ref_unique.collect()
+        ref_values = ref_unique.get_column(ref_col_name).to_list()
+        ref_values_clean = [v for v in ref_values if v is not None]
+
+        expr: nw.Expr = _is_in(col_name, ref_values_clean, tbl_schema[col_name])
+        if na_pass:
+            expr = expr | nw.col(col_name).is_null()
+
+        result_tbl = nw_tbl.with_columns(pb_is_good_=expr)
+        return result_tbl.to_native()
+
+    # Composite-key path: left-join with distinct ref keys + marker
+    ref_keys = nw_ref.select(ref_columns).unique()
+    if isinstance(ref_keys, nw.LazyFrame):  # pragma: no cover
+        ref_keys = ref_keys.collect()
+
+    # Rename ref columns to match target columns (required for join)
+    rename_map = {src: tgt for src, tgt in zip(ref_columns, columns) if src != tgt}
+    if rename_map:
+        ref_keys = ref_keys.rename(rename_map)
+
+    ref_keys = ref_keys.with_columns(nw.lit(True).alias("__pb_ref_matched__"))
+
+    # Materialize lazy main table for the join
+    if isinstance(nw_tbl, nw.LazyFrame):  # pragma: no cover
+        nw_tbl = nw_tbl.collect()
+
+    # Joins require the key columns on both sides to have the same dtype, so mismatched numeric
+    # keys (e.g., an integer key against a float reference key) are cast to a common dtype; this
+    # only applies to the join keys, the returned table keeps its original dtypes
+    key_casts = {
+        c: dtype
+        for c, rc in zip(columns, ref_columns)
+        if (dtype := _common_numeric_key_dtype(tbl_schema[c], ref_schema[rc])) is not None
+    }
+    tbl_keys = nw_tbl.select(columns)
+    if key_casts:
+        tbl_keys = tbl_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+        ref_keys = ref_keys.with_columns(nw.col(c).cast(d) for c, d in key_casts.items())
+
+    joined = tbl_keys.join(ref_keys, on=columns, how="left")
+
+    # The marker is `True` or null after the left join; pandas stores that as an `object` column,
+    # so it is cast to make it a proper boolean column
+    matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False).cast(nw.Boolean)
+
+    if na_pass:
+        all_null = nw.all_horizontal(*[nw.col(c).is_null() for c in columns], ignore_nulls=False)
+        all_null_series = nw_tbl.select(all_null.alias("__pb_all_null__")).get_column(
+            "__pb_all_null__"
+        )
+        matched_series = matched_series | all_null_series
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=matched_series)
     return result_tbl.to_native()
 
 
-def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: bool) -> FrameT:
+def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
+    """Not in set interrogation."""
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    # Missing values fail, like in `interrogate_isin()`; `is_in()` gives null for them on most
+    # backends (and False for NaN in pandas), so make the result a plain boolean
+    in_set = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(False)
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~in_set & ~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def interrogate_regex(
+    tbl: IntoFrame, column: str, values: dict[str, Any] | str, na_pass: bool
+) -> Any:
     """Regex interrogation."""
 
     # Handle both old and new formats for backward compatibility
@@ -2014,6 +2244,7 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
         inverse = values["inverse"]
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
         pb_is_good_2=nw.col(column).str.contains(pattern, literal=False).fill_null(False),
@@ -2033,7 +2264,41 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
     return result_tbl.to_native()
 
 
-def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
+    """String length interrogation."""
+
+    min_val = values.get("min_val")
+    max_val = values.get("max_val")
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+        pb_is_good_2=nw.lit(True),
+        pb_is_good_3=nw.lit(True),
+    )
+
+    if min_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_2=(nw.col(column).str.len_chars() >= min_val).fill_null(False)
+        )
+
+    if max_val is not None:
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_3=(nw.col(column).str.len_chars() <= max_val).fill_null(False)
+        )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=(nw.col("pb_is_good_1") | (nw.col("pb_is_good_2") & nw.col("pb_is_good_3")))
+    ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
+
+    return result_tbl.to_native()
+
+
+def interrogate_within_spec(
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
     """Within specification interrogation."""
     from pointblank._spec_utils import (
         regex_email,
@@ -2058,6 +2323,7 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
 
     # Convert to Narwhals for cross-backend compatibility
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Regex-based specifications can use Narwhals directly (no materialization needed)
     regex_specs = {
@@ -2102,27 +2368,27 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
     is_ibis = hasattr(native_tbl, "execute")
 
     # Use database-native validation for VIN and credit_card when using Ibis
-    if is_ibis and spec_lower == "vin":
+    if is_ibis and spec_lower == "vin":  # pragma: no cover
         # Route to database-native VIN validation
         return interrogate_within_spec_db(tbl, column, values, na_pass)
-    elif is_ibis and spec_lower in ("credit_card", "creditcard"):
+    elif is_ibis and spec_lower in ("credit_card", "creditcard"):  # pragma: no cover
         # Route to database-native credit card validation
         return interrogate_credit_card_db(tbl, column, values, na_pass)
 
     # For non-Ibis tables or other specs, materialize data and use Python validation
     # Get the column data as a list
-    col_data = nw_tbl.select(column).to_native()
+    col_data: Any = nw_tbl.select(column).to_native()
 
-    # Convert to list based on backend
-    if hasattr(col_data, "to_list"):  # Polars
-        col_list = col_data[column].to_list()
-    elif hasattr(col_data, "tolist"):  # Pandas
-        col_list = col_data[column].tolist()
-    else:  # For Ibis tables, we need to execute the query first
+    # Convert to list based on backend - type varies so use duck typing
+    if hasattr(col_data, "to_list"):  # pragma: no cover  # Polars
+        col_list = col_data[column].to_list()  # type: ignore[index]
+    elif hasattr(col_data, "tolist"):  # pragma: no cover  # Pandas
+        col_list = col_data[column].tolist()  # type: ignore[index]
+    else:  # pragma: no cover  # For Ibis tables, we need to execute the query first
         try:
             # Try to execute if it's an Ibis table
             if hasattr(col_data, "execute"):
-                col_data_exec = col_data.execute()
+                col_data_exec = col_data.execute()  # type: ignore[operator]
                 if hasattr(col_data_exec, "to_list"):  # Polars result
                     col_list = col_data_exec[column].to_list()
                 elif hasattr(col_data_exec, "tolist"):  # Pandas result
@@ -2134,6 +2400,8 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
         except Exception:
             # Fallback to direct list conversion
             col_list = list(col_data[column])
+
+    assert isinstance(col_list, list)
 
     # Validate based on spec type (checksum-based validations)
     if spec_lower in ("isbn", "isbn-10", "isbn-13"):
@@ -2154,7 +2422,7 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
     # Create result table with validation results
     # For Ibis tables, execute to get a materialized dataframe first
     native_tbl = nw_tbl.to_native()
-    if hasattr(native_tbl, "execute"):
+    if hasattr(native_tbl, "execute"):  # pragma: no cover
         native_tbl = native_tbl.execute()
 
     # Add validation column: convert native table to Series, then back through Narwhals
@@ -2167,7 +2435,9 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
 
         native_tbl["pb_is_good_2"] = pd.Series(is_valid_list, index=native_tbl.index)
     else:
-        raise NotImplementedError(f"Backend type not supported: {type(native_tbl)}")
+        raise NotImplementedError(
+            f"Backend type not supported: {type(native_tbl)}"
+        )  # pragma: no cover
 
     result_tbl = nw.from_native(native_tbl)  # Handle NA values and combine validation results
     result_tbl = result_tbl.with_columns(
@@ -2181,7 +2451,9 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
     return result_tbl.to_native()
 
 
-def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+def interrogate_within_spec_db(  # pragma: no cover
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
     """
     Database-native specification validation (proof of concept).
 
@@ -2202,7 +2474,7 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
 
     Returns
     -------
-    FrameT
+    Any
         Result table with pb_is_good_ column indicating validation results.
 
     Notes
@@ -2215,9 +2487,9 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
     spec_lower = spec.lower()
 
     # Check if this is an Ibis table
-    native_tbl = tbl
-    if hasattr(tbl, "to_native"):
-        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+    native_tbl: Any = tbl
+    if is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl):
+        native_tbl = tbl.to_native()
 
     is_ibis = hasattr(native_tbl, "execute")
 
@@ -2284,7 +2556,7 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
     weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
 
     # Get the column as an Ibis expression
-    col_expr = native_tbl[column]
+    col_expr = native_tbl[column]  # type: ignore[index]
 
     # Basic checks: length must be 17, no invalid characters (I, O, Q)
     valid_length = col_expr.length() == 17
@@ -2311,11 +2583,11 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
         value = ibis.cases(*conditions, else_=0)  # Default: invalid char = 0 (will fail validation)
 
         # Multiply by weight and add to checksum
-        checksum = checksum + (value * weights[pos])
+        checksum = checksum + (value * weights[pos])  # type: ignore[operator]
 
     # Check digit calculation: checksum % 11
     # If result is 10, check digit should be 'X', otherwise it's the digit itself
-    expected_check = checksum % 11
+    expected_check = checksum % 11  # type: ignore[operator]
     actual_check_char = col_expr.upper().substr(8, 1)  # Position 9 (0-indexed 8)
 
     # Validate check digit using ibis.cases()
@@ -2338,14 +2610,14 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
         is_valid = is_valid.fill_null(False)
 
     # Add validation column to table
-    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
 
     return result_tbl
 
 
-def interrogate_credit_card_db(
-    tbl: FrameT, column: str, values: dict[str, str], na_pass: bool
-) -> FrameT:
+def interrogate_credit_card_db(  # pragma: no cover
+    tbl: IntoFrame, column: str, values: dict[str, str], na_pass: bool
+) -> Any:
     """
     Database-native credit card validation using Luhn algorithm in SQL.
 
@@ -2367,7 +2639,7 @@ def interrogate_credit_card_db(
 
     Returns
     -------
-    FrameT
+    Any
         Result table with pb_is_good_ column indicating validation results.
 
     Notes
@@ -2384,7 +2656,7 @@ def interrogate_credit_card_db(
     # Check if this is an Ibis table
     native_tbl = tbl
     if hasattr(tbl, "to_native"):
-        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl  # type: ignore[operator]
 
     is_ibis = hasattr(native_tbl, "execute")
 
@@ -2398,7 +2670,7 @@ def interrogate_credit_card_db(
         raise ImportError("Ibis is required for database-native validation")
 
     # Get the column as an Ibis expression
-    col_expr = native_tbl[column]
+    col_expr = native_tbl[column]  # type: ignore[index]
 
     # Step 1: Clean the input and remove spaces and hyphens
     # First check format: only digits, spaces, and hyphens allowed
@@ -2451,7 +2723,7 @@ def interrogate_credit_card_db(
 
         # Calculate contribution to checksum
         # If should_double: double the digit, then if > 9 subtract 9
-        doubled = digit_val * 2
+        doubled = digit_val * 2  # type: ignore[operator]
         adjusted = ibis.cases(
             (should_double & (doubled > 9), doubled - 9),
             (should_double, doubled),
@@ -2464,10 +2736,10 @@ def interrogate_credit_card_db(
             else_=0,
         )
 
-        checksum = checksum + contribution
+        checksum = checksum + contribution  # type: ignore[operator]
 
     # Step 4: Valid if checksum % 10 == 0
-    luhn_valid = (checksum % 10) == 0
+    luhn_valid = (checksum % 10) == 0  # type: ignore[operator]
 
     # Combine all validation checks
     is_valid = valid_chars & valid_length & luhn_valid
@@ -2481,30 +2753,170 @@ def interrogate_credit_card_db(
         is_valid = is_valid.fill_null(False)
 
     # Add validation column to table
-    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
 
     return result_tbl
 
 
-def interrogate_null(tbl: FrameT, column: str) -> FrameT:
+def interrogate_null(tbl: IntoFrame, column: str) -> Any:
     """Null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=nw.col(column).is_null())
     return result_tbl.to_native()
 
 
-def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
+def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
     """Not null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
     return result_tbl.to_native()
 
 
+def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> Any:
+    """Mark rows with structured-missing values as passing.
+
+    Given a `results_tbl` that already carries a boolean `pb_is_good_` column, force that column to
+    `True` for any row whose value in `column` is a declared sentinel of `spec` (a `MissingSpec`),
+    or a null when `spec.null_is_missing` is `True`. This implements the `missing=` exclusion on
+    `col_vals_*` validation methods: sentinel/missing values are excluded from the check (they pass)
+    so that only the "real" values are validated.
+    """
+    sentinels = spec.sentinel_values()
+
+    nw_tbl = nw.from_native(results_tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
+    # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
+    # sentinel mask is explicitly filled with `False` for null rows.
+    mask = None
+    if sentinels:
+        mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
+    if spec.null_is_missing:
+        null_expr = nw.col(column).is_null()
+        mask = null_expr if mask is None else (mask | null_expr)
+
+    if mask is None:
+        return results_tbl
+
+    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
+    return nw_tbl.to_native()
+
+
+def interrogate_missing_only_coded(
+    tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    allowed: list | None,
+    min_val: Any,
+    max_val: Any,
+) -> Any:
+    """Missing-only-coded interrogation.
+
+    A row passes when its value is either a declared sentinel (a documented missing code), a null
+    (when `count_null=True`), or a legitimate "real" value — one in `allowed` or within the
+    `[min_val, max_val]` range. Any other value is treated as an *undocumented* code and fails.
+    """
+    nw_tbl = nw.from_native(tbl)
+    dtype = nw_tbl.collect_schema()[column]
+
+    good = None
+
+    def _or(expr):
+        nonlocal good
+        good = expr if good is None else (good | expr)
+
+    if sentinels:
+        _or(_is_in(column, sentinels, dtype).fill_null(False))
+    if count_null:
+        _or(nw.col(column).is_null())
+    if allowed:
+        _or(_is_in(column, allowed, dtype).fill_null(False))
+    if min_val is not None or max_val is not None:
+        range_expr = nw.lit(True)
+        if min_val is not None:
+            range_expr = range_expr & (nw.col(column) >= min_val)
+        if max_val is not None:
+            range_expr = range_expr & (nw.col(column) <= max_val)
+        _or(range_expr.fill_null(False))
+
+    if good is None:
+        good = nw.lit(False)
+
+    result_tbl = nw_tbl.with_columns(pb_is_good_=good)
+    return result_tbl.to_native()
+
+
+def interrogate_missing_consistent(
+    tbl: IntoFrame, columns: list[str], sentinels: list, count_null: bool
+) -> Any:
+    """Cross-column missing-consistency interrogation.
+
+    Given a set of related `columns`, a row passes when the "missing for a given reason" status is
+    consistent across all of them: either *none* of the columns carry the reason, or *all* of them
+    do. A row fails when some-but-not-all of the columns are missing for that reason. Missingness
+    for the reason is encoded by the `sentinels` values (and, when `count_null=True`, actual nulls).
+    """
+    nw_tbl = nw.from_native(tbl)
+    schema = nw_tbl.collect_schema()
+    n_cols = len(columns)
+
+    count_expr = None
+    for c in columns:
+        if sentinels:
+            col_expr = _is_in(c, sentinels, schema[c]).fill_null(False)
+        else:
+            col_expr = nw.lit(False)  # noqa
+        if count_null:
+            col_expr = col_expr | nw.col(c).is_null()
+        col_count = col_expr.cast(nw.Int32)
+        count_expr = col_count if count_expr is None else (count_expr + col_count)
+
+    result_tbl = nw_tbl.with_columns(_n_reason_=count_expr)
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=((nw.col("_n_reason_") == 0) | (nw.col("_n_reason_") == n_cols))
+    )
+    result_tbl = result_tbl.drop("_n_reason_")
+    return result_tbl.to_native()
+
+
+def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
+    """Missing-coded interrogation.
+
+    A row passes when its value is *not* a raw null. Under the structured-missingness model, every
+    absence should be expressed with an explicit sentinel code (which is non-null), so a raw null
+    represents *uncoded* missingness and fails the test unit.
+    """
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    return result_tbl.to_native()
+
+
+def _with_lagged_difference(
+    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    """
+    Add a `pb_lagged_difference_` column holding the difference from the previous row's value.
+
+    Narwhals needs an explicit row order for `shift()` on LazyFrames. Polars LazyFrames keep their
+    row order, so a `pb_row_index_` column is added to order by (the caller drops it).
+    """
+    lagged = nw.col(column).shift(1)
+    if isinstance(nw_tbl, nw.LazyFrame) and is_polars_lazyframe(nw_tbl.to_native()):
+        nw_tbl = _with_row_index(nw_tbl, name="pb_row_index_")
+        lagged = lagged.over(order_by="pb_row_index_")
+    return nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - lagged)
+
+
 def interrogate_increasing(
-    tbl: FrameT, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+) -> Any:
     """
     Increasing interrogation.
 
@@ -2525,13 +2937,14 @@ def interrogate_increasing(
 
     Returns
     -------
-    FrameT
+    Any
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
-    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
 
     # Build the condition based on allow_stationary and decreasing_tol
     if allow_stationary or decreasing_tol != 0:
@@ -2557,12 +2970,12 @@ def interrogate_increasing(
         )
     )
 
-    return result_tbl.drop("pb_lagged_difference_").to_native()
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def interrogate_decreasing(
-    tbl: FrameT, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+) -> Any:
     """
     Decreasing interrogation.
 
@@ -2583,13 +2996,14 @@ def interrogate_decreasing(
 
     Returns
     -------
-    FrameT
+    Any
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
-    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+    result_tbl = _with_lagged_difference(nw_tbl, column=column)
 
     # Build the condition based on allow_stationary and increasing_tol
     if allow_stationary or increasing_tol != 0:
@@ -2615,12 +3029,12 @@ def interrogate_decreasing(
         )
     )
 
-    return result_tbl.drop("pb_lagged_difference_").to_native()
+    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def _interrogate_comparison_base(
-    tbl: FrameT, column: str, compare: any, na_pass: bool, operator: str
-) -> FrameT:
+    tbl: IntoFrame, column: str, compare: Any, na_pass: bool, operator: str
+) -> Any:
     """
     Unified base function for comparison operations (gt, ge, lt, le, eq, ne).
 
@@ -2639,13 +3053,14 @@ def _interrogate_comparison_base(
 
     Returns
     -------
-    FrameT
+    Any
         The result table with `pb_is_good_` column indicating the passing test units.
     """
 
     compare_expr = _get_compare_expr_nw(compare=compare)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
 
     # Create the comparison expression based on the operator
@@ -2658,9 +3073,9 @@ def _interrogate_comparison_base(
         comparison = column_expr < compare_expr
     elif operator == "le":
         comparison = column_expr <= compare_expr
-    elif operator == "eq":
+    elif operator == "eq":  # pragma: no cover
         comparison = column_expr == compare_expr
-    elif operator == "ne":
+    elif operator == "ne":  # pragma: no cover
         comparison = column_expr != compare_expr
     else:
         raise ValueError(  # pragma: no cover
@@ -2692,7 +3107,7 @@ def _interrogate_comparison_base(
     return result_tbl.to_native()
 
 
-def interrogate_rows_distinct(data_tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
+def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """
     Check if rows in a DataFrame are distinct.
 
@@ -2709,29 +3124,33 @@ def interrogate_rows_distinct(data_tbl: FrameT, columns_subset: list[str] | None
 
     Returns
     -------
-    FrameT
+    Any
         A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
     """
     tbl = nw.from_native(data_tbl)
+    assert is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl)
 
     # Get the column subset to use for the test
     if columns_subset is None:
-        columns_subset = tbl.columns
+        columns_subset = tbl.collect_schema().names() if is_narwhals_lazyframe(tbl) else tbl.columns
 
-    # Create a count of duplicates using group_by approach
-    # Group by the columns of interest and count occurrences
-    count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
+    # Check for duplicate rows using null-safe approaches
+    # The previous group_by + join approach failed because NULL != NULL in join semantics,
+    # causing rows with nulls to be excluded from both PASS and FAIL counts.
+    if is_narwhals_dataframe(tbl):
+        # For DataFrames, is_duplicated() correctly treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=~tbl.select(columns_subset).is_duplicated())
+        return result.to_native()
+    elif is_narwhals_lazyframe(tbl):
+        # For LazyFrames, use a window function which treats nulls as equal
+        result = tbl.with_columns(pb_is_good_=nw.len().over(columns_subset) == 1)
+        return result.to_native()
+    else:  # pragma: no cover
+        msg = f"Expected DataFrame or LazyFrame, got {type(tbl)}"
+        raise TypeError(msg)
 
-    # Join back to original table to get count for each row
-    tbl = tbl.join(count_tbl, on=columns_subset, how="left")
 
-    # Passing rows will have the value `1` (no duplicates, so True), otherwise False applies
-    tbl = tbl.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
-
-    return tbl.to_native()
-
-
-def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
+def interrogate_rows_complete(tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """Rows complete interrogation."""
     nw_tbl = nw.from_native(tbl)
 
@@ -2747,11 +3166,29 @@ def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> 
     return result_tbl.to_native()
 
 
-def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config: dict) -> FrameT:
+def interrogate_prompt(  # pragma: no cover
+    tbl: IntoFrame, columns_subset: list[str] | None, ai_config: dict[str, Any]
+) -> Any:
     """AI-powered interrogation of rows."""
     import logging
 
     logger = logging.getLogger(__name__)
+
+    # AI validation inherently needs materialized data (sends rows to LLM)
+    # Collect lazy frames here since this cannot operate lazily
+    if _is_lazy_frame(tbl):
+        tbl = tbl.collect()
+
+    # Convert to narwhals early for consistent row counting
+    nw_tbl = nw.from_native(tbl)
+    # Get row count - for LazyFrame we need to use select/collect
+    if is_narwhals_lazyframe(nw_tbl):
+        row_count = nw_tbl.select(nw.len()).collect().item()
+        assert isinstance(row_count, int)
+        total_rows = row_count
+    else:
+        assert is_narwhals_dataframe(nw_tbl)
+        total_rows = len(nw_tbl)
 
     try:
         # Import AI validation modules
@@ -2770,6 +3207,7 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
         llm_model = ai_config["llm_model"]
         batch_size = ai_config.get("batch_size", 1000)
         max_concurrent = ai_config.get("max_concurrent", 3)
+        attachments = ai_config.get("attachments", [])
 
         # Set up LLM configuration (api_key will be loaded from environment)
         llm_config = _LLMConfig(
@@ -2801,7 +3239,7 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
         prompt_builder = _PromptBuilder(prompt)
 
         # Create AI validation engine
-        engine = _AIValidationEngine(llm_config)
+        engine = _AIValidationEngine(llm_config, attachments=attachments)
 
         # Run AI validation synchronously (chatlas is synchronous)
         batch_results = engine.validate_batches(
@@ -2809,28 +3247,25 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
         )
 
         # Parse and combine results with signature mapping optimization
-        parser = _ValidationResponseParser(total_rows=len(tbl))
+        parser = _ValidationResponseParser(total_rows=total_rows)
         combined_results = parser.combine_batch_results(batch_results, signature_mapping)
 
         # Debug: Log table info and combined results
         logger.debug("🏁 Final result conversion:")
-        logger.debug(f"   - Table length: {len(tbl)}")
+        logger.debug(f"   - Table length: {total_rows}")
         logger.debug(
             f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
         )
 
-        # Convert results to narwhals format
-        nw_tbl = nw.from_native(tbl)
-
         # Create a boolean column for validation results
         validation_results = []
-        for i in range(len(tbl)):
+        for i in range(total_rows):
             # Default to False if row wasn't processed
             result = combined_results.get(i, False)
             validation_results.append(result)
 
             # Debug: Log first few conversions
-            if i < 5 or len(tbl) - i <= 2:
+            if i < 5 or total_rows - i <= 2:
                 logger.debug(f"   Row {i}: {result} (from combined_results.get({i}, False))")
 
         logger.debug(f"   - Final validation_results length: {len(validation_results)}")
@@ -2869,10 +3304,9 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
         logger.error(f"Missing dependencies for AI validation: {e}")
         logger.error("Install required packages: pip install openai anthropic aiohttp")
 
-        # Return all False results as fallback
-        nw_tbl = nw.from_native(tbl)
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
         native_tbl = nw_tbl.to_native()
-        validation_results = [False] * len(tbl)
+        validation_results = [False] * total_rows
 
         if hasattr(native_tbl, "with_columns"):  # Polars
             import polars as pl
@@ -2894,10 +3328,9 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
     except Exception as e:
         logger.error(f"AI validation failed: {e}")
 
-        # Return all False results as fallback
-        nw_tbl = nw.from_native(tbl)
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
         native_tbl = nw_tbl.to_native()
-        validation_results = [False] * len(tbl)
+        validation_results = [False] * total_rows
 
         if hasattr(native_tbl, "with_columns"):  # Polars
             import polars as pl
@@ -2915,3 +3348,201 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
             result_tbl["pb_is_good_"] = validation_results
 
         return result_tbl
+
+
+def data_freshness(
+    data_tbl: IntoFrame,
+    column: str,
+    max_age: Any,  # datetime.timedelta
+    reference_time: Any | None,  # datetime.datetime | None
+    timezone: str | None,
+    allow_tz_mismatch: bool,
+) -> dict:
+    """
+    Check if the most recent datetime value in a column is within the allowed max_age.
+
+    Parameters
+    ----------
+    data_tbl
+        The data table to check.
+    column
+        The datetime column to check.
+    max_age
+        The maximum allowed age as a timedelta.
+    reference_time
+        The reference time to compare against (None = use current time).
+    timezone
+        The timezone to use for interpretation.
+    allow_tz_mismatch
+        Whether to suppress timezone mismatch warnings.
+
+    Returns
+    -------
+    dict
+        A dictionary containing:
+        - 'passed': bool, whether the validation passed
+        - 'max_datetime': the maximum datetime found in the column
+        - 'reference_time': the reference time used
+        - 'age': the calculated age (timedelta)
+        - 'max_age': the maximum allowed age
+        - 'tz_warning': any timezone warning message
+    """
+    import datetime
+
+    nw_frame = nw.from_native(data_tbl)
+
+    result = {
+        "passed": False,
+        "max_datetime": None,
+        "reference_time": None,
+        "age": None,
+        "max_age": max_age,
+        "tz_warning": None,
+        "column_empty": False,
+    }
+
+    # Get the maximum datetime value from the column using lazy-compatible aggregation
+    try:
+        max_val_result = nw_frame.select(nw.col(column).max())
+        if is_narwhals_lazyframe(max_val_result):  # pragma: no cover
+            max_val_result = max_val_result.collect()
+        max_datetime_raw = max_val_result.item()
+
+        if max_datetime_raw is None:
+            result["column_empty"] = True
+            result["passed"] = False
+            return result
+
+        # Convert to Python datetime if needed
+        if hasattr(max_datetime_raw, "to_pydatetime"):
+            # Pandas Timestamp
+            max_datetime = max_datetime_raw.to_pydatetime()
+        elif hasattr(max_datetime_raw, "isoformat"):
+            # Already a datetime-like object
+            max_datetime = max_datetime_raw
+        else:  # pragma: no cover
+            # Try to parse as string or handle other types
+            max_datetime = datetime.datetime.fromisoformat(str(max_datetime_raw))
+
+        result["max_datetime"] = max_datetime
+
+    except Exception as e:  # pragma: no cover
+        result["error"] = str(e)
+        result["passed"] = False
+        return result
+
+    # Determine the reference time
+    # We'll set the reference time after we know the timezone awareness of the data
+    if reference_time is None:
+        ref_time = None  # Will be set below based on data timezone awareness
+    else:
+        ref_time = reference_time
+
+    # Handle timezone awareness/naivete
+    max_dt_aware = _is_datetime_aware(max_datetime)
+
+    # Helper to parse timezone string (supports IANA names and offsets like "-7", "-07:00")
+    def _get_tz_from_string(tz_str: str) -> datetime.tzinfo:
+        import re
+
+        # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+        offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+        match = re.match(offset_pattern, tz_str.strip())
+
+        if match:
+            sign_str, hours_str, minutes_str = match.groups()
+            hours = int(hours_str)
+            minutes = int(minutes_str) if minutes_str else 0
+
+            total_minutes = hours * 60 + minutes
+            if sign_str == "-":
+                total_minutes = -total_minutes
+
+            return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+        # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+        try:
+            return ZoneInfo(tz_str)
+        except KeyError:  # pragma: no cover
+            # Invalid timezone name, fall back to UTC
+            return datetime.timezone.utc
+
+    # If ref_time is None (no reference_time provided), set it based on data awareness
+    if ref_time is None:
+        if max_dt_aware:
+            # Data is timezone-aware, use timezone-aware now
+            if timezone:
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # Default to UTC when data is aware but no timezone specified
+                ref_time = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            # Data is naive, use naive local time for comparison
+            if timezone:
+                # If user specified timezone, use it for reference
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # No timezone specified and data is naive -> use naive local time
+                ref_time = datetime.datetime.now()
+
+    result["reference_time"] = ref_time
+    ref_dt_aware = _is_datetime_aware(ref_time)
+
+    # Track timezone warnings - use keys for translation lookup
+    tz_warning_key = None
+
+    if max_dt_aware != ref_dt_aware:
+        if not allow_tz_mismatch:
+            if max_dt_aware and not ref_dt_aware:
+                tz_warning_key = "data_freshness_tz_warning_aware_naive"
+            else:
+                tz_warning_key = "data_freshness_tz_warning_naive_aware"
+        result["tz_warning_key"] = tz_warning_key
+
+    # Make both comparable
+    try:
+        if max_dt_aware and not ref_dt_aware:
+            # Add timezone to reference time
+            if timezone:
+                try:
+                    ref_time = ref_time.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:  # pragma: no cover
+                    ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+            else:
+                # Assume UTC
+                ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+
+        elif not max_dt_aware and ref_dt_aware:
+            # Localize the max_datetime if we have a timezone
+            if timezone:
+                try:
+                    max_datetime = max_datetime.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:  # pragma: no cover
+                    # Remove timezone from reference for comparison
+                    ref_time = ref_time.replace(tzinfo=None)
+            else:
+                # Remove timezone from reference for comparison
+                ref_time = ref_time.replace(tzinfo=None)
+
+        # Calculate the age
+        age = ref_time - max_datetime
+        result["age"] = age
+        result["reference_time"] = ref_time
+
+        # Check if within max_age
+        result["passed"] = age <= max_age
+
+    except Exception as e:  # pragma: no cover
+        result["error"] = str(e)
+        result["passed"] = False
+
+    return result
+
+
+def _is_datetime_aware(dt: Any) -> bool:
+    """Check if a datetime object is timezone-aware."""
+    if dt is None:
+        return False
+    if hasattr(dt, "tzinfo"):
+        return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+    return False

@@ -7,15 +7,10 @@ serve as regression tests to ensure serialization compatibility across versions.
 """
 
 import pickle
-
-# Add the parent directory to Python path to import pointblank
 import sys
 from pathlib import Path
 
 import polars as pl
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 from preprocessing_functions import (
     add_computed_column,
     complex_preprocessing,
@@ -111,11 +106,14 @@ def save_validation_files(validations, output_dir):
             with open(json_path, "w") as f:
                 f.write(json_report)
             print(f"Saved {name} validation JSON to {json_path}")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             print(f"Could not save JSON for {name}: {e}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
+    # When run as a standalone script, ensure the project root is on sys.path
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
     # Create validation examples
     validations = create_validation_examples()
 

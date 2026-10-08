@@ -1,6 +1,7 @@
 import os
 import sys
 import tempfile
+from decimal import Decimal
 from unittest.mock import patch
 
 import narwhals as nw
@@ -12,6 +13,7 @@ from pointblank._utils_llms_txt import (
     _get_api_and_examples_text,
     _get_api_text,
     _get_examples_text,
+    get_api_details,
 )
 from pointblank._utils import (
     _check_any_df_lib,
@@ -24,6 +26,7 @@ from pointblank._utils import (
     _copy_dataframe,
     _count_null_values_in_column,
     _count_true_values_in_column,
+    _count_validation_units,
     _derive_bounds,
     _derive_single_bound,
     _format_to_float_value,
@@ -34,6 +37,7 @@ from pointblank._utils import (
     _get_tbl_type,
     _is_date_or_datetime_dtype,
     _is_duration_dtype,
+    _is_in,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
@@ -42,6 +46,7 @@ from pointblank._utils import (
     _pivot_to_dict,
     _process_ibis_through_narwhals,
     _select_df_lib,
+    _with_row_index,
     transpose_dicts,
 )
 from pointblank.validate import load_dataset
@@ -362,6 +367,31 @@ def test_count_null_values_in_column(tbl_type):
     data = load_dataset(dataset="small_table", tbl_type=tbl_type)
 
     assert _count_null_values_in_column(tbl=data, column="c") == 2
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_count_validation_units(tbl_type):
+    data = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Column `e` has 8 True and 5 False values (13 rows total, no nulls)
+    n, n_passed, n_failed, n_null = _count_validation_units(tbl=data, column="e")
+
+    assert n == 13
+    assert n_passed == 8
+    assert n_failed == 5
+    assert n_null == 0
+
+
+def test_count_validation_units_with_nulls():
+    import polars as pl
+
+    df = pl.DataFrame({"pb_is_good_": [True, False, True, None, None]})
+
+    # A LazyFrame and an eager DataFrame should yield identical counts; Null values are excluded
+    # from both the pass and fail counts and surfaced separately
+    for native in (df, df.lazy()):
+        n, n_passed, n_failed, n_null = _count_validation_units(tbl=native, column="pb_is_good_")
+        assert (n, n_passed, n_failed, n_null) == (5, 2, 1, 2)
 
 
 def test_format_to_integer_value():
@@ -881,3 +911,170 @@ def test_copy_dataframe_exception_handling():
     result = _copy_dataframe(uncopyable)
 
     assert result is uncopyable  # Should return the original
+
+
+def test_resolve_columns_with_string():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns("x")
+    assert result == ["x"]
+
+
+def test_resolve_columns_with_column_object():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnLiteral
+
+    c = ColumnLiteral(exprs="x")
+    result = _resolve_columns(c)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0] is c
+
+
+def test_resolve_columns_with_list_of_strings():
+    from pointblank._utils import _resolve_columns
+
+    result = _resolve_columns(["a", "b", "c"])
+    assert result == ["a", "b", "c"]
+
+
+def test_resolve_columns_with_column_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import Column, StartsWith
+
+    selector = StartsWith(text="x")
+    result = _resolve_columns(selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], Column)
+
+
+def test_resolve_columns_with_narwhals_selector():
+    from pointblank._utils import _resolve_columns
+    from pointblank.column import ColumnSelectorNarwhals
+
+    nw_selector = nw.selectors.numeric()
+    result = _resolve_columns(nw_selector)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], ColumnSelectorNarwhals)
+
+
+def test_get_tbl_type_ibis_get_backend_fallback():
+    """Test the fallback path when ibis.get_backend() raises an exception."""
+    import ibis as ibis_mod
+
+    ibis_table = ibis_mod.memtable(pd.DataFrame({"x": [1, 2, 3]}))
+
+    with patch.object(ibis_mod, "get_backend", side_effect=Exception("get_backend failed")):
+        result = _get_tbl_type(ibis_table)
+
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+
+def test_get_api_details_agg_docstring_fallback():
+    import types
+
+    def col_sum_gt(self):
+        pass
+
+    col_sum_gt.__doc__ = None
+    col_sum_gt.__name__ = "col_sum_gt"
+
+    mod = types.ModuleType("fake_mod")
+    mod.col_sum_gt = col_sum_gt
+
+    result = get_api_details(mod, ["col_sum_gt"])
+    assert isinstance(result, str)
+
+
+# Each case: (column values, Polars dtype, `is_in()` values, expected result)
+IS_IN_CASES = {
+    "int_col_integral_floats": ([1, 2, 3], pl.Int64, [1.0, 2.0], [True, True, False]),
+    "int_col_mixed_values": ([1, 2, 3], pl.Int64, [1, 2.5], [True, False, False]),
+    "int_col_mixed_values_float_first": ([1, 2, 3], pl.Int64, [2.5, 3], [False, False, True]),
+    "int_col_non_finite_and_huge_floats": (
+        [1, 2, 3],
+        pl.Int64,
+        [float("nan"), float("inf"), 1e30],
+        [False, False, False],
+    ),
+    "int_col_none_and_float": ([1, 2, 3], pl.Int64, [None, 2.0], [False, True, False]),
+    "int_col_decimals": ([1, 2, 3], pl.Int64, [Decimal("2"), Decimal("2.5")], [False, True, False]),
+    "int_col_exact_above_2_53": ([2**53 + 1], pl.Int64, [float(2**53)], [False]),
+    "uint_col_floats": ([1, 2, 3], pl.UInt8, [1.0, -1.0], [True, False, False]),
+    "float_col_ints": ([1.0, 2.0, 3.5], pl.Float64, [1, 2], [True, True, False]),
+    "float32_col_mixed_values": ([1.0, 2.0, 3.5], pl.Float32, [1, 3.5], [True, False, True]),
+    "float_col_decimals": ([1.0, 2.0, 3.5], pl.Float64, [Decimal("3.5")], [False, False, True]),
+    "decimal_col_floats": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [1.5, 3.25],
+        [True, False, True],
+    ),
+    "decimal_col_ints": (
+        [Decimal("1.50"), Decimal("2.00"), Decimal("3.25")],
+        pl.Decimal(10, 2),
+        [2],
+        [False, True, False],
+    ),
+    "string_col": (["a", "b", "c"], pl.String, ["a", "c"], [True, False, True]),
+    "bool_col": ([True, False, True], pl.Boolean, [True], [True, False, True]),
+}
+
+
+@pytest.mark.parametrize("case", IS_IN_CASES.values(), ids=IS_IN_CASES.keys())
+@pytest.mark.parametrize("backend", ["polars", "polars_lazy", "pandas"])
+def test_is_in_aligns_numeric_values(case, backend):
+    column_values, dtype, values, expected = case
+
+    tbl = pl.DataFrame({"x": pl.Series(column_values, dtype=dtype)})
+    if backend == "polars_lazy":
+        tbl = tbl.lazy()
+    elif backend == "pandas":
+        if dtype.is_decimal():
+            pytest.skip("pandas has no native decimal dtype")
+        tbl = tbl.to_pandas()
+
+    nw_tbl = nw.from_native(tbl)
+    result = nw_tbl.select(_is_in("x", values, nw_tbl.collect_schema()["x"]))
+    if backend == "polars_lazy":
+        result = result.collect()
+
+    assert result["x"].to_list() == expected
+
+
+def test_is_in_unknown_dtype_passes_values_through():
+    tbl = nw.from_native(pl.DataFrame({"x": ["a", "b"]}))
+
+    assert tbl.select(_is_in("x", ["b"], None))["x"].to_list() == [False, True]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
+def test_with_row_index(tbl_type):
+    # The first column is unsorted and has ties so that ordering by it can't masquerade as the
+    # positional row order
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    if tbl_type == "polars_lazy":
+        tbl = tbl.lazy()
+    elif tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        if ibis is None:
+            pytest.skip("ibis is not installed")
+        tbl = ibis.memtable(tbl.to_pandas())
+
+    result = _with_row_index(tbl, name="idx")
+    if isinstance(result, nw.LazyFrame):
+        result = result.collect()
+
+    assert result.columns == ["idx", "x", "y"]
+
+    if tbl_type == "duckdb":
+        # Tables without an inherent row order are indexed in the order of their first column
+        assert result.sort("idx")["x"].to_list() == [1, 1, 3, 4, 5]
+    else:
+        assert result["idx"].to_list() == [0, 1, 2, 3, 4]
+        assert result["y"].to_list() == [10, 20, 30, 40, 50]

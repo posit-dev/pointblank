@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
 import narwhals as nw
 
@@ -8,7 +8,7 @@ from pointblank.column import Column, ColumnSelector
 from pointblank.thresholds import Thresholds
 
 
-def _check_boolean_input(param: bool, param_name: str):
+def _check_boolean_input(param: bool, param_name: str) -> None:
     """
     Check that input value is a boolean.
 
@@ -28,7 +28,36 @@ def _check_boolean_input(param: bool, param_name: str):
         raise ValueError(f"`{param_name}=` must be a boolean value.")
 
 
-def _check_column(column: str | list[str]):
+def _check_active_input(param: bool | Callable, param_name: str) -> None:
+    """
+    Check that the `active=` parameter is a boolean or a callable.
+
+    The callable form allows `active=` to accept an expression that will be evaluated at
+    interrogation time. The callable should accept a single argument (the table) and return a
+    boolean value.
+
+    Parameters
+    ----------
+    param
+        The input value to check. Must be a boolean or a callable.
+    param_name
+        The name of the parameter being checked. This is used in the error message.
+
+    Raises
+    ------
+    ValueError
+        When `param` is not a boolean value or a callable.
+    """
+    if isinstance(param, bool):
+        return
+    if callable(param):
+        return
+    raise ValueError(f"`{param_name}=` must be a boolean value or a callable.")
+
+
+def _check_column(
+    column: str | list[str] | Column | ColumnSelector | nw.selectors.Selector,
+) -> None:
     """
     Check the input value of the `column=` parameter.
 
@@ -59,7 +88,7 @@ def _check_column(column: str | list[str]):
 
 
 # TODO: allow for checking of dates/datetimes
-def _check_value_float_int(value: float | int | any):
+def _check_value_float_int(value: float | int | Any) -> None:
     """
     Check that input value of the `value=` parameter is a float or integer.
 
@@ -80,7 +109,7 @@ def _check_value_float_int(value: float | int | any):
         raise ValueError("`value=` must be a float, integer, or reference to a column.")
 
 
-def _check_set_types(set: list[float | int | str]):
+def _check_set_types(set: list[float | int | str]) -> None:
     """
     Check that input value of the `set=` parameter is a list of floats, integers, or strings.
 
@@ -101,7 +130,7 @@ def _check_set_types(set: list[float | int | str]):
         raise ValueError("`set=` must not contain boolean values.")
 
 
-def _check_pre(pre: Callable | None):
+def _check_pre(pre: Callable | None) -> None:
     """
     Check that input value of the `pre=` parameter is a callable function.
 
@@ -119,7 +148,7 @@ def _check_pre(pre: Callable | None):
         raise ValueError("`pre=` must be a callable function.")
 
 
-def _check_thresholds(thresholds: int | float | tuple | dict | Thresholds | None):
+def _check_thresholds(thresholds: int | float | tuple | dict | Thresholds | None) -> None:
     """
     Check that input value of the `thresholds=` parameter is a valid threshold.
 

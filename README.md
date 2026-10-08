@@ -1,7 +1,71 @@
 > [!TIP]
-> **📺 Featured Talk: ['Making Things Nice in Python'](https://www.youtube.com/watch?v=J6e2BKjHyPg)**
->
-> Discover how Pointblank and Great Tables (used in this library) prioritize user experience in Python package design. I go over why convenient options, extensive documentation, and thoughtful API decisions is better for everyone (even when they challenge conventional Python patterns/practices).
+> **📖 [Pointblank: The Complete Guide](https://rich-iannone.github.io/pointblank-the-complete-guide/)**: A comprehensive (and free!) book on data validation with Pointblank is now being written. Follow along and learn everything from first steps to advanced validation patterns and AI-assisted workflows.
+
+<details>
+<summary>📊 Book chapter progress</summary>
+<br>
+
+<!-- BOOK_PROGRESS_BEGIN -->
+Overall: **31%** complete &mdash; 14 of 37 chapters have content
+
+**Foundations**<br>
+Intro: `███████████████` 100%<br>
+Getting Started: `█████████████░░` 88%<br>
+Inspecting Data: `███████████████` 100%<br>
+Validation Workflow: `███████████████` 100%<br>
+Analysis Loop: `██████████░░░░░` 65%<br>
+
+**Building Validation Plans**<br>
+Column Validations: `███████████████` 100%<br>
+Aggregate Validations: `███████████░░░░` 71%<br>
+Row Validations: `███████████░░░░` 72%<br>
+Table Validations: `███████████████` 100%<br>
+Missing Data: `███████████████` 100%<br>
+Segmented Validation: `███████████░░░░` 75%<br>
+Advanced Validation: `████████████░░░` 78%<br>
+
+**Responding to Results**<br>
+Thresholds & Actions: `███████████████` 100%<br>
+Reports & Extracts: `█░░░░░░░░░░░░░░` 9%<br>
+Quality Scoring: `░░░░░░░░░░░░░░░` 0%<br>
+Notifications & Observability: `░░░░░░░░░░░░░░░` 0%<br>
+
+**AI-Assisted Validation**<br>
+Semantic Validation: `░░░░░░░░░░░░░░░` 1%<br>
+AI Authoring: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Data Sources, Interfaces & Automation**<br>
+Data Sources: `░░░░░░░░░░░░░░░` 1%<br>
+YAML Workflows: `░░░░░░░░░░░░░░░` 1%<br>
+Command Line: `░░░░░░░░░░░░░░░` 1%<br>
+MCP Server: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Data Contracts & Pipelines**<br>
+Data Contracts: `░░░░░░░░░░░░░░░` 1%<br>
+Pipelines: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Test Data Generation**<br>
+Test Data Generation: `░░░░░░░░░░░░░░░` 1%<br>
+
+**Clinical & Regulated Data**<br>
+Clinical & CDISC: `░░░░░░░░░░░░░░░` 0%<br>
+CDISC Conformance: `░░░░░░░░░░░░░░░` 0%<br>
+
+**Industry Playbooks**<br>
+Financial: `░░░░░░░░░░░░░░░` 0%<br>
+Ecommerce: `░░░░░░░░░░░░░░░` 0%<br>
+Data Engineering: `░░░░░░░░░░░░░░░` 0%<br>
+Healthcare: `░░░░░░░░░░░░░░░` 0%<br>
+Real-World Evidence: `░░░░░░░░░░░░░░░` 0%<br>
+ML Monitoring: `░░░░░░░░░░░░░░░` 0%<br>
+IoT Sensors: `░░░░░░░░░░░░░░░` 0%<br>
+Insurance: `░░░░░░░░░░░░░░░` 0%<br>
+Public Sector: `░░░░░░░░░░░░░░░` 0%<br>
+Marketing: `░░░░░░░░░░░░░░░` 0%<br>
+
+<!-- BOOK_PROGRESS_END -->
+
+</details>
 
 <div align="center">
 
@@ -60,7 +124,7 @@ import pointblank as pb
 data = pb.load_dataset("game_revenue")              # A sample dataset
 
 # Use DraftValidation to generate a validation plan
-pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 ```
 
 The output is a complete validation plan with intelligent suggestions based on your data:
@@ -354,12 +418,51 @@ Click the following headings to see some video demonstrations of the CLI:
 
 </details>
 
+## Generate Realistic Test Data
+
+Need test data for your validation workflows? The `generate_dataset()` function creates realistic, locale-aware synthetic data based on schema definitions. It's very useful for developing pipelines without production data, running CI/CD tests with reproducible scenarios, or prototyping workflows before production data is available.
+
+```python
+import pointblank as pb
+
+# Define a schema with field constraints
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate 10 rows of realistic test data
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+pb.preview(data)
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-data-generation.png" width="800px">
+</div>
+
+<br>
+
+The generator supports sophisticated data generation with these capabilities:
+
+- **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **User agent strings**: Generate highly varied, realistic browser user agent strings from 17 browser categories with over 42,000 unique combinations
+- **100 country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
+- **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
+- **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
+
+This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data.
+
 ## Features That Set Pointblank Apart
 
 - **Complete validation workflow**: From data access to validation to reporting in a single pipeline
 - **Built for collaboration**: Share results with colleagues through beautiful interactive reports
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
+- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
 - **Customizable**: Tailor validation steps and reporting to your specific needs
 - **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 

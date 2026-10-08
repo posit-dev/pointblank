@@ -10,6 +10,14 @@ except PackageNotFoundError:  # pragma: no cover
 
 # Import objects from the module
 from pointblank.actions import send_slack_notification
+from pointblank.adapters import (
+    ContractAdapter,
+    ContractImport,
+    export_contract,
+    import_contract,
+    list_adapters,
+    register_adapter,
+)
 from pointblank.assistant import assistant
 from pointblank.column import (
     col,
@@ -20,11 +28,69 @@ from pointblank.column import (
     first_n,
     last_n,
     matches,
+    ref,
     starts_with,
 )
-from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank.contract import Contract, Step
+from pointblank.datascan import DataScan, DataScanDiff, col_summary_tbl
+from pointblank.steps import Steps
 from pointblank.draft import DraftValidation
-from pointblank.schema import Schema
+from pointblank.edit import EditValidation
+from pointblank.field import (
+    BoolField,
+    DateField,
+    DatetimeField,
+    DurationField,
+    Field,
+    FloatField,
+    IntField,
+    StringField,
+    TimeField,
+    bool_field,
+    date_field,
+    datetime_field,
+    duration_field,
+    float_field,
+    int_field,
+    profile_fields,
+    string_field,
+    time_field,
+)
+from pointblank.generate.base import GeneratorConfig
+from pointblank.inspect import has_columns, has_rows
+from pointblank.integrations.otel import emit_otel
+from pointblank.missing import MissingSpec
+from pointblank.metadata import (
+    ADaMDatasetTemplate,
+    ADaMVariableSpec,
+    Codelist,
+    CodelistEntry,
+    ConformanceReport,
+    MetadataImport,
+    MetadataPackage,
+    MissingValueCode,
+    SDTMDomainTemplate,
+    SDTMVariableSpec,
+    SubmissionPackage,
+    VariableMetadata,
+    adam_to_metadata,
+    export_metadata,
+    get_adam_dataset,
+    get_sdtm_domain,
+    import_metadata,
+    list_adam_datasets,
+    list_sdtm_domains,
+    load_metadata_example,
+    sdtm_to_metadata,
+    validate_adam,
+    validate_adam_structure,
+    validate_cdisc_submission,
+    validate_sdtm,
+    validate_sdtm_structure,
+    validate_sdtmig,
+)
+from pointblank.pipeline import Pipeline, PipelineResult
+from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from pointblank.validate import (
@@ -56,9 +122,18 @@ __all__ = [
     "Actions",
     "FinalActions",
     "Schema",
+    "Contract",
+    "Step",
+    "Steps",
+    "Pipeline",
+    "PipelineResult",
     "DataScan",
+    "DataScanDiff",
     "DraftValidation",
+    "EditValidation",
+    "MissingSpec",
     "col",
+    "ref",
     "expr_col",
     "col_summary_tbl",
     "starts_with",
@@ -83,8 +158,75 @@ __all__ = [
     "get_row_count",
     "seg_group",
     "send_slack_notification",
+    "emit_otel",
+    # Data generation - Field classes
+    "Field",
+    "IntField",
+    "FloatField",
+    "StringField",
+    "BoolField",
+    "DateField",
+    "DatetimeField",
+    "TimeField",
+    "DurationField",
+    # Data generation - helper functions
+    "int_field",
+    "float_field",
+    "string_field",
+    "bool_field",
+    "date_field",
+    "datetime_field",
+    "time_field",
+    "duration_field",
+    "profile_fields",
+    # Data generation - configuration
+    "GeneratorConfig",
+    # Data generation - convenience function
+    "generate_dataset",
+    "schema_from_tbl",
+    # Table inspection functions (for use with `active=`)
+    "has_columns",
+    "has_rows",
     # YAML functionality
     "yaml_interrogate",
     "validate_yaml",
     "yaml_to_python",
+    # Contract import/export
+    "ContractAdapter",
+    "ContractImport",
+    "import_contract",
+    "export_contract",
+    "list_adapters",
+    "register_adapter",
+    # Metadata standards import/export
+    "import_metadata",
+    "load_metadata_example",
+    "export_metadata",
+    "MetadataImport",
+    "MetadataPackage",
+    "VariableMetadata",
+    "Codelist",
+    "CodelistEntry",
+    "MissingValueCode",
+    # SDTM domain validation
+    "SDTMDomainTemplate",
+    "SDTMVariableSpec",
+    "get_sdtm_domain",
+    "list_sdtm_domains",
+    "validate_sdtm_structure",
+    "sdtm_to_metadata",
+    "validate_sdtm",
+    # ADaM dataset validation
+    "ADaMDatasetTemplate",
+    "ADaMVariableSpec",
+    "get_adam_dataset",
+    "list_adam_datasets",
+    "validate_adam_structure",
+    "adam_to_metadata",
+    "validate_adam",
+    # CDISC submission-package conformance
+    "SubmissionPackage",
+    "ConformanceReport",
+    "validate_cdisc_submission",
+    "validate_sdtmig",
 ]

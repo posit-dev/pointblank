@@ -79,6 +79,9 @@ ipython_config.py
 # celery beat schedule file
 celerybeat-schedule
 
+# Claude
+.claude/
+
 # dotenv
 .env
 .venv
@@ -131,6 +134,10 @@ datasets/
 /*.csv
 .ruff_cache
 
+/*.md
+!README.md
+!ROADMAP.md
+
 # Benchmark results and reports
 benchmark/results/
 benchmark/reports/
@@ -141,3 +148,13 @@ benchmark/data/*.json
 uv.lock
 memory
 .vscode/mcp.json
+
+# While typing is experimental, don't mark the entire package as typed
+pointblank/py.typed
+
+# Great Docs build directory (ephemeral, do not commit)
+great-docs/
+
+# Other directories
+vhs/
+pdf-export/

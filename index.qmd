@@ -1,0 +1,71 @@
+---
+title: ""
+jupyter: python3
+html-table-processing: none
+---
+
+Pointblank is a data validation framework for Python that makes data quality checks beautiful,
+powerful, and stakeholder-friendly. Instead of cryptic error messages, get stunning interactive
+reports that turn data issues into conversations.
+
+Here's what a validation looks like (click "Show the code" to see how it's done):
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+import pointblank as pb
+import polars as pl
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars"),
+        tbl_name="game_revenue",
+        label="Comprehensive validation of game revenue data",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35),
+        brief=True
+    )
+    .col_vals_regex(columns="player_id", pattern=r"^[A-Z]{12}[0-9]{3}$")
+    .col_vals_gt(columns="session_duration", value=20)
+    .col_vals_ge(columns="item_revenue", value=0.20)
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_in_set(
+        columns="acquisition",
+        set=["google", "facebook", "organic", "crosspromo", "other_campaign"]
+    )
+    .col_vals_not_in_set(columns="country", set=["Mongolia", "Germany"])
+    .col_vals_between(
+        columns="session_duration",
+        left=10, right=50,
+        pre=lambda df: df.select(pl.median("session_duration")),
+        brief="Expect that the median of `session_duration` should be between `10` and `50`."
+    )
+    .rows_distinct(columns_subset=["player_id", "session_id", "time"])
+    .row_count_match(count=2000)
+    .col_count_match(count=11)
+    .col_vals_not_null(columns="item_type")
+    .col_exists(columns="start_day")
+    .interrogate()
+)
+
+validation.get_tabular_report(title="Game Revenue Validation Report")
+```
+
+That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
+your team.
+
+## What is Data Validation?
+
+Data validation makes sure your data is what you think it is before it reaches analysis, reports, or downstream systems. Pointblank gives you a structured way to declare what good data looks like, run those checks against a real table, and communicate the results to technical and non-technical audiences alike. You build a plan with a fluent, chainable API that draws on more than 45 validation methods, set warning, error, and critical thresholds, attach actions that fire when a threshold is crossed, and get back a report anyone on the team can read. Because Pointblank runs on [Narwhals](https://narwhals-dev.github.io/narwhals/) and [Ibis](https://ibis-project.org) under the hood, the same plan executes unchanged across Polars, Pandas, DuckDB, Spark, Snowflake, BigQuery, Databricks, PostgreSQL, MySQL, SQLite, and Parquet.
+
+## More than a checker
+
+The reporting goes well beyond a single pass or fail. Any step can be opened in a focused [step report](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) that drills into the exact rows that failed, and those [failing rows can be pulled out](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) as their own table for debugging. The source data can even be [split into passing and failing pieces](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) for quarantine or reprocessing. Reports are localized in 40 languages, and results roll up into [quality dimensions and a single health score](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html), so completeness, validity, uniqueness, consistency, timeliness, and volume become one number you can watch over time.
+
+![A step report drills into the specific rows behind a failing validation step.](https://posit-dev.github.io/pointblank/assets/pointblank-step-report.png)
+
+Authoring a plan does not have to start from an empty file. Pointblank can [draft a starting plan from a natural-language prompt](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html), and from there you can [revise and iterate on it in plain English](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html) or ask it to suggest improvements. When your standards already live somewhere else, you can bring them with you. Pointblank will [import contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/importing-contracts.html) written as JSON Schema or Frictionless, pull column metadata straight from [SPSS, SAS, and Stata](https://posit-dev.github.io/pointblank/user-guide/metadata-import/statistical-packages.html) files, and for clinical work validate against [CDISC SDTM and ADaM](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html) templates or read a Define-XML specification. It can also model structured missingness, encoding [why a value is absent](https://posit-dev.github.io/pointblank/user-guide/data-inspection/missing-vals-tbl.html) instead of treating every gap identically.
+
+![Point Pointblank at a table and let it draft a starting validation plan for you.](https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png)
+
+Getting all of this into production is where Pointblank earns its place. You can define reusable [data contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html) and enforce them at [both the source and target](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html) of a transformation, keep plans as [YAML](https://posit-dev.github.io/pointblank/user-guide/yaml/yaml-validation-workflows.html) for version control and review, and run the whole thing from a [command-line interface](https://posit-dev.github.io/pointblank/user-guide/the-pointblank-cli/cli-data-validation.html) inside CI. Pointblank also speaks to machines: it ships an [MCP server](https://posit-dev.github.io/pointblank/user-guide/mcp-server/mcp-quick-start.html) and llms.txt files for AI agents, emits [OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html) traces and metrics for observability, and can [generate synthetic test data](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/test-data-generation.html) when you need something to validate against.

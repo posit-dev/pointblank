@@ -1,17 +1,48 @@
 .PHONY: check
 
+.PHONY: pyi
+pyi: ## Generate .pyi stub files
+	@uv run stubgen ./pointblank/validate.py \
+		--include-private \
+		-o  .
+	@uv run scripts/generate_agg_validate_pyi.py
+	@uv run ruff check --fix pointblank/validate.pyi
+	@uv run ruff format pointblank/validate.pyi
+
 .PHONY: test
 test:
-	@uv run pytest \
+	@uv run pytest tests \
 		--cov=pointblank \
 		--cov-report=term-missing \
 		--randomly-seed 123 \
 		-n auto \
 		--reruns 3 \
-		--reruns-delay 1
+		--reruns-delay 1 \
+		--doctest-modules pointblank \
+		--durations 10
+
+.PHONY: test-core
+test-core: ## Run core libraries only; useful for local CI
+	@SKIP_PYSPARK_TESTS=1 \
+		SKIP_SQLITE_TESTS=1 \
+		SKIP_PARQUET_TESTS=1 \
+		uv run pytest \
+		--cov=pointblank \
+		--cov-report=term-missing \
+		--randomly-seed 123 \
+		-n auto \
+		--durations=10
+
+.PHONY: tox
+tox: ## Run tox tests across isolated environments (pandas, polars, ibis)
+	@tox
 
 test-update:
 	pytest --snapshot-update
+
+.PHONY: pre-commit
+pre-commit: ## Run pre-commit hooks
+	@uvx pre-commit run --all-files
 
 .PHONY: lint
 lint: ## Run ruff formatter and linter
@@ -25,6 +56,11 @@ install-pre-commit: # Install pre-commit hooks
 .PHONY: run-pre-commit
 run-pre-commit: # Run pre-commit hooks
 	@uvx pre-commit run --all-files
+
+
+type: ## Run experimental type checking
+	@uv run ty check pointblank
+
 
 check:
 	pyright --pythonversion 3.8 pointblank
@@ -74,10 +110,10 @@ docs-pdf: ## Build PDF version of User Guide (HTML to PDF preserving graphics)
 	uv run python scripts/create_toc_pdf.py docs/user-guide.pdf
 	@echo "PDF available at docs/user-guide.pdf"
 
-docs-llms: ## Generate llms.txt and llms-full.txt files for LLM consumption
-	@uv run python scripts/generate_llms_txt.py
+docs-api-text: ## Regenerate api-docs.txt for DraftValidation/assistant
+	@uv run python scripts/generate_api_docs.py
 
-docs-full: docs-build docs-llms ## Build docs and generate llms.txt files
+docs-full: docs-build ## Build docs
 
 install: dist ## install the package to the active Python's site-packages
 	python3 -m pip install --force-reinstall dist/pointblank*.whl

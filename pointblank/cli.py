@@ -21,7 +21,7 @@ console = Console()
 class OrderedGroup(click.Group):
     """A Click Group that displays commands in a custom order."""
 
-    def list_commands(self, ctx):
+    def list_commands(self, ctx) -> list[str]:
         """Return commands in the desired logical order."""
         # Define the desired order
         desired_order = [
@@ -1240,7 +1240,7 @@ def _display_validation_summary(validation: Any) -> None:
 @click.group(cls=OrderedGroup)
 @click.version_option(pb.__version__, "-v", "--version", prog_name="pb")
 @click.help_option("-h", "--help")
-def cli():
+def cli() -> None:
     """
     Pointblank CLI: Data validation and quality tools for data engineers.
 
@@ -1262,7 +1262,7 @@ def cli():
 
 @cli.command()
 @click.argument("data_source", type=str, required=False)
-def info(data_source: str | None):
+def info(data_source: str | None) -> None:
     """
     Display information about a data source.
 
@@ -1348,7 +1348,7 @@ def preview(
     min_table_width: int,
     no_header: bool,
     output_html: str | None,
-):
+) -> None:
     """
     Preview a data table showing head and tail rows.
 
@@ -1589,7 +1589,7 @@ def scan(
     data_source: str | None,
     output_html: str | None,
     columns: str | None,
-):
+) -> None:
     """
     Generate a data scan profile report.
 
@@ -1732,7 +1732,7 @@ def scan(
 @cli.command()
 @click.argument("data_source", type=str, required=False)
 @click.option("--output-html", type=click.Path(), help="Save HTML output to file")
-def missing(data_source: str | None, output_html: str | None):
+def missing(data_source: str | None, output_html: str | None) -> None:
     """
     Generate a missing values report for a data table.
 
@@ -1913,7 +1913,7 @@ def validate(
     limit: int,
     exit_code: bool,
     list_checks: bool,
-):
+) -> None:
     """
     Perform single or multiple data validations.
 
@@ -2330,7 +2330,7 @@ def validate(
 
 
 @cli.command()
-def datasets():
+def datasets() -> None:
     """
     List available built-in datasets.
     """
@@ -2370,7 +2370,7 @@ def datasets():
 
 
 @cli.command()
-def requirements():
+def requirements() -> None:
     """
     Check installed dependencies and their availability.
     """
@@ -2411,7 +2411,7 @@ def requirements():
 
 
 def _rich_print_missing_table_enhanced(
-    gt_table: Any, original_data: Any = None, missing_info: dict = None
+    gt_table: Any, original_data: Any = None, missing_info: dict | None = None
 ) -> None:
     """Convert a missing values GT table to Rich table with enhanced formatting and metadata.
 
@@ -3157,7 +3157,7 @@ def _map_parameters_to_checks(
     return mapped_columns, mapped_sets, mapped_values
 
 
-def _resolve_column_indices(columns_list, data):
+def _resolve_column_indices(columns_list: list[str], data):
     """
     Replace any '#N' entries in columns_list with the actual column name from data (1-based).
     """
@@ -3891,7 +3891,7 @@ def _show_extract_and_summary(
 
 @cli.command()
 @click.argument("output_file", type=click.Path(), required=False)
-def make_template(output_file: str | None):
+def make_template(output_file: str | None) -> None:
     """
     Create a validation script or YAML configuration template.
 
@@ -3944,11 +3944,19 @@ def make_template(output_file: str | None):
 tbl: small_table  # Replace with your data source
                   # Can be: dataset name, CSV file, Parquet file, database connection, etc.
 
+# Optional: DataFrame library ("polars", "pandas", "duckdb")
+# df_library: polars
+
 # Optional: Table name for reporting (defaults to filename if not specified)
 tbl_name: "Example Validation"
 
 # Optional: Label for this validation run
 label: "Validation Template"
+
+# Optional: Governance metadata
+# owner: "Data Engineering"
+# consumers: [Analytics, Finance]
+# version: "1.0.0"
 
 # Optional: Validation thresholds (defaults shown below)
 # thresholds:
@@ -3992,6 +4000,27 @@ steps:
   # - col_vals_in_set:
   #     columns: status
   #     set: [active, inactive, pending]
+
+  # Aggregate validations (uncomment and modify as needed)
+  # - col_sum_gt:
+  #     columns: revenue
+  #     value: 0
+  #     brief: "Total revenue is positive"
+
+  # - col_avg_between:
+  #     columns: rating
+  #     left: 1
+  #     right: 5
+
+  # Check null percentage (uncomment and modify as needed)
+  # - col_pct_null:
+  #     columns: [email, phone]
+  #     value: 0.05
+
+  # Data freshness check (uncomment and modify as needed)
+  # - data_freshness:
+  #     columns: event_date
+  #     freshness: "24h"
 
 # Add more validation steps as needed
 # See the Pointblank documentation for the full list of available validation functions
@@ -4105,7 +4134,7 @@ def run(
     write_extract: str | None,
     limit: int,
     fail_on: str | None,
-):
+) -> None:
     """
     Run a Pointblank validation script or YAML configuration.
 
@@ -4575,6 +4604,119 @@ def run(
         sys.exit(1)
 
 
+def _print_unified_diff(diff: str) -> None:
+    """Print a unified diff with basic color coding."""
+    for line in diff.splitlines():
+        if line.startswith(("+++", "---")):
+            console.print(f"[bold]{line}[/bold]")
+        elif line.startswith("@@"):
+            console.print(f"[cyan]{line}[/cyan]")
+        elif line.startswith("+"):
+            console.print(f"[green]{line}[/green]")
+        elif line.startswith("-"):
+            console.print(f"[red]{line}[/red]")
+        else:
+            console.print(line)
+
+
+@cli.command(name="edit")
+@click.argument("validation_file", type=click.Path(exists=True), required=False)
+@click.option(
+    "--instruction",
+    "-i",
+    help="Plain-English description of the change to make to the plan.",
+)
+@click.option(
+    "--model",
+    "-m",
+    help="Model to use, as provider:model (e.g., anthropic:claude-opus-4-8).",
+)
+@click.option(
+    "--data",
+    "data_source",
+    type=str,
+    help="Optional data source used for DataScan-informed edits and validation.",
+)
+@click.option("--output", "-o", type=click.Path(), help="Write the revised plan to this file.")
+@click.option(
+    "--yes", "-y", is_flag=True, help="Write the output file without asking for confirmation."
+)
+def edit(
+    validation_file: str | None,
+    instruction: str | None,
+    model: str | None,
+    data_source: str | None,
+    output: str | None,
+    yes: bool,
+) -> None:
+    """
+    Edit an existing validation plan with a natural-language instruction (AI Validation Editor).
+
+    VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validation plan.
+    The instruction is sent, along with the current plan, to the specified model; the proposed
+    change is shown as a diff for review and can optionally be written to a file.
+
+    Examples:
+
+    \b
+    pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
+    pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+    pb edit plan.py -i "drop the email regex check" -m anthropic:claude-opus-4-8 -o plan2.py -y
+    """
+    if not validation_file:
+        console.print("[red]Error:[/red] VALIDATION_FILE is required.")
+        sys.exit(1)
+    if not instruction:
+        console.print("[red]Error:[/red] --instruction/-i is required.")
+        sys.exit(1)
+    if not model:
+        console.print("[red]Error:[/red] --model/-m is required (e.g., anthropic:claude-opus-4-8).")
+        sys.exit(1)
+
+    try:
+        data = _load_data_source(data_source) if data_source else None
+
+        console.print(f"[dim]Editing {validation_file} with {model}...[/dim]")
+        edited = pb.EditValidation(
+            validation=validation_file,
+            instruction=instruction,
+            model=model,
+            data=data,
+        )
+
+        diff = edited.diff()
+        if not diff.strip():
+            console.print("[yellow]The model returned no changes to the plan.[/yellow]")
+        else:
+            console.print(Panel.fit("Proposed changes", border_style="cyan"))
+            _print_unified_diff(diff)
+
+        changes = edited.changed_steps()
+        if changes:
+            added = sum(1 for c in changes if c["action"] == "add")
+            removed = sum(1 for c in changes if c["action"] == "remove")
+            modified = sum(1 for c in changes if c["action"] == "modify")
+            console.print(f"\n[bold]{added} added, {removed} removed, {modified} modified[/bold]")
+
+        if not edited.validate_syntax():
+            console.print(
+                "[yellow]Warning:[/yellow] the revised plan did not pass the syntax check. "
+                "Review it carefully before use."
+            )
+
+        if output:
+            if not yes:
+                click.confirm(f"Write the revised plan to {output}?", abort=True)
+            Path(output).write_text(edited.to_code(), encoding="utf-8")
+            console.print(f"[green]Wrote revised plan to {output}[/green]")
+
+    except click.exceptions.Abort:
+        console.print("[yellow]Aborted; no file written.[/yellow]")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        sys.exit(1)
+
+
 def _format_missing_percentage(value: float) -> str:
     """Format missing value percentages for display.
 
@@ -4633,7 +4775,7 @@ def pl(
     output_html: str | None,
     pipe: bool,
     pipe_format: str,
-):
+) -> None:
     """
     Execute Polars expressions and display results.
 

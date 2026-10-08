@@ -1197,6 +1197,31 @@ def test_tbl_match_duckdb_ibis_vs_pandas():
     assert validation.all_passed()
 
 
+def test_tbl_match_ibis_memtable_vs_dataframes():
+    """Test Ibis memtable vs Polars and Pandas comparisons."""
+
+    # Create test data
+    data = {
+        "int_col": [1, 2, 3],
+        "float_col": [1.5, None, 3.5],
+        "str_col": ["a", "b", "c"],
+    }
+
+    tbl_memtable = ibis.memtable(pd.DataFrame(data))
+
+    for tbl_df in [pl.DataFrame(data), pd.DataFrame(data)]:
+        validation = Validate(data=tbl_df).tbl_match(tbl_compare=tbl_memtable).interrogate()
+        assert validation.all_passed()
+
+        validation = Validate(data=tbl_memtable).tbl_match(tbl_compare=tbl_df).interrogate()
+        assert validation.all_passed()
+
+    # Different data still fails
+    tbl_different = pl.DataFrame({**data, "str_col": ["a", "b", "d"]})
+    validation = Validate(data=tbl_memtable).tbl_match(tbl_compare=tbl_different).interrogate()
+    assert not validation.all_passed()
+
+
 def test_tbl_match_sqlite_vs_pandas():
     """Test SQLite vs Pandas comparison."""
 

@@ -3,13 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import pathlib
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import narwhals as nw
-from narwhals.typing import FrameT
 
 from pointblank._constants import MODEL_PROVIDERS
+
+_IMAGE_EXTS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".webp"})
+_PDF_EXTS = frozenset({".pdf"})
+_SUPPORTED_ATTACHMENT_EXTS = _IMAGE_EXTS | _PDF_EXTS
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +32,7 @@ class _LLMConfig:
     provider
         LLM provider name (e.g., 'anthropic', 'openai', 'ollama', 'bedrock').
     model
-        Model name (e.g., 'claude-sonnet-4-5', 'gpt-4').
+        Model name (e.g., 'claude-opus-4-6', 'gpt-4').
     api_key
         API key for the provider. If None, will be read from environment.
     verify_ssl
@@ -41,8 +45,32 @@ class _LLMConfig:
     verify_ssl: bool = True
 
 
+_ROW_VALIDATION_SYSTEM_PROMPT = """You are a data validation assistant. Your task is to analyze rows of data and determine if they meet the specified validation criteria.
+
+INSTRUCTIONS:
+- Analyze each row in the provided data
+- For each row, determine if it meets the validation criteria (True) or not (False)
+- Return ONLY a JSON array with validation results
+- Each result should have: {"index": <row_index>, "result": <true_or_false>}
+- Do not include any explanatory text, only the JSON array
+- The row_index should match the "_pb_row_index" field from the input data
+
+EXAMPLE OUTPUT FORMAT:
+[
+  {"index": 0, "result": true},
+  {"index": 1, "result": false},
+  {"index": 2, "result": true}
+]
+
+If reference attachments (images or PDFs) are provided alongside the data, use them as context when evaluating each row."""
+
+
 def _create_chat_instance(
-    provider: str, model_name: str, api_key: Optional[str] = None, verify_ssl: bool = True
+    provider: str,
+    model_name: str,
+    api_key: Optional[str] = None,
+    verify_ssl: bool = True,
+    system_prompt: Optional[str] = None,
 ):
     """
     Create a chatlas chat instance for the specified provider.
@@ -57,6 +85,10 @@ def _create_chat_instance(
         Optional API key. If None, will be read from environment.
     verify_ssl
         Whether to verify SSL certificates when making requests. Defaults to True.
+    system_prompt
+        Optional system prompt to steer the model. If None, a row-validation system prompt is
+        used (the default for the AI validation flow). Other flows (e.g., drafting/editing
+        validation plans) supply their own prompt.
 
     Returns
     -------
@@ -78,23 +110,9 @@ def _create_chat_instance(
             f"Supported providers: {', '.join(MODEL_PROVIDERS)}"
         )
 
-    # System prompt with role definition and instructions
-    system_prompt = """You are a data validation assistant. Your task is to analyze rows of data and determine if they meet the specified validation criteria.
-
-INSTRUCTIONS:
-- Analyze each row in the provided data
-- For each row, determine if it meets the validation criteria (True) or not (False)
-- Return ONLY a JSON array with validation results
-- Each result should have: {"index": <row_index>, "result": <true_or_false>}
-- Do not include any explanatory text, only the JSON array
-- The row_index should match the "_pb_row_index" field from the input data
-
-EXAMPLE OUTPUT FORMAT:
-[
-  {"index": 0, "result": true},
-  {"index": 1, "result": false},
-  {"index": 2, "result": true}
-]"""
+    # Use the row-validation system prompt unless a caller supplies its own
+    if system_prompt is None:
+        system_prompt = _ROW_VALIDATION_SYSTEM_PROMPT
 
     # Create httpx client with SSL verification settings
     try:
@@ -111,7 +129,7 @@ EXAMPLE OUTPUT FORMAT:
     if provider == "anthropic":  # pragma: no cover
         # Check that the anthropic package is installed
         try:
-            import anthropic  # noqa
+            import anthropic  # noqa  # type: ignore[import-not-found]
         except ImportError:
             raise ImportError(
                 "The `anthropic` package is required to use AI validation with "
@@ -167,8 +185,45 @@ EXAMPLE OUTPUT FORMAT:
     elif provider == "bedrock":  # pragma: no cover
         from chatlas import ChatBedrockAnthropic
 
+        # ChatBedrockAnthropic creates both a sync and async client internally,
+        # so we cannot pass a single http_client instance. Omit it and let
+        # the Bedrock client manage its own HTTP stack.
         chat = ChatBedrockAnthropic(
             model=model_name,
+            system_prompt=system_prompt,
+        )
+
+    elif provider == "azure-openai":  # pragma: no cover
+        try:
+            import openai  # noqa
+        except ImportError:
+            raise ImportError(
+                "The `openai` package is required to use AI validation with "
+                "`azure-openai`. Please install it using `pip install openai`."
+            )
+
+        import os
+
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("OPENAI_API_VERSION")
+        if not endpoint:
+            raise ValueError(
+                "AZURE_OPENAI_ENDPOINT environment variable must be set to use "
+                "the 'azure-openai' provider."
+            )
+        if not api_version:
+            raise ValueError(
+                "OPENAI_API_VERSION environment variable must be set to use "
+                "the 'azure-openai' provider (e.g. '2024-06-01')."
+            )
+
+        from chatlas import ChatAzureOpenAI
+
+        chat = ChatAzureOpenAI(
+            endpoint=endpoint,
+            deployment_id=model_name,
+            api_version=api_version,
+            api_key=api_key,
             system_prompt=system_prompt,
             kwargs={"http_client": http_client},
         )
@@ -177,6 +232,71 @@ EXAMPLE OUTPUT FORMAT:
         raise ValueError(f"Unsupported provider: {provider}")
 
     return chat
+
+
+def _prepare_attachments(attachments: Optional[List[Any]]) -> List[Any]:
+    """
+    Coerce a heterogeneous list of attachment specs into chatlas Content objects.
+
+    Accepts:
+    - ``str`` or ``pathlib.Path``: auto-converted to ``content_image_*`` or ``content_pdf_*``
+      based on extension. URLs (``http://``/``https://``) use the URL variants.
+    - Pre-built chatlas ``Content`` objects: passed through untouched.
+
+    Raises ``ValueError`` for unsupported extensions and ``ImportError`` if chatlas
+    is not installed.
+    """
+    if not attachments:
+        return []
+
+    if not isinstance(attachments, (list, tuple)):
+        raise TypeError(f"attachments must be a list or tuple, got {type(attachments).__name__}")
+
+    try:
+        from chatlas import (
+            content_image_file,
+            content_image_url,
+            content_pdf_file,
+            content_pdf_url,
+        )
+    except ImportError:  # pragma: no cover
+        raise ImportError(
+            "The `chatlas` package is required for attachments support. "
+            "Please install it using `pip install chatlas`."
+        )
+
+    prepared: List[Any] = []
+    for item in attachments:
+        # If it's a string or path-like, coerce based on extension. Otherwise
+        # assume it's an already-built chatlas Content object and pass through.
+        if isinstance(item, (str, pathlib.PurePath)):
+            path_str = str(item)
+            # Strip query string before checking extension for URLs.
+            ext = pathlib.PurePosixPath(path_str.split("?", 1)[0]).suffix.lower()
+            if ext not in _SUPPORTED_ATTACHMENT_EXTS:
+                raise ValueError(
+                    f"Unsupported attachment extension {ext!r} for {path_str!r}. "
+                    f"Supported extensions: {sorted(_SUPPORTED_ATTACHMENT_EXTS)}"
+                )
+            is_url = path_str.startswith(("http://", "https://"))
+            if ext in _IMAGE_EXTS:
+                # content_image_file emits MissingResizeWarning when no resize
+                # is given; pass "low" explicitly (its implicit default) to
+                # suppress it. content_image_url has no resize parameter.
+                # Users wanting higher fidelity should pre-build the Content
+                # with their preferred resize and pass it in directly (the
+                # pass-through branch below handles that).
+                prepared.append(
+                    content_image_url(path_str)
+                    if is_url
+                    else content_image_file(path_str, resize="low")
+                )
+            else:
+                prepared.append(content_pdf_url(path_str) if is_url else content_pdf_file(path_str))
+        else:
+            prepared.append(item)
+
+    return prepared
 
 
 # ============================================================================
@@ -205,7 +325,7 @@ class _DataBatcher:
 
     def __init__(
         self,
-        data: FrameT,
+        data: Any,
         columns: Optional[List[str]] = None,
         config: Optional[_BatchConfig] = None,
     ):
@@ -265,13 +385,13 @@ class _DataBatcher:
         signature_str = json.dumps(signature_data, sort_keys=True, default=str)
         return hashlib.md5(signature_str.encode()).hexdigest()
 
-    def _build_unique_rows_table(self) -> Tuple[FrameT, Dict[str, List[int]]]:
+    def _build_unique_rows_table(self) -> Tuple[Any, Dict[str, List[int]]]:
         """
         Build unique rows table and mapping back to original indices.
 
         Returns
         -------
-        Tuple[FrameT, Dict[str, List[int]]]
+        Tuple[Any, Dict[str, List[int]]]
             Unique rows table and signature-to-indices mapping.
         """
         nw_data = self._nw_data
@@ -733,7 +853,11 @@ class _ValidationResponseParser:
 class _AIValidationEngine:
     """Main engine for AI-powered validation using chatlas."""
 
-    def __init__(self, llm_config: _LLMConfig):
+    def __init__(
+        self,
+        llm_config: _LLMConfig,
+        attachments: Optional[List[Any]] = None,
+    ):
         """
         Initialize the AI validation engine.
 
@@ -741,8 +865,12 @@ class _AIValidationEngine:
         ----------
         llm_config
             Configuration for the LLM provider.
+        attachments
+            Optional list of chatlas ``Content`` objects sent as global context
+            alongside every batch's text prompt.
         """
         self.llm_config = llm_config
+        self.attachments: List[Any] = list(attachments) if attachments else []
         self.chat = _create_chat_instance(
             provider=llm_config.provider,
             model_name=llm_config.model,
@@ -789,8 +917,9 @@ class _AIValidationEngine:
                 logger.debug(prompt)
                 logger.debug("--- PROMPT END ---")
 
-                # Get response from LLM using chatlas (synchronous)
-                response = str(self.chat.chat(prompt, stream=False, echo="none"))
+                # Get response from LLM using chatlas (synchronous). Attachments
+                # ride along as global context content blocks for every batch.
+                response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
                 # Debug: Log the raw LLM response
                 logger.debug(f"📥 LLM Response for batch {batch['batch_id']}:")
@@ -856,8 +985,9 @@ class _AIValidationEngine:
             # Build the prompt for this batch
             prompt = prompt_builder.build_prompt(batch["data"])
 
-            # Get response from LLM using chatlas (synchronous)
-            response = str(self.chat.chat(prompt, stream=False, echo="none"))
+            # Get response from LLM using chatlas (synchronous). Attachments
+            # ride along as global context content blocks for every batch.
+            response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
             # Parse the response
             parser = _ValidationResponseParser(total_rows=1000)  # This will be set properly
@@ -873,3 +1003,238 @@ class _AIValidationEngine:
             for i in range(batch["start_row"], batch["end_row"]):
                 default_results.append({"index": i, "result": False})
             return default_results
+
+
+# ============================================================================
+# Validation-plan code helpers (shared by DraftValidation and EditValidation)
+# ============================================================================
+
+import ast as _ast
+import difflib as _difflib
+
+# Validation method names a generated or edited plan may legitimately call. Used by the
+# syntax guardrail to catch hallucinated methods before a plan is handed back to the user.
+_KNOWN_PLAN_METHODS = frozenset(
+    {
+        "col_vals_gt",
+        "col_vals_lt",
+        "col_vals_eq",
+        "col_vals_ne",
+        "col_vals_ge",
+        "col_vals_le",
+        "col_vals_between",
+        "col_vals_outside",
+        "col_vals_in_set",
+        "col_vals_not_in_set",
+        "col_vals_increasing",
+        "col_vals_decreasing",
+        "col_vals_null",
+        "col_vals_not_null",
+        "col_vals_regex",
+        "col_vals_within_spec",
+        "col_vals_expr",
+        "col_exists",
+        "col_pct_null",
+        "col_schema_match",
+        "col_count_match",
+        "row_count_match",
+        "rows_distinct",
+        "rows_complete",
+        "data_freshness",
+        "tbl_match",
+        "conjointly",
+        "specially",
+        "interrogate",
+    }
+)
+
+
+def _extract_code(text: str) -> str:
+    """Extract Python source from a model response or fenced code block.
+
+    Strips a single ```python ... ``` (or bare ``` ... ```) fence if present; otherwise returns
+    the text unchanged (trimmed).
+    """
+    stripped = text.strip()
+    if "```" not in stripped:
+        return stripped
+
+    fence_start = stripped.find("```")
+    after = stripped[fence_start + 3 :]
+    newline = after.find("\n")
+    if newline != -1:
+        first_line = after[:newline].strip()
+        if first_line.lower() in ("python", "py", ""):
+            after = after[newline + 1 :]
+    fence_end = after.find("```")
+    if fence_end != -1:
+        after = after[:fence_end]
+    return after.strip()
+
+
+def _check_syntax(code: str) -> Tuple[bool, str]:
+    """Parse `code` and flag unknown validation methods.
+
+    Returns `(ok, message)`. `ok` is False if the code fails to parse or calls a method that
+    looks like a validation method but is not in the known set; `message` describes the first
+    problem found.
+    """
+    try:
+        tree = _ast.parse(code)
+    except SyntaxError as e:
+        return False, f"SyntaxError: {e.msg} (line {e.lineno})"
+
+    unknown: List[str] = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Attribute):
+            name = node.func.attr
+            if name.startswith(("col_", "row_", "rows_")) and name not in _KNOWN_PLAN_METHODS:
+                unknown.append(name)
+    if unknown:
+        return False, f"Unknown validation method(s): {', '.join(sorted(set(unknown)))}"
+
+    return True, ""
+
+
+def _chain_base_is_validate(node: Any) -> bool:
+    """Whether an attribute-call chain ultimately starts from a `Validate(...)` call."""
+    cur = node
+    # Descend through chained method calls (whose receiver is itself a call) to the base call
+    while (
+        isinstance(cur, _ast.Call)
+        and isinstance(cur.func, _ast.Attribute)
+        and isinstance(cur.func.value, _ast.Call)
+    ):
+        cur = cur.func.value
+    if isinstance(cur, _ast.Call):
+        func = cur.func
+        if isinstance(func, _ast.Attribute):
+            return func.attr == "Validate"
+        if isinstance(func, _ast.Name):
+            return func.id == "Validate"
+    return False
+
+
+def _chain_depth(node: Any) -> int:
+    depth = 0
+    cur = node
+    while (
+        isinstance(cur, _ast.Call)
+        and isinstance(cur.func, _ast.Attribute)
+        and isinstance(cur.func.value, _ast.Call)
+    ):
+        depth += 1
+        cur = cur.func.value
+    return depth
+
+
+def _extract_chain_steps(code: str) -> List[Dict[str, Any]]:
+    """Parse a plan's code into an ordered list of step descriptors.
+
+    Each descriptor is `{"method": str, "text": str, "kwargs": {name: source}}`. The terminal
+    `.interrogate()` call, if present, is omitted. Returns an empty list if the code cannot be
+    parsed or contains no `Validate(...)` chain.
+    """
+    try:
+        tree = _ast.parse(code)
+    except SyntaxError:
+        return []
+
+    # Locate the deepest (outermost) Validate(...) method chain in the module
+    best: Optional[Tuple[int, Any]] = None
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Call) and _chain_base_is_validate(node):
+            depth = _chain_depth(node)
+            if best is None or depth > best[0]:
+                best = (depth, node)
+    if best is None:
+        return []
+
+    calls: List[Any] = []
+    cur = best[1]
+    # Collect chained method calls, stopping before the base `Validate(...)` constructor
+    while (
+        isinstance(cur, _ast.Call)
+        and isinstance(cur.func, _ast.Attribute)
+        and isinstance(cur.func.value, _ast.Call)
+    ):
+        calls.append(cur)
+        cur = cur.func.value
+    calls.reverse()
+
+    steps: List[Dict[str, Any]] = []
+    for call in calls:
+        method = call.func.attr
+        if method == "interrogate":
+            continue
+        args = [_ast.unparse(a) for a in call.args]
+        kwargs: Dict[str, Any] = {}
+        for kw in call.keywords:
+            if kw.arg is not None:
+                kwargs[kw.arg] = _ast.unparse(kw.value)
+        rendered = ", ".join(args + [f"{k}={v}" for k, v in kwargs.items()])
+        steps.append({"method": method, "text": f"{method}({rendered})", "kwargs": kwargs})
+    return steps
+
+
+def _diff_plan_steps(
+    old_steps: List[Dict[str, Any]], new_steps: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Compute a structured, step-level diff between two parsed plans.
+
+    Returns a list of change records, each `{"action": "add"|"remove"|"modify", "method": str,
+    ...}`. For "add"/"modify" the record includes `"new"` (the new step text); for
+    "remove"/"modify" it includes `"old"` (the old step text).
+    """
+    old_texts = [s["text"] for s in old_steps]
+    new_texts = [s["text"] for s in new_steps]
+    matcher = _difflib.SequenceMatcher(a=old_texts, b=new_texts, autojunk=False)
+
+    changes: List[Dict[str, Any]] = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        if tag == "delete":
+            for k in range(i1, i2):
+                changes.append(
+                    {"action": "remove", "method": old_steps[k]["method"], "old": old_texts[k]}
+                )
+        elif tag == "insert":
+            for k in range(j1, j2):
+                changes.append(
+                    {"action": "add", "method": new_steps[k]["method"], "new": new_texts[k]}
+                )
+        else:  # "replace": pair same-method steps as modifications, leftovers as add/remove
+            old_block = list(range(i1, i2))
+            new_block = list(range(j1, j2))
+            used_new: set[int] = set()
+            for oi in list(old_block):
+                match = next(
+                    (
+                        nj
+                        for nj in new_block
+                        if nj not in used_new and new_steps[nj]["method"] == old_steps[oi]["method"]
+                    ),
+                    None,
+                )
+                if match is not None:
+                    used_new.add(match)
+                    old_block.remove(oi)
+                    changes.append(
+                        {
+                            "action": "modify",
+                            "method": old_steps[oi]["method"],
+                            "old": old_texts[oi],
+                            "new": new_texts[match],
+                        }
+                    )
+            for oi in old_block:
+                changes.append(
+                    {"action": "remove", "method": old_steps[oi]["method"], "old": old_texts[oi]}
+                )
+            for nj in new_block:
+                if nj not in used_new:
+                    changes.append(
+                        {"action": "add", "method": new_steps[nj]["method"], "new": new_texts[nj]}
+                    )
+    return changes

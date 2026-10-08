@@ -13,11 +13,13 @@
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
-    },
+    }
   },
   "[markdown]": {
     "editor.formatOnSave": false
   },
+  "ruff.format.args": ["--exclude", "*.pyi", "--exclude", "*.md"],
+  "ruff.lint.args": ["--exclude", "*.pyi", "--exclude", "*.md"],
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,

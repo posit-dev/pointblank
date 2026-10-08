@@ -1,19 +1,27 @@
 from __future__ import annotations
 
 import inspect
+import math
+import numbers
 import re
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Collection
 
 import narwhals as nw
 from great_tables import GT
 from great_tables.gt import _get_column_of_values
-from narwhals.typing import FrameT
+from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe, is_polars_lazyframe
+from narwhals.utils import Implementation
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
+from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+
+    from narwhals.dtypes import DType
+    from narwhals.typing import IntoFrame, IntoFrameT
 
     from pointblank._typing import AbsoluteBounds, Tolerance
 
@@ -35,6 +43,7 @@ def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]
     return dict(result)
 
 
+# TODO: doctest
 def _derive_single_bound(ref: int, tol: int | float) -> int:
     """Derive a single bound using the reference."""
     if not isinstance(tol, float | int):
@@ -44,16 +53,17 @@ def _derive_single_bound(ref: int, tol: int | float) -> int:
     return int(tol * ref) if tol < 1 else int(tol)
 
 
+# TODO: doctest
 def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
-        return tuple(_derive_single_bound(ref, t) for t in tol)
+        return (_derive_single_bound(ref, tol[0]), _derive_single_bound(ref, tol[1]))
 
     bound = _derive_single_bound(ref, tol)
     return bound, bound
 
 
-def _get_tbl_type(data: FrameT | Any) -> str:
+def _get_tbl_type(data: Any) -> str:
     type_str = str(type(data))
 
     ibis_tbl = "ibis.expr.types.relations.Table" in type_str
@@ -84,7 +94,12 @@ def _get_tbl_type(data: FrameT | Any) -> str:
         #       we either extract the backend name from the table name or get the backend name
         #       from the get_backend() method and name attribute
 
-        backend = ibis.get_backend(data).name
+        try:
+            backend = ibis.get_backend(data).name
+        except Exception:  # sometimes this will fail. Not an expert on why - Tyler Riccio
+            namespace = nw.get_native_namespace(nw.from_native(data))
+            backend = Implementation.from_native_namespace(namespace).name
+            return backend.lower()
 
         # Try using the get_name() method to get the table name, this is important for elucidating
         # the original table type since it sometimes gets handled by duckdb
@@ -110,7 +125,7 @@ def _get_tbl_type(data: FrameT | Any) -> str:
     return "unknown"  # pragma: no cover
 
 
-def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[FrameT | Any, str]:
+def _process_ibis_through_narwhals(data: Any, tbl_type: str) -> tuple[Any, str]:
     """
     Process Ibis tables through Narwhals to unify the processing pathway.
 
@@ -120,14 +135,14 @@ def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[F
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The data table, potentially an Ibis table
-    tbl_type : str
+    tbl_type
         The detected table type
 
     Returns
     -------
-    tuple[FrameT | Any, str]
+    tuple[Any, str]
         A tuple of (processed_data, updated_tbl_type) where:
         - processed_data is the Narwhals-wrapped table if it was Ibis, otherwise original data
         - updated_tbl_type is "narwhals" if it was Ibis, otherwise original tbl_type
@@ -145,7 +160,7 @@ def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[F
     return data, tbl_type
 
 
-def _is_narwhals_table(data: any) -> bool:
+def _is_narwhals_table(data: Any) -> bool:
     # Check if the data is a Narwhals DataFrame
     type_str = str(type(data)).lower()
 
@@ -156,7 +171,7 @@ def _is_narwhals_table(data: any) -> bool:
     return False
 
 
-def _is_lazy_frame(data: any) -> bool:
+def _is_lazy_frame(data: Any) -> bool:
     # Check if the data is a Polars or Narwhals DataFrame
     type_str = str(type(data)).lower()
 
@@ -180,15 +195,17 @@ def _is_lib_present(lib_name: str) -> bool:
 
 def _check_any_df_lib(method_used: str) -> None:
     # Determine whether Pandas or Polars is available
+    pd = None
     try:
         import pandas as pd
     except ImportError:
-        pd = None
+        pass
 
+    pl = None
     try:
         import polars as pl
     except ImportError:
-        pl = None
+        pass
 
     # If neither Pandas nor Polars is available, raise an ImportError
     if pd is None and pl is None:
@@ -211,16 +228,18 @@ def _is_value_a_df(value: Any) -> bool:
 
 def _select_df_lib(preference: str = "polars") -> Any:
     # Determine whether Pandas is available
+    pd = None
     try:
         import pandas as pd
     except ImportError:
-        pd = None
+        pass
 
-    # Determine whether Pandas is available
+    # Determine whether Polars is available
+    pl = None
     try:
         import polars as pl
     except ImportError:
-        pl = None
+        pass
 
     # TODO: replace this with the `_check_any_df_lib()` function, introduce `method_used=` param
     # If neither Pandas nor Polars is available, raise an ImportError
@@ -240,7 +259,8 @@ def _select_df_lib(preference: str = "polars") -> Any:
     return pl if pl is not None else pd
 
 
-def _copy_dataframe(df):
+# TODO: Good argument exceptions should be handled by caller
+def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
     """
     Create a copy of a DataFrame, handling different DataFrame types.
 
@@ -280,19 +300,126 @@ def _copy_dataframe(df):
         return df  # pragma: no cover
 
 
-def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:
+# TODO: Should straight up remove this
+def _convert_to_narwhals(df: IntoFrame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with
-    return nw.from_native(df)
+    result = nw.from_native(df)
+    assert is_narwhals_dataframe(result) or is_narwhals_lazyframe(result)
+    return result
 
 
-def _check_column_exists(dfn: nw.DataFrame, column: str) -> None:
+def _is_real_number(value: Any) -> bool:
+    # `Decimal` isn't registered as `numbers.Real`; `bool` is (as an `Integral`) but isn't a number
+    # for the purposes of set membership
+    return isinstance(value, (numbers.Real, Decimal)) and not isinstance(value, bool)
+
+
+def _is_float_value(value: Any) -> bool:
+    return isinstance(value, numbers.Real) and not isinstance(value, numbers.Integral)
+
+
+def _is_in(column: str, values: Collection[Any], dtype: DType | None) -> nw.Expr:
+    """
+    Build `nw.col(column).is_in(values)`, aligning numeric values with the column's dtype.
+
+    Polars < 2.0 coerced the column and the values of `is_in()` to a common supertype (e.g., an
+    integer column checked against `[1.0, 2.0]`), whereas Polars >= 2.0 raises an
+    `InvalidOperationError` when the dtypes differ. Narwhals passes `is_in()` through to the
+    backend unchanged, so the values are aligned here instead. Only numeric columns checked against
+    purely numeric values are adjusted; anything else (strings, temporal values, mixed-type
+    collections) is passed through as is, keeping whatever behavior the backend has for it.
+
+    Parameters
+    ----------
+    column
+        The name of the column to check.
+    values
+        The values to check membership against. A `None` value is passed through as is.
+    dtype
+        The Narwhals dtype of `column`. If `None` (dtype unknown), no alignment is performed.
+
+    Returns
+    -------
+    nw.Expr
+        A boolean expression.
+    """
+    values = list(values)
+    non_null = [v for v in values if v is not None]
+
+    if (
+        dtype is None
+        or not dtype.is_numeric()
+        or not non_null
+        or not all(_is_real_number(v) for v in non_null)
+    ):
+        return nw.col(column).is_in(values)
+
+    # NOTE: See https://docs.pola.rs/releases/upgrade/2/#make-coercion-casts-for-is_in-strict-instead-of-lossy
+    if dtype.is_float():
+        # Compare as floats (an integer or `Decimal` value can't be checked against float data)
+        return nw.col(column).is_in([None if v is None else float(v) for v in values])
+
+    if dtype.is_integer() and not all(isinstance(v, numbers.Integral) for v in non_null):
+        # A value can only ever match an integer if it is integral, so integral values are
+        # converted to integers and all others (fractional values, NaN, infinity, values outside of
+        # the 64-bit range) are dropped; this is exact, unlike casting the column to `Float64`
+        # (which is lossy above 2**53)
+        int_values: list[Any] = [
+            None if v is None else int(v)
+            for v in values
+            if v is None or (math.isfinite(v) and v == int(v) and -(2**63) <= v < 2**64)
+        ]
+        return nw.col(column).is_in(int_values)
+
+    if dtype.is_decimal() and any(_is_float_value(v) for v in non_null):
+        # A `Decimal` column checked against float values is compared as `Float64`
+        float_values = [None if v is None else float(v) for v in values]
+        return nw.col(column).cast(nw.Float64).is_in(float_values)
+
+    # Integer values against integer data, and integer or `Decimal` values against `Decimal` data,
+    # are accepted as is
+    return nw.col(column).is_in(values)
+
+
+def _with_row_index(tbl: Any, name: str) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    """
+    Add a zero-based row index column to a table, following the table's row order.
+
+    Narwhals requires an `order_by=` column for row indexes on LazyFrames. Polars LazyFrames do
+    have a positional row order though (and ordering by a column would number the rows in sorted
+    order rather than in their actual order), so the native Polars row index is used for those.
+    Other LazyFrames have no inherent row order, so their first column is used for ordering.
+
+    Parameters
+    ----------
+    tbl
+        A native table or a Narwhals DataFrame/LazyFrame.
+    name
+        The name of the row index column.
+
+    Returns
+    -------
+    nw.DataFrame | nw.LazyFrame
+        The Narwhals table with the row index as its first column.
+    """
+    tbl_nw = nw.from_native(tbl)
+    if isinstance(tbl_nw, nw.DataFrame):
+        return tbl_nw.with_row_index(name=name)
+    native = tbl_nw.to_native()
+    if is_polars_lazyframe(native):
+        return nw.from_native(native.with_row_index(name=name))
+    first_col = tbl_nw.collect_schema().names()[0]
+    return tbl_nw.with_row_index(name=name, order_by=first_col)
+
+
+def _check_column_exists(dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> None:
     """
     Check if a column exists in a DataFrame.
 
     Parameters
     ----------
     dfn
-        A Narwhals DataFrame.
+        A Narwhals DataFrame or LazyFrame.
     column
         The column to check for existence.
 
@@ -307,7 +434,7 @@ def _check_column_exists(dfn: nw.DataFrame, column: str) -> None:
 
 
 def _count_true_values_in_column(
-    tbl: FrameT,
+    tbl: IntoFrame,
     column: str,
     inverse: bool = False,
 ) -> int:
@@ -336,15 +463,15 @@ def _count_true_values_in_column(
     # Filter the table based on the column and whether we want to count True or False values
     tbl_filtered = tbl_nw.filter(nw.col(column) if not inverse else ~nw.col(column))
 
-    # Always collect table if it is a LazyFrame; this is required to get the row count
-    if _is_lazy_frame(tbl_filtered):
-        tbl_filtered = tbl_filtered.collect()
+    # For LazyFrames, use aggregation to get the count without materializing all filtered rows
+    if is_narwhals_lazyframe(tbl_filtered):
+        return int(tbl_filtered.select(nw.len()).collect().item())
 
     return len(tbl_filtered)
 
 
 def _count_null_values_in_column(
-    tbl: FrameT,
+    tbl: IntoFrame,
     column: str,
 ) -> int:
     """
@@ -367,14 +494,68 @@ def _count_null_values_in_column(
     # already a Narwhals DataFrame)
     tbl_nw = nw.from_native(tbl)
 
-    # Filter the table to get rows where the specified column is Null
-    tbl_filtered = tbl_nw.filter(nw.col(column).is_null())
+    # Use aggregation to count null values without materializing the full frame
+    # Cast to Int32 before sum to support PySpark which can't sum booleans
+    result = tbl_nw.select(nw.col(column).is_null().cast(nw.Int32).sum())
 
-    # Always collect table if it is a LazyFrame; this is required to get the row count
-    if _is_lazy_frame(tbl_filtered):
-        tbl_filtered = tbl_filtered.collect()
+    if is_narwhals_lazyframe(result):
+        return int(result.collect().item())
+    return int(result.item())
 
-    return len(tbl_filtered)
+
+def _count_validation_units(
+    tbl: IntoFrame,
+    column: str,
+) -> tuple[int, int, int, int]:
+    """
+    Compute the row count and pass/fail/null counts for a results table in a single pass.
+
+    Given a results table with a boolean `column` (typically ``pb_is_good_``), this returns
+    the total number of rows, the number of `True` values (passing test units), the number of
+    `False` values (failing test units), and the number of Null values.
+
+    Computing all four quantities in one aggregation is important for LazyFrames: otherwise each
+    separate count would trigger its own `collect()`, re-executing the entire (potentially
+    expensive) lazy plan multiple times.
+
+    Parameters
+    ----------
+    tbl
+        A Narwhals-compatible DataFrame or table-like object.
+    column
+        The boolean column to summarize.
+
+    Returns
+    -------
+    tuple[int, int, int, int]
+        A tuple of ``(n, n_passed, n_failed, n_null)``.
+    """
+
+    # Convert the DataFrame to a Narwhals DataFrame (no detrimental effect if
+    # already a Narwhals DataFrame)
+    tbl_nw = nw.from_native(tbl)
+
+    # Build a single aggregation that computes all counts at once. Casting booleans to Int32
+    # before summing is required for backends like PySpark (which can't sum booleans), and the
+    # sums naturally ignore Null values (so `n_passed`/`n_failed` exclude nulls).
+    result = tbl_nw.select(
+        nw.len().alias("n"),
+        nw.col(column).cast(nw.Int32).sum().alias("n_passed"),
+        (~nw.col(column)).cast(nw.Int32).sum().alias("n_failed"),
+        nw.col(column).is_null().cast(nw.Int32).sum().alias("n_null"),
+    )
+
+    if is_narwhals_lazyframe(result):
+        result = result.collect()
+
+    row = result.rows(named=True)[0]
+
+    n = int(row["n"])
+    n_passed = int(row["n_passed"] or 0)
+    n_failed = int(row["n_failed"] or 0)
+    n_null = int(row["n_null"] or 0)
+
+    return n, n_passed, n_failed, n_null
 
 
 def _is_numeric_dtype(dtype: str) -> bool:
@@ -435,8 +616,11 @@ def _is_duration_dtype(dtype: str) -> bool:
 
 
 def _get_column_dtype(
-    dfn: nw.DataFrame, column: str, raw: bool = False, lowercased: bool = True
-) -> str:
+    dfn: nw.DataFrame[Any] | nw.LazyFrame[Any],
+    column: str,
+    raw: bool = False,
+    lowercased: bool = True,
+) -> str | nw.dtypes.DType | None:
     """
     Get the data type of a column in a DataFrame.
 
@@ -447,14 +631,14 @@ def _get_column_dtype(
     column
         The column from which to get the data type.
     raw
-        If `True`, return the raw data type string.
+        If `True`, return the raw DType object (or None if column not found).
     lowercased
         If `True`, return the data type string in lowercase.
 
     Returns
     -------
-    str
-        The data type of the column.
+    str | nw.dtypes.DType | None
+        The data type of the column as a string, or the raw DType object if `raw=True`.
     """
 
     if raw:  # pragma: no cover
@@ -468,7 +652,9 @@ def _get_column_dtype(
     return column_dtype_str
 
 
-def _check_column_type(dfn: nw.DataFrame, column: str, allowed_types: list[str]) -> None:
+def _check_column_type(
+    dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, allowed_types: list[str]
+) -> None:
     """
     Check if a column is of a certain data type.
 
@@ -520,8 +706,8 @@ def _check_column_type(dfn: nw.DataFrame, column: str, allowed_types: list[str])
 
 
 def _column_test_prep(
-    df: FrameT, column: str, allowed_types: list[str] | None, check_exists: bool = True
-) -> nw.DataFrame:
+    df: IntoFrame, column: str, allowed_types: list[str] | None, check_exists: bool = True
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with.
     dfn = _convert_to_narwhals(df=df)
 
@@ -537,8 +723,8 @@ def _column_test_prep(
 
 
 def _column_subset_test_prep(
-    df: FrameT, columns_subset: list[str] | None, check_exists: bool = True
-) -> nw.DataFrame:
+    df: IntoFrame, columns_subset: list[str] | None, check_exists: bool = True
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with.
     dfn = _convert_to_narwhals(df=df)
 
@@ -550,24 +736,47 @@ def _column_subset_test_prep(
     return dfn
 
 
-def _get_fn_name() -> str:
+_PBUnresolvedColumn = (
+    str | Collection[str] | Collection[Column] | Column | ColumnSelector | ColumnSelectorNarwhals
+)
+_PBResolvedColumn = (
+    Column | ColumnLiteral | ColumnSelectorNarwhals | Collection[Column] | Collection[str]
+)
+
+
+def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
+    # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+    # resolve the columns
+    if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+        columns = col(columns)
+
+    # If `columns` is Column value or a string, place it in a list for iteration
+    if isinstance(columns, (Column, str)):
+        columns: list[Column] | list[str] = [columns]
+
+    return columns
+
+
+def _get_fn_name() -> str | None:
     # Get the current function name
-    fn_name = inspect.currentframe().f_back.f_code.co_name
+    frame = inspect.currentframe()
+    if frame is None or frame.f_back is None:  # pragma: no cover
+        return None
+    return frame.f_back.f_code.co_name
 
-    return fn_name
 
-
-def _get_assertion_from_fname() -> str:
+def _get_assertion_from_fname() -> str | None:
     # Get the current function name
-    func_name = inspect.currentframe().f_back.f_code.co_name
+    frame = inspect.currentframe()
+    if frame is None or frame.f_back is None:  # pragma: no cover
+        return None
+    func_name = frame.f_back.f_code.co_name
 
     # Use the `ASSERTION_TYPE_METHOD_MAP` dictionary to get the assertion type
-    assertion = ASSERTION_TYPE_METHOD_MAP.get(func_name)
-
-    return assertion
+    return ASSERTION_TYPE_METHOD_MAP.get(func_name)
 
 
-def _check_invalid_fields(fields: list[str], valid_fields: list[str]):
+def _check_invalid_fields(fields: list[str], valid_fields: list[str]) -> None:
     """
     Check if any fields in the list are not in the valid fields list.
 
@@ -660,10 +869,10 @@ def _format_to_float_value(
 
 def _pivot_to_dict(col_dict: Mapping[str, Any]):  # TODO : Type hint and unit test
     result_dict = {}
-    for col, sub_dict in col_dict.items():
+    for _col, sub_dict in col_dict.items():
         for key, value in sub_dict.items():
             # add columns fields not present
             if key not in result_dict:
                 result_dict[key] = [None] * len(col_dict)
-            result_dict[key][list(col_dict.keys()).index(col)] = value
+            result_dict[key][list(col_dict.keys()).index(_col)] = value
     return result_dict
