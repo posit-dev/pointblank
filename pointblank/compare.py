@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import os
 import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
@@ -286,10 +287,10 @@ def compare(
         if not keys_list or keys_list == ["*"]:
             raise ValueError("`partitions=` requires `keys=` (rows are partitioned by key).")
 
-    if source_name is None and isinstance(source, str):
-        source_name = source
-    if target_name is None and isinstance(target, str):
-        target_name = target
+    if source_name is None and isinstance(source, (str, os.PathLike)):
+        source_name = str(source)
+    if target_name is None and isinstance(target, (str, os.PathLike)):
+        target_name = str(target)
 
     if callable(source) and not hasattr(source, "columns"):
         source = source()
