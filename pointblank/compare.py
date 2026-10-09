@@ -124,6 +124,7 @@ def compare(
     schema: Literal["strict", "common"] = "strict",
     dup_keys: Literal["flag", "compare"] = "flag",
     order_by: str | list[str] | None = None,
+    partitions: int | None = None,
     source_name: str | None = None,
     target_name: str | None = None,
 ) -> Comparison:
@@ -196,6 +197,12 @@ def compare(
     order_by
         Column(s) defining row order for positional alignment on backends without an inherent
         row order (e.g., database tables). Ignored when `keys=` is given.
+    partitions
+        Compare the tables in this many passes, each covering a disjoint subset of the key values
+        (by key hash). This bounds peak memory for tables too large to compare in one pass (each
+        pass joins only about `1/partitions` of the rows), at the cost of reading the tables once
+        per pass. Requires `keys=`, and Polars, DuckDB, or Ibis tables (including CSV/Parquet
+        paths). The results are identical to a single-pass comparison.
     source_name, target_name
         Optional labels for the two tables, used in the report.
 
@@ -217,6 +224,17 @@ def compare(
 
     Rows with a null in a key column can't be matched: they count as `"missing"` (source) or
     `"extra"` (target).
+
+    Large Tables
+    ------------
+    The comparison runs inside the tables' own engine and only counts and small samples of rows
+    are collected, so file paths (scanned lazily) and database tables never have to be loaded into
+    Python. The engine's join still needs memory for the rows it compares. If that's too much, use
+    `partitions=` to compare the tables in several smaller passes. For the lowest memory use with
+    very large files, read them as DuckDB relations (e.g., `duckdb.connect().read_csv(path)`) and
+    use `partitions=`: in a benchmark with two 10-million-row CSV files (730 MB each), peak memory
+    was about 0.8 GB with DuckDB and `partitions=8`, versus about 5.5 GB to read both files with
+    Polars and join them.
 
     Examples
     --------
@@ -262,6 +280,11 @@ def compare(
         raise ValueError(f"`schema=` must be 'strict' or 'common', not {schema!r}.")
     if dup_keys not in ("flag", "compare"):
         raise ValueError(f"`dup_keys=` must be 'flag' or 'compare', not {dup_keys!r}.")
+    if partitions is not None:
+        if isinstance(partitions, bool) or not isinstance(partitions, int) or partitions < 1:
+            raise ValueError("`partitions=` must be a positive integer.")
+        if not keys_list or keys_list == ["*"]:
+            raise ValueError("`partitions=` requires `keys=` (rows are partitioned by key).")
 
     if source_name is None and isinstance(source, str):
         source_name = source
@@ -278,9 +301,7 @@ def compare(
 
     src, tgt = _align_backends(nw.from_native(source), nw.from_native(target))
 
-    return Comparison._build(
-        src=src,
-        tgt=tgt,
+    settings = dict(
         keys=keys_list or [],
         columns=columns_list,
         column_map=column_map,
@@ -293,6 +314,9 @@ def compare(
         source_name=source_name or "source",
         target_name=target_name or "target",
     )
+    if partitions is not None and partitions > 1:
+        return Comparison._build_partitioned(src, tgt, partitions=partitions, **settings)
+    return Comparison._build(src=src, tgt=tgt, **settings)
 
 
 class Comparison:
@@ -357,6 +381,8 @@ class Comparison:
         self._order_by = order_by
         self._tgt_input = tgt
         self._key_casts: dict[str, Any] = {}
+        self._parts: list[Comparison] | None = None
+        self.partitions = 1
         self.schema_mode = schema
         self.dup_keys_mode = dup_keys
         self.null_equal = null_equal
@@ -693,6 +719,8 @@ class Comparison:
 
     def _fetch(self, status: str, limit: int) -> Any:
         """Fetch a sample of rows with a status as an eager narwhals DataFrame."""
+        if self._parts is not None:
+            return self._collect_from_parts(status, limit, lambda part, n: part._fetch(status, n))
         if self.mode == "multiset":
             return self._fetch_multiset(status, limit)
         joined = self._joined
@@ -763,6 +791,13 @@ class Comparison:
         Returns an eager narwhals DataFrame with the key columns and one difference flag per
         compared column, for every source/target row pair of up to `limit` duplicated keys.
         """
+        if self._parts is not None:
+            pairs = None
+            for part in self._parts:
+                piece = part._dup_pairs(limit)
+                if piece is not None:
+                    pairs = piece if pairs is None else _concat_eager(pairs, piece)
+            return pairs
         if self._dup_frame is None:
             return None
         sample_keys = _collect(self._dup_frame.select(self._join_keys).head(limit))
@@ -786,6 +821,101 @@ class Comparison:
         if len(self._join_keys) > 1:
             pairs = pairs.join(sample_keys, on=self._join_keys, how="semi")
         return pairs
+
+    # ------------------------------------------------------------------------------------------
+    # Partitioned comparison (`partitions=`)
+    # ------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _build_partitioned(cls, src: Any, tgt: Any, partitions: int, **settings: Any) -> Comparison:
+        """
+        Compare in `partitions` passes, each restricted (on both sides) to the rows whose key
+        hashes into one bucket, then combine the per-partition results. A key value always lands
+        in the same bucket on both sides, so every partition is a self-contained comparison.
+        """
+        keys = settings["keys"]
+        column_map = settings["column_map"]
+        tgt_keys = [column_map.get(k, k) for k in keys]
+        src_schema = dict(src.collect_schema().items())
+        tgt_schema = dict(tgt.collect_schema().items())
+        for k, tk in zip(keys, tgt_keys):
+            if k not in src_schema:
+                raise ValueError(f"Key column {k!r} isn't in the source table.")
+            if tk not in tgt_schema:
+                raise ValueError(
+                    f"Key column {tk!r} isn't in the target table. If it was renamed, map it "
+                    "with `column_map=`."
+                )
+
+        # Keys must hash identically on both sides, so harmonize their types first
+        src, tgt, _ = _harmonize_key_dtypes(src, tgt, keys, tgt_keys, src_schema, tgt_schema)
+
+        parts = [
+            cls._build(
+                src=_bucket_filter(src, keys, partitions, i),
+                tgt=_bucket_filter(tgt, tgt_keys, partitions, i),
+                **settings,
+            )
+            for i in range(partitions)
+        ]
+
+        self = object.__new__(cls)
+        first = parts[0]
+        for attr in (
+            "source_name",
+            "target_name",
+            "keys",
+            "mode",
+            "schema_mode",
+            "dup_keys_mode",
+            "null_equal",
+            "column_map",
+            "schema_diff",
+            "compared_columns",
+            "_specs",
+            "_src_columns",
+            "_tgt_columns",
+            "_join_keys",
+            "_tgt_keys",
+            "_order_by",
+        ):
+            setattr(self, attr, getattr(first, attr))
+        for attr in (
+            "n_match",
+            "n_changed",
+            "n_missing",
+            "n_extra",
+            "n_dup_key",
+            "n_dup_key_values",
+            "n_source_rows",
+            "n_target_rows",
+        ):
+            setattr(self, attr, sum(getattr(part, attr) for part in parts))
+        self.column_mismatches = {
+            col: sum(part.column_mismatches[col] for part in parts)
+            for col in first.column_mismatches
+        }
+        self._parts = parts
+        self.partitions = partitions
+        self._tgt_input = None
+        self._key_casts = {}
+        self._sample_cache = {}
+        return self
+
+    def _collect_from_parts(self, status: str, limit: int, fetch: Any) -> Any:
+        """Gather up to `limit` rows from the partitions, in partition order."""
+        assert self._parts is not None
+        count_attr = {"dup_key": "n_dup_key_values", "match": "n_match"}.get(status, f"n_{status}")
+        frame = None
+        for part in self._parts:
+            remaining = limit - (0 if frame is None else len(frame))
+            if remaining <= 0:
+                break
+            if frame is not None and getattr(part, count_attr, 0) == 0:
+                continue
+            piece = fetch(part, remaining)
+            frame = piece if frame is None else _concat_eager(frame, piece)
+        return frame
 
     # ------------------------------------------------------------------------------------------
     # Multiset mode (`keys="*"`)
@@ -900,6 +1030,15 @@ class Comparison:
         a `_status_` column, then `<column>_source`/`<column>_target` pairs for each compared
         column. In multiset mode, the compared columns (as strings) and their occurrence counts.
         """
+        if self._parts is not None:
+            frame = None
+            for part in self._parts:
+                remaining = limit - (0 if frame is None else len(frame))
+                if remaining <= 0:
+                    break
+                piece = nw.from_native(part._failing_rows(remaining))
+                frame = piece if frame is None else _concat_eager(frame, piece)
+            return frame.to_native()
         if self.mode == "multiset":
             parts = []
             for status in ("missing", "extra"):
@@ -1094,6 +1233,7 @@ class Comparison:
             "column_map": dict(self.column_map),
             "schema_mode": self.schema_mode,
             "null_equal": self.null_equal,
+            "partitions": self.partitions,
             "n_source_rows": self.n_source_rows,
             "n_target_rows": self.n_target_rows,
             "n": self.n,
@@ -1342,6 +1482,41 @@ def _with_row_index(frame: Any, order_by: list[str] | None, side: str, name: str
         f"The {side} table has no defined row order, so rows can't be aligned by position. "
         "Provide `keys=` to align rows by key (recommended), or `order_by=` to define the row "
         "order."
+    )
+
+
+def _bucket_filter(frame: Any, keys: list[str], partitions: int, i: int) -> Any:
+    """
+    Keep the rows whose key hashes into bucket `i` of `partitions`. The bucket is
+    `sum(hash(key) mod partitions) mod partitions` over the key columns, computed with the
+    backend's own hash function (so equal key values always share a bucket on the same backend).
+    Rows with null keys land in a bucket too, so they're still counted.
+    """
+    impl = frame.implementation
+    native = frame.to_native()
+
+    if impl == nw.Implementation.POLARS:
+        import polars as pl
+
+        bucket = pl.sum_horizontal([pl.col(k).hash(seed=0) % partitions for k in keys]) % partitions
+        return nw.from_native(native.filter(bucket == i))
+
+    if impl == nw.Implementation.IBIS:
+        terms = [((native[k].hash() % partitions) + partitions) % partitions for k in keys]
+        total = terms[0]
+        for term in terms[1:]:
+            total = total + term
+        return nw.from_native(native.filter((total % partitions) == i))
+
+    if impl == nw.Implementation.DUCKDB:
+        terms = " + ".join(
+            '(hash("' + k.replace('"', '""') + '") % ' + str(partitions) + ")" for k in keys
+        )
+        return nw.from_native(native.filter(f"(({terms}) % {partitions}) = {i}"))
+
+    raise ValueError(
+        "`partitions=` is supported for Polars, DuckDB, and Ibis tables (and CSV/Parquet file "
+        f"paths), not {impl}."
     )
 
 
