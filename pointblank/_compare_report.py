@@ -174,6 +174,8 @@ def _spec_badges(cmp: Comparison) -> str:
         badges.append(_chip("schema: common columns"))
     if cmp.dup_keys_mode == "compare":
         badges.append(_chip("duplicate keys compared pairwise"))
+    if cmp.partitions > 1:
+        badges.append(_chip(f"computed in {cmp.partitions} partitions"))
     n_src_cols = len(cmp._src_columns) - len(cmp.keys)
     if len(cmp.compared_columns) < n_src_cols:
         badges.append(_chip(f"{len(cmp.compared_columns)} of {n_src_cols} columns compared"))
