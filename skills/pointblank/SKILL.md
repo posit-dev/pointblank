@@ -77,6 +77,7 @@ skills/pointblank/
 | Get failing rows                     | `get_data_extracts`                  |
 | Split data into pass/fail            | `get_sundered_data`                  |
 | Profile a dataset first              | `DataScan`                           |
+| Compare two tables (diff)            | `compare`, `tbl_match(keys=...)`     |
 | Define validation in YAML            | `yaml_interrogate`                   |
 | Enforce contracts in a pipeline      | `Contract`, `Pipeline`               |
 | Generate test data                   | `Schema.generate`, field classes     |
