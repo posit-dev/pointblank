@@ -32,6 +32,7 @@ from pointblank.column import (
     starts_with,
 )
 from pointblank.contract import Contract, Step
+from pointblank.compare import Comparison, SchemaDiff, compare
 from pointblank.datascan import DataScan, DataScanDiff, col_summary_tbl
 from pointblank.steps import Steps
 from pointblank.draft import DraftValidation
@@ -127,6 +128,9 @@ __all__ = [
     "Steps",
     "Pipeline",
     "PipelineResult",
+    "Comparison",
+    "SchemaDiff",
+    "compare",
     "DataScan",
     "DataScanDiff",
     "DraftValidation",
