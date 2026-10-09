@@ -644,6 +644,7 @@ class Validate:
         schema: Literal["strict", "common"] = "strict",
         dup_keys: Literal["flag", "compare"] = "flag",
         order_by: str | list[str] | None = None,
+        partitions: int | None = None,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
