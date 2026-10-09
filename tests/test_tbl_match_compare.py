@@ -378,3 +378,87 @@ def test_pandas_target_with_polars_comparison():
     extract = v.get_data_extracts(i=1, frame=True)
     assert isinstance(extract, (pl.DataFrame, pd.DataFrame))
     assert len(extract) == 3
+
+
+# ----------------------------------------------------------------------------------------------
+# Partitioned comparison (`partitions=`)
+# ----------------------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("backend", ["polars", "polars_lazy", "duckdb"])
+def test_partitions_give_identical_results(backend):
+    if backend == "duckdb":
+        con = ibis.duckdb.connect()
+        data, comparison = con.create_table("tgt", TARGET), con.create_table("src", SOURCE)
+    elif backend == "polars_lazy":
+        data, comparison = TARGET.lazy(), SOURCE.lazy()
+    else:
+        data, comparison = TARGET, SOURCE
+
+    v = (
+        pb.Validate(data)
+        .tbl_match(comparison, keys="id")
+        .tbl_match(comparison, keys="id", partitions=3)
+        .interrogate()
+    )
+    single, parted = _step(v, 1), _step(v, 2)
+
+    assert (parted.n, parted.n_passed, parted.n_failed) == (
+        single.n,
+        single.n_passed,
+        single.n_failed,
+    )
+    assert parted.val_info["comparison"].partitions == 3
+    assert len(v.get_data_extracts(i=2, frame=True)) == len(v.get_data_extracts(i=1, frame=True))
+    assert "3 partitions" in v.get_tabular_report().as_raw_html()
+    assert "computed in 3 partitions" in v.get_step_report(i=2).as_raw_html()
+
+
+def test_partitions_step_is_left_out_of_sundering():
+    v = pb.Validate(TARGET).tbl_match(SOURCE, keys="id", partitions=2).interrogate()
+    assert _step(v).tbl_checked is None
+    assert len(v.get_sundered_data(type="pass")) == len(TARGET)
+
+
+def test_partitions_serialization(tmp_path):
+    src_path, tgt_path = str(tmp_path / "source.csv"), str(tmp_path / "target.csv")
+    SOURCE.write_csv(src_path)
+    TARGET.write_csv(tgt_path)
+
+    v = pb.Validate(TARGET).tbl_match(src_path, keys="id", partitions=4)
+    assert "partitions=4" in v.to_code()
+    yaml_str = v.to_yaml()
+    assert "partitions: 4" in yaml_str
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        from_yaml = pb.yaml_interrogate(yaml_str.replace("tbl: your_data", f"tbl: {tgt_path}"))
+    assert _step(from_yaml).val_info["comparison"].partitions == 4
+    assert _step(from_yaml).n_passed == 2
+
+    steps = pb.Steps().tbl_match(SOURCE, keys="id", partitions=2)
+    assert _step(pb.Validate(TARGET).add_steps(steps).interrogate()).values["partitions"] == 2
+
+    values = json.loads(
+        pb.Validate(TARGET)
+        .tbl_match(SOURCE, keys="id", partitions=2)
+        .interrogate()
+        .get_json_report()
+    )[0]["values"]
+    assert values["partitions"] == 2
+    assert values["comparison"]["partitions"] == 2
+
+
+def test_partitions_argument_errors():
+    with pytest.raises(ValueError, match="positive integer"):
+        pb.Validate(TARGET).tbl_match(SOURCE, keys="id", partitions=0)
+    with pytest.raises(ValueError, match="requires `keys=`"):
+        pb.Validate(TARGET).tbl_match(SOURCE, partitions=2)
+    with pytest.raises(ValueError, match="requires `keys=`"):
+        pb.Validate(TARGET).tbl_match(SOURCE, keys="*", partitions=2)
+
+    # Unsupported backends are an evaluation error at interrogation (with a note)
+    v = pb.Validate(TARGET.to_pandas()).tbl_match(SOURCE.to_pandas(), keys="id", partitions=2)
+    v = v.interrogate()
+    assert _step(v).eval_error
+    assert "supported for Polars, DuckDB, and Ibis" in v.get_notes(i=1, format="text")[0]
