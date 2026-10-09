@@ -190,5 +190,5 @@ pb compare source.csv target.csv --key order_id --engine duckdb --partitions 8 \
 
 The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add
 `--no-samples` to keep row values out of the JSON output. To make the comparison one check among
-others in a validation, use `Validate.tbl_match()`, which accepts the same settings (see
-[Comparing Two Tables](01-comparing-tables.qmd)).
+others in a validation, use `Validate.tbl_match()`, which accepts the same settings, including
+`partitions=` (see [Comparing Two Tables](01-comparing-tables.qmd)).
