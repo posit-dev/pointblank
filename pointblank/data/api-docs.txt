@@ -827,7 +827,7 @@ Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: '
     retrieve metadata about the step where the action is executed.
     
 
-FinalActions(*args) -> 'None'
+FinalActions(*actions) -> 'None'
 
     Define actions to be taken after validation is complete.
 
@@ -1179,7 +1179,7 @@ Definition of a schema object.
     `Schema` object is used in a validation workflow.
     
 
-DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True) -> None
+DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True, max_reprompts: 'int' = 1) -> None
 
     Draft a validation plan for a given table using an LLM.
 
@@ -1187,9 +1187,9 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     starting point for validating a table. This can be useful when you have a new table and you
     want to get a sense of how to validate it (and adjustments could always be made later). The
     `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-    using an LLM from either the `"anthropic"`, `"openai"`, `"ollama"` or `"bedrock"` provider. You
-    can install all requirements for the class through an optional 'generate' install of Pointblank
-    via `pip install pointblank[generate]`.
+    using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"`
+    provider. You can install all requirements for the class through an optional 'generate' install
+    of Pointblank via `pip install pointblank[generate]`.
 
     :::{.callout-warning}
     The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -1203,7 +1203,8 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, and `"bedrock"`.
+        `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the
+        colon is the Azure *deployment id*, not an OpenAI model id.
     api_key
         The API key to be used for the model.
     verify_ssl
@@ -1226,9 +1227,15 @@ DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_
     - `"openai"` (OpenAI)
     - `"ollama"` (Ollama)
     - `"bedrock"` (Amazon Bedrock)
+    - `"azure-openai"` (Azure OpenAI)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
+    For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you
+    assigned when deploying the model in your Azure OpenAI resource). It also requires the
+    environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+    `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
+    be set.
 
     Notes on Authentication
     -----------------------
@@ -1394,7 +1401,7 @@ Validation steps can be thought of as sequential validations on the target
 data. We call `Validate`'s validation methods to build up a validation plan: a collection of steps
 that, in the aggregate, provides good validation coverage.
 
-col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data greater than a fixed value or data in another column?
 
@@ -1456,6 +1463,12 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -1624,7 +1637,7 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 3: `c` is `2` and `b` is `2`.
         
 
-col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data less than a fixed value or data in another column?
 
@@ -1686,6 +1699,12 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -1854,7 +1873,7 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 2: `b` is `1` and `c` is `1`.
         
 
-col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data greater than or equal to a fixed value or data in another column?
 
@@ -1916,6 +1935,12 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -2084,7 +2109,7 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `b` is `3` and `c` is `4`.
         
 
-col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data less than or equal to a fixed value or data in another column?
 
@@ -2146,6 +2171,12 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -2314,7 +2345,7 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `c` is `3` and `b` is `2`.
         
 
-col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data equal to a fixed value or data in another column?
 
@@ -2376,6 +2407,12 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -2542,7 +2579,7 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 5: `a` is `5` and `b` is `4`.
         
 
-col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data not equal to a fixed value or data in another column?
 
@@ -2604,6 +2641,12 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -2768,7 +2811,7 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         0 and 4, where `a` is `5` and `b` is `5` in both cases (i.e., they are equal to each other).
         
 
-col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Do column data lie between two specified values or data in other columns?
 
@@ -2840,6 +2883,12 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -3018,7 +3067,7 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 4: `b` is `8` but the bounds are `3` (`a`) and `7` (`c`).
         
 
-col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Do column data lie outside of two specified values or data in other columns?
 
@@ -3090,6 +3139,12 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -3268,7 +3323,7 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 5: `b` is `6` and the bounds are `5` (`a`) and `7` (`c`).
         
 
-col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether column values are in a set of values.
 
@@ -3325,6 +3380,12 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -3520,7 +3581,7 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3577,6 +3638,12 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -3749,7 +3816,7 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         statuses in the `InvalidStatus` enum.
         
 
-col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data increasing by row?
 
@@ -3817,10 +3884,23 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
 
         Examples
         --------
@@ -3882,7 +3962,7 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data decreasing by row?
 
@@ -3950,10 +4030,23 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
+        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
+        `shift()`. Calling this method on a PySpark DataFrame will raise an
+        `InvalidOperationError` during interrogation.
 
         Examples
         --------
@@ -4015,7 +4108,7 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether values in a column are Null.
 
@@ -4066,6 +4159,12 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4206,7 +4305,7 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
         two non-Null values in column `b`.
         
 
-col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether values in a column are not Null.
 
@@ -4257,6 +4356,12 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4397,7 +4502,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
         
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -4457,6 +4562,12 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4598,7 +4709,7 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         string values of rows 1 and 2 in column `b`.
         
 
-col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether column values fit within a specification.
 
@@ -4659,6 +4770,12 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -4821,7 +4938,7 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
         The validation table shows that one test unit failed (the invalid email address in row 3).
         
 
-col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate column values using a custom expression.
 
@@ -4873,10 +4990,22 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Notes
+        -----
+        This validation method is not supported for PySpark DataFrames. The internal implementation
+        uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this
+        method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
 
         Preprocessing
         -------------
@@ -4997,7 +5126,7 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         by using `col_vals_expr()`. All test units passed, with no failing test units.
         
 
-col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a greater than comparison?
 
     The `col_sum_gt()` validation method checks whether the sum of values in a column
@@ -5178,7 +5307,7 @@ Does the column sum satisfy a greater than comparison?
     validation
     ```
 
-col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a less than comparison?
 
     The `col_sum_lt()` validation method checks whether the sum of values in a column
@@ -5359,7 +5488,7 @@ Does the column sum satisfy a less than comparison?
     validation
     ```
 
-col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a greater than or equal to comparison?
 
     The `col_sum_ge()` validation method checks whether the sum of values in a column
@@ -5540,7 +5669,7 @@ Does the column sum satisfy a greater than or equal to comparison?
     validation
     ```
 
-col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a less than or equal to comparison?
 
     The `col_sum_le()` validation method checks whether the sum of values in a column
@@ -5721,7 +5850,7 @@ Does the column sum satisfy a less than or equal to comparison?
     validation
     ```
 
-col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy an equal to comparison?
 
     The `col_sum_eq()` validation method checks whether the sum of values in a column
@@ -5904,7 +6033,7 @@ Does the column sum satisfy an equal to comparison?
     validation
     ```
 
-col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a greater than comparison?
 
     The `col_avg_gt()` validation method checks whether the average of values in a column
@@ -6085,7 +6214,7 @@ Does the column average satisfy a greater than comparison?
     validation
     ```
 
-col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a less than comparison?
 
     The `col_avg_lt()` validation method checks whether the average of values in a column
@@ -6266,7 +6395,7 @@ Does the column average satisfy a less than comparison?
     validation
     ```
 
-col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a greater than or equal to comparison?
 
     The `col_avg_ge()` validation method checks whether the average of values in a column
@@ -6447,7 +6576,7 @@ Does the column average satisfy a greater than or equal to comparison?
     validation
     ```
 
-col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a less than or equal to comparison?
 
     The `col_avg_le()` validation method checks whether the average of values in a column
@@ -6628,7 +6757,7 @@ Does the column average satisfy a less than or equal to comparison?
     validation
     ```
 
-col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy an equal to comparison?
 
     The `col_avg_eq()` validation method checks whether the average of values in a column
@@ -6811,7 +6940,7 @@ Does the column average satisfy an equal to comparison?
     validation
     ```
 
-col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a greater than comparison?
 
     The `col_sd_gt()` validation method checks whether the standard deviation of values in a column
@@ -6992,7 +7121,7 @@ Does the column standard deviation satisfy a greater than comparison?
     validation
     ```
 
-col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a less than comparison?
 
     The `col_sd_lt()` validation method checks whether the standard deviation of values in a column
@@ -7173,7 +7302,7 @@ Does the column standard deviation satisfy a less than comparison?
     validation
     ```
 
-col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a greater than or equal to comparison?
 
     The `col_sd_ge()` validation method checks whether the standard deviation of values in a column
@@ -7354,7 +7483,7 @@ Does the column standard deviation satisfy a greater than or equal to comparison
     validation
     ```
 
-col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a less than or equal to comparison?
 
     The `col_sd_le()` validation method checks whether the standard deviation of values in a column
@@ -7535,7 +7664,7 @@ Does the column standard deviation satisfy a less than or equal to comparison?
     validation
     ```
 
-col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy an equal to comparison?
 
     The `col_sd_eq()` validation method checks whether the standard deviation of values in a column
@@ -7718,7 +7847,7 @@ Does the column standard deviation satisfy an equal to comparison?
     validation
     ```
 
-rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether rows in the table are distinct.
 
@@ -7769,6 +7898,12 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -7913,7 +8048,7 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether row data are complete by having no missing values.
 
@@ -7964,6 +8099,12 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8108,7 +8249,7 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether one or more columns exist in the table.
 
@@ -8149,6 +8290,12 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8235,7 +8382,7 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
         failing validation step (the check for column `c`, which doesn't exist).
         
 
-col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', p: 'float', tol: 'Tolerance' = 0, thresholds: 'int | float | None | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', p: 'float', tol: 'Tolerance' = 0, thresholds: 'int | float | None | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether a column has a specific percentage of Null values.
 
@@ -8287,6 +8434,12 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8481,7 +8634,7 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
         calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         
 
-data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate that data in a datetime column is not older than a specified maximum age.
 
@@ -8546,6 +8699,12 @@ data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', referen
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8751,7 +8910,7 @@ data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', referen
         ```
         
 
-col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Do columns in the table (and their types) match a predefined schema?
 
@@ -8818,6 +8977,12 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -8916,7 +9081,7 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
         since the table columns and their types match the schema.
         
 
-row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether the row count of the table matches a specified count.
 
@@ -8976,6 +9141,12 @@ row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' 
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9075,7 +9246,7 @@ row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' 
 
         
 
-col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether the column count of the table matches a specified count.
 
@@ -9127,6 +9298,12 @@ col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callabl
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9195,31 +9372,83 @@ col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callabl
         columns in the target table. So, the single test unit passed.
         
 
-tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether the target table matches a comparison table.
 
-        The `tbl_match()` method checks whether the target table's composition matches that of a
-        comparison table. The validation performs a comprehensive comparison using progressively
-        stricter checks (from least to most stringent):
+        The `tbl_match()` method compares the target table, row by row, against a comparison table
+        that holds the expected data (the *source*). Rows of the two tables are aligned and every
+        aligned row becomes a test unit: it passes if the row is present in both tables with equal
+        values, and fails if its values changed, if it's missing from the target, if it's an extra
+        row in the target, or if its key is duplicated. Schema differences (columns added, removed,
+        retyped, or reordered) are checked too.
 
-        1. **Column count match**: both tables must have the same number of columns
-        2. **Row count match**: both tables must have the same number of rows
-        3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
-        4. **Schema match (order)**: columns in the correct order (case-insensitive names)
-        5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
-        6. **Data match**: values in corresponding cells must be identical
+        Rows are aligned in one of three ways:
 
-        This progressive approach helps identify exactly where tables differ. The validation will
-        fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
-        validation operates over a single test unit (pass/fail for complete table match).
+        - **by key** (`keys=` given): rows are matched on one or more key columns, so row order
+          doesn't matter; this is the most informative mode
+        - **by position** (`keys=None`, the default): the first row of each table is compared, then
+          the second, and so on
+        - **as multisets** (`keys="*"`): rows are compared as whole values regardless of order, with
+          duplicates counted (for tables without a key)
+
+        The comparison runs inside the table's own engine (it is backend-agnostic, and database
+        tables are compared in the database). Use
+        [`get_step_report()`](`pointblank.Validate.get_step_report`) to see a detailed report of
+        the differences, and [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) to
+        get the failing rows. The same comparison is available outside of a validation with
+        [`compare()`](`pointblank.compare`).
 
         Parameters
         ----------
         tbl_compare
-            The comparison table to validate against. This can be a DataFrame object (Polars or
-            Pandas), an Ibis table object, or a callable that returns a table. If a callable is
-            provided, it will be executed during interrogation to obtain the comparison table.
+            The comparison table (the expected data) to validate against. This can be a DataFrame
+            object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a
+            callable that returns a table. If a callable is provided, it will be executed during
+            interrogation to obtain the comparison table.
+        keys
+            One or more columns that uniquely identify a row, used to align the rows of the two
+            tables. Key names refer to the comparison table (use `column_map=` if the target names
+            them differently). If `None` (the default), rows are aligned by position. Use `"*"` to
+            compare the tables as multisets of rows.
+        columns
+            The comparison-table columns whose values should be compared. By default, all columns
+            present in both tables (other than the keys) are compared. Giving `columns=` also limits
+            the schema check to the keys and these columns.
+        column_map
+            A mapping of comparison-table column names to target column names, for renamed columns.
+        tolerance
+            Tolerance for numeric and datetime comparisons. A number is an absolute tolerance for all
+            numeric columns. A dict with `"atol"` and/or `"rtol"` keys applies to all numeric
+            columns, where values are equal if `|expected - actual| <= atol + rtol * |expected|`. A
+            dict mapping column names to either of the above sets per-column tolerances. Datetime
+            tolerances are given as a `datetime.timedelta` or a string like `"1s"` or `"500ms"`.
+        normalize
+            Per-column transformations applied to both tables before comparing, as a dict mapping a
+            column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
+            `"collapse_whitespace"`, or `{"round": n}`.
+        null_equal
+            Should two null values count as equal? By default, they do. NaN values in floating-point
+            columns are treated as null.
+        schema
+            How schema differences affect the result. With `"strict"` (the default), any schema
+            difference (other than renames given in `column_map=`) means the tables don't match,
+            and every test unit fails. With `"common"`, only the shared columns are compared and
+            schema differences are reported without failing any test units.
+        dup_keys
+            Rows whose key appears more than once in either table always fail. With `"flag"` (the
+            default), the step report lists the duplicated keys. With `"compare"`, the step report
+            also compares the duplicated rows pairwise to show which columns differ.
+        order_by
+            Column(s) defining the row order for positional alignment on backends without an
+            inherent row order (e.g., database tables). Ignored when `keys=` is given.
+        partitions
+            Compare the tables in this many passes, each covering a disjoint subset of the key
+            values (by key hash), to bound memory use for very large tables. Each pass reads the
+            tables again, so this trades time for memory; the results are identical to a
+            single-pass comparison. Requires `keys=` (not `"*"`), and Polars, DuckDB, or Ibis
+            tables (including CSV/Parquet paths). Sundering isn't available for the step when
+            partitions are used.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9251,10 +9480,38 @@ tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: '
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Test Units
+        ----------
+        Each aligned row is a test unit. With `keys=`, that's every key value found in either table
+        (a duplicated key counts as many units as its larger number of occurrences); by position,
+        it's the number of rows in the longer table; as multisets, it's every row copy. A test unit
+        passes only if its row is in both tables with all compared values equal. If the strict
+        schema check fails, all test units fail. When both tables are empty, the step has a single
+        test unit, which passes if the schemas match.
+
+        Because failures are counted per row, thresholds can be expressed as proportions (e.g., a
+        `warning` when more than 1% of rows differ). To fail on any difference, use an absolute
+        threshold of `1`.
+
+        The data extract for the step (from
+        [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing rows
+        of *both* tables: the key column(s), a `_status_` column (`"changed"`, `"missing"`,
+        `"extra"`, or `"dup_key"`), and a pair of `<column>_source`/`<column>_target` columns for
+        each compared column. For [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`),
+        target rows with a matching row in the comparison table pass; rows missing from the target
+        can't be part of the sundered data. Sundering for this step is available with in-memory
+        tables (not lazy or database tables) and isn't available in multiset mode.
 
         Preprocessing
         -------------
@@ -9300,63 +9557,16 @@ tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: '
 
         Cross-Backend Validation
         ------------------------
-        The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
-        different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
-        comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
-        different backends are detected, the comparison table is automatically converted to match the
-        data table's backend before validation proceeds.
+        The two tables can come from different backends (e.g., a Polars DataFrame and a Pandas
+        DataFrame, or a database table and a CSV file). Tables on the same backend are compared in
+        place (so two tables in the same database are compared inside the database). Tables on
+        different backends are both converted to Polars (or to Pandas, if Polars isn't installed)
+        before the comparison. Key columns whose types differ between the tables (e.g., integer
+        keys that became floats in Pandas because of a missing value) are cast to a common type.
 
-        **Certified Backend Combinations:**
-
-        All combinations of the following backends have been tested and certified to work (in both
-        directions):
-
-        - Pandas DataFrame
-        - Polars DataFrame
-        - DuckDB (native)
-        - DuckDB (as Ibis table)
-        - SQLite (via Ibis)
-
-        Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
-        automatically materialized during validation:
-
-        - if comparing **against Polars**: materialized to Polars
-        - if comparing **against Pandas**: materialized to Pandas
-        - if **both tables are database backends**: both materialized to Polars
-
-        This ensures optimal performance and type consistency.
-
-        **Data Types That Work Best in Cross-Backend Validation:**
-
-        - numeric types: int, float columns (including proper NaN handling)
-        - string types: text columns with consistent encodings
-        - boolean types: True/False values
-        - null values: `None` and `NaN` are treated as equivalent across backends
-        - list columns: nested list structures (with basic types)
-
-        **Known Limitations:**
-
-        While many data types work well in cross-backend validation, there are some known
-        limitations to be aware of:
-
-        - date/datetime types: When converting between Polars and Pandas, date objects may be
-          represented differently. For example, `datetime.date` objects in Pandas may become
-          `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
-          around this, ensure both tables use the same datetime representation before comparison.
-        - custom types: User-defined types or complex nested structures may not convert cleanly
-          between backends and could cause unexpected comparison failures.
-        - categorical types: Categorical/factor columns may have different internal
-          representations across backends.
-        - timezone-aware datetimes: Timezone handling differs between backends and may cause
-          comparison issues.
-
-        Here are some ideas to overcome such limitations:
-
-        - for date/datetime columns, consider using `pre=` preprocessing to normalize representations
-          before comparison.
-        - when working with custom types, manually convert tables to the same backend before using
-          `tbl_match()`.
-        - use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+        Values in columns whose types differ are compared numerically when both columns are numeric
+        and as strings otherwise; note that such differences also fail the strict schema check
+        (use `schema="common"` to only report them).
 
         Examples
         --------
@@ -9397,33 +9607,37 @@ tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: '
         validation
         ```
 
-        The validation table shows that the single test unit passed, indicating that the two tables
-        match completely.
+        The validation table shows that all four test units (one per row) passed, indicating that
+        the two tables match completely.
 
-        Now, let's create a table with a slight difference and see what happens.
+        Now, let's compare against a table that has one different value, is missing a row, and has
+        an extra row. Since the rows can be identified by column `a`, we'll use it as the key.
 
         ```python
-        # Create a table with one different value
         tbl_3 = pl.DataFrame({
-            "a": [1, 2, 3, 4],
-            "b": ["w", "x", "y", "z"],
-            "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+            "a": [1, 2, 4, 5],
+            "b": ["w", "x", "z", "v"],
+            "c": [4.0, 5.5, 7.0, 8.0]  # Changed 5.0 to 5.5
         })
 
         validation = (
-            pb.Validate(data=tbl_1)
-            .tbl_match(tbl_compare=tbl_3)
+            pb.Validate(data=tbl_3)
+            .tbl_match(tbl_compare=tbl_1, keys="a")
             .interrogate()
         )
 
         validation
         ```
 
-        The validation table shows that the single test unit failed because the tables don't match
-        (one value is different in column `c`).
+        Three of the five aligned rows failed: one changed, one missing from the target, and one
+        extra. The step report shows exactly what differs.
+
+        ```python
+        validation.get_step_report(i=1)
+        ```
         
 
-conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Perform multiple row-wise validations for joint validity.
 
@@ -9475,6 +9689,12 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9627,7 +9847,7 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
         information on how to use it with different table backends.
         
 
-specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Perform a specialized validation with customized logic.
 
@@ -9694,6 +9914,12 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -9932,7 +10158,7 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
         virtually any data quality requirement in your organization.
         
 
-prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
+prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, attachments: 'list | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate rows using AI/LLM-powered analysis.
 
@@ -9969,12 +10195,22 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             A single column or list of columns to include in the validation. If `None`, all columns
             will be included. Specifying fewer columns can improve performance and reduce API costs
             so try to include only the columns necessary for the validation.
+        attachments
+            An optional list of reference files (images or PDFs) to attach as global context for
+            every batch. Each item can be a local file path, a URL (`http://` / `https://`), a
+            `pathlib.Path`, or a pre-built chatlas `Content` object. Supported extensions are
+            `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and `.pdf`. The attachments apply to the whole
+            validation step, not per-row, so they are well-suited for things like brand guides,
+            schema diagrams, or sample documents the LLM should consult when scoring each row.
+            **Cost note**: attachments are re-sent on every batch — see the *Multi-modal
+            attachments* section below for cost-management tips.
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
             `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-            `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from
-            the provider. Model names are subject to change so consult the provider's documentation
-            for the most up-to-date model names.
+            `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific
+            model to be used from the provider (for `"azure-openai"`, the value after the colon is
+            the Azure *deployment id*). Model names are subject to change so consult the provider's
+            documentation for the most up-to-date model names.
         batch_size
             Number of rows to process in each batch. Larger batches are more efficient but may hit
             API limits. Default is `1000`.
@@ -10014,6 +10250,12 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
 
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
         Returns
         -------
         Validate
@@ -10028,10 +10270,13 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
         - `"openai"` (OpenAI)
         - `"ollama"` (Ollama)
         - `"bedrock"` (Amazon Bedrock)
+        - `"azure-openai"` (Azure OpenAI)
 
         The model name should be the specific model to be used from the provider. Model names are
         subject to change so consult the provider's documentation for the most up-to-date model
-        names.
+        names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the
+        name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI
+        model id.
 
         Notes on Authentication
         -----------------------
@@ -10062,6 +10307,8 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
         - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
         - **Ollama**: no API key required, just ensure Ollama is running locally
         - **Bedrock**: configure AWS credentials through standard AWS methods
+        - **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
+          `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
 
         AI Validation Process
         ---------------------
@@ -10130,6 +10377,39 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
         - "What do you think about this data?" (too open-ended)
         - "Describe the quality of each row" (asks for description, not validation)
         - "How would you improve this data?" (asks for suggestions, not pass/fail)
+
+        Multi-modal Attachments
+        -----------------------
+        Use `attachments=` to give the LLM a reference image or PDF that applies to every row. The
+        attachment is sent as global context, while each row's values are still serialized as JSON
+        and validated against your `prompt=`. Useful patterns:
+
+        - validating descriptions against a brand-style image: `attachments=["brand_guide.pdf"]`
+        - cross-referencing rows with a schema diagram: `attachments=["schema.png"]`
+        - matching free-text fields to a sample document: `attachments=["sample_invoice.pdf"]`
+
+        Accepted values per list item:
+
+        - local path strings or `pathlib.Path` objects (e.g., `"docs/diagram.png"`)
+        - URLs (e.g., `"https://example.com/diagram.png"`)
+        - pre-built chatlas `Content` objects (e.g., `chatlas.content_image_plot()`)
+
+        Supported extensions: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.pdf`.
+
+        Note: local image paths auto-coerced through `attachments=` use `resize="low"` (chatlas's
+        default downscale to 512x512) to keep token costs predictable. For higher fidelity,
+        pre-build the content yourself with `chatlas.content_image_file(path, resize="high")`
+        (or `"none"`) and pass that object inside `attachments=`.
+
+        **Cost / batching note**: attachments are re-sent on *every* batch (one batch = one LLM API
+        call). For a table that requires N batches, each attachment's input tokens are billed N
+        times. To control costs:
+
+        - keep attachments small (downscale images, crop PDFs to the relevant page)
+        - use `columns_subset=` aggressively to maximize row-signature memoization (fewer unique
+          rows means fewer batches)
+        - raise `batch_size=` when the combined system prompt, attachment, and row JSON fit
+          comfortably under the model's context window
 
         Performance Considerations
         --------------------------
@@ -10246,6 +10526,28 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
         which exceeds all threshold levels. The validation will trigger the specified error action
         since the failure rate (40%) is above the error threshold (20%). The AI can recognize
         various phone number formats and determine whether they include area codes.
+
+        **Multi-modal example with `attachments=`:**
+
+        Suppose you have a table of product descriptions and a brand-style PDF that describes the
+        approved tone and vocabulary. Pass the PDF as a global attachment so the LLM can compare
+        each description against it.
+
+        ```python
+        validation = (
+            pb.Validate(data=products)
+            .prompt(
+                prompt="Each product description must match the tone and vocabulary in the brand guide.",
+                columns_subset=["description"],
+                attachments=["docs/brand_guide.pdf"],
+                model="anthropic:claude-opus-4-6",
+            )
+            .interrogate()
+        )
+        ```
+
+        The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each
+        description with the same reference document in view.
         
 
 
@@ -11980,7 +12282,7 @@ set_tbl(self, tbl: 'Any', tbl_name: 'str | None' = None, label: 'str | None' = N
         ```
         
 
-get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool | None' = None, incl_footer: 'bool | None' = None, incl_footer_timings: 'bool | None' = None, incl_footer_notes: 'bool | None' = None) -> 'GT'
+get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool | None' = None, incl_footer: 'bool | None' = None, incl_footer_timings: 'bool | None' = None, incl_footer_notes: 'bool | None' = None, incl_dimensions: 'bool | None' = None) -> 'GT'
 
         Validation report as a GT table.
 
@@ -12016,6 +12318,11 @@ get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool |
         incl_footer_notes
             Controls whether notes from validation steps should be displayed in the footer. If
             `None`, uses the global configuration setting. Only applies when `incl_footer=True`.
+        incl_dimensions
+            Controls whether the data quality dimension display is shown: a color-coded dimension
+            badge on each step number and a health-score summary block in the footer. If `None`,
+            uses the global configuration setting (which defaults to `False`, i.e., opt-in). Set to
+            `True` to include it for this report.
 
         Returns
         -------
@@ -13986,7 +14293,7 @@ col_summary_tbl(data: 'Any', tbl_name: 'str | None' = None) -> 'GT'
     ```
     
 
-missing_vals_tbl(data: 'Any') -> 'GT'
+missing_vals_tbl(data: 'Any', missing: 'dict[str, MissingSpec] | None' = None, as_heatmap: 'bool' = False) -> 'GT'
 
     Display a table that shows the missing values in the input table.
 
@@ -13994,12 +14301,40 @@ missing_vals_tbl(data: 'Any') -> 'GT'
     table. The table is displayed using the Great Tables API, which allows for further customization
     of the table's appearance if so desired.
 
+    By default, missingness is treated as binary (a value is either Null or it isn't) and the
+    function renders a sector-based heatmap of the proportion of Null values across the rows of each
+    column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
+    is supplied, the function instead renders a *structured missingness* breakdown: one row per
+    column with the count and percentage of complete values and of each missing *reason* (e.g.,
+    `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner
+    and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of
+    the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
+    they aren't mistaken for declared reasons.
+
+    Note that supplying `missing=` produces a *different report* than the default view: it is a
+    distinct visualization (a per-reason breakdown table, or a per-reason heatmap with
+    `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles
+    differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing
+    Pattern Heatmap" for the structured views), and the shared header/title styling makes the family
+    resemblance clear.
+
     Parameters
     ----------
     data
         The table for which to display the missing values. This could be a DataFrame object, an
         Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
         Read the *Supported Input Table Types* section for details on the supported table types.
+    missing
+        An optional dictionary mapping column names to [`MissingSpec`](`pointblank.MissingSpec`)
+        objects. When provided, the function renders a structured breakdown of missingness by
+        reason for the specified columns (rather than the default sector heatmap). The reason
+        columns are the union of reasons across the supplied specs; a reason that isn't defined for
+        a given column is shown as an em dash (not applicable), as distinct from a defined-but-unobserved
+        reason (shown as `0 (0%)`).
+    as_heatmap
+        Only applies when `missing=` is provided. When `True`, render the per-reason proportions as
+        a color-coded heatmap (cells shaded from light to dark by the proportion missing) instead of
+        the count/percentage text breakdown. Default is `False`.
 
     Returns
     -------
@@ -14506,6 +14841,213 @@ print_database_tables(connection_string: 'str') -> 'list[str]'
     See Also
     --------
     connect_to_table : Connect to a database table with full connection string documentation
+    
+
+
+## The Table Comparison family
+
+The *Table Comparison* group compares two tables row by row. The `compare()`
+function aligns the rows of a source table (the expected data) and a target table by key, by
+position, or as multisets, and classifies every aligned row as matching, changed, missing from the
+target, extra in the target, or having a duplicated key. It also reports schema differences. Numeric
+and datetime tolerances, string normalization, and column renames are supported, and large files
+can be compared lazily (with `partitions=` to bound memory). The result is a `Comparison` object
+with counts, samples of differing rows, and a tabular report. The same comparison is available as a
+validation step with `Validate.tbl_match()`.
+
+compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, source_name: 'str | None' = None, target_name: 'str | None' = None) -> 'Comparison'
+
+    Compare two tables row by row and report how they differ.
+
+    The `compare()` function aligns the rows of a *source* table (the reference, or expected data)
+    with those of a *target* table (the data being checked) and classifies every aligned row:
+    rows that match, rows whose values changed, rows missing from the target, and extra rows in the
+    target. It also reports schema differences (columns added, removed, retyped, or reordered). The
+    returned `Comparison` object gives you the counts, samples of the differing rows, and a
+    tabular report.
+
+    Rows are aligned in one of two ways:
+
+    - **by key** (`keys=` given): rows are matched on the values of one or more key columns, so
+      row order doesn't matter. This is the most useful mode for comparing extracts of the same
+      data (e.g., the source and target of a pipeline run).
+    - **by position** (`keys=None`, the default): the first row of the source is compared with the
+      first row of the target, and so on.
+
+    The comparison is backend-agnostic and runs inside the table's own engine: tables can be
+    Polars or Pandas DataFrames, Polars LazyFrames, Ibis tables (e.g., DuckDB, PostgreSQL), or
+    paths to CSV/Parquet files. File paths are scanned lazily, and only counts and small samples of
+    differing rows are ever collected, so tables that don't fit in memory can still be compared.
+
+    Parameters
+    ----------
+    source
+        The reference table. Can be any table type supported by Pointblank, a path to a CSV or
+        Parquet file, or a callable that returns a table.
+    target
+        The table to check against the source. Same input types as `source=`.
+    keys
+        One or more columns that uniquely identify a row, used to align rows between the tables.
+        Key names refer to the source table (use `column_map=` if the target names them
+        differently). If `None`, rows are aligned by position, which requires the tables to have
+        a defined row order (eager DataFrames, Polars LazyFrames, or any table with `order_by=`).
+    columns
+        The source columns whose values should be compared. By default, all columns present in
+        both tables (other than the keys) are compared. Giving `columns=` also limits the schema
+        check to the keys and these columns.
+    column_map
+        A mapping of source column names to target column names, for columns that were renamed.
+    tolerance
+        Tolerance for numeric and datetime comparisons. A number is an absolute tolerance applied
+        to all numeric columns. A dict with `"atol"` and/or `"rtol"` keys applies to all numeric
+        columns, where values are equal if `|source - target| <= atol + rtol * |source|`. A dict
+        mapping column names to either of the above sets per-column tolerances. Datetime
+        tolerances are given as a `datetime.timedelta` or a string like `"1s"`, `"500ms"`, `"2m"`,
+        or `"1d"`, e.g., `tolerance={"updated_at": "1s"}`.
+    normalize
+        Per-column transformations applied to both sides before comparing, as a dict mapping a
+        column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
+        `"collapse_whitespace"`, or `{"round": n}`. Reported values are always the original ones.
+    null_equal
+        Should a null in the source and a null in the target count as equal? By default, they do.
+        NaN values in floating-point columns are treated as null.
+    schema
+        How schema differences affect the result. With `"strict"` (the default), any schema
+        difference (other than renames given in `column_map=`) means the tables don't match, and
+        every row counts as failing. With `"common"`, only the shared columns are compared and
+        schema differences are reported without failing rows.
+    dup_keys
+        Rows whose key appears more than once in either table can't be aligned unambiguously, so
+        they always get the `"dup_key"` status. With `"flag"` (the default), they are only flagged
+        and counted. With `"compare"`, the report also compares the duplicated rows pairwise
+        (every source row against every target row with the same key) to show which columns
+        differ.
+    order_by
+        Column(s) defining row order for positional alignment on backends without an inherent
+        row order (e.g., database tables). Ignored when `keys=` is given.
+    partitions
+        Compare the tables in this many passes, each covering a disjoint subset of the key values
+        (by key hash). This bounds peak memory for tables too large to compare in one pass (each
+        pass joins only about `1/partitions` of the rows), at the cost of reading the tables once
+        per pass. Requires `keys=`, and Polars, DuckDB, or Ibis tables (including CSV/Parquet
+        paths). The results are identical to a single-pass comparison.
+    source_name, target_name
+        Optional labels for the two tables, used in the report.
+
+    Returns
+    -------
+    Comparison
+        The result of the comparison.
+
+    Test Units and Row Statuses
+    ---------------------------
+    Every aligned row is one *test unit* and gets exactly one status:
+
+    - `"match"`: the row is in both tables and all compared values are equal (within tolerance)
+    - `"changed"`: the row is in both tables but at least one compared value differs
+    - `"missing"`: the row is in the source but not in the target
+    - `"extra"`: the row is in the target but not in the source
+    - `"dup_key"`: the row's key appears more than once in either table. A duplicated key counts
+      as many units as the larger of its two occurrence counts.
+
+    Rows with a null in a key column can't be matched: they count as `"missing"` (source) or
+    `"extra"` (target).
+
+    Large Tables
+    ------------
+    The comparison runs inside the tables' own engine and only counts and small samples of rows
+    are collected, so file paths (scanned lazily) and database tables never have to be loaded into
+    Python. The engine's join still needs memory for the rows it compares. If that's too much, use
+    `partitions=` to compare the tables in several smaller passes. For the lowest memory use with
+    very large files, read them as DuckDB relations (e.g., `duckdb.connect().read_csv(path)`) and
+    use `partitions=`: in a benchmark with two 10-million-row CSV files (730 MB each), peak memory
+    was about 0.8 GB with DuckDB and `partitions=8`, versus about 5.5 GB to read both files with
+    Polars and join them.
+
+    Examples
+    --------
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    source = pl.DataFrame(
+        {"id": [1, 2, 3, 4], "amount": [10.0, 20.0, 30.0, 40.0], "region": ["N", "S", "E", "W"]}
+    )
+    target = pl.DataFrame(
+        {"id": [1, 2, 4, 5], "amount": [10.0, 20.5, 40.0, 50.0], "region": ["N", "S", "W", "N"]}
+    )
+
+    cmp = pb.compare(source, target, keys="id")
+    cmp
+    ```
+
+    The counts are available as attributes, and the differing rows can be retrieved by status:
+
+    ```python
+    cmp.n_changed, cmp.n_missing, cmp.n_extra
+    ```
+
+    ```python
+    cmp.rows("changed")
+    ```
+
+    A tolerance can absorb small numeric differences:
+
+    ```python
+    pb.compare(source, target, keys="id", tolerance={"amount": 1}).n_changed
+    ```
+    
+
+Comparison() -> 'None'
+
+    The result of comparing a source table with a target table.
+
+    `Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
+    status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
+    of differing rows on demand.
+
+    Attributes
+    ----------
+    source_name, target_name
+        Labels for the two tables.
+    keys
+        The key columns used to align rows (empty for positional alignment).
+    mode
+        `"keyed"` or `"positional"`.
+    schema_diff
+        A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
+    n_source_rows, n_target_rows
+        Row counts of the two tables.
+    n_match, n_changed, n_missing, n_extra, n_dup_key
+        Number of test units (aligned rows) with each status.
+    column_mismatches
+        A dict mapping each compared source column to the number of matched rows where its values
+        differ.
+    
+
+SchemaDiff(only_in_source: 'list[str]' = <factory>, only_in_target: 'list[str]' = <factory>, dtype_changed: 'list[tuple[str, str, str]]' = <factory>, renamed: 'list[tuple[str, str]]' = <factory>, case_only: 'list[tuple[str, str]]' = <factory>, reordered: 'bool' = False) -> None
+
+    Differences between the schemas of the source and target tables.
+
+    Column names refer to the source table except in `only_in_target` (and the second element of
+    `renamed` and `case_only` pairs), which refer to the target table.
+
+    Attributes
+    ----------
+    only_in_source
+        Columns present in the source but not the target.
+    only_in_target
+        Columns present in the target but not the source.
+    dtype_changed
+        `(column, source_dtype, target_dtype)` for shared columns whose data types differ.
+    renamed
+        `(source_column, target_column)` pairs paired up through `column_map=`.
+    case_only
+        `(source_column, target_column)` pairs whose names differ only by letter case. These are
+        *not* paired up automatically (they also appear in `only_in_source`/`only_in_target`); use
+        `column_map=` to compare them.
+    reordered
+        `True` if the shared columns appear in a different order in the two tables.
     
 
 
@@ -15493,6 +16035,10 @@ Access validation summary information when authoring final actions.
     - `tbl_column_count` (`int`): The number of columns in the target table.
     - `tbl_name` (`str`): The name of the target table.
     - `validation_duration` (`float`): The duration of the validation in seconds.
+    - `dimension_scores` (`dict`): The test-unit-weighted health score (`0`-`100`) for each data
+      quality dimension present in the validation (e.g., `{"completeness": 99.2, "validity": 97.8}`).
+    - `overall_health_score` (`float`): The overall, test-unit-weighted health score (`0`-`100`)
+      across all dimensions.
 
     Note that the summary dictionary is only available within the context of a final action. If
     called outside of a final action (i.e., when no final action is being executed), this function
@@ -15851,7 +16397,7 @@ read_file(filepath: 'str | Path') -> 'Validate'
     to disk for later retrieval with this function.
     
 
-config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, report_incl_footer_timings: 'bool' = True, report_incl_footer_notes: 'bool' = True, preview_incl_header: 'bool' = True) -> 'PointblankConfig'
+config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, report_incl_footer_timings: 'bool' = True, report_incl_footer_notes: 'bool' = True, report_incl_dimensions: 'bool' = False, preview_incl_header: 'bool' = True, dimension_map: 'dict[str, str] | None' = None, dimension_weights: 'dict[str, float] | None' = None, dimension_thresholds: 'dict[str, float] | None' = None) -> 'PointblankConfig'
 
     Configuration settings for the Pointblank library.
 
@@ -15870,9 +16416,32 @@ config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, rep
     report_incl_footer_notes
         Controls whether the notes from validation steps should be displayed in the footer. Only
         applies when `report_incl_footer=True`.
+    report_incl_dimensions
+        Controls whether the data quality dimension display is included in the validation report by
+        default. When `True`, each step's report shows a color-coded dimension badge on the step
+        number and a health-score summary block in the footer. This is `False` by default (opt-in);
+        it can also be toggled per-report via `get_tabular_report(incl_dimensions=...)`.
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
+    dimension_map
+        An optional mapping of `assertion_type` (e.g., `"col_vals_gt"`) to a data quality dimension
+        name (e.g., `"validity"`). This is merged on top of the built-in inference map, letting you
+        remap how validation steps are categorized for health scoring. Only affects steps where the
+        dimension is not set explicitly via a validation method's `dimension=` parameter.
+    dimension_weights
+        An optional mapping of dimension name to a relative weight (a positive number) used when
+        computing the overall health score. A weight scales that dimension's *test-unit*
+        contribution to the overall score, so a dimension's influence is its weight multiplied by
+        its number of test units (a heavily-weighted dimension with few test units still
+        contributes modestly). Dimensions not present in the mapping default to a weight of `1.0`;
+        when omitted entirely, the overall score is a pure test-unit-weighted pass rate.
+    dimension_thresholds
+        An optional mapping of dimension name to a minimum acceptable health score (`0`-`100`).
+        This is used as the default by
+        [`assert_dimension_scores()`](`pointblank.Validate.assert_dimension_scores`), which raises
+        an `AssertionError` when any dimension's score falls below its minimum (e.g., to fail a CI
+        run when the completeness score drops below `95`).
 
     Returns
     -------
@@ -16252,7 +16821,7 @@ int_field(min_val: 'int | None' = None, max_val: 'int | None' = None, allowed: '
     ```
     
 
-float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
+float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, precision: 'int | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
 
     Create a floating-point column specification for use in a schema.
 
@@ -16276,6 +16845,9 @@ float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allo
     allowed
         List of allowed values (categorical constraint). When provided, values are sampled from
         this list. Cannot be combined with `min_val=`/`max_val=`.
+    precision
+        Number of decimal places to round generated values to. Default is `None` (no rounding).
+        Must be a non-negative integer. Has no effect when `allowed=` or `generator=` is used.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
@@ -16299,8 +16871,8 @@ float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allo
     ------
     ValueError
         If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
-        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
-        float type.
+        `null_probability` is not between `0.0` and `1.0`, if `precision` is negative,
+        or if `dtype` is not a valid float type.
 
     Examples
     --------
@@ -16341,7 +16913,20 @@ float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allo
         calibration=pb.float_field(min_val=0.9, max_val=1.1),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    Use `precision=` to round generated values to a fixed number of decimal places. This is useful
+    for prices, scores, or any measurement where full floating-point precision is unwanted:
+
+    ```python
+    schema = pb.Schema(
+        price=pb.float_field(min_val=1.0, max_val=200.0, precision=2),
+        score=pb.float_field(min_val=0.0, max_val=100.0, precision=1),
+        probability=pb.float_field(min_val=0.0, max_val=1.0, precision=4),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
 
     Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
@@ -16357,7 +16942,7 @@ float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allo
         log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=20, seed=99))
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
     
 
