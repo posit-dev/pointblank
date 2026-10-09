@@ -2329,6 +2329,454 @@ def validate(
         sys.exit(1)
 
 
+def _parse_compare_tolerance(specs: tuple[str, ...]) -> Any:
+    """
+    Parse `--tolerance` values into a `tolerance=` argument for `pb.compare()`.
+
+    Each value is `[COLUMN=]SPEC`, where SPEC is a number (absolute tolerance), a duration (e.g.,
+    `1s`, `500ms`), or comma-separated `atol:X`/`rtol:Y` parts. Without `COLUMN=`, the tolerance
+    applies to all numeric columns.
+    """
+
+    def parse_spec(spec: str) -> Any:
+        spec = spec.strip()
+        if ":" in spec:
+            out: dict[str, Any] = {}
+            for part in spec.split(","):
+                name, _, val = part.partition(":")
+                name = name.strip()
+                if name not in ("atol", "rtol"):
+                    raise click.BadParameter(
+                        f"Unknown tolerance option {name!r} in {spec!r}; use atol: or rtol:.",
+                        param_hint="--tolerance",
+                    )
+                val = val.strip()
+                try:
+                    out[name] = float(val)
+                except ValueError:
+                    out[name] = val  # a duration like 1s
+            return out
+        try:
+            return float(spec)
+        except ValueError:
+            return spec  # a duration like 1s
+
+    if not specs:
+        return None
+    per_column: dict[str, Any] = {}
+    global_spec: Any = None
+    for item in specs:
+        column, sep, spec = item.partition("=")
+        if sep:
+            per_column[column.strip()] = parse_spec(spec)
+        else:
+            global_spec = parse_spec(item)
+    if per_column and global_spec is not None:
+        raise click.BadParameter(
+            "Use either a table-wide tolerance or per-column tolerances, not both.",
+            param_hint="--tolerance",
+        )
+    return per_column or global_spec
+
+
+def _parse_compare_normalize(specs: tuple[str, ...]) -> dict[str, Any] | None:
+    """Parse `--normalize COLUMN=op,op,...` values (`round:N` for rounding)."""
+    if not specs:
+        return None
+    out: dict[str, Any] = {}
+    for item in specs:
+        column, sep, ops = item.partition("=")
+        if not sep or not ops:
+            raise click.BadParameter(
+                f"Expected COLUMN=op[,op...], got {item!r}.", param_hint="--normalize"
+            )
+        parsed: list[Any] = []
+        for op in ops.split(","):
+            name, _, arg = op.strip().partition(":")
+            parsed.append({name: int(arg)} if arg else name)
+        out[column.strip()] = parsed
+    return out
+
+
+def _parse_compare_column_map(specs: tuple[str, ...]) -> dict[str, str] | None:
+    """Parse `--column-map SOURCE=TARGET` values."""
+    if not specs:
+        return None
+    out: dict[str, str] = {}
+    for item in specs:
+        source_col, sep, target_col = item.partition("=")
+        if not sep or not source_col or not target_col:
+            raise click.BadParameter(
+                f"Expected SOURCE_COLUMN=TARGET_COLUMN, got {item!r}.", param_hint="--column-map"
+            )
+        out[source_col.strip()] = target_col.strip()
+    return out
+
+
+def _split_csv_option(value: str | None) -> list[str] | None:
+    if not value:
+        return None
+    return [v.strip() for v in value.split(",") if v.strip()]
+
+
+def _compare_load_source(data_source: str, duckdb_con: Any = None) -> Any:
+    """
+    Built-in dataset names are loaded; with a DuckDB connection, CSV/Parquet paths are read as
+    DuckDB relations; everything else is passed to `pb.compare()` as-is (so that file paths are
+    scanned lazily with Polars).
+    """
+    if data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
+        return pb.load_dataset(data_source)
+    if duckdb_con is not None:
+        suffix = Path(data_source).suffix.lower()
+        if suffix == ".csv" or data_source.lower().endswith(".csv.gz"):
+            if not Path(data_source).exists():
+                raise FileNotFoundError(f"CSV file not found: {data_source}")
+            return duckdb_con.read_csv(data_source)
+        if suffix == ".parquet" or "*.parquet" in data_source.lower():
+            return duckdb_con.read_parquet(data_source)
+    return data_source
+
+
+def _fmt_compare_value(value: Any, width: int = 30) -> str:
+    from rich.markup import escape
+
+    if value is None or (isinstance(value, float) and value != value):
+        return "[dim italic]NULL[/dim italic]"
+    text = f"{value:.6g}" if isinstance(value, float) else str(value)
+    if len(text) > width:
+        text = text[: width - 1] + "…"
+    return escape(text)
+
+
+def _compare_section(title: str) -> None:
+    console.print(f"\n[bold]{title}[/bold]")
+
+
+def _compare_sample_title(title: str, shown: int, total: int) -> str:
+    if shown >= total:
+        return f"{title} ({total:,})"
+    return f"{title} (showing {shown:,} of {total:,})"
+
+
+def _rich_print_comparison(cmp: Any, limit: int) -> None:
+    """Print a terminal summary of a `Comparison`."""
+    from rich.markup import escape
+
+    status_style = {
+        "match": "green",
+        "changed": "yellow",
+        "missing": "red",
+        "extra": "blue",
+        "dup_key": "magenta",
+    }
+
+    if cmp.mode == "keyed":
+        alignment = "aligned by key " + ", ".join(cmp.keys)
+    elif cmp.mode == "multiset":
+        alignment = "compared as multisets of rows"
+    else:
+        alignment = "aligned by row position"
+
+    if cmp.identical:
+        verdict = "[bold green]IDENTICAL[/bold green]"
+    else:
+        pct = cmp.n_failed / cmp.n * 100 if cmp.n else 0.0
+        verdict = (
+            f"[bold red]DIFFERENT[/bold red]: {cmp.n_failed:,} of {cmp.n:,} rows fail ({pct:.1f}%)"
+        )
+        if not cmp.schema_ok:
+            verdict += (
+                "\n[red]Schema differs[/red] (strict schema check: all rows count as failing)"
+            )
+
+    header = (
+        f"[bold]{escape(cmp.source_name)}[/bold] ({cmp.n_source_rows:,} rows) → "
+        f"[bold]{escape(cmp.target_name)}[/bold] ({cmp.n_target_rows:,} rows)\n"
+        f"[dim]{alignment}"
+        + (f", {cmp.partitions} partitions" if cmp.partitions > 1 else "")
+        + f"[/dim]\n\n{verdict}"
+    )
+    console.print(Panel(header, title="Table Comparison", border_style="blue", expand=False))
+
+    # Row statuses
+    _compare_section("Row status")
+    status_tbl = Table(show_edge=False, box=None)
+    status_tbl.add_column("Status")
+    status_tbl.add_column("Rows", justify="right")
+    status_tbl.add_column("%", justify="right")
+    for status, count in cmp.status_counts.items():
+        if status == "dup_key" and count == 0:
+            continue
+        pct = count / cmp.n * 100 if cmp.n else 0.0
+        style = status_style[status]
+        status_tbl.add_row(f"[{style}]{status}[/{style}]", f"{count:,}", f"{pct:.1f}")
+    console.print(status_tbl)
+
+    # Schema differences
+    diff = cmp.schema_diff
+    schema_rows = (
+        [(c, "only in source") for c in diff.only_in_source]
+        + [(c, "only in target") for c in diff.only_in_target]
+        + [(c, f"type {s} → {t}") for c, s, t in diff.dtype_changed]
+        + [(s, f"renamed → {t}") for s, t in diff.renamed]
+        + (
+            [("(column order)", "shared columns are in a different order")]
+            if diff.reordered
+            else []
+        )
+    )
+    if schema_rows:
+        _compare_section("Schema differences")
+        schema_tbl = Table(box=None)
+        schema_tbl.add_column("Column")
+        schema_tbl.add_column("Difference")
+        for col, what in schema_rows:
+            schema_tbl.add_row(escape(col), what)
+        console.print(schema_tbl)
+
+    # Per-column mismatches
+    n_matched = cmp.n_match + cmp.n_changed
+    mismatched = sorted(
+        ((c, n) for c, n in cmp.column_mismatches.items() if n), key=lambda x: -x[1]
+    )
+    if mismatched:
+        _compare_section("Column mismatches")
+        col_tbl = Table(box=None)
+        col_tbl.add_column("Column")
+        col_tbl.add_column("Rows differ", justify="right")
+        col_tbl.add_column("% of matched", justify="right")
+        for col, n in mismatched:
+            col_tbl.add_row(
+                escape(col), f"{n:,}", f"{n / n_matched * 100:.1f}" if n_matched else "-"
+            )
+        console.print(col_tbl)
+
+    # Samples of changed rows: one line per differing cell
+    key_cols = cmp._key_out_names()
+    if cmp.n_changed:
+        frame = cmp._fetch("changed", limit)
+        _compare_section(_compare_sample_title("Changed rows", len(frame), cmp.n_changed))
+        changed_tbl = Table(box=None)
+        changed_tbl.add_column(", ".join(key_cols))
+        changed_tbl.add_column("Column")
+        changed_tbl.add_column("Source")
+        changed_tbl.add_column("Target", style="yellow")
+        for row in frame.rows(named=True):
+            key = ", ".join(_fmt_compare_value(row[k]) for k in key_cols)
+            for i, spec in enumerate(cmp._specs):
+                if row.get(f"__pb_d_{i}"):
+                    changed_tbl.add_row(
+                        key,
+                        escape(spec.source),
+                        _fmt_compare_value(row[f"{spec.source}_source"]),
+                        _fmt_compare_value(row[f"{spec.source}_target"]),
+                    )
+                    key = ""
+        console.print(changed_tbl)
+
+    # Samples of missing/extra rows
+    for status, title in (("missing", "Missing from target"), ("extra", "Extra in target")):
+        count = cmp.n_missing if status == "missing" else cmp.n_extra
+        if not count:
+            continue
+        frame = cmp._fetch(status, limit)
+        columns = [c for c in frame.columns if not c.startswith("__pb_")][:8]
+        _compare_section(_compare_sample_title(title, len(frame), count))
+        tbl = Table(box=None)
+        for col in columns:
+            tbl.add_column(escape(col), style="bold" if col in key_cols else None)
+        for row in frame.rows(named=True):
+            tbl.add_row(*[_fmt_compare_value(row[c], width=20) for c in columns])
+        console.print(tbl)
+
+    if cmp.n_dup_key:
+        console.print(
+            f"\n[magenta]{cmp.n_dup_key_values:,} duplicated key value(s)[/magenta] "
+            f"({cmp.n_dup_key:,} rows can't be aligned); see the HTML report for details."
+        )
+
+
+@cli.command()
+@click.argument("source", type=str)
+@click.argument("target", type=str)
+@click.option(
+    "--key",
+    "-k",
+    "keys",
+    multiple=True,
+    help="Key column used to align rows (repeat for composite keys). Use '*' to compare as "
+    "multisets of rows. Without a key, rows are compared by position.",
+)
+@click.option("--columns", "-c", help="Comma-separated source columns to compare")
+@click.option(
+    "--column-map",
+    multiple=True,
+    help="Renamed column as SOURCE_COLUMN=TARGET_COLUMN (repeatable)",
+)
+@click.option(
+    "--tolerance",
+    "-t",
+    multiple=True,
+    help="Tolerance as [COLUMN=]SPEC; SPEC is a number (absolute), a duration (1s, 500ms), or "
+    "atol:X,rtol:Y (repeatable)",
+)
+@click.option(
+    "--normalize",
+    multiple=True,
+    help="Normalization as COLUMN=op[,op...] with ops strip, lower, upper, "
+    "collapse_whitespace, round:N (repeatable)",
+)
+@click.option("--null-unequal", is_flag=True, help="Treat two nulls as different values")
+@click.option(
+    "--schema",
+    type=click.Choice(["strict", "common"]),
+    default="strict",
+    show_default=True,
+    help="'strict': any schema difference fails all rows; 'common': compare shared columns only",
+)
+@click.option(
+    "--dup-keys",
+    type=click.Choice(["flag", "compare"]),
+    default="flag",
+    show_default=True,
+    help="'compare' also compares rows with duplicated keys pairwise in the report",
+)
+@click.option("--order-by", help="Comma-separated columns defining row order (positional mode)")
+@click.option(
+    "--partitions",
+    type=click.IntRange(min=1),
+    help="Compare in N passes by key hash to bound memory use for very large tables",
+)
+@click.option(
+    "--engine",
+    type=click.Choice(["polars", "duckdb"]),
+    default="polars",
+    show_default=True,
+    help="Engine for reading CSV/Parquet files: 'polars' is fastest, 'duckdb' uses the least "
+    "memory (especially with --partitions)",
+)
+@click.option("--limit", default=10, show_default=True, help="Maximum sample rows shown per status")
+@click.option("--output-html", type=click.Path(), help="Save the HTML comparison report to file")
+@click.option(
+    "--output-json", type=click.Path(), help="Save the comparison results as JSON to file"
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    show_default=True,
+    help="Terminal output: a summary ('text') or the results as JSON ('json')",
+)
+@click.option(
+    "--no-samples",
+    is_flag=True,
+    help="Leave sample row values out of JSON output (e.g., for sensitive data)",
+)
+@click.option(
+    "--exit-code/--no-exit-code",
+    default=True,
+    show_default=True,
+    help="Exit with code 1 when the tables differ",
+)
+def compare(
+    source: str,
+    target: str,
+    keys: tuple[str, ...],
+    columns: str | None,
+    column_map: tuple[str, ...],
+    tolerance: tuple[str, ...],
+    normalize: tuple[str, ...],
+    null_unequal: bool,
+    schema: str,
+    dup_keys: str,
+    order_by: str | None,
+    partitions: int | None,
+    engine: str,
+    limit: int,
+    output_html: str | None,
+    output_json: str | None,
+    output_format: str,
+    no_samples: bool,
+    exit_code: bool,
+) -> None:
+    """
+    Compare two tables row by row.
+
+    SOURCE is the reference (expected) table and TARGET is the table to check. Each can be a CSV
+    or Parquet file (scanned lazily, so large files work), a database connection string, or a
+    built-in dataset name. Every row is classified as matching, changed, missing from the target,
+    extra in the target, or having a duplicated key; schema differences are reported too.
+
+    Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
+
+    Examples:
+
+    \b
+      pb compare source.csv target.csv --key id
+      pb compare old.parquet new.parquet -k id -t amount=rtol:1e-6 --output-html diff.html
+      pb compare a.csv b.csv -k region -k date --schema common --format json
+      pb compare big_a.csv big_b.csv -k id --engine duckdb --partitions 8
+    """
+    try:
+        duckdb_con = None
+        if engine == "duckdb":
+            if not _is_lib_present("duckdb"):
+                raise ImportError("`--engine duckdb` requires the 'duckdb' package.")
+            import duckdb
+
+            duckdb_con = duckdb.connect()
+
+        keys_arg: Any = list(keys) if keys else None
+        if keys_arg == ["*"]:
+            keys_arg = "*"
+
+        cmp = pb.compare(
+            _compare_load_source(source, duckdb_con),
+            _compare_load_source(target, duckdb_con),
+            keys=keys_arg,
+            columns=_split_csv_option(columns),
+            column_map=_parse_compare_column_map(column_map),
+            tolerance=_parse_compare_tolerance(tolerance),
+            normalize=_parse_compare_normalize(normalize),
+            null_equal=not null_unequal,
+            schema=schema,
+            dup_keys=dup_keys,
+            order_by=_split_csv_option(order_by),
+            partitions=partitions,
+            source_name=source,
+            target_name=target,
+        )
+
+        if output_format == "json":
+            click.echo(cmp.to_json(samples=not no_samples, limit=limit))
+        else:
+            _rich_print_comparison(cmp, limit=limit)
+
+        if output_html:
+            html_content = cmp.get_tabular_report(limit=limit).as_raw_html()
+            Path(output_html).write_text(html_content, encoding="utf-8")
+            if output_format == "text":
+                console.print(f"[green]✓[/green] HTML report saved to: {output_html}")
+
+        if output_json:
+            Path(output_json).write_text(
+                cmp.to_json(samples=not no_samples, limit=limit), encoding="utf-8"
+            )
+            if output_format == "text":
+                console.print(f"[green]✓[/green] JSON results saved to: {output_json}")
+
+    except click.ClickException:
+        raise
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        sys.exit(2)
+
+    if exit_code and not cmp.identical:
+        sys.exit(1)
+
+
 @cli.command()
 def datasets() -> None:
     """
