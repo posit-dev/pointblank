@@ -11451,8 +11451,8 @@ def test_process_data_processing_order() -> None:
         # Verify the order of calls
         mock_github.assert_called_once_with(test_input)
         mock_conn.assert_called_once_with(test_input)
-        mock_csv.assert_called_once_with(test_input)
-        mock_parquet.assert_called_once_with(test_input)
+        mock_csv.assert_called_once_with(test_input, lazy=False)
+        mock_parquet.assert_called_once_with(test_input, lazy=False)
 
         # Verify result
         assert result == test_input
@@ -11564,8 +11564,8 @@ def test_process_data_dataframe_goes_through_pipeline() -> None:
         # All processing functions should have been called
         mock_github.assert_called_once_with(df)
         mock_conn.assert_called_once_with(df)
-        mock_csv.assert_called_once_with(df)
-        mock_parquet.assert_called_once_with(df)
+        mock_csv.assert_called_once_with(df, lazy=False)
+        mock_parquet.assert_called_once_with(df, lazy=False)
 
 
 def test_process_title_text() -> None:
