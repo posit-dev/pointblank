@@ -1,0 +1,284 @@
+---
+title: Comparing Two Tables
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+A very common data question is *how do these two tables differ?* Maybe you refactored a pipeline
+and want to know whether its output changed, migrated a table from one database to another, or
+received a new extract of a data feed. In each case there's a *source* table (the reference, or the
+data you expect) and a *target* table (the data you want to check), and you want to know:
+
+- which records are missing from the target
+- which records in the target are extra
+- which records have values that differ, and in which columns
+- whether the columns themselves (names, types, order) changed
+
+Pointblank answers all of these with the `compare()` function, and the same comparison is available
+as a validation step through `Validate.tbl_match()` and on the command line through `pb compare`.
+
+## A First Comparison
+
+Let's make two small tables of orders. The target is a later extract of the same data: one order
+had its amount corrected, one order is gone, and a new order has appeared.
+
+```{python}
+import polars as pl
+
+source = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1003, 1004, 1005],
+        "customer": ["Ana", "Ben", "Cho", "Dev", "Eli"],
+        "amount": [25.00, 40.50, 12.75, 99.99, 5.00],
+        "status": ["shipped", "shipped", "pending", "shipped", "cancelled"],
+    }
+)
+
+target = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1004, 1005, 1006],
+        "customer": ["Ana", "Ben", "Dev", "Eli", "Fay"],
+        "amount": [25.00, 45.50, 99.99, 5.00, 18.25],
+        "status": ["shipped", "shipped", "shipped", "cancelled", "pending"],
+    }
+)
+```
+
+Since every order has a unique `order_id`, we'll use it as the *key* to line up the rows of the two
+tables:
+
+```{python}
+import pointblank as pb
+
+comparison = pb.compare(source, target, keys="order_id")
+
+comparison
+```
+
+The report's header gives the verdict and a breakdown of the rows. Below it, each section shows one
+kind of difference: which columns have mismatched values (and how often), then samples of the
+changed, missing, and extra rows. For changed rows, only the differing values are shown, as
+*old → new* with the numeric difference alongside.
+
+## Row Statuses
+
+Every row that can be aligned between the two tables gets exactly one status:
+
+| Status | Meaning |
+|---|---|
+| `match` | the row is in both tables and all compared values are equal |
+| `changed` | the row is in both tables but at least one compared value differs |
+| `missing` | the row is in the source but not in the target |
+| `extra` | the row is in the target but not in the source |
+| `dup_key` | the row's key appears more than once in either table, so it can't be aligned |
+
+The counts are available directly on the `Comparison` object:
+
+```{python}
+comparison.status_counts
+```
+
+```{python}
+comparison.n_changed, comparison.n_missing, comparison.n_extra
+```
+
+A `Comparison` is truthy only if the tables match, so it can be used directly in a test or an
+`if` statement:
+
+```{python}
+bool(comparison)
+```
+
+## Getting the Differing Rows
+
+Use the `rows()` method to get the rows with a given status as a table. Changed rows come with a
+`<column>_source` and a `<column>_target` column for each compared column:
+
+```{python}
+comparison.rows("changed")
+```
+
+Missing rows come from the source and extra rows from the target:
+
+```{python}
+comparison.rows("missing")
+```
+
+```{python}
+comparison.rows("extra")
+```
+
+Only up to `limit=` rows (100 by default) are collected, so this is safe even for very large
+tables. For a per-column view of the mismatches, use `column_summary()`:
+
+```{python}
+comparison.column_summary()
+```
+
+## How Rows Are Aligned
+
+The `keys=` argument decides how the rows of the two tables are lined up:
+
+- **By key** (`keys="order_id"`, or a list for a composite key): rows are matched on the key
+  values, so their order doesn't matter. This is the most informative mode, and the one to use
+  whenever the data has an identifier.
+- **By position** (`keys=None`, the default): the first row of the source is compared with the first
+  row of the target, and so on. This suits outputs that are supposed to be identical row for row.
+- **As multisets** (`keys="*"`): whole rows are compared regardless of their order, with
+  duplicates counted. This is for tables that have no key at all.
+
+Here's what positional alignment makes of the same two tables. Since a row was removed and another
+added, most rows no longer line up:
+
+```{python}
+pb.compare(source, target).status_counts
+```
+
+## Tolerances, Normalization, and Nulls
+
+Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given
+for all numeric columns or per column. An absolute tolerance of `5` absorbs the corrected amount:
+
+```{python}
+pb.compare(source, target, keys="order_id", tolerance={"amount": 5}).n_changed
+```
+
+Tolerances can be absolute (`atol`), relative to the source value (`rtol`), or both, as in
+`tolerance={"amount": {"atol": 0.01, "rtol": 1e-6}}`. Two values are equal if
+`|source - target| <= atol + rtol * |source|`. Datetime tolerances are durations like `"1s"`,
+`"500ms"`, or `"2m"`.
+
+String values can be normalized before comparing with `normalize=`. For example,
+`normalize={"customer": ["strip", "lower"]}` ignores surrounding whitespace and letter case (the
+available operations are `"strip"`, `"lower"`, `"upper"`, `"collapse_whitespace"`, and
+`{"round": n}`). Reports always show the original values.
+
+By default, two nulls count as equal, and NaN values in floating-point columns are treated as nulls.
+Use `null_equal=False` to count two nulls as a difference.
+
+## Schema Differences
+
+Column differences are reported in the *Schema differences* section of the report and in the
+`schema_diff` attribute. Suppose the target renamed a column and added another:
+
+```{python}
+target_v2 = target.rename({"customer": "customer_name"}).with_columns(
+    region=pl.lit("EU")
+)
+
+comparison_v2 = pb.compare(source, target_v2, keys="order_id")
+
+comparison_v2.schema_diff
+```
+
+With the default `schema="strict"`, any schema difference means the tables don't match and every
+row counts as failing. Two arguments help here. `column_map=` pairs up renamed columns, and
+`schema="common"` compares only the columns that both tables share (still reporting the schema
+differences, but without failing any rows):
+
+```{python}
+pb.compare(
+    source,
+    target_v2,
+    keys="order_id",
+    column_map={"customer": "customer_name"},
+    schema="common",
+)
+```
+
+To compare just some of the columns, list them in `columns=`. The schema check is then limited to
+the keys and those columns.
+
+## Duplicate Keys
+
+A key that appears more than once in either table can't be aligned unambiguously, so its rows get
+the `dup_key` status (they always count as failing). By default the report lists the duplicated keys
+with their number of occurrences in each table. With `dup_keys="compare"`, the report also compares
+the duplicated rows pairwise to show which columns differ between them.
+
+## Table Comparison as a Validation Step
+
+The `tbl_match()` validation method uses the same comparison, which makes it a validation step like
+any other: it can have thresholds and actions, and it shows up in the validation report. The table
+being validated is the target, and `tbl_compare=` is the source. Every aligned row is a *test
+unit*, so thresholds can be set as a proportion of rows:
+
+```{python}
+validation = (
+    pb.Validate(data=target, tbl_name="orders", thresholds=(0.1, 0.25))
+    .tbl_match(tbl_compare=source, keys="order_id")
+    .interrogate()
+)
+
+validation
+```
+
+Three of the six aligned rows differ, exceeding both the 'warning' and 'error' thresholds. The step
+report holds the full comparison:
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+The data extract for the step contains the failing rows from both tables, with a `_status_` column
+and source/target value pairs:
+
+```{python}
+validation.get_data_extracts(i=1, frame=True)
+```
+
+All the comparison arguments (`keys=`, `tolerance=`, `schema=`, and so on) are available in
+`tbl_match()`, and they can be written in YAML too:
+
+```yaml
+tbl: orders_target.csv
+steps:
+  - tbl_match:
+      tbl_compare: orders_source.csv
+      keys: order_id
+      tolerance:
+        amount: 0.01
+```
+
+## Exporting the Results
+
+The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema
+differences, and (by default) samples of the differing rows. If the data could contain sensitive
+values, leave the samples out:
+
+```{python}
+print(comparison.to_json(samples=False))
+```
+
+The tabular report can be saved as HTML, like any Great Tables table:
+
+```python
+comparison.get_tabular_report().write_raw_html("orders_diff.html")
+```
+
+## From the Command Line
+
+The `pb compare` command runs a comparison on files, database tables, or built-in datasets, prints a
+summary, and can save the HTML report and the JSON results:
+
+```bash
+pb compare orders_source.csv orders_target.csv --key order_id --output-html diff.html
+```
+
+Its exit code makes it easy to use in scripts and CI pipelines: `0` if the tables match, `1` if
+they differ, and `2` if there was an error. Use `--format json` to print the results as JSON. All
+the comparison settings have command-line options (e.g., `--tolerance amount=0.01`,
+`--schema common`); see the [CLI reference](../07-the-pointblank-cli/03-cli-reference.qmd) for the
+full list.
+
+For tables that are too large to fit in memory, see
+[Comparing Large Files](02-comparing-large-files.qmd).
