@@ -1650,7 +1650,7 @@ def get_data_path(
                 return tmp_file.name
 
 
-def _process_data(data: Any) -> Any:
+def _process_data(data: Any, lazy: bool = False) -> Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
@@ -1675,6 +1675,10 @@ def _process_data(data: Any) -> Any:
         - a CSV file path (string or Path object with .csv extension)
         - a Parquet file path, glob pattern, directory, or partitioned dataset
         - any other data type (returned unchanged)
+    lazy
+        If `True`, CSV and Parquet file paths are scanned lazily (a Polars `LazyFrame`, or a
+        DuckDB relation when Polars isn't installed) instead of being read into memory. Used by
+        `compare()` so that large files can be compared without loading them in full.
 
     Returns
     -------
@@ -1689,10 +1693,10 @@ def _process_data(data: Any) -> Any:
     data = _process_connection_string(data)
 
     # Handle CSV file input (e.g., "data.csv" or Path("data.csv"))
-    data = _process_csv_input(data)
+    data = _process_csv_input(data, lazy=lazy)
 
     # Handle Parquet file input (e.g., "data.parquet", "data/*.parquet", "data/")
-    data = _process_parquet_input(data)
+    data = _process_parquet_input(data, lazy=lazy)
 
     return data
 
@@ -1829,7 +1833,7 @@ def _process_connection_string(data: Any) -> Any:
     return connect_to_table(data)
 
 
-def _process_csv_input(data: Any) -> Any:
+def _process_csv_input(data: Any, lazy: bool = False) -> Any:
     """
     Process data parameter to handle CSV file inputs.
 
@@ -1855,6 +1859,11 @@ def _process_csv_input(data: Any) -> Any:
     # Check if the CSV file exists
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
+
+    if lazy:
+        lazy_tbl = _scan_csv_lazy(csv_path)
+        if lazy_tbl is not None:
+            return lazy_tbl
 
     # Determine which library to use for reading CSV: prefer Polars but fallback to Pandas
     if _is_lib_present(lib_name="polars"):
@@ -1887,7 +1896,44 @@ def _process_csv_input(data: Any) -> Any:
         )
 
 
-def _process_parquet_input(data: Any) -> Any:
+def _scan_csv_lazy(csv_path: Any) -> Any:
+    """
+    Lazily scan a CSV file, returning `None` if no lazy-capable library is available.
+
+    Polars is preferred (`scan_csv()`, with the same date parsing as the eager reader); DuckDB is
+    used as a fallback. Nothing is read beyond what's needed to infer the schema.
+    """
+    if _is_lib_present(lib_name="polars"):
+        import polars as pl
+
+        return pl.scan_csv(csv_path, try_parse_dates=True)
+    if _is_lib_present(lib_name="duckdb"):  # pragma: no cover
+        import duckdb
+
+        return duckdb.read_csv(str(csv_path))
+    return None  # pragma: no cover
+
+
+def _scan_parquet_lazy(parquet_paths: list[Any]) -> Any:
+    """
+    Lazily scan one or more Parquet files, returning `None` if no lazy-capable library is
+    available.
+    """
+    if _is_lib_present(lib_name="polars"):
+        import polars as pl
+
+        scans = [pl.scan_parquet(path) for path in parquet_paths]
+        if len(scans) == 1:
+            return scans[0]
+        return pl.concat(scans, how="vertical_relaxed")
+    if _is_lib_present(lib_name="duckdb"):  # pragma: no cover
+        import duckdb
+
+        return duckdb.read_parquet([str(path) for path in parquet_paths])
+    return None  # pragma: no cover
+
+
+def _process_parquet_input(data: Any, lazy: bool = False) -> Any:
     """
     Process data parameter to handle Parquet file inputs.
 
@@ -1934,7 +1980,14 @@ def _process_parquet_input(data: Any) -> Any:
             # Parquet files are in subdirectories with partition columns encoded in paths
             try:
                 # Both Polars and Pandas can handle partitioned datasets natively
-                if _is_lib_present(lib_name="polars"):
+                if lazy and _is_lib_present(lib_name="polars"):
+                    import polars as pl
+
+                    lazy_df = pl.scan_parquet(str(path_obj))
+                    # Resolve the schema now so that unreadable directories fall through
+                    lazy_df.collect_schema()
+                    return lazy_df
+                elif _is_lib_present(lib_name="polars"):
                     import polars as pl
 
                     # Try reading as partitioned dataset first
@@ -1981,6 +2034,11 @@ def _process_parquet_input(data: Any) -> Any:
     # If no parquet files found, return original data
     if not parquet_paths:
         return data
+
+    if lazy:
+        lazy_tbl = _scan_parquet_lazy(parquet_paths)
+        if lazy_tbl is not None:
+            return lazy_tbl
 
     # Read the parquet file(s) using available libraries; prefer Polars, fallback to Pandas
     if _is_lib_present(lib_name="polars"):
