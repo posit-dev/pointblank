@@ -621,3 +621,74 @@ def test_compare_mixed_file_types():
     cmp = compare("data_raw/small_table.csv", "tests/tbl_files/tbl_xyz.parquet", schema="common")
     assert not cmp.schema_diff.matches
     assert cmp.compared_columns == []
+
+
+# ----------------------------------------------------------------------------------------------
+# Partitioned comparison (`partitions=`)
+# ----------------------------------------------------------------------------------------------
+
+
+_DUCKDB_CONNECTIONS: list = []  # keep connections alive for the relations' lifetime
+
+
+def _duckdb_relations(s: dict, t: dict):
+    import duckdb
+
+    con = duckdb.connect()
+    _DUCKDB_CONNECTIONS.append(con)
+    s_df, t_df = pl.DataFrame(s), pl.DataFrame(t)  # noqa: F841 (referenced by name in SQL)
+    return con.sql("select * from s_df"), con.sql("select * from t_df")
+
+
+@pytest.mark.parametrize("backend", ["polars", "polars_lazy", "duckdb", "duckdb_relation"])
+@pytest.mark.parametrize("partitions", [2, 5])
+def test_partitioned_results_equal_single_pass(backend, partitions):
+    target = {**TARGET, "cid": TARGET["id"]}
+    target = {k: v for k, v in target.items() if k != "id"}
+    if backend == "duckdb_relation":
+        s, t = _duckdb_relations(SOURCE, target)
+    else:
+        s, t = _make(backend, SOURCE, "ps"), _make(backend, target, "pt")
+    kwargs = dict(keys="id", column_map={"id": "cid"}, dup_keys="compare")
+
+    single = compare(s, t, **kwargs)
+    parted = compare(s, t, partitions=partitions, **kwargs)
+
+    assert parted.partitions == partitions
+    assert parted.status_counts == single.status_counts == EXPECTED_COUNTS
+    assert parted.column_mismatches == single.column_mismatches
+    assert (parted.n_source_rows, parted.n_target_rows) == (7, 6)
+    for status in ("changed", "missing", "extra", "dup_key"):
+        assert len(parted.rows(status)) == len(single.rows(status))
+    # (one extract row per duplicated key value)
+    assert len(nw.from_native(parted._failing_rows(100))) == len(
+        nw.from_native(single._failing_rows(100))
+    )
+    assert parted._target_pass_table() is None
+    assert "duplicate keys compared pairwise" in parted.get_tabular_report().as_raw_html()
+    assert parted.to_dict()["partitions"] == partitions
+
+
+def test_partitioned_composite_keys_and_sample_limit():
+    s = pl.DataFrame({"k1": [i // 2 for i in range(80)], "k2": ["a", "b"] * 40, "v": [0] * 80})
+    t = s.with_columns(v=pl.lit(1))
+    cmp = compare(s, t, keys=["k1", "k2"], partitions=4)
+    assert cmp.n_changed == 80
+    assert len(cmp.rows("changed", limit=25)) == 25
+    assert len(nw.from_native(cmp._failing_rows(30))) == 30
+
+
+def test_partitions_argument_errors():
+    s = pl.DataFrame({"id": [1], "v": [1]})
+    with pytest.raises(ValueError, match="requires `keys=`"):
+        compare(s, s, partitions=2)
+    with pytest.raises(ValueError, match="requires `keys=`"):
+        compare(s, s, keys="*", partitions=2)
+    with pytest.raises(ValueError, match="positive integer"):
+        compare(s, s, keys="id", partitions=0)
+    with pytest.raises(ValueError, match="supported for Polars, DuckDB, and Ibis"):
+        compare(s.to_pandas(), s.to_pandas(), keys="id", partitions=2)
+    with pytest.raises(ValueError, match="isn't in the target"):
+        compare(s, s.rename({"id": "x"}), keys="id", partitions=2)
+    # A single partition is an ordinary comparison
+    assert compare(s, s, keys="id", partitions=1).partitions == 1
