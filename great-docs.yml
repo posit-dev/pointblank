@@ -341,6 +341,18 @@ reference:
         - connect_to_table
         - print_database_tables
 
+    - title: Table Comparison
+      desc: >
+        Compare two tables row by row. `compare()` aligns the rows of a source and a target table
+        (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus
+        schema differences. The result is a `Comparison` object with counts, row samples, and a
+        tabular report. The same comparison is available as a validation step through
+        `Validate.tbl_match()`.
+      contents:
+        - compare
+        - Comparison
+        - SchemaDiff
+
     - title: Table Pre-checks
       desc: >
         Helper functions for use with the `active=` parameter of validation methods. These inspect
