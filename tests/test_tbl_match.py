@@ -52,7 +52,7 @@ def test_tbl_match_identical_polars():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert validation.all_passed()
-    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_passed(i=1, scalar=True) == 4  # one test unit per row
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
@@ -66,7 +66,7 @@ def test_tbl_match_identical_pandas():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert validation.all_passed()
-    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_passed(i=1, scalar=True) == 4  # one test unit per row
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
@@ -104,7 +104,7 @@ def test_tbl_match_mixed_backends_with_differences():
     # Should fail due to data mismatch (stage 6 failure)
     validation = Validate(data=tbl_polars).tbl_match(tbl_compare=tbl_pandas).interrogate()
     assert not validation.all_passed()
-    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_passed(i=1, scalar=True) == 3  # rows 1-3 match
     assert validation.n_failed(i=1, scalar=True) == 1
 
 
@@ -202,7 +202,7 @@ def test_tbl_match_different_column_count_fewer():
 
     assert not validation.all_passed()
     assert validation.n_passed(i=1, scalar=True) == 0
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 4  # strict schema check fails all rows
 
 
 def test_tbl_match_different_column_count_more():
@@ -222,7 +222,7 @@ def test_tbl_match_different_column_count_more():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert not validation.all_passed()
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 4  # strict schema check fails all rows
 
 
 def test_tbl_match_different_row_count_fewer():
@@ -250,7 +250,7 @@ def test_tbl_match_different_row_count_more():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert not validation.all_passed()
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 3  # 3 rows of the comparison table are missing
 
 
 def test_tbl_match_empty_vs_nonempty():
@@ -282,7 +282,7 @@ def test_tbl_match_different_column_names():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert not validation.all_passed()
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 4  # strict schema check fails all rows
 
 
 def test_tbl_match_completely_different_column_names():
@@ -313,7 +313,7 @@ def test_tbl_match_different_column_order_two_swapped():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert not validation.all_passed()
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 4  # strict schema check fails all rows
 
 
 def test_tbl_match_different_column_order_completely_reversed():
@@ -344,7 +344,7 @@ def test_tbl_match_different_column_case_uppercase():
     validation = Validate(data=tbl_1).tbl_match(tbl_compare=tbl_2).interrogate()
 
     assert not validation.all_passed()
-    assert validation.n_failed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 4  # strict schema check fails all rows
 
 
 def test_tbl_match_different_column_case_mixed():
@@ -630,8 +630,8 @@ def test_tbl_match_multiple_steps():
     )
 
     assert validation.all_passed()
-    assert validation.n() == {1: 1, 2: 1}
-    assert validation.n_passed() == {1: 1, 2: 1}
+    assert validation.n() == {1: 4, 2: 4}
+    assert validation.n_passed() == {1: 4, 2: 4}
 
 
 def test_tbl_match_with_other_validations():
