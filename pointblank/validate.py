@@ -4648,6 +4648,7 @@ def _validation_info_to_step(
             "schema",
             "dup_keys",
             "order_by",
+            "partitions",
         ):
             if name in values:
                 params[name] = values[name]
@@ -14868,6 +14869,7 @@ class Validate:
         schema: Literal["strict", "common"] = "strict",
         dup_keys: Literal["flag", "compare"] = "flag",
         order_by: str | list[str] | None = None,
+        partitions: int | None = None,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
@@ -14944,6 +14946,13 @@ class Validate:
         order_by
             Column(s) defining the row order for positional alignment on backends without an
             inherent row order (e.g., database tables). Ignored when `keys=` is given.
+        partitions
+            Compare the tables in this many passes, each covering a disjoint subset of the key
+            values (by key hash), to bound memory use for very large tables. Each pass reads the
+            tables again, so this trades time for memory; the results are identical to a
+            single-pass comparison. Requires `keys=` (not `"*"`), and Polars, DuckDB, or Ibis
+            tables (including CSV/Parquet paths). Sundering isn't available for the step when
+            partitions are used.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -15149,6 +15158,11 @@ class Validate:
             raise ValueError(f"`schema=` must be 'strict' or 'common', not {schema!r}.")
         if dup_keys not in ("flag", "compare"):
             raise ValueError(f"`dup_keys=` must be 'flag' or 'compare', not {dup_keys!r}.")
+        if partitions is not None:
+            if isinstance(partitions, bool) or not isinstance(partitions, int) or partitions < 1:
+                raise ValueError("`partitions=` must be a positive integer.")
+            if not keys or keys == "*" or keys == ["*"]:
+                raise ValueError("`partitions=` requires `keys=` (rows are partitioned by key).")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -15168,6 +15182,7 @@ class Validate:
             "schema": schema,
             "dup_keys": dup_keys,
             "order_by": order_by,
+            "partitions": partitions,
         }
         defaults = {"null_equal": True, "schema": "strict", "dup_keys": "flag"}
         for name, setting in settings.items():
@@ -16744,6 +16759,7 @@ class Validate:
                                 schema=value.get("schema", "strict"),
                                 dup_keys=value.get("dup_keys", "flag"),
                                 order_by=value.get("order_by"),
+                                partitions=value.get("partitions"),
                                 source_name="tbl_compare",
                                 target_name=self.tbl_name or "target",
                             )
@@ -21431,16 +21447,23 @@ class Validate:
         if not active:
             return "This validation step is inactive."
 
-        # Create a table with a sample of ten rows, highlighting the column of interest
-        tbl_preview = preview(
-            data=self.data,
-            columns_subset=columns_subset,
-            n_head=5,
-            n_tail=5,
-            limit=10,
-            min_tbl_width=600,
-            incl_header=False,
-        )
+        # Create a table with a sample of ten rows, highlighting the column of interest (only the
+        # row-based reports use it)
+        tbl_preview = None
+        if assertion_type in ROW_BASED_VALIDATION_TYPES + [
+            "rows_complete",
+            "col_missing_consistent",
+            "rows_distinct",
+        ]:
+            tbl_preview = preview(
+                data=self.data,
+                columns_subset=columns_subset,
+                n_head=5,
+                n_tail=5,
+                limit=10,
+                min_tbl_width=600,
+                incl_header=False,
+            )
 
         # If no rows were extracted, create a message to indicate that no rows were extracted
         # if get_row_count(extract) == 0:
@@ -23985,6 +24008,8 @@ def _tbl_match_spec_badge(values: Any) -> str:
         parts.append("null &ne; null")
     if values.get("schema") == "common":
         parts.append("common schema")
+    if (values.get("partitions") or 1) > 1:
+        parts.append(f"{values['partitions']} partitions")
     if not parts:
         return ""
     return (
