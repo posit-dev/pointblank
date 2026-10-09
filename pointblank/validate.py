@@ -4624,6 +4624,33 @@ def _validation_info_to_step(
                 params["columns_subset"] = list(vi.column)
             elif name is not None:  # pragma: no cover
                 params["columns_subset"] = name  # pragma: no cover
+    elif at == "tbl_match":
+        values = vi.values or {}
+        tbl_compare = values.get("tbl_compare")
+        if isinstance(tbl_compare, str):
+            # A file path or connection string round-trips as-is
+            params["tbl_compare"] = tbl_compare
+        else:
+            params["tbl_compare"] = _placeholder(
+                code="your_comparison_table",
+                note=(
+                    "Step 'tbl_match' compares against a table object that cannot be serialized; "
+                    "a placeholder was emitted and must be edited manually."
+                ),
+            )
+        for name in (
+            "keys",
+            "columns",
+            "column_map",
+            "tolerance",
+            "normalize",
+            "null_equal",
+            "schema",
+            "dup_keys",
+            "order_by",
+        ):
+            if name in values:
+                params[name] = values[name]
     elif at == "conjointly":
         params["expressions"] = _placeholder(
             code="[lambda df: df]",
@@ -4846,6 +4873,12 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return [_value_to_yaml(v, warnings_out) for v in value]
     if isinstance(value, list):
         return [_value_to_yaml(v, warnings_out) for v in value]
+    if isinstance(value, dict):
+        # e.g., the `column_map=`, `tolerance=`, and `normalize=` settings of `tbl_match()`
+        return {str(k): _value_to_yaml(v, warnings_out) for k, v in value.items()}
+    if isinstance(value, datetime.timedelta):
+        # Written as a duration string (e.g., "1.5s") that `tbl_match(tolerance=)` accepts
+        return f"{value.total_seconds():g}s"
     return str(value)  # pragma: no cover
 
 
@@ -14826,6 +14859,15 @@ class Validate:
     def tbl_match(
         self,
         tbl_compare: Any,
+        keys: str | list[str] | None = None,
+        columns: str | list[str] | None = None,
+        column_map: dict[str, str] | None = None,
+        tolerance: Any = None,
+        normalize: dict[str, Any] | None = None,
+        null_equal: bool = True,
+        schema: Literal["strict", "common"] = "strict",
+        dup_keys: Literal["flag", "compare"] = "flag",
+        order_by: str | list[str] | None = None,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
@@ -14836,27 +14878,72 @@ class Validate:
         """
         Validate whether the target table matches a comparison table.
 
-        The `tbl_match()` method checks whether the target table's composition matches that of a
-        comparison table. The validation performs a comprehensive comparison using progressively
-        stricter checks (from least to most stringent):
+        The `tbl_match()` method compares the target table, row by row, against a comparison table
+        that holds the expected data (the *source*). Rows of the two tables are aligned and every
+        aligned row becomes a test unit: it passes if the row is present in both tables with equal
+        values, and fails if its values changed, if it's missing from the target, if it's an extra
+        row in the target, or if its key is duplicated. Schema differences (columns added, removed,
+        retyped, or reordered) are checked too.
 
-        1. **Column count match**: both tables must have the same number of columns
-        2. **Row count match**: both tables must have the same number of rows
-        3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
-        4. **Schema match (order)**: columns in the correct order (case-insensitive names)
-        5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
-        6. **Data match**: values in corresponding cells must be identical
+        Rows are aligned in one of three ways:
 
-        This progressive approach helps identify exactly where tables differ. The validation will
-        fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
-        validation operates over a single test unit (pass/fail for complete table match).
+        - **by key** (`keys=` given): rows are matched on one or more key columns, so row order
+          doesn't matter; this is the most informative mode
+        - **by position** (`keys=None`, the default): the first row of each table is compared, then
+          the second, and so on
+        - **as multisets** (`keys="*"`): rows are compared as whole values regardless of order, with
+          duplicates counted (for tables without a key)
+
+        The comparison runs inside the table's own engine (it is backend-agnostic, and database
+        tables are compared in the database). Use
+        [`get_step_report()`](`pointblank.Validate.get_step_report`) to see a detailed report of
+        the differences, and [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) to
+        get the failing rows. The same comparison is available outside of a validation with
+        [`compare()`](`pointblank.compare`).
 
         Parameters
         ----------
         tbl_compare
-            The comparison table to validate against. This can be a DataFrame object (Polars or
-            Pandas), an Ibis table object, or a callable that returns a table. If a callable is
-            provided, it will be executed during interrogation to obtain the comparison table.
+            The comparison table (the expected data) to validate against. This can be a DataFrame
+            object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a
+            callable that returns a table. If a callable is provided, it will be executed during
+            interrogation to obtain the comparison table.
+        keys
+            One or more columns that uniquely identify a row, used to align the rows of the two
+            tables. Key names refer to the comparison table (use `column_map=` if the target names
+            them differently). If `None` (the default), rows are aligned by position. Use `"*"` to
+            compare the tables as multisets of rows.
+        columns
+            The comparison-table columns whose values should be compared. By default, all columns
+            present in both tables (other than the keys) are compared. Giving `columns=` also limits
+            the schema check to the keys and these columns.
+        column_map
+            A mapping of comparison-table column names to target column names, for renamed columns.
+        tolerance
+            Tolerance for numeric and datetime comparisons. A number is an absolute tolerance for all
+            numeric columns. A dict with `"atol"` and/or `"rtol"` keys applies to all numeric
+            columns, where values are equal if `|expected - actual| <= atol + rtol * |expected|`. A
+            dict mapping column names to either of the above sets per-column tolerances. Datetime
+            tolerances are given as a `datetime.timedelta` or a string like `"1s"` or `"500ms"`.
+        normalize
+            Per-column transformations applied to both tables before comparing, as a dict mapping a
+            column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
+            `"collapse_whitespace"`, or `{"round": n}`.
+        null_equal
+            Should two null values count as equal? By default, they do. NaN values in floating-point
+            columns are treated as null.
+        schema
+            How schema differences affect the result. With `"strict"` (the default), any schema
+            difference (other than renames given in `column_map=`) means the tables don't match,
+            and every test unit fails. With `"common"`, only the shared columns are compared and
+            schema differences are reported without failing any test units.
+        dup_keys
+            Rows whose key appears more than once in either table always fail. With `"flag"` (the
+            default), the step report lists the duplicated keys. With `"compare"`, the step report
+            also compares the duplicated rows pairwise to show which columns differ.
+        order_by
+            Column(s) defining the row order for positional alignment on backends without an
+            inherent row order (e.g., database tables). Ignored when `keys=` is given.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -14898,6 +14985,28 @@ class Validate:
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Test Units
+        ----------
+        Each aligned row is a test unit. With `keys=`, that's every key value found in either table
+        (a duplicated key counts as many units as its larger number of occurrences); by position,
+        it's the number of rows in the longer table; as multisets, it's every row copy. A test unit
+        passes only if its row is in both tables with all compared values equal. If the strict
+        schema check fails, all test units fail. When both tables are empty, the step has a single
+        test unit, which passes if the schemas match.
+
+        Because failures are counted per row, thresholds can be expressed as proportions (e.g., a
+        `warning` when more than 1% of rows differ). To fail on any difference, use an absolute
+        threshold of `1`.
+
+        The data extract for the step (from
+        [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing rows
+        of *both* tables: the key column(s), a `_status_` column (`"changed"`, `"missing"`,
+        `"extra"`, or `"dup_key"`), and a pair of `<column>_source`/`<column>_target` columns for
+        each compared column. For [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`),
+        target rows with a matching row in the comparison table pass; rows missing from the target
+        can't be part of the sundered data. Sundering for this step is available with in-memory
+        tables (not lazy or database tables) and isn't available in multiset mode.
 
         Preprocessing
         -------------
@@ -14943,63 +15052,16 @@ class Validate:
 
         Cross-Backend Validation
         ------------------------
-        The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
-        different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
-        comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
-        different backends are detected, the comparison table is automatically converted to match the
-        data table's backend before validation proceeds.
+        The two tables can come from different backends (e.g., a Polars DataFrame and a Pandas
+        DataFrame, or a database table and a CSV file). Tables on the same backend are compared in
+        place (so two tables in the same database are compared inside the database). Tables on
+        different backends are both converted to Polars (or to Pandas, if Polars isn't installed)
+        before the comparison. Key columns whose types differ between the tables (e.g., integer
+        keys that became floats in Pandas because of a missing value) are cast to a common type.
 
-        **Certified Backend Combinations:**
-
-        All combinations of the following backends have been tested and certified to work (in both
-        directions):
-
-        - Pandas DataFrame
-        - Polars DataFrame
-        - DuckDB (native)
-        - DuckDB (as Ibis table)
-        - SQLite (via Ibis)
-
-        Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
-        automatically materialized during validation:
-
-        - if comparing **against Polars**: materialized to Polars
-        - if comparing **against Pandas**: materialized to Pandas
-        - if **both tables are database backends**: both materialized to Polars
-
-        This ensures optimal performance and type consistency.
-
-        **Data Types That Work Best in Cross-Backend Validation:**
-
-        - numeric types: int, float columns (including proper NaN handling)
-        - string types: text columns with consistent encodings
-        - boolean types: True/False values
-        - null values: `None` and `NaN` are treated as equivalent across backends
-        - list columns: nested list structures (with basic types)
-
-        **Known Limitations:**
-
-        While many data types work well in cross-backend validation, there are some known
-        limitations to be aware of:
-
-        - date/datetime types: When converting between Polars and Pandas, date objects may be
-          represented differently. For example, `datetime.date` objects in Pandas may become
-          `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
-          around this, ensure both tables use the same datetime representation before comparison.
-        - custom types: User-defined types or complex nested structures may not convert cleanly
-          between backends and could cause unexpected comparison failures.
-        - categorical types: Categorical/factor columns may have different internal
-          representations across backends.
-        - timezone-aware datetimes: Timezone handling differs between backends and may cause
-          comparison issues.
-
-        Here are some ideas to overcome such limitations:
-
-        - for date/datetime columns, consider using `pre=` preprocessing to normalize representations
-          before comparison.
-        - when working with custom types, manually convert tables to the same backend before using
-          `tbl_match()`.
-        - use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+        Values in columns whose types differ are compared numerically when both columns are numeric
+        and as strings otherwise; note that such differences also fail the strict schema check
+        (use `schema="common"` to only report them).
 
         Examples
         --------
@@ -15047,30 +15109,34 @@ class Validate:
         validation
         ```
 
-        The validation table shows that the single test unit passed, indicating that the two tables
-        match completely.
+        The validation table shows that all four test units (one per row) passed, indicating that
+        the two tables match completely.
 
-        Now, let's create a table with a slight difference and see what happens.
+        Now, let's compare against a table that has one different value, is missing a row, and has
+        an extra row. Since the rows can be identified by column `a`, we'll use it as the key.
 
         ```{python}
-        # Create a table with one different value
         tbl_3 = pl.DataFrame({
-            "a": [1, 2, 3, 4],
-            "b": ["w", "x", "y", "z"],
-            "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+            "a": [1, 2, 4, 5],
+            "b": ["w", "x", "z", "v"],
+            "c": [4.0, 5.5, 7.0, 8.0]  # Changed 5.0 to 5.5
         })
 
         validation = (
-            pb.Validate(data=tbl_1)
-            .tbl_match(tbl_compare=tbl_3)
+            pb.Validate(data=tbl_3)
+            .tbl_match(tbl_compare=tbl_1, keys="a")
             .interrogate()
         )
 
         validation
         ```
 
-        The validation table shows that the single test unit failed because the tables don't match
-        (one value is different in column `c`).
+        Three of the five aligned rows failed: one changed, one missing from the target, and one
+        extra. The step report shows exactly what differs.
+
+        ```{python}
+        validation.get_step_report(i=1)
+        ```
         """
 
         assertion_type = _get_fn_name()
@@ -15079,13 +15145,34 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_active_input(param=active, param_name="active")
 
+        if schema not in ("strict", "common"):
+            raise ValueError(f"`schema=` must be 'strict' or 'common', not {schema!r}.")
+        if dup_keys not in ("flag", "compare"):
+            raise ValueError(f"`dup_keys=` must be 'flag' or 'compare', not {dup_keys!r}.")
+
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        # Package up the `tbl_compare` into a dictionary for later interrogation
-        values = {"tbl_compare": tbl_compare}
+        # Package up the `tbl_compare` and comparison settings for later interrogation; only
+        # settings that differ from the defaults are stored
+        values: dict[str, Any] = {"tbl_compare": tbl_compare}
+        settings = {
+            "keys": keys,
+            "columns": columns,
+            "column_map": column_map,
+            "tolerance": tolerance,
+            "normalize": normalize,
+            "null_equal": null_equal,
+            "schema": schema,
+            "dup_keys": dup_keys,
+            "order_by": order_by,
+        }
+        defaults = {"null_equal": True, "schema": "strict", "dup_keys": "flag"}
+        for name, setting in settings.items():
+            if setting is not None and setting != defaults.get(name):
+                values[name] = setting
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -16633,21 +16720,69 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "tbl_match":
-                        from pointblank._interrogation import tbl_match
+                        from pointblank.compare import compare
 
                         # Get the comparison table (could be callable or actual table)
                         tbl_compare = value["tbl_compare"]
 
                         # If tbl_compare is callable, execute it to get the table
-                        if callable(tbl_compare):
+                        if callable(tbl_compare) and not hasattr(tbl_compare, "columns"):
                             tbl_compare = tbl_compare()
 
-                        result_bool = tbl_match(data_tbl=data_tbl_step, tbl_compare=tbl_compare)
+                        # The comparison table is the source (expected data) and the table under
+                        # validation is the target; each aligned row is one test unit
+                        try:
+                            comparison = compare(
+                                source=tbl_compare,
+                                target=data_tbl_step,
+                                keys=value.get("keys"),
+                                columns=value.get("columns"),
+                                column_map=value.get("column_map"),
+                                tolerance=value.get("tolerance"),
+                                normalize=value.get("normalize"),
+                                null_equal=value.get("null_equal", True),
+                                schema=value.get("schema", "strict"),
+                                dup_keys=value.get("dup_keys", "flag"),
+                                order_by=value.get("order_by"),
+                                source_name="tbl_compare",
+                                target_name=self.tbl_name or "target",
+                            )
+                        except ValueError as e:
+                            # A comparison that can't be set up (e.g., a key column that isn't
+                            # in the target) is an evaluation error, not a failing comparison
+                            validation.eval_error = True
+                            validation._add_note(
+                                key="tbl_match_error", markdown=str(e), text=str(e)
+                            )
+                            comparison = None
 
-                        validation.all_passed = result_bool
-                        validation.n = 1
-                        validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - int(result_bool)
+                        if comparison is not None:
+                            n_units = comparison.n
+                            n_passed = comparison.n_passed
+                            if n_units == 0:
+                                # Two empty tables: keep a single unit so a schema failure counts
+                                n_units = 1
+                                n_passed = int(comparison.identical)
+
+                            validation.n = n_units
+                            validation.n_passed = n_passed
+                            validation.n_failed = n_units - n_passed
+                            validation.all_passed = validation.n_failed == 0
+                            # Samples of row values go into exports only if extracts are being
+                            # collected (`collect_extracts=False` keeps data, e.g. PII, out)
+                            validation.val_info = {
+                                "comparison": comparison,
+                                "samples": collect_extracts,
+                            }
+
+                            if collect_extracts:
+                                validation.extract = comparison._failing_rows(limit=extract_limit)
+                            if collect_tbl_checked:
+                                # Only usable for sundering if it's the same kind of table as
+                                # the validated data (not converted for the comparison)
+                                pass_tbl = comparison._target_pass_table()
+                                if pass_tbl is not None and type(pass_tbl) is type(data_tbl_step):
+                                    validation.tbl_checked = pass_tbl
 
                         results_tbl = None
 
@@ -19589,6 +19724,11 @@ class Validate:
             if "pre" in fields:
                 report_entry["pre"] = _pre_processing_funcs_to_str(report_entry["pre"])
 
+            # For `tbl_match()`, report the comparison settings and results rather than the
+            # comparison table itself
+            if validation_info.assertion_type == "tbl_match":
+                report_entry["values"] = _tbl_match_values_json(validation_info)
+
             # Filter the report entry based on the fields to include
             report_entry = {field: report_entry[field] for field in fields}
 
@@ -19689,7 +19829,12 @@ class Validate:
         validation_info = [
             validation
             for validation in self.validation_info
-            if validation.assertion_type in ROW_BASED_VALIDATION_TYPES and validation.active
+            if validation.active
+            and (
+                validation.assertion_type in ROW_BASED_VALIDATION_TYPES
+                # `tbl_match()` steps take part when a row-aligned result table is available
+                or (validation.assertion_type == "tbl_match" and validation.tbl_checked is not None)
+            )
         ]
 
         # TODO: ensure that the stored evaluation tables across all steps have not been mutated
@@ -20473,8 +20618,8 @@ class Validate:
 
                 values_upd.append(str(count))
 
-            elif assertion_type[i] in ["tbl_match"]:  # pragma: no cover
-                values_upd.append("EXTERNAL TABLE")  # pragma: no cover
+            elif assertion_type[i] in ["tbl_match"]:
+                values_upd.append("EXTERNAL TABLE" + _tbl_match_spec_badge(values[i]))
 
             elif assertion_type[i] in ["specially"]:
                 values_upd.append("EXPR")
@@ -21371,6 +21516,21 @@ class Validate:
                     debug_return_df=debug_return_df,
                 )
 
+        elif assertion_type == "tbl_match":
+            comparison = (val_info or {}).get("comparison")
+            if comparison is None:
+                # The comparison couldn't be evaluated (see the step's notes)
+                step_report = None
+            else:
+                step_report = _step_report_tbl_match(
+                    comparison=comparison,
+                    i=i,
+                    values=values,
+                    all_passed=all_passed,
+                    header=header,
+                    limit=limit if limit is not None else 10,
+                    lang=lang,
+                )
         elif is_valid_agg(assertion_type):
             step_report = _step_report_aggregate(
                 assertion_type=assertion_type,
@@ -23761,6 +23921,75 @@ def _missing_legend_html(spec: Any) -> str:  # pragma: no cover
     return (
         "<div style='font-size: 10px; color: #555555; padding-top: 4px;'>"
         "<strong>Missing codes:</strong> " + "; ".join(items) + "</div>"
+    )
+
+
+def _tbl_match_values_json(validation_info: Any) -> dict[str, Any]:
+    """
+    JSON-friendly `values` for a `tbl_match()` step: the comparison settings, a description of
+    the comparison table, and (once interrogated) the comparison results. Samples of differing
+    rows are included only if data extracts were collected during interrogation.
+    """
+    from pointblank.compare import _jsonable
+
+    values = dict(validation_info.values or {})
+    tbl_compare = values.pop("tbl_compare", None)
+    if isinstance(tbl_compare, str):
+        tbl_desc = tbl_compare
+    elif callable(tbl_compare) and not hasattr(tbl_compare, "columns"):
+        tbl_desc = "<callable>"
+    else:
+        tbl_desc = f"<{_get_tbl_type(tbl_compare)} table>"
+
+    def to_json(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {str(k): to_json(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [to_json(v) for v in value]
+        return _jsonable(value)
+
+    out: dict[str, Any] = {"tbl_compare": tbl_desc}
+    out.update({k: to_json(v) for k, v in values.items()})
+
+    info = validation_info.val_info or {}
+    comparison = info.get("comparison")
+    if comparison is not None:
+        out["comparison"] = comparison.to_dict(samples=bool(info.get("samples", True)))
+    return out
+
+
+def _tbl_match_spec_badge(values: Any) -> str:
+    """
+    A compact in-cell badge (for the report's values cell) summarizing the comparison settings
+    of a `tbl_match()` step, e.g. `key: id · tol`. Empty when only defaults are used.
+    """
+    if not isinstance(values, dict):
+        return ""
+    parts = []
+    keys = values.get("keys")
+    if keys == "*" or keys == ["*"]:
+        parts.append("multiset")
+    elif keys:
+        keys_list = [keys] if isinstance(keys, str) else list(keys)
+        label = "key" if len(keys_list) == 1 else "keys"
+        parts.append(f"{label}: " + ", ".join(html_module.escape(str(k)) for k in keys_list))
+    if values.get("columns"):
+        parts.append("cols subset")
+    if values.get("column_map"):
+        parts.append("renames")
+    if values.get("tolerance") is not None:
+        parts.append("tol")
+    if values.get("normalize"):
+        parts.append("normalized")
+    if values.get("null_equal") is False:
+        parts.append("null &ne; null")
+    if values.get("schema") == "common":
+        parts.append("common schema")
+    if not parts:
+        return ""
+    return (
+        "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+        "color: #5A6B7B;'>" + " &middot; ".join(parts) + "</span>"
     )
 
 
@@ -26352,6 +26581,66 @@ def _step_report_aggregate(
     step_report = step_report.tab_header(title=md(header))
 
     return step_report
+
+
+def _step_report_tbl_match(
+    comparison: Any,
+    i: int,
+    values: Any,
+    all_passed: bool,
+    header: str | None,
+    limit: int,
+    lang: str,
+) -> GT:
+    """
+    Step report for `tbl_match()`: the comparison report (row statuses, schema differences,
+    column mismatches, and samples of differing rows) under the standard step-report header.
+    """
+    from pointblank._compare_report import _comparison_report, _header_html
+
+    step_report = _comparison_report(comparison, limit=limit)
+
+    # If no header requested, return the comparison report with its own header
+    if header is None:
+        return step_report
+
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Show the non-default comparison settings in the assertion text
+    settings = []
+    if isinstance(values, dict):
+        for name, setting in values.items():
+            if name == "tbl_compare":
+                continue
+            settings.append(f"{name}={setting!r}")
+    assertion_text = html_module.escape(f"tbl_match({', '.join(settings)})")
+
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+    mark = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
+    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + mark
+
+    details = (
+        f"<div style='font-size: 13.6px; {direction_rtl}'>"
+        "<div style='padding-top: 7px;'>"
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        f"position: relative; bottom: 1px;'>{assertion_text}</code></span>"
+        "</div>"
+        f"<div style='padding-top: 7px;'>{_header_html(comparison)}</div>"
+        "</div>"
+    )
+
+    # Generate the default template text for the header when `":default:"` is used
+    if header == ":default:":
+        header = "{title}{details}"
+
+    # Use commonmark to convert the header text to HTML, then place any templated text
+    header = commonmark.commonmark(header)
+    header = header.format(title=title, details=details)
+
+    return step_report.tab_header(title=md(header))
 
 
 def _pl_concat_horizontal(frames: list[Any]) -> Any:
