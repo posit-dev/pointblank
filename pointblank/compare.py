@@ -28,6 +28,12 @@ _N_TARGET = "__pb_n_t"
 # Column name used for the row number in positional mode (matches Pointblank's extracts)
 _ROW_NUM_COL = "_row_num_"
 
+# Stand-in for null values when rows are compared as whole (stringified) values in multiset mode
+_NULL_SENTINEL = "\x00__pb_null__"
+
+# Name of the status column in `tbl_match()` data extracts
+_STATUS_OUT_COL = "_status_"
+
 _NORMALIZERS = ("strip", "lower", "upper", "collapse_whitespace", "round")
 
 _DURATION_UNITS = {
@@ -343,8 +349,14 @@ class Comparison:
         self = object.__new__(cls)
         self.source_name = source_name
         self.target_name = target_name
+        multiset = keys == ["*"]
+        if multiset:
+            keys = []
         self.keys = list(keys)
-        self.mode = "keyed" if keys else "positional"
+        self.mode = "multiset" if multiset else ("keyed" if keys else "positional")
+        self._order_by = order_by
+        self._tgt_input = tgt
+        self._key_casts: dict[str, Any] = {}
         self.schema_mode = schema
         self.dup_keys_mode = dup_keys
         self.null_equal = null_equal
@@ -420,6 +432,15 @@ class Comparison:
         self._specs = specs
         self.compared_columns = [spec.source for spec in specs]
 
+        if self.mode == "multiset":
+            if tolerance is not None:
+                raise ValueError(
+                    "`tolerance=` can't be used with `keys='*'` (multiset comparison matches "
+                    "whole rows exactly)."
+                )
+            self._build_multiset(src, tgt)
+            return self
+
         # Positional alignment: add a row index on both sides and use it as the key
         if self.mode == "positional":
             src = _with_row_index(src, order_by, "source")
@@ -429,7 +450,9 @@ class Comparison:
         else:
             join_keys = list(keys)
             tgt_keys = [tgt_name(k) for k in keys]
-            src, tgt = _harmonize_key_dtypes(src, tgt, join_keys, tgt_keys, src_schema, tgt_schema)
+            src, tgt, self._key_casts = _harmonize_key_dtypes(
+                src, tgt, join_keys, tgt_keys, src_schema, tgt_schema
+            )
 
         self._join_keys = join_keys
         self._tgt_keys = tgt_keys
@@ -479,6 +502,21 @@ class Comparison:
 
         # The main full outer join and per-row status
         joined = _join_frames(src, tgt, join_keys, tgt_keys)
+        if isinstance(joined, nw.DataFrame) and len(joined) == 0:
+            # Nothing to classify (literal broadcasting also fails on empty Pandas frames), so add
+            # empty flag/status columns without literals
+            joined = joined.with_columns(
+                *[
+                    nw.col(_IN_SOURCE).cast(nw.Boolean).alias(_flag_name(i))
+                    for i in range(len(specs))
+                ],
+                nw.col(_IN_SOURCE).cast(nw.String).alias(_STATUS),
+            )
+            self._joined = joined
+            self._set_counts(
+                {}, specs, n_null_src, n_null_tgt, n_dup_units, n_dup_src_rows, n_dup_tgt_rows
+            )
+            return self
         flag_exprs = {
             _flag_name(i): _differs_expr(spec, null_equal) for i, spec in enumerate(specs)
         }
@@ -509,22 +547,37 @@ class Comparison:
         ]
         aggs += [(nw.col(f) & both).cast(nw.Int64).sum().alias(f) for f in flag_names]
         counts = _collect_row(joined.select(*aggs))
+        self._set_counts(
+            counts, specs, n_null_src, n_null_tgt, n_dup_units, n_dup_src_rows, n_dup_tgt_rows
+        )
+        return self
 
-        self.n_match = int(counts["match"] or 0)
-        self.n_changed = int(counts["changed"] or 0)
-        self.n_missing = int(counts["missing"] or 0) + n_null_src
-        self.n_extra = int(counts["extra"] or 0) + n_null_tgt
+    def _set_counts(
+        self,
+        counts: dict[str, Any],
+        specs: list[_ColumnSpec],
+        n_null_src: int,
+        n_null_tgt: int,
+        n_dup_units: int,
+        n_dup_src_rows: int,
+        n_dup_tgt_rows: int,
+    ) -> None:
+        """Set the status counts and row counts from the joined frame's aggregation."""
+
+        def get(name: str) -> int:
+            return int(counts.get(name) or 0)
+
+        self.n_match = get("match")
+        self.n_changed = get("changed")
+        self.n_missing = get("missing") + n_null_src
+        self.n_extra = get("extra") + n_null_tgt
         self.n_dup_key = n_dup_units
-        self.column_mismatches = {
-            spec.source: int(counts[_flag_name(i)] or 0) for i, spec in enumerate(specs)
-        }
+        self.column_mismatches = {spec.source: get(_flag_name(i)) for i, spec in enumerate(specs)}
 
-        n_src_joined = self.n_match + self.n_changed + int(counts["missing"] or 0)
-        n_tgt_joined = self.n_match + self.n_changed + int(counts["extra"] or 0)
+        n_src_joined = self.n_match + self.n_changed + get("missing")
+        n_tgt_joined = self.n_match + self.n_changed + get("extra")
         self.n_source_rows = n_src_joined + n_null_src + n_dup_src_rows
         self.n_target_rows = n_tgt_joined + n_null_tgt + n_dup_tgt_rows
-
-        return self
 
     # ------------------------------------------------------------------------------------------
     # Summary properties
@@ -621,6 +674,8 @@ class Comparison:
         return self._sample_cache[cache_key]
 
     def _key_out_names(self) -> list[str]:
+        if self.mode == "multiset":
+            return []
         return [_ROW_NUM_COL] if self.mode == "positional" else list(self.keys)
 
     def _key_out_exprs(self, from_target: bool = False) -> list[Any]:
@@ -638,6 +693,8 @@ class Comparison:
 
     def _fetch(self, status: str, limit: int) -> Any:
         """Fetch a sample of rows with a status as an eager narwhals DataFrame."""
+        if self.mode == "multiset":
+            return self._fetch_multiset(status, limit)
         joined = self._joined
         filtered = joined.filter(nw.col(_STATUS) == nw.lit(status))
 
@@ -731,6 +788,248 @@ class Comparison:
         return pairs
 
     # ------------------------------------------------------------------------------------------
+    # Multiset mode (`keys="*"`)
+    # ------------------------------------------------------------------------------------------
+
+    def _multiset_values(self, frame: Any, side: str) -> Any:
+        """Each compared column as a normalized string (nulls as a sentinel), for grouping."""
+        exprs = []
+        for i, spec in enumerate(self._specs):
+            name = spec.source if side == "source" else spec.target
+            dtype = spec.source_dtype if side == "source" else spec.target_dtype
+            expr = nw.col(name)
+            if _is_float(dtype):
+                expr = expr.fill_nan(None)
+            if (
+                _is_numeric(spec.source_dtype)
+                and _is_numeric(spec.target_dtype)
+                and str(spec.source_dtype) != str(spec.target_dtype)
+            ):
+                # e.g., 1 (integer) and 1.0 (float) should be the same value
+                expr = expr.cast(nw.Float64)
+            expr = _normalized(expr, spec.normalize)
+            exprs.append(expr.cast(nw.String).fill_null(_NULL_SENTINEL).alias(f"__pb_m_{i}"))
+        return frame.select(*exprs)
+
+    def _build_multiset(self, src: Any, tgt: Any) -> None:
+        """
+        Compare the tables as multisets of rows: each distinct row (over the compared columns)
+        matches as many times as it occurs in both tables; surplus copies are missing or extra.
+        """
+        self._join_keys, self._tgt_keys = [], []
+        self._src, self._tgt = src, tgt
+        self._src_main, self._tgt_main = src, tgt
+        self._n_null_src = self._n_null_tgt = 0
+        self._dup_frame = None
+        self.n_dup_key_values = 0
+        self.n_dup_key = 0
+        self.n_changed = 0
+        self.column_mismatches = {}
+
+        n_s, n_t = nw.col(_N_SOURCE), nw.col(_N_TARGET)
+        if not self._specs:
+            # No shared columns: rows can only be counted
+            n_src, n_tgt = _count(src), _count(tgt)
+            self.n_match = min(n_src, n_tgt)
+            self.n_missing = max(n_src - n_tgt, 0)
+            self.n_extra = max(n_tgt - n_src, 0)
+            self.n_source_rows, self.n_target_rows = n_src, n_tgt
+            self._joined = None
+            return
+
+        m_cols = [f"__pb_m_{i}" for i in range(len(self._specs))]
+        gs = self._multiset_values(src, "source").group_by(m_cols).agg(nw.len().alias(_N_SOURCE))
+        gt = (
+            self._multiset_values(tgt, "target")
+            .group_by(m_cols)
+            .agg(nw.len().alias(_N_TARGET))
+            .rename({c: c + _TGT_SUFFIX for c in m_cols})
+        )
+        joined = gs.join(gt, left_on=m_cols, right_on=[c + _TGT_SUFFIX for c in m_cols], how="full")
+        joined = joined.with_columns(
+            *[nw.coalesce(nw.col(c), nw.col(c + _TGT_SUFFIX)).alias(c) for c in m_cols],
+            n_s.fill_null(0).cast(nw.Int64),
+            n_t.fill_null(0).cast(nw.Int64),
+        ).select(*m_cols, _N_SOURCE, _N_TARGET)
+        self._joined = joined
+
+        zero = nw.lit(0).cast(nw.Int64)
+        counts = _collect_row(
+            joined.select(
+                nw.min_horizontal(n_s, n_t).sum().alias("match"),
+                nw.when(n_s > n_t).then(n_s - n_t).otherwise(zero).sum().alias("missing"),
+                nw.when(n_t > n_s).then(n_t - n_s).otherwise(zero).sum().alias("extra"),
+                n_s.sum().alias("n_s"),
+                n_t.sum().alias("n_t"),
+            )
+        )
+        self.n_match = int(counts["match"] or 0)
+        self.n_missing = int(counts["missing"] or 0)
+        self.n_extra = int(counts["extra"] or 0)
+        self.n_source_rows = int(counts["n_s"] or 0)
+        self.n_target_rows = int(counts["n_t"] or 0)
+
+    def _fetch_multiset(self, status: str, limit: int) -> Any:
+        """Samples in multiset mode: distinct rows (as strings) with their occurrence counts."""
+        names = [spec.source if status != "extra" else spec.target for spec in self._specs]
+        n_s, n_t = nw.col(_N_SOURCE), nw.col(_N_TARGET)
+        if self._joined is None:
+            return _records_frame_like([], names + ["n_source", "n_target"])
+        cond = {
+            "missing": n_s > n_t,
+            "extra": n_t > n_s,
+            "match": (n_s > 0) & (n_t > 0),
+        }.get(status, nw.lit(False))
+        out = [
+            nw.when(nw.col(f"__pb_m_{i}") == nw.lit(_NULL_SENTINEL))
+            .then(nw.lit(None, dtype=nw.String))
+            .otherwise(nw.col(f"__pb_m_{i}"))
+            .alias(name)
+            for i, name in enumerate(names)
+        ]
+        out += [n_s.alias("n_source"), n_t.alias("n_target")]
+        return _collect(self._joined.filter(cond).select(*out).head(limit))
+
+    # ------------------------------------------------------------------------------------------
+    # Support for `Validate.tbl_match()`: data extracts and sundering
+    # ------------------------------------------------------------------------------------------
+
+    def _failing_rows(self, limit: int) -> Any:
+        """
+        All failing test units in one table (the `tbl_match()` data extract): the key column(s),
+        a `_status_` column, then `<column>_source`/`<column>_target` pairs for each compared
+        column. In multiset mode, the compared columns (as strings) and their occurrence counts.
+        """
+        if self.mode == "multiset":
+            parts = []
+            for status in ("missing", "extra"):
+                frame = self._fetch_multiset(status, limit)
+                if status == "extra":
+                    frame = frame.rename(
+                        {s.target: s.source for s in self._specs if s.target != s.source}
+                    )
+                parts.append(frame.with_columns(nw.lit(status).alias(_STATUS_OUT_COL)))
+            frame = _concat_eager(parts[0], parts[1])
+            cols = [_STATUS_OUT_COL] + [c for c in frame.columns if c != _STATUS_OUT_COL]
+            return frame.select(cols).head(limit).to_native()
+
+        pair_exprs = []
+        for spec in self._specs:
+            pair_exprs.append(nw.col(spec.source).alias(f"{spec.source}_source"))
+            pair_exprs.append(nw.col(spec.target + _TGT_SUFFIX).alias(f"{spec.source}_target"))
+
+        main = _collect(
+            self._joined.filter(nw.col(_STATUS) != nw.lit("match"))
+            .select(
+                *self._key_out_exprs(),
+                nw.col(_STATUS).alias(_STATUS_OUT_COL),
+                *pair_exprs,
+            )
+            .head(limit)
+        )
+        columns = main.columns
+        schema = dict(main.schema.items())
+
+        def null_of(col: str) -> Any:
+            return nw.lit(None).cast(schema[col]).alias(col)
+
+        # Rows that never entered the join: null keys (missing/extra) and duplicated keys
+        extras = []
+        if self._n_null_src:
+            extras.append(
+                self._src.filter(_any_null(self._join_keys)).select(
+                    *[nw.col(k).cast(schema[k]) for k in self.keys],
+                    nw.lit("missing").alias(_STATUS_OUT_COL),
+                    *[
+                        nw.col(spec.source).alias(c).cast(schema[c])
+                        if c.endswith("_source")
+                        else null_of(c)
+                        for spec in self._specs
+                        for c in (f"{spec.source}_source", f"{spec.source}_target")
+                    ],
+                )
+            )
+        if self._n_null_tgt:
+            extras.append(
+                self._tgt.filter(_any_null(self._tgt_keys)).select(
+                    *[
+                        nw.col(tk).cast(schema[k]).alias(k)
+                        for k, tk in zip(self.keys, self._tgt_keys)
+                    ],
+                    nw.lit("extra").alias(_STATUS_OUT_COL),
+                    *[
+                        nw.col(spec.target).alias(c).cast(schema[c])
+                        if c.endswith("_target")
+                        else null_of(c)
+                        for spec in self._specs
+                        for c in (f"{spec.source}_source", f"{spec.source}_target")
+                    ],
+                )
+            )
+        if self._dup_frame is not None:
+            extras.append(
+                self._dup_frame.select(
+                    *[nw.col(k).cast(schema[k]) for k in self.keys],
+                    nw.lit("dup_key").alias(_STATUS_OUT_COL),
+                    *[null_of(c) for c in columns[len(self.keys) + 1 :]],
+                )
+            )
+
+        frame = main
+        for extra in extras:
+            if len(frame) >= limit:
+                break
+            frame = _concat_eager(frame, _collect(extra.select(columns).head(limit - len(frame))))
+        return frame.to_native()
+
+    def _target_pass_table(self) -> Any:
+        """
+        The target table (in its original row order) with a boolean `pb_is_good_` column: `True`
+        for rows whose status is `"match"`. Used by `Validate.get_sundered_data()`. Returns `None`
+        when this isn't possible (lazy inputs, or multiset mode where rows aren't identified).
+        """
+        tgt = self._tgt_input
+        if (
+            self.mode == "multiset"
+            or not isinstance(tgt, nw.DataFrame)
+            or not isinstance(self._joined, nw.DataFrame)
+        ):
+            return None
+
+        columns = tgt.columns
+        orig = "__pb_tgt_row"
+        tgt = tgt.with_row_index(orig)
+        temp_keys = [f"__pb_k_{i}" for i in range(len(self._tgt_keys))]
+        if self.mode == "positional":
+            left = _with_row_index(tgt, self._order_by, "target", name=temp_keys[0])
+        else:
+            left = tgt.with_columns(
+                *[
+                    (
+                        nw.col(tk).cast(self._key_casts[tk])
+                        if tk in self._key_casts
+                        else nw.col(tk)
+                    ).alias(tmp)
+                    for tk, tmp in zip(self._tgt_keys, temp_keys)
+                ]
+            )
+        matched = self._joined.filter(nw.col(_STATUS) == nw.lit("match")).select(
+            *[nw.col(tk + _TGT_SUFFIX).alias(tmp) for tk, tmp in zip(self._tgt_keys, temp_keys)]
+        )
+        if not self.schema_ok or len(matched) == 0:
+            # No row passes (and empty frames can't take a literal column on every backend)
+            return tgt.select(*columns).with_columns(nw.lit(False).alias("pb_is_good_")).to_native()
+        out = (
+            left.join(
+                matched.with_columns(nw.lit(True).alias("pb_is_good_")), on=temp_keys, how="left"
+            )
+            .with_columns(nw.col("pb_is_good_").fill_null(False))
+            .sort(orig)
+            .select(*columns, "pb_is_good_")
+        )
+        return out.to_native()
+
+    # ------------------------------------------------------------------------------------------
     # Summaries and export
     # ------------------------------------------------------------------------------------------
 
@@ -753,9 +1052,11 @@ class Comparison:
                 "target_column": spec.target,
                 "dtype_source": str(spec.source_dtype),
                 "dtype_target": str(spec.target_dtype),
-                "n_mismatch": self.column_mismatches[spec.source],
+                "n_mismatch": self.column_mismatches.get(spec.source),
                 "f_mismatch": (
-                    self.column_mismatches[spec.source] / n_matched if n_matched else 0.0
+                    self.column_mismatches[spec.source] / n_matched
+                    if n_matched and spec.source in self.column_mismatches
+                    else None
                 ),
             }
             for spec in self._specs
@@ -926,6 +1227,11 @@ def _concat_eager(a: Any, b: Any) -> Any:
         return a
 
 
+def _records_frame_like(records: list[dict[str, Any]], columns: list[str]) -> Any:
+    """An eager narwhals DataFrame (all-string columns when empty) for sample output."""
+    return nw.from_native(_records_to_frame(records, columns))
+
+
 def _records_to_frame(records: list[dict[str, Any]], columns: list[str]) -> Any:
     from pointblank._utils import _is_lib_present
 
@@ -958,14 +1264,15 @@ def _align_backends(src: Any, tgt: Any) -> tuple[Any, Any]:
 
     Frames on the same backend are left as they are, so database tables stay in the database and
     the comparison is pushed down. A Polars DataFrame paired with a Polars LazyFrame is made lazy.
-    Otherwise both frames are converted to Polars (lazy) if available, else to Pandas.
+    Otherwise both frames are converted to Polars if available (DataFrames if both inputs are
+    in-memory, else LazyFrames), or to Pandas.
     """
     s_impl = src.implementation
     t_impl = tgt.implementation
     s_lazy = isinstance(src, nw.LazyFrame)
     t_lazy = isinstance(tgt, nw.LazyFrame)
 
-    if s_impl == t_impl:
+    if s_impl == t_impl and _same_connection(src, tgt):
         if s_lazy != t_lazy:
             return src.lazy(), tgt.lazy()
         return src, tgt
@@ -973,8 +1280,24 @@ def _align_backends(src: Any, tgt: Any) -> tuple[Any, Any]:
     from pointblank._utils import _is_lib_present
 
     if _is_lib_present("polars"):
+        if not s_lazy and not t_lazy:
+            # Two in-memory tables stay in memory (as Polars DataFrames)
+            return _to_polars_lazy(src).collect(), _to_polars_lazy(tgt).collect()
         return _to_polars_lazy(src), _to_polars_lazy(tgt)
     return _to_pandas(src), _to_pandas(tgt)  # pragma: no cover
+
+
+def _same_connection(src: Any, tgt: Any) -> bool:
+    """
+    For Ibis tables, are both tables in the same database connection (so they can be joined in
+    place)? Always `True` for other backends.
+    """
+    if src.implementation != nw.Implementation.IBIS:
+        return True
+    try:
+        return src.to_native().get_backend() is tgt.to_native().get_backend()
+    except Exception:  # pragma: no cover
+        return False
 
 
 def _to_polars_lazy(frame: Any) -> Any:
@@ -993,17 +1316,28 @@ def _to_pandas(frame: Any) -> Any:  # pragma: no cover
     return nw.from_native(_collect(frame).to_pandas())
 
 
-def _with_row_index(frame: Any, order_by: list[str] | None, side: str) -> Any:
-    """Add a 0-based row index (`_ROW_IDX`) for positional alignment."""
+def _with_row_index(frame: Any, order_by: list[str] | None, side: str, name: str = _ROW_IDX) -> Any:
+    """
+    Add a 0-based row index for positional alignment. With `order_by=`, the index follows that
+    order but the rows themselves keep their original order.
+    """
     if isinstance(frame, nw.DataFrame):
-        if order_by:
-            frame = frame.sort(order_by)
-        return frame.with_row_index(_ROW_IDX)
+        if not order_by:
+            return frame.with_row_index(name)
+        # (`with_row_index(order_by=)` on eager frames is unreliable, so sort explicitly)
+        orig = "__pb_orig_idx"
+        return (
+            frame.with_row_index(orig)
+            .sort([*order_by, orig])
+            .with_row_index(name)
+            .sort(orig)
+            .drop(orig)
+        )
     if order_by:
-        return frame.with_row_index(_ROW_IDX, order_by=order_by)
+        return frame.with_row_index(name, order_by=order_by)
     if frame.implementation == nw.Implementation.POLARS:
         # Polars LazyFrames (e.g., from `scan_csv()`) preserve row order
-        return nw.from_native(frame.to_native().with_row_index(_ROW_IDX))
+        return nw.from_native(frame.to_native().with_row_index(name))
     raise ValueError(
         f"The {side} table has no defined row order, so rows can't be aligned by position. "
         "Provide `keys=` to align rows by key (recommended), or `order_by=` to define the row "
@@ -1018,12 +1352,14 @@ def _harmonize_key_dtypes(
     tgt_keys: list[str],
     src_schema: dict[str, Any],
     tgt_schema: dict[str, Any],
-) -> tuple[Any, Any]:
+) -> tuple[Any, Any, dict[str, Any]]:
     """
     Cast key columns to a common type where the two tables disagree (e.g., integer keys that
-    became floats in Pandas because of a null), so that they can be joined.
+    became floats in Pandas because of a null), so that they can be joined. Also returns the
+    casts applied (target key name -> dtype).
     """
     src_casts, tgt_casts = [], []
+    casts: dict[str, Any] = {}
     for k, tk in zip(keys, tgt_keys):
         s_dtype, t_dtype = src_schema[k], tgt_schema[tk]
         if str(s_dtype) == str(t_dtype):
@@ -1031,10 +1367,11 @@ def _harmonize_key_dtypes(
         common = nw.Float64 if (_is_numeric(s_dtype) and _is_numeric(t_dtype)) else nw.String
         src_casts.append(nw.col(k).cast(common))
         tgt_casts.append(nw.col(tk).cast(common))
+        casts[tk] = common
     if src_casts:
         src = src.with_columns(*src_casts)
         tgt = tgt.with_columns(*tgt_casts)
-    return src, tgt
+    return src, tgt, casts
 
 
 def _dup_key_frame(src: Any, tgt: Any, keys: list[str], tgt_keys: list[str]) -> Any:
