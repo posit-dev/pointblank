@@ -93,6 +93,8 @@ def _header_html(cmp: Comparison) -> str:
     esc = html_lib.escape
     if cmp.mode == "keyed":
         alignment = "aligned by key " + ", ".join(f"<code>{esc(k)}</code>" for k in cmp.keys)
+    elif cmp.mode == "multiset":
+        alignment = "compared as multisets of rows (order ignored)"
     else:
         alignment = "aligned by row position"
 
@@ -292,13 +294,14 @@ def _missing_extra_rows(cmp: Comparison, status: str, limit: int) -> list[dict[s
     key_cols = cmp._key_out_names()
     out = []
     for row in frame.rows(named=True):
-        out.append(
-            {
-                "group": group,
-                "item": _key_label(row, key_cols),
-                "detail": _row_preview(row, exclude=set(key_cols)),
-            }
-        )
+        if cmp.mode == "multiset":
+            # Distinct rows, with how many surplus copies one table has over the other
+            item = f"&times;{abs(row['n_source'] - row['n_target']):,}"
+            exclude = {"n_source", "n_target"}
+        else:
+            item = _key_label(row, key_cols)
+            exclude = set(key_cols)
+        out.append({"group": group, "item": item, "detail": _row_preview(row, exclude=exclude)})
     return out
 
 
