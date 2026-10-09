@@ -33,6 +33,7 @@ class OrderedGroup(click.Group):
             # Validation
             "validate",
             "run",
+            "compare",
             "make-template",
             # Data Manipulation
             "pl",
