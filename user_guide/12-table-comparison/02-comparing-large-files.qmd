@@ -1,0 +1,194 @@
+---
+title: Comparing Large Files
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a situation that comes up all the time: a pipeline run produces a target CSV file from a
+source CSV file, and you need to check that nothing went wrong. Specifically, you want to find
+
+1. records missing from the target,
+2. extra records in the target,
+3. records whose column values differ, and
+4. schema or column-name mismatches,
+
+and the files are big enough that loading both of them into memory is slow, or impossible.
+
+This article looks at why the usual approaches struggle with this, and how to do it with
+Pointblank's [`compare()`](../12-table-comparison/01-comparing-tables.qmd) function and the
+`pb compare` command.
+
+## Why the Usual Approaches Fall Short
+
+**A pandas merge.** Reading both files and doing an outer merge on the key (with `indicator=True`)
+does identify missing and extra rows, and the merged frame can be compared column by column to find
+changed values. But it needs both files in memory *plus* the merged result, which is wider than
+either input. For large files that's where memory runs out. Nulls take extra care too, since
+`NaN != NaN`.
+
+**Python sets.** Turning each file's rows into a set of tuples and taking set differences is quick to
+write, but it can't tell a *changed* row from a missing one plus an extra one, can't say which
+column changed, silently collapses duplicate rows, and still holds every row of both files in
+memory (as Python objects, which is worse than a DataFrame).
+
+**Reading in chunks.** Processing the files chunk by chunk keeps memory in check, but a row's
+counterpart in the other file is usually in a *different* chunk, unless both files happen to be
+sorted the same way. Making chunked comparison correct means partitioning both files by key, so
+that each key's rows from both files land in the same chunk. That's a lot of code to get right.
+
+## How Pointblank Approaches It
+
+Three things make `compare()` suitable for large files:
+
+1. **Files are scanned, not loaded.** CSV and Parquet paths are read lazily (with Polars, or
+   DuckDB), so the comparison is a query plan rather than two DataFrames in memory.
+2. **The work happens in the engine.** The join on the key, the per-column comparisons, and the
+   counting are all done by the query engine. Python only receives the counts and small samples of
+   the differing rows (the `limit=` of each sample).
+3. **Chunking done correctly.** With `partitions=N`, the comparison runs in N passes, each covering
+   the keys whose hash falls into one bucket, on *both* tables. A key's rows always land in the same
+   pass, so the results are exactly those of a single-pass comparison, while each pass only joins
+   about `1/N` of the rows.
+
+Let's try it on a pair of CSV files. We'll generate a source file with 200,000 orders and a target
+file in which some orders are missing, some amounts changed, a few orders were added, and the rows
+were shuffled:
+
+```{python}
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import polars as pl
+
+n = 200_000
+rng = np.random.default_rng(23)
+
+source = pl.DataFrame(
+    {
+        "order_id": np.arange(n),
+        "amount": rng.normal(100, 20, n).round(2),
+        "region": rng.choice(["north", "south", "east", "west"], n),
+    }
+)
+
+target = (
+    source.filter(pl.col("order_id") % 1000 != 7)  # 200 orders missing
+    .with_columns(  # 400 amounts changed
+        amount=pl.when(pl.col("order_id") % 500 == 3)
+        .then(pl.col("amount") + 1)
+        .otherwise("amount")
+    )
+    .vstack(source.tail(50).with_columns(pl.col("order_id") + n))  # 50 extra orders
+    .sample(fraction=1.0, shuffle=True, seed=1)
+)
+
+data_dir = Path(tempfile.mkdtemp())
+source.write_csv(data_dir / "source.csv")
+target.write_csv(data_dir / "target.csv")
+```
+
+Now we compare the two files by giving `compare()` their paths:
+
+```{python}
+import pointblank as pb
+
+comparison = pb.compare(
+    data_dir / "source.csv",
+    data_dir / "target.csv",
+    keys="order_id",
+)
+
+comparison
+```
+
+All four questions are answered in one place: missing and extra rows, changed rows (with the
+`amount` column identified as the one that differs), and the schema check in the header.
+
+The same comparison in four partitions gives identical results:
+
+```{python}
+partitioned = pb.compare(
+    data_dir / "source.csv",
+    data_dir / "target.csv",
+    keys="order_id",
+    partitions=4,
+)
+
+partitioned.status_counts == comparison.status_counts
+```
+
+## Choosing an Engine and a Number of Partitions
+
+When given file paths, `compare()` scans them with Polars, which is the fastest option. DuckDB uses
+less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB
+relations and pass those to `compare()`:
+
+```python
+import duckdb
+
+con = duckdb.connect()
+
+comparison = pb.compare(
+    con.read_csv("source.csv"),
+    con.read_csv("target.csv"),
+    keys="order_id",
+    partitions=8,
+)
+```
+
+Here's how the options compare on two CSV files with 10 million rows and 10 columns each (about
+730 MB per file), with the rows of the target shuffled:
+
+| Approach | Wall time | Peak memory |
+|---|---|---|
+| Polars: read both files, then a full join (for reference) | 2.5 s | 5.5 GB |
+| `compare()` on file paths (Polars) | 4.9 s | 4.8 GB |
+| `compare()` on file paths (Polars), `partitions=8` | 9.6 s | 2.6 GB |
+| `compare()` on DuckDB relations | 6.4 s | 2.0 GB |
+| `compare()` on DuckDB relations, `partitions=8` | 17.9 s | 0.8 GB |
+
+Every approach found the same differences. The numbers will vary with your machine and data, but
+the pattern is consistent: partitions trade time (each pass reads the files again) for memory, and
+DuckDB is the more memory-efficient engine. Some practical guidance:
+
+- If the files fit comfortably in memory, use the defaults.
+- If memory is tight, use DuckDB relations and increase `partitions=` until the peak memory is
+  acceptable.
+- A good key matters most: with `keys=`, row order doesn't matter, and partitioning is possible.
+  Without a key, rows are compared by position (or as multisets, with `keys="*"`), and partitions
+  can't be used.
+
+You can run the same benchmark on your own machine with the script in the Pointblank repository
+(`benchmark/compare_large_files.py`).
+
+## Tables in Databases
+
+Tables don't have to be files. If both tables are in the same database (e.g., two Ibis tables from
+one DuckDB, PostgreSQL, or Snowflake connection), the comparison runs entirely inside the database,
+and only the counts and samples are transferred. Tables from *different* databases are first
+brought into Polars, so for large tables it's better to have both in one place.
+
+## In Scripts and CI Pipelines
+
+The `pb compare` command does all of this from the command line, and its exit code tells a script or
+CI job whether the files match (`0`), differ (`1`), or couldn't be compared (`2`):
+
+```bash
+pb compare source.csv target.csv --key order_id --engine duckdb --partitions 8 \
+  --output-html diff.html --output-json diff.json
+```
+
+The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add
+`--no-samples` to keep row values out of the JSON output. To make the comparison one check among
+others in a validation, use `Validate.tbl_match()`, which accepts the same settings (see
+[Comparing Two Tables](01-comparing-tables.qmd)).
