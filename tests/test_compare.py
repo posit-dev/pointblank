@@ -692,3 +692,10 @@ def test_partitions_argument_errors():
         compare(s, s.rename({"id": "x"}), keys="id", partitions=2)
     # A single partition is an ordinary comparison
     assert compare(s, s, keys="id", partitions=1).partitions == 1
+
+
+def test_path_objects_name_the_tables(tmp_path):
+    path = tmp_path / "source.csv"
+    pl.DataFrame({"id": [1]}).write_csv(path)
+    cmp = compare(path, path, keys="id")
+    assert cmp.source_name == cmp.target_name == str(path)
