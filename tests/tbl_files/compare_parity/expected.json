@@ -1,0 +1,214 @@
+{
+  "datacompy_version": "1.1.0",
+  "cases": {
+    "basic": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ]
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 25,
+        "n_df2_unq_rows": 15,
+        "n_intersect_rows": 475,
+        "n_matching_rows": 437,
+        "unequal_cnt": {
+          "amount": 20,
+          "qty": 8,
+          "region": 11,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "nulls": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ]
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 300,
+        "n_matching_rows": 272,
+        "unequal_cnt": {
+          "amount": 20,
+          "qty": 0,
+          "region": 0,
+          "name": 9,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "abs_tol": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ],
+        "abs_tol": 0.01
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 300,
+        "n_matching_rows": 285,
+        "unequal_cnt": {
+          "amount": 15,
+          "qty": 0,
+          "region": 0,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "rel_tol": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ],
+        "rel_tol": 0.001
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 300,
+        "n_matching_rows": 285,
+        "unequal_cnt": {
+          "amount": 15,
+          "qty": 0,
+          "region": 0,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "spaces_case": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ],
+        "ignore_spaces": true,
+        "ignore_case": true
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 300,
+        "n_matching_rows": 293,
+        "unequal_cnt": {
+          "amount": 0,
+          "qty": 0,
+          "region": 0,
+          "name": 7,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "composite_keys": {
+      "settings": {
+        "join_columns": [
+          "id",
+          "store"
+        ]
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 20,
+        "n_df2_unq_rows": 10,
+        "n_intersect_rows": 380,
+        "n_matching_rows": 365,
+        "unequal_cnt": {
+          "amount": 15,
+          "qty": 0,
+          "region": 0,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    },
+    "schema": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ]
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 200,
+        "n_matching_rows": 190,
+        "unequal_cnt": {
+          "amount": 0,
+          "region": 10,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [
+          "qty"
+        ],
+        "df2_unq_columns": [
+          "channel"
+        ]
+      }
+    },
+    "duplicates": {
+      "settings": {
+        "join_columns": [
+          "id"
+        ]
+      },
+      "datacompy": {
+        "n_df1_unq_rows": 8,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 200,
+        "n_matching_rows": 188,
+        "unequal_cnt": {
+          "amount": 12,
+          "qty": 0,
+          "region": 0,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      },
+      "duplicated_keys": [
+        7,
+        78,
+        120,
+        123,
+        149,
+        150,
+        152,
+        155
+      ],
+      "datacompy_without_duplicates": {
+        "n_df1_unq_rows": 0,
+        "n_df2_unq_rows": 0,
+        "n_intersect_rows": 192,
+        "n_matching_rows": 180,
+        "unequal_cnt": {
+          "amount": 12,
+          "qty": 0,
+          "region": 0,
+          "name": 0,
+          "day": 0
+        },
+        "df1_unq_columns": [],
+        "df2_unq_columns": []
+      }
+    }
+  }
+}
