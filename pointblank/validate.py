@@ -2440,8 +2440,11 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         if tbl_type == "polars":
+            # A LazyFrame has no `height`, so count its rows and only collect the rows to show
+            is_lazy = isinstance(data, pl.LazyFrame)
+
             # Note: polars DataFrames have height, head(), tail() attributes
-            n_rows = int(data.height)
+            n_rows = data.select(pl.len()).collect().item() if is_lazy else int(data.height)
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
@@ -2457,6 +2460,9 @@ def _generate_display_table(
                     row_number_list = list(range(1, n_head + 1)) + list(
                         range(n_rows - n_tail + 1, n_rows + 1)
                     )
+
+            if is_lazy:
+                data = data.collect()
 
         if tbl_type == "pandas":
             # Note: pandas DataFrames have shape, head(), tail() attributes
