@@ -24,8 +24,13 @@ Configurations (`--configs`, comma-separated):
 - `duckdb-spill:LIMIT`: `pb.compare()` on DuckDB relations with no partitions, but with DuckDB's
   `memory_limit` set to LIMIT (e.g. `4GB`) and a `temp_directory` so that it can spill to disk
 
-Each run is killed if its resident memory exceeds `--max-gb` (16 GB by default), so that a
-configuration that needs too much memory fails safely instead of pushing the machine into swap.
+Memory is measured as the process's *physical footprint* on macOS (memory the process owns,
+excluding clean file-backed pages). Resident set size (RSS) would overstate it for engines that
+memory-map their input: Polars maps CSV files, so a plain scan of a 7 GB file shows ~7 GB of RSS
+while needing only a few MB. On other platforms, RSS is used (and the table says so).
+
+Each run is killed if its memory exceeds `--max-gb` (16 GB by default), so that a configuration
+that needs too much memory fails safely instead of pushing the machine into swap.
 The CSV files are kept in `--dir` and reused if they already exist with the same row count.
 """
 
@@ -103,9 +108,48 @@ def generate(directory: Path, n: int) -> tuple[Path, Path]:
     return src, tgt
 
 
+def _footprint_gb(pid: int | None = None) -> tuple[float, float] | None:
+    """
+    (current, lifetime peak) physical footprint of a process in GB, on macOS; else `None`.
+    """
+    if sys.platform != "darwin":
+        return None
+    import ctypes
+    import os
+
+    names = (
+        "user_time system_time pkg_idle_wkups interrupt_wkups pageins wired_size resident_size "
+        "phys_footprint proc_start_abstime proc_exit_abstime child_user_time child_system_time "
+        "child_pkg_idle_wkups child_interrupt_wkups child_pageins child_elapsed_abstime "
+        "diskio_bytesread diskio_byteswritten cpu_time_qos_default cpu_time_qos_maintenance "
+        "cpu_time_qos_background cpu_time_qos_utility cpu_time_qos_legacy "
+        "cpu_time_qos_user_initiated cpu_time_qos_user_interactive billed_system_time "
+        "serviced_system_time logical_writes lifetime_max_phys_footprint"
+    ).split()
+
+    class RUsageInfoV4(ctypes.Structure):  # the leading fields of `rusage_info_v4`
+        _fields_ = [("uuid", ctypes.c_uint8 * 16)] + [(n, ctypes.c_uint64) for n in names]
+        _fields_ += [("rest", ctypes.c_uint64 * 8)]
+
+    info = RUsageInfoV4()
+    libproc = ctypes.CDLL("/usr/lib/libproc.dylib")
+    if libproc.proc_pid_rusage(pid or os.getpid(), 4, ctypes.byref(info)) != 0:
+        return None
+    return info.phys_footprint / 1e9, info.lifetime_max_phys_footprint / 1e9
+
+
+def _peak_gb() -> float:
+    """This process's peak memory: physical footprint on macOS, else max RSS."""
+    import resource
+
+    fp = _footprint_gb()
+    if fp is not None:
+        return fp[1]
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024 / 1e9  # Linux: KiB
+
+
 def run_one(config: str, src: str, tgt: str, workdir: str) -> dict:
     """Run a single configuration (in this process) and return timing, memory, and counts."""
-    import resource
     import warnings
 
     warnings.simplefilter("ignore")
@@ -142,12 +186,14 @@ def run_one(config: str, src: str, tgt: str, workdir: str) -> dict:
         counts = cmp.status_counts
 
     elapsed = time.perf_counter() - start
-    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    peak_bytes = peak if sys.platform == "darwin" else peak * 1024  # Linux reports KiB
-    return {"seconds": elapsed, "peak_gb": peak_bytes / 1e9, "counts": counts}
+    return {"seconds": elapsed, "peak_gb": _peak_gb(), "counts": counts}
 
 
-def _rss_gb(pid: int) -> float:
+def _memory_gb(pid: int) -> float:
+    """A process's current memory: physical footprint on macOS, else RSS."""
+    fp = _footprint_gb(pid)
+    if fp is not None:
+        return fp[0]
     out = subprocess.run(["ps", "-o", "rss=", "-p", str(pid)], capture_output=True, text=True)
     try:
         return int(out.stdout.strip()) * 1024 / 1e9  # ps reports KiB
@@ -156,13 +202,13 @@ def _rss_gb(pid: int) -> float:
 
 
 def run_guarded(config: str, src: Path, tgt: Path, workdir: Path, max_gb: float) -> dict:
-    """Run a configuration in a subprocess, killing it if its RSS exceeds `max_gb`."""
+    """Run a configuration in a subprocess, killing it if its memory exceeds `max_gb`."""
     cmd = [sys.executable, __file__, "--run", config, "--src", str(src), "--tgt", str(tgt)]
     cmd += ["--dir", str(workdir)]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     start, peak_seen = time.perf_counter(), 0.0
     while proc.poll() is None:
-        peak_seen = max(peak_seen, _rss_gb(proc.pid))
+        peak_seen = max(peak_seen, _memory_gb(proc.pid))
         if peak_seen > max_gb:
             proc.kill()
             proc.wait()
@@ -199,7 +245,8 @@ def main() -> None:
         flush=True,
     )
     expected = expected_counts(args.rows)
-    print("| Configuration | Wall time | Peak RSS | Counts exact? |")
+    measure = "Peak memory (footprint)" if sys.platform == "darwin" else "Peak RSS"
+    print(f"| Configuration | Wall time | {measure} | Counts exact? |")
     print("|---|---|---|---|", flush=True)
     for config in args.configs.split(","):
         result = run_guarded(config, src, tgt, args.dir, args.max_gb)
