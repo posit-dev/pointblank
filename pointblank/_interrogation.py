@@ -171,7 +171,7 @@ class ConjointlyValidation:
             return self._get_polars_results()
         elif "pandas" in self.tbl_type:
             return self._get_pandas_results()
-        elif "duckdb" in self.tbl_type or "ibis" in self.tbl_type:
+        elif "duckdb" in self.tbl_type or "ibis" in self.tbl_type or self.tbl_type in IBIS_BACKENDS:
             return self._get_ibis_results()
         elif "pyspark" in self.tbl_type:
             return self._get_pyspark_results()
@@ -304,25 +304,20 @@ class ConjointlyValidation:
             # Strategy 1: Try direct evaluation with native Ibis expressions
             try:
                 expr_result = expr_fn(self.data_tbl)
+            except Exception:
+                expr_result = None  # Continue to Strategy 2
 
-                # Check if it's a valid Ibis expression
-                if hasattr(expr_result, "_ibis_expr"):  # pragma: no cover
-                    ibis_expressions.append(expr_result)
-                    continue  # Skip to next expression if this worked
-            except Exception:  # pragma: no cover
-                pass  # Silently continue to Strategy 2
+            # Check if it's a valid Ibis expression
+            if isinstance(expr_result, ibis.expr.types.Value):
+                ibis_expressions.append(expr_result)
+                continue  # Skip to next expression if this worked
 
             # Strategy 2: Try with ColumnExpression
-            try:  # pragma: no cover
-                # Skip this strategy if we don't have an expr_col implementation
-                if not hasattr(self, "to_ibis_expr"):
-                    continue
-
-                col_expr = expr_fn(None)
-
-                # Skip if we got None
-                if col_expr is None:
-                    continue
+            try:
+                if hasattr(expr_result, "to_ibis_expr"):
+                    col_expr = expr_result
+                else:
+                    col_expr = expr_fn(None)
 
                 # Convert ColumnExpression to Ibis expression
                 if hasattr(col_expr, "to_ibis_expr"):
@@ -333,7 +328,7 @@ class ConjointlyValidation:
                 pass
 
         # Combine expressions
-        if ibis_expressions:  # pragma: no cover
+        if ibis_expressions:
             try:
                 final_result = ibis_expressions[0]
                 for expr in ibis_expressions[1:]:

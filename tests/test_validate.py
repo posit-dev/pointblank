@@ -5513,6 +5513,24 @@ def test_conjointly_duckdb_expr_col() -> None:
     assert validation.n_passed(i=1, scalar=True) == 13
 
 
+@pytest.mark.parametrize("tbl_type", ["duckdb", "memtable"])
+def test_conjointly_ibis_failing_rows(tbl_type) -> None:
+    if tbl_type == "memtable":
+        tbl = ibis.memtable(load_dataset(dataset="small_table", tbl_type="polars").to_pandas())
+    else:
+        tbl = load_dataset(dataset="small_table", tbl_type="duckdb")
+
+    # Only 3 of the 13 rows have `a > 3` and `d > 1000`
+    for exprs in [
+        (lambda df: df["a"] > 3, lambda df: df["d"] > 1000),
+        (lambda df: expr_col("a") > 3, lambda df: expr_col("d") > 1000),
+    ]:
+        validation = Validate(data=tbl).conjointly(*exprs).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 3
+        assert validation.n_failed(i=1, scalar=True) == 10
+
+
 def test_conjointly_error_no_expr() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
