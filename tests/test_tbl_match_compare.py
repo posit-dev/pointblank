@@ -462,3 +462,23 @@ def test_partitions_argument_errors():
     v = v.interrogate()
     assert _step(v).eval_error
     assert "supported for Polars, DuckDB, and Ibis" in v.get_notes(i=1, format="text")[0]
+
+
+@pytest.mark.parametrize(
+    "n_diff, threshold, expected",
+    [
+        (1, 1, True),  # an absolute threshold of 1 reacts to any difference (as before)
+        (1, 0.1, False),  # fractional thresholds now refer to the share of failing rows
+        (9, 0.1, False),
+        (10, 0.1, True),  # "at least 10% of rows"
+    ],
+)
+def test_threshold_semantics_documented_in_migration_note(n_diff, threshold, expected):
+    source = pl.DataFrame({"id": range(100), "v": 0})
+    target = source.with_columns(v=pl.when(pl.col("id") < n_diff).then(1).otherwise(0))
+    v = (
+        pb.Validate(target, thresholds=pb.Thresholds(warning=threshold))
+        .tbl_match(source, keys="id")
+        .interrogate()
+    )
+    assert _step(v).warning is expected
