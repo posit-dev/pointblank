@@ -1367,8 +1367,15 @@ def _collect(frame: Any) -> Any:
         return frame
     if frame.implementation == nw.Implementation.POLARS:
         # The streaming engine processes data in batches, keeping memory use bounded for large
-        # (e.g., scanned CSV/Parquet) inputs
-        return frame.collect(engine="streaming")
+        # (e.g., scanned CSV/Parquet) inputs. It occasionally panics (seen with Polars 1.33 on
+        # these queries, intermittently), so retry once and then fall back to the default engine.
+        for attempt in range(2):
+            try:
+                return frame.collect(engine="streaming")
+            except BaseException as e:  # Polars panics derive from BaseException
+                if not _is_polars_panic(e):
+                    raise
+        return frame.collect()
     from pointblank._utils import _is_lib_present
 
     if _is_lib_present("polars"):
@@ -1376,6 +1383,11 @@ def _collect(frame: Any) -> Any:
     if _is_lib_present("pandas"):  # pragma: no cover
         return frame.collect(backend="pandas")
     return frame.collect()  # pragma: no cover
+
+
+def _is_polars_panic(e: BaseException) -> bool:
+    """Is this an internal Polars panic (`pyo3_runtime.PanicException`)?"""
+    return type(e).__name__ == "PanicException" and type(e).__module__ == "pyo3_runtime"
 
 
 def _collect_row(frame: Any) -> dict[str, Any]:
