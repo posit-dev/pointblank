@@ -273,6 +273,45 @@ def compare(
     pb.compare(source, target, keys="id", tolerance={"amount": 1}).n_changed
     ```
     """
+    return _compare(
+        source=source,
+        target=target,
+        keys=keys,
+        columns=columns,
+        column_map=column_map,
+        tolerance=tolerance,
+        normalize=normalize,
+        null_equal=null_equal,
+        schema=schema,
+        dup_keys=dup_keys,
+        order_by=order_by,
+        partitions=partitions,
+        source_name=source_name,
+        target_name=target_name,
+    )
+
+
+def _compare(
+    source: Any,
+    target: Any,
+    keys: str | list[str] | None = None,
+    columns: str | list[str] | None = None,
+    column_map: dict[str, str] | None = None,
+    tolerance: Any = None,
+    normalize: dict[str, Any] | None = None,
+    null_equal: bool = True,
+    schema: Literal["strict", "common"] = "strict",
+    dup_keys: Literal["flag", "compare"] = "flag",
+    order_by: str | list[str] | None = None,
+    partitions: int | None = None,
+    source_name: str | None = None,
+    target_name: str | None = None,
+    null_keys_match: bool = False,
+) -> Comparison:
+    """
+    The implementation of `compare()`. `null_keys_match=True` makes rows with null keys match
+    each other (used by `Validate.tbl_reconcile()`, where a null key is a group like any other).
+    """
     from pointblank.validate import _process_data
 
     keys_list = _as_list(keys)
@@ -317,10 +356,129 @@ def compare(
         order_by=order_by_list,
         source_name=source_name or "source",
         target_name=target_name or "target",
+        null_keys_match=null_keys_match,
     )
     if partitions is not None and partitions > 1:
         return Comparison._build_partitioned(src, tgt, partitions=partitions, **settings)
     return Comparison._build(src=src, tgt=tgt, **settings)
+
+
+# Aggregations available to `Validate.tbl_reconcile()`, and the key used for whole-table totals
+RECONCILE_AGGS = ("sum", "count", "mean", "min", "max")
+_TOTAL_KEY = "_all_rows_"
+
+
+def _reconcile(
+    source: Any,
+    target: Any,
+    keys: str | list[str] | None,
+    measures: str | list[str] | None,
+    agg: str | dict[str, str],
+    tolerance: Any = None,
+    column_map: dict[str, str] | None = None,
+    partitions: int | None = None,
+    source_name: str = "source",
+    target_name: str = "target",
+) -> Comparison:
+    """
+    Reconcile two tables on aggregates: aggregate the measures of each table by the key columns
+    (or over the whole table, without keys), then compare the aggregates by key. Each key group is
+    one test unit. Used by `Validate.tbl_reconcile()`.
+
+    Aggregated columns are named `<measure>_<agg>` (and `n_rows` for a row count, which is what
+    `agg="count"` without `measures=` compares). Tolerances are given per measure (or table-wide)
+    and apply to that measure's aggregates.
+    """
+    from pointblank.validate import _process_data
+
+    keys_list = _as_list(keys) or []
+    measures_list = _as_list(measures) or []
+    column_map = dict(column_map or {})
+
+    # Which aggregations to compute for each measure
+    if isinstance(agg, dict):
+        unknown = set(agg) - set(measures_list)
+        if unknown:
+            raise ValueError(f"`agg=` refers to columns not in `measures=`: {sorted(unknown)}.")
+        plan = {m: _as_list(agg.get(m, "sum")) for m in measures_list}
+    else:
+        plan = {m: [agg] for m in measures_list}
+    for aggs in plan.values():
+        for a in aggs:
+            if a not in RECONCILE_AGGS:
+                raise ValueError(f"`agg=` must be one of {list(RECONCILE_AGGS)}, not {a!r}.")
+    count_rows = not measures_list
+    if count_rows and not (agg == "count" or agg == ["count"]):
+        raise ValueError(
+            "`measures=` is required unless `agg='count'` (which then compares row counts)."
+        )
+
+    if callable(source) and not hasattr(source, "columns"):
+        source = source()
+    if callable(target) and not hasattr(target, "columns"):
+        target = target()
+    src = nw.from_native(_process_data(source, lazy=True))
+    tgt = nw.from_native(_process_data(target, lazy=True))
+    src, tgt = _align_backends(src, tgt)
+
+    # Give the target's columns the source's names, so both aggregates share a schema
+    needed = keys_list + measures_list
+    tgt_names = tgt.collect_schema().names()
+    for name in needed:
+        if name not in src.collect_schema().names():
+            raise ValueError(f"Column {name!r} isn't in the comparison table (`tbl_compare=`).")
+        if column_map.get(name, name) not in tgt_names:
+            raise ValueError(
+                f"Column {column_map.get(name, name)!r} isn't in the target table. If it was "
+                "renamed, map it with `column_map=`."
+            )
+    tgt = tgt.select(*[nw.col(column_map.get(n, n)).alias(n) for n in needed])
+    src = src.select(*[nw.col(n) for n in needed])
+
+    src_schema = dict(src.collect_schema().items())
+    for m, aggs in plan.items():
+        if any(a in ("sum", "mean") for a in aggs) and not _is_numeric(src_schema[m]):
+            raise ValueError(f"Column {m!r} isn't numeric, so it can't be summed or averaged.")
+
+    def aggregate(frame: Any) -> Any:
+        exprs = []
+        for m, aggs in plan.items():
+            for a in aggs:
+                exprs.append(getattr(nw.col(m), a)().alias(f"{m}_{a}"))
+        if count_rows:
+            exprs.append(nw.len().alias("n_rows"))
+        if keys_list:
+            return frame.group_by(keys_list).agg(*exprs)
+        return frame.select(*exprs).with_columns(nw.lit("all").alias(_TOTAL_KEY))
+
+    # Tolerances are given per measure; apply them to each of the measure's aggregates
+    agg_tolerance = tolerance
+    if isinstance(tolerance, dict) and not (tolerance and set(tolerance) <= {"atol", "rtol"}):
+        agg_tolerance = {}
+        for col, tol in tolerance.items():
+            if col not in plan:
+                raise ValueError(f"Column {col!r} given in `tolerance=` isn't in `measures=`.")
+            for a in plan[col]:
+                if a != "count":
+                    agg_tolerance[f"{col}_{a}"] = tol
+
+    # Label the tables with what was aggregated (their "rows" are groups)
+    agg_names = sorted({a for aggs in plan.values() for a in aggs}) or ["count"]
+    grouping = "by " + ", ".join(keys_list) if keys_list else "totals"
+    description = f"{'/'.join(agg_names)} {grouping}"
+
+    # A null key is a group like any other, so null-key groups are matched with each other
+    return _compare(
+        aggregate(src).to_native(),
+        aggregate(tgt).to_native(),
+        keys=keys_list or [_TOTAL_KEY],
+        tolerance=agg_tolerance,
+        schema="common",
+        partitions=partitions if keys_list else None,
+        source_name=f"{source_name}, {description}",
+        target_name=f"{target_name}, {description}",
+        null_keys_match=True,
+    )
 
 
 class Comparison:
@@ -373,6 +531,7 @@ class Comparison:
         order_by: list[str] | None,
         source_name: str,
         target_name: str,
+        null_keys_match: bool = False,
     ) -> Comparison:
         self = object.__new__(cls)
         self.source_name = source_name
@@ -387,6 +546,7 @@ class Comparison:
         self._key_casts: dict[str, Any] = {}
         self._parts: list[Comparison] | None = None
         self.partitions = 1
+        self._null_keys_match = bool(null_keys_match) and bool(keys) and keys != ["*"]
         self.schema_mode = schema
         self.dup_keys_mode = dup_keys
         self.null_equal = null_equal
@@ -483,6 +643,25 @@ class Comparison:
             src, tgt, self._key_casts = _harmonize_key_dtypes(
                 src, tgt, join_keys, tgt_keys, src_schema, tgt_schema
             )
+        self._display_tgt_keys = list(tgt_keys)
+
+        if self._null_keys_match:
+            # Join on helper columns so that null keys match each other: an "is null" flag plus
+            # the key with nulls replaced by a same-typed placeholder (the flag keeps placeholders
+            # from colliding with real values). The key columns themselves keep their values.
+            helpers = []
+            for i, (k, tk) in enumerate(zip(join_keys, tgt_keys)):
+                dtype = self._key_casts.get(tk, src_schema[k])
+                filled, is_null = f"__pb_kf_{i}", f"__pb_kn_{i}"
+                src = src.with_columns(
+                    _null_filled(nw.col(k), dtype).alias(filled), nw.col(k).is_null().alias(is_null)
+                )
+                tgt = tgt.with_columns(
+                    _null_filled(nw.col(tk), dtype).alias(filled),
+                    nw.col(tk).is_null().alias(is_null),
+                )
+                helpers += [filled, is_null]
+            join_keys = tgt_keys = helpers
 
         self._join_keys = join_keys
         self._tgt_keys = tgt_keys
@@ -491,7 +670,7 @@ class Comparison:
 
         # Rows with null keys can't be matched; keep them out of the join
         n_null_src = n_null_tgt = 0
-        if self.mode == "keyed":
+        if self.mode == "keyed" and not self._null_keys_match:
             src_null = _any_null(join_keys)
             tgt_null = _any_null(tgt_keys)
             n_null_src, n_null_tgt = _count(src.filter(src_null)), _count(tgt.filter(tgt_null))
@@ -714,9 +893,12 @@ class Comparison:
             col = _ROW_IDX + _TGT_SUFFIX if from_target else _ROW_IDX
             return [(nw.col(col) + 1).alias(_ROW_NUM_COL)]
         out = []
-        for k, tk in zip(self._join_keys, self._tgt_keys):
+        for k, tk in zip(self.keys, self._display_tgt_keys):
             if from_target:
                 out.append(nw.col(tk + _TGT_SUFFIX).alias(k))
+            elif self._null_keys_match:
+                # (joined on helper columns, so the key's value comes from either side)
+                out.append(nw.coalesce(nw.col(k), nw.col(tk + _TGT_SUFFIX)).alias(k))
             else:
                 out.append(nw.col(k))
         return out
@@ -772,7 +954,7 @@ class Comparison:
             return frame
 
         # status == "extra"
-        tgt_key_names = set(self._tgt_keys)
+        tgt_key_names = set(self._display_tgt_keys)
         non_keys = [c for c in self._tgt_columns if c not in tgt_key_names]
         out = self._key_out_exprs(from_target=True) + [
             nw.col(c + _TGT_SUFFIX).alias(c) for c in non_keys
@@ -782,7 +964,7 @@ class Comparison:
             extra = _collect(
                 self._tgt.filter(_any_null(self._tgt_keys))
                 .select(
-                    *[nw.col(tk).alias(k) for k, tk in zip(self.keys, self._tgt_keys)],
+                    *[nw.col(tk).alias(k) for k, tk in zip(self.keys, self._display_tgt_keys)],
                     *[nw.col(c) for c in non_keys],
                 )
                 .head(limit - len(frame))
@@ -886,6 +1068,8 @@ class Comparison:
             "_tgt_columns",
             "_join_keys",
             "_tgt_keys",
+            "_display_tgt_keys",
+            "_null_keys_match",
             "_order_by",
         ):
             setattr(self, attr, getattr(first, attr))
@@ -956,7 +1140,7 @@ class Comparison:
         Compare the tables as multisets of rows: each distinct row (over the compared columns)
         matches as many times as it occurs in both tables; surplus copies are missing or extra.
         """
-        self._join_keys, self._tgt_keys = [], []
+        self._join_keys, self._tgt_keys, self._display_tgt_keys = [], [], []
         self._src, self._tgt = src, tgt
         self._src_main, self._tgt_main = src, tgt
         self._n_null_src = self._n_null_tgt = 0
@@ -1105,7 +1289,7 @@ class Comparison:
                 self._tgt.filter(_any_null(self._tgt_keys)).select(
                     *[
                         nw.col(tk).cast(schema[k]).alias(k)
-                        for k, tk in zip(self.keys, self._tgt_keys)
+                        for k, tk in zip(self.keys, self._display_tgt_keys)
                     ],
                     nw.lit("extra").alias(_STATUS_OUT_COL),
                     *[
@@ -1142,6 +1326,7 @@ class Comparison:
         tgt = self._tgt_input
         if (
             self.mode == "multiset"
+            or self._null_keys_match
             or not isinstance(tgt, nw.DataFrame)
             or not isinstance(self._joined, nw.DataFrame)
         ):
@@ -1568,6 +1753,17 @@ def _bucket_filter(frame: Any, keys: list[str], partitions: int, i: int) -> Any:
         "`partitions=` is supported for Polars, DuckDB, and Ibis tables (and CSV/Parquet file "
         f"paths), not {impl}."
     )
+
+
+def _null_filled(expr: Any, dtype: Any) -> Any:
+    """A key expression with nulls replaced by a fixed placeholder of a matching type."""
+    if _is_numeric(dtype):
+        return expr.fill_null(0)
+    if dtype == nw.String:
+        return expr.fill_null("")
+    if dtype == nw.Boolean:
+        return expr.fill_null(False)
+    return expr.cast(nw.String).fill_null("")
 
 
 def _harmonize_key_dtypes(
