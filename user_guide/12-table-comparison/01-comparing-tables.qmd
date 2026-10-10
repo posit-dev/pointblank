@@ -222,6 +222,12 @@ validation = (
 validation
 ```
 
+:::{.callout-note}
+In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit for the whole table. Steps
+still pass or fail in the same situations, but fractional thresholds now refer to the share of
+differing rows. To react to *any* difference, as before, use an absolute threshold of `1`.
+:::
+
 Three of the six aligned rows differ, exceeding both the 'warning' and 'error' thresholds. The step
 report holds the full comparison:
 
