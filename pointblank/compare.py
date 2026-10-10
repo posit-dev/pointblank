@@ -740,7 +740,7 @@ class Comparison:
                 nw.col(_N_SOURCE).cast(nw.Int64).alias("n_source"),
                 nw.col(_N_TARGET).cast(nw.Int64).alias("n_target"),
             )
-            return _collect(frame.head(limit))
+            return _collect(_first_rows(frame, self._join_keys, limit))
 
         if status == "changed":
             out = self._key_out_exprs()
@@ -748,15 +748,17 @@ class Comparison:
                 out.append(nw.col(spec.source).alias(f"{spec.source}_source"))
                 out.append(nw.col(spec.target + _TGT_SUFFIX).alias(f"{spec.source}_target"))
             out += [nw.col(_flag_name(i)) for i in range(len(self._specs))]
-            return _collect(filtered.select(*out).head(limit))
+            return _collect(_first_rows(filtered.select(*out), self._key_out_names(), limit))
 
         if status == "match":
-            return _collect(filtered.select(*self._key_out_exprs()).head(limit))
+            return _collect(
+                _first_rows(filtered.select(*self._key_out_exprs()), self._key_out_names(), limit)
+            )
 
         if status == "missing":
             non_keys = [c for c in self._src_columns if c not in self.keys]
             out = self._key_out_exprs() + [nw.col(c) for c in non_keys]
-            frame = _collect(filtered.select(*out).head(limit))
+            frame = _collect(_first_rows(filtered.select(*out), self._key_out_names(), limit))
             if self._n_null_src and len(frame) < limit:
                 extra = _collect(
                     self._src.filter(_any_null(self._join_keys))
@@ -772,7 +774,7 @@ class Comparison:
         out = self._key_out_exprs(from_target=True) + [
             nw.col(c + _TGT_SUFFIX).alias(c) for c in non_keys
         ]
-        frame = _collect(filtered.select(*out).head(limit))
+        frame = _collect(_first_rows(filtered.select(*out), self._key_out_names(), limit))
         if self._n_null_tgt and len(frame) < limit:
             extra = _collect(
                 self._tgt.filter(_any_null(self._tgt_keys))
@@ -801,7 +803,10 @@ class Comparison:
             return pairs
         if self._dup_frame is None:
             return None
-        sample_keys = _collect(self._dup_frame.select(self._join_keys).head(limit))
+        # (the same keys, in the same order, as the duplicate-key sample from `_fetch()`)
+        sample_keys = _collect(
+            _first_rows(self._dup_frame.select(self._join_keys), self._join_keys, limit)
+        )
         # Joining an eager sample back onto a lazy table isn't possible on every backend, so
         # filter with `is_in` per key column instead (bounded by `limit` key values). This can
         # over-select for composite keys; the inner join below restores exact key matching.
@@ -1019,7 +1024,7 @@ class Comparison:
             for i, name in enumerate(names)
         ]
         out += [n_s.alias("n_source"), n_t.alias("n_target")]
-        return _collect(self._joined.filter(cond).select(*out).head(limit))
+        return _collect(_first_rows(self._joined.filter(cond).select(*out), names, limit))
 
     # ------------------------------------------------------------------------------------------
     # Support for `Validate.tbl_match()`: data extracts and sundering
@@ -1059,13 +1064,15 @@ class Comparison:
             pair_exprs.append(nw.col(spec.target + _TGT_SUFFIX).alias(f"{spec.source}_target"))
 
         main = _collect(
-            self._joined.filter(nw.col(_STATUS) != nw.lit("match"))
-            .select(
-                *self._key_out_exprs(),
-                nw.col(_STATUS).alias(_STATUS_OUT_COL),
-                *pair_exprs,
+            _first_rows(
+                self._joined.filter(nw.col(_STATUS) != nw.lit("match")).select(
+                    *self._key_out_exprs(),
+                    nw.col(_STATUS).alias(_STATUS_OUT_COL),
+                    *pair_exprs,
+                ),
+                self._key_out_names(),
+                limit,
             )
-            .head(limit)
         )
         columns = main.columns
         schema = dict(main.schema.items())
@@ -1262,7 +1269,13 @@ class Comparison:
         """Get the comparison results as a JSON string (see `to_dict()`)."""
         return json.dumps(self.to_dict(samples=samples, limit=limit), indent=indent)
 
-    def get_tabular_report(self, limit: int = 10, title: str | None = None) -> GT:
+    def get_tabular_report(
+        self,
+        limit: int = 10,
+        title: str | None = None,
+        lang: str | None = None,
+        locale: str | None = None,
+    ) -> GT:
         """
         Get a tabular report of the comparison.
 
@@ -1277,6 +1290,13 @@ class Comparison:
             The maximum number of sample rows shown per row status.
         title
             An optional title replacing the default.
+        lang
+            The language of the report's labels, as a two-letter language code (e.g., `"fr"`,
+            `"de"`) or one of the other Pointblank reporting languages. English by default.
+            Values from the tables (keys, column names, and data) are shown as they are.
+        locale
+            The locale used to format counts and percentages (e.g., the thousands separator).
+            By default, it's the same as `lang=`.
 
         Returns
         -------
@@ -1284,8 +1304,10 @@ class Comparison:
             A Great Tables object.
         """
         from pointblank._compare_report import _comparison_report
+        from pointblank.validate import _normalize_reporting_language
 
-        return _comparison_report(self, limit=limit, title=title)
+        lang = _normalize_reporting_language(lang=lang)
+        return _comparison_report(self, limit=limit, title=title, lang=lang, locale=locale)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -1319,6 +1341,17 @@ def _is_temporal(dtype: Any) -> bool:
 
 def _any_null(cols: list[str]) -> Any:
     return nw.any_horizontal(*[nw.col(c).is_null() for c in cols], ignore_nulls=False)
+
+
+def _first_rows(frame: Any, by: list[str], limit: int) -> Any:
+    """
+    The first `limit` rows ordered by the `by` columns (nulls last), so that samples are the
+    same from run to run (join and group-by output order isn't guaranteed). Engines execute a
+    sort followed by a limit as an efficient top-k.
+    """
+    if by:
+        frame = frame.sort(by, nulls_last=True)
+    return frame.head(limit)
 
 
 def _collect(frame: Any) -> Any:
