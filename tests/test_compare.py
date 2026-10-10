@@ -699,3 +699,28 @@ def test_path_objects_name_the_tables(tmp_path):
     pl.DataFrame({"id": [1]}).write_csv(path)
     cmp = compare(path, path, keys="id")
     assert cmp.source_name == cmp.target_name == str(path)
+
+
+def test_normalizers_skip_columns_of_other_types():
+    # String operations leave non-string columns alone (and `round` non-numeric ones), e.g. a
+    # date column that's parsed as a date rather than read as text
+    s = pl.DataFrame(
+        {
+            "id": [1, 2],
+            "day": [datetime.date(2024, 1, 1)] * 2,
+            "name": [" a", "B"],
+            "x": [1.234, 2.0],
+        }
+    )
+    t = s.with_columns(name=pl.Series(["A", "b "]), x=pl.Series([1.23, 2.0]))
+    cmp = compare(
+        s,
+        t,
+        keys="id",
+        normalize={
+            "day": ["strip", "lower"],
+            "name": ["strip", "lower", {"round": 2}],
+            "x": ["lower", {"round": 2}],
+        },
+    )
+    assert cmp.identical
