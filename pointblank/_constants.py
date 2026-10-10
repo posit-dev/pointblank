@@ -61,6 +61,7 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "col_count_match": "col_count_match",
     "data_freshness": "data_freshness",
     "tbl_match": "tbl_match",
+    "tbl_reconcile": "tbl_reconcile",
     "conjointly": "conjointly",
     "specially": "specially",
     "col_sum_eq": "sum_eq",
@@ -96,6 +97,7 @@ ASSERTION_TYPE_TO_DIMENSION: dict[str, str] = {
     "conjointly": "consistency",
     "col_vals_in_table": "consistency",
     "tbl_match": "consistency",
+    "tbl_reconcile": "consistency",
     # Validity: values conform to expected rules, ranges, formats, or schema
     "col_vals_gt": "validity",
     "col_vals_lt": "validity",
@@ -1042,6 +1044,9 @@ SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
     </g>
 </svg>""",
 }
+
+# `tbl_reconcile()` shares the `tbl_match()` icon
+SVG_ICONS_FOR_ASSERTION_TYPES["tbl_reconcile"] = SVG_ICONS_FOR_ASSERTION_TYPES["tbl_match"]
 
 
 SVG_ICONS_FOR_TBL_STATUS = {
