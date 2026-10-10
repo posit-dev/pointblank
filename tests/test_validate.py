@@ -11803,6 +11803,34 @@ def test_preview_large_head_tail_pl_table() -> None:
     preview(small_table, n_head=10, n_tail=10)
 
 
+def test_preview_pl_lazyframe() -> None:
+    small_table = load_dataset(dataset="small_table", tbl_type="polars")
+
+    # A LazyFrame shows the same rows as the DataFrame it was made from
+    for n_head, n_tail in [(5, 5), (2, 2), (10, 10)]:
+        assert (
+            preview(small_table.lazy(), n_head=n_head, n_tail=n_tail).as_raw_html()
+            == preview(small_table, n_head=n_head, n_tail=n_tail).as_raw_html()
+        )
+
+
+def test_get_step_report_pl_lazyframe() -> None:
+    small_table = load_dataset(dataset="small_table", tbl_type="polars")
+
+    def step_reports(tbl):
+        validation = (
+            Validate(tbl)
+            .col_vals_gt(columns="a", value=3)
+            .rows_distinct()
+            .col_count_match(count=8)
+            .interrogate()
+        )
+        reports = [validation.get_step_report(i=i) for i in range(1, 4)]
+        return [report if report is None else report.as_raw_html() for report in reports]
+
+    assert step_reports(small_table.lazy()) == step_reports(small_table)
+
+
 def test_preview_large_head_tail_duckdb_table() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
     preview(small_table, n_head=10, n_tail=10)
