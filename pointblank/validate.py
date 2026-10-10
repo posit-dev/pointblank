@@ -2372,9 +2372,13 @@ def _generate_display_table(
     if "pyspark" not in tbl_type:
         data = copy.deepcopy(data)
 
-    # Does the data table already have a leading row number column?
-    if "_row_num_" in data.columns:
-        if data.columns[0] == "_row_num_":
+    # Does the data table already have a leading row number column? (Column names of lazy tables
+    # are read from the schema, which avoids resolving the full query)
+    data_columns = (
+        data.collect_schema().names() if hasattr(data, "collect_schema") else list(data.columns)
+    )
+    if "_row_num_" in data_columns:
+        if data_columns[0] == "_row_num_":
             has_leading_row_num_col = True
         else:
             has_leading_row_num_col = False
@@ -2423,7 +2427,7 @@ def _generate_display_table(
         # Note: PySpark import is handled as needed, typically already imported in user's environment
 
     # Get the initial column count for the table
-    n_columns = len(data.columns)
+    n_columns = len(data_columns)
 
     # If `columns_subset=` is not None, resolve the columns to display
     if columns_subset is not None:
@@ -2497,7 +2501,26 @@ def _generate_display_table(
         # Get the Schema of the table
         tbl_schema = Schema(tbl=data)
 
-        if tbl_type == "polars":
+        if tbl_type == "polars" and isinstance(data, pl.LazyFrame):
+            # For a LazyFrame, count the rows lazily and collect only the rows to display
+            n_rows = int(data.select(pl.len()).collect().item())
+
+            if n_head + n_tail >= n_rows:
+                full_dataset = True
+                data = data.collect()
+
+                if row_number_list is None:
+                    row_number_list = list(range(1, n_rows + 1))
+
+            else:
+                data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)]).collect()
+
+                if row_number_list is None:
+                    row_number_list = list(range(1, n_head + 1)) + list(
+                        range(n_rows - n_tail + 1, n_rows + 1)
+                    )
+
+        elif tbl_type == "polars":
             # Note: polars DataFrames have height, head(), tail() attributes
             n_rows = int(data.height)
 
