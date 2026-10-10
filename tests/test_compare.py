@@ -724,3 +724,50 @@ def test_normalizers_skip_columns_of_other_types():
         },
     )
     assert cmp.identical
+
+
+def _fake_polars_panic():
+    # Polars panics surface as `pyo3_runtime.PanicException`, a `BaseException` subclass
+    return type("PanicException", (BaseException,), {"__module__": "pyo3_runtime"})
+
+
+@pytest.mark.parametrize(
+    "n_panics, expected_engines",
+    [
+        (1, ["streaming", "streaming"]),  # retried once with the streaming engine
+        (2, ["streaming", "streaming", None]),  # then falls back to the default engine
+    ],
+)
+def test_collect_recovers_from_polars_streaming_panics(monkeypatch, n_panics, expected_engines):
+    import narwhals.dataframe as nw_dataframe
+
+    from pointblank.compare import _collect
+
+    panic = _fake_polars_panic()
+    original = nw_dataframe.LazyFrame.collect
+    engines = []
+
+    def flaky_collect(self, backend=None, **kwargs):
+        engines.append(kwargs.get("engine"))
+        if kwargs.get("engine") == "streaming" and len(engines) <= n_panics:
+            raise panic("invalid SlotMap key used")
+        return original(self, backend, **kwargs)
+
+    monkeypatch.setattr(nw_dataframe.LazyFrame, "collect", flaky_collect)
+    result = _collect(nw.from_native(pl.LazyFrame({"a": [1, 2]})))
+
+    assert result["a"].to_list() == [1, 2]
+    assert engines == expected_engines
+
+
+def test_collect_does_not_swallow_other_errors(monkeypatch):
+    import narwhals.dataframe as nw_dataframe
+
+    from pointblank.compare import _collect
+
+    def failing_collect(self, backend=None, **kwargs):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(nw_dataframe.LazyFrame, "collect", failing_collect)
+    with pytest.raises(KeyboardInterrupt):
+        _collect(nw.from_native(pl.LazyFrame({"a": [1]})))
