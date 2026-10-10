@@ -14974,8 +14974,9 @@ compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, col
     `partitions=` to compare the tables in several smaller passes. For the lowest memory use with
     very large files, read them as DuckDB relations (e.g., `duckdb.connect().read_csv(path)`) and
     use `partitions=`: in a benchmark with two 10-million-row CSV files (730 MB each), peak memory
-    was about 0.8 GB with DuckDB and `partitions=8`, versus about 5.5 GB to read both files with
-    Polars and join them.
+    was about 0.8 GB with DuckDB and `partitions=8`, versus about 5.7 GB to read both files with
+    Polars and join them. With 100-million-row files (7.4 GB each), DuckDB with `partitions=8`
+    peaked at about 2 GB.
 
     Examples
     --------
