@@ -15031,6 +15031,16 @@ class Validate:
         `warning` when more than 1% of rows differ). To fail on any difference, use an absolute
         threshold of `1`.
 
+        :::{.callout-important}
+        In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit that failed if the
+        tables differed in any way. Whether a step passes or fails is unchanged, but the counts
+        (`n`, `n_passed`, `n_failed`, and the fractions) now reflect rows. This changes the meaning
+        of fractional thresholds: `thresholds=0.1` used to be exceeded by any difference, and is
+        now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of
+        reacting to any difference, use an absolute threshold of `1` (e.g., `thresholds=1` or
+        `Thresholds(warning=1)`).
+        :::
+
         The data extract for the step (from
         [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing rows
         of *both* tables: the key column(s), a `_status_` column (`"changed"`, `"missing"`,
