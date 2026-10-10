@@ -652,6 +652,22 @@ class Validate:
         active: bool | Callable = True,
         dimension: str | None = None,
     ) -> Validate: ...
+    def tbl_reconcile(
+        self,
+        tbl_compare: Any,
+        keys: str | list[str] | None = None,
+        measures: str | list[str] | None = None,
+        agg: str | dict[str, str | list[str]] = "sum",
+        tolerance: Any = None,
+        column_map: dict[str, str] | None = None,
+        partitions: int | None = None,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
     def conjointly(
         self,
         *exprs: Callable,
