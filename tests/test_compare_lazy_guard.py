@@ -178,3 +178,25 @@ def test_guard_detects_a_full_collection(tmp_path, collected):
     collected.clear()
     source.collect()
     assert max(collected) >= N
+
+
+# (`Validate` doesn't accept native DuckDB relations as its data, so they aren't included here)
+@pytest.mark.parametrize("kind", ["polars_lazy", "csv", "ibis_duckdb"])
+def test_tbl_reconcile_never_collects_full_tables(kind, tmp_path, collected):
+    con_holder: list = []
+    source, target = _lazy_inputs(kind, tmp_path, con_holder)
+    collected.clear()
+
+    # Group by a high-cardinality key so that the aggregated tables are large too
+    validation = (
+        pb.Validate(data=target)
+        .tbl_reconcile(tbl_compare=source, keys="id", measures="amount", agg="sum")
+        .tbl_reconcile(tbl_compare=source, measures="amount", agg="sum")
+        .interrogate(extract_limit=MAX_ROWS)
+    )
+    validation.get_step_report(i=1, limit=10).as_raw_html()
+    validation.get_data_extracts(i=1, frame=True)
+    json.loads(validation.get_json_report())
+
+    assert validation.validation_info[0].n > N
+    assert max(collected) <= MAX_ROWS, sorted(collected)[-5:]
