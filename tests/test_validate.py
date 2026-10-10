@@ -14092,6 +14092,28 @@ def test_get_step_report_no_fail(tbl_type) -> None:
     )
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_get_step_report_without_extracts(tbl_type) -> None:
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Extracts are not collected with `collect_extracts=False`, nor for Ibis tables
+    validation = (
+        Validate(small_table)
+        .col_vals_gt(columns="a", value=0)
+        .col_vals_gt(columns="a", value=3)
+        .rows_distinct()
+        .interrogate(collect_extracts=False)
+    )
+
+    # A step where all rows pass doesn't need the extract
+    assert isinstance(validation.get_step_report(i=1), GT.GT)
+
+    # Failing steps say that the failing rows were not collected
+    for i in [2, 3]:
+        with pytest.raises(ValueError, match="were not collected"):
+            validation.get_step_report(i=i)
+
+
 def test_get_step_report_failing_inputs() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
