@@ -147,23 +147,38 @@ comparison = pb.compare(
 ```
 
 Here's how the options compare on two CSV files with 10 million rows and 10 columns each (about
-730 MB per file), with the rows of the target shuffled:
+730 MB per file), with the rows of the target shuffled. Peak memory is the memory the process
+actually owns (its physical footprint):
 
 | Approach | Wall time | Peak memory |
 |---|---|---|
-| Polars: read both files, then a full join (for reference) | 2.5 s | 5.5 GB |
-| `compare()` on file paths (Polars) | 4.9 s | 4.8 GB |
-| `compare()` on file paths (Polars), `partitions=8` | 9.6 s | 2.6 GB |
-| `compare()` on DuckDB relations | 6.4 s | 2.0 GB |
-| `compare()` on DuckDB relations, `partitions=8` | 17.9 s | 0.8 GB |
+| Polars: read both files, then a full join (for reference) | 2.1 s | 5.7 GB |
+| `compare()` on file paths (Polars) | 5.7 s | 4.2 GB |
+| `compare()` on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
+| `compare()` on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
+| `compare()` on DuckDB relations | 6.8 s | 1.6 GB |
+| `compare()` on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
 
-Every approach found the same differences. The numbers will vary with your machine and data, but
-the pattern is consistent: partitions trade time (each pass reads the files again) for memory, and
-DuckDB is the more memory-efficient engine. Some practical guidance:
+And with 100 million rows (about 7.4 GB per file), where comparing without partitions needs more
+memory than most machines have:
+
+| Approach | Wall time | Peak memory |
+|---|---|---|
+| `compare()` on file paths (Polars), `partitions=8` | 139 s | 6.6 GB |
+| `compare()` on file paths (Polars), `partitions=16` | 217 s | 4.4 GB |
+| `compare()` on DuckDB relations, `partitions=8` | 166 s | 2.0 GB |
+
+Every approach found exactly the expected differences. The numbers will vary with your machine and
+data, but the pattern is consistent: partitions trade time (each pass reads the files again) for
+memory, Polars is the faster engine, and DuckDB the more memory-efficient one. Some practical
+guidance:
 
 - If the files fit comfortably in memory, use the defaults.
-- If memory is tight, use DuckDB relations and increase `partitions=` until the peak memory is
-  acceptable.
+- If memory is tight, increase `partitions=` until the peak memory is acceptable; for the lowest
+  memory use, read the files as DuckDB relations.
+- Setting DuckDB's own `memory_limit` (so it can spill to disk) without partitions doesn't hold
+  memory to the limit: with a 4 GB limit, the 100-million-row comparison peaked at 6.3 GB.
+  Partitions give more predictable memory use.
 - A good key matters most: with `keys=`, row order doesn't matter, and partitioning is possible.
   Without a key, rows are compared by position (or as multisets, with `keys="*"`), and partitions
   can't be used.
