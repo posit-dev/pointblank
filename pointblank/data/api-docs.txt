@@ -9426,7 +9426,8 @@ tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, colum
         normalize
             Per-column transformations applied to both tables before comparing, as a dict mapping a
             column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
-            `"collapse_whitespace"`, or `{"round": n}`.
+            `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+            columns and `round` only to numeric ones.
         null_equal
             Should two null values count as equal? By default, they do. NaN values in floating-point
             columns are treated as null.
@@ -14917,7 +14918,9 @@ compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, col
     normalize
         Per-column transformations applied to both sides before comparing, as a dict mapping a
         column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
-        `"collapse_whitespace"`, or `{"round": n}`. Reported values are always the original ones.
+        `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+        columns and `round` only to numeric ones (other columns are left as they are). Reported
+        values are always the original ones.
     null_equal
         Should a null in the source and a null in the target count as equal? By default, they do.
         NaN values in floating-point columns are treated as null.
