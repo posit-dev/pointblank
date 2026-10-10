@@ -21576,6 +21576,7 @@ class Validate:
                     header=header,
                     limit=limit if limit is not None else 10,
                     lang=lang,
+                    locale=locale,
                 )
         elif is_valid_agg(assertion_type):
             step_report = _step_report_aggregate(
@@ -22245,12 +22246,12 @@ def _normalize_reporting_language(lang: str | None) -> str:
     if lang is None:
         return "en"
 
-    if lang.lower() not in REPORTING_LANGUAGES:
-        raise ValueError(
-            f"The text '{lang}' doesn't correspond to a Pointblank reporting language."
-        )
+    # Match case-insensitively, returning the canonical code (e.g., "zh-hans" -> "zh-Hans")
+    for code in REPORTING_LANGUAGES:
+        if code.lower() == lang.lower():
+            return code
 
-    return lang.lower()
+    raise ValueError(f"The text '{lang}' doesn't correspond to a Pointblank reporting language.")
 
 
 def _is_string_date(value: str) -> bool:
@@ -26639,6 +26640,7 @@ def _step_report_tbl_match(
     header: str | None,
     limit: int,
     lang: str,
+    locale: str | None = None,
 ) -> GT:
     """
     Step report for `tbl_match()`: the comparison report (row statuses, schema differences,
@@ -26646,7 +26648,7 @@ def _step_report_tbl_match(
     """
     from pointblank._compare_report import _comparison_report, _header_html
 
-    step_report = _comparison_report(comparison, limit=limit)
+    step_report = _comparison_report(comparison, limit=limit, lang=lang, locale=locale)
 
     # If no header requested, return the comparison report with its own header
     if header is None:
@@ -26676,7 +26678,7 @@ def _step_report_tbl_match(
         "<code style='color: #303030; background-color: transparent; "
         f"position: relative; bottom: 1px;'>{assertion_text}</code></span>"
         "</div>"
-        f"<div style='padding-top: 7px;'>{_header_html(comparison)}</div>"
+        f"<div style='padding-top: 7px;'>{_header_html(comparison, lang=lang, locale=locale)}</div>"
         "</div>"
     )
 
