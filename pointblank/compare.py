@@ -180,7 +180,9 @@ def compare(
     normalize
         Per-column transformations applied to both sides before comparing, as a dict mapping a
         column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
-        `"collapse_whitespace"`, or `{"round": n}`. Reported values are always the original ones.
+        `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+        columns and `round` only to numeric ones (other columns are left as they are). Reported
+        values are always the original ones.
     null_equal
         Should a null in the source and a null in the target count as equal? By default, they do.
         NaN values in floating-point columns are treated as null.
@@ -943,7 +945,8 @@ class Comparison:
             ):
                 # e.g., 1 (integer) and 1.0 (float) should be the same value
                 expr = expr.cast(nw.Float64)
-            expr = _normalized(expr, spec.normalize)
+                dtype = nw.Float64
+            expr = _normalized(expr, spec.normalize, dtype)
             exprs.append(expr.cast(nw.String).fill_null(_NULL_SENTINEL).alias(f"__pb_m_{i}"))
         return frame.select(*exprs)
 
@@ -1623,8 +1626,22 @@ def _join_frames(
     return joined
 
 
-def _normalized(expr: Any, ops: tuple[tuple[str, Any], ...]) -> Any:
+_STRING_NORMALIZERS = ("strip", "lower", "upper", "collapse_whitespace")
+
+
+def _normalized(expr: Any, ops: tuple[tuple[str, Any], ...], dtype: Any) -> Any:
+    """
+    Apply normalization operations to a column expression of the given dtype. String operations
+    only apply to string columns and `round` only to numeric ones (others are left as they are,
+    e.g. a date column that's parsed as a date from one file and read as text from another).
+    """
+    is_string = dtype == nw.String
+    is_numeric = _is_numeric(dtype)
     for op, arg in ops:
+        if op in _STRING_NORMALIZERS and not is_string:
+            continue
+        if op == "round" and not is_numeric:
+            continue
         if op == "strip":
             expr = expr.str.strip_chars()
         elif op == "lower":
@@ -1658,8 +1675,10 @@ def _differs_expr(spec: _ColumnSpec, null_equal: bool) -> Any:
         b = b.cast(nw.String)
         s_num = t_num = s_tmp = t_tmp = False
 
-    a = _normalized(a, spec.normalize)
-    b = _normalized(b, spec.normalize)
+    a_dtype = spec.source_dtype if comparable else nw.String
+    b_dtype = spec.target_dtype if comparable else nw.String
+    a = _normalized(a, spec.normalize, a_dtype)
+    b = _normalized(b, spec.normalize, b_dtype)
 
     equal = (a == b).fill_null(False)
     if spec.atol is not None or spec.rtol is not None:
