@@ -1042,6 +1042,7 @@ _KNOWN_PLAN_METHODS = frozenset(
         "rows_complete",
         "data_freshness",
         "tbl_match",
+        "tbl_reconcile",
         "conjointly",
         "specially",
         "interrogate",
