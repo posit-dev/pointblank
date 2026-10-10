@@ -134,6 +134,7 @@ def _get_api_text() -> str:
         "Validate.row_count_match",
         "Validate.col_count_match",
         "Validate.tbl_match",
+        "Validate.tbl_reconcile",
         "Validate.conjointly",
         "Validate.specially",
         "Validate.prompt",
@@ -271,7 +272,8 @@ target, extra in the target, or having a duplicated key. It also reports schema 
 and datetime tolerances, string normalization, and column renames are supported, and large files
 can be compared lazily (with `partitions=` to bound memory). The result is a `Comparison` object
 with counts, samples of differing rows, and a tabular report. The same comparison is available as a
-validation step with `Validate.tbl_match()`."""
+validation step with `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates
+(e.g., sums or counts per group of key columns) instead of rows."""
 
     yaml_desc = """The *YAML* group contains functions that allow for the use of YAML to orchestrate
 validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
