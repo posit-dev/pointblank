@@ -14953,7 +14953,8 @@ class Validate:
         normalize
             Per-column transformations applied to both tables before comparing, as a dict mapping a
             column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
-            `"collapse_whitespace"`, or `{"round": n}`.
+            `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+            columns and `round` only to numeric ones.
         null_equal
             Should two null values count as equal? By default, they do. NaN values in floating-point
             columns are treated as null.
