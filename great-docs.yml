@@ -243,6 +243,7 @@ reference:
         - Validate.col_count_match
         - Validate.data_freshness
         - Validate.tbl_match
+        - Validate.tbl_reconcile
         - Validate.conjointly
         - Validate.specially
         - Validate.prompt
@@ -347,7 +348,8 @@ reference:
         (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus
         schema differences. The result is a `Comparison` object with counts, row samples, and a
         tabular report. The same comparison is available as a validation step through
-        `Validate.tbl_match()`.
+        `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals
+        per group) instead of rows.
       contents:
         - compare
         - Comparison
