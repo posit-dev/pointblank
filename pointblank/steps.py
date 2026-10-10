@@ -84,6 +84,7 @@ class Steps:
             # `tbl_match()` comparison settings
             "null_equal": True,
             "dup_keys": "flag",
+            "agg": "sum",
         }
         if value is None:
             return True
@@ -998,6 +999,39 @@ class Steps:
             schema=schema,
             dup_keys=dup_keys,
             order_by=order_by,
+            partitions=partitions,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+    def tbl_reconcile(
+        self,
+        tbl_compare: Any,
+        keys: str | list[str] | None = None,
+        measures: str | list[str] | None = None,
+        agg: str | dict[str, Any] = "sum",
+        tolerance: Any = None,
+        column_map: dict[str, str] | None = None,
+        partitions: int | None = None,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Steps:
+        return self._add(
+            "tbl_reconcile",
+            tbl_compare=tbl_compare,
+            keys=keys,
+            measures=measures,
+            agg=agg,
+            tolerance=tolerance,
+            column_map=column_map,
             partitions=partitions,
             pre=pre,
             thresholds=thresholds,
