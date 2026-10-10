@@ -22363,3 +22363,37 @@ def test_data_freshness_multiple_columns_same_validation() -> None:
     assert validation.n_passed(i=1, scalar=True) == 1  # 48h < 3 days
     assert validation.n_passed(i=2, scalar=True) == 1  # 2h < 24h
     assert validation.n_passed(i=3, scalar=True) == 1  # 30m < 1h
+
+
+def _preview_text(gt_tbl) -> str:
+    import html as html_lib
+
+    text = re.sub(r"<[^>]+>", " ", gt_tbl.as_raw_html())
+    # Drop the randomly-generated table id so that two renders can be compared
+    text = re.sub(r"#[a-z]{10}", "", text)
+    return html_lib.unescape(re.sub(r"\s+", " ", text))
+
+
+@pytest.mark.parametrize("n_rows", [6, 20])
+@pytest.mark.parametrize("columns_subset", [None, "a"])
+def test_preview_polars_lazyframe_matches_eager(n_rows, columns_subset):
+    df = pl.DataFrame({"a": list(range(1, n_rows + 1)), "b": [f"x{i}" for i in range(n_rows)]})
+
+    lazy_text = _preview_text(preview(df.lazy(), columns_subset=columns_subset))
+    eager_text = _preview_text(preview(df, columns_subset=columns_subset))
+
+    assert lazy_text == eager_text
+    assert f"Rows {n_rows}" in lazy_text
+
+
+def test_step_reports_with_polars_lazyframe_data():
+    lf = pl.LazyFrame({"a": list(range(1, 21)), "b": [f"x{i}" for i in range(20)]})
+    validation = (
+        Validate(data=lf)
+        .col_vals_gt(columns="a", value=3)
+        .rows_distinct()
+        .col_vals_not_null(columns="b")
+        .interrogate()
+    )
+    for i in (1, 2, 3):
+        assert "Report for Validation Step" in validation.get_step_report(i=i).as_raw_html()
