@@ -255,6 +255,42 @@ steps:
         amount: 0.01
 ```
 
+## Reconciling Aggregates
+
+Sometimes two tables shouldn't have the same rows but should add up to the same numbers: a
+warehouse table loaded from a source system, a summary table built from detailed transactions, or
+two systems that record the same activity at different levels of detail. For these, the
+`tbl_reconcile()` validation method compares *aggregates* instead of rows. It groups both tables by
+the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by default, or `"count"`,
+`"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is a test unit.
+
+Here, the orders in the target have been loaded at a finer grain than in the source, so we
+reconcile the total amount per customer:
+
+```{python}
+order_lines = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1002, 1004, 1005, 1006],
+        "customer": ["Ana", "Ben", "Ben", "Dev", "Eli", "Fay"],
+        "amount": [25.00, 40.50, 5.00, 99.99, 5.00, 18.25],
+    }
+)
+
+validation = (
+    pb.Validate(data=order_lines, tbl_name="order_lines")
+    .tbl_reconcile(tbl_compare=source, keys="customer", measures="amount")
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+`Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is
+new. Without `keys=`, `tbl_reconcile()` compares grand totals (a single test unit), and
+`agg="count"` without `measures=` compares the number of rows in each group. Tolerances,
+`column_map=`, and `partitions=` work as they do in `tbl_match()`. Rows with a null key form a group
+of their own, which is matched with the other table's null-key group.
+
 ## Exporting the Results
 
 The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema
