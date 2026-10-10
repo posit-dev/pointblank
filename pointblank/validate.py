@@ -4647,7 +4647,7 @@ def _validation_info_to_step(
                 params["columns_subset"] = list(vi.column)
             elif name is not None:  # pragma: no cover
                 params["columns_subset"] = name  # pragma: no cover
-    elif at == "tbl_match":
+    elif at in ("tbl_match", "tbl_reconcile"):
         values = vi.values or {}
         tbl_compare = values.get("tbl_compare")
         if isinstance(tbl_compare, str):
@@ -4657,12 +4657,14 @@ def _validation_info_to_step(
             params["tbl_compare"] = _placeholder(
                 code="your_comparison_table",
                 note=(
-                    "Step 'tbl_match' compares against a table object that cannot be serialized; "
+                    f"Step '{at}' compares against a table object that cannot be serialized; "
                     "a placeholder was emitted and must be edited manually."
                 ),
             )
         for name in (
             "keys",
+            "measures",
+            "agg",
             "columns",
             "column_map",
             "tolerance",
@@ -15241,6 +15243,300 @@ class Validate:
 
         return self
 
+    def tbl_reconcile(
+        self,
+        tbl_compare: Any,
+        keys: str | list[str] | None = None,
+        measures: str | list[str] | None = None,
+        agg: str | dict[str, str | list[str]] = "sum",
+        tolerance: Any = None,
+        column_map: dict[str, str] | None = None,
+        partitions: int | None = None,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate that aggregates of the target table reconcile with a comparison table.
+
+        The `tbl_reconcile()` method checks that the target table agrees with a comparison table
+        (the *source*, or expected data) on aggregate values: totals, counts, averages, minimums,
+        or maximums of *measure* columns, computed per group of *key* columns (or over the whole
+        table). It's the check to reach for when the two tables don't have the same rows but must
+        add up to the same numbers, for example a warehouse fact table against the source system it
+        was loaded from, or a monthly summary against the detailed transactions.
+
+        Each key group is a test unit: it passes if the group is in both tables and all of its
+        aggregates are equal (within the tolerance), and fails if an aggregate differs, if the
+        group is missing from the target, or if it's an extra group in the target. To compare the
+        rows themselves rather than aggregates, use
+        [`tbl_match()`](`pointblank.Validate.tbl_match`).
+
+        Parameters
+        ----------
+        tbl_compare
+            The comparison table (the expected data) to reconcile against. This can be a DataFrame
+            object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a
+            callable that returns a table.
+        keys
+            The column(s) to group by. Aggregates are compared group by group. If `None` (the
+            default), the aggregates are computed over the whole table and compared as a single
+            group (a grand total).
+        measures
+            The column(s) to aggregate. Required unless `agg="count"`, which (without `measures=`)
+            compares the number of rows in each group.
+        agg
+            The aggregation(s): `"sum"` (the default), `"count"` (the number of non-null values),
+            `"mean"`, `"min"`, or `"max"`. Use a dict to aggregate measures differently, mapping a
+            measure to an aggregation or a list of aggregations (e.g.,
+            `{"amount": ["sum", "max"], "qty": "sum"}`).
+        tolerance
+            Tolerance for comparing the aggregates. A number is an absolute tolerance for all
+            aggregates. A dict with `"atol"` and/or `"rtol"` keys applies to all aggregates, where
+            values are equal if `|expected - actual| <= atol + rtol * |expected|`. A dict mapping
+            measures to either of the above sets per-measure tolerances (applied to all of a
+            measure's aggregates other than counts).
+        column_map
+            A mapping of comparison-table column names to target column names, for keys or
+            measures that are named differently in the target.
+        partitions
+            Compare the aggregated tables in this many passes, each covering a disjoint subset of
+            the key values, to bound memory use when there are very many groups. Requires `keys=`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
+
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is inferred automatically from the assertion type. This label appears in the
+            validation report and feeds the overall and per-dimension health scores.
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Test Units
+        ----------
+        Each key group found in either table is a test unit (with `keys=None`, there's a single
+        unit for the whole table). A unit passes if its aggregates are equal (within the tolerance)
+        in both tables. Rows with null keys form a group of their own, which is matched with the
+        null-key group of the other table.
+
+        The data extract for the step (from
+        [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing
+        groups: the key column(s), a `_status_` column (`"changed"`, `"missing"`, or `"extra"`),
+        and a pair of `<measure>_<agg>_source`/`<measure>_<agg>_target` columns for each aggregate.
+        The step report shows the full comparison of the aggregates. Since test units are groups
+        rather than rows, this step doesn't take part in
+        [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`).
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that the same preprocessing
+        is **not** applied to the comparison table; only the target table is preprocessed. Regarding
+        the lifetime of the transformed table, it only exists during the validation step and is not
+        stored in the `Validate` object or used in subsequent validation steps.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Let's reconcile a small table of loaded orders against the source system's orders. The
+        loaded table names the amount column differently, has a different number of rows (one order
+        was split into two rows), and is missing the orders for one region.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        source_orders = pl.DataFrame(
+            {
+                "region": ["north", "north", "south", "east", "west"],
+                "amount": [100.0, 250.0, 75.5, 30.0, 12.0],
+            }
+        )
+
+        loaded_orders = pl.DataFrame(
+            {
+                "region": ["north", "north", "north", "south", "east"],
+                "amt": [100.0, 200.0, 50.0, 75.5, 31.0],
+            }
+        )
+
+        validation = (
+            pb.Validate(data=loaded_orders)
+            .tbl_reconcile(
+                tbl_compare=source_orders,
+                keys="region",
+                measures="amount",
+                column_map={"amount": "amt"},
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Of the four regions, `north` and `south` reconcile; `east` has a different total, and
+        `west` is missing from the loaded orders. The step report shows the details:
+
+        ```{python}
+        validation.get_step_report(i=1)
+        ```
+
+        Grand totals don't need any keys. Here, the total amount matches within a tolerance of
+        `20`, and so the step passes:
+
+        ```{python}
+        (
+            pb.Validate(data=loaded_orders)
+            .tbl_reconcile(
+                tbl_compare=source_orders,
+                measures="amount",
+                column_map={"amount": "amt"},
+                tolerance=20,
+            )
+            .interrogate()
+            .all_passed()
+        )
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        from pointblank.compare import RECONCILE_AGGS
+
+        agg_values = (
+            [a for v in agg.values() for a in ([v] if isinstance(v, str) else v)]
+            if isinstance(agg, dict)
+            else [agg]
+        )
+        for a in agg_values:
+            if a not in RECONCILE_AGGS:
+                raise ValueError(f"`agg=` must be one of {list(RECONCILE_AGGS)}, not {a!r}.")
+        if measures is None and agg != "count":
+            raise ValueError(
+                "`measures=` is required unless `agg='count'` (which then compares row counts)."
+            )
+        if partitions is not None:
+            if isinstance(partitions, bool) or not isinstance(partitions, int) or partitions < 1:
+                raise ValueError("`partitions=` must be a positive integer.")
+            if not keys:
+                raise ValueError("`partitions=` requires `keys=` (groups are partitioned by key).")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package up the `tbl_compare` and reconciliation settings for later interrogation
+        values: dict[str, Any] = {"tbl_compare": tbl_compare}
+        settings = {
+            "keys": keys,
+            "measures": measures,
+            "agg": agg,
+            "tolerance": tolerance,
+            "column_map": column_map,
+            "partitions": partitions,
+        }
+        for name, setting in settings.items():
+            if setting is not None:
+                values[name] = setting
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            values=values,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
     def conjointly(
         self,
         *exprs: Callable,
@@ -16357,6 +16653,7 @@ class Validate:
                 "col_count_match",
                 "data_freshness",
                 "tbl_match",
+                "tbl_reconcile",
             ]
 
             if validation.n == 0 and assertion_type not in table_level_assertions:
@@ -16768,8 +17065,8 @@ class Validate:
 
                         results_tbl = None
 
-                    elif assertion_type == "tbl_match":
-                        from pointblank.compare import compare
+                    elif assertion_type in ("tbl_match", "tbl_reconcile"):
+                        from pointblank.compare import _reconcile, compare
 
                         # Get the comparison table (could be callable or actual table)
                         tbl_compare = value["tbl_compare"]
@@ -16779,30 +17076,45 @@ class Validate:
                             tbl_compare = tbl_compare()
 
                         # The comparison table is the source (expected data) and the table under
-                        # validation is the target; each aligned row is one test unit
+                        # validation is the target; each aligned row (`tbl_match()`) or key group
+                        # (`tbl_reconcile()`) is one test unit
                         try:
-                            comparison = compare(
-                                source=tbl_compare,
-                                target=data_tbl_step,
-                                keys=value.get("keys"),
-                                columns=value.get("columns"),
-                                column_map=value.get("column_map"),
-                                tolerance=value.get("tolerance"),
-                                normalize=value.get("normalize"),
-                                null_equal=value.get("null_equal", True),
-                                schema=value.get("schema", "strict"),
-                                dup_keys=value.get("dup_keys", "flag"),
-                                order_by=value.get("order_by"),
-                                partitions=value.get("partitions"),
-                                source_name="tbl_compare",
-                                target_name=self.tbl_name or "target",
-                            )
+                            if assertion_type == "tbl_reconcile":
+                                comparison = _reconcile(
+                                    source=tbl_compare,
+                                    target=data_tbl_step,
+                                    keys=value.get("keys"),
+                                    measures=value.get("measures"),
+                                    agg=value.get("agg", "sum"),
+                                    tolerance=value.get("tolerance"),
+                                    column_map=value.get("column_map"),
+                                    partitions=value.get("partitions"),
+                                    source_name="tbl_compare",
+                                    target_name=self.tbl_name or "target",
+                                )
+                            else:
+                                comparison = compare(
+                                    source=tbl_compare,
+                                    target=data_tbl_step,
+                                    keys=value.get("keys"),
+                                    columns=value.get("columns"),
+                                    column_map=value.get("column_map"),
+                                    tolerance=value.get("tolerance"),
+                                    normalize=value.get("normalize"),
+                                    null_equal=value.get("null_equal", True),
+                                    schema=value.get("schema", "strict"),
+                                    dup_keys=value.get("dup_keys", "flag"),
+                                    order_by=value.get("order_by"),
+                                    partitions=value.get("partitions"),
+                                    source_name="tbl_compare",
+                                    target_name=self.tbl_name or "target",
+                                )
                         except ValueError as e:
                             # A comparison that can't be set up (e.g., a key column that isn't
                             # in the target) is an evaluation error, not a failing comparison
                             validation.eval_error = True
                             validation._add_note(
-                                key="tbl_match_error", markdown=str(e), text=str(e)
+                                key=f"{assertion_type}_error", markdown=str(e), text=str(e)
                             )
                             comparison = None
 
@@ -19776,7 +20088,7 @@ class Validate:
 
             # For `tbl_match()`, report the comparison settings and results rather than the
             # comparison table itself
-            if validation_info.assertion_type == "tbl_match":
+            if validation_info.assertion_type in ("tbl_match", "tbl_reconcile"):
                 report_entry["values"] = _tbl_match_values_json(validation_info)
 
             # Filter the report entry based on the fields to include
@@ -20670,6 +20982,9 @@ class Validate:
 
             elif assertion_type[i] in ["tbl_match"]:
                 values_upd.append("EXTERNAL TABLE" + _tbl_match_spec_badge(values[i]))
+
+            elif assertion_type[i] in ["tbl_reconcile"]:
+                values_upd.append("EXTERNAL TABLE" + _tbl_reconcile_spec_badge(values[i]))
 
             elif assertion_type[i] in ["specially"]:
                 values_upd.append("EXPR")
@@ -21573,13 +21888,14 @@ class Validate:
                     debug_return_df=debug_return_df,
                 )
 
-        elif assertion_type == "tbl_match":
+        elif assertion_type in ("tbl_match", "tbl_reconcile"):
             comparison = (val_info or {}).get("comparison")
             if comparison is None:
                 # The comparison couldn't be evaluated (see the step's notes)
                 step_report = None
             else:
                 step_report = _step_report_tbl_match(
+                    assertion_type=assertion_type,
                     comparison=comparison,
                     i=i,
                     values=values,
@@ -24014,6 +24330,34 @@ def _tbl_match_values_json(validation_info: Any) -> dict[str, Any]:
     if comparison is not None:
         out["comparison"] = comparison.to_dict(samples=bool(info.get("samples", True)))
     return out
+
+
+def _tbl_reconcile_spec_badge(values: Any) -> str:
+    """
+    A compact in-cell badge for a `tbl_reconcile()` step, e.g. `sum · by region · tol`.
+    """
+    if not isinstance(values, dict):
+        return ""
+    agg = values.get("agg", "sum")
+    if isinstance(agg, dict):
+        aggs = sorted({a for v in agg.values() for a in ([v] if isinstance(v, str) else v)})
+        parts = ["/".join(aggs)]
+    else:
+        parts = ["row count" if agg == "count" and not values.get("measures") else agg]
+    keys = values.get("keys")
+    if keys:
+        keys_list = [keys] if isinstance(keys, str) else list(keys)
+        parts.append("by " + ", ".join(html_module.escape(str(k)) for k in keys_list))
+    else:
+        parts.append("totals")
+    if values.get("tolerance") is not None:
+        parts.append("tol")
+    if (values.get("partitions") or 1) > 1:
+        parts.append(f"{values['partitions']} partitions")
+    return (
+        "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+        "color: #5A6B7B;'>" + " &middot; ".join(parts) + "</span>"
+    )
 
 
 def _tbl_match_spec_badge(values: Any) -> str:
@@ -26652,6 +26996,7 @@ def _step_report_tbl_match(
     limit: int,
     lang: str,
     locale: str | None = None,
+    assertion_type: str = "tbl_match",
 ) -> GT:
     """
     Step report for `tbl_match()`: the comparison report (row statuses, schema differences,
@@ -26675,7 +27020,7 @@ def _step_report_tbl_match(
             if name == "tbl_compare":
                 continue
             settings.append(f"{name}={setting!r}")
-    assertion_text = html_module.escape(f"tbl_match({', '.join(settings)})")
+    assertion_text = html_module.escape(f"{assertion_type}({', '.join(settings)})")
 
     assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
     mark = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
