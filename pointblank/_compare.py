@@ -307,10 +307,14 @@ def _compare(
     source_name: str | None = None,
     target_name: str | None = None,
     null_keys_match: bool = False,
+    positional_collect: bool = False,
 ) -> Comparison:
     """
     The implementation of `compare()`. `null_keys_match=True` makes rows with null keys match
     each other (used by `Validate.tbl_reconcile()`, where a null key is a group like any other).
+    `positional_collect=True` lets positional alignment collect tables that have no inherent row
+    order, using the order the backend returns (used by `Validate.tbl_match()`, which always
+    worked that way, rather than requiring `order_by=`).
     """
     from pointblank.validate import _process_data
 
@@ -357,6 +361,7 @@ def _compare(
         source_name=source_name or "source",
         target_name=target_name or "target",
         null_keys_match=null_keys_match,
+        positional_collect=positional_collect,
     )
     if partitions is not None and partitions > 1:
         return Comparison._build_partitioned(src, tgt, partitions=partitions, **settings)
@@ -538,6 +543,7 @@ class Comparison:
         source_name: str,
         target_name: str,
         null_keys_match: bool = False,
+        positional_collect: bool = False,
     ) -> Comparison:
         self = object.__new__(cls)
         self.source_name = source_name
@@ -639,8 +645,8 @@ class Comparison:
 
         # Positional alignment: add a row index on both sides and use it as the key
         if self.mode == "positional":
-            src = _with_row_index(src, order_by, "source")
-            tgt = _with_row_index(tgt, order_by, "target")
+            src = _with_row_index(src, order_by, "source", collect_unordered=positional_collect)
+            tgt = _with_row_index(tgt, order_by, "target", collect_unordered=positional_collect)
             join_keys = [_ROW_IDX]
             tgt_keys = [_ROW_IDX]
         else:
@@ -1697,10 +1703,18 @@ def _to_pandas(frame: Any) -> Any:  # pragma: no cover
     return nw.from_native(_collect(frame).to_pandas())
 
 
-def _with_row_index(frame: Any, order_by: list[str] | None, side: str, name: str = _ROW_IDX) -> Any:
+def _with_row_index(
+    frame: Any,
+    order_by: list[str] | None,
+    side: str,
+    name: str = _ROW_IDX,
+    collect_unordered: bool = False,
+) -> Any:
     """
     Add a 0-based row index for positional alignment. With `order_by=`, the index follows that
-    order but the rows themselves keep their original order.
+    order but the rows themselves keep their original order. A table without an inherent row
+    order (e.g., PySpark or a database table) is an error, unless `collect_unordered=True`, which
+    collects it and uses the order in which the backend returns its rows.
     """
     if isinstance(frame, nw.DataFrame):
         if not order_by:
@@ -1719,6 +1733,8 @@ def _with_row_index(frame: Any, order_by: list[str] | None, side: str, name: str
     if frame.implementation == nw.Implementation.POLARS:
         # Polars LazyFrames (e.g., from `scan_csv()`) preserve row order
         return nw.from_native(frame.to_native().with_row_index(name))
+    if collect_unordered:
+        return _with_row_index(_collect(frame), None, side, name=name)
     raise ValueError(
         f"The {side} table has no defined row order, so rows can't be aligned by position. "
         "Provide `keys=` to align rows by key (recommended), or `order_by=` to define the row "
