@@ -11,7 +11,7 @@ from pointblank._constants import RTL_LANGUAGES
 from pointblank._constants_translations import COMPARISON_REPORT_TEXT
 
 if TYPE_CHECKING:
-    from pointblank.compare import Comparison
+    from pointblank._compare import Comparison
 
 # Colors for row statuses (shared by the status bar, legend, and section labels)
 STATUS_COLORS = {
