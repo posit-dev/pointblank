@@ -482,3 +482,18 @@ def test_threshold_semantics_documented_in_migration_note(n_diff, threshold, exp
         .interrogate()
     )
     assert _step(v).warning is expected
+
+
+def test_positional_tbl_match_on_unordered_tables_uses_returned_order():
+    # Tables with no inherent row order (here, two tables in one DuckDB database) are compared
+    # by position in the order their rows are returned, as `tbl_match()` always did
+    con = ibis.duckdb.connect()
+    a = con.create_table("a", pl.DataFrame({"x": [1, 2, 3], "y": ["p", "q", "r"]}))
+    b = con.create_table("b", pl.DataFrame({"x": [1, 2, 3], "y": ["p", "Q", "r"]}))
+    v = pb.Validate(a).tbl_match(b).tbl_match(con.create_table("c", a.to_polars())).interrogate()
+    assert (_step(v, 1).n, _step(v, 1).n_failed, _step(v, 1).eval_error) == (3, 1, None)
+    assert _step(v, 2).all_passed
+
+    # The public `compare()` asks for keys (or `order_by=`) instead
+    with pytest.raises(ValueError, match="no defined row order"):
+        pb.compare(b, a)
