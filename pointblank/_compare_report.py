@@ -147,8 +147,13 @@ def _comparison_report(
 
         df = pd.DataFrame(rows, columns=["group", "item", "detail"])
 
+    from pointblank._utils_html import _fmt_raw_html
+
+    # The cells hold HTML built here (Great Tables v1.0.0+ escapes cell content by default)
     gt_tbl = (
-        GT(df, groupname_col="group", id="pb_comparison_tbl")
+        _fmt_raw_html(
+            GT(df, groupname_col="group", id="pb_comparison_tbl"), columns=["item", "detail"]
+        )
         .tab_header(
             title=html(title or ctx.t("title")),
             subtitle=html(_header_html(cmp, lang=ctx.lang, locale=ctx.locale)),
