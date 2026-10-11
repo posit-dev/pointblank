@@ -15480,7 +15480,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_active_input(param=active, param_name="active")
 
-        from pointblank.compare import RECONCILE_AGGS
+        from pointblank._compare import RECONCILE_AGGS
 
         agg_values = (
             [a for v in agg.values() for a in ([v] if isinstance(v, str) else v)]
@@ -17066,7 +17066,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type in ("tbl_match", "tbl_reconcile"):
-                        from pointblank.compare import _reconcile, compare
+                        from pointblank._compare import _reconcile, compare
 
                         # Get the comparison table (could be callable or actual table)
                         tbl_compare = value["tbl_compare"]
@@ -24304,7 +24304,7 @@ def _tbl_match_values_json(validation_info: Any) -> dict[str, Any]:
     the comparison table, and (once interrogated) the comparison results. Samples of differing
     rows are included only if data extracts were collected during interrogation.
     """
-    from pointblank.compare import _jsonable
+    from pointblank._compare import _jsonable
 
     values = dict(validation_info.values or {})
     tbl_compare = values.pop("tbl_compare", None)
