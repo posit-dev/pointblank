@@ -10,7 +10,7 @@ import polars as pl
 import pytest
 
 import pointblank as pb
-from pointblank.compare import Comparison, SchemaDiff, compare
+from pointblank._compare import Comparison, SchemaDiff, compare
 
 
 # Source and target tables covering every row status: ids 1 and 4 match (4 via NaN == null),
@@ -741,7 +741,7 @@ def _fake_polars_panic():
 def test_collect_recovers_from_polars_streaming_panics(monkeypatch, n_panics, expected_engines):
     import narwhals.dataframe as nw_dataframe
 
-    from pointblank.compare import _collect
+    from pointblank._compare import _collect
 
     panic = _fake_polars_panic()
     original = nw_dataframe.LazyFrame.collect
@@ -763,7 +763,7 @@ def test_collect_recovers_from_polars_streaming_panics(monkeypatch, n_panics, ex
 def test_collect_does_not_swallow_other_errors(monkeypatch):
     import narwhals.dataframe as nw_dataframe
 
-    from pointblank.compare import _collect
+    from pointblank._compare import _collect
 
     def failing_collect(self, backend=None, **kwargs):
         raise KeyboardInterrupt
