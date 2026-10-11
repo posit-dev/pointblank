@@ -14971,7 +14971,9 @@ class Validate:
             also compares the duplicated rows pairwise to show which columns differ.
         order_by
             Column(s) defining the row order for positional alignment on backends without an
-            inherent row order (e.g., database tables). Ignored when `keys=` is given.
+            inherent row order (e.g., PySpark or database tables). Without it, such tables are
+            collected and compared in the order in which their rows are returned; use `keys=` for
+            a reliable alignment. Ignored when `keys=` is given.
         partitions
             Compare the tables in this many passes, each covering a disjoint subset of the key
             values (by key hash), to bound memory use for very large tables. Each pass reads the
@@ -17066,7 +17068,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type in ("tbl_match", "tbl_reconcile"):
-                        from pointblank._compare import _reconcile, compare
+                        from pointblank._compare import _compare, _reconcile
 
                         # Get the comparison table (could be callable or actual table)
                         tbl_compare = value["tbl_compare"]
@@ -17093,7 +17095,7 @@ class Validate:
                                     target_name=self.tbl_name or "target",
                                 )
                             else:
-                                comparison = compare(
+                                comparison = _compare(
                                     source=tbl_compare,
                                     target=data_tbl_step,
                                     keys=value.get("keys"),
@@ -17108,6 +17110,10 @@ class Validate:
                                     partitions=value.get("partitions"),
                                     source_name="tbl_compare",
                                     target_name=self.tbl_name or "target",
+                                    # Without keys, tables with no inherent row order (PySpark,
+                                    # databases) are compared in the order their rows are
+                                    # returned, as `tbl_match()` always did
+                                    positional_collect=True,
                                 )
                         except ValueError as e:
                             # A comparison that can't be set up (e.g., a key column that isn't
