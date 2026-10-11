@@ -61,6 +61,13 @@ class _Ctx:
 
     lang: str = "en"
     locale: str = "en"
+    unit: str = "rows"  # or "groups" (for `tbl_reconcile()`)
+
+    def u(self, key: str) -> str:
+        """The label key for the comparison's unit (e.g. `n_rows` -> `n_groups`)."""
+        if self.unit == "groups":
+            return key.replace("rows", "groups")
+        return key
 
     @property
     def rtl(self) -> bool:
@@ -112,7 +119,7 @@ def _comparison_report(
     """Build the tabular (GT) report for a `Comparison`."""
     from pointblank._utils import _is_lib_present
 
-    ctx = _Ctx(lang=lang, locale=locale or lang)
+    ctx = _Ctx(lang=lang, locale=locale or lang, unit=cmp.unit)
 
     rows: list[dict[str, str]] = []
     rows += _schema_rows(cmp, ctx)
@@ -127,7 +134,7 @@ def _comparison_report(
             {
                 "group": ctx.t("group_result"),
                 "item": _badge("✓", STATUS_COLORS["match"]),
-                "detail": ctx.t_count("all_rows_match", cmp.n),
+                "detail": ctx.t_count(ctx.u("all_rows_match"), cmp.n),
             }
         )
 
@@ -175,7 +182,7 @@ def _comparison_report(
 
 
 def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -> str:
-    ctx = _Ctx(lang=lang, locale=locale or lang)
+    ctx = _Ctx(lang=lang, locale=locale or lang, unit=cmp.unit)
     esc = html_lib.escape
     if cmp.mode == "keyed":
         keys = ", ".join(f"<code>{esc(k)}</code>" for k in cmp.keys)
@@ -186,9 +193,9 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
         alignment = ctx.t("aligned_by_position")
 
     tables_line = (
-        f"<strong>{esc(cmp.source_name)}</strong> ({ctx.t_count('n_rows', cmp.n_source_rows)}) "
+        f"<strong>{esc(cmp.source_name)}</strong> ({ctx.t_count(ctx.u('n_rows'), cmp.n_source_rows)}) "
         f"&rarr; <strong>{esc(cmp.target_name)}</strong> "
-        f"({ctx.t_count('n_rows', cmp.n_target_rows)}), {alignment}"
+        f"({ctx.t_count(ctx.u('n_rows'), cmp.n_target_rows)}), {alignment}"
     )
 
     if cmp.identical:
@@ -198,7 +205,12 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
         verdict = (
             _badge(ctx.t("different"), STATUS_COLORS["missing"])
             + " "
-            + ctx.t("rows_fail", n_failed=ctx.int(cmp.n_failed), n=ctx.int(cmp.n), pct=ctx.pct(pct))
+            + ctx.t(
+                ctx.u("rows_fail"),
+                n_failed=ctx.int(cmp.n_failed),
+                n=ctx.int(cmp.n),
+                pct=ctx.pct(pct),
+            )
         )
         if not cmp.schema_ok:
             verdict += " &middot; " + _badge(ctx.t("schema_differs"), STATUS_COLORS["missing"])
@@ -254,6 +266,13 @@ def _legend(cmp: Comparison, ctx: _Ctx) -> str:
 def _spec_badges(cmp: Comparison, ctx: _Ctx) -> str:
     esc = html_lib.escape
     badges = []
+    if cmp.aggregation is not None:
+        aggs = "/".join(f"<code>{esc(a)}</code>" for a in cmp.aggregation["aggs"])
+        if cmp.aggregation["keys"]:
+            keys = ", ".join(f"<code>{esc(k)}</code>" for k in cmp.aggregation["keys"])
+            badges.append(_chip(ctx.t("spec_aggregated_by", aggs=aggs, keys=keys)))
+        else:
+            badges.append(_chip(ctx.t("spec_aggregated_totals", aggs=aggs)))
     tolerant = [s.source for s in cmp._specs if s.atol is not None or s.rtol is not None]
     if tolerant:
         badges.append(_chip(ctx.t("spec_tolerance", columns=esc(", ".join(tolerant)))))
@@ -262,7 +281,8 @@ def _spec_badges(cmp: Comparison, ctx: _Ctx) -> str:
         badges.append(_chip(ctx.t("spec_normalized", columns=esc(", ".join(normalized)))))
     if not cmp.null_equal:
         badges.append(_chip("null &ne; null"))
-    if cmp.schema_mode == "common":
+    if cmp.schema_mode == "common" and cmp.aggregation is None:
+        # (reconciliations always compare the shared aggregate columns, so it isn't shown)
         badges.append(_chip(ctx.t("spec_common_schema")))
     if cmp.dup_keys_mode == "compare":
         badges.append(_chip(ctx.t("spec_dup_compare")))
@@ -371,7 +391,7 @@ def _column_rows(cmp: Comparison, ctx: _Ctx) -> list[dict[str, str]]:
         if target_of[col] != col:
             item += f" &rarr; {html_lib.escape(target_of[col])}"
         detail = ctx.t(
-            "matched_rows_differ", n=ctx.int(n), total=ctx.int(n_matched), pct=ctx.pct(pct)
+            ctx.u("matched_rows_differ"), n=ctx.int(n), total=ctx.int(n_matched), pct=ctx.pct(pct)
         )
         out.append({"group": group, "item": item, "detail": f"{bar}{detail}"})
     return out
@@ -381,7 +401,8 @@ def _changed_rows(cmp: Comparison, limit: int, ctx: _Ctx) -> list[dict[str, str]
     if cmp.n_changed == 0:
         return []
     frame = cmp._fetch("changed", limit)
-    group = _sample_group(ctx.t("group_changed"), len(frame), cmp.n_changed, ctx)
+    title = ctx.t("group_changed_groups" if ctx.unit == "groups" else "group_changed")
+    group = _sample_group(title, len(frame), cmp.n_changed, ctx)
     key_cols = cmp._key_out_names()
     out = []
     for row in frame.rows(named=True):
@@ -472,8 +493,9 @@ def _dup_rows(cmp: Comparison, limit: int, ctx: _Ctx) -> list[dict[str, str]]:
 # ----------------------------------------------------------------------------------------------
 
 
-def _sample_group(title: str, shown: int, total: int, ctx: _Ctx, noun: str = "rows") -> str:
+def _sample_group(title: str, shown: int, total: int, ctx: _Ctx, noun: str | None = None) -> str:
     """A section title with its count, e.g. 'Changed rows (showing 10 of 400 rows)'."""
+    noun = noun or ctx.unit
     if shown >= total:
         count = ctx.t_count(f"n_{noun}", total)
     else:
