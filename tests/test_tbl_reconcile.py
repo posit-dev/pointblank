@@ -238,13 +238,33 @@ def test_reports():
 
     step_report = v.get_step_report(i=1).as_raw_html()
     assert "tbl_reconcile(" in step_report
-    assert "loaded_orders, sum by region" in step_report
-    assert "Missing from target (1 row)" in step_report
+    # Test units are groups: counts, sections, and the aggregation chip say so
+    assert "loaded_orders</strong> (5 groups)" in step_report
+    assert "2 of 6 groups fail" in step_report  # east's 30 vs 31 is within the tolerance
+    assert "Missing from target (1 group)" in step_report
+    assert "<code>sum</code> by <code>region</code>" in step_report
+    assert "schema: common columns" not in step_report
+
+    no_tolerance = (
+        pb.Validate(data=TARGET)
+        .tbl_reconcile(tbl_compare=SOURCE, keys="region", measures="amount", column_map=COLUMN_MAP)
+        .interrogate()
+    )
+    assert "Changed groups (1 group)" in no_tolerance.get_step_report(i=1).as_raw_html()
+
+    totals = (
+        pb.Validate(data=TARGET)
+        .tbl_reconcile(tbl_compare=SOURCE, measures="amount", column_map=COLUMN_MAP)
+        .interrogate()
+    )
+    assert "<code>sum</code> of whole table" in totals.get_step_report(i=1).as_raw_html()
 
     french = pb.Validate(data=TARGET, lang="fr").tbl_reconcile(
         tbl_compare=SOURCE, keys="region", measures="amount", column_map=COLUMN_MAP
     )
-    assert "Absentes de la cible" in french.interrogate().get_step_report(i=1).as_raw_html()
+    french_report = french.interrogate().get_step_report(i=1).as_raw_html()
+    assert "Absentes de la cible (1 groupe)" in french_report
+    assert "Groupes modifiés" in french_report
 
 
 def test_json_report():
