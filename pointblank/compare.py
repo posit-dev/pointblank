@@ -462,23 +462,24 @@ def _reconcile(
                 if a != "count":
                     agg_tolerance[f"{col}_{a}"] = tol
 
-    # Label the tables with what was aggregated (their "rows" are groups)
-    agg_names = sorted({a for aggs in plan.values() for a in aggs}) or ["count"]
-    grouping = "by " + ", ".join(keys_list) if keys_list else "totals"
-    description = f"{'/'.join(agg_names)} {grouping}"
-
     # A null key is a group like any other, so null-key groups are matched with each other
-    return _compare(
+    comparison = _compare(
         aggregate(src).to_native(),
         aggregate(tgt).to_native(),
         keys=keys_list or [_TOTAL_KEY],
         tolerance=agg_tolerance,
         schema="common",
         partitions=partitions if keys_list else None,
-        source_name=f"{source_name}, {description}",
-        target_name=f"{target_name}, {description}",
+        source_name=source_name,
+        target_name=target_name,
         null_keys_match=True,
     )
+    comparison.unit = "groups"  # each test unit is a key group, not a row
+    comparison.aggregation = {
+        "aggs": sorted({a for aggs in plan.values() for a in aggs}) or ["count"],
+        "keys": list(keys_list),
+    }
+    return comparison
 
 
 class Comparison:
@@ -507,6 +508,11 @@ class Comparison:
         A dict mapping each compared source column to the number of matched rows where its values
         differ.
     """
+
+    # What a test unit is, for reporting: aligned rows, or key groups (`tbl_reconcile()`)
+    unit = "rows"
+    # For `tbl_reconcile()`: the aggregations and grouping keys (else `None`)
+    aggregation: dict[str, list[str]] | None = None
 
     def __init__(self) -> None:  # pragma: no cover
         raise TypeError("Create a `Comparison` with `pb.compare()`.")
