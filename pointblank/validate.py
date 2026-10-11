@@ -22221,6 +22221,17 @@ class Validate:
                 "autobrief": dt.String(),
             }
 
+            # `values` is a JSON column, so serialize non-string values (numbers, the
+            # members of a set, the bounds of a range) rather than handing Arrow raw objects.
+            if "values" in final_report:
+                final_report = {
+                    **final_report,
+                    "values": [
+                        v if v is None or isinstance(v, str) else json.dumps(v, default=str)
+                        for v in final_report["values"]
+                    ],
+                }
+
             report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
                 {v: k for k, v in names_dict.items() if k != v}
             )

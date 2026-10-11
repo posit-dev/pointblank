@@ -14193,6 +14193,24 @@ def test_get_dataframe_report_returns_ibis_memtable():
     assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
 
+def test_get_dataframe_report_duckdb_with_non_string_values():
+    # `values` holds numbers, sets and (left, right) bounds; the duckdb report stores it as JSON
+    df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+    validation = (
+        Validate(df)
+        .col_vals_gt(columns="a", value=0)
+        .col_vals_in_set(columns="b", set=["x", "y"])
+        .col_vals_between(columns="a", left=0, right=5)
+        .col_vals_regex(columns="b", pattern="[a-z]")
+        .col_exists(columns="a")
+        .interrogate()
+    )
+
+    report = validation.get_dataframe_report("duckdb").to_pandas()
+
+    assert list(report["values"]) == [0, ["x", "y"], [0, 5], "[a-z]", None]
+
+
 def get_schema_info(
     data_tbl,
     schema,
