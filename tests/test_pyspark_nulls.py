@@ -466,7 +466,8 @@ class TestTblMatch:
         tbl2 = spark.createDataFrame([(1, "a"), (2, "b")], ["id", "val"])
 
         v = Validate(tbl1).tbl_match(tbl_compare=tbl2).interrogate()
-        assert v.n_passed(i=1, scalar=True) == 1
+        assert v.all_passed()
+        assert v.n_passed(i=1, scalar=True) == 2  # one test unit per row
 
     def test_tbl_match_different_data(self, spark):
         """tbl_match with different data."""
@@ -474,7 +475,8 @@ class TestTblMatch:
         tbl2 = spark.createDataFrame([(1, "a"), (2, "x")], ["id", "val"])
 
         v = Validate(tbl1).tbl_match(tbl_compare=tbl2).interrogate()
-        assert v.n_failed(i=1, scalar=True) == 1
+        assert not v.all_passed()
+        assert v.n_failed(i=1, scalar=True) == 1  # only the second row differs
 
     def test_tbl_match_with_nulls(self, spark):
         """tbl_match with NULLs in both tables (matching NULLs)."""
@@ -482,7 +484,8 @@ class TestTblMatch:
         tbl2 = spark.createDataFrame([(1, "a"), (2, None)], ["id", "val"])
 
         v = Validate(tbl1).tbl_match(tbl_compare=tbl2).interrogate()
-        assert v.n_passed(i=1, scalar=True) == 1
+        assert v.all_passed()
+        assert v.n_passed(i=1, scalar=True) == 2  # one test unit per row
 
     def test_tbl_match_null_mismatch(self, spark):
         """tbl_match where one table has NULL but the other doesn't."""
@@ -490,7 +493,41 @@ class TestTblMatch:
         tbl2 = spark.createDataFrame([(1, "a"), (2, "b")], ["id", "val"])
 
         v = Validate(tbl1).tbl_match(tbl_compare=tbl2).interrogate()
-        assert v.n_failed(i=1, scalar=True) == 1
+        assert not v.all_passed()
+        assert v.n_failed(i=1, scalar=True) == 1  # only the second row differs
+
+    def test_tbl_match_keyed(self, spark):
+        """tbl_match aligned by key (row order doesn't matter; null keys can't be matched)."""
+        tbl1 = spark.createDataFrame(
+            [(1, 10.0), (2, 20.5), (4, 40.0), (None, 5.0)], ["id", "amount"]
+        )
+        tbl2 = spark.createDataFrame(
+            [(2, 20.0), (1, 10.0), (3, 30.0), (None, 5.0)], ["id", "amount"]
+        )
+
+        v = Validate(tbl1).tbl_match(tbl_compare=tbl2, keys="id").interrogate()
+        # id 1 matches; 2 changed; 3 missing; 4 extra; the null-key rows are missing/extra
+        assert v.n(i=1, scalar=True) == 6
+        assert v.n_passed(i=1, scalar=True) == 1
+        assert len(v.get_data_extracts(i=1, frame=True)) == 5
+
+    def test_tbl_reconcile(self, spark):
+        """tbl_reconcile on sums by group (null-key groups are matched with each other)."""
+        tbl1 = spark.createDataFrame(
+            [("a", 10.0), ("b", 20.5), ("d", 40.0), (None, 5.0)], ["grp", "amount"]
+        )
+        tbl2 = spark.createDataFrame(
+            [("a", 4.0), ("a", 6.0), ("b", 20.0), ("c", 30.0), (None, 5.0)], ["grp", "amount"]
+        )
+
+        v = (
+            Validate(tbl1)
+            .tbl_reconcile(tbl_compare=tbl2, keys="grp", measures="amount")
+            .interrogate()
+        )
+        # a and the null group reconcile; b changed; c missing; d extra
+        assert v.n(i=1, scalar=True) == 5
+        assert v.n_passed(i=1, scalar=True) == 2
 
 
 # ---------------------------------------------------------------------------
