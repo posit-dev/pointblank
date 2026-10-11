@@ -134,6 +134,7 @@ def _get_api_text() -> str:
         "Validate.row_count_match",
         "Validate.col_count_match",
         "Validate.tbl_match",
+        "Validate.tbl_reconcile",
         "Validate.conjointly",
         "Validate.specially",
         "Validate.prompt",
@@ -187,6 +188,12 @@ def _get_api_text() -> str:
         "get_data_path",
         "connect_to_table",
         "print_database_tables",
+    ]
+
+    comparison_exported = [
+        "compare",
+        "Comparison",
+        "SchemaDiff",
     ]
 
     yaml_exported = [
@@ -258,6 +265,16 @@ datasets included in the package can be accessed via the `load_dataset()` functi
 `config()` utility lets us set global configuration parameters. Want to chat with an assistant? Use
 the `assistant()` function to get help with Pointblank."""
 
+    comparison_desc = """The *Table Comparison* group compares two tables row by row. The `compare()`
+function aligns the rows of a source table (the expected data) and a target table by key, by
+position, or as multisets, and classifies every aligned row as matching, changed, missing from the
+target, extra in the target, or having a duplicated key. It also reports schema differences. Numeric
+and datetime tolerances, string normalization, and column renames are supported, and large files
+can be compared lazily (with `partitions=` to bound memory). The result is a `Comparison` object
+with counts, samples of differing rows, and a tabular report. The same comparison is available as a
+validation step with `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates
+(e.g., sums or counts per group of key columns) instead of rows."""
+
     yaml_desc = """The *YAML* group contains functions that allow for the use of YAML to orchestrate
 validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
 from YAML strings or files. The `validate_yaml()` function checks if the YAML configuration passes
@@ -300,6 +317,9 @@ table information, and timing details."""
 
     api_text += f"""\n## The Inspection and Assistance family\n\n{inspect_desc}\n\n"""
     api_text += get_api_details(module=pointblank, exported_list=inspect_exported)
+
+    api_text += f"""\n## The Table Comparison family\n\n{comparison_desc}\n\n"""
+    api_text += get_api_details(module=pointblank, exported_list=comparison_exported)
 
     api_text += f"""\n## The YAML family\n\n{yaml_desc}\n\n"""
     api_text += get_api_details(module=pointblank, exported_list=yaml_exported)

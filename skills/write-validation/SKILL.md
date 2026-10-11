@@ -85,7 +85,7 @@ skills/write-validation/
 | Structured missingness            | `col_pct_missing` with `MissingSpec` |
 | Aggregate comparison (sum, avg)   | `col_sum_eq`, `col_avg_gt`, etc.     |
 | Data is recent enough             | `data_freshness`                     |
-| Table matches another table       | `tbl_match`                          |
+| Table matches another table       | `tbl_match` (`keys=`, `tolerance=`)  |
 | Multiple conditions per row       | `conjointly`                         |
 | Custom logic                      | `specially`                          |
 | LLM-based semantic check          | `prompt`                             |

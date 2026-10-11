@@ -286,6 +286,7 @@ class YAMLValidator:
         "col_schema_match": "col_schema_match",
         "data_freshness": "data_freshness",
         "tbl_match": "tbl_match",
+        "tbl_reconcile": "tbl_reconcile",
         "prompt": "prompt",
         "conjointly": "conjointly",
         "specially": "specially",
