@@ -1441,7 +1441,7 @@ What we see are the six columns we specified from the `nycflights` dataset.
 
 Note that the columns are displayed in the order provided in the `columns_subset=` list. This can be useful for making quick, side-by-side comparisons. In the example above, we placed `hour` and `minute` next to the `sched_dep_time` column. In the original dataset, `sched_dep_time` is far apart from the other two columns, but, it's useful to have them next to each other in the preview since `hour` and `minute` are derived from `sched_dep_time` (and this lets us spot check any issues).
 
-We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns that have `"dep_"` or `"arr_"` in the name. To do that, we use the [matches()](../../reference/matches.md#pointblank.matches) column selector function:
+We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns that have `"dep_"` or `"arr_"` in the name. To do that, we use the `matches()` column selector function:
 
 
 ``` python

@@ -4078,7 +4078,7 @@ for status, count in sorted(s["status_counts"].items()):
       SUCCESS             : 78
 
 
-The `status_counts` dictionary enumerates every status bucket CORE reported. Use it to build pass/fail thresholds or trend charts across multiple submission runs.
+The [status_counts](../../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) dictionary enumerates every status bucket CORE reported. Use it to build pass/fail thresholds or trend charts across multiple submission runs.
 
 **Issues.** [issues()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) returns one record per (dataset, rule) pair that reported at least one issue. Pass a `status` filter to separate conformance violations from execution errors:
 

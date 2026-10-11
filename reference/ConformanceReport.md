@@ -389,7 +389,7 @@ issues(
 
 
 `list[dict]`  
-For a **built-in engine** report, one dict per failing step, with keys `dataset`, `step`, `assertion`, `column`, [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed), [n](Validate.n.md#pointblank.Validate.n), and `severity`.
+For a **built-in engine** report, one dict per failing step, with keys `dataset`, `step`, `assertion`, `column`, `n_failed`, `n`, and `severity`.
 
 For a **CORE** report, one dict per (dataset, rule) with reported issues, with keys `dataset`, `rule_id`, `message`, [issues](ConformanceReport.md#pointblank.ConformanceReport.issues) (count), and `status`.
 
@@ -440,9 +440,9 @@ summary()
 
 
 `dict`  
-For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed) (failing test units), and `all_passed`.
+For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, `n_failed` (failing test units), and `all_passed`.
 
-For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, `status_counts` (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and `all_passed`.
+For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, [status_counts](Comparison.status_counts.md#pointblank.Comparison.status_counts) (rule counts by run status), `n_issues` (total reported issues), [n_datasets](ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and `all_passed`.
 
 
 ------------------------------------------------------------------------

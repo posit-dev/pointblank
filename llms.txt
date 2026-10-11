@@ -76,6 +76,7 @@
 - [Validate.col_count_match](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html)
 - [Validate.data_freshness](https://posit-dev.github.io/pointblank/reference/Validate.data_freshness.html)
 - [Validate.tbl_match](https://posit-dev.github.io/pointblank/reference/Validate.tbl_match.html)
+- [Validate.tbl_reconcile](https://posit-dev.github.io/pointblank/reference/Validate.tbl_reconcile.html)
 - [Validate.conjointly](https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html)
 - [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html)
 - [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html)
@@ -180,6 +181,31 @@
 - [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html)
 - [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html)
 - [DataScan.compare](https://posit-dev.github.io/pointblank/reference/DataScan.compare.html)
+
+#### Table Comparison
+> Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
+
+
+- [compare](https://posit-dev.github.io/pointblank/reference/compare.html): Compare two tables row by row and report how they differ
+- [Comparison](https://posit-dev.github.io/pointblank/reference/Comparison.html): The result of comparing a source table with a target table
+- [SchemaDiff](https://posit-dev.github.io/pointblank/reference/SchemaDiff.html): Differences between the schemas of the source and target tables
+
+#### Comparison Methods
+> Methods for the Comparison class
+
+- [Comparison.n](https://posit-dev.github.io/pointblank/reference/Comparison.n.html)
+- [Comparison.schema_ok](https://posit-dev.github.io/pointblank/reference/Comparison.schema_ok.html)
+- [Comparison.n_passed](https://posit-dev.github.io/pointblank/reference/Comparison.n_passed.html)
+- [Comparison.n_failed](https://posit-dev.github.io/pointblank/reference/Comparison.n_failed.html)
+- [Comparison.identical](https://posit-dev.github.io/pointblank/reference/Comparison.identical.html)
+- [Comparison.status_counts](https://posit-dev.github.io/pointblank/reference/Comparison.status_counts.html)
+- [Comparison.__bool__](https://posit-dev.github.io/pointblank/reference/Comparison.__bool__.html)
+- [Comparison.__repr__](https://posit-dev.github.io/pointblank/reference/Comparison.__repr__.html)
+- [Comparison.rows](https://posit-dev.github.io/pointblank/reference/Comparison.rows.html)
+- [Comparison.column_summary](https://posit-dev.github.io/pointblank/reference/Comparison.column_summary.html)
+- [Comparison.to_dict](https://posit-dev.github.io/pointblank/reference/Comparison.to_dict.html)
+- [Comparison.to_json](https://posit-dev.github.io/pointblank/reference/Comparison.to_json.html)
+- [Comparison.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html)
 
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.

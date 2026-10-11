@@ -39,7 +39,7 @@ Whether the column can contain null values. Default is `False`.
 Probability of generating a null value for each row when `nullable=True`. Must be between `0.0` and `1.0`. Default is `0.0`.
 
 `unique: bool = ``False`  
-Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces [n](Validate.n.md#pointblank.Validate.n) distinct dates. Ensure the date range is large enough to accommodate the requested number of unique dates.
+Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces `n` distinct dates. Ensure the date range is large enough to accommodate the requested number of unique dates.
 
 `generator: Callable[[], Any] | None = None`  
 Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single `datetime.date` value.

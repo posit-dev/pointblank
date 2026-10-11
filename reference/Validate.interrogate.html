@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-90c0cb8701bc726ef78bd9649a6be318.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="493" data-forks="35"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -578,6 +578,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validate.tbl_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_reconcile.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_reconcile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1083,9 +1089,121 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Table Pre-checks</span></a>
+ <span class="menu-text">Table Comparison</span></a>
 </div>
       <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SchemaDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SchemaDiff</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Comparison Methods</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.schema_ok.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.schema_ok</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.identical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.identical</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.status_counts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.status_counts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__bool__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__bool__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__repr__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__repr__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.rows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.column_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.column_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.get_tabular_report</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Pre-checks</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
@@ -1105,7 +1223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">YAML</span></a>
 </div>
-      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
@@ -1131,7 +1249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Utility Functions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
@@ -1181,7 +1299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Test Data Generation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
@@ -1255,7 +1373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Prebuilt Actions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
@@ -1275,7 +1393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Metadata Import/Export</span></a>
 </div>
-      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/import_metadata.html" class="sidebar-item-text sidebar-link">
@@ -1331,7 +1449,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">SDTM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtm.html" class="sidebar-item-text sidebar-link">
@@ -1381,7 +1499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">ADaM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_adam.html" class="sidebar-item-text sidebar-link">
@@ -1431,7 +1549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">CDISC Submission Conformance</span></a>
 </div>
-      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-21" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
@@ -1463,7 +1581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Integrations</span></a>
 </div>
-      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-22" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
@@ -1515,7 +1633,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15669-L17165" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16161-L17726" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">interrogate</span>(</span>
@@ -1546,11 +1664,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">get_first_n</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>If the option to collect rows where test units is chosen, there is the option here to collect the first <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).</p>
+<p>If the option to collect rows where test units is chosen, there is the option here to collect the first <code>n</code> rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">sample_n</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>If the option to collect non-passing rows is chosen, this option allows for the sampling of <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> rows. Supply an integer number of rows to sample from the subset table. If <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> happens to be greater than the number of non-passing rows, then all such rows will be returned.</p>
+<p>If the option to collect non-passing rows is chosen, this option allows for the sampling of <code>n</code> rows. Supply an integer number of rows to sample from the subset table. If <code>n</code> happens to be greater than the number of non-passing rows, then all such rows will be returned.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">sample_frac</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | float | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1576,8 +1694,8 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s use a built-in dataset (<code>"game_revenue"</code>) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We’ll use the <code>get_first_n=</code> option so that any extracts of failing rows are limited to the first <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n</a> rows.</p>
-<div id="8aee44d8" class="cell" data-execution_count="1">
+<p>Let’s use a built-in dataset (<code>"game_revenue"</code>) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We’ll use the <code>get_first_n=</code> option so that any extracts of failing rows are limited to the first <code>n</code> rows.</p>
+<div id="1f7b33f6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1681,7 +1799,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-08|15:35:33</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-11|18:47:57</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1910,14 +2028,14 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-08 15:35:33 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-08 15:35:33 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-11 18:47:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-11 18:47:57 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>The validation table shows that step 3 (checking for <code>session_duration</code> greater than <code>5</code>) has 18 failing test units. This means that 18 rows in the table are problematic. We’d like to see the rows that failed this validation step and we can do that with the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method.</p>
-<div id="f5f501d2" class="cell" data-execution_count="2">
+<div id="15ae3fa8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

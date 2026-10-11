@@ -35,10 +35,10 @@ An option to collect rows of the input table that didn't pass a particular valid
 The processed data frames produced by executing the validation steps is collected and stored in the [Validate](Validate.md#pointblank.Validate) object if `collect_tbl_checked=True`. This information is necessary for some methods (e.g., <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a>), but it can potentially make the object grow to a large size. To opt out of attaching this data, set this to `False`.
 
 `get_first_n: int | None = None`  
-If the option to collect rows where test units is chosen, there is the option here to collect the first [n](Validate.n.md#pointblank.Validate.n) rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).
+If the option to collect rows where test units is chosen, there is the option here to collect the first `n` rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).
 
 `sample_n: int | None = None`  
-If the option to collect non-passing rows is chosen, this option allows for the sampling of [n](Validate.n.md#pointblank.Validate.n) rows. Supply an integer number of rows to sample from the subset table. If [n](Validate.n.md#pointblank.Validate.n) happens to be greater than the number of non-passing rows, then all such rows will be returned.
+If the option to collect non-passing rows is chosen, this option allows for the sampling of `n` rows. Supply an integer number of rows to sample from the subset table. If `n` happens to be greater than the number of non-passing rows, then all such rows will be returned.
 
 `sample_frac: int | float | None = None`  
 If the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of `0` and `1`. The number of rows to return could be very large, however, the `extract_limit=` option will apply a hard limit to the returned rows.
@@ -56,7 +56,7 @@ The [Validate](Validate.md#pointblank.Validate) object with the results of the i
 
 ## Examples
 
-Let's use a built-in dataset (`"game_revenue"`) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We'll use the `get_first_n=` option so that any extracts of failing rows are limited to the first [n](Validate.n.md#pointblank.Validate.n) rows.
+Let's use a built-in dataset (`"game_revenue"`) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We'll use the `get_first_n=` option so that any extracts of failing rows are limited to the first `n` rows.
 
 
 ``` python
@@ -148,7 +148,7 @@ validation.interrogate(get_first_n=10)
 </tr>
 <tr class="gt_heading">
 <th colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div>
-<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-08|15:35:33</span>
+<span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-11|18:47:57</span>
 
 <span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span>
 
@@ -291,7 +291,7 @@ col_vals_regex()
 <tr class="gt_sourcenotes">
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 
-<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-08 15:35:33 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-08 15:35:33 UTC</span>
+<span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-11 18:47:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">< 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-11 18:47:57 UTC</span>
 </div></td>
 </tr>
 </tfoot>

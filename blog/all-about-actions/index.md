@@ -909,7 +909,7 @@ The <a href="../../reference/get_validation_summary.html#pointblank.get_validati
 - `tbl_name`: name of the validated table
 - `n_steps`: total number of validation steps
 - `n_passing_steps`, n_failing_steps: count of passing/failing steps
-- [n](../../reference/Validate.n.md#pointblank.Validate.n), [n_passed](../../reference/Validate.n_passed.md#pointblank.Validate.n_passed), [n_failed](../../reference/Validate.n_failed.md#pointblank.Validate.n_failed): total test units and their pass/fail counts
+- `n`, `n_passed`, `n_failed`: total test units and their pass/fail counts
 - `highest_severity`: the most severe threshold level reached ('warning', 'error', 'critical')
 - and many more detailed statistics
 

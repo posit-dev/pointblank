@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Comparing Large Files | Pointblank</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/reference/glossary.html" rel="next">
+<link href="../../user-guide/table-comparison/comparing-tables.html" rel="prev">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-compare.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
+<script src="../../theme-init.js"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <link rel="alternate" type="text/markdown" href="comparing-large-files.md">
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-large-files.html">
+  <meta name="description" content="Here’s a situation that comes up all the time: a pipeline run produces a target CSV file from a source CSV file, and you need to check that nothing...">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Comparing Large Files | Pointblank">
+  <meta property="og:description" content="Here’s a situation that comes up all the time: a pipeline run produces a target CSV file from a source CSV file, and you need to check that nothing...">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-large-files.html">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Comparing Large Files | Pointblank">
+  <meta name="twitter:description" content="Here’s a situation that comes up all the time: a pipeline run produces a target CSV file from a source CSV file, and you need to check that nothing...">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.0.1</code><br>Released 2026-10-07">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class=""></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+    </span>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs">Comparing Large Files</h1>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Getting Started</span></a>
+</div>
+      <ul id="quarto-sidebar-section-1" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/quickstart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quickstart</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validation Plan</span></a>
+</div>
+      <ul id="quarto-sidebar-section-2" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Methods</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/column-selection-patterns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Selection Patterns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/preprocessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preprocessing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/segmentation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Segmentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/briefs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Briefs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Advanced Validation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-3" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Expression-Based Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/schema-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Schema Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/assertions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assertions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/draft-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Draft Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/plan-serialization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializing Validation Plans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">YAML</span></a>
+</div>
+      <ul id="quarto-sidebar-section-4" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Validation Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Post Interrogation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-5" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/validation-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/step-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/sundering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sundering Validated Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quality Dimensions &amp; Scoring</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Data Inspection</span></a>
+</div>
+      <ul id="quarto-sidebar-section-6" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previewing Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/col-summary-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Summaries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/missing-vals-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing Values Reporting</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Test Data Generation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-7" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/test-data-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Test Data Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">The Pointblank CLI</span></a>
+</div>
+      <ul id="quarto-sidebar-section-8" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Inspection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CLI Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">MCP Server</span></a>
+</div>
+      <ul id="quarto-sidebar-section-9" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP Quick Start</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-10" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenTelemetry Integration</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Contracts &amp; Pipelines</span></a>
+</div>
+      <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Contracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/pipelines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pipeline Boundary Enforcement</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/yaml-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Contracts &amp; Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing External Schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/custom-adapters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Custom Adapters</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Metadata Import</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/metadata-import.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing Metadata from External Standards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/statistical-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical Package Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/cdisc-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CDISC Clinical Data Standards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CDISC Submission Conformance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Comparison</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing Two Tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-large-files.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Comparing Large Files</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Reference</span></a>
+</div>
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/reference/glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#why-the-usual-approaches-fall-short" id="toc-why-the-usual-approaches-fall-short" class="nav-link active" data-scroll-target="#why-the-usual-approaches-fall-short">Why the Usual Approaches Fall Short</a></li>
+  <li><a href="#how-pointblank-approaches-it" id="toc-how-pointblank-approaches-it" class="nav-link" data-scroll-target="#how-pointblank-approaches-it">How Pointblank Approaches It</a></li>
+  <li><a href="#choosing-an-engine-and-a-number-of-partitions" id="toc-choosing-an-engine-and-a-number-of-partitions" class="nav-link" data-scroll-target="#choosing-an-engine-and-a-number-of-partitions">Choosing an Engine and a Number of Partitions</a></li>
+  <li><a href="#tables-in-databases" id="toc-tables-in-databases" class="nav-link" data-scroll-target="#tables-in-databases">Tables in Databases</a></li>
+  <li><a href="#in-scripts-and-ci-pipelines" id="toc-in-scripts-and-ci-pipelines" class="nav-link" data-scroll-target="#in-scripts-and-ci-pipelines">In Scripts and CI Pipelines</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Comparing Large Files</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Here’s a situation that comes up all the time: a pipeline run produces a target CSV file from a source CSV file, and you need to check that nothing went wrong. Specifically, you want to find</p>
+<ol type="1">
+<li>records missing from the target,</li>
+<li>extra records in the target,</li>
+<li>records whose column values differ, and</li>
+<li>schema or column-name mismatches,</li>
+</ol>
+<p>and the files are big enough that loading both of them into memory is slow, or impossible.</p>
+<p>This article looks at why the usual approaches struggle with this, and how to do it with Pointblank’s <a href="../../user-guide/table-comparison/comparing-tables.html"><code>compare()</code></a> function and the <code>pb compare</code> command.</p>
+<section id="why-the-usual-approaches-fall-short" class="level1">
+<h1>Why the Usual Approaches Fall Short</h1>
+<p><strong>A pandas merge.</strong> Reading both files and doing an outer merge on the key (with <code>indicator=True</code>) does identify missing and extra rows, and the merged frame can be compared column by column to find changed values. But it needs both files in memory <em>plus</em> the merged result, which is wider than either input. For large files that’s where memory runs out. Nulls take extra care too, since <code>NaN != NaN</code>.</p>
+<p><strong>Python sets.</strong> Turning each file’s rows into a set of tuples and taking set differences is quick to write, but it can’t tell a <em>changed</em> row from a missing one plus an extra one, can’t say which column changed, silently collapses duplicate rows, and still holds every row of both files in memory (as Python objects, which is worse than a DataFrame).</p>
+<p><strong>Reading in chunks.</strong> Processing the files chunk by chunk keeps memory in check, but a row’s counterpart in the other file is usually in a <em>different</em> chunk, unless both files happen to be sorted the same way. Making chunked comparison correct means partitioning both files by key, so that each key’s rows from both files land in the same chunk. That’s a lot of code to get right.</p>
+</section>
+<section id="how-pointblank-approaches-it" class="level1">
+<h1>How Pointblank Approaches It</h1>
+<p>Three things make <code>compare()</code> suitable for large files:</p>
+<ol type="1">
+<li><strong>Files are scanned, not loaded.</strong> CSV and Parquet paths are read lazily (with Polars, or DuckDB), so the comparison is a query plan rather than two DataFrames in memory.</li>
+<li><strong>The work happens in the engine.</strong> The join on the key, the per-column comparisons, and the counting are all done by the query engine. Python only receives the counts and small samples of the differing rows (the <code>limit=</code> of each sample).</li>
+<li><strong>Chunking done correctly.</strong> With <code>partitions=N</code>, the comparison runs in N passes, each covering the keys whose hash falls into one bucket, on <em>both</em> tables. A key’s rows always land in the same pass, so the results are exactly those of a single-pass comparison, while each pass only joins about <code>1/N</code> of the rows.</li>
+</ol>
+<p>Let’s try it on a pair of CSV files. We’ll generate a source file with 200,000 orders and a target file in which some orders are missing, some amounts changed, a few orders were added, and the rows were shuffled:</p>
+<div id="267d2536" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200_000</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">23</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: np.arange(n),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: rng.normal(<span class="dv">100</span>, <span class="dv">20</span>, n).<span class="bu">round</span>(<span class="dv">2</span>),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"region"</span>: rng.choice([<span class="st">"north"</span>, <span class="st">"south"</span>, <span class="st">"east"</span>, <span class="st">"west"</span>], n),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> (</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    source.<span class="bu">filter</span>(pl.col(<span class="st">"order_id"</span>) <span class="op">%</span> <span class="dv">1000</span> <span class="op">!=</span> <span class="dv">7</span>)  <span class="co"># 200 orders missing</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    .with_columns(  <span class="co"># 400 amounts changed</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        amount<span class="op">=</span>pl.when(pl.col(<span class="st">"order_id"</span>) <span class="op">%</span> <span class="dv">500</span> <span class="op">==</span> <span class="dv">3</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        .then(pl.col(<span class="st">"amount"</span>) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        .otherwise(<span class="st">"amount"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    .vstack(source.tail(<span class="dv">50</span>).with_columns(pl.col(<span class="st">"order_id"</span>) <span class="op">+</span> n))  <span class="co"># 50 extra orders</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    .sample(fraction<span class="op">=</span><span class="fl">1.0</span>, shuffle<span class="op">=</span><span class="va">True</span>, seed<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> Path(tempfile.mkdtemp())</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>source.write_csv(data_dir <span class="op">/</span> <span class="st">"source.csv"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>target.write_csv(data_dir <span class="op">/</span> <span class="st">"target.csv"</span>)</span></code></pre></div>
+</div>
+<p>Now we compare the two files by giving <code>compare()</code> their paths:</p>
+<div id="7e01b2b4" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"source.csv"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"target.csv"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"order_id"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>comparison</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmpni0pmy56/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpni0pmy56/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:1.00%; height:100%; background:#E8A33D;"></div></div>400 of 199,800 matched rows differ (0.2%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (showing 10 of 400 rows)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">53.62</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">54.62</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">503</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">115.89</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">116.89</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">104.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">105.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1503</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">117.92</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">118.92</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">56.37</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">57.37</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2503</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">119.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">120.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">88.82</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">89.82</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3503</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">58.09</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">59.09</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">86.61</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">87.61</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4503</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">96.4</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">97.4</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (showing 10 of 200 rows)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">7</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 112.12</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 94.3</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.68</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 140</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.94</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">5007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.42</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">6007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 78.28</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">7007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 68.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">8007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 58.93</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">9007</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 95.88</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (showing 10 of 50 rows)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399950</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 104.47</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399951</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 102.32</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399952</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.29</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399953</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 91.71</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399954</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 103.78</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399955</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 134.2</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399956</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 133.98</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399957</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 107.84</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399958</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 76.61</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399959</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 90.26</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>All four questions are answered in one place: missing and extra rows, changed rows (with the <code>amount</code> column identified as the one that differs), and the schema check in the header.</p>
+<p>The same comparison in four partitions gives identical results:</p>
+<div id="48b47bc4" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>partitioned <span class="op">=</span> pb.compare(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"source.csv"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"target.csv"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"order_id"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    partitions<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>partitioned.status_counts <span class="op">==</span> comparison.status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>True</code></pre>
+</div>
+</div>
+</section>
+<section id="choosing-an-engine-and-a-number-of-partitions" class="level1">
+<h1>Choosing an Engine and a Number of Partitions</h1>
+<p>When given file paths, <code>compare()</code> scans them with Polars, which is the fastest option. DuckDB uses less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB relations and pass those to <code>compare()</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    con.read_csv(<span class="st">"source.csv"</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    con.read_csv(<span class="st">"target.csv"</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"order_id"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    partitions<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Here’s how the options compare on two CSV files with 10 million rows and 10 columns each (about 730 MB per file), with the rows of the target shuffled. Peak memory is the memory the process actually owns (its physical footprint):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Wall time</th>
+<th>Peak memory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Polars: read both files, then a full join (for reference)</td>
+<td>2.1 s</td>
+<td>5.7 GB</td>
+</tr>
+<tr class="even">
+<td><code>compare()</code> on file paths (Polars)</td>
+<td>5.7 s</td>
+<td>4.2 GB</td>
+</tr>
+<tr class="odd">
+<td><code>compare()</code> on file paths (Polars), <code>partitions=4</code></td>
+<td>6.8 s</td>
+<td>1.6 GB</td>
+</tr>
+<tr class="even">
+<td><code>compare()</code> on file paths (Polars), <code>partitions=8</code></td>
+<td>10.2 s</td>
+<td>1.1 GB</td>
+</tr>
+<tr class="odd">
+<td><code>compare()</code> on DuckDB relations</td>
+<td>6.8 s</td>
+<td>1.6 GB</td>
+</tr>
+<tr class="even">
+<td><code>compare()</code> on DuckDB relations, <code>partitions=8</code></td>
+<td>19.0 s</td>
+<td>0.8 GB</td>
+</tr>
+</tbody>
+</table>
+<p>And with 100 million rows (about 7.4 GB per file), where comparing without partitions needs more memory than most machines have:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Wall time</th>
+<th>Peak memory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>compare()</code> on file paths (Polars), <code>partitions=8</code></td>
+<td>139 s</td>
+<td>6.6 GB</td>
+</tr>
+<tr class="even">
+<td><code>compare()</code> on file paths (Polars), <code>partitions=16</code></td>
+<td>217 s</td>
+<td>4.4 GB</td>
+</tr>
+<tr class="odd">
+<td><code>compare()</code> on DuckDB relations, <code>partitions=8</code></td>
+<td>166 s</td>
+<td>2.0 GB</td>
+</tr>
+</tbody>
+</table>
+<p>Every approach found exactly the expected differences. The numbers will vary with your machine and data, but the pattern is consistent: partitions trade time (each pass reads the files again) for memory, Polars is the faster engine, and DuckDB the more memory-efficient one. Some practical guidance:</p>
+<ul>
+<li>If the files fit comfortably in memory, use the defaults.</li>
+<li>If memory is tight, increase <code>partitions=</code> until the peak memory is acceptable; for the lowest memory use, read the files as DuckDB relations.</li>
+<li>Setting DuckDB’s own <code>memory_limit</code> (so it can spill to disk) without partitions doesn’t hold memory to the limit: with a 4 GB limit, the 100-million-row comparison peaked at 6.3 GB. Partitions give more predictable memory use.</li>
+<li>A good key matters most: with <code>keys=</code>, row order doesn’t matter, and partitioning is possible. Without a key, rows are compared by position (or as multisets, with <code>keys="*"</code>), and partitions can’t be used.</li>
+</ul>
+<p>You can run the same benchmark on your own machine with the script in the Pointblank repository (<code>benchmark/compare_large_files.py</code>).</p>
+</section>
+<section id="tables-in-databases" class="level1">
+<h1>Tables in Databases</h1>
+<p>Tables don’t have to be files. If both tables are in the same database (e.g., two Ibis tables from one DuckDB, PostgreSQL, or Snowflake connection), the comparison runs entirely inside the database, and only the counts and samples are transferred. Tables from <em>different</em> databases are first brought into Polars, so for large tables it’s better to have both in one place.</p>
+</section>
+<section id="in-scripts-and-ci-pipelines" class="level1">
+<h1>In Scripts and CI Pipelines</h1>
+<p>The <code>pb compare</code> command does all of this from the command line, and its exit code tells a script or CI job whether the files match (<code>0</code>), differ (<code>1</code>), or couldn’t be compared (<code>2</code>):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> compare source.csv target.csv <span class="at">--key</span> order_id <span class="at">--engine</span> duckdb <span class="at">--partitions</span> 8 <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-html</span> diff.html <span class="at">--output-json</span> diff.json</span></code></pre></div>
+<p>The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add <code>--no-samples</code> to keep row values out of the JSON output. To make the comparison one check among others in a validation, use <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">Validate.tbl_match()</a>, which accepts the same settings, including <code>partitions=</code> (see <a href="../../user-guide/table-comparison/comparing-tables.html">Comparing Two Tables</a>).</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../user-guide/table-comparison/comparing-tables.html" class="pagination-link" aria-label="Comparing Two Tables">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Comparing Two Tables</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../user-guide/reference/glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text">Glossary</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+</div>
+</footer>
+<script src="../../github-widget.js"></script>
+<script src="../../copy-page.js"></script>
+<script src="../../sidebar-wrap.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
+<script src="../../sidebar-filter.js"></script>
+<script src="../../dark-mode-toggle.js"></script>
+<script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
+<script src="../../keyboard-nav.js"></script>
+<script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
+<script src="../../mermaid-renderer.js"></script>
+<script src="../../reference-switcher.js"></script>
+<script src="../../tooltips.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
+<script src="../../responsive-tables.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
+<script src="../../navbar-widgets.js"></script>
+
+
+
+
+</body></html>

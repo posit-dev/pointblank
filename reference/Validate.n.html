@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-90c0cb8701bc726ef78bd9649a6be318.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="493" data-forks="35"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -575,6 +575,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validate.tbl_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_reconcile.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_reconcile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1080,9 +1086,121 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Table Pre-checks</span></a>
+ <span class="menu-text">Table Comparison</span></a>
 </div>
       <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SchemaDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SchemaDiff</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Comparison Methods</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.schema_ok.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.schema_ok</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.identical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.identical</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.status_counts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.status_counts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__bool__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__bool__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__repr__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__repr__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.rows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.column_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.column_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.get_tabular_report</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Pre-checks</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
@@ -1102,7 +1220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">YAML</span></a>
 </div>
-      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
@@ -1128,7 +1246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Utility Functions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
@@ -1178,7 +1296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Test Data Generation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
@@ -1252,7 +1370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Prebuilt Actions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
@@ -1272,7 +1390,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Metadata Import/Export</span></a>
 </div>
-      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/import_metadata.html" class="sidebar-item-text sidebar-link">
@@ -1328,7 +1446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">SDTM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtm.html" class="sidebar-item-text sidebar-link">
@@ -1378,7 +1496,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">ADaM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_adam.html" class="sidebar-item-text sidebar-link">
@@ -1428,7 +1546,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">CDISC Submission Conformance</span></a>
 </div>
-      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-21" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
@@ -1460,7 +1578,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Integrations</span></a>
 </div>
-      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-22" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
@@ -1512,7 +1630,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17593-L17703" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18154-L18264" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">n</span>(</span>
@@ -1521,7 +1639,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n()</a> method provides the number of test units for each validation step. This is the total number of test units that were evaluated in the validation step. It is always an integer value.</p>
+<p>The <code>n()</code> method provides the number of test units for each validation step. This is the total number of test units that were evaluated in the validation step. It is always an integer value.</p>
 <p>Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.</p>
 <p>The method provides a dictionary of the number of test units for each validation step. If the <code>scalar=True</code> argument is provided and <code>i=</code> is a scalar, the value is returned as a scalar instead of a dictionary. The total number of test units for a validation step is the sum of the number of passing and failing test units (i.e., <code>n = n_passed + n_failed</code>).</p>
 </div>
@@ -1554,7 +1672,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Different types of validation steps can have different numbers of test units. In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the number of test units for each step will be a little bit different.</p>
-<div id="465ab4f0" class="cell" data-execution_count="1">
+<div id="2e1f6b9e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1578,32 +1696,32 @@ A dictionary of the number of test units for each validation step or a scalar va
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<p>The first validation step checks that all values in column <code>a</code> are greater than <code>0</code>. Let’s use the <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n()</a> method to determine the number of test units this validation step.</p>
-<div id="a536e1e5" class="cell" data-execution_count="2">
+<p>The first validation step checks that all values in column <code>a</code> are greater than <code>0</code>. Let’s use the <code>n()</code> method to determine the number of test units this validation step.</p>
+<div id="44429e15" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">1</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>4</code></pre>
 </div>
 </div>
 <p>The returned value of <code>4</code> is the number of test units for the first validation step. This value is the same as the number of rows in the table.</p>
-<p>The second validation step checks for the existence of column <code>b</code>. Using the <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n()</a> method we can get the number of test units for this the second step.</p>
-<div id="3a15f69b" class="cell" data-execution_count="3">
+<p>The second validation step checks for the existence of column <code>b</code>. Using the <code>n()</code> method we can get the number of test units for this the second step.</p>
+<div id="0ff1ebd2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">2</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>1</code></pre>
 </div>
 </div>
 <p>There’s a single test unit here because the validation step is checking for the presence of a single column.</p>
-<p>The third validation step checks that all values in column <code>b</code> are less than <code>9</code> after filtering the table to only include rows where the value in column <code>a</code> is greater than <code>1</code>. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let’s prove this by using the <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n()</a> method.</p>
-<div id="3a4e5d17" class="cell" data-execution_count="4">
+<p>The third validation step checks that all values in column <code>b</code> are less than <code>9</code> after filtering the table to only include rows where the value in column <code>a</code> is greater than <code>1</code>. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let’s prove this by using the <code>n()</code> method.</p>
+<div id="66fa8a56" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">3</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>3</code></pre>
 </div>
 </div>
-<p>The returned value of <code>3</code> is the number of test units for the third validation step. When using the <code>pre=</code> argument, the input table can be mutated before performing the validation. The <a href="../reference/Validate.n.html#pointblank.Validate.n" class="gdls-link gdls-code">n()</a> method is a good way to determine whether the mutation performed as expected.</p>
+<p>The returned value of <code>3</code> is the number of test units for the third validation step. When using the <code>pre=</code> argument, the input table can be mutated before performing the validation. The <code>n()</code> method is a good way to determine whether the mutation performed as expected.</p>
 <p>In all of these examples, the <code>scalar=True</code> argument was used to return the value as a scalar integer value. If <code>scalar=False</code>, the method will return a dictionary with an entry for the validation step number (from the <code>i=</code> argument) and the number of test units. Futhermore, leaving out the <code>i=</code> argument altogether will return a dictionary with filled with the number of test units for each validation step. Here’s what that looks like:</p>
-<div id="0f8b8214" class="cell" data-execution_count="5">
+<div id="3f974f4c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.n()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>{1: 4, 2: 1, 3: 3}</code></pre>

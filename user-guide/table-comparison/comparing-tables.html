@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Comparing Two Tables | Pointblank</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/table-comparison/comparing-large-files.html" rel="next">
+<link href="../../user-guide/metadata-import/cdisc-submission-conformance.html" rel="prev">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-compare.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-compare.js';s.defer=true;document.head.appendChild(s);})();</script>
+<script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'gd-lightbox-annotate.css'}));</script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'gd-lightbox-annotate.js';s.defer=true;document.head.appendChild(s);})();</script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
+<script src="../../theme-init.js"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+
+
+  <link rel="alternate" type="text/markdown" href="comparing-tables.md">
+  <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html">
+  <meta name="description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Comparing Two Tables | Pointblank">
+  <meta property="og:description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
+  <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html">
+  <meta property="og:site_name" content="Pointblank">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Comparing Two Tables | Pointblank">
+  <meta name="twitter:description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.0.1</code><br>Released 2026-10-07">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class=""></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <span class="nav-link">
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+    </span>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs">Comparing Two Tables</h1>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Getting Started</span></a>
+</div>
+      <ul id="quarto-sidebar-section-1" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/quickstart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quickstart</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/getting-started/installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Validation Plan</span></a>
+</div>
+      <ul id="quarto-sidebar-section-2" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/validation-methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Methods</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/column-selection-patterns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Selection Patterns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/preprocessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preprocessing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/segmentation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Segmentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/validation-plan/briefs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Briefs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Advanced Validation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-3" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Expression-Based Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/schema-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Schema Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/assertions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assertions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/draft-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Draft Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/plan-serialization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializing Validation Plans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/ai-validation-editor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI Validation Editor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/composable-steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composable Steps</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">YAML</span></a>
+</div>
+      <ul id="quarto-sidebar-section-4" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Validation Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Post Interrogation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-5" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/validation-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/step-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step Reports</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/sundering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sundering Validated Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quality Dimensions &amp; Scoring</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Data Inspection</span></a>
+</div>
+      <ul id="quarto-sidebar-section-6" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previewing Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/col-summary-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Column Summaries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/data-inspection/missing-vals-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing Values Reporting</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Test Data Generation</span></a>
+</div>
+      <ul id="quarto-sidebar-section-7" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/test-data-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Test Data Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">The Pointblank CLI</span></a>
+</div>
+      <ul id="quarto-sidebar-section-8" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Inspection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CLI Reference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">MCP Server</span></a>
+</div>
+      <ul id="quarto-sidebar-section-9" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP Quick Start</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Integrations</span></a>
+</div>
+      <ul id="quarto-sidebar-section-10" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenTelemetry Integration</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Contracts &amp; Pipelines</span></a>
+</div>
+      <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Contracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/pipelines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pipeline Boundary Enforcement</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/yaml-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Contracts &amp; Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing External Schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/contracts-and-pipelines/custom-adapters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Custom Adapters</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Metadata Import</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/metadata-import.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing Metadata from External Standards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/statistical-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical Package Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/cdisc-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CDISC Clinical Data Standards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CDISC Submission Conformance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Comparison</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-tables.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Comparing Two Tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-large-files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing Large Files</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Reference</span></a>
+</div>
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/reference/glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#a-first-comparison" id="toc-a-first-comparison" class="nav-link active" data-scroll-target="#a-first-comparison">A First Comparison</a></li>
+  <li><a href="#row-statuses" id="toc-row-statuses" class="nav-link" data-scroll-target="#row-statuses">Row Statuses</a></li>
+  <li><a href="#getting-the-differing-rows" id="toc-getting-the-differing-rows" class="nav-link" data-scroll-target="#getting-the-differing-rows">Getting the Differing Rows</a></li>
+  <li><a href="#how-rows-are-aligned" id="toc-how-rows-are-aligned" class="nav-link" data-scroll-target="#how-rows-are-aligned">How Rows Are Aligned</a></li>
+  <li><a href="#tolerances-normalization-and-nulls" id="toc-tolerances-normalization-and-nulls" class="nav-link" data-scroll-target="#tolerances-normalization-and-nulls">Tolerances, Normalization, and Nulls</a></li>
+  <li><a href="#schema-differences" id="toc-schema-differences" class="nav-link" data-scroll-target="#schema-differences">Schema Differences</a></li>
+  <li><a href="#duplicate-keys" id="toc-duplicate-keys" class="nav-link" data-scroll-target="#duplicate-keys">Duplicate Keys</a></li>
+  <li><a href="#table-comparison-as-a-validation-step" id="toc-table-comparison-as-a-validation-step" class="nav-link" data-scroll-target="#table-comparison-as-a-validation-step">Table Comparison as a Validation Step</a></li>
+  <li><a href="#reconciling-aggregates" id="toc-reconciling-aggregates" class="nav-link" data-scroll-target="#reconciling-aggregates">Reconciling Aggregates</a></li>
+  <li><a href="#exporting-the-results" id="toc-exporting-the-results" class="nav-link" data-scroll-target="#exporting-the-results">Exporting the Results</a></li>
+  <li><a href="#from-the-command-line" id="toc-from-the-command-line" class="nav-link" data-scroll-target="#from-the-command-line">From the Command Line</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Comparing Two Tables</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A very common data question is <em>how do these two tables differ?</em> Maybe you refactored a pipeline and want to know whether its output changed, migrated a table from one database to another, or received a new extract of a data feed. In each case there’s a <em>source</em> table (the reference, or the data you expect) and a <em>target</em> table (the data you want to check), and you want to know:</p>
+<ul>
+<li>which records are missing from the target</li>
+<li>which records in the target are extra</li>
+<li>which records have values that differ, and in which columns</li>
+<li>whether the columns themselves (names, types, order) changed</li>
+</ul>
+<p>Pointblank answers all of these with the <code>compare()</code> function, and the same comparison is available as a validation step through <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">Validate.tbl_match()</a> and on the command line through <code>pb compare</code>.</p>
+<section id="a-first-comparison" class="level1">
+<h1>A First Comparison</h1>
+<p>Let’s make two small tables of orders. The target is a later extract of the same data: one order had its amount corrected, one order is gone, and a new order has appeared.</p>
+<div id="ccacb78d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1003</span>, <span class="dv">1004</span>, <span class="dv">1005</span>],</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Ana"</span>, <span class="st">"Ben"</span>, <span class="st">"Cho"</span>, <span class="st">"Dev"</span>, <span class="st">"Eli"</span>],</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">25.00</span>, <span class="fl">40.50</span>, <span class="fl">12.75</span>, <span class="fl">99.99</span>, <span class="fl">5.00</span>],</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"status"</span>: [<span class="st">"shipped"</span>, <span class="st">"shipped"</span>, <span class="st">"pending"</span>, <span class="st">"shipped"</span>, <span class="st">"cancelled"</span>],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1004</span>, <span class="dv">1005</span>, <span class="dv">1006</span>],</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Ana"</span>, <span class="st">"Ben"</span>, <span class="st">"Dev"</span>, <span class="st">"Eli"</span>, <span class="st">"Fay"</span>],</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">25.00</span>, <span class="fl">45.50</span>, <span class="fl">99.99</span>, <span class="fl">5.00</span>, <span class="fl">18.25</span>],</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"status"</span>: [<span class="st">"shipped"</span>, <span class="st">"shipped"</span>, <span class="st">"shipped"</span>, <span class="st">"cancelled"</span>, <span class="st">"pending"</span>],</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>Since every order has a unique <code>order_id</code>, we’ll use it as the <em>key</em> to line up the rows of the two tables:</p>
+<div id="d11610be" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>comparison</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The report’s header gives the verdict and a breakdown of the rows. Below it, each section shows one kind of difference: which columns have mismatched values (and how often), then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown, as <em>old → new</em> with the numeric difference alongside.</p>
+</section>
+<section id="row-statuses" class="level1">
+<h1>Row Statuses</h1>
+<p>Every row that can be aligned between the two tables gets exactly one status:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>match</code></td>
+<td>the row is in both tables and all compared values are equal</td>
+</tr>
+<tr class="even">
+<td><code>changed</code></td>
+<td>the row is in both tables but at least one compared value differs</td>
+</tr>
+<tr class="odd">
+<td><code>missing</code></td>
+<td>the row is in the source but not in the target</td>
+</tr>
+<tr class="even">
+<td><code>extra</code></td>
+<td>the row is in the target but not in the source</td>
+</tr>
+<tr class="odd">
+<td><code>dup_key</code></td>
+<td>the row’s key appears more than once in either table, so it can’t be aligned</td>
+</tr>
+</tbody>
+</table>
+<p>The counts are available directly on the <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object:</p>
+<div id="70ba2ed9" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
+</div>
+</div>
+<div id="36a121ad" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison.n_changed, comparison.n_missing, comparison.n_extra</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>(1, 1, 1)</code></pre>
+</div>
+</div>
+<p>A <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only if the tables match, so it can be used directly in a test or an <code>if</code> statement:</p>
+<div id="63f83a8a" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">bool</span>(comparison)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>False</code></pre>
+</div>
+</div>
+</section>
+<section id="getting-the-differing-rows" class="level1">
+<h1>Getting the Differing Rows</h1>
+<p>Use the <a href="../../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> method to get the rows with a given status as a table. Changed rows come with a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column:</p>
+<div id="cc6f8b2c" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 7)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer_source</th><th>customer_target</th><th>amount_source</th><th>amount_target</th><th>status_source</th><th>status_target</th></tr><tr><td>i64</td><td>str</td><td>str</td><td>f64</td><td>f64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1002</td><td>"Ben"</td><td>"Ben"</td><td>40.5</td><td>45.5</td><td>"shipped"</td><td>"shipped"</td></tr></tbody></table></div>
+</div>
+</div>
+<p>Missing rows come from the source and extra rows from the target:</p>
+<div id="f1a37875" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>status</th></tr><tr><td>i64</td><td>str</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>1003</td><td>"Cho"</td><td>12.75</td><td>"pending"</td></tr></tbody></table></div>
+</div>
+</div>
+<div id="282363f2" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>status</th></tr><tr><td>i64</td><td>str</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>1006</td><td>"Fay"</td><td>18.25</td><td>"pending"</td></tr></tbody></table></div>
+</div>
+</div>
+<p>Only up to <code>limit=</code> rows (100 by default) are collected, so this is safe even for very large tables. For a per-column view of the mismatches, use <a href="../../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
+<div id="f86a2967" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 6)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>column</th><th>target_column</th><th>dtype_source</th><th>dtype_target</th><th>n_mismatch</th><th>f_mismatch</th></tr><tr><td>str</td><td>str</td><td>str</td><td>str</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>"customer"</td><td>"customer"</td><td>"String"</td><td>"String"</td><td>0</td><td>0.0</td></tr><tr><td>"amount"</td><td>"amount"</td><td>"Float64"</td><td>"Float64"</td><td>1</td><td>0.25</td></tr><tr><td>"status"</td><td>"status"</td><td>"String"</td><td>"String"</td><td>0</td><td>0.0</td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="how-rows-are-aligned" class="level1">
+<h1>How Rows Are Aligned</h1>
+<p>The <code>keys=</code> argument decides how the rows of the two tables are lined up:</p>
+<ul>
+<li><strong>By key</strong> (<code>keys="order_id"</code>, or a list for a composite key): rows are matched on the key values, so their order doesn’t matter. This is the most informative mode, and the one to use whenever the data has an identifier.</li>
+<li><strong>By position</strong> (<code>keys=None</code>, the default): the first row of the source is compared with the first row of the target, and so on. This suits outputs that are supposed to be identical row for row.</li>
+<li><strong>As multisets</strong> (<code>keys="*"</code>): whole rows are compared regardless of their order, with duplicates counted. This is for tables that have no key at all.</li>
+</ul>
+<p>Here’s what positional alignment makes of the same two tables. Since a row was removed and another added, most rows no longer line up:</p>
+<div id="4a6efa27" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target).status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
+</div>
+</div>
+</section>
+<section id="tolerances-normalization-and-nulls" class="level1">
+<h1>Tolerances, Normalization, and Nulls</h1>
+<p>Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given for all numeric columns or per column. An absolute tolerance of <code>5</code> absorbs the corrected amount:</p>
+<div id="44b24822" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">5</span>}).n_changed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>0</code></pre>
+</div>
+</div>
+<p>Tolerances can be absolute (<code>atol</code>), relative to the source value (<code>rtol</code>), or both, as in <code>tolerance={"amount": {"atol": 0.01, "rtol": 1e-6}}</code>. Two values are equal if <code>|source - target| &lt;= atol + rtol * |source|</code>. Datetime tolerances are durations like <code>"1s"</code>, <code>"500ms"</code>, or <code>"2m"</code>.</p>
+<p>String values can be normalized before comparing with <code>normalize=</code>. For example, <code>normalize={"customer": ["strip", "lower"]}</code> ignores surrounding whitespace and letter case (the available operations are <code>"strip"</code>, <code>"lower"</code>, <code>"upper"</code>, <code>"collapse_whitespace"</code>, and <code>{"round": n}</code>). Reports always show the original values.</p>
+<p>By default, two nulls count as equal, and NaN values in floating-point columns are treated as nulls. Use <code>null_equal=False</code> to count two nulls as a difference.</p>
+</section>
+<section id="schema-differences" class="level1">
+<h1>Schema Differences</h1>
+<p>Column differences are reported in the <em>Schema differences</em> section of the report and in the <code>schema_diff</code> attribute. Suppose the target renamed a column and added another:</p>
+<div id="e8dff99c" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>target_v2 <span class="op">=</span> target.rename({<span class="st">"customer"</span>: <span class="st">"customer_name"</span>}).with_columns(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    region<span class="op">=</span>pl.lit(<span class="st">"EU"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>comparison_v2 <span class="op">=</span> pb.compare(source, target_v2, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>comparison_v2.schema_diff</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>SchemaDiff(only_in_source=['customer'], only_in_target=['customer_name', 'region'], dtype_changed=[], renamed=[], case_only=[], reordered=False)</code></pre>
+</div>
+</div>
+<p>With the default <code>schema="strict"</code>, any schema difference means the tables don’t match and every row counts as failing. Two arguments help here. <code>column_map=</code> pairs up renamed columns, and <code>schema="common"</code> compares only the columns that both tables share (still reporting the schema differences, but without failing any rows):</p>
+<div id="eefd54c0" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pb.compare(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    source,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    target_v2,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"order_id"</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    column_map<span class="op">=</span>{<span class="st">"customer"</span>: <span class="st">"customer_name"</span>},</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    schema<span class="op">=</span><span class="st">"common"</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">schema: common columns</span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Schema differences</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">region</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">customer</td>
+    <td style="font-size: 12px;" class="gt_row gt_left">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>To compare just some of the columns, list them in <code>columns=</code>. The schema check is then limited to the keys and those columns.</p>
+</section>
+<section id="duplicate-keys" class="level1">
+<h1>Duplicate Keys</h1>
+<p>A key that appears more than once in either table can’t be aligned unambiguously, so its rows get the <code>dup_key</code> status (they always count as failing). By default the report lists the duplicated keys with their number of occurrences in each table. With <code>dup_keys="compare"</code>, the report also compares the duplicated rows pairwise to show which columns differ between them.</p>
+</section>
+<section id="table-comparison-as-a-validation-step" class="level1">
+<h1>Table Comparison as a Validation Step</h1>
+<p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
+<div id="55755b34" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>target, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.25</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>source, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #EBBC14; color: transparent;font-size: 0px;" class="gt_row gt_left">#EBBC14</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>tbl_match</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="tbl_match" transform="translate(0.000000, 0.758621)">
+            <path d="M56.712234,1.01466935 C59.1975153,1.01466935 61.4475153,2.02202867 63.076195,3.65070832 C64.7048747,5.27938798 65.712234,7.52938798 65.712234,10.0146694 L65.712234,10.0146694 L65.712234,65.0146694 L10.712234,65.0146694 C8.22695259,65.0146694 5.97695259,64.00731 4.34827294,62.3786304 C2.71959328,60.7499507 1.71223397,58.4999507 1.71223397,56.0146694 L1.71223397,56.0146694 L1.71223397,10.0146694 C1.71223397,7.52938798 2.71959328,5.27938798 4.34827294,3.65070832 C5.97695259,2.02202867 8.22695259,1.01466935 10.712234,1.01466935 L10.712234,1.01466935 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="equal" transform="translate(46.026611, 20.710122) rotate(-90.000000) translate(-46.026611, -20.710122) translate(42.526611, 16.210122)" stroke="#000000" stroke-linecap="square">
+                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="Line"></line>
+                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line"></line>
+            </g>
+            <g id="equal" transform="translate(21.397857, 45.319217) rotate(-90.000000) translate(-21.397857, -45.319217) translate(17.897857, 40.819217)" stroke="#000000" stroke-linecap="square">
+                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="Line"></line>
+                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line"></line>
+            </g>
+            <path d="M21.3882419,7.77869783 C21.3584298,7.77935177 21.328704,7.78216367 21.2992996,7.78711914 L9.09014824,7.78711914 C8.75029431,7.78715312 8.47479677,8.06265067 8.47476279,8.4025046 L8.47476279,16.2991498 C8.46377874,16.3656061 8.46377874,16.4334149 8.47476279,16.4998713 L8.47476279,24.9145461 C8.46377874,24.9810025 8.46377874,25.0488112 8.47476279,25.1152676 L8.47476279,33.0179226 C8.47479677,33.3577766 8.75029431,33.6332741 9.09014824,33.6333081 L21.2944916,33.6333081 C21.3609479,33.6442921 21.4287567,33.6442921 21.4952131,33.6333081 L33.7055663,33.6333081 C34.0454202,33.6332741 34.3209178,33.3577766 34.3209517,33.0179226 L34.3209517,25.1212775 C34.3319358,25.0548211 34.3319358,24.9870123 34.3209517,24.920556 L34.3209517,16.5058811 C34.3319358,16.4394248 34.3319358,16.371616 34.3209517,16.3051596 L34.3209517,8.4025046 C34.3209178,8.06265067 34.0454202,7.78715312 33.7055663,7.78711914 L21.4928094,7.78711914 C21.4582565,7.78134369 21.4232736,7.77869783 21.3882419,7.77869783 Z M9.70553369,9.01789005 L20.7824718,9.01789005 L20.7824718,15.78713 L9.70553369,15.78713 L9.70553369,9.01789005 Z M22.0132427,9.01789005 L33.0901808,9.01789005 L33.0901808,15.78713 L22.0132427,15.78713 L22.0132427,9.01789005 Z M9.70553369,17.0179009 L20.7824718,17.0179009 L20.7824718,24.4025263 L9.70553369,24.4025263 L9.70553369,17.0179009 Z M22.0132427,17.0179009 L33.0901808,17.0179009 L33.0901808,24.4025263 L22.0132427,24.4025263 L22.0132427,17.0179009 Z M9.70553369,25.6332972 L20.7824718,25.6332972 L20.7824718,32.4025372 L9.70553369,32.4025372 L9.70553369,25.6332972 Z M22.0132427,25.6332972 L33.0901808,25.6332972 L33.0901808,32.4025372 L22.0132427,32.4025372 L22.0132427,25.6332972 Z" id="table" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M46.0169953,32.3877926 C45.9871832,32.3884465 45.9574575,32.3912584 45.928053,32.3962139 L33.7189016,32.3962139 C33.3790477,32.3962479 33.1035502,32.6717454 33.1035162,33.0115993 L33.1035162,40.9082445 C33.0925322,40.9747009 33.0925322,41.0425097 33.1035162,41.108966 L33.1035162,49.5236408 C33.0925322,49.5900972 33.0925322,49.657906 33.1035162,49.7243624 L33.1035162,57.6270174 C33.1035502,57.9668713 33.3790477,58.2423689 33.7189016,58.2424028 L45.923245,58.2424028 C45.9897014,58.2533869 46.0575101,58.2533869 46.1239665,58.2424028 L58.3343197,58.2424028 C58.6741736,58.2423689 58.9496712,57.9668713 58.9497051,57.6270174 L58.9497051,49.7303722 C58.9606892,49.6639158 58.9606892,49.5961071 58.9497051,49.5296507 L58.9497051,41.1149759 C58.9606892,41.0485195 58.9606892,40.9807107 58.9497051,40.9142544 L58.9497051,33.0115993 C58.9496712,32.6717454 58.6741736,32.3962479 58.3343197,32.3962139 L46.1215628,32.3962139 C46.0870099,32.3904384 46.052027,32.3877926 46.0169953,32.3877926 Z M34.3342871,33.6269848 L45.4112252,33.6269848 L45.4112252,40.3962248 L34.3342871,40.3962248 L34.3342871,33.6269848 Z M46.6419961,33.6269848 L57.7189342,33.6269848 L57.7189342,40.3962248 L46.6419961,40.3962248 L46.6419961,33.6269848 Z M34.3342871,41.6269957 L45.4112252,41.6269957 L45.4112252,49.0116211 L34.3342871,49.0116211 L34.3342871,41.6269957 Z M46.6419961,41.6269957 L57.7189342,41.6269957 L57.7189342,49.0116211 L46.6419961,49.0116211 L46.6419961,41.6269957 Z M34.3342871,50.242392 L45.4112252,50.242392 L45.4112252,57.0116319 L34.3342871,57.0116319 L34.3342871,50.242392 Z M46.6419961,50.242392 L57.7189342,50.242392 L57.7189342,57.0116319 L46.6419961,57.0116319 L46.6419961,50.242392 Z" id="table" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>tbl_match()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">None</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXTERNAL TABLE<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #5A6B7B;">key: order_id</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">6</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>0.50</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>0.50</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color: #AAAAAA;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,b3JkZXJfaWQsX3N0YXR1c18sY3VzdG9tZXJfc291cmNlLGN1c3RvbWVyX3RhcmdldCxhbW91bnRfc291cmNlLGFtb3VudF90YXJnZXQsc3RhdHVzX3NvdXJjZSxzdGF0dXNfdGFyZ2V0CjEwMDIsY2hhbmdlZCxCZW4sQmVuLDQwLjUsNDUuNSxzaGlwcGVkLHNoaXBwZWQKMTAwMyxtaXNzaW5nLENobywsMTIuNzUsLHBlbmRpbmcsCjEwMDYsZXh0cmEsLEZheSwsMTguMjUsLHBlbmRpbmcK" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In Pointblank <code>v1.0.1</code> and earlier, <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> had a single test unit for the whole table. Steps still pass or fail in the same situations, but fractional thresholds now refer to the share of differing rows. To react to <em>any</em> difference, as before, use an absolute threshold of <code>1</code>.</p>
+</div>
+</div>
+<p>Three of the six aligned rows differ, exceeding both the ‘warning’ and ‘error’ thresholds. The step report holds the full comparison:</p>
+<div id="320fbaaa" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_match(keys='order_id')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 rows) → <strong>orders</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></div></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The data extract for the step contains the failing rows from both tables, with a <code>_status_</code> column and source/target value pairs:</p>
+<div id="21960064" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 8)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>_status_</th><th>customer_source</th><th>customer_target</th><th>amount_source</th><th>amount_target</th><th>status_source</th><th>status_target</th></tr><tr><td>i64</td><td>str</td><td>str</td><td>str</td><td>f64</td><td>f64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1002</td><td>"changed"</td><td>"Ben"</td><td>"Ben"</td><td>40.5</td><td>45.5</td><td>"shipped"</td><td>"shipped"</td></tr><tr><td>1003</td><td>"missing"</td><td>"Cho"</td><td>null</td><td>12.75</td><td>null</td><td>"pending"</td><td>null</td></tr><tr><td>1006</td><td>"extra"</td><td>null</td><td>"Fay"</td><td>null</td><td>18.25</td><td>null</td><td>"pending"</td></tr></tbody></table></div>
+</div>
+</div>
+<p>All the comparison arguments (<code>keys=</code>, <code>tolerance=</code>, <code>schema=</code>, and so on) are available in <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>, and they can be written in YAML too:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> orders_target.csv</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">tbl_compare</span><span class="kw">:</span><span class="at"> orders_source.csv</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">keys</span><span class="kw">:</span><span class="at"> order_id</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">tolerance</span><span class="kw">:</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">amount</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span></code></pre></div>
+</section>
+<section id="reconciling-aggregates" class="level1">
+<h1>Reconciling Aggregates</h1>
+<p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
+<p>Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:</p>
+<div id="367a78d6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>order_lines <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1002</span>, <span class="dv">1004</span>, <span class="dv">1005</span>, <span class="dv">1006</span>],</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Ana"</span>, <span class="st">"Ben"</span>, <span class="st">"Ben"</span>, <span class="st">"Dev"</span>, <span class="st">"Eli"</span>, <span class="st">"Fay"</span>],</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">25.00</span>, <span class="fl">40.50</span>, <span class="fl">5.00</span>, <span class="fl">99.99</span>, <span class="fl">5.00</span>, <span class="fl">18.25</span>],</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>order_lines, tbl_name<span class="op">=</span><span class="st">"order_lines"</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    .tbl_reconcile(tbl_compare<span class="op">=</span>source, keys<span class="op">=</span><span class="st">"customer"</span>, measures<span class="op">=</span><span class="st">"amount"</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_reconcile(keys='customer', measures='amount', agg='sum')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 groups) → <strong>order_lines</strong> (5 groups), aligned by key <code>customer</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 groups fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;"><code>sum</code> by <code>customer</code></span></div></div></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 1 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount_sum</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched groups differ (25.0%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed groups (1 group)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Ben</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 group)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Cho</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 group)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Fay</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p><code>Ben</code>’s two order lines add up to more than his order in the source, <code>Cho</code> is missing, and <code>Fay</code> is new. Without <code>keys=</code>, <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> compares grand totals (a single test unit), and <code>agg="count"</code> without <code>measures=</code> compares the number of rows in each group. Tolerances, <code>column_map=</code>, and <code>partitions=</code> work as they do in <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>. Rows with a null key form a group of their own, which is matched with the other table’s null-key group.</p>
+</section>
+<section id="exporting-the-results" class="level1">
+<h1>Exporting the Results</h1>
+<p>The results can be serialized with <code>to_dict()</code> or <code>to_json()</code>, which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:</p>
+<div id="ef8ad3e7" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "source_name": "source",
+  "target_name": "target",
+  "mode": "keyed",
+  "keys": [
+    "order_id"
+  ],
+  "compared_columns": [
+    "customer",
+    "amount",
+    "status"
+  ],
+  "column_map": {},
+  "schema_mode": "strict",
+  "null_equal": true,
+  "partitions": 1,
+  "n_source_rows": 5,
+  "n_target_rows": 5,
+  "n": 6,
+  "n_passed": 3,
+  "n_failed": 3,
+  "identical": false,
+  "status_counts": {
+    "match": 3,
+    "changed": 1,
+    "missing": 1,
+    "extra": 1,
+    "dup_key": 0
+  },
+  "column_mismatches": {
+    "customer": 0,
+    "amount": 1,
+    "status": 0
+  },
+  "schema_diff": {
+    "matches": true,
+    "only_in_source": [],
+    "only_in_target": [],
+    "dtype_changed": [],
+    "renamed": [],
+    "case_only": [],
+    "reordered": false
+  }
+}</code></pre>
+</div>
+</div>
+<p>The tabular report can be saved as HTML, like any Great Tables table:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>comparison.get_tabular_report().write_raw_html(<span class="st">"orders_diff.html"</span>)</span></code></pre></div>
+</section>
+<section id="from-the-command-line" class="level1">
+<h1>From the Command Line</h1>
+<p>The <code>pb compare</code> command runs a comparison on files, database tables, or built-in datasets, prints a summary, and can save the HTML report and the JSON results:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> compare orders_source.csv orders_target.csv <span class="at">--key</span> order_id <span class="at">--output-html</span> diff.html</span></code></pre></div>
+<p>Its exit code makes it easy to use in scripts and CI pipelines: <code>0</code> if the tables match, <code>1</code> if they differ, and <code>2</code> if there was an error. Use <code>--format json</code> to print the results as JSON. All the comparison settings have command-line options (e.g., <code>--tolerance amount=0.01</code>, <code>--schema common</code>); see the <a href="../../user-guide/the-pointblank-cli/cli-reference.html">CLI reference</a> for the full list.</p>
+<p>For tables that are too large to fit in memory, see <a href="../../user-guide/table-comparison/comparing-large-files.html">Comparing Large Files</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html" class="pagination-link" aria-label="CDISC Submission Conformance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">CDISC Submission Conformance</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../user-guide/table-comparison/comparing-large-files.html" class="pagination-link" aria-label="Comparing Large Files">
+        <span class="nav-page-text">Comparing Large Files</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+<div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+</div>
+</footer>
+<script src="../../github-widget.js"></script>
+<script src="../../copy-page.js"></script>
+<script src="../../sidebar-wrap.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'sidebar-float.js';document.body.appendChild(s);})();</script>
+<script src="../../sidebar-filter.js"></script>
+<script src="../../dark-mode-toggle.js"></script>
+<script src="../../back-to-top.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'on-this-page.js';document.body.appendChild(s);})();</script>
+<script src="../../keyboard-nav.js"></script>
+<script src="../../copy-code.js"></script>
+<script src="../../details.js"></script>
+<script src="../../mermaid-renderer.js"></script>
+<script src="../../reference-switcher.js"></script>
+<script src="../../tooltips.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'color-swatch.js';document.body.appendChild(s);})();</script>
+<script src="../../responsive-tables.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
+<script src="../../navbar-widgets.js"></script>
+
+
+
+
+</body></html>

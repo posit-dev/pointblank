@@ -48,7 +48,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-90c0cb8701bc726ef78bd9649a6be318.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -149,7 +149,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="493" data-forks="35"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -532,9 +532,29 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Reference</span></a>
+ <span class="menu-text">Table Comparison</span></a>
 </div>
       <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing Two Tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-large-files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing Large Files</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Reference</span></a>
+</div>
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/reference/glossary.html" class="sidebar-item-text sidebar-link">
@@ -560,6 +580,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#pb-missing---missing-values-reports" id="toc-pb-missing---missing-values-reports" class="nav-link" data-scroll-target="#pb-missing---missing-values-reports"><code>pb missing</code> - Missing Values Reports</a></li>
   <li><a href="#pb-validate---quick-data-validations" id="toc-pb-validate---quick-data-validations" class="nav-link" data-scroll-target="#pb-validate---quick-data-validations"><code>pb validate</code> - Quick Data Validations</a></li>
   <li><a href="#pb-run---validation-scripts-and-yaml" id="toc-pb-run---validation-scripts-and-yaml" class="nav-link" data-scroll-target="#pb-run---validation-scripts-and-yaml"><code>pb run</code> - Validation Scripts and YAML</a></li>
+  <li><a href="#pb-compare---table-comparison" id="toc-pb-compare---table-comparison" class="nav-link" data-scroll-target="#pb-compare---table-comparison"><code>pb compare</code> - Table Comparison</a></li>
   <li><a href="#pb-make-template---template-generation" id="toc-pb-make-template---template-generation" class="nav-link" data-scroll-target="#pb-make-template---template-generation"><code>pb make-template</code> - Template Generation</a></li>
   <li><a href="#pb-pl---polars-expression-execution" id="toc-pb-pl---polars-expression-execution" class="nav-link" data-scroll-target="#pb-pl---polars-expression-execution"><code>pb pl</code> - Polars Expression Execution</a></li>
   <li><a href="#pb-datasets---built-in-datasets" id="toc-pb-datasets---built-in-datasets" class="nav-link" data-scroll-target="#pb-datasets---built-in-datasets"><code>pb datasets</code> - Built-in Datasets</a></li>
@@ -886,6 +907,70 @@ Options:
   --help                          Show this message and exit.</code></pre>
 </blockquote>
 </section>
+<section id="pb-compare---table-comparison" class="level1">
+<h1><code>pb compare</code> - Table Comparison</h1>
+<p>Compare two tables row by row: rows missing from or extra in the target, rows whose values changed, duplicated keys, and schema differences. File inputs are scanned lazily. For very large files, <code>--engine duckdb --partitions N</code> keeps memory use low (about 0.8 GB for two 10-million-row CSV files with 8 partitions):</p>
+<blockquote class="blockquote">
+<pre><code>Usage: pb compare [OPTIONS] SOURCE TARGET
+
+  Compare two tables row by row.
+
+  SOURCE is the reference (expected) table and TARGET is the table to check.
+  Each can be a CSV or Parquet file (scanned lazily, so large files work), a
+  database connection string, or a built-in dataset name. Every row is
+  classified as matching, changed, missing from the target, extra in the
+  target, or having a duplicated key; schema differences are reported too.
+
+  Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
+
+  Examples:
+
+    pb compare source.csv target.csv --key id
+    pb compare old.parquet new.parquet -k id -t amount=rtol:1e-6 --output-html diff.html
+    pb compare a.csv b.csv -k region -k date --schema common --format json
+    pb compare big_a.csv big_b.csv -k id --engine duckdb --partitions 8
+
+Options:
+  -k, --key TEXT                Key column used to align rows (repeat for
+                                composite keys). Use '*' to compare as
+                                multisets of rows. Without a key, rows are
+                                compared by position.
+  -c, --columns TEXT            Comma-separated source columns to compare
+  --column-map TEXT             Renamed column as SOURCE_COLUMN=TARGET_COLUMN
+                                (repeatable)
+  -t, --tolerance TEXT          Tolerance as [COLUMN=]SPEC; SPEC is a number
+                                (absolute), a duration (1s, 500ms), or
+                                atol:X,rtol:Y (repeatable)
+  --normalize TEXT              Normalization as COLUMN=op[,op...] with ops
+                                strip, lower, upper, collapse_whitespace,
+                                round:N (repeatable)
+  --null-unequal                Treat two nulls as different values
+  --schema [strict|common]      'strict': any schema difference fails all
+                                rows; 'common': compare shared columns only
+                                [default: strict]
+  --dup-keys [flag|compare]     'compare' also compares rows with duplicated
+                                keys pairwise in the report  [default: flag]
+  --order-by TEXT               Comma-separated columns defining row order
+                                (positional mode)
+  --partitions INTEGER RANGE    Compare in N passes by key hash to bound
+                                memory use for very large tables  [x&gt;=1]
+  --engine [polars|duckdb]      Engine for reading CSV/Parquet files: 'polars'
+                                is fastest, 'duckdb' uses the least memory
+                                (especially with --partitions)  [default:
+                                polars]
+  --limit INTEGER               Maximum sample rows shown per status
+                                [default: 10]
+  --output-html PATH            Save the HTML comparison report to file
+  --output-json PATH            Save the comparison results as JSON to file
+  --format [text|json]          Terminal output: a summary ('text') or the
+                                results as JSON ('json')  [default: text]
+  --no-samples                  Leave sample row values out of JSON output
+                                (e.g., for sensitive data)
+  --exit-code / --no-exit-code  Exit with code 1 when the tables differ
+                                [default: exit-code]
+  --help                        Show this message and exit.</code></pre>
+</blockquote>
+</section>
 <section id="pb-make-template---template-generation" class="level1">
 <h1><code>pb make-template</code> - Template Generation</h1>
 <p>Create validation script or YAML configuration templates:</p>
@@ -1021,6 +1106,7 @@ Options:
 <p>Many commands support options useful for automation and CI/CD:</p>
 <ul>
 <li><code>--exit-code</code>: Exit with non-zero code on validation failure</li>
+<li><code>pb compare</code> exits with <code>0</code> when the tables match, <code>1</code> when they differ, and <code>2</code> on error (use <code>--no-exit-code</code> to always exit with <code>0</code> unless there’s an error)</li>
 <li><code>--fail-on [critical|error|warning|any]</code>: Control failure thresholds</li>
 <li><code>--output-html</code>, <code>--output-json</code>: Save reports for external consumption</li>
 <li><code>--write-extract</code>: Save failing rows for investigation</li>

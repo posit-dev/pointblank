@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-90c0cb8701bc726ef78bd9649a6be318.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="493" data-forks="35"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -578,6 +578,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Validate.tbl_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_reconcile.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_reconcile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1083,9 +1089,121 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Table Pre-checks</span></a>
+ <span class="menu-text">Table Comparison</span></a>
 </div>
       <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SchemaDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SchemaDiff</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Comparison Methods</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.schema_ok.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.schema_ok</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.identical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.identical</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.status_counts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.status_counts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__bool__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__bool__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__repr__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__repr__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.rows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.column_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.column_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.get_tabular_report</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Pre-checks</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
@@ -1105,7 +1223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">YAML</span></a>
 </div>
-      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
@@ -1131,7 +1249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Utility Functions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
@@ -1181,7 +1299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Test Data Generation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
@@ -1255,7 +1373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Prebuilt Actions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
@@ -1275,7 +1393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Metadata Import/Export</span></a>
 </div>
-      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/import_metadata.html" class="sidebar-item-text sidebar-link">
@@ -1331,7 +1449,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">SDTM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtm.html" class="sidebar-item-text sidebar-link">
@@ -1381,7 +1499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">ADaM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_adam.html" class="sidebar-item-text sidebar-link">
@@ -1431,7 +1549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">CDISC Submission Conformance</span></a>
 </div>
-      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-21" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
@@ -1463,7 +1581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Integrations</span></a>
 </div>
-      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-22" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
@@ -1484,6 +1602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#test-units" id="toc-test-units" class="nav-link" data-scroll-target="#test-units">Test Units</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
   <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#cross-backend-validation" id="toc-cross-backend-validation" class="nav-link" data-scroll-target="#cross-backend-validation">Cross-Backend Validation</a></li>
@@ -1518,30 +1637,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14768-L15048" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14885-L15246" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">tbl_match</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">tbl_compare</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">keys</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">columns</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">column_map</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">tolerance</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">normalize</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_equal</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span><span class="op">=</span><span class="st">"strict"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">dup_keys</span><span class="op">=</span><span class="st">"flag"</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">order_by</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">partitions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> method checks whether the target table’s composition matches that of a comparison table. The validation performs a comprehensive comparison using progressively stricter checks (from least to most stringent):</p>
-<ol type="1">
-<li><strong>Column count match</strong>: both tables must have the same number of columns</li>
-<li><strong>Row count match</strong>: both tables must have the same number of rows</li>
-<li><strong>Schema match (loose)</strong>: column names and dtypes match (case-insensitive, any order)</li>
-<li><strong>Schema match (order)</strong>: columns in the correct order (case-insensitive names)</li>
-<li><strong>Schema match (exact)</strong>: column names match exactly (case-sensitive, correct order)</li>
-<li><strong>Data match</strong>: values in corresponding cells must be identical</li>
-</ol>
-<p>This progressive approach helps identify exactly where tables differ. The validation will fail at the first check that doesn’t pass, making it easier to diagnose mismatches. This validation operates over a single test unit (pass/fail for complete table match).</p>
+<p>The <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> method compares the target table, row by row, against a comparison table that holds the expected data (the <em>source</em>). Rows of the two tables are aligned and every aligned row becomes a test unit: it passes if the row is present in both tables with equal values, and fails if its values changed, if it’s missing from the target, if it’s an extra row in the target, or if its key is duplicated. Schema differences (columns added, removed, retyped, or reordered) are checked too.</p>
+<p>Rows are aligned in one of three ways:</p>
+<ul>
+<li><strong>by key</strong> (<code>keys=</code> given): rows are matched on one or more key columns, so row order doesn’t matter; this is the most informative mode</li>
+<li><strong>by position</strong> (<code>keys=None</code>, the default): the first row of each table is compared, then the second, and so on</li>
+<li><strong>as multisets</strong> (<code>keys="*"</code>): rows are compared as whole values regardless of order, with duplicates counted (for tables without a key)</li>
+</ul>
+<p>The comparison runs inside the table’s own engine (it is backend-agnostic, and database tables are compared in the database). Use <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a> to see a detailed report of the differences, and <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> to get the failing rows. The same comparison is available outside of a validation with <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1549,7 +1676,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">tbl_compare</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The comparison table to validate against. This can be a DataFrame object (Polars or Pandas), an Ibis table object, or a callable that returns a table. If a callable is provided, it will be executed during interrogation to obtain the comparison table.</p>
+<p>The comparison table (the expected data) to validate against. This can be a DataFrame object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a callable that returns a table. If a callable is provided, it will be executed during interrogation to obtain the comparison table.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>One or more columns that uniquely identify a row, used to align the rows of the two tables. Key names refer to the comparison table (use <code>column_map=</code> if the target names them differently). If <code>None</code> (the default), rows are aligned by position. Use <code>"*"</code> to compare the tables as multisets of rows.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">columns</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The comparison-table columns whose values should be compared. By default, all columns present in both tables (other than the keys) are compared. Giving <code>columns=</code> also limits the schema check to the keys and these columns.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">column_map</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>A mapping of comparison-table column names to target column names, for renamed columns.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">tolerance</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Tolerance for numeric and datetime comparisons. A number is an absolute tolerance for all numeric columns. A dict with <code>"atol"</code> and/or <code>"rtol"</code> keys applies to all numeric columns, where values are equal if <code>|expected - actual| &lt;= atol + rtol * |expected|</code>. A dict mapping column names to either of the above sets per-column tolerances. Datetime tolerances are given as a <code>datetime.timedelta</code> or a string like <code>"1s"</code> or <code>"500ms"</code>.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">normalize</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Per-column transformations applied to both tables before comparing, as a dict mapping a column name to a list of operations: <code>"strip"</code>, <code>"lower"</code>, <code>"upper"</code>, <code>"collapse_whitespace"</code>, or <code>{"round": n}</code>. The string operations only apply to string columns and <code>round</code> only to numeric ones.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">null_equal</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
+<dd>
+<p>Should two null values count as equal? By default, they do. NaN values in floating-point columns are treated as null.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">schema</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Literal[<span class="st">"strict"</span>, <span class="st">"common"</span>]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"strict"</span></span></code></dt>
+<dd>
+<p>How schema differences affect the result. With <code>"strict"</code> (the default), any schema difference (other than renames given in <code>column_map=</code>) means the tables don’t match, and every test unit fails. With <code>"common"</code>, only the shared columns are compared and schema differences are reported without failing any test units.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">dup_keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Literal[<span class="st">"flag"</span>, <span class="st">"compare"</span>]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"flag"</span></span></code></dt>
+<dd>
+<p>Rows whose key appears more than once in either table always fail. With <code>"flag"</code> (the default), the step report lists the duplicated keys. With <code>"compare"</code>, the step report also compares the duplicated rows pairwise to show which columns differ.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">order_by</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Column(s) defining the row order for positional alignment on backends without an inherent row order (e.g., PySpark or database tables). Without it, such tables are collected and compared in the order in which their rows are returned; use <code>keys=</code> for a reliable alignment. Ignored when <code>keys=</code> is given.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">partitions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Compare the tables in this many passes, each covering a disjoint subset of the key values (by key hash), to bound memory use for very large tables. Each pass reads the tables again, so this trades time for memory; the results are identical to a single-pass comparison. Requires <code>keys=</code> (not <code>"*"</code>), and Polars, DuckDB, or Ibis tables (including CSV/Parquet paths). Sundering isn’t available for the step when partitions are used.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1589,6 +1756,25 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </dl>
 </div>
 </section>
+<section id="test-units" class="level2 doc-test-units">
+<h2 class="doc-test-units anchored" data-anchor-id="test-units">Test Units</h2>
+<p>Each aligned row is a test unit. With <code>keys=</code>, that’s every key value found in either table (a duplicated key counts as many units as its larger number of occurrences); by position, it’s the number of rows in the longer table; as multisets, it’s every row copy. A test unit passes only if its row is in both tables with all compared values equal. If the strict schema check fails, all test units fail. When both tables are empty, the step has a single test unit, which passes if the schemas match.</p>
+<p>Because failures are counted per row, thresholds can be expressed as proportions (e.g., a <a href="../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link gdls-code">warning</a> when more than 1% of rows differ). To fail on any difference, use an absolute threshold of <code>1</code>.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In Pointblank <code>v1.0.1</code> and earlier, <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> had a single test unit that failed if the tables differed in any way. Whether a step passes or fails is unchanged, but the counts (<code>n</code>, <code>n_passed</code>, <code>n_failed</code>, and the fractions) now reflect rows. This changes the meaning of fractional thresholds: <code>thresholds=0.1</code> used to be exceeded by any difference, and is now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of reacting to any difference, use an absolute threshold of <code>1</code> (e.g., <code>thresholds=1</code> or <code>Thresholds(warning=1)</code>).</p>
+</div>
+</div>
+<p>The data extract for the step (from <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>) contains the failing rows of <em>both</em> tables: the key column(s), a <code>_status_</code> column (<code>"changed"</code>, <code>"missing"</code>, <code>"extra"</code>, or <code>"dup_key"</code>), and a pair of <code>&lt;column&gt;_source</code>/<code>&lt;column&gt;_target</code> columns for each compared column. For <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a>, target rows with a matching row in the comparison table pass; rows missing from the target can’t be part of the sundered data. Sundering for this step is available with in-memory tables (not lazy or database tables) and isn’t available in multiset mode.</p>
+</section>
 <section id="preprocessing" class="level2 doc-preprocessing">
 <h2 class="doc-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
@@ -1610,50 +1796,13 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </section>
 <section id="cross-backend-validation" class="level2 doc-cross-backend-validation">
 <h2 class="doc-cross-backend-validation anchored" data-anchor-id="cross-backend-validation">Cross-Backend Validation</h2>
-<p>The <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> method supports <strong>automatic backend coercion</strong> when comparing tables from different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with different backends are detected, the comparison table is automatically converted to match the data table’s backend before validation proceeds.</p>
-<p><strong>Certified Backend Combinations:</strong></p>
-<p>All combinations of the following backends have been tested and certified to work (in both directions):</p>
-<ul>
-<li>Pandas DataFrame</li>
-<li>Polars DataFrame</li>
-<li>DuckDB (native)</li>
-<li>DuckDB (as Ibis table)</li>
-<li>SQLite (via Ibis)</li>
-</ul>
-<p>Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are automatically materialized during validation:</p>
-<ul>
-<li>if comparing <strong>against Polars</strong>: materialized to Polars</li>
-<li>if comparing <strong>against Pandas</strong>: materialized to Pandas</li>
-<li>if <strong>both tables are database backends</strong>: both materialized to Polars</li>
-</ul>
-<p>This ensures optimal performance and type consistency.</p>
-<p><strong>Data Types That Work Best in Cross-Backend Validation:</strong></p>
-<ul>
-<li>numeric types: int, float columns (including proper NaN handling)</li>
-<li>string types: text columns with consistent encodings</li>
-<li>boolean types: True/False values</li>
-<li>null values: <code>None</code> and <code>NaN</code> are treated as equivalent across backends</li>
-<li>list columns: nested list structures (with basic types)</li>
-</ul>
-<p><strong>Known Limitations:</strong></p>
-<p>While many data types work well in cross-backend validation, there are some known limitations to be aware of:</p>
-<ul>
-<li>date/datetime types: When converting between Polars and Pandas, date objects may be represented differently. For example, <code>datetime.date</code> objects in Pandas may become <code>pd.Timestamp</code> objects when converted from Polars, leading to false mismatches. To work around this, ensure both tables use the same datetime representation before comparison.</li>
-<li>custom types: User-defined types or complex nested structures may not convert cleanly between backends and could cause unexpected comparison failures.</li>
-<li>categorical types: Categorical/factor columns may have different internal representations across backends.</li>
-<li>timezone-aware datetimes: Timezone handling differs between backends and may cause comparison issues.</li>
-</ul>
-<p>Here are some ideas to overcome such limitations:</p>
-<ul>
-<li>for date/datetime columns, consider using <code>pre=</code> preprocessing to normalize representations before comparison.</li>
-<li>when working with custom types, manually convert tables to the same backend before using <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>.</li>
-<li>use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.</li>
-</ul>
+<p>The two tables can come from different backends (e.g., a Polars DataFrame and a Pandas DataFrame, or a database table and a CSV file). Tables on the same backend are compared in place (so two tables in the same database are compared inside the database). Tables on different backends are both converted to Polars (or to Pandas, if Polars isn’t installed) before the comparison. Key columns whose types differ between the tables (e.g., integer keys that became floats in Pandas because of a missing value) are cast to a common type.</p>
+<p>Values in columns whose types differ are compared numerically when both columns are numeric and as strings otherwise; note that such differences also fail the strict schema check (use <code>schema="common"</code> to only report them).</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll create two simple tables to demonstrate the <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation.</p>
-<div id="5dafbd8f" class="cell" data-execution_count="2">
+<div id="ffaefb3a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1791,7 +1940,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that <code>tbl_1</code> matches <code>tbl_2</code>. Since these tables are identical, the validation should pass.</p>
-<div id="243d5bb8" class="cell" data-execution_count="3">
+<div id="5894ee3f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_1)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>tbl_2)</span>
@@ -1945,8 +2094,8 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4<br>1.00</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
@@ -1960,23 +2109,22 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>The validation table shows that the single test unit passed, indicating that the two tables match completely.</p>
-<p>Now, let’s create a table with a slight difference and see what happens.</p>
-<div id="de31a723" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a table with one different value</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tbl_3 <span class="op">=</span> pl.DataFrame({</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"w"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"z"</span>],</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"c"</span>: [<span class="fl">4.0</span>, <span class="fl">5.5</span>, <span class="fl">6.0</span>, <span class="fl">7.0</span>]  <span class="co"># Changed 5.0 to 5.5</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_1)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>tbl_3)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<p>The validation table shows that all four test units (one per row) passed, indicating that the two tables match completely.</p>
+<p>Now, let’s compare against a table that has one different value, is missing a row, and has an extra row. Since the rows can be identified by column <code>a</code>, we’ll use it as the key.</p>
+<div id="3661b450" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl_3 <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"w"</span>, <span class="st">"x"</span>, <span class="st">"z"</span>, <span class="st">"v"</span>],</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"c"</span>: [<span class="fl">4.0</span>, <span class="fl">5.5</span>, <span class="fl">7.0</span>, <span class="fl">8.0</span>]  <span class="co"># Changed 5.0 to 5.5</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_3)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>tbl_1, keys<span class="op">=</span><span class="st">"a"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2112,7 +2260,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">None</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXTERNAL TABLE</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXTERNAL TABLE<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #5A6B7B;">key: a</span></td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -2123,13 +2271,13 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2<br>0.40</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>0.60</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,YSxfc3RhdHVzXyxiX3NvdXJjZSxiX3RhcmdldCxjX3NvdXJjZSxjX3RhcmdldAoyLGNoYW5nZWQseCx4LDUuMCw1LjUKMyxtaXNzaW5nLHksLDYuMCwKNSxleHRyYSwsdiwsOC4wCg==" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
 
@@ -2138,7 +2286,124 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>The validation table shows that the single test unit failed because the tables don’t match (one value is different in column <code>c</code>).</p>
+<p>Three of the five aligned rows failed: one changed, one missing from the target, and one extra. The step report shows exactly what differs.</p>
+<div id="7e3b6a0a" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_match(keys='a')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (4 rows) → <strong>target</strong> (4 rows), aligned by key <code>a</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 5 rows fail (60.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 2" style="width:40.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:20.000%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:20.000%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:20.000%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></div></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">c</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">c:</span> <span style="text-decoration:line-through; color:#999;">5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">5.5</span> <span style="color:#888; font-size:11px;">(+0.5)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">b:</span> y</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">c:</span> 6</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">5</td>
+    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">b:</span> v</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">c:</span> 8</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
 
 
 </section>

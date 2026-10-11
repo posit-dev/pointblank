@@ -4688,7 +4688,7 @@ postcode
 </table>
 
 
-Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above. Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly [n](../../reference/Validate.n.md#pointblank.Validate.n).
+Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above. Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly `n`.
 
 By default, rows from different countries are interleaved randomly (`shuffle=True`). Set `shuffle=False` to keep rows grouped by country in the order the countries are listed:
 

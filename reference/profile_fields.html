@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-90c0cb8701bc726ef78bd9649a6be318.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="493" data-forks="35"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -578,6 +578,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validate.tbl_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_reconcile.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_reconcile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1083,9 +1089,121 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Table Pre-checks</span></a>
+ <span class="menu-text">Table Comparison</span></a>
 </div>
       <ul id="quarto-sidebar-section-11" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SchemaDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SchemaDiff</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Comparison Methods</span></a>
+</div>
+      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.schema_ok.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.schema_ok</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.identical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.identical</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.status_counts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.status_counts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__bool__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__bool__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.__repr__.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.__repr__</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.rows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.column_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.column_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.get_tabular_report</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Table Pre-checks</span></a>
+</div>
+      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
@@ -1105,7 +1223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">YAML</span></a>
 </div>
-      <ul id="quarto-sidebar-section-12" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
@@ -1131,7 +1249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Utility Functions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-13" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
@@ -1181,7 +1299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Test Data Generation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-14" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
@@ -1255,7 +1373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Prebuilt Actions</span></a>
 </div>
-      <ul id="quarto-sidebar-section-15" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
@@ -1275,7 +1393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Metadata Import/Export</span></a>
 </div>
-      <ul id="quarto-sidebar-section-16" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/import_metadata.html" class="sidebar-item-text sidebar-link">
@@ -1331,7 +1449,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">SDTM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-17" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtm.html" class="sidebar-item-text sidebar-link">
@@ -1381,7 +1499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">ADaM Validation</span></a>
 </div>
-      <ul id="quarto-sidebar-section-18" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_adam.html" class="sidebar-item-text sidebar-link">
@@ -1431,7 +1549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">CDISC Submission Conformance</span></a>
 </div>
-      <ul id="quarto-sidebar-section-19" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-21" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
@@ -1463,7 +1581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <a class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Integrations</span></a>
 </div>
-      <ul id="quarto-sidebar-section-20" class="list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-22" class="list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
@@ -1583,7 +1701,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The default call returns the <code>"standard"</code> set of profile columns. The <code>**</code> operator unpacks the returned dictionary directly into <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema()</a>, as if each <a href="../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a> call had been written by hand. All coherence rules apply automatically: emails are derived from names, and city/state/postcode/phone are internally consistent.</p>
-<div id="9441f1f1" class="cell" data-execution_count="1">
+<div id="3e29d450" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1807,7 +1925,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>Use <code>set=</code> to control how many columns are generated. The <code>"minimal"</code> set includes only <code>name</code>, <code>email</code>, and <code>phone</code>, while <code>"full"</code> adds <code>address</code>, <code>company</code>, and <code>job</code>. Setting <code>split_name=False</code> collapses <code>first_name</code> and <code>last_name</code> into a single combined <code>name</code> column:</p>
-<div id="3a02b00a" class="cell" data-execution_count="2">
+<div id="a4619b19" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, split_name<span class="op">=</span><span class="va">False</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    balance<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="dv">0</span>, max_val<span class="op">=</span><span class="dv">10000</span>),</span>
@@ -1981,7 +2099,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>The <code>include=</code> and <code>exclude=</code> parameters let you customize the column set without switching to a different base set. Here we start from the <code>"full"</code> set but drop the business columns:</p>
-<div id="b4237bb5" class="cell" data-execution_count="3">
+<div id="99fc9dd2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"full"</span>, exclude<span class="op">=</span>[<span class="st">"company"</span>, <span class="st">"job"</span>]),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -2202,7 +2320,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>The <code>prefix=</code> parameter prepends a string to every column name, which is especially useful when a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group maintains its own coherence:</p>
-<div id="6c285336" class="cell" data-execution_count="4">
+<div id="82ff6956" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"sender_"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"recipient_"</span>),</span>

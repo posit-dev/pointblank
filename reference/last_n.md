@@ -1,7 +1,7 @@
 # last_n()
 
 
-Select the last [n](Validate.n.md#pointblank.Validate.n) columns in the column list.
+Select the last `n` columns in the column list.
 
 
 Usage
@@ -27,7 +27,7 @@ The `offset=` parameter can be used to skip a certain number of columns from the
 
 
 `n: int`  
-The number of columns to select from the end of the column list. Should be a positive integer value. If [n](Validate.n.md#pointblank.Validate.n) is greater than the number of columns in the table, all columns will be selected.
+The number of columns to select from the end of the column list. Should be a positive integer value. If `n` is greater than the number of columns in the table, all columns will be selected.
 
 `offset: int = ``0`  
 The offset from the end of the column list. The default is `0`. If `offset` is greater than the number of columns in the table, no columns will be selected.
@@ -37,7 +37,7 @@ The offset from the end of the column list. The default is `0`. If `offset` is g
 
 
 `LastN`  
-A `LastN` object, which can be used to select the last [n](Validate.n.md#pointblank.Validate.n) columns.
+A `LastN` object, which can be used to select the last `n` columns.
 
 
 ## Relevant Validation Methods Where [last_n()](last_n.md#pointblank.last_n) Can Be Used

@@ -21,6 +21,9 @@ Generate a missing values report for a data table.
 [validate](../../reference/cli/validate.md)  
 Perform single or multiple data validations.
 
+[compare](../../reference/cli/compare.md)  
+Compare two tables row by row.
+
 [datasets](../../reference/cli/datasets.md)  
 List available built-in datasets.
 

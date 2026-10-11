@@ -54,8 +54,8 @@ The JSON report can include any of the standard validation report fields, includ
 - `brief`: a brief description of the validation step
 - `active`: whether the validation step is active
 - `all_passed`: whether all test units passed in the step
-- [n](Validate.n.md#pointblank.Validate.n): total number of test units
-- [n_passed](Validate.n_passed.md#pointblank.Validate.n_passed), [n_failed](Validate.n_failed.md#pointblank.Validate.n_failed): number of test units that passed and failed
+- `n`: total number of test units
+- `n_passed`, `n_failed`: number of test units that passed and failed
 - [f_passed](Validate.f_passed.md#pointblank.Validate.f_passed), [f_failed](Validate.f_failed.md#pointblank.Validate.f_failed): Fraction of test units that passed and failed
 - [warning](Validate.warning.md#pointblank.Validate.warning), [error](Validate.error.md#pointblank.Validate.error), [critical](Validate.critical.md#pointblank.Validate.critical): whether the namesake threshold level was exceeded (is `null` if threshold not set)
 - `time_processed`: when the validation step was processed (ISO 8601 format)
@@ -117,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-08T15:35:14.272+00:00",
-            "proc_duration_s": 0.007885
+            "time_processed": "2026-10-11T18:47:42.419+00:00",
+            "proc_duration_s": 0.006344
         },
         {
             "i": 2,
@@ -144,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-08T15:35:14.275+00:00",
-            "proc_duration_s": 0.003042
+            "time_processed": "2026-10-11T18:47:42.421+00:00",
+            "proc_duration_s": 0.001883
         }
     ]
 

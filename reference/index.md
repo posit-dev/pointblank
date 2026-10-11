@@ -181,6 +181,9 @@ Validate that data in a datetime column is not older than a specified maximum ag
 [Validate.tbl_match()](Validate.tbl_match.md#pointblank.Validate.tbl_match)  
 Validate whether the target table matches a comparison table.
 
+[Validate.tbl_reconcile()](Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile)  
+Validate that aggregates of the target table reconcile with a comparison table.
+
 [Validate.conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly)  
 Perform multiple row-wise validations for joint validity.
 
@@ -246,7 +249,7 @@ Does the column standard deviation satisfy an equal to comparison?
 ## Column Selection
 
 
-Use the [col()](col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](col.md#pointblank.col) with [starts_with()](starts_with.md#pointblank.starts_with), [matches()](matches.md#pointblank.matches), etc. for selecting multiple target columns.
+Use the [col()](col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](col.md#pointblank.col) with [starts_with()](starts_with.md#pointblank.starts_with), `matches()`, etc. for selecting multiple target columns.
 
 
 [col()](col.md#pointblank.col)  
@@ -268,10 +271,10 @@ Select columns that match a specified regular expression pattern.
 Select all columns.
 
 [first_n()](first_n.md#pointblank.first_n)  
-Select the first [n](Validate.n.md#pointblank.Validate.n) columns in the column list.
+Select the first `n` columns in the column list.
 
 [last_n()](last_n.md#pointblank.last_n)  
-Select the last [n](Validate.n.md#pointblank.Validate.n) columns in the column list.
+Select the last `n` columns in the column list.
 
 [expr_col()](expr_col.md#pointblank.expr_col)  
 Create a column expression for use in [conjointly()](Validate.conjointly.md#pointblank.Validate.conjointly) validation.
@@ -445,6 +448,66 @@ Load a [DataScan](DataScan.md#pointblank.DataScan) from a JSON file produced by 
 
 [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
 Compare this scan against a baseline and return the differences.
+
+
+## Table Comparison
+
+
+Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a [Comparison](Comparison.md#pointblank.Comparison) object with counts, row samples, and a tabular report. The same comparison is available as a validation step through [Validate.tbl_match()](Validate.tbl_match.md#pointblank.Validate.tbl_match), and [Validate.tbl_reconcile()](Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares aggregates (e.g., totals per group) instead of rows.
+
+
+[compare()](compare.md#pointblank.compare)  
+Compare two tables row by row and report how they differ.
+
+[Comparison](Comparison.md#pointblank.Comparison)  
+The result of comparing a source table with a target table.
+
+[SchemaDiff](SchemaDiff.md#pointblank.SchemaDiff)  
+Differences between the schemas of the source and target tables.
+
+
+## Comparison Methods
+
+
+Methods for the Comparison class
+
+
+[Comparison.n](Comparison.n.md#pointblank.Comparison.n)  
+The number of test units (aligned rows).
+
+[Comparison.schema_ok](Comparison.schema_ok.md#pointblank.Comparison.schema_ok)  
+`True` if the schemas match, or if schema differences are tolerated (`"common"`).
+
+[Comparison.n_passed](Comparison.n_passed.md#pointblank.Comparison.n_passed)  
+Test units that pass: matching rows (none, if the schema check fails).
+
+[Comparison.n_failed](Comparison.n_failed.md#pointblank.Comparison.n_failed)  
+Test units that fail: all non-matching rows (all rows, if the schema check fails).
+
+[Comparison.identical](Comparison.identical.md#pointblank.Comparison.identical)  
+`True` if the tables match under the comparison settings.
+
+[Comparison.status_counts](Comparison.status_counts.md#pointblank.Comparison.status_counts)  
+The number of test units with each row status.
+
+[Comparison.__bool__()](Comparison.__bool__.md#pointblank.Comparison.__bool__)  
+
+[Comparison.__repr__()](Comparison.__repr__.md#pointblank.Comparison.__repr__)  
+
+[Comparison.rows()](Comparison.rows.md#pointblank.Comparison.rows)  
+Get a sample of rows with a given status.
+
+[Comparison.column_summary()](Comparison.column_summary.md#pointblank.Comparison.column_summary)  
+Get a per-column summary of value mismatches.
+
+[Comparison.to_dict()](Comparison.to_dict.md#pointblank.Comparison.to_dict)  
+Get the comparison results as a JSON-serializable dict.
+
+[Comparison.to_json()](Comparison.to_json.md#pointblank.Comparison.to_json)  
+Get the comparison results as a JSON string (see `to_dict()`).
+
+[Comparison.get_tabular_report()](Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report)  
+Get a tabular report of the comparison.
 
 
 ## Table Pre-checks

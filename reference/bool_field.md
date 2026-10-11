@@ -35,7 +35,7 @@ Whether the column can contain null values. Default is `False`.
 Probability of generating a null value for each row when `nullable=True`. Must be between `0.0` and `1.0`. Default is `0.0`.
 
 `unique: bool = ``False`  
-Whether all values must be unique. Default is `False`. Note that boolean columns can only have 2 unique non-null values, so [n](Validate.n.md#pointblank.Validate.n) must be `<= 2` when `unique=True` (or `<= 3` with `nullable=True`).
+Whether all values must be unique. Default is `False`. Note that boolean columns can only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or `<= 3` with `nullable=True`).
 
 `generator: Callable[[], Any] | None = None`  
 Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single boolean value.

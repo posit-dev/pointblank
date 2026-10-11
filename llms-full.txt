@@ -8166,31 +8166,86 @@ validation = (
 validation
 ```
 
-tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Validate whether the target table matches a comparison table.
 
-The `tbl_match()` method checks whether the target table's composition matches that of a
-comparison table. The validation performs a comprehensive comparison using progressively
-stricter checks (from least to most stringent):
+The `tbl_match()` method compares the target table, row by row, against a comparison table
+that holds the expected data (the *source*). Rows of the two tables are aligned and every
+aligned row becomes a test unit: it passes if the row is present in both tables with equal
+values, and fails if its values changed, if it's missing from the target, if it's an extra
+row in the target, or if its key is duplicated. Schema differences (columns added, removed,
+retyped, or reordered) are checked too.
 
-1. **Column count match**: both tables must have the same number of columns
-2. **Row count match**: both tables must have the same number of rows
-3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
-4. **Schema match (order)**: columns in the correct order (case-insensitive names)
-5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
-6. **Data match**: values in corresponding cells must be identical
+Rows are aligned in one of three ways:
 
-This progressive approach helps identify exactly where tables differ. The validation will
-fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
-validation operates over a single test unit (pass/fail for complete table match).
+- **by key** (`keys=` given): rows are matched on one or more key columns, so row order
+  doesn't matter; this is the most informative mode
+- **by position** (`keys=None`, the default): the first row of each table is compared, then
+  the second, and so on
+- **as multisets** (`keys="*"`): rows are compared as whole values regardless of order, with
+  duplicates counted (for tables without a key)
+
+The comparison runs inside the table's own engine (it is backend-agnostic, and database
+tables are compared in the database). Use
+[`get_step_report()`](`pointblank.Validate.get_step_report`) to see a detailed report of
+the differences, and [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) to
+get the failing rows. The same comparison is available outside of a validation with
+[`compare()`](`pointblank.compare`).
 
 Parameters
 ----------
 tbl_compare
-    The comparison table to validate against. This can be a DataFrame object (Polars or
-    Pandas), an Ibis table object, or a callable that returns a table. If a callable is
-    provided, it will be executed during interrogation to obtain the comparison table.
+    The comparison table (the expected data) to validate against. This can be a DataFrame
+    object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a
+    callable that returns a table. If a callable is provided, it will be executed during
+    interrogation to obtain the comparison table.
+keys
+    One or more columns that uniquely identify a row, used to align the rows of the two
+    tables. Key names refer to the comparison table (use `column_map=` if the target names
+    them differently). If `None` (the default), rows are aligned by position. Use `"*"` to
+    compare the tables as multisets of rows.
+columns
+    The comparison-table columns whose values should be compared. By default, all columns
+    present in both tables (other than the keys) are compared. Giving `columns=` also limits
+    the schema check to the keys and these columns.
+column_map
+    A mapping of comparison-table column names to target column names, for renamed columns.
+tolerance
+    Tolerance for numeric and datetime comparisons. A number is an absolute tolerance for all
+    numeric columns. A dict with `"atol"` and/or `"rtol"` keys applies to all numeric
+    columns, where values are equal if `|expected - actual| <= atol + rtol * |expected|`. A
+    dict mapping column names to either of the above sets per-column tolerances. Datetime
+    tolerances are given as a `datetime.timedelta` or a string like `"1s"` or `"500ms"`.
+normalize
+    Per-column transformations applied to both tables before comparing, as a dict mapping a
+    column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
+    `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+    columns and `round` only to numeric ones.
+null_equal
+    Should two null values count as equal? By default, they do. NaN values in floating-point
+    columns are treated as null.
+schema
+    How schema differences affect the result. With `"strict"` (the default), any schema
+    difference (other than renames given in `column_map=`) means the tables don't match,
+    and every test unit fails. With `"common"`, only the shared columns are compared and
+    schema differences are reported without failing any test units.
+dup_keys
+    Rows whose key appears more than once in either table always fail. With `"flag"` (the
+    default), the step report lists the duplicated keys. With `"compare"`, the step report
+    also compares the duplicated rows pairwise to show which columns differ.
+order_by
+    Column(s) defining the row order for positional alignment on backends without an
+    inherent row order (e.g., PySpark or database tables). Without it, such tables are
+    collected and compared in the order in which their rows are returned; use `keys=` for
+    a reliable alignment. Ignored when `keys=` is given.
+partitions
+    Compare the tables in this many passes, each covering a disjoint subset of the key
+    values (by key hash), to bound memory use for very large tables. Each pass reads the
+    tables again, so this trades time for memory; the results are identical to a
+    single-pass comparison. Requires `keys=` (not `"*"`), and Polars, DuckDB, or Ibis
+    tables (including CSV/Parquet paths). Sundering isn't available for the step when
+    partitions are used.
 pre
     An optional preprocessing function or lambda to apply to the data table during
     interrogation. This function should take a table as input and return a modified table.
@@ -8232,6 +8287,38 @@ Returns
 -------
 Validate
     The `Validate` object with the added validation step.
+
+Test Units
+----------
+Each aligned row is a test unit. With `keys=`, that's every key value found in either table
+(a duplicated key counts as many units as its larger number of occurrences); by position,
+it's the number of rows in the longer table; as multisets, it's every row copy. A test unit
+passes only if its row is in both tables with all compared values equal. If the strict
+schema check fails, all test units fail. When both tables are empty, the step has a single
+test unit, which passes if the schemas match.
+
+Because failures are counted per row, thresholds can be expressed as proportions (e.g., a
+`warning` when more than 1% of rows differ). To fail on any difference, use an absolute
+threshold of `1`.
+
+:::{.callout-important}
+In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit that failed if the
+tables differed in any way. Whether a step passes or fails is unchanged, but the counts
+(`n`, `n_passed`, `n_failed`, and the fractions) now reflect rows. This changes the meaning
+of fractional thresholds: `thresholds=0.1` used to be exceeded by any difference, and is
+now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of
+reacting to any difference, use an absolute threshold of `1` (e.g., `thresholds=1` or
+`Thresholds(warning=1)`).
+:::
+
+The data extract for the step (from
+[`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing rows
+of *both* tables: the key column(s), a `_status_` column (`"changed"`, `"missing"`,
+`"extra"`, or `"dup_key"`), and a pair of `<column>_source`/`<column>_target` columns for
+each compared column. For [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`),
+target rows with a matching row in the comparison table pass; rows missing from the target
+can't be part of the sundered data. Sundering for this step is available with in-memory
+tables (not lazy or database tables) and isn't available in multiset mode.
 
 Preprocessing
 -------------
@@ -8277,63 +8364,16 @@ take for each level of failure (using the `actions=` parameter).
 
 Cross-Backend Validation
 ------------------------
-The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
-different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
-comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
-different backends are detected, the comparison table is automatically converted to match the
-data table's backend before validation proceeds.
+The two tables can come from different backends (e.g., a Polars DataFrame and a Pandas
+DataFrame, or a database table and a CSV file). Tables on the same backend are compared in
+place (so two tables in the same database are compared inside the database). Tables on
+different backends are both converted to Polars (or to Pandas, if Polars isn't installed)
+before the comparison. Key columns whose types differ between the tables (e.g., integer
+keys that became floats in Pandas because of a missing value) are cast to a common type.
 
-**Certified Backend Combinations:**
-
-All combinations of the following backends have been tested and certified to work (in both
-directions):
-
-- Pandas DataFrame
-- Polars DataFrame
-- DuckDB (native)
-- DuckDB (as Ibis table)
-- SQLite (via Ibis)
-
-Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
-automatically materialized during validation:
-
-- if comparing **against Polars**: materialized to Polars
-- if comparing **against Pandas**: materialized to Pandas
-- if **both tables are database backends**: both materialized to Polars
-
-This ensures optimal performance and type consistency.
-
-**Data Types That Work Best in Cross-Backend Validation:**
-
-- numeric types: int, float columns (including proper NaN handling)
-- string types: text columns with consistent encodings
-- boolean types: True/False values
-- null values: `None` and `NaN` are treated as equivalent across backends
-- list columns: nested list structures (with basic types)
-
-**Known Limitations:**
-
-While many data types work well in cross-backend validation, there are some known
-limitations to be aware of:
-
-- date/datetime types: When converting between Polars and Pandas, date objects may be
-  represented differently. For example, `datetime.date` objects in Pandas may become
-  `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
-  around this, ensure both tables use the same datetime representation before comparison.
-- custom types: User-defined types or complex nested structures may not convert cleanly
-  between backends and could cause unexpected comparison failures.
-- categorical types: Categorical/factor columns may have different internal
-  representations across backends.
-- timezone-aware datetimes: Timezone handling differs between backends and may cause
-  comparison issues.
-
-Here are some ideas to overcome such limitations:
-
-- for date/datetime columns, consider using `pre=` preprocessing to normalize representations
-  before comparison.
-- when working with custom types, manually convert tables to the same backend before using
-  `tbl_match()`.
-- use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+Values in columns whose types differ are compared numerically when both columns are numeric
+and as strings otherwise; note that such differences also fail the strict schema check
+(use `schema="common"` to only report them).
 
 Examples
 --------
@@ -8381,30 +8421,249 @@ validation = (
 validation
 ```
 
-The validation table shows that the single test unit passed, indicating that the two tables
-match completely.
+The validation table shows that all four test units (one per row) passed, indicating that
+the two tables match completely.
 
-Now, let's create a table with a slight difference and see what happens.
+Now, let's compare against a table that has one different value, is missing a row, and has
+an extra row. Since the rows can be identified by column `a`, we'll use it as the key.
 
 ```{python}
-# Create a table with one different value
 tbl_3 = pl.DataFrame({
-    "a": [1, 2, 3, 4],
-    "b": ["w", "x", "y", "z"],
-    "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+    "a": [1, 2, 4, 5],
+    "b": ["w", "x", "z", "v"],
+    "c": [4.0, 5.5, 7.0, 8.0]  # Changed 5.0 to 5.5
 })
 
 validation = (
-    pb.Validate(data=tbl_1)
-    .tbl_match(tbl_compare=tbl_3)
+    pb.Validate(data=tbl_3)
+    .tbl_match(tbl_compare=tbl_1, keys="a")
     .interrogate()
 )
 
 validation
 ```
 
-The validation table shows that the single test unit failed because the tables don't match
-(one value is different in column `c`).
+Three of the five aligned rows failed: one changed, one missing from the target, and one
+extra. The step report shows exactly what differs.
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+tbl_reconcile(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, measures: 'str | list[str] | None' = None, agg: 'str | dict[str, str | list[str]]' = 'sum', tolerance: 'Any' = None, column_map: 'dict[str, str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+
+Validate that aggregates of the target table reconcile with a comparison table.
+
+The `tbl_reconcile()` method checks that the target table agrees with a comparison table
+(the *source*, or expected data) on aggregate values: totals, counts, averages, minimums,
+or maximums of *measure* columns, computed per group of *key* columns (or over the whole
+table). It's the check to reach for when the two tables don't have the same rows but must
+add up to the same numbers, for example a warehouse fact table against the source system it
+was loaded from, or a monthly summary against the detailed transactions.
+
+Each key group is a test unit: it passes if the group is in both tables and all of its
+aggregates are equal (within the tolerance), and fails if an aggregate differs, if the
+group is missing from the target, or if it's an extra group in the target. To compare the
+rows themselves rather than aggregates, use
+[`tbl_match()`](`pointblank.Validate.tbl_match`).
+
+Parameters
+----------
+tbl_compare
+    The comparison table (the expected data) to reconcile against. This can be a DataFrame
+    object (Polars or Pandas), an Ibis table object, a path to a CSV or Parquet file, or a
+    callable that returns a table.
+keys
+    The column(s) to group by. Aggregates are compared group by group. If `None` (the
+    default), the aggregates are computed over the whole table and compared as a single
+    group (a grand total).
+measures
+    The column(s) to aggregate. Required unless `agg="count"`, which (without `measures=`)
+    compares the number of rows in each group.
+agg
+    The aggregation(s): `"sum"` (the default), `"count"` (the number of non-null values),
+    `"mean"`, `"min"`, or `"max"`. Use a dict to aggregate measures differently, mapping a
+    measure to an aggregation or a list of aggregations (e.g.,
+    `{"amount": ["sum", "max"], "qty": "sum"}`).
+tolerance
+    Tolerance for comparing the aggregates. A number is an absolute tolerance for all
+    aggregates. A dict with `"atol"` and/or `"rtol"` keys applies to all aggregates, where
+    values are equal if `|expected - actual| <= atol + rtol * |expected|`. A dict mapping
+    measures to either of the above sets per-measure tolerances (applied to all of a
+    measure's aggregates other than counts).
+column_map
+    A mapping of comparison-table column names to target column names, for keys or
+    measures that are named differently in the target.
+partitions
+    Compare the aggregated tables in this many passes, each covering a disjoint subset of
+    the key values, to bound memory use when there are very many groups. Requires `keys=`.
+pre
+    An optional preprocessing function or lambda to apply to the data table during
+    interrogation. This function should take a table as input and return a modified table.
+    Have a look at the *Preprocessing* section for more information on how to use this
+    argument.
+thresholds
+    Set threshold failure levels for reporting and reacting to exceedences of the levels.
+    The thresholds are set at the step level and will override any global thresholds set in
+    `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+    be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+    section for information on how to set threshold levels.
+actions
+    Optional actions to take when the validation step meets or exceeds any set threshold
+    levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+    define the actions.
+brief
+    An optional brief description of the validation step that will be displayed in the
+    reporting table. You can use the templating elements like `"{step}"` to insert
+    the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+    the entire brief will be automatically generated. If `None` (the default) then there
+    won't be a brief.
+active
+    A boolean value or callable that determines whether the validation step should be
+    active. Using `False` will make the validation step inactive (still reporting its
+    presence and keeping indexes for the steps unchanged). A callable can also be
+    provided; it will receive the data table as its single argument and must return a
+    boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+    functions like [`has_columns()`](`pointblank.has_columns`) and
+    [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+    based on properties of the target table.
+
+dimension
+    An optional data quality dimension to categorize this validation step for health
+    scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+    `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+    dimension is inferred automatically from the assertion type. This label appears in the
+    validation report and feeds the overall and per-dimension health scores.
+Returns
+-------
+Validate
+    The `Validate` object with the added validation step.
+
+Test Units
+----------
+Each key group found in either table is a test unit (with `keys=None`, there's a single
+unit for the whole table). A unit passes if its aggregates are equal (within the tolerance)
+in both tables. Rows with null keys form a group of their own, which is matched with the
+null-key group of the other table.
+
+The data extract for the step (from
+[`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) contains the failing
+groups: the key column(s), a `_status_` column (`"changed"`, `"missing"`, or `"extra"`),
+and a pair of `<measure>_<agg>_source`/`<measure>_<agg>_target` columns for each aggregate.
+The step report shows the full comparison of the aggregates. Since test units are groups
+rather than rows, this step doesn't take part in
+[`get_sundered_data()`](`pointblank.Validate.get_sundered_data`).
+
+Preprocessing
+-------------
+The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+table during interrogation. This function should take a table as input and return a modified
+table. This is useful for performing any necessary transformations or filtering on the data
+before the validation step is applied.
+
+The preprocessing function can be any callable that takes a table as input and returns a
+modified table. For example, you could use a lambda function to filter the table based on
+certain criteria or to apply a transformation to the data. Note that the same preprocessing
+is **not** applied to the comparison table; only the target table is preprocessed. Regarding
+the lifetime of the transformed table, it only exists during the validation step and is not
+stored in the `Validate` object or used in subsequent validation steps.
+
+Thresholds
+----------
+The `thresholds=` parameter is used to set the failure-condition levels for the validation
+step. If they are set here at the step level, these thresholds will override any thresholds
+set at the global level in `Validate(thresholds=...)`.
+
+There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+can either be set as a proportion failing of all test units (a value between `0` to `1`),
+or, the absolute number of failing test units (as integer that's `1` or greater).
+
+Thresholds can be defined using one of these input schemes:
+
+1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+thresholds)
+2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+the 'error' level, and position `2` is the 'critical' level
+3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+'critical'
+4. a single integer/float value denoting absolute number or fraction of failing test units
+for the 'warning' level only
+
+If the number of failing test units exceeds set thresholds, the validation step will be
+marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+set, you're free to set any combination of them.
+
+Aside from reporting failure conditions, thresholds can be used to determine the actions to
+take for each level of failure (using the `actions=` parameter).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Let's reconcile a small table of loaded orders against the source system's orders. The
+loaded table names the amount column differently, has a different number of rows (one order
+was split into two rows), and is missing the orders for one region.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+source_orders = pl.DataFrame(
+    {
+        "region": ["north", "north", "south", "east", "west"],
+        "amount": [100.0, 250.0, 75.5, 30.0, 12.0],
+    }
+)
+
+loaded_orders = pl.DataFrame(
+    {
+        "region": ["north", "north", "north", "south", "east"],
+        "amt": [100.0, 200.0, 50.0, 75.5, 31.0],
+    }
+)
+
+validation = (
+    pb.Validate(data=loaded_orders)
+    .tbl_reconcile(
+        tbl_compare=source_orders,
+        keys="region",
+        measures="amount",
+        column_map={"amount": "amt"},
+    )
+    .interrogate()
+)
+
+validation
+```
+
+Of the four regions, `north` and `south` reconcile; `east` has a different total, and
+`west` is missing from the loaded orders. The step report shows the details:
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+Grand totals don't need any keys. Here, the total amount matches within a tolerance of
+`20`, and so the step passes:
+
+```{python}
+(
+    pb.Validate(data=loaded_orders)
+    .tbl_reconcile(
+        tbl_compare=source_orders,
+        measures="amount",
+        column_map={"amount": "amt"},
+        tolerance=20,
+    )
+    .interrogate()
+    .all_passed()
+)
+```
 
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -17081,6 +17340,325 @@ DataScanDiff
     An object describing the differences between the two scans.
 
 
+## Table Comparison
+
+Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
+
+
+
+compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, source_name: 'str | None' = None, target_name: 'str | None' = None) -> 'Comparison'
+
+Compare two tables row by row and report how they differ.
+
+The `compare()` function aligns the rows of a *source* table (the reference, or expected data)
+with those of a *target* table (the data being checked) and classifies every aligned row:
+rows that match, rows whose values changed, rows missing from the target, and extra rows in the
+target. It also reports schema differences (columns added, removed, retyped, or reordered). The
+returned `Comparison` object gives you the counts, samples of the differing rows, and a
+tabular report.
+
+Rows are aligned in one of two ways:
+
+- **by key** (`keys=` given): rows are matched on the values of one or more key columns, so
+  row order doesn't matter. This is the most useful mode for comparing extracts of the same
+  data (e.g., the source and target of a pipeline run).
+- **by position** (`keys=None`, the default): the first row of the source is compared with the
+  first row of the target, and so on.
+
+The comparison is backend-agnostic and runs inside the table's own engine: tables can be
+Polars or Pandas DataFrames, Polars LazyFrames, Ibis tables (e.g., DuckDB, PostgreSQL), or
+paths to CSV/Parquet files. File paths are scanned lazily, and only counts and small samples of
+differing rows are ever collected, so tables that don't fit in memory can still be compared.
+
+Parameters
+----------
+source
+    The reference table. Can be any table type supported by Pointblank, a path to a CSV or
+    Parquet file, or a callable that returns a table.
+target
+    The table to check against the source. Same input types as `source=`.
+keys
+    One or more columns that uniquely identify a row, used to align rows between the tables.
+    Key names refer to the source table (use `column_map=` if the target names them
+    differently). If `None`, rows are aligned by position, which requires the tables to have
+    a defined row order (eager DataFrames, Polars LazyFrames, or any table with `order_by=`).
+columns
+    The source columns whose values should be compared. By default, all columns present in
+    both tables (other than the keys) are compared. Giving `columns=` also limits the schema
+    check to the keys and these columns.
+column_map
+    A mapping of source column names to target column names, for columns that were renamed.
+tolerance
+    Tolerance for numeric and datetime comparisons. A number is an absolute tolerance applied
+    to all numeric columns. A dict with `"atol"` and/or `"rtol"` keys applies to all numeric
+    columns, where values are equal if `|source - target| <= atol + rtol * |source|`. A dict
+    mapping column names to either of the above sets per-column tolerances. Datetime
+    tolerances are given as a `datetime.timedelta` or a string like `"1s"`, `"500ms"`, `"2m"`,
+    or `"1d"`, e.g., `tolerance={"updated_at": "1s"}`.
+normalize
+    Per-column transformations applied to both sides before comparing, as a dict mapping a
+    column name to a list of operations: `"strip"`, `"lower"`, `"upper"`,
+    `"collapse_whitespace"`, or `{"round": n}`. The string operations only apply to string
+    columns and `round` only to numeric ones (other columns are left as they are). Reported
+    values are always the original ones.
+null_equal
+    Should a null in the source and a null in the target count as equal? By default, they do.
+    NaN values in floating-point columns are treated as null.
+schema
+    How schema differences affect the result. With `"strict"` (the default), any schema
+    difference (other than renames given in `column_map=`) means the tables don't match, and
+    every row counts as failing. With `"common"`, only the shared columns are compared and
+    schema differences are reported without failing rows.
+dup_keys
+    Rows whose key appears more than once in either table can't be aligned unambiguously, so
+    they always get the `"dup_key"` status. With `"flag"` (the default), they are only flagged
+    and counted. With `"compare"`, the report also compares the duplicated rows pairwise
+    (every source row against every target row with the same key) to show which columns
+    differ.
+order_by
+    Column(s) defining row order for positional alignment on backends without an inherent
+    row order (e.g., database tables). Ignored when `keys=` is given.
+partitions
+    Compare the tables in this many passes, each covering a disjoint subset of the key values
+    (by key hash). This bounds peak memory for tables too large to compare in one pass (each
+    pass joins only about `1/partitions` of the rows), at the cost of reading the tables once
+    per pass. Requires `keys=`, and Polars, DuckDB, or Ibis tables (including CSV/Parquet
+    paths). The results are identical to a single-pass comparison.
+source_name, target_name
+    Optional labels for the two tables, used in the report.
+
+Returns
+-------
+Comparison
+    The result of the comparison.
+
+Test Units and Row Statuses
+---------------------------
+Every aligned row is one *test unit* and gets exactly one status:
+
+- `"match"`: the row is in both tables and all compared values are equal (within tolerance)
+- `"changed"`: the row is in both tables but at least one compared value differs
+- `"missing"`: the row is in the source but not in the target
+- `"extra"`: the row is in the target but not in the source
+- `"dup_key"`: the row's key appears more than once in either table. A duplicated key counts
+  as many units as the larger of its two occurrence counts.
+
+Rows with a null in a key column can't be matched: they count as `"missing"` (source) or
+`"extra"` (target).
+
+Large Tables
+------------
+The comparison runs inside the tables' own engine and only counts and small samples of rows
+are collected, so file paths (scanned lazily) and database tables never have to be loaded into
+Python. The engine's join still needs memory for the rows it compares. If that's too much, use
+`partitions=` to compare the tables in several smaller passes. For the lowest memory use with
+very large files, read them as DuckDB relations (e.g., `duckdb.connect().read_csv(path)`) and
+use `partitions=`: in a benchmark with two 10-million-row CSV files (730 MB each), peak memory
+was about 0.8 GB with DuckDB and `partitions=8`, versus about 5.7 GB to read both files with
+Polars and join them. With 100-million-row files (7.4 GB each), DuckDB with `partitions=8`
+peaked at about 2 GB.
+
+Examples
+--------
+```{python}
+import pointblank as pb
+import polars as pl
+
+source = pl.DataFrame(
+    {"id": [1, 2, 3, 4], "amount": [10.0, 20.0, 30.0, 40.0], "region": ["N", "S", "E", "W"]}
+)
+target = pl.DataFrame(
+    {"id": [1, 2, 4, 5], "amount": [10.0, 20.5, 40.0, 50.0], "region": ["N", "S", "W", "N"]}
+)
+
+cmp = pb.compare(source, target, keys="id")
+cmp
+```
+
+The counts are available as attributes, and the differing rows can be retrieved by status:
+
+```{python}
+cmp.n_changed, cmp.n_missing, cmp.n_extra
+```
+
+```{python}
+cmp.rows("changed")
+```
+
+A tolerance can absorb small numeric differences:
+
+```{python}
+pb.compare(source, target, keys="id", tolerance={"amount": 1}).n_changed
+```
+
+Comparison() -> 'None'
+
+The result of comparing a source table with a target table.
+
+`Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
+status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
+of differing rows on demand.
+
+Attributes
+----------
+source_name, target_name
+    Labels for the two tables.
+keys
+    The key columns used to align rows (empty for positional alignment).
+mode
+    `"keyed"` or `"positional"`.
+schema_diff
+    A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
+n_source_rows, n_target_rows
+    Row counts of the two tables.
+n_match, n_changed, n_missing, n_extra, n_dup_key
+    Number of test units (aligned rows) with each status.
+column_mismatches
+    A dict mapping each compared source column to the number of matched rows where its values
+    differ.
+
+SchemaDiff(only_in_source: 'list[str]' = <factory>, only_in_target: 'list[str]' = <factory>, dtype_changed: 'list[tuple[str, str, str]]' = <factory>, renamed: 'list[tuple[str, str]]' = <factory>, case_only: 'list[tuple[str, str]]' = <factory>, reordered: 'bool' = False) -> None
+
+Differences between the schemas of the source and target tables.
+
+Column names refer to the source table except in `only_in_target` (and the second element of
+`renamed` and `case_only` pairs), which refer to the target table.
+
+Attributes
+----------
+only_in_source
+    Columns present in the source but not the target.
+only_in_target
+    Columns present in the target but not the source.
+dtype_changed
+    `(column, source_dtype, target_dtype)` for shared columns whose data types differ.
+renamed
+    `(source_column, target_column)` pairs paired up through `column_map=`.
+case_only
+    `(source_column, target_column)` pairs whose names differ only by letter case. These are
+    *not* paired up automatically (they also appear in `only_in_source`/`only_in_target`); use
+    `column_map=` to compare them.
+reordered
+    `True` if the shared columns appear in a different order in the two tables.
+
+
+## Comparison Methods
+
+Methods for the Comparison class
+
+
+Comparison.n
+
+The number of test units (aligned rows).
+
+Comparison.schema_ok
+
+`True` if the schemas match, or if schema differences are tolerated (`"common"`).
+
+Comparison.n_passed
+
+Test units that pass: matching rows (none, if the schema check fails).
+
+Comparison.n_failed
+
+Test units that fail: all non-matching rows (all rows, if the schema check fails).
+
+Comparison.identical
+
+`True` if the tables match under the comparison settings.
+
+Comparison.status_counts
+
+The number of test units with each row status.
+
+__bool__(self) -> 'bool'
+
+__repr__(self) -> 'str'
+
+rows(self, status: "Literal['changed', 'missing', 'extra', 'dup_key', 'match']", limit: 'int' = 100) -> 'Any'
+
+Get a sample of rows with a given status.
+
+Only up to `limit=` rows are collected, so this is safe to use on very large tables.
+
+Parameters
+----------
+status
+    The row status to retrieve:
+
+    - `"changed"`: the keys, then a `<column>_source` and a `<column>_target` column for
+      each compared column
+    - `"missing"`: source rows not in the target (source column names)
+    - `"extra"`: target rows not in the source (target column names)
+    - `"dup_key"`: duplicated key values with their occurrence counts in each table
+      (`n_source`, `n_target`)
+    - `"match"`: the keys of matching rows
+limit
+    The maximum number of rows to return.
+
+Returns
+-------
+Any
+    A table of the same type as the (collected) input tables. In positional mode, rows
+    are identified by a 1-based `_row_num_` column.
+
+column_summary(self) -> 'Any'
+
+Get a per-column summary of value mismatches.
+
+Returns
+-------
+Any
+    A table (Polars if available, else Pandas) with one row per compared column: the
+    source and target column names and data types, the number of matched rows whose
+    values differ (`n_mismatch`), and that number as a fraction of matched rows
+    (`f_mismatch`).
+
+to_dict(self, samples: 'bool' = True, limit: 'int' = 10) -> 'dict[str, Any]'
+
+Get the comparison results as a JSON-serializable dict.
+
+Parameters
+----------
+samples
+    Should samples of differing rows be included? Set to `False` when the data might
+    contain sensitive values (e.g., PII) and only counts and schema details may be stored.
+limit
+    The maximum number of sample rows per status.
+
+to_json(self, samples: 'bool' = True, limit: 'int' = 10, indent: 'int | None' = 2) -> 'str'
+
+Get the comparison results as a JSON string (see `to_dict()`).
+
+get_tabular_report(self, limit: 'int' = 10, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
+
+Get a tabular report of the comparison.
+
+The report has a header with the verdict, the row status counts, and the comparison
+settings, followed by sections (as row groups) for schema differences, per-column
+mismatches, and samples of changed, missing, extra, and duplicate-key rows. Sections with
+nothing to show are omitted.
+
+Parameters
+----------
+limit
+    The maximum number of sample rows shown per row status.
+title
+    An optional title replacing the default.
+lang
+    The language of the report's labels, as a two-letter language code (e.g., `"fr"`,
+    `"de"`) or one of the other Pointblank reporting languages. English by default.
+    Values from the tables (keys, column names, and data) are shown as they are.
+locale
+    The locale used to format counts and percentages (e.g., the thousands separator).
+    By default, it's the same as `lang=`.
+
+Returns
+-------
+GT
+    A Great Tables object.
+
+
 ## Table Pre-checks
 
 Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
@@ -21401,6 +21979,7 @@ Commands:
   missing        Generate a missing values report for a data table.
   validate       Perform single or multiple data validations.
   run            Run a Pointblank validation script or YAML configuration.
+  compare        Compare two tables row by row.
   make-template  Create a validation script or YAML configuration template.
   pl             Execute Polars expressions and display results.
   datasets       List available built-in datasets.
@@ -21601,6 +22180,69 @@ Options:
                         (default: 500)
   --exit-code           Exit with non-zero code if validation fails
   --help                Show this message and exit.
+```
+
+### pb compare
+
+```
+Usage: pb compare [OPTIONS] SOURCE TARGET
+
+  Compare two tables row by row.
+
+  SOURCE is the reference (expected) table and TARGET is the table to check.
+  Each can be a CSV or Parquet file (scanned lazily, so large files work), a
+  database connection string, or a built-in dataset name. Every row is
+  classified as matching, changed, missing from the target, extra in the
+  target, or having a duplicated key; schema differences are reported too.
+
+  Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
+
+  Examples:
+
+    pb compare source.csv target.csv --key id
+    pb compare old.parquet new.parquet -k id -t amount=rtol:1e-6 --output-html diff.html
+    pb compare a.csv b.csv -k region -k date --schema common --format json
+    pb compare big_a.csv big_b.csv -k id --engine duckdb --partitions 8
+
+Options:
+  -k, --key TEXT                Key column used to align rows (repeat for
+                                composite keys). Use '*' to compare as
+                                multisets of rows. Without a key, rows are
+                                compared by position.
+  -c, --columns TEXT            Comma-separated source columns to compare
+  --column-map TEXT             Renamed column as SOURCE_COLUMN=TARGET_COLUMN
+                                (repeatable)
+  -t, --tolerance TEXT          Tolerance as [COLUMN=]SPEC; SPEC is a number
+                                (absolute), a duration (1s, 500ms), or
+                                atol:X,rtol:Y (repeatable)
+  --normalize TEXT              Normalization as COLUMN=op[,op...] with ops
+                                strip, lower, upper, collapse_whitespace,
+                                round:N (repeatable)
+  --null-unequal                Treat two nulls as different values
+  --schema [strict|common]      'strict': any schema difference fails all
+                                rows; 'common': compare shared columns only
+                                [default: strict]
+  --dup-keys [flag|compare]     'compare' also compares rows with duplicated
+                                keys pairwise in the report  [default: flag]
+  --order-by TEXT               Comma-separated columns defining row order
+                                (positional mode)
+  --partitions INTEGER RANGE    Compare in N passes by key hash to bound
+                                memory use for very large tables  [x>=1]
+  --engine [polars|duckdb]      Engine for reading CSV/Parquet files: 'polars'
+                                is fastest, 'duckdb' uses the least memory
+                                (especially with --partitions)  [default:
+                                polars]
+  --limit INTEGER               Maximum sample rows shown per status
+                                [default: 10]
+  --output-html PATH            Save the HTML comparison report to file
+  --output-json PATH            Save the comparison results as JSON to file
+  --format [text|json]          Terminal output: a summary ('text') or the
+                                results as JSON ('json')  [default: text]
+  --no-samples                  Leave sample row values out of JSON output
+                                (e.g., for sensitive data)
+  --exit-code / --no-exit-code  Exit with code 1 when the tables differ
+                                [default: exit-code]
+  --help                        Show this message and exit.
 ```
 
 ### pb datasets
@@ -22037,6 +22679,10 @@ We'd love to hear from you! Connect with us:
 
 
 ### Metadata Import
+
+
+
+### Table Comparison
 
 
 
@@ -35019,6 +35665,74 @@ Run Python validation scripts or YAML configurations:
 >   --help                          Show this message and exit.
 > ```
 
+## `pb compare` - Table Comparison
+
+Compare two tables row by row: rows missing from or extra in the target, rows whose values
+changed, duplicated keys, and schema differences. File inputs are scanned lazily. For very large
+files, `--engine duckdb --partitions N` keeps memory use low (about 0.8 GB for two 10-million-row
+CSV files with 8 partitions):
+
+> ```
+> Usage: pb compare [OPTIONS] SOURCE TARGET
+>
+>   Compare two tables row by row.
+>
+>   SOURCE is the reference (expected) table and TARGET is the table to check.
+>   Each can be a CSV or Parquet file (scanned lazily, so large files work), a
+>   database connection string, or a built-in dataset name. Every row is
+>   classified as matching, changed, missing from the target, extra in the
+>   target, or having a duplicated key; schema differences are reported too.
+>
+>   Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
+>
+>   Examples:
+>
+>     pb compare source.csv target.csv --key id
+>     pb compare old.parquet new.parquet -k id -t amount=rtol:1e-6 --output-html diff.html
+>     pb compare a.csv b.csv -k region -k date --schema common --format json
+>     pb compare big_a.csv big_b.csv -k id --engine duckdb --partitions 8
+>
+> Options:
+>   -k, --key TEXT                Key column used to align rows (repeat for
+>                                 composite keys). Use '*' to compare as
+>                                 multisets of rows. Without a key, rows are
+>                                 compared by position.
+>   -c, --columns TEXT            Comma-separated source columns to compare
+>   --column-map TEXT             Renamed column as SOURCE_COLUMN=TARGET_COLUMN
+>                                 (repeatable)
+>   -t, --tolerance TEXT          Tolerance as [COLUMN=]SPEC; SPEC is a number
+>                                 (absolute), a duration (1s, 500ms), or
+>                                 atol:X,rtol:Y (repeatable)
+>   --normalize TEXT              Normalization as COLUMN=op[,op...] with ops
+>                                 strip, lower, upper, collapse_whitespace,
+>                                 round:N (repeatable)
+>   --null-unequal                Treat two nulls as different values
+>   --schema [strict|common]      'strict': any schema difference fails all
+>                                 rows; 'common': compare shared columns only
+>                                 [default: strict]
+>   --dup-keys [flag|compare]     'compare' also compares rows with duplicated
+>                                 keys pairwise in the report  [default: flag]
+>   --order-by TEXT               Comma-separated columns defining row order
+>                                 (positional mode)
+>   --partitions INTEGER RANGE    Compare in N passes by key hash to bound
+>                                 memory use for very large tables  [x>=1]
+>   --engine [polars|duckdb]      Engine for reading CSV/Parquet files: 'polars'
+>                                 is fastest, 'duckdb' uses the least memory
+>                                 (especially with --partitions)  [default:
+>                                 polars]
+>   --limit INTEGER               Maximum sample rows shown per status
+>                                 [default: 10]
+>   --output-html PATH            Save the HTML comparison report to file
+>   --output-json PATH            Save the comparison results as JSON to file
+>   --format [text|json]          Terminal output: a summary ('text') or the
+>                                 results as JSON ('json')  [default: text]
+>   --no-samples                  Leave sample row values out of JSON output
+>                                 (e.g., for sensitive data)
+>   --exit-code / --no-exit-code  Exit with code 1 when the tables differ
+>                                 [default: exit-code]
+>   --help                        Show this message and exit.
+> ```
+
 ## `pb make-template` - Template Generation
 
 Create validation script or YAML configuration templates:
@@ -35157,6 +35871,8 @@ All commands that accept a `DATA_SOURCE` parameter support these formats:
 Many commands support options useful for automation and CI/CD:
 
 - `--exit-code`: Exit with non-zero code on validation failure
+- `pb compare` exits with `0` when the tables match, `1` when they differ, and `2` on error
+  (use `--no-exit-code` to always exit with `0` unless there's an error)
 - `--fail-on [critical|error|warning|any]`: Control failure thresholds
 - `--output-html`, `--output-json`: Save reports for external consumption
 - `--write-extract`: Save failing rows for investigation
@@ -40493,6 +41209,533 @@ pytest -m cdisc_core
 The integration tests validate the full subprocess pipeline end-to-end, including XPT materialization,
 CORE invocation, JSON parsing, and report construction. Running them against your local CORE
 installation is a good sanity check after upgrading either Pointblank or the CORE engine.
+
+
+### Comparing Two Tables
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+A very common data question is *how do these two tables differ?* Maybe you refactored a pipeline
+and want to know whether its output changed, migrated a table from one database to another, or
+received a new extract of a data feed. In each case there's a *source* table (the reference, or the
+data you expect) and a *target* table (the data you want to check), and you want to know:
+
+- which records are missing from the target
+- which records in the target are extra
+- which records have values that differ, and in which columns
+- whether the columns themselves (names, types, order) changed
+
+Pointblank answers all of these with the `compare()` function, and the same comparison is available
+as a validation step through `Validate.tbl_match()` and on the command line through `pb compare`.
+
+## A First Comparison
+
+Let's make two small tables of orders. The target is a later extract of the same data: one order
+had its amount corrected, one order is gone, and a new order has appeared.
+
+```{python}
+import polars as pl
+
+source = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1003, 1004, 1005],
+        "customer": ["Ana", "Ben", "Cho", "Dev", "Eli"],
+        "amount": [25.00, 40.50, 12.75, 99.99, 5.00],
+        "status": ["shipped", "shipped", "pending", "shipped", "cancelled"],
+    }
+)
+
+target = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1004, 1005, 1006],
+        "customer": ["Ana", "Ben", "Dev", "Eli", "Fay"],
+        "amount": [25.00, 45.50, 99.99, 5.00, 18.25],
+        "status": ["shipped", "shipped", "shipped", "cancelled", "pending"],
+    }
+)
+```
+
+Since every order has a unique `order_id`, we'll use it as the *key* to line up the rows of the two
+tables:
+
+```{python}
+import pointblank as pb
+
+comparison = pb.compare(source, target, keys="order_id")
+
+comparison
+```
+
+The report's header gives the verdict and a breakdown of the rows. Below it, each section shows one
+kind of difference: which columns have mismatched values (and how often), then samples of the
+changed, missing, and extra rows. For changed rows, only the differing values are shown, as
+*old → new* with the numeric difference alongside.
+
+## Row Statuses
+
+Every row that can be aligned between the two tables gets exactly one status:
+
+| Status | Meaning |
+|---|---|
+| `match` | the row is in both tables and all compared values are equal |
+| `changed` | the row is in both tables but at least one compared value differs |
+| `missing` | the row is in the source but not in the target |
+| `extra` | the row is in the target but not in the source |
+| `dup_key` | the row's key appears more than once in either table, so it can't be aligned |
+
+The counts are available directly on the `Comparison` object:
+
+```{python}
+comparison.status_counts
+```
+
+```{python}
+comparison.n_changed, comparison.n_missing, comparison.n_extra
+```
+
+A `Comparison` is truthy only if the tables match, so it can be used directly in a test or an
+`if` statement:
+
+```{python}
+bool(comparison)
+```
+
+## Getting the Differing Rows
+
+Use the `rows()` method to get the rows with a given status as a table. Changed rows come with a
+`<column>_source` and a `<column>_target` column for each compared column:
+
+```{python}
+comparison.rows("changed")
+```
+
+Missing rows come from the source and extra rows from the target:
+
+```{python}
+comparison.rows("missing")
+```
+
+```{python}
+comparison.rows("extra")
+```
+
+Only up to `limit=` rows (100 by default) are collected, so this is safe even for very large
+tables. For a per-column view of the mismatches, use `column_summary()`:
+
+```{python}
+comparison.column_summary()
+```
+
+## How Rows Are Aligned
+
+The `keys=` argument decides how the rows of the two tables are lined up:
+
+- **By key** (`keys="order_id"`, or a list for a composite key): rows are matched on the key
+  values, so their order doesn't matter. This is the most informative mode, and the one to use
+  whenever the data has an identifier.
+- **By position** (`keys=None`, the default): the first row of the source is compared with the first
+  row of the target, and so on. This suits outputs that are supposed to be identical row for row.
+- **As multisets** (`keys="*"`): whole rows are compared regardless of their order, with
+  duplicates counted. This is for tables that have no key at all.
+
+Here's what positional alignment makes of the same two tables. Since a row was removed and another
+added, most rows no longer line up:
+
+```{python}
+pb.compare(source, target).status_counts
+```
+
+## Tolerances, Normalization, and Nulls
+
+Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given
+for all numeric columns or per column. An absolute tolerance of `5` absorbs the corrected amount:
+
+```{python}
+pb.compare(source, target, keys="order_id", tolerance={"amount": 5}).n_changed
+```
+
+Tolerances can be absolute (`atol`), relative to the source value (`rtol`), or both, as in
+`tolerance={"amount": {"atol": 0.01, "rtol": 1e-6}}`. Two values are equal if
+`|source - target| <= atol + rtol * |source|`. Datetime tolerances are durations like `"1s"`,
+`"500ms"`, or `"2m"`.
+
+String values can be normalized before comparing with `normalize=`. For example,
+`normalize={"customer": ["strip", "lower"]}` ignores surrounding whitespace and letter case (the
+available operations are `"strip"`, `"lower"`, `"upper"`, `"collapse_whitespace"`, and
+`{"round": n}`). Reports always show the original values.
+
+By default, two nulls count as equal, and NaN values in floating-point columns are treated as nulls.
+Use `null_equal=False` to count two nulls as a difference.
+
+## Schema Differences
+
+Column differences are reported in the *Schema differences* section of the report and in the
+`schema_diff` attribute. Suppose the target renamed a column and added another:
+
+```{python}
+target_v2 = target.rename({"customer": "customer_name"}).with_columns(
+    region=pl.lit("EU")
+)
+
+comparison_v2 = pb.compare(source, target_v2, keys="order_id")
+
+comparison_v2.schema_diff
+```
+
+With the default `schema="strict"`, any schema difference means the tables don't match and every
+row counts as failing. Two arguments help here. `column_map=` pairs up renamed columns, and
+`schema="common"` compares only the columns that both tables share (still reporting the schema
+differences, but without failing any rows):
+
+```{python}
+pb.compare(
+    source,
+    target_v2,
+    keys="order_id",
+    column_map={"customer": "customer_name"},
+    schema="common",
+)
+```
+
+To compare just some of the columns, list them in `columns=`. The schema check is then limited to
+the keys and those columns.
+
+## Duplicate Keys
+
+A key that appears more than once in either table can't be aligned unambiguously, so its rows get
+the `dup_key` status (they always count as failing). By default the report lists the duplicated keys
+with their number of occurrences in each table. With `dup_keys="compare"`, the report also compares
+the duplicated rows pairwise to show which columns differ between them.
+
+## Table Comparison as a Validation Step
+
+The `tbl_match()` validation method uses the same comparison, which makes it a validation step like
+any other: it can have thresholds and actions, and it shows up in the validation report. The table
+being validated is the target, and `tbl_compare=` is the source. Every aligned row is a *test
+unit*, so thresholds can be set as a proportion of rows:
+
+```{python}
+validation = (
+    pb.Validate(data=target, tbl_name="orders", thresholds=(0.1, 0.25))
+    .tbl_match(tbl_compare=source, keys="order_id")
+    .interrogate()
+)
+
+validation
+```
+
+:::{.callout-note}
+In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit for the whole table. Steps
+still pass or fail in the same situations, but fractional thresholds now refer to the share of
+differing rows. To react to *any* difference, as before, use an absolute threshold of `1`.
+:::
+
+Three of the six aligned rows differ, exceeding both the 'warning' and 'error' thresholds. The step
+report holds the full comparison:
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+The data extract for the step contains the failing rows from both tables, with a `_status_` column
+and source/target value pairs:
+
+```{python}
+validation.get_data_extracts(i=1, frame=True)
+```
+
+All the comparison arguments (`keys=`, `tolerance=`, `schema=`, and so on) are available in
+`tbl_match()`, and they can be written in YAML too:
+
+```yaml
+tbl: orders_target.csv
+steps:
+  - tbl_match:
+      tbl_compare: orders_source.csv
+      keys: order_id
+      tolerance:
+        amount: 0.01
+```
+
+## Reconciling Aggregates
+
+Sometimes two tables shouldn't have the same rows but should add up to the same numbers: a
+warehouse table loaded from a source system, a summary table built from detailed transactions, or
+two systems that record the same activity at different levels of detail. For these, the
+`tbl_reconcile()` validation method compares *aggregates* instead of rows. It groups both tables by
+the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by default, or `"count"`,
+`"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is a test unit.
+
+Here, the orders in the target have been loaded at a finer grain than in the source, so we
+reconcile the total amount per customer:
+
+```{python}
+order_lines = pl.DataFrame(
+    {
+        "order_id": [1001, 1002, 1002, 1004, 1005, 1006],
+        "customer": ["Ana", "Ben", "Ben", "Dev", "Eli", "Fay"],
+        "amount": [25.00, 40.50, 5.00, 99.99, 5.00, 18.25],
+    }
+)
+
+validation = (
+    pb.Validate(data=order_lines, tbl_name="order_lines")
+    .tbl_reconcile(tbl_compare=source, keys="customer", measures="amount")
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+`Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is
+new. Without `keys=`, `tbl_reconcile()` compares grand totals (a single test unit), and
+`agg="count"` without `measures=` compares the number of rows in each group. Tolerances,
+`column_map=`, and `partitions=` work as they do in `tbl_match()`. Rows with a null key form a group
+of their own, which is matched with the other table's null-key group.
+
+## Exporting the Results
+
+The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema
+differences, and (by default) samples of the differing rows. If the data could contain sensitive
+values, leave the samples out:
+
+```{python}
+print(comparison.to_json(samples=False))
+```
+
+The tabular report can be saved as HTML, like any Great Tables table:
+
+```python
+comparison.get_tabular_report().write_raw_html("orders_diff.html")
+```
+
+## From the Command Line
+
+The `pb compare` command runs a comparison on files, database tables, or built-in datasets, prints a
+summary, and can save the HTML report and the JSON results:
+
+```bash
+pb compare orders_source.csv orders_target.csv --key order_id --output-html diff.html
+```
+
+Its exit code makes it easy to use in scripts and CI pipelines: `0` if the tables match, `1` if
+they differ, and `2` if there was an error. Use `--format json` to print the results as JSON. All
+the comparison settings have command-line options (e.g., `--tolerance amount=0.01`,
+`--schema common`); see the [CLI reference](../07-the-pointblank-cli/03-cli-reference.qmd) for the
+full list.
+
+For tables that are too large to fit in memory, see
+[Comparing Large Files](02-comparing-large-files.qmd).
+
+
+### Comparing Large Files
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a situation that comes up all the time: a pipeline run produces a target CSV file from a
+source CSV file, and you need to check that nothing went wrong. Specifically, you want to find
+
+1. records missing from the target,
+2. extra records in the target,
+3. records whose column values differ, and
+4. schema or column-name mismatches,
+
+and the files are big enough that loading both of them into memory is slow, or impossible.
+
+This article looks at why the usual approaches struggle with this, and how to do it with
+Pointblank's [`compare()`](../12-table-comparison/01-comparing-tables.qmd) function and the
+`pb compare` command.
+
+## Why the Usual Approaches Fall Short
+
+**A pandas merge.** Reading both files and doing an outer merge on the key (with `indicator=True`)
+does identify missing and extra rows, and the merged frame can be compared column by column to find
+changed values. But it needs both files in memory *plus* the merged result, which is wider than
+either input. For large files that's where memory runs out. Nulls take extra care too, since
+`NaN != NaN`.
+
+**Python sets.** Turning each file's rows into a set of tuples and taking set differences is quick to
+write, but it can't tell a *changed* row from a missing one plus an extra one, can't say which
+column changed, silently collapses duplicate rows, and still holds every row of both files in
+memory (as Python objects, which is worse than a DataFrame).
+
+**Reading in chunks.** Processing the files chunk by chunk keeps memory in check, but a row's
+counterpart in the other file is usually in a *different* chunk, unless both files happen to be
+sorted the same way. Making chunked comparison correct means partitioning both files by key, so
+that each key's rows from both files land in the same chunk. That's a lot of code to get right.
+
+## How Pointblank Approaches It
+
+Three things make `compare()` suitable for large files:
+
+1. **Files are scanned, not loaded.** CSV and Parquet paths are read lazily (with Polars, or
+   DuckDB), so the comparison is a query plan rather than two DataFrames in memory.
+2. **The work happens in the engine.** The join on the key, the per-column comparisons, and the
+   counting are all done by the query engine. Python only receives the counts and small samples of
+   the differing rows (the `limit=` of each sample).
+3. **Chunking done correctly.** With `partitions=N`, the comparison runs in N passes, each covering
+   the keys whose hash falls into one bucket, on *both* tables. A key's rows always land in the same
+   pass, so the results are exactly those of a single-pass comparison, while each pass only joins
+   about `1/N` of the rows.
+
+Let's try it on a pair of CSV files. We'll generate a source file with 200,000 orders and a target
+file in which some orders are missing, some amounts changed, a few orders were added, and the rows
+were shuffled:
+
+```{python}
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import polars as pl
+
+n = 200_000
+rng = np.random.default_rng(23)
+
+source = pl.DataFrame(
+    {
+        "order_id": np.arange(n),
+        "amount": rng.normal(100, 20, n).round(2),
+        "region": rng.choice(["north", "south", "east", "west"], n),
+    }
+)
+
+target = (
+    source.filter(pl.col("order_id") % 1000 != 7)  # 200 orders missing
+    .with_columns(  # 400 amounts changed
+        amount=pl.when(pl.col("order_id") % 500 == 3)
+        .then(pl.col("amount") + 1)
+        .otherwise("amount")
+    )
+    .vstack(source.tail(50).with_columns(pl.col("order_id") + n))  # 50 extra orders
+    .sample(fraction=1.0, shuffle=True, seed=1)
+)
+
+data_dir = Path(tempfile.mkdtemp())
+source.write_csv(data_dir / "source.csv")
+target.write_csv(data_dir / "target.csv")
+```
+
+Now we compare the two files by giving `compare()` their paths:
+
+```{python}
+import pointblank as pb
+
+comparison = pb.compare(
+    data_dir / "source.csv",
+    data_dir / "target.csv",
+    keys="order_id",
+)
+
+comparison
+```
+
+All four questions are answered in one place: missing and extra rows, changed rows (with the
+`amount` column identified as the one that differs), and the schema check in the header.
+
+The same comparison in four partitions gives identical results:
+
+```{python}
+partitioned = pb.compare(
+    data_dir / "source.csv",
+    data_dir / "target.csv",
+    keys="order_id",
+    partitions=4,
+)
+
+partitioned.status_counts == comparison.status_counts
+```
+
+## Choosing an Engine and a Number of Partitions
+
+When given file paths, `compare()` scans them with Polars, which is the fastest option. DuckDB uses
+less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB
+relations and pass those to `compare()`:
+
+```python
+import duckdb
+
+con = duckdb.connect()
+
+comparison = pb.compare(
+    con.read_csv("source.csv"),
+    con.read_csv("target.csv"),
+    keys="order_id",
+    partitions=8,
+)
+```
+
+Here's how the options compare on two CSV files with 10 million rows and 10 columns each (about
+730 MB per file), with the rows of the target shuffled. Peak memory is the memory the process
+actually owns (its physical footprint):
+
+| Approach | Wall time | Peak memory |
+|---|---|---|
+| Polars: read both files, then a full join (for reference) | 2.1 s | 5.7 GB |
+| `compare()` on file paths (Polars) | 5.7 s | 4.2 GB |
+| `compare()` on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
+| `compare()` on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
+| `compare()` on DuckDB relations | 6.8 s | 1.6 GB |
+| `compare()` on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
+
+And with 100 million rows (about 7.4 GB per file), where comparing without partitions needs more
+memory than most machines have:
+
+| Approach | Wall time | Peak memory |
+|---|---|---|
+| `compare()` on file paths (Polars), `partitions=8` | 139 s | 6.6 GB |
+| `compare()` on file paths (Polars), `partitions=16` | 217 s | 4.4 GB |
+| `compare()` on DuckDB relations, `partitions=8` | 166 s | 2.0 GB |
+
+Every approach found exactly the expected differences. The numbers will vary with your machine and
+data, but the pattern is consistent: partitions trade time (each pass reads the files again) for
+memory, Polars is the faster engine, and DuckDB the more memory-efficient one. Some practical
+guidance:
+
+- If the files fit comfortably in memory, use the defaults.
+- If memory is tight, increase `partitions=` until the peak memory is acceptable; for the lowest
+  memory use, read the files as DuckDB relations.
+- Setting DuckDB's own `memory_limit` (so it can spill to disk) without partitions doesn't hold
+  memory to the limit: with a 4 GB limit, the 100-million-row comparison peaked at 6.3 GB.
+  Partitions give more predictable memory use.
+- A good key matters most: with `keys=`, row order doesn't matter, and partitioning is possible.
+  Without a key, rows are compared by position (or as multisets, with `keys="*"`), and partitions
+  can't be used.
+
+You can run the same benchmark on your own machine with the script in the Pointblank repository
+(`benchmark/compare_large_files.py`).
+
+## Tables in Databases
+
+Tables don't have to be files. If both tables are in the same database (e.g., two Ibis tables from
+one DuckDB, PostgreSQL, or Snowflake connection), the comparison runs entirely inside the database,
+and only the counts and samples are transferred. Tables from *different* databases are first
+brought into Polars, so for large tables it's better to have both in one place.
+
+## In Scripts and CI Pipelines
+
+The `pb compare` command does all of this from the command line, and its exit code tells a script or
+CI job whether the files match (`0`), differ (`1`), or couldn't be compared (`2`):
+
+```bash
+pb compare source.csv target.csv --key order_id --engine duckdb --partitions 8 \
+  --output-html diff.html --output-json diff.json
+```
+
+The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add
+`--no-samples` to keep row values out of the JSON output. To make the comparison one check among
+others in a validation, use `Validate.tbl_match()`, which accepts the same settings, including
+`partitions=` (see [Comparing Two Tables](01-comparing-tables.qmd)).
 
 
 ### Glossary

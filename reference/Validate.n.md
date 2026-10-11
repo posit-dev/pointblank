@@ -14,7 +14,7 @@ Validate.n(
 ```
 
 
-The [n()](Validate.n.md#pointblank.Validate.n) method provides the number of test units for each validation step. This is the total number of test units that were evaluated in the validation step. It is always an integer value.
+The `n()` method provides the number of test units for each validation step. This is the total number of test units that were evaluated in the validation step. It is always an integer value.
 
 Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.
 
@@ -69,7 +69,7 @@ validation = (
 ```
 
 
-The first validation step checks that all values in column `a` are greater than `0`. Let's use the [n()](Validate.n.md#pointblank.Validate.n) method to determine the number of test units this validation step.
+The first validation step checks that all values in column `a` are greater than `0`. Let's use the `n()` method to determine the number of test units this validation step.
 
 
 ``` python
@@ -82,7 +82,7 @@ validation.n(i=1, scalar=True)
 
 The returned value of `4` is the number of test units for the first validation step. This value is the same as the number of rows in the table.
 
-The second validation step checks for the existence of column `b`. Using the [n()](Validate.n.md#pointblank.Validate.n) method we can get the number of test units for this the second step.
+The second validation step checks for the existence of column `b`. Using the `n()` method we can get the number of test units for this the second step.
 
 
 ``` python
@@ -95,7 +95,7 @@ validation.n(i=2, scalar=True)
 
 There's a single test unit here because the validation step is checking for the presence of a single column.
 
-The third validation step checks that all values in column `b` are less than `9` after filtering the table to only include rows where the value in column `a` is greater than `1`. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let's prove this by using the [n()](Validate.n.md#pointblank.Validate.n) method.
+The third validation step checks that all values in column `b` are less than `9` after filtering the table to only include rows where the value in column `a` is greater than `1`. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let's prove this by using the `n()` method.
 
 
 ``` python
@@ -106,7 +106,7 @@ validation.n(i=3, scalar=True)
     3
 
 
-The returned value of `3` is the number of test units for the third validation step. When using the `pre=` argument, the input table can be mutated before performing the validation. The [n()](Validate.n.md#pointblank.Validate.n) method is a good way to determine whether the mutation performed as expected.
+The returned value of `3` is the number of test units for the third validation step. When using the `pre=` argument, the input table can be mutated before performing the validation. The `n()` method is a good way to determine whether the mutation performed as expected.
 
 In all of these examples, the `scalar=True` argument was used to return the value as a scalar integer value. If `scalar=False`, the method will return a dictionary with an entry for the validation step number (from the `i=` argument) and the number of test units. Futhermore, leaving out the `i=` argument altogether will return a dictionary with filled with the number of test units for each validation step. Here's what that looks like:
 

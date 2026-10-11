@@ -49,6 +49,7 @@ Use pb COMMAND -help for detailed help on any command.
       missing        Generate a missing values report for a data table.
       validate       Perform single or multiple data validations.
       run            Run a Pointblank validation script or YAML configuration.
+      compare        Compare two tables row by row.
       make-template  Create a validation script or YAML configuration template.
       pl             Execute Polars expressions and display results.
       datasets       List available built-in datasets.
@@ -80,6 +81,9 @@ Show the version and exit.
 
 `validate`  
 [Perform single or multiple data validations.](../../reference/cli/validate.md)
+
+`compare`  
+[Compare two tables row by row.](../../reference/cli/compare.md)
 
 `datasets`  
 [List available built-in datasets.](../../reference/cli/datasets.md)

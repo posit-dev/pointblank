@@ -14,7 +14,7 @@ Validate.n_failed(
 ```
 
 
-The [n_failed()](Validate.n_failed.md#pointblank.Validate.n_failed) method provides the number of test units that failed for each validation step. This is the number of test units that did not pass in the the validation step. It is always some integer value between `0` and the total number of test units.
+The `n_failed()` method provides the number of test units that failed for each validation step. This is the number of test units that did not pass in the the validation step. It is always some integer value between `0` and the total number of test units.
 
 Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.
 
@@ -40,7 +40,7 @@ A dictionary of the number of failing test units for each validation step or a s
 
 ## Examples
 
-In the example below, we'll use a simple Polars DataFrame with three columns (`a`, `b`, and `c`). There will be three validation steps and, as it turns out, all of them will have failing test units. After interrogation, the [n_failed()](Validate.n_failed.md#pointblank.Validate.n_failed) method is used to determine the number of failing test units for each validation step.
+In the example below, we'll use a simple Polars DataFrame with three columns (`a`, `b`, and `c`). There will be three validation steps and, as it turns out, all of them will have failing test units. After interrogation, the `n_failed()` method is used to determine the number of failing test units for each validation step.
 
 
 ``` python
