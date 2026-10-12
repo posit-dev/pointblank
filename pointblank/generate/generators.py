@@ -556,6 +556,65 @@ def _generate_column_with_row_context(
     return values
 
 
+def _generate_unique_columns_with_row_context(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    locale_gen: LocaleGenerator,
+) -> dict[str, list[Any]]:
+    """
+    Generate a set of coherent columns together, honoring `unique=True` on any of them.
+
+    Coherent values are derived from per-row context (person, location, etc.), so a duplicate
+    in one column can't be fixed by simply drawing another value for that column alone. Instead,
+    all coherent columns are generated row by row; when a row yields a value already seen in a
+    unique column, the row's context is re-drawn and every coherent column is regenerated for
+    that row, keeping the row internally consistent.
+
+    Each column uses its own RNG seeded as in `_generate_column_with_row_context()`, so rows
+    generated before any collision are identical to those produced without `unique=True`.
+    """
+    rngs = {col_name: random.Random(config.seed) for col_name in fields}
+    unique_cols = [col_name for col_name, field in fields.items() if field.unique]
+    seen: dict[str, set[Any]] = {col_name: set() for col_name in unique_cols}
+    data: dict[str, list[Any]] = {col_name: [] for col_name in fields}
+
+    for i in range(config.n):
+        locale_gen.set_row(i)
+        retries = 0
+        while True:
+            row = {
+                col_name: _generate_value(field, rngs[col_name], locale_gen)
+                for col_name, field in fields.items()
+            }
+            if all(row[col_name] not in seen[col_name] for col_name in unique_cols):
+                break
+            retries += 1
+            if retries > config.max_unique_retries:
+                dup_cols = [col_name for col_name in unique_cols if row[col_name] in seen[col_name]]
+                raise ValueError(
+                    f"Unable to generate {config.n} unique values for column(s) "
+                    f"{', '.join(repr(c) for c in dup_cols)} after {config.max_unique_retries} "
+                    f"consecutive retries. Generated {i} unique values. "
+                    "Consider relaxing constraints or reducing n."
+                )
+            locale_gen.reroll_row(i)
+
+        for col_name, value in row.items():
+            data[col_name].append(value)
+        for col_name in unique_cols:
+            seen[col_name].add(row[col_name])
+
+    # Apply null probability
+    for col_name, field in fields.items():
+        if field.nullable and field.null_probability > 0:
+            null_rng = random.Random(config.seed + 1 if config.seed else None)
+            data[col_name] = [
+                None if null_rng.random() < field.null_probability else v for v in data[col_name]
+            ]
+
+    return data
+
+
 def generate_dataframe(
     fields: dict[str, Field],
     config: GeneratorConfig,
@@ -656,13 +715,26 @@ def _generate_single_country(
                 if new_min != cur_min or new_max != cur_max:
                     fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
 
+    # Coherent columns with `unique=True` must be generated together, row by row, so that a
+    # duplicate can be resolved by re-drawing the row's shared context
+    coherent_fields = {
+        col_name: field
+        for col_name, field in fields.items()
+        if needs_coherence and getattr(field, "preset", None) in coherent_presets
+    }
+    unique_coherent_data: dict[str, list[Any]] = {}
+    if any(field.unique for field in coherent_fields.values()):
+        unique_coherent_data = _generate_unique_columns_with_row_context(
+            coherent_fields, config, shared_locale_gen
+        )
+
     # Generate data for each column
     data: dict[str, list[Any]] = {}
     for col_name, field in fields.items():
-        preset = getattr(field, "preset", None)
-
-        # Use shared locale generator for coherent presets
-        if needs_coherence and preset in coherent_presets:
+        if col_name in unique_coherent_data:
+            data[col_name] = unique_coherent_data[col_name]
+        elif col_name in coherent_fields:
+            # Use shared locale generator for coherent presets
             data[col_name] = _generate_column_with_row_context(field, config, shared_locale_gen)
         else:
             data[col_name] = generate_column(field, config)
