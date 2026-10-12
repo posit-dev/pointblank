@@ -21387,7 +21387,8 @@ class Validate:
         - `active`: Whether the validation step was active (`True`/`False`).
         - `step_number`: The 1-indexed step number.
         - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
-        - `columns`: The column name validated.
+        - `columns`: The column name validated. For steps that use several columns (e.g.,
+          `rows_distinct()` with `columns_subset=`), the column names are separated by commas.
         - `values`: The comparison value used in the validation. For regex validations, just the
           pattern string is included.
         - `step_evaluated`: Whether the step was evaluated without error.
@@ -21477,6 +21478,20 @@ class Validate:
                 "values": [
                     v.get("pattern") if isinstance(v, dict) and "pattern" in v else v
                     for v in values
+                ],
+            }
+
+        # Normalize `column`: steps like `rows_distinct()` with `columns_subset=` hold a list of
+        # column names, so join them with commas (as in the tabular report) to keep a string column
+        columns = final_report.get("column")
+        if isinstance(columns, list):
+            final_report = {
+                **final_report,
+                "column": [
+                    ", ".join(str(c) for c in column)
+                    if isinstance(column, (list, tuple))
+                    else column
+                    for column in columns
                 ],
             }
 

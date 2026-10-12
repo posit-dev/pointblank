@@ -14193,6 +14193,27 @@ def test_get_dataframe_report_returns_ibis_memtable():
     assert isinstance(df_ibis, ibis.expr.types.relations.Table)
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_get_dataframe_report_columns_subset(tbl_type):
+    tbl = pl.DataFrame({"a": [1, 2, 2], "b": ["x", "y", None]})
+
+    validation = (
+        Validate(data=tbl)
+        .rows_distinct()
+        .rows_distinct(columns_subset="a")
+        .rows_complete(columns_subset=["a", "b"])
+        .col_vals_not_null(columns="a")
+        .interrogate()
+    )
+
+    report = validation.get_dataframe_report(tbl_type)
+    if tbl_type == "duckdb":
+        report = report.execute()
+
+    assert list(report["columns"]) == [None, "a", "a, b", "a"]
+    assert list(report["failed_n"]) == [0, 2, 1, 0]
+
+
 def get_schema_info(
     data_tbl,
     schema,
