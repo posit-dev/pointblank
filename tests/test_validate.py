@@ -14092,6 +14092,28 @@ def test_get_step_report_no_fail(tbl_type) -> None:
     )
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_get_step_report_without_extracts(tbl_type) -> None:
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Extracts are not collected with `collect_extracts=False`, nor for Ibis tables
+    validation = (
+        Validate(small_table)
+        .col_vals_gt(columns="a", value=0)
+        .col_vals_gt(columns="a", value=3)
+        .rows_distinct()
+        .interrogate(collect_extracts=False)
+    )
+
+    # A step where all rows pass doesn't need the extract
+    assert isinstance(validation.get_step_report(i=1), GT.GT)
+
+    # Failing steps say that the failing rows were not collected
+    for i in [2, 3]:
+        with pytest.raises(ValueError, match="were not collected"):
+            validation.get_step_report(i=i)
+
+
 def test_get_step_report_failing_inputs() -> None:
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
@@ -14211,6 +14233,24 @@ def test_get_dataframe_report_with_list_column(tbl_type):
         report = report.to_pandas()
     columns = list(report["columns"])
     assert columns == ["a, b", "a", "a"]
+
+
+def test_get_dataframe_report_duckdb_with_non_string_values():
+    # `values` holds numbers, sets and (left, right) bounds; the duckdb report stores it as JSON
+    df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+    validation = (
+        Validate(df)
+        .col_vals_gt(columns="a", value=0)
+        .col_vals_in_set(columns="b", set=["x", "y"])
+        .col_vals_between(columns="a", left=0, right=5)
+        .col_vals_regex(columns="b", pattern="[a-z]")
+        .col_exists(columns="a")
+        .interrogate()
+    )
+
+    report = validation.get_dataframe_report("duckdb").to_pandas()
+
+    assert list(report["values"]) == [0, ["x", "y"], [0, 5], "[a-z]", None]
 
 
 def get_schema_info(

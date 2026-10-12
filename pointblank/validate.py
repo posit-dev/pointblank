@@ -21830,6 +21830,7 @@ class Validate:
         ]:
             # Get the extracted data for the step
             extract = self.get_data_extracts(i=i, frame=True)
+            _check_step_report_extract(extract=extract, i=i, all_passed=all_passed)
 
             step_report = _step_report_row_based(
                 assertion_type=assertion_type,
@@ -21851,6 +21852,7 @@ class Validate:
 
         elif assertion_type == "rows_distinct":
             extract = self.get_data_extracts(i=i, frame=True)
+            _check_step_report_extract(extract=extract, i=i, all_passed=all_passed)
 
             step_report = _step_report_rows_distinct(
                 i=i,
@@ -22232,6 +22234,17 @@ class Validate:
                 "brief": dt.String(),
                 "autobrief": dt.String(),
             }
+
+            # `values` is a JSON column, so serialize non-string values (numbers, the
+            # members of a set, the bounds of a range) rather than handing Arrow raw objects.
+            if "values" in final_report:
+                final_report = {
+                    **final_report,
+                    "values": [
+                        v if v is None or isinstance(v, str) else json.dumps(v, default=str)
+                        for v in final_report["values"]
+                    ],
+                }
 
             report_table = ibis.memtable(final_report, schema=ibis_schema).rename(
                 {v: k for k, v in names_dict.items() if k != v}
@@ -26314,6 +26327,17 @@ def _create_col_schema_match_note_text(schema_info: dict) -> str:
         return f"Schema validation failed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
 
 
+def _check_step_report_extract(extract: Any, i: int, all_passed: bool) -> None:
+    # The report of a failing row-based step shows the extracted failing rows; these are not
+    # collected with `interrogate(collect_extracts=False)` or for Ibis tables
+    if extract is None and not all_passed:
+        raise ValueError(
+            f"The step report for step {i} needs the rows that failed, but they were not "
+            "collected. Use `interrogate(collect_extracts=True)` (the default) with a table that "
+            "supports extracts (Ibis tables don't yet)."
+        )
+
+
 def _step_report_row_based(
     assertion_type: str,
     i: int,
@@ -26331,9 +26355,6 @@ def _step_report_row_based(
     limit: int | None,
     lang: str,
 ) -> GT:
-    # Get the length of the extracted data for the step
-    extract_length = get_row_count(extract)
-
     # Determine whether the `lang` value represents a right-to-left language
     is_rtl_lang = lang in RTL_LANGUAGES
     direction_rtl = " direction: rtl;" if is_rtl_lang else ""
@@ -26475,6 +26496,9 @@ def _step_report_row_based(
         step_report = step_report.tab_header(title=md(header))
 
     else:
+        # Get the length of the extracted data for the step (only failing steps need it)
+        extract_length = get_row_count(extract)
+
         if limit is None:
             limit = extract_length
 
@@ -26595,9 +26619,6 @@ def _step_report_rows_distinct(
     limit: int | None,
     lang: str,
 ) -> GT:
-    # Get the length of the extracted data for the step
-    extract_length = get_row_count(extract)
-
     # Determine whether the `lang` value represents a right-to-left language
     is_rtl_lang = lang in RTL_LANGUAGES
     direction_rtl = " direction: rtl;" if is_rtl_lang else ""
@@ -26648,6 +26669,9 @@ def _step_report_rows_distinct(
         step_report = step_report.tab_header(title=md(header))
 
     else:
+        # Get the length of the extracted data for the step (only failing steps need it)
+        extract_length = get_row_count(extract)
+
         if limit is None:
             limit = extract_length
 
