@@ -428,6 +428,71 @@ class TestGenerateColumnUnique:
             generate_column(field, config)
 
 
+class TestGenerateCoherentUnique:
+    """Tests for `unique=True` on presets that use per-row coherent context (issue #441)."""
+
+    @pytest.mark.parametrize("preset", ["email", "name", "user_name", "address", "phone_number"])
+    def test_coherent_preset_unique(self, preset):
+        """Coherent presets honor unique=True."""
+        fields = {"x": string_field(preset=preset, unique=True)}
+        config = GeneratorConfig(n=1000, seed=42, country="US", output="dict")
+        data = generate_dataframe(fields, config)
+
+        assert len(data["x"]) == 1000
+        assert len(set(data["x"])) == 1000
+
+    def test_coherent_preset_unique_impossible_raises(self):
+        """An unsatisfiable unique constraint on a coherent preset raises, not silently dupes."""
+        fields = {"x": string_field(preset="city", unique=True)}
+        config = GeneratorConfig(n=2000, seed=42, country="US", output="dict")
+
+        with pytest.raises(ValueError, match="Unable to generate 2000 unique values"):
+            generate_dataframe(fields, config)
+
+    def test_coherent_unique_keeps_row_coherence(self):
+        """Re-drawn rows stay coherent across person and address columns."""
+        fields = {
+            "first": string_field(preset="first_name"),
+            "last": string_field(preset="last_name"),
+            "name": string_field(preset="name", unique=True),
+            "email": string_field(preset="email", unique=True),
+            "address": string_field(preset="address"),
+            "city": string_field(preset="city"),
+            "state": string_field(preset="state"),
+        }
+        config = GeneratorConfig(n=2000, seed=1, country="US", output="dict")
+        data = generate_dataframe(fields, config)
+
+        assert len(set(data["name"])) == 2000
+        assert len(set(data["email"])) == 2000
+        for first, last, name in zip(data["first"], data["last"], data["name"]):
+            assert name == f"{first} {last}"
+
+        for address, city, state in zip(data["address"], data["city"], data["state"]):
+            assert f", {city}, {state} " in address
+
+    def test_coherent_unique_matches_non_unique_without_collisions(self):
+        """Rows before any collision are identical to the non-unique output."""
+        base = GeneratorConfig(n=50, seed=7, country="US", output="dict")
+        non_unique = generate_dataframe(
+            {"name": string_field(preset="name"), "city": string_field(preset="city")}, base
+        )
+        unique = generate_dataframe(
+            {"name": string_field(preset="name", unique=True), "city": string_field(preset="city")},
+            base,
+        )
+
+        assert len(set(non_unique["name"])) == 50
+        assert unique == non_unique
+
+    def test_coherent_unique_is_reproducible(self):
+        """Seeded generation with coherent unique columns is deterministic."""
+        fields = {"email": string_field(preset="email", unique=True)}
+        config = GeneratorConfig(n=2000, seed=99, country="US", output="dict")
+
+        assert generate_dataframe(fields, config) == generate_dataframe(fields, config)
+
+
 class TestGenerateColumnNullable:
     """Tests for nullable column generation."""
 

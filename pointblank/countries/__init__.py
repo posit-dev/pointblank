@@ -2508,6 +2508,32 @@ class LocaleGenerator:
         """Clear pre-generated card prefixes."""
         self._row_card_prefixes = None
 
+    def reroll_row(self, row_index: int) -> None:
+        """
+        Replace all pre-generated context (location, person, employer, card prefix) for one row.
+
+        This is used when a coherent column has `unique=True` and the current row's context
+        produced a duplicate value: drawing a fresh context for the row allows a new value to be
+        generated while keeping all coherent columns of that row consistent with each other.
+
+        Parameters
+        ----------
+        row_index
+            The row index (0-based).
+        """
+        if self._row_locations is not None:
+            self._row_locations[row_index] = self._get_location()
+        if self._row_persons is not None:
+            self._row_persons[row_index] = self._get_person()
+        if self._row_employers is not None:
+            # Employers may depend on the row's location (e.g., "{city} General Hospital")
+            prev_row = self._current_row
+            self._current_row = row_index
+            self._row_employers[row_index] = self._get_employer()
+            self._current_row = prev_row
+        if self._row_card_prefixes is not None:
+            self._row_card_prefixes[row_index] = self.rng.choice(self._CARD_PREFIXES)
+
     def _get_current_card_prefix(self) -> str:
         """Get the current card prefix, using row context if available.
 
