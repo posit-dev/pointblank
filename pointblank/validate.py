@@ -22080,6 +22080,18 @@ class Validate:
                 ],
             }
 
+        # Normalize `column`: steps like `rows_distinct(columns_subset=...)` store a list of
+        # column names, which can't go into the string-typed `column` column of the report.
+        columns = final_report.get("column")
+        if isinstance(columns, list):
+            final_report = {
+                **final_report,
+                "column": [
+                    ", ".join(str(c) for c in col) if isinstance(col, (list, tuple)) else col
+                    for col in columns
+                ],
+            }
+
         if tbl_type == "polars":
             if not _is_lib_present(lib_name="polars"):
                 raise ImportError(
