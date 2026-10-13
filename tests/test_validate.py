@@ -5257,6 +5257,97 @@ def test_col_vals_expr_null_results_fail() -> None:
         assert list(extract["_row_num_"]) == [1, 3]
 
 
+def _expr_test_tables(data: dict) -> dict:
+    """The same data as Polars, pandas (NumPy and nullable dtypes), DuckDB, and memtable tables."""
+    tbl_pl = pl.DataFrame(data)
+    return {
+        "polars": tbl_pl,
+        "polars_lazy": tbl_pl.lazy(),
+        "pandas": tbl_pl.to_pandas(),
+        "pandas_nullable": tbl_pl.to_pandas().convert_dtypes(),
+        "duckdb": ibis.duckdb.connect().create_table("tbl", tbl_pl),
+        "memtable": ibis.memtable(tbl_pl),
+    }
+
+
+EXPR_TEST_DATA = {"a": [1, 2, 3, 4], "c": [5, None, 1, 9]}
+
+
+@pytest.mark.parametrize("tbl_name", list(_expr_test_tables(EXPR_TEST_DATA)))
+def test_col_vals_expr_narwhals_every_backend(tbl_name) -> None:
+    """A Narwhals expression runs on every backend, and its null result (row 2) fails."""
+    tbl = _expr_test_tables(EXPR_TEST_DATA)[tbl_name]
+
+    validation = Validate(data=tbl).col_vals_expr(expr=nw.col("c") > 2).interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 2
+    assert validation.n_failed(i=1, scalar=True) == 2
+
+
+def test_col_vals_expr_ibis_native() -> None:
+    tbl = _expr_test_tables(EXPR_TEST_DATA)["duckdb"]
+
+    for expr in [lambda t: t.c > 2, ibis._.c > 2]:
+        validation = Validate(data=tbl).col_vals_expr(expr=expr).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 2
+        assert validation.n_failed(i=1, scalar=True) == 2
+
+
+def test_col_vals_expr_function_on_polars() -> None:
+    """A function is given the table, so pandas-style lambdas also work on Polars tables."""
+    tbl = pl.DataFrame(EXPR_TEST_DATA)
+
+    validation = Validate(data=tbl).col_vals_expr(expr=lambda df: df["c"] > 2).interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 2
+    assert validation.n_failed(i=1, scalar=True) == 2
+
+
+def test_col_vals_expr_pandas_object_booleans() -> None:
+    """pandas gives an `object` column for booleans mixed with nulls; the nulls fail."""
+    tbl = pd.DataFrame({"s": ["apple", None, "banana", "cherry"]})
+
+    validation = (
+        Validate(data=tbl).col_vals_expr(expr=lambda df: df["s"].str.contains("an")).interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 3
+
+
+@pytest.mark.parametrize(
+    "tbl, expr, note",
+    [
+        # Non-boolean results
+        (pl.DataFrame(EXPR_TEST_DATA), pl.col("a").cast(pl.Int64), "the Int64 type"),
+        (pl.DataFrame(EXPR_TEST_DATA), pl.col("a").cast(pl.String), "the String type"),
+        (pd.DataFrame(EXPR_TEST_DATA), lambda df: df["a"] - 1, "the Int64 type"),
+        # Expressions referencing a missing column
+        (pl.DataFrame(EXPR_TEST_DATA), pl.col("zzz") > 1, "zzz"),
+        (pl.LazyFrame(EXPR_TEST_DATA), pl.col("zzz") > 1, "zzz"),
+        (pd.DataFrame(EXPR_TEST_DATA), lambda df: df["zzz"] > 1, "zzz"),
+        (ibis.memtable(EXPR_TEST_DATA), nw.col("zzz") > 1, "zzz"),
+        # An expression from a library that doesn't match the table
+        (pd.DataFrame(EXPR_TEST_DATA), pl.col("a") > 1, "polars Expr"),
+        (ibis.memtable(EXPR_TEST_DATA), pl.col("a") > 1, "polars Expr"),
+    ],
+)
+def test_col_vals_expr_eval_error(tbl, expr, note) -> None:
+    """An expression that can't be evaluated is an evaluation error, not a crash or a pass."""
+    validation = (
+        Validate(data=tbl).col_vals_expr(expr=expr).col_vals_gt(columns="a", value=0).interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert step.n_passed is None
+    assert note in step.notes["eval_error"]["text"]
+
+    # The other steps are still interrogated
+    assert validation.n_passed(i=2, scalar=True) == 4
+
+
 def test_col_vals_expr_pandas_tbl() -> None:
     df = load_dataset(tbl_type="pandas")
 
@@ -5418,6 +5509,9 @@ def test_rows_distinct_with_nulls(tbl_type) -> None:
     v3 = Validate(df_dup).rows_distinct().interrogate()
     assert v3.n_passed(i=1, scalar=True) == 1
     assert v3.n_failed(i=1, scalar=True) == 2
+
+
+def test_conjointly_polars_native() -> None:
     tbl = load_dataset(dataset="small_table", tbl_type="polars")
 
     validation = (
@@ -5536,6 +5630,64 @@ def test_conjointly_error_no_expr() -> None:
 
     with pytest.raises(ValueError):
         Validate(data=tbl).conjointly()
+
+
+@pytest.mark.parametrize("tbl_name", list(_expr_test_tables(EXPR_TEST_DATA)))
+def test_conjointly_null_results_fail(tbl_name) -> None:
+    """A comparison on a null (row 2) fails rather than going uncounted."""
+    tbl = _expr_test_tables(EXPR_TEST_DATA)[tbl_name]
+
+    validation = (
+        Validate(data=tbl)
+        .conjointly(lambda df: expr_col("a") > 1, lambda df: expr_col("c") > 2)
+        .interrogate()
+    )
+
+    assert validation.n(i=1, scalar=True) == 4
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 3
+
+
+@pytest.mark.parametrize("tbl_name", list(_expr_test_tables(EXPR_TEST_DATA)))
+@pytest.mark.parametrize("n_good", [0, 1])
+def test_conjointly_broken_expression_is_eval_error(tbl_name, n_good) -> None:
+    """A broken expression is an evaluation error, rather than being dropped (passing every row)."""
+    tbl = _expr_test_tables(EXPR_TEST_DATA)[tbl_name]
+    exprs = [lambda df: expr_col("a") > 1] * n_good + [lambda df: expr_col("zzz") > 1]
+
+    validation = (
+        Validate(data=tbl).conjointly(*exprs).col_vals_gt(columns="a", value=0).interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert step.n_passed is None
+    assert f"Expression {n_good + 1} passed to conjointly()" in step.notes["eval_error"]["text"]
+    assert "zzz" in step.notes["eval_error"]["text"]
+
+    # The other steps are still interrogated
+    assert validation.n_passed(i=2, scalar=True) == 4
+
+
+def test_conjointly_non_boolean_is_eval_error() -> None:
+    tbl = pl.DataFrame(EXPR_TEST_DATA)
+
+    validation = Validate(data=tbl).conjointly(lambda df: pl.col("a") * 2).interrogate()
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert "must evaluate to boolean values" in step.notes["eval_error"]["text"]
+
+
+def test_conjointly_combination_error_is_eval_error() -> None:
+    """An error when combining the results (e.g., a Series of the wrong length) is reported."""
+    tbl = pl.DataFrame(EXPR_TEST_DATA)
+
+    validation = Validate(data=tbl).conjointly(lambda df: pl.Series([True, False])).interrogate()
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert "conjointly() expressions couldn't be evaluated" in step.notes["eval_error"]["text"]
 
 
 def test_specially_simple_validation_polars() -> None:

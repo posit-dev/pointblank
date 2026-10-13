@@ -369,15 +369,37 @@ class TestColSchemaMatch:
 
 
 class TestColValsExpr:
-    def test_expr_basic(self, tbl_nulls_int):
-        """col_vals_expr on PySpark - PySpark DataFrame lacks .assign()."""
+    def test_expr_narwhals(self, tbl_nulls_int):
+        """A Narwhals expression runs on PySpark; the null comparison (row 2) fails."""
+        import narwhals as nw
+
+        v = Validate(tbl_nulls_int).col_vals_expr(expr=nw.col("z") == 8).interrogate()
+
+        assert v.n_passed(i=1, scalar=True) == 3
+        assert v.n_failed(i=1, scalar=True) == 1
+
+    def test_expr_pyspark_column(self, tbl_nulls_int):
+        """A function returning a PySpark Column runs on PySpark."""
         from pyspark.sql import functions as F
 
-        # col_vals_expr internally calls .assign() which PySpark doesn't support
-        with pytest.raises(AttributeError, match="assign"):
-            Validate(tbl_nulls_int).col_vals_expr(
-                expr=lambda df: df.withColumn("pb_is_good_", F.col("z") == 8)
-            ).interrogate()
+        v = Validate(tbl_nulls_int).col_vals_expr(expr=lambda df: F.col("z") == 8).interrogate()
+
+        assert v.n_passed(i=1, scalar=True) == 3
+        assert v.n_failed(i=1, scalar=True) == 1
+
+    def test_expr_unsupported_result_is_eval_error(self, tbl_nulls_int):
+        """A result that isn't a column expression marks the step as an evaluation error."""
+        from pyspark.sql import functions as F
+
+        v = (
+            Validate(tbl_nulls_int)
+            .col_vals_expr(expr=lambda df: df.withColumn("pb_is_good_", F.col("z") == 8))
+            .col_vals_not_null("x")
+            .interrogate()
+        )
+
+        assert v.validation_info[0].eval_error is True
+        assert v.n_failed(i=2, scalar=True) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -398,15 +420,11 @@ class TestConjointlyNulls:
         )
 
         # Row 1: x=1>0 AND z=8==8 -> True
-        # Row 2: x=2>0 AND z=None==8 -> NULL (NULL comparison yields NULL, not False)
-        # Row 3: x=None>0 AND z=8==8 -> NULL (NULL comparison yields NULL, not False)
+        # Row 2: x=2>0 AND z=None==8 -> NULL, which fails
+        # Row 3: x=None>0 AND z=8==8 -> NULL, which fails
         # Row 4: x=4>0 AND z=8==8 -> True
-        # PySpark NULL semantics: NULL comparisons produce NULL (not True/False),
-        # and conjointly counts test units as total rows after collection.
-        # The actual behavior: passed=2, failed=0 (NULLs are excluded from count)
-        # Total test units = n_passed + n_failed = 2
         assert v.n_passed(i=1, scalar=True) == 2
-        assert v.n_failed(i=1, scalar=True) == 0
+        assert v.n_failed(i=1, scalar=True) == 2
 
 
 class TestSpeciallyNulls:

@@ -1834,8 +1834,8 @@ def test_yaml_conjointly_expression_col_syntax():
     steps:
     - conjointly:
         expressions:
-          - "lambda df: expr_col('d') > expr_col('a')"
-          - "lambda df: expr_col('a') > 0"
+          - "lambda df: pb.expr_col('d') > pb.expr_col('a')"
+          - "lambda df: pb.expr_col('a') > 0"
         brief: "Using expr_col for cross-table compatibility"
     """
 
