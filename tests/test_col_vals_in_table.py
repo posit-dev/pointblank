@@ -552,3 +552,58 @@ def test_incompatible_key_types_eval_error(backend, composite):
     )
 
     assert v.validation_info[0].eval_error is True
+
+
+# ── Mixed backends ────────────────────────────────────────────────────────────
+
+_BACKEND_KINDS = ["polars", "pandas", "duckdb", "memtable"]
+
+
+def _table_on(kind, df, name):
+    import ibis
+
+    if kind == "polars":
+        return df
+    if kind == "pandas":
+        return df.to_pandas()
+    if kind == "duckdb":
+        return ibis.duckdb.connect().create_table(name, df)
+    return ibis.memtable(df)
+
+
+@pytest.mark.parametrize("ref_kind", _BACKEND_KINDS)
+@pytest.mark.parametrize("tbl_kind", _BACKEND_KINDS)
+def test_mixed_backends(tbl_kind, ref_kind):
+    """Every pair of backends gives the same result (the null key fails)."""
+    tbl = _table_on(tbl_kind, pl.DataFrame({"k": [1, 2, 3, None]}), "tbl")
+    ref = _table_on(ref_kind, pl.DataFrame({"k": [1, 2]}), "ref")
+
+    v = pb.Validate(data=tbl).col_vals_in_table(columns="k", ref_table=ref, ref_column="k")
+    v = v.interrogate()
+
+    assert v.n_passed(i=1, scalar=True) == 2
+    assert v.n_failed(i=1, scalar=True) == 2
+
+
+def test_failed_ref_conversion_is_eval_error():
+    """A reference table that can't be materialized is an evaluation error, not a crash."""
+    from unittest.mock import patch
+
+    import ibis
+
+    ref = ibis.memtable(pl.DataFrame({"k": [1]}))
+
+    with patch.object(
+        type(ref), "to_polars", side_effect=RuntimeError("connection lost"), autospec=True
+    ):
+        v = (
+            pb.Validate(data=pl.DataFrame({"k": [1, 2]}))
+            .col_vals_in_table(columns="k", ref_table=ref, ref_column="k")
+            .col_vals_not_null(columns="k")
+            .interrogate()
+        )
+
+    step = v.validation_info[0]
+    assert step.eval_error is True
+    assert "connection lost" in step.notes["eval_error"]["text"]
+    assert v.n_passed(i=2, scalar=True) == 2
