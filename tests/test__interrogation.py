@@ -5,6 +5,7 @@ import polars as pl
 from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
+    StepEvaluationError,
     _column_has_null_values,
     _modify_datetime_compare_val,
     _safe_is_nan_or_null_expr,
@@ -162,107 +163,55 @@ def test_safe_modify_datetime_outer_exception():
     assert result == "2023-01-01"  # Original value returned
 
 
-@patch("pointblank._interrogation._get_tbl_type")
-def test_pyspark_expression_handling_with_error(mock_get_tbl_type):
-    """Test PySpark expression error handling."""
-
-    mock_get_tbl_type.return_value = "pyspark"
-
-    # Create a mock PySpark DataFrame
-    mock_df = Mock()
-
-    # Create ConjointlyValidation instance with expression functions
-    conjointly = ConjointlyValidation(
-        data_tbl=mock_df,
-        expressions=[],
-        threshold=1.0,
-        tbl_type="pyspark",
+def _pyspark_conjointly(expressions):
+    return ConjointlyValidation(
+        data_tbl=Mock(), expressions=expressions, threshold=1.0, tbl_type="pyspark"
     )
 
-    # Mock expression functions that will fail
+
+def test_pyspark_expression_error_names_expression():
+    """An expression that can't be evaluated is an error naming it, not silently skipped."""
+
     def failing_expr_fn(df):
         raise Exception("PySpark error")
 
+    conjointly = _pyspark_conjointly([failing_expr_fn])
+
+    with pytest.raises(StepEvaluationError, match=r"Expression 1 .*PySpark error"):
+        conjointly._get_pyspark_results()
+
+
+def test_pyspark_expression_conversion_error_is_reported():
+    """A `pb.expr_col()` expression that fails to convert reports the conversion error."""
+
+    def good_expr_fn(df):
+        mock_col_expr = Mock()
+        mock_col_expr.to_pyspark_expr.return_value = "good"
+        return mock_col_expr
+
     def failing_col_expr_fn(df):
-        # Mock a column expression that also fails conversion
         mock_col_expr = Mock()
         mock_col_expr.to_pyspark_expr.side_effect = Exception("Conversion error")
         return mock_col_expr
 
-    conjointly.expressions = [failing_expr_fn, failing_col_expr_fn]
+    conjointly = _pyspark_conjointly([good_expr_fn, failing_col_expr_fn])
 
-    # Mock the PySpark imports and methods
-    with patch("pyspark.sql.functions.lit") as mock_lit:
-        lit_result = Mock()
-        mock_lit.return_value = lit_result
-        mock_df.withColumn.return_value = "results_table"
-
-        # This should handle the errors gracefully and return default case
-        result = conjointly._get_pyspark_results()
-
-        # Should fall back to default case
-        assert result == "results_table"
-        # Just verify it was called, don't check the exact mock object
-        mock_df.withColumn.assert_called_once()
-        args, kwargs = mock_df.withColumn.call_args
-        assert args[0] == "pb_is_good_"
+    with pytest.raises(StepEvaluationError, match=r"Expression 2 .*Conversion error"):
+        conjointly._get_pyspark_results()
 
 
-def test_pyspark_results_table_creation_default_case():
-    """Test default case in PySpark results."""
-
-    mock_df = Mock()
-
-    conjointly = ConjointlyValidation(
-        data_tbl=mock_df,
-        expressions=[],
-        threshold=1.0,
-        tbl_type="pyspark",
-    )
-
-    # Mock PySpark F.lit for the default case
-    with patch("pyspark.sql.functions.lit") as mock_lit:
-        mock_lit.return_value = "lit_true"
-        mock_df.withColumn.return_value = "results_table"
-
-        result = conjointly._get_pyspark_results()
-
-        assert result == "results_table"
-        mock_df.withColumn.assert_called_with("pb_is_good_", "lit_true")
-
-
-def test_pyspark_nested_exception_print():
-    """Test the nested exception print statement."""
-
-    mock_df = Mock()
-
-    conjointly = ConjointlyValidation(
-        data_tbl=mock_df,
-        expressions=[],
-        threshold=1.0,
-        tbl_type="pyspark",
-    )
-
-    def failing_expr_fn(df):
-        raise Exception("First error")
+def test_pyspark_expression_error_reports_first_error():
+    """When neither evaluation strategy works, the error from the table call is reported."""
 
     def failing_nested_expr_fn(df):
         if df is None:
             raise Exception("Second error")
         raise Exception("First error")
 
-    conjointly.expressions = [failing_expr_fn, failing_nested_expr_fn]
+    conjointly = _pyspark_conjointly([failing_nested_expr_fn])
 
-    # Mock print to capture the error message
-    with patch("builtins.print") as mock_print:
-        with patch("pyspark.sql.functions.lit") as mock_lit:
-            mock_lit.return_value = "lit_true"
-            mock_df.withColumn.return_value = "results_table"
-
-            result = conjointly._get_pyspark_results()
-
-            # Should have printed the error messages
-            assert mock_print.call_count >= 1
+    with pytest.raises(StepEvaluationError, match="First error"):
+        conjointly._get_pyspark_results()
 
 
 def test_check_column_has_nulls_attribute_error():

@@ -65,6 +65,7 @@ from pointblank._constants_translations import (
 from pointblank._interrogation import (
     NumberOfTestUnits,
     SpeciallyValidation,
+    StepEvaluationError,
     apply_missing_exclusion,
     col_count_match,
     col_exists,
@@ -11150,9 +11151,12 @@ class Validate:
         ----------
         expr
             A column expression that will evaluate each row in the table, returning a boolean value
-            per table row. If the target table is a Polars DataFrame, the expression should either
-            be a Polars column expression or a Narwhals one. For a Pandas DataFrame, the expression
-            should either be a lambda expression or a Narwhals column expression.
+            per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every
+            table type. Otherwise, use an expression from the table's own library: a Polars
+            expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark
+            column for a PySpark DataFrame. A function (such as a lambda) can also be given; it
+            receives the table and should return one of those expressions or a boolean Series
+            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -11200,11 +11204,16 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. The internal implementation
-        uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this
-        method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
+        Missing Values and Evaluation Errors
+        ------------------------------------
+        A row where the expression evaluates to a missing value (e.g., `pl.col("a") > 1` when `a`
+        is null) counts as a failing test unit. To let such rows pass, allow for them in the
+        expression itself, as in `(pl.col("a") > 1) | pl.col("a").is_null()`.
+
+        If the expression can't be evaluated against the table (e.g., it refers to a column that
+        doesn't exist, comes from a library that doesn't match the table, or doesn't produce boolean
+        values), the step is marked as having an evaluation error and a note explains why. The
+        other validation steps are still interrogated.
 
         Preprocessing
         -------------
@@ -15611,6 +15620,16 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
+        Missing Values and Evaluation Errors
+        ------------------------------------
+        A row where any expression evaluates to a missing value (e.g., a comparison on a null)
+        counts as a failing test unit. To let such rows pass, allow for them in the expression
+        itself (e.g., `lambda df: (pl.col("a") > 1) | pl.col("a").is_null()`).
+
+        If any of the expressions can't be evaluated against the table (e.g., one refers to a column
+        that doesn't exist), the step is marked as having an evaluation error and a note says which
+        expression failed and why. The other validation steps are still interrogated.
+
         Preprocessing
         -------------
         The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
@@ -17229,6 +17248,21 @@ class Validate:
                         raise ValueError(
                             f"Unknown assertion type: {assertion_type}"
                         )  # pragma: no cover
+
+                except StepEvaluationError as e:
+                    # The step can't be evaluated against this table (e.g., an expression that
+                    # references a missing column): record that on the step and move on
+                    validation.eval_error = True
+                    validation._add_note(
+                        key="eval_error", markdown=html_module.escape(str(e)), text=str(e)
+                    )
+
+                    end_time = datetime.datetime.now(datetime.timezone.utc)
+                    validation.proc_duration_s = (end_time - start_time).total_seconds()
+                    validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                    validation.active = False
+
+                    continue
 
                 except Exception as e:
                     # Catch data quality errors and column not found errors

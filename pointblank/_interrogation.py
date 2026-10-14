@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import operator
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -36,6 +37,26 @@ from pointblank.column import Column
 
 if TYPE_CHECKING:
     from narwhals.typing import Frame, IntoFrame
+
+
+class StepEvaluationError(Exception):
+    """
+    A validation step can't be evaluated against the table (e.g., an invalid expression).
+
+    `Validate.interrogate()` catches this and marks the step with `eval_error=True`, using the
+    message as the step's note, instead of letting it stop the whole interrogation.
+    """
+
+
+def _first_line(error: BaseException) -> str:
+    """Get a short description of an error (some backends add query plans after the first line)."""
+    message = str(error).strip().splitlines()
+    return f"{type(error).__name__}: {message[0]}" if message else type(error).__name__
+
+
+def _native_lib(obj: Any) -> str:
+    """Get the name of the library an object comes from (e.g., `"polars"`, `"pandas"`)."""
+    return type(obj).__module__.split(".")[0]
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -146,6 +167,12 @@ def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, colum
     return null_check | column_expr.is_nan()
 
 
+def _conjointly_expression_error(i: int, reason: str) -> StepEvaluationError:
+    return StepEvaluationError(
+        f"Expression {i} passed to conjointly() couldn't be evaluated ({reason})."
+    )
+
+
 class ConjointlyValidation:
     def __init__(self, data_tbl, expressions: type[nw.Expr], threshold, tbl_type) -> None:
         self.data_tbl = data_tbl
@@ -168,230 +195,122 @@ class ConjointlyValidation:
         """Evaluate all expressions and combine them conjointly."""
 
         if "polars" in self.tbl_type:
-            return self._get_polars_results()
+            get_results = self._get_polars_results
         elif "pandas" in self.tbl_type:
-            return self._get_pandas_results()
+            get_results = self._get_pandas_results
         elif "duckdb" in self.tbl_type or "ibis" in self.tbl_type or self.tbl_type in IBIS_BACKENDS:
-            return self._get_ibis_results()
+            get_results = self._get_ibis_results
         elif "pyspark" in self.tbl_type:
-            return self._get_pyspark_results()
+            get_results = self._get_pyspark_results
         else:  # pragma: no cover
             raise NotImplementedError(f"Support for {self.tbl_type} is not yet implemented")
+
+        try:
+            results_tbl = get_results()
+            return _fill_null_as_failing(results_tbl, source="conjointly() expressions")
+        except StepEvaluationError:
+            raise
+        except Exception as e:
+            raise StepEvaluationError(
+                f"The conjointly() expressions couldn't be evaluated ({_first_line(e)})."
+            ) from e
+
+    def _resolve_expressions(
+        self, is_native: Callable[[Any], bool], converter: str, *converter_args: Any
+    ) -> list[Any]:
+        """
+        Turn each expression into a native boolean expression (or Series) for the table.
+
+        Each expression is a function that, given the table, returns either a native expression
+        or a `pb.expr_col()` expression. The latter (which can also be built without the table) is
+        converted with its `converter` method. An expression that can't be resolved raises a
+        `StepEvaluationError` rather than being skipped, which would make it pass every row.
+        """
+        if not self.expressions:  # pragma: no cover
+            raise StepEvaluationError("conjointly() needs at least one expression.")
+
+        resolved = []
+        for i, expr_fn in enumerate(self.expressions, start=1):
+            error = None
+            try:
+                result = expr_fn(self.data_tbl)
+            except Exception as e:
+                result, error = None, e
+
+            if result is not None and is_native(result):
+                resolved.append(result)
+                continue
+
+            col_expr = result
+            if not hasattr(col_expr, converter):
+                try:
+                    col_expr = expr_fn(None)
+                except Exception:
+                    col_expr = None
+
+            if hasattr(col_expr, converter):
+                try:
+                    resolved.append(getattr(col_expr, converter)(*converter_args))
+                    continue
+                except Exception as e:
+                    reason = _first_line(e)
+            elif error is not None:
+                reason = _first_line(error)
+            else:
+                reason = f"it returned a {type(result).__name__}, not a boolean expression"
+
+            raise _conjointly_expression_error(i, reason)
+
+        return resolved
 
     def _get_polars_results(self):
         """Process expressions for Polars DataFrames."""
         import polars as pl
 
-        polars_results = []  # Changed from polars_expressions to polars_results
+        resolved = self._resolve_expressions(
+            lambda x: isinstance(x, (pl.Expr, pl.Series)), "to_polars_expr"
+        )
 
-        for expr_fn in self.expressions:
+        # Evaluate expressions to Series so they can be combined with any Series results
+        series = []
+        for i, x in enumerate(resolved, start=1):
             try:
-                # First try direct evaluation with native expressions
-                expr_result = expr_fn(self.data_tbl)
-                if isinstance(expr_result, pl.Expr):
-                    # This is a Polars expression, we'll evaluate it later
-                    polars_results.append(("expr", expr_result))
-                elif isinstance(expr_result, pl.Series):
-                    # This is a boolean Series from lambda function
-                    polars_results.append(("series", expr_result))
-                else:
-                    raise TypeError("Not a valid Polars expression or series")
+                series.append(
+                    x if isinstance(x, pl.Series) else self.data_tbl.select(x).to_series()
+                )
             except Exception as e:
-                try:
-                    # Try to get a ColumnExpression
-                    col_expr = expr_fn(None)
-                    if hasattr(col_expr, "to_polars_expr"):
-                        polars_expr = col_expr.to_polars_expr()
-                        polars_results.append(("expr", polars_expr))
-                    else:  # pragma: no cover
-                        raise TypeError(f"Cannot convert {type(col_expr)} to Polars expression")
-                except Exception as e:  # pragma: no cover
-                    print(f"Error evaluating expression: {e}")
-
-        # Combine results with AND logic
-        if polars_results:
-            # Convert everything to Series for consistent handling
-            series_results = []
-            for result_type, result_value in polars_results:
-                if result_type == "series":
-                    series_results.append(result_value)
-                elif result_type == "expr":
-                    # Evaluate the expression on the DataFrame to get a Series
-                    evaluated_series = self.data_tbl.select(result_value).to_series()
-                    series_results.append(evaluated_series)
-
-            # Combine all boolean Series with AND logic
-            final_result = series_results[0]
-            for series in series_results[1:]:
-                final_result = final_result & series
-
-            # Create results table with boolean column
-            results_tbl = self.data_tbl.with_columns(pb_is_good_=final_result)
-            return results_tbl
-
-        # Default case
-        results_tbl = self.data_tbl.with_columns(pb_is_good_=pl.lit(True))  # pragma: no cover
-        return results_tbl  # pragma: no cover
+                raise _conjointly_expression_error(i, _first_line(e)) from e
+        return self.data_tbl.with_columns(pb_is_good_=functools.reduce(operator.and_, series))
 
     def _get_pandas_results(self):
         """Process expressions for pandas DataFrames."""
         import pandas as pd
 
-        pandas_series = []
-
-        for expr_fn in self.expressions:
-            try:
-                # First try direct evaluation with pandas DataFrame
-                expr_result = expr_fn(self.data_tbl)
-
-                # Check that it's a pandas Series with bool dtype
-                if isinstance(expr_result, pd.Series):
-                    if expr_result.dtype == bool or pd.api.types.is_bool_dtype(expr_result):
-                        pandas_series.append(expr_result)
-                    else:  # pragma: no cover
-                        raise TypeError(
-                            f"Expression returned Series of type {expr_result.dtype}, expected bool"
-                        )
-                else:  # pragma: no cover
-                    raise TypeError(f"Expression returned {type(expr_result)}, expected pd.Series")
-
-            except Exception as e:
-                try:
-                    # Try as a ColumnExpression (for pb.expr_col style)
-                    col_expr = expr_fn(None)
-
-                    if hasattr(col_expr, "to_pandas_expr"):
-                        # Watch for NotImplementedError here and re-raise it
-                        try:
-                            pandas_expr = col_expr.to_pandas_expr(self.data_tbl)
-                            pandas_series.append(pandas_expr)
-                        except NotImplementedError as nie:  # pragma: no cover
-                            # Re-raise NotImplementedError with the original message
-                            raise NotImplementedError(str(nie))
-                    else:  # pragma: no cover
-                        raise TypeError(f"Cannot convert {type(col_expr)} to pandas Series")
-                except NotImplementedError as nie:  # pragma: no cover
-                    # Re-raise NotImplementedError
-                    raise NotImplementedError(str(nie))
-                except Exception as nested_e:  # pragma: no cover
-                    print(f"Error evaluating pandas expression: {e} -> {nested_e}")
-
-        # Combine results with AND logic
-        if pandas_series:
-            final_result = pandas_series[0]
-            for series in pandas_series[1:]:
-                final_result = final_result & series
-
-            # Create results table with boolean column
-            results_tbl = self.data_tbl.copy()
-            results_tbl["pb_is_good_"] = final_result
-            return results_tbl
-
-        # Default case
-        results_tbl = self.data_tbl.copy()  # pragma: no cover
-        results_tbl["pb_is_good_"] = pd.Series(  # pragma: no cover
-            [True] * len(self.data_tbl), index=self.data_tbl.index
+        resolved = self._resolve_expressions(
+            lambda x: isinstance(x, pd.Series), "to_pandas_expr", self.data_tbl
         )
-        return results_tbl  # pragma: no cover
+
+        results_tbl = self.data_tbl.copy()
+        results_tbl["pb_is_good_"] = functools.reduce(operator.and_, resolved)
+        return results_tbl
 
     def _get_ibis_results(self):
         """Process expressions for Ibis tables (including DuckDB)."""
         import ibis
 
-        ibis_expressions = []
-
-        for expr_fn in self.expressions:
-            # Strategy 1: Try direct evaluation with native Ibis expressions
-            try:
-                expr_result = expr_fn(self.data_tbl)
-            except Exception:
-                expr_result = None  # Continue to Strategy 2
-
-            # Check if it's a valid Ibis expression
-            if isinstance(expr_result, ibis.expr.types.Value):
-                ibis_expressions.append(expr_result)
-                continue  # Skip to next expression if this worked
-
-            # Strategy 2: Try with ColumnExpression
-            try:
-                if hasattr(expr_result, "to_ibis_expr"):
-                    col_expr = expr_result
-                else:
-                    col_expr = expr_fn(None)
-
-                # Convert ColumnExpression to Ibis expression
-                if hasattr(col_expr, "to_ibis_expr"):
-                    ibis_expr = col_expr.to_ibis_expr(self.data_tbl)
-                    ibis_expressions.append(ibis_expr)
-            except Exception:  # pragma: no cover
-                # Silent failure where we already tried both strategies
-                pass
-
-        # Combine expressions
-        if ibis_expressions:
-            try:
-                final_result = ibis_expressions[0]
-                for expr in ibis_expressions[1:]:
-                    final_result = final_result & expr
-
-                # Create results table with boolean column
-                results_tbl = self.data_tbl.mutate(pb_is_good_=final_result)
-                return results_tbl
-            except Exception as e:
-                print(f"Error combining Ibis expressions: {e}")
-
-        # Default case
-        results_tbl = self.data_tbl.mutate(pb_is_good_=ibis.literal(True))
-        return results_tbl
+        resolved = self._resolve_expressions(
+            lambda x: isinstance(x, ibis.expr.types.Value), "to_ibis_expr", self.data_tbl
+        )
+        return self.data_tbl.mutate(pb_is_good_=functools.reduce(operator.and_, resolved))
 
     def _get_pyspark_results(self):
         """Process expressions for PySpark DataFrames."""
-        from pyspark.sql import functions as F
-
-        pyspark_columns = []
-
-        for expr_fn in self.expressions:
-            try:
-                # First try direct evaluation with PySpark DataFrame
-                expr_result = expr_fn(self.data_tbl)
-
-                # Check if it's a PySpark Column
-                if hasattr(expr_result, "_jc"):  # PySpark Column has _jc attribute
-                    pyspark_columns.append(expr_result)
-                else:
-                    raise TypeError(
-                        f"Expression returned {type(expr_result)}, expected PySpark Column"
-                    )  # pragma: no cover
-
-            except Exception as e:
-                try:
-                    # Try as a ColumnExpression (for pb.expr_col style)
-                    col_expr = expr_fn(None)
-
-                    if hasattr(col_expr, "to_pyspark_expr"):  # pragma: no cover
-                        # Convert to PySpark expression
-                        pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
-                        pyspark_columns.append(pyspark_expr)
-                    else:
-                        raise TypeError(
-                            f"Cannot convert {type(col_expr)} to PySpark Column"
-                        )  # pragma: no cover
-                except Exception as nested_e:
-                    print(f"Error evaluating PySpark expression: {e} -> {nested_e}")
-
-        # Combine results with AND logic
-        if pyspark_columns:
-            final_result = pyspark_columns[0]
-            for col in pyspark_columns[1:]:
-                final_result = final_result & col
-
-            # Create results table with boolean column
-            results_tbl = self.data_tbl.withColumn("pb_is_good_", final_result)
-            return results_tbl
-
-        # Default case
-        results_tbl = self.data_tbl.withColumn("pb_is_good_", F.lit(True))
-        return results_tbl
+        resolved = self._resolve_expressions(
+            lambda x: _native_lib(x) == "pyspark" and type(x).__name__ == "Column",
+            "to_pyspark_expr",
+            self.data_tbl,
+        )
+        return self.data_tbl.withColumn("pb_is_good_", functools.reduce(operator.and_, resolved))
 
 
 class SpeciallyValidation:
@@ -620,42 +539,72 @@ def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     return compare_expr
 
 
-def _fill_null_as_failing(tbl: Any) -> Any:
-    """Make a null `pb_is_good_` result (e.g., from an expression on a null value) fail."""
+def _fill_null_as_failing(tbl: Any, source: str) -> Any:
+    """
+    Check that the `pb_is_good_` results are boolean, and make null results fail.
+
+    Null results come from expressions on null values (e.g., `pl.col("a") > 1` where `a` is null).
+    Non-boolean results raise a `StepEvaluationError` instead of being judged by truthiness.
+    """
     tbl_nw = nw.from_native(tbl)
+    dtype = tbl_nw.collect_schema()["pb_is_good_"]
+
+    # pandas gives an `object` column for booleans mixed with nulls (e.g., `.str.contains()`)
+    is_boolean = dtype == nw.Boolean or (
+        dtype == nw.Object
+        and {type(v).__name__ for v in tbl_nw.get_column("pb_is_good_").drop_nulls().to_list()}
+        <= {"bool", "bool_"}
+    )
+    if not is_boolean:
+        raise StepEvaluationError(
+            f"The {source} must evaluate to boolean values, but the result has the {dtype} type."
+        )
+
     return tbl_nw.with_columns(
         pb_is_good_=nw.col("pb_is_good_").fill_null(False).cast(nw.Boolean)
     ).to_native()
 
 
+def _apply_row_expr(data_tbl: Any, expr: Any) -> Any:
+    """Add the result of a `col_vals_expr()` expression to the table as `pb_is_good_`."""
+    # A function (e.g., a lambda for a pandas table) is given the table and returns the result;
+    # Ibis deferred expressions (`_.a > 1`) are callable but are resolved by Ibis itself
+    if callable(expr) and _native_lib(expr) != "ibis":
+        expr = expr(data_tbl)
+
+    # Narwhals expressions work on every backend
+    if isinstance(expr, nw.Expr):
+        return nw.from_native(data_tbl).with_columns(pb_is_good_=expr).to_native()
+
+    tbl_lib = _native_lib(data_tbl)
+    expr_lib = _native_lib(expr)
+
+    if tbl_lib == "polars" and expr_lib == "polars":
+        return data_tbl.with_columns(pb_is_good_=expr)
+    if tbl_lib == "pandas" and expr_lib in ("pandas", "numpy"):
+        return data_tbl.assign(pb_is_good_=expr)
+    if tbl_lib == "ibis" and expr_lib == "ibis":
+        return data_tbl.mutate(pb_is_good_=expr)
+    if tbl_lib == "pyspark" and expr_lib == "pyspark":
+        return data_tbl.withColumn("pb_is_good_", expr)
+
+    raise StepEvaluationError(
+        f"The expr= expression is a {expr_lib} {type(expr).__name__}, which can't be used with a "
+        f'{tbl_lib} table. Use a Narwhals expression (e.g., nw.col("a") > 1) or one from {tbl_lib}.'
+    )
+
+
 def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
     """Check if values in a column evaluate to True for a given predicate expression."""
-    if tbl_type == "local":
-        # Check the type of expression provided
-        if "narwhals" in str(type(expr)) and "expr" in str(type(expr)):
-            expression_type = "narwhals"
-        elif "polars" in str(type(expr)) and "expr" in str(type(expr)):
-            expression_type = "polars"
-        else:
-            expression_type = "pandas"
-
-        # Determine whether this is a Pandas or Polars table
-        tbl_type_detected = _get_tbl_type(data=data_tbl)
-        df_lib_name = "polars" if "polars" in tbl_type_detected else "pandas"
-
-        if expression_type == "narwhals":
-            tbl_nw = _convert_to_narwhals(df=data_tbl)
-            tbl_nw = tbl_nw.with_columns(pb_is_good_=expr)
-            return _fill_null_as_failing(tbl_nw.to_native())
-
-        if df_lib_name == "polars" and expression_type == "polars":
-            return _fill_null_as_failing(data_tbl.with_columns(pb_is_good_=expr))
-
-        if df_lib_name == "pandas" and expression_type == "pandas":
-            return _fill_null_as_failing(data_tbl.assign(pb_is_good_=expr))
-
-    # For remote backends, return original table (placeholder)
-    return data_tbl  # pragma: no cover
+    try:
+        results_tbl = _apply_row_expr(data_tbl=data_tbl, expr=expr)
+        return _fill_null_as_failing(results_tbl, source="expr= expression")
+    except StepEvaluationError:
+        raise
+    except Exception as e:
+        raise StepEvaluationError(
+            f"The expr= expression couldn't be evaluated ({_first_line(e)})."
+        ) from e
 
 
 def rows_complete(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
