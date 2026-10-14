@@ -388,7 +388,10 @@ def _with_row_index(tbl: Any, name: str) -> nw.DataFrame[Any] | nw.LazyFrame[Any
     Narwhals requires an `order_by=` column for row indexes on LazyFrames. Polars LazyFrames do
     have a positional row order though (and ordering by a column would number the rows in sorted
     order rather than in their actual order), so the native Polars row index is used for those.
-    Other LazyFrames have no inherent row order, so their first column is used for ordering.
+    Other LazyFrames (e.g., database tables) have no inherent row order, so they're ordered by
+    their first column, with ties broken by the other columns that can be sorted (numeric,
+    temporal, string, and boolean ones) so that the numbering doesn't vary from run to run. A
+    results column (`pb_is_good_`) isn't used, so a table is numbered the same with or without it.
 
     Parameters
     ----------
@@ -408,8 +411,19 @@ def _with_row_index(tbl: Any, name: str) -> nw.DataFrame[Any] | nw.LazyFrame[Any
     native = tbl_nw.to_native()
     if is_polars_lazyframe(native):
         return nw.from_native(native.with_row_index(name=name))
-    first_col = tbl_nw.collect_schema().names()[0]
-    return tbl_nw.with_row_index(name=name, order_by=first_col)
+    schema = tbl_nw.collect_schema()
+    first_col, *other_cols = schema.names()
+    tie_breakers = [
+        c
+        for c in other_cols
+        if c != "pb_is_good_"
+        and (
+            schema[c].is_numeric()
+            or schema[c].is_temporal()
+            or schema[c] in (nw.String, nw.Boolean)
+        )
+    ]
+    return tbl_nw.with_row_index(name=name, order_by=[first_col, *tie_breakers])
 
 
 def _check_column_exists(dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> None:
