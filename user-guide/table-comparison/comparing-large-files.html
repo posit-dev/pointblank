@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-fb64202714f654bfc1afd1c68b58d00e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -129,6 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-large-files.html">
 
@@ -665,7 +666,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Chunking done correctly.</strong> With <code>partitions=N</code>, the comparison runs in N passes, each covering the keys whose hash falls into one bucket, on <em>both</em> tables. A key’s rows always land in the same pass, so the results are exactly those of a single-pass comparison, while each pass only joins about <code>1/N</code> of the rows.</li>
 </ol>
 <p>Let’s try it on a pair of CSV files. We’ll generate a source file with 200,000 orders and a target file in which some orders are missing, some amounts changed, a few orders were added, and the rows were shuffled:</p>
-<div id="a907fadf" class="cell" data-execution_count="2">
+<div id="d80c4ecb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -699,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>target.write_csv(data_dir <span class="op">/</span> <span class="st">"target.csv"</span>)</span></code></pre></div>
 </div>
 <p>Now we compare the two files by giving <code>compare()</code> their paths:</p>
-<div id="83735f1f" class="cell" data-execution_count="3">
+<div id="2ed890bd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
@@ -787,7 +788,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmpcv5n68nc/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpcv5n68nc/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmpt6_3py2b/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpt6_3py2b/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
   </tr>
 
 </thead>
@@ -937,7 +938,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>All four questions are answered in one place: missing and extra rows, changed rows (with the <code>amount</code> column identified as the one that differs), and the schema check in the header.</p>
 <p>The same comparison in four partitions gives identical results:</p>
-<div id="17c05f45" class="cell" data-execution_count="4">
+<div id="79939f97" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>partitioned <span class="op">=</span> pb.compare(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"source.csv"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"target.csv"</span>,</span>

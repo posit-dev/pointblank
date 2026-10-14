@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-7da3a98e89d3edd6ca18c2adb6535bff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fb64202714f654bfc1afd1c68b58d00e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -127,6 +127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/duration_field.html">
 
@@ -226,7 +227,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <h5 class="quarto-secondary-nav-title no-breadcrumbs gd-ref-title"><span class="gd-ref-title-prefix">API</span><span class="gd-ref-title-sep">/</span><span class="gd-ref-title-name">duration_field()</span></h5>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs"><span class="doc-object-name doc-function doc-label doc-label-function">duration_field()</span></h1>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1612,7 +1613,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="doc-object-name doc-function doc-label doc-label-function">duration_field()</span></h1>
+<h1 class="title d-none d-lg-block"><span class="doc-object-name doc-function doc-label doc-label-function">duration_field()</span></h1>
 </div>
 
 
@@ -1706,7 +1707,7 @@ If <code>min_duration</code> is greater than <code>max_duration</code>, or if a 
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>min_duration=</code> and <code>max_duration=</code> parameters accept <code>timedelta</code> objects for defining duration ranges:</p>
-<div id="eace7ffc" class="cell" data-execution_count="1">
+<div id="6dd76b87" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> timedelta</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1865,7 +1866,7 @@ If <code>min_duration</code> is greater than <code>max_duration</code>, or if a 
 </div>
 </div>
 <p>Colon-separated strings can also be used for quick duration definitions:</p>
-<div id="c4c5ef22" class="cell" data-execution_count="2">
+<div id="ff29bf72" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    call_duration<span class="op">=</span>pb.duration_field(min_duration<span class="op">=</span><span class="st">"0:01:00"</span>, max_duration<span class="op">=</span><span class="st">"1:30:00"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    break_time<span class="op">=</span>pb.duration_field(min_duration<span class="op">=</span><span class="st">"0:05:00"</span>, max_duration<span class="op">=</span><span class="st">"0:30:00"</span>),</span>
@@ -2015,7 +2016,7 @@ If <code>min_duration</code> is greater than <code>max_duration</code>, or if a 
 </div>
 </div>
 <p>Optional durations can be created with <code>nullable=True</code>, and duration fields work well alongside other field types:</p>
-<div id="14224619" class="cell" data-execution_count="3">
+<div id="b8b135b6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    task_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>, max_val<span class="op">=</span><span class="dv">500</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    time_spent<span class="op">=</span>pb.duration_field(</span>
