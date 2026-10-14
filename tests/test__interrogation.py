@@ -1415,6 +1415,68 @@ class TestCoerceToCommonBackend:
         assert isinstance(result1, pl.DataFrame)
         assert isinstance(result2, pl.DataFrame)
 
+    @pytest.mark.parametrize("swap", [False, True])
+    def test_ibis_pair_keeps_dtypes(self, swap):
+        """Both Ibis tables are materialized directly to Polars, in either order (no pandas
+        detour that would turn a nullable integer column into floats)."""
+        import ibis
+
+        from pointblank._interrogation import _coerce_to_common_backend, tbl_match
+
+        duck_float = ibis.duckdb.connect().create_table("f", pl.DataFrame({"k": [1.0, 2.0, None]}))
+        mem_int = ibis.memtable(pl.DataFrame({"k": [1, 2, None]}))
+        tbls = (mem_int, duck_float) if swap else (duck_float, mem_int)
+
+        result1, result2 = _coerce_to_common_backend(*tbls)
+        assert isinstance(result1, pl.DataFrame) and isinstance(result2, pl.DataFrame)
+        dtypes = {result1.schema["k"], result2.schema["k"]}
+        assert dtypes == {pl.Float64, pl.Int64}
+
+        # So the dtype difference is caught in both directions
+        assert tbl_match(*tbls) is False
+
+    @pytest.mark.parametrize("data_kind", ["polars", "pandas"])
+    def test_ibis_comparison_table_matches_data_backend(self, data_kind):
+        import ibis
+
+        from pointblank._interrogation import _coerce_to_common_backend
+
+        data = pl.DataFrame({"k": [1, 2]})
+        data = data if data_kind == "polars" else data.to_pandas()
+        _, result = _coerce_to_common_backend(data, ibis.memtable(pl.DataFrame({"k": [1, None]})))
+
+        assert type(result) is type(data)
+
+    def test_other_backends_left_as_they_are(self):
+        """Backends without a conversion route (e.g., PySpark) are returned unchanged."""
+        from pointblank._interrogation import _coerce_to_common_backend
+
+        other = Mock()
+
+        with patch(
+            "pointblank._interrogation._get_tbl_type",
+            side_effect=lambda t: "pyspark" if t is other else "polars",
+        ):
+            data = pl.DataFrame({"k": [1]})
+            result1, result2 = _coerce_to_common_backend(data, other)
+
+        assert result1 is data
+        assert result2 is other
+
+    def test_failed_conversion_raises(self):
+        """A table that can't be converted raises, rather than being compared as is."""
+        from pointblank._interrogation import StepEvaluationError, _coerce_to_common_backend
+
+        broken = Mock()
+        broken.to_polars.side_effect = RuntimeError("connection lost")
+
+        with patch(
+            "pointblank._interrogation._get_tbl_type",
+            side_effect=lambda t: "duckdb" if t is broken else "polars",
+        ):
+            with pytest.raises(StepEvaluationError, match="connection lost"):
+                _coerce_to_common_backend(pl.DataFrame({"k": [1]}), broken)
+
 
 class TestInterrogateInTable:
     """Tests for interrogate_in_table()."""
