@@ -14600,7 +14600,10 @@ def test_get_dataframe_report_with_list_column(tbl_type):
 
 
 def test_get_dataframe_report_duckdb_with_non_string_values():
-    # `values` holds numbers, sets and (left, right) bounds; the duckdb report stores it as JSON
+    # `values` holds numbers, sets, (left, right) bounds and strings; the duckdb report stores each
+    # as JSON text in a string column, so strings that look like JSON keep their type
+    import json
+
     df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
     validation = (
         Validate(df)
@@ -14609,12 +14612,60 @@ def test_get_dataframe_report_duckdb_with_non_string_values():
         .col_vals_between(columns="a", left=0, right=5)
         .col_vals_regex(columns="b", pattern="[a-z]")
         .col_exists(columns="a")
+        .col_vals_eq(columns="b", value="123")
+        .col_vals_eq(columns="b", value="true")
+        .col_vals_eq(columns="b", value="null")
+        .col_vals_eq(columns="b", value='"q"')
         .interrogate()
     )
 
-    report = validation.get_dataframe_report("duckdb").to_pandas()
+    report = validation.get_dataframe_report("duckdb")
+    expected = [0, ["x", "y"], [0, 5], "[a-z]", None, "123", "true", "null", '"q"']
 
-    assert list(report["values"]) == [0, ["x", "y"], [0, 5], "[a-z]", None]
+    # The stored text is valid JSON, and reads back the same way with every Ibis converter
+    stored = report.to_pyarrow()["values"].to_pylist()
+    assert stored[3] == '"[a-z]"'
+    assert [None if v is None else json.loads(v) for v in stored] == expected
+    assert report.to_polars()["values"].to_list() == stored
+    assert list(report.to_pandas()["values"]) == stored
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_get_dataframe_report_step_evaluated(tbl_type):
+    # `True` for an evaluated step, `False` for one that couldn't be, `None` for an inactive one
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2]}))
+        .col_vals_gt(columns="a", value=0)
+        .col_vals_gt(columns="nonexistent", value=0)
+        .col_vals_gt(columns="a", value=0, active=False)
+        .interrogate()
+    )
+
+    report = validation.get_dataframe_report(tbl_type=tbl_type)
+    if tbl_type == "duckdb":
+        report = report.to_polars()
+
+    step_evaluated = [None if pd.isna(v) else v for v in report["step_evaluated"]]
+    assert step_evaluated == [True, False, None]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_get_dataframe_report_composite_key(tbl_type):
+    # A composite key in `col_vals_in_table()` is reported with all of its columns
+    ref = pl.DataFrame({"x": [1, 2], "y": ["p", "q"]})
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2], "b": ["p", "z"]}))
+        .col_vals_in_table(columns=["a", "b"], ref_table=ref, ref_column=["x", "y"])
+        .interrogate()
+    )
+
+    assert validation.validation_info[0].column == ["a", "b"]
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+    report = validation.get_dataframe_report(tbl_type=tbl_type)
+    if tbl_type == "duckdb":
+        report = report.to_polars()
+    assert list(report["columns"]) == ["a, b"]
 
 
 def get_schema_info(
