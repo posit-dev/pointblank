@@ -3,7 +3,7 @@
   "version": "3.4",
   "generated": "2026-07-14T00:00:00Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "5146d20551cceca6",
+  "checksum": "9b0573b3dc833d9d",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -6113,53 +6113,6 @@
       }
     },
     {
-      "core_id": "SDTM-134",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "IEINCLCR in TI must use NY controlled terminology when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Special-Purpose"
-      ],
-      "domains": [
-        "TI"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "IEINCLCR",
-            "codelist": "NY"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "IEINCLCR",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_IEINCLCR_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IEINCLCR in TI contains a value not in the NY codelist."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-135",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -7282,7 +7235,7 @@
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "TI must contain required variables: STUDYID, DOMAIN, IETESTCD, IETEST, IECAT, IEINCLCR.",
+      "description": "TI must contain required variables: STUDYID, DOMAIN, IETESTCD, IETEST, IECAT.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -7303,8 +7256,7 @@
               "DOMAIN",
               "IETESTCD",
               "IETEST",
-              "IECAT",
-              "IEINCLCR"
+              "IECAT"
             ]
           }
         }
@@ -7335,59 +7287,13 @@
             "name": "_pb_IECAT_present",
             "operator": "equal_to",
             "value": false
-          },
-          {
-            "name": "_pb_IEINCLCR_present",
-            "operator": "equal_to",
-            "value": false
           }
         ]
       },
       "actions": {
         "id": "generate_variable_error",
         "params": {
-          "message": "TI is missing one or more required variables: STUDYID, DOMAIN, IETESTCD, IETEST, IECAT, IEINCLCR."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-162",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISITNUM must be present in AE.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "VISITNUM"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_VISITNUM_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "VISITNUM must be present in AE."
+          "message": "TI is missing one or more required variables: STUDYID, DOMAIN, IETESTCD, IETEST, IECAT."
         }
       }
     },
@@ -7670,90 +7576,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "LBSTNRHI in LB must be numeric type."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-170",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "LBORNRLO must be numeric type in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "LBORNRLO",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_LBORNRLO_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "LBORNRLO in LB must be numeric type."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-171",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "LBORNRHI must be numeric type in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "LBORNRHI",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_LBORNRHI_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "LBORNRHI in LB must be numeric type."
         }
       }
     },
@@ -10576,47 +10398,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "DOMAIN value must be 'TI' in the TI dataset."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-240",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "IEINCLCR (inclusion/exclusion criterion result flag) must be present as a variable in the TI dataset.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Special-Purpose"
-      ],
-      "domains": [
-        "TI"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "IEINCLCR"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_IEINCLCR_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "IEINCLCR must be present in TI."
         }
       }
     },
@@ -13544,74 +13325,6 @@
       }
     },
     {
-      "core_id": "SDTM-326",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "ARM (arm name) must not be null in TV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "ARM",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "ARM must not be null in TV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-327",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "ARMCD (arm code) must not be null in TV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "ARMCD",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "ARMCD must not be null in TV."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-328",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -13870,40 +13583,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "SVENDTC must conform to ISO 8601 format in SV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-335",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISITNUM must not be null in VS.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "VS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VISITNUM",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VISITNUM must not be null in VS."
         }
       }
     },
@@ -15256,47 +14935,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "MHENDY must be numeric in MH."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-371",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "LBSPEC (specimen type) column must be present in the LB domain.",
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "LBSPEC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_LBSPEC_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "LBSPEC must be present in LB."
         }
       }
     },
@@ -17617,53 +17255,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "EPOCH must be a valid CDISC EPOCH term when present."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-435",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "EXDOSFRQ in EX must be a valid FREQ codelist term when present (dosing frequency per interval).",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "EXDOSFRQ",
-            "codelist": "FREQ"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXDOSFRQ",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_EXDOSFRQ_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXDOSFRQ must be a valid CDISC FREQ term when present."
         }
       }
     }
