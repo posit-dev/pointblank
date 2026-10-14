@@ -128,10 +128,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html">
 
 
   <link rel="alternate" type="text/markdown" href="Validate.col_vals_expr.md">
-  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html">
   <meta name="description" content="Validate column values using a custom expression.">
   <script type="application/ld+json">
 [
@@ -1602,7 +1602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#missing-values-and-evaluation-errors" id="toc-missing-values-and-evaluation-errors" class="nav-link" data-scroll-target="#missing-values-and-evaluation-errors">Missing Values And Evaluation Errors</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
   <li><a href="#segmentation" id="toc-segmentation" class="nav-link" data-scroll-target="#segmentation">Segmentation</a></li>
   <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
@@ -1637,7 +1637,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11130-L11367" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11131-L11376" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_vals_expr</span>(</span>
@@ -1660,7 +1660,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">expr</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. If the target table is a Polars DataFrame, the expression should either be a Polars column expression or a Narwhals one. For a Pandas DataFrame, the expression should either be a lambda expression or a Narwhals column expression.</p>
+<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., <code>nw.col("a") &gt; 1</code>) works with every table type. Otherwise, use an expression from the table’s own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., <code>lambda df: df["a"] &gt; 1</code> for a pandas DataFrame).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1704,9 +1704,10 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </dl>
 </div>
 </section>
-<section id="notes" class="level2 doc-notes">
-<h2 class="doc-notes anchored" data-anchor-id="notes">Notes</h2>
-<p>This validation method is not supported for PySpark DataFrames. The internal implementation uses pandas-style <code>.assign()</code> which is not available on PySpark DataFrames. Calling this method on a PySpark DataFrame will raise an <code>AttributeError</code> during interrogation.</p>
+<section id="missing-values-and-evaluation-errors" class="level2 doc-missing-values-and-evaluation-errors">
+<h2 class="doc-missing-values-and-evaluation-errors anchored" data-anchor-id="missing-values-and-evaluation-errors">Missing Values And Evaluation Errors</h2>
+<p>A row where the expression evaluates to a missing value (e.g., <code>pl.col("a") &gt; 1</code> when <code>a</code> is null) counts as a failing test unit. To let such rows pass, allow for them in the expression itself, as in <code>(pl.col("a") &gt; 1) | pl.col("a").is_null()</code>.</p>
+<p>If the expression can’t be evaluated against the table (e.g., it refers to a column that doesn’t exist, comes from a library that doesn’t match the table, or doesn’t produce boolean values), the step is marked as having an evaluation error and a note explains why. The other validation steps are still interrogated.</p>
 </section>
 <section id="preprocessing" class="level2 doc-preprocessing">
 <h2 class="doc-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
@@ -1745,7 +1746,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="0f968c8f" class="cell" data-execution_count="2">
+<div id="fa86d50a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1886,7 +1887,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that the values in column <code>a</code> are all integers. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="e5ff9ff8" class="cell" data-execution_count="3">
+<div id="ea6746ff" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_expr(expr<span class="op">=</span>pl.col(<span class="st">"a"</span>) <span class="op">%</span> <span class="dv">1</span> <span class="op">==</span> <span class="dv">0</span>)</span>

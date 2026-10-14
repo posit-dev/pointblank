@@ -128,10 +128,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html">
 
 
   <link rel="alternate" type="text/markdown" href="Validate.conjointly.md">
-  <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html">
   <meta name="description" content="Perform multiple row-wise validations for joint validity.">
   <script type="application/ld+json">
 [
@@ -1602,6 +1602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#missing-values-and-evaluation-errors" id="toc-missing-values-and-evaluation-errors" class="nav-link" data-scroll-target="#missing-values-and-evaluation-errors">Missing Values And Evaluation Errors</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
   <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
@@ -1636,7 +1637,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15542-L15801" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15551-L15820" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">conjointly</span>(</span>
@@ -1699,6 +1700,11 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </dl>
 </div>
 </section>
+<section id="missing-values-and-evaluation-errors" class="level2 doc-missing-values-and-evaluation-errors">
+<h2 class="doc-missing-values-and-evaluation-errors anchored" data-anchor-id="missing-values-and-evaluation-errors">Missing Values And Evaluation Errors</h2>
+<p>A row where any expression evaluates to a missing value (e.g., a comparison on a null) counts as a failing test unit. To let such rows pass, allow for them in the expression itself (e.g., <code>lambda df: (pl.col("a") &gt; 1) | pl.col("a").is_null()</code>).</p>
+<p>If any of the expressions can’t be evaluated against the table (e.g., one refers to a column that doesn’t exist), the step is marked as having an evaluation error and a note says which expression failed and why. The other validation steps are still interrogated.</p>
+</section>
 <section id="preprocessing" class="level2 doc-preprocessing">
 <h2 class="doc-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
@@ -1721,7 +1727,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="366ad745" class="cell" data-execution_count="2">
+<div id="7e045d3b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1868,7 +1874,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <li>The sum of <code>a</code> and <code>b</code> should be less than the value in column <code>c</code></li>
 </ol>
 <p>We’ll use <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> to check all these conditions together:</p>
-<div id="29e8ad84" class="cell" data-execution_count="3">
+<div id="52997bcf" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .conjointly(</span>
@@ -2034,7 +2040,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The validation table shows that not all rows satisfy all three conditions together. For a row to pass the conjoint validation, all three conditions must be true for that row.</p>
 <p>We can also use preprocessing to filter the data before applying the conjoint validation:</p>
-<div id="8ed7ff2f" class="cell" data-execution_count="4">
+<div id="a8614bcc" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define preprocessing function for serialization compatibility</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> filter_by_c_gt_5(df):</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.<span class="bu">filter</span>(pl.col(<span class="st">"c"</span>) <span class="op">&gt;</span> <span class="dv">5</span>)</span>
@@ -2209,7 +2215,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>This allows for more complex validation scenarios where the data is first prepared and then validated against multiple conditions simultaneously.</p>
 <p>Or, you can use the backend-agnostic column expression helper <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> to write expressions that work across different table backends:</p>
-<div id="c29165e1" class="cell" data-execution_count="5">
+<div id="2a1f8410" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>, <span class="dv">4</span>],</span>
