@@ -340,6 +340,7 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         set: Collection[Any],
+        na_pass: bool = False,
         missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
