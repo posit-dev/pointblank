@@ -203,9 +203,19 @@ class TestColValsInSetNulls:
         """NULLs with not_in_set."""
         v = Validate(tbl_nulls_int).col_vals_not_in_set(columns="x", set=[99]).interrogate()
 
-        # Non-null values (1, 2, 4) are not in {99} -> pass
-        # NULL should produce False for NOT IN check (NULL comparison semantics)
-        assert v.n_passed(i=1, scalar=True) >= 3
+        # Non-null values (1, 2, 4) are not in {99} -> pass; the NULL fails
+        assert v.n_passed(i=1, scalar=True) == 3
+        assert v.n_failed(i=1, scalar=True) == 1
+
+        v = (
+            Validate(tbl_nulls_int)
+            .col_vals_not_in_set(columns="x", set=[99], na_pass=True)
+            .interrogate()
+        )
+
+        # With `na_pass=True` the NULL passes
+        assert v.n_passed(i=1, scalar=True) == 4
+        assert v.n_failed(i=1, scalar=True) == 0
 
     def test_in_set_string_with_nulls(self, tbl_nulls_str):
         """String column in_set with NULLs."""
