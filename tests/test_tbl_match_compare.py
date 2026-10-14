@@ -143,8 +143,10 @@ def test_invalid_comparison_is_an_eval_error_with_note():
     step = _step(v)
     assert step.eval_error
     assert "nope" in v.get_notes(i=1, format="text")[0]
-    # The step report can't be produced, but nothing raises
-    assert v.get_step_report(i=1) is None
+    # The step report can't be produced, so it explains why instead
+    assert v.get_step_report(i=1) == (
+        "Step 1 couldn't be evaluated. Key column 'nope' isn't in the source table."
+    )
 
 
 def test_invalid_setting_values_raise_early():
