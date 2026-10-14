@@ -6,7 +6,6 @@ from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
     StepEvaluationError,
-    _column_has_null_values,
     _modify_datetime_compare_val,
     _safe_is_nan_or_null_expr,
     _safe_modify_datetime_compare_val,
@@ -212,28 +211,6 @@ def test_pyspark_expression_error_reports_first_error():
 
     with pytest.raises(StepEvaluationError, match="First error"):
         conjointly._get_pyspark_results()
-
-
-def test_check_column_has_nulls_attribute_error():
-    """Test that _column_has_null_values returns False when select raises an exception."""
-
-    # Create a mock table that raises when select() is called
-    mock_table = Mock()
-    mock_table.select.side_effect = Exception("Unsupported operation")
-
-    result = _column_has_null_values(mock_table, "test_col")
-    assert result is False
-
-
-def test_check_column_has_nulls_nested_exceptions():
-    """Test nested exception handling in null checking."""
-
-    # Create a mock table that raises when select() is called
-    mock_table = Mock()
-    mock_table.select.side_effect = Exception("Select failed")
-
-    result = _column_has_null_values(mock_table, "test_col")
-    assert result is False  # Last resort returns False
 
 
 def test_modify_datetime_column_isinstance_check():
