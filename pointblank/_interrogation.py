@@ -2086,138 +2086,131 @@ def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
     return result_tbl.to_native()
 
 
-def _with_lagged_difference(
-    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str
-) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
-    """
-    Add a `pb_lagged_difference_` column holding the difference from the previous row's value.
+def _unused_column_name(name: str, existing: list[str]) -> str:
+    """Get an internal column name that doesn't collide with any of the table's columns."""
+    while name in existing:
+        name = f"_{name}"
+    return name
 
-    Narwhals needs an explicit row order for `shift()` on LazyFrames. Polars LazyFrames keep their
-    row order, so a `pb_row_index_` column is added to order by (the caller drops it).
+
+def _with_lagged_difference(
+    nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, order_by: list[str] | None
+) -> tuple[nw.DataFrame[Any] | nw.LazyFrame[Any], str, list[str]]:
     """
-    lagged = nw.col(column).shift(1)
-    if isinstance(nw_tbl, nw.LazyFrame) and is_polars_lazyframe(nw_tbl.to_native()):
-        nw_tbl = _with_row_index(nw_tbl, name="pb_row_index_")
-        lagged = lagged.over(order_by="pb_row_index_")
-    return nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - lagged)
+    Add a column with the difference from the last non-null value in an earlier row.
+
+    The difference is null for null values and for the first non-null value. Rows are taken in
+    `order_by=` order if given; otherwise DataFrames and Polars LazyFrames use their row order, and
+    other tables (e.g., database tables), which have no row order, raise a `StepEvaluationError`.
+
+    Returns the table, the name of the difference column, and the internal columns to drop.
+    """
+    existing = nw_tbl.collect_schema().names()
+    temp_columns = []
+
+    if order_by:
+        not_found = [c for c in order_by if c not in existing]
+        if not_found:
+            raise StepEvaluationError(
+                f"The order_by= column(s) {', '.join(repr(c) for c in not_found)} aren't in the "
+                "table."
+            )
+        order = order_by
+    elif isinstance(nw_tbl, nw.DataFrame) or is_polars_lazyframe(nw_tbl.to_native()):
+        row_index = _unused_column_name("pb_row_index_", existing)
+        nw_tbl = _with_row_index(nw_tbl, name=row_index)
+        order = [row_index]
+        temp_columns.append(row_index)
+    else:
+        raise StepEvaluationError(
+            "This table has no inherent row order (e.g., it's a database table), so use order_by= "
+            'to give the column(s) that put the rows in order (e.g., order_by="date").'
+        )
+
+    group, filled, lagged = (
+        _unused_column_name(name, existing)
+        for name in ("pb_group_", "pb_filled_", "pb_lagged_difference_")
+    )
+    temp_columns += [group, filled, lagged]
+
+    # Forward-fill the column without `fill_null(strategy=)` (not supported by every backend): a
+    # running count of non-null values puts each non-null value in its own group, together with
+    # the nulls that follow it, so the group's maximum is that value
+    nw_tbl = nw_tbl.with_columns(
+        **{group: (~nw.col(column).is_null()).cast(nw.Int64).cum_sum().over(order_by=order)}
+    )
+    nw_tbl = nw_tbl.with_columns(**{filled: nw.col(column).max().over(group)})
+    nw_tbl = nw_tbl.with_columns(
+        **{lagged: nw.col(column) - nw.col(filled).shift(1).over(order_by=order)}
+    )
+
+    return nw_tbl, lagged, temp_columns
+
+
+def _interrogate_monotonic(
+    tbl: IntoFrame,
+    column: str,
+    increasing: bool,
+    allow_stationary: bool,
+    tol: float,
+    na_pass: bool,
+    order_by: list[str] | None,
+) -> Any:
+    """
+    Check that column values increase (or decrease) from one row to the next.
+
+    Each non-null value is compared with the last non-null value before it, so nulls don't break
+    the sequence. Null values pass only with `na_pass=True`, and the first non-null value passes.
+    A nonzero `tol=` allows movement in the wrong direction up to that size (and stationary values).
+    """
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    result_tbl, lagged, temp_columns = _with_lagged_difference(nw_tbl, column, order_by)
+
+    # The movement in the expected direction
+    movement = nw.col(lagged) if increasing else nw.col(lagged) * -1
+    if allow_stationary or tol != 0:
+        good_condition = movement >= -abs(tol)
+    else:
+        good_condition = movement > 0
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col(column).is_null())
+        .then(nw.lit(na_pass))
+        # The first non-null value has nothing to be compared with
+        .otherwise(nw.when(nw.col(lagged).is_null()).then(nw.lit(True)).otherwise(good_condition))
+    )
+
+    return result_tbl.drop(*temp_columns).to_native()
 
 
 def interrogate_increasing(
-    tbl: IntoFrame, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+    tbl: IntoFrame,
+    column: str,
+    allow_stationary: bool,
+    decreasing_tol: float,
+    na_pass: bool,
+    order_by: list[str] | None = None,
 ) -> Any:
-    """
-    Increasing interrogation.
-
-    Checks whether column values are increasing row by row.
-
-    Parameters
-    ----------
-    tbl
-        The table to interrogate.
-    column
-        The column to check.
-    allow_stationary
-        Whether to allow consecutive equal values (stationary phases).
-    decreasing_tol
-        Optional tolerance for negative movement (decreasing values).
-    na_pass
-        Whether NA/null values should be considered as passing.
-
-    Returns
-    -------
-    Any
-        The table with a `pb_is_good_` column indicating pass/fail for each row.
-    """
-    nw_tbl = nw.from_native(tbl)
-    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-
-    # Create a lagged difference column
-    result_tbl = _with_lagged_difference(nw_tbl, column=column)
-
-    # Build the condition based on allow_stationary and decreasing_tol
-    if allow_stationary or decreasing_tol != 0:
-        # Allow stationary (diff >= 0) or within tolerance
-        threshold = -abs(decreasing_tol) if decreasing_tol != 0 else 0
-        good_condition = nw.col("pb_lagged_difference_") >= threshold
-    else:
-        # Strictly increasing (diff > 0)
-        good_condition = nw.col("pb_lagged_difference_") > 0
-
-    # Apply the validation logic
-    # The logic is:
-    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
-    # 2. If current value is null -> apply na_pass
-    # 3. Otherwise -> apply the good_condition
-    result_tbl = result_tbl.with_columns(
-        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
-        .then(nw.lit(True))  # First row or row after NA (can't validate)
-        .otherwise(
-            nw.when(nw.col(column).is_null())
-            .then(nw.lit(na_pass))  # Handle NA values in current row
-            .otherwise(good_condition)
-        )
+    """Increasing interrogation (see `_interrogate_monotonic()`)."""
+    return _interrogate_monotonic(
+        tbl, column, True, allow_stationary, decreasing_tol, na_pass, order_by
     )
-
-    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def interrogate_decreasing(
-    tbl: IntoFrame, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+    tbl: IntoFrame,
+    column: str,
+    allow_stationary: bool,
+    increasing_tol: float,
+    na_pass: bool,
+    order_by: list[str] | None = None,
 ) -> Any:
-    """
-    Decreasing interrogation.
-
-    Checks whether column values are decreasing row by row.
-
-    Parameters
-    ----------
-    tbl
-        The table to interrogate.
-    column
-        The column to check.
-    allow_stationary
-        Whether to allow consecutive equal values (stationary phases).
-    increasing_tol
-        Optional tolerance for positive movement (increasing values).
-    na_pass
-        Whether NA/null values should be considered as passing.
-
-    Returns
-    -------
-    Any
-        The table with a `pb_is_good_` column indicating pass/fail for each row.
-    """
-    nw_tbl = nw.from_native(tbl)
-    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-
-    # Create a lagged difference column
-    result_tbl = _with_lagged_difference(nw_tbl, column=column)
-
-    # Build the condition based on allow_stationary and increasing_tol
-    if allow_stationary or increasing_tol != 0:
-        # Allow stationary (diff <= 0) or within tolerance
-        threshold = abs(increasing_tol) if increasing_tol != 0 else 0
-        good_condition = nw.col("pb_lagged_difference_") <= threshold
-    else:
-        # Strictly decreasing (diff < 0)
-        good_condition = nw.col("pb_lagged_difference_") < 0
-
-    # Apply the validation logic
-    # The logic is:
-    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
-    # 2. If current value is null -> apply na_pass
-    # 3. Otherwise -> apply the good_condition
-    result_tbl = result_tbl.with_columns(
-        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
-        .then(nw.lit(True))  # First row or row after NA (can't validate)
-        .otherwise(
-            nw.when(nw.col(column).is_null())
-            .then(nw.lit(na_pass))  # Handle NA values in current row
-            .otherwise(good_condition)
-        )
+    """Decreasing interrogation (see `_interrogate_monotonic()`)."""
+    return _interrogate_monotonic(
+        tbl, column, False, allow_stationary, increasing_tol, na_pass, order_by
     )
-
-    return result_tbl.drop("pb_lagged_difference_", "pb_row_index_", strict=False).to_native()
 
 
 def _interrogate_comparison_base(
