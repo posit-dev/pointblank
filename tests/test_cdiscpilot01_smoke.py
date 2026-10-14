@@ -21,7 +21,7 @@ Or set the variable directly when running pytest:
 
 These tests are skipped automatically when CDISCPILOT01_PATH is not set.
 
-Validated against: SDTMIG 3.4 conformance catalog, 426 rules, CT 2024-09-27.
+Validated against: SDTMIG 3.4 conformance catalog, 416 rules, CT 2024-09-27.
 Study: CDISCPILOT01, Alzheimer's disease study, 306 subjects, 18 SDTM + 4 SUPP-- domains.
 """
 
@@ -135,8 +135,8 @@ def test_report_is_rules_type(pilot_report):
 
 
 def test_report_has_expected_rule_count(pilot_report):
-    """426 rules in the SDTMIG 3.4 catalog after deduplication (as of 2025-07-14)."""
-    assert len(pilot_report.native_result.rule_results) == 426
+    """416 rules in the SDTMIG 3.4 catalog (after removing rules that contradict the IG)."""
+    assert len(pilot_report.native_result.rule_results) == 416
 
 
 def test_report_overall_pass_rate(pilot_report):
@@ -205,24 +205,11 @@ def test_aerel_finding_is_present(pilot_report):
     assert aerel.n_issues <= 1_200
 
 
-def test_visitnum_in_ae_finding(pilot_report):
-    """VISITNUM is absent from the pilot AE domain (it's optional in SDTM AE events)."""
-    rule = next(
-        (r for r in pilot_report.native_result.rule_results if r.rule_id == "SDTM-162"),
-        None,
-    )
-    assert rule is not None
-    assert rule.n_issues == 1  # one dataset (AE) fails the column-presence check
-
-
-def test_lbornrlo_type_finding(pilot_report):
-    """LBORNRLO is character in the pilot (stores 'SEE TEXT'); SDTMIG requires numeric type."""
-    rule = next(
-        (r for r in pilot_report.native_result.rule_results if r.rule_id == "SDTM-170"),
-        None,
-    )
-    assert rule is not None
-    assert rule.n_issues >= 1
+def test_no_findings_for_conformant_pilot_features(pilot_report):
+    """The pilot has no VISITNUM in AE (Permissible) and character LBORNRLO/LBORNRHI (Char in
+    SDTMIG), both conformant; the rules that flagged them (SDTM-162/170/171) were removed."""
+    rule_ids = {r.rule_id for r in pilot_report.native_result.rule_results}
+    assert not {"SDTM-162", "SDTM-170", "SDTM-171"} & rule_ids
 
 
 # ── Engine correctness: empty-string handling ──────────────────────────────────
