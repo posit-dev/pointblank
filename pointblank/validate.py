@@ -14964,9 +14964,9 @@ class Validate:
 
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
-        # Store the column(s) for display; for composite keys store the first column
-        # (the full list is in values for the interrogation function)
-        display_column = columns if isinstance(columns, str) else columns[0]
+        # Store the column(s) for display; a composite key is stored as the full list, like
+        # `rows_distinct(columns_subset=...)` (the interrogation function uses `values`)
+        display_column = columns if isinstance(columns, str) else list(columns)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -22122,10 +22122,14 @@ class Validate:
         - `active`: Whether the validation step was active (`True`/`False`).
         - `step_number`: The 1-indexed step number.
         - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
-        - `columns`: The column name validated.
+        - `columns`: The column name validated. For a step on several columns (e.g., a composite
+          key), the names are joined with `", "`.
         - `values`: The comparison value used in the validation. For regex validations, just the
-          pattern string is included.
-        - `step_evaluated`: Whether the step was evaluated without error.
+          pattern string is included. With `tbl_type="duckdb"`, each value is stored as JSON text
+          in a string column (e.g., `"[a-z]"` for a pattern, `[1, 2]` for a set), which can be
+          decoded with `json.loads()` or cast with `.cast("json")`.
+        - `step_evaluated`: Whether the step was evaluated without error (`False` if it couldn't
+          be evaluated, e.g., because its column doesn't exist).
         - `units`: Total number of test units.
         - `all_units_passed`: Whether every test unit passed.
         - `pass_n`: Number of passing test units.
@@ -22138,7 +22142,8 @@ class Validate:
         - `segmented`: Whether the step used segmented validation.
 
         For inactive steps (`active=False`), the result columns (`step_evaluated` through
-        `critical`) are set to `None`/`null`.
+        `critical`) are set to `None`/`null`; for steps that couldn't be evaluated,
+        `step_evaluated` is `False` and the other result columns are `None`/`null`.
 
         Examples
         --------
@@ -22215,6 +22220,21 @@ class Validate:
                 ],
             }
 
+        # `step_evaluated` is the opposite of `eval_error`: `True` for a step that was evaluated,
+        # `False` for one that couldn't be (such steps are also inactive, so this is computed
+        # here rather than nulled below with the other results of inactive steps), and `None`
+        # for a step that was made inactive (or that hasn't been interrogated)
+        if "eval_error" in final_report:
+            final_report = {
+                **final_report,
+                "eval_error": [
+                    False if eval_error else (True if active and n is not None else None)
+                    for eval_error, active, n in zip(
+                        final_report["eval_error"], final_report["active"], report_original["n"]
+                    )
+                ],
+            }
+
         # Normalize `column`: steps like `rows_distinct(columns_subset=...)` store a list of
         # column names, which can't go into the string-typed `column` column of the report.
         columns = final_report.get("column")
@@ -22261,7 +22281,6 @@ class Validate:
             )
 
             inactive_null_cols = [
-                "step_evaluated",
                 "units",
                 "all_units_passed",
                 "pass_n",
@@ -22312,7 +22331,6 @@ class Validate:
                 )
 
                 inactive_null_cols = [
-                    "step_evaluated",
                     "units",
                     "all_units_passed",
                     "pass_n",
@@ -22353,7 +22371,7 @@ class Validate:
                 "i": dt.Int64(),
                 "assertion_type": dt.String(),
                 "column": dt.String(),
-                "values": dt.json(),
+                "values": dt.String(),
                 "pre": dt.json(),
                 "segments": dt.String(),
                 "eval_error": dt.Boolean(),
@@ -22370,13 +22388,15 @@ class Validate:
                 "autobrief": dt.String(),
             }
 
-            # `values` is a JSON column, so serialize non-string values (numbers, the
-            # members of a set, the bounds of a range) rather than handing Arrow raw objects.
+            # `values` holds each value as JSON text (in a string column, as Ibis decodes JSON
+            # columns twice in `to_pandas()` and can't convert them in `to_polars()`); strings are
+            # encoded too, so that e.g. a regex like `[a-z]` is valid JSON and `"123"` stays a
+            # string. Use `json.loads()`, or `.cast("json")` in SQL, to decode the values.
             if "values" in final_report:
                 final_report = {
                     **final_report,
                     "values": [
-                        v if v is None or isinstance(v, str) else json.dumps(v, default=str)
+                        None if v is None else json.dumps(v, default=str)
                         for v in final_report["values"]
                     ],
                 }
@@ -22386,7 +22406,6 @@ class Validate:
             )
 
             inactive_null_cols = [
-                "step_evaluated",
                 "units",
                 "all_units_passed",
                 "pass_n",
