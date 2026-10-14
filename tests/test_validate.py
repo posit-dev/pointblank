@@ -14389,7 +14389,7 @@ def test_get_step_report_no_fail(tbl_type) -> None:
 def test_get_step_report_without_extracts(tbl_type) -> None:
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
 
-    # Extracts are not collected with `collect_extracts=False`, nor for Ibis tables
+    # Extracts are not collected with `collect_extracts=False`
     validation = (
         Validate(small_table)
         .col_vals_gt(columns="a", value=0)
@@ -14431,6 +14431,77 @@ def test_get_step_report_inactive_step() -> None:
     validation = Validate(small_table).col_vals_gt(columns="a", value=0, active=False).interrogate()
 
     assert validation.get_step_report(i=1) == "This validation step is inactive."
+
+
+@pytest.mark.parametrize("tbl_type", ["duckdb", "memtable"])
+def test_get_data_extracts_ibis(tbl_type) -> None:
+    # Failing rows are extracted for Ibis tables too (as a Polars DataFrame), and the step
+    # reports for failing steps can be produced from them
+    small_table = load_dataset(dataset="small_table", tbl_type="polars")
+    if tbl_type == "memtable":
+        tbl = ibis.memtable(small_table)
+    else:
+        tbl = load_dataset(dataset="small_table", tbl_type="duckdb")
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="d", value=1000)
+        .col_vals_not_null(columns="c")
+        .rows_distinct()
+        .rows_complete()
+        .interrogate(extract_limit=3)
+    )
+
+    expected_rows = {1: [5, 7, 9], 2: [4, 13], 3: [9, 10], 4: [4, 13]}
+    for i, rows in expected_rows.items():
+        extract = validation.get_data_extracts(i=i, frame=True)
+        assert isinstance(extract, pl.DataFrame)
+        assert extract["_row_num_"].to_list() == rows
+        assert isinstance(validation.get_step_report(i=i), GT.GT)
+
+    # The extract has the table's columns (and no internal ones)
+    assert validation.get_data_extracts(i=1, frame=True).columns == ["_row_num_"] + list(
+        small_table.columns
+    )
+
+
+def test_get_data_extracts_ibis_ties_are_stable() -> None:
+    # Database tables are numbered by their first column, with ties broken by the other columns,
+    # so the extract doesn't vary from run to run
+    tbl = load_dataset(dataset="game_revenue", tbl_type="duckdb")
+
+    extracts = [
+        Validate(tbl).col_vals_gt(columns="item_revenue", value=1.0).interrogate() for _ in range(3)
+    ]
+    extracts = [v.get_data_extracts(i=1, frame=True) for v in extracts]
+
+    assert len(extracts[0]) == 500
+    for extract in extracts[1:]:
+        assert_frame_equal(extract, extracts[0])
+
+
+def test_get_step_report_eval_error_step() -> None:
+    small_table = load_dataset(dataset="small_table", tbl_type="polars")
+
+    validation = Validate(small_table).col_vals_gt(columns="nonexistent", value=0).interrogate()
+
+    report = validation.get_step_report(i=1)
+    assert report.startswith("Step 1 couldn't be evaluated.")
+    assert "nonexistent" in report
+
+
+def test_get_step_report_column_created_by_pre() -> None:
+    # A column that only exists after `pre=` has no position in the table, but the report works
+    small_table = load_dataset(dataset="small_table", tbl_type="polars")
+
+    validation = (
+        Validate(small_table)
+        .col_vals_gt(columns="a2", value=10, pre=lambda df: df.with_columns(a2=pl.col("a") * 2))
+        .interrogate()
+    )
+
+    assert validation.n_failed(i=1, scalar=True) > 0
+    assert isinstance(validation.get_step_report(i=1), GT.GT)
 
 
 @pytest.mark.parametrize(
