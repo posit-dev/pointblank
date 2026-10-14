@@ -123,6 +123,7 @@ import narwhals as nw
 import narwhals.selectors as ncs
 
 from pointblank._constants import REPORTING_LANGUAGES
+from pointblank.missing import MissingSpec
 from pointblank.validate import (
     Actions,
     FinalActions,
@@ -4757,21 +4758,105 @@ def test_col_vals_not_in_set(request, tbl_fixture) -> None:
     assert validation_2.n_failed(i=1, scalar=True) == 1
 
 
-@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
-def test_col_vals_not_in_set_missing_values(tbl_type) -> None:
-    # Missing values fail, and every row counts as either passing or failing
-    tbl = pl.DataFrame({"x": [1.0, 2.0, None, 5.0]})
+def _not_in_set_test_table(tbl_type: str):
+    """A column with values `x`, missing, `y`, `z` (or 1, missing, 2, 3), for `set=` `["x"]`/`[1]`."""
+    strings = ["x", None, "y", "z"]
+    if tbl_type == "polars_float":
+        return pl.DataFrame({"a": [1.0, None, 2.0, 3.0]}), [1.0]
     if tbl_type == "polars_lazy":
-        tbl = tbl.lazy()
-    elif tbl_type == "pandas":
-        tbl = tbl.to_pandas()
-    elif tbl_type == "duckdb":
-        tbl = ibis.memtable(tbl.to_pandas())
+        return pl.LazyFrame({"a": strings}), ["x"]
+    if tbl_type == "polars_enum":
+        return pl.DataFrame({"a": strings}, schema={"a": pl.Enum(["x", "y", "z"])}), ["x"]
+    if tbl_type == "pandas_float":
+        return pd.DataFrame({"a": [1.0, None, 2.0, 3.0]}), [1.0]
+    if tbl_type == "pandas_object":
+        return pd.DataFrame({"a": strings}), ["x"]
+    if tbl_type == "pandas_string_pyarrow":
+        return pd.DataFrame({"a": pd.array(strings, dtype="string[pyarrow]")}), ["x"]
+    if tbl_type == "pandas_Int64":
+        return pd.DataFrame({"a": pd.array([1, None, 2, 3], dtype="Int64")}), [1]
+    if tbl_type == "duckdb":
+        return ibis.duckdb.connect().create_table("tbl", pl.DataFrame({"a": strings})), ["x"]
 
-    validation = Validate(tbl).col_vals_not_in_set(columns="x", set=[1.0, 5.0]).interrogate()
 
-    assert validation.n_passed(i=1, scalar=True) == 1
-    assert validation.n_failed(i=1, scalar=True) == 3
+NOT_IN_SET_TBL_TYPES = [
+    "polars_float",
+    "polars_lazy",
+    "polars_enum",
+    "pandas_float",
+    "pandas_object",
+    "pandas_string_pyarrow",
+    "pandas_Int64",
+    "duckdb",
+]
+
+
+@pytest.mark.parametrize("tbl_type", NOT_IN_SET_TBL_TYPES)
+@pytest.mark.parametrize("na_pass, expected", [(False, (2, 2)), (True, (3, 1))])
+def test_col_vals_not_in_set_missing_values(tbl_type, na_pass, expected) -> None:
+    # The missing value fails unless `na_pass=True`, and every row counts as passing or failing
+    tbl, set_values = _not_in_set_test_table(tbl_type)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_in_set(columns="a", set=set_values, na_pass=na_pass)
+        .interrogate()
+    )
+
+    assert (
+        validation.n_passed(i=1, scalar=True),
+        validation.n_failed(i=1, scalar=True),
+    ) == expected
+
+
+@pytest.mark.parametrize("tbl_type", NOT_IN_SET_TBL_TYPES)
+@pytest.mark.parametrize("null_is_missing, expected", [(False, (3, 1)), (True, (4, 0))])
+def test_col_vals_not_in_set_missing_spec(tbl_type, null_is_missing, expected) -> None:
+    # The value in the set is declared a sentinel, so it passes as a documented missing value;
+    # the null passes only with `null_is_missing=True`
+    tbl, set_values = _not_in_set_test_table(tbl_type)
+    spec = MissingSpec(reasons={set_values[0]: "refused"}, null_is_missing=null_is_missing)
+
+    validation = (
+        Validate(tbl).col_vals_not_in_set(columns="a", set=set_values, missing=spec).interrogate()
+    )
+
+    assert (
+        validation.n_passed(i=1, scalar=True),
+        validation.n_failed(i=1, scalar=True),
+    ) == expected
+
+
+def test_col_vals_not_in_set_nan() -> None:
+    # pandas treats `NaN` as missing (it fails unless `na_pass=True`); Polars treats it as a value
+    data = {"a": [1.0, float("nan"), 2.0]}
+
+    for na_pass, expected in [(False, (1, 2)), (True, (2, 1))]:
+        validation = (
+            Validate(pd.DataFrame(data))
+            .col_vals_not_in_set(columns="a", set=[1.0], na_pass=na_pass)
+            .interrogate()
+        )
+        assert (
+            validation.n_passed(i=1, scalar=True),
+            validation.n_failed(i=1, scalar=True),
+        ) == expected
+
+    validation = Validate(pl.DataFrame(data)).col_vals_not_in_set(columns="a", set=[1.0])
+    assert validation.interrogate().n_passed(i=1, scalar=True) == 2
+
+
+def test_col_vals_not_in_set_none_in_set_raises() -> None:
+    with pytest.raises(ValueError, match="na_pass=True"):
+        Validate(pl.DataFrame({"a": [1]})).col_vals_not_in_set(columns="a", set=[1, None])
+
+
+def test_col_vals_not_in_set_na_pass_round_trips() -> None:
+    validation = Validate(pl.DataFrame({"a": [1]})).col_vals_not_in_set(
+        columns="a", set=[2], na_pass=True
+    )
+
+    assert "na_pass=True" in validation.to_code()
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])

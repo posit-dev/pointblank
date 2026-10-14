@@ -8862,6 +8862,17 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
+        Missing Values
+        --------------
+        A missing value (`None`, `NA`, or Null) counts as a failing test unit unless `set=` contains
+        `None`. Alternatively, `missing=MissingSpec(null_is_missing=True)` lets missing values pass
+        (a [`MissingSpec`](`pointblank.MissingSpec`) can also declare sentinel values, such as
+        `-99`, that pass as documented missing values).
+
+        A `NaN` in a float column counts as missing on pandas, so it passes when `set=` contains
+        `None`. Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes only
+        when `set=` contains `NaN`.
+
         Preprocessing
         -------------
         The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
@@ -9118,6 +9129,7 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         set: Collection[Any],
+        na_pass: bool = False,
         missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
@@ -9146,7 +9158,14 @@ class Validate:
             A collection of values to compare against. Can be a list of values, a Python Enum class,
             or a collection containing Enum instances. When an Enum class is provided, all enum
             values will be used. When a collection contains Enum instances, their values will be
-            extracted automatically.
+            extracted automatically. It can't contain `None`; see the *Missing Values* section.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring values that encode
+            missingness (and whether nulls count as missing). Those values are excluded from the
+            check, so they pass. See the *Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9193,6 +9212,21 @@ class Validate:
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Missing Values
+        --------------
+        A missing value (`None`, `NA`, or Null) isn't in the set, but it isn't a valid value either,
+        so by default it counts as a failing test unit. There are two ways to let missing values
+        pass: `na_pass=True`, or `missing=MissingSpec(null_is_missing=True)` (a `MissingSpec` can
+        also declare sentinel values, such as `-99`, that pass as documented missing values). As
+        missing values are handled with these options, `set=` can't contain `None`.
+
+        A `NaN` in a float column counts as missing on pandas, so it fails unless `na_pass=True`.
+        Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes unless `set=`
+        contains `NaN` (unlike comparison methods such as
+        [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`), which treat `NaN` as missing on every
+        backend). To treat `NaN` as missing everywhere, convert it to null first, for example with
+        `pre=lambda df: df.with_columns(pl.col("a").fill_nan(None))` on a Polars table.
 
         Preprocessing
         -------------
@@ -9374,7 +9408,13 @@ class Validate:
         # Extract values from Enum classes or Enum instances if present
         set = _extract_enum_values(set)
 
+        if None in set:
+            raise ValueError(
+                "`set=` can't contain `None` in `col_vals_not_in_set()`. Missing values fail by "
+                "default; use `na_pass=True` to let them pass."
+            )
         _check_set_types(set=set)
+        _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_pre(pre=pre)
         # TODO: add check for segments
         # _check_segments(segments=segments)
@@ -9404,6 +9444,7 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=set,
+                na_pass=na_pass,
                 missing=missing,
                 pre=pre,
                 segments=segments,
@@ -16816,7 +16857,7 @@ class Validate:
 
                         elif assertion_type == "col_vals_not_in_set":
                             results_tbl = interrogate_notin(
-                                tbl=tbl, column=column, set_values=value
+                                tbl=tbl, column=column, set_values=value, na_pass=na_pass
                             )
 
                         elif assertion_type == "col_vals_regex":
