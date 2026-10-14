@@ -125,8 +125,8 @@ def tbl_increasing():
     """Table for increasing/decreasing tests."""
     spark = get_spark_session()
     return spark.createDataFrame(
-        [(1,), (2,), (None,), (4,), (5,)],
-        ["val"],
+        [(1, 1), (2, 2), (3, None), (4, 4), (5, 5)],
+        ["seq", "val"],
     )
 
 
@@ -135,8 +135,8 @@ def tbl_decreasing():
     """Table for decreasing tests."""
     spark = get_spark_session()
     return spark.createDataFrame(
-        [(5,), (4,), (None,), (2,), (1,)],
-        ["val"],
+        [(1, 5), (2, 4), (3, None), (4, 2), (5, 1)],
+        ["seq", "val"],
     )
 
 
@@ -291,35 +291,36 @@ class TestRowsCompleteNulls:
 
 
 class TestDirectionNulls:
-    def test_increasing_with_nulls_na_pass_true(self, tbl_increasing):
-        """Increasing not supported on PySpark (order-dependent expressions)."""
-        # narwhals raises InvalidOperationError for order-dependent expressions
-        # (shift) on LazyFrames (PySpark DataFrames).
-        from narwhals.exceptions import InvalidOperationError
+    @pytest.mark.parametrize("na_pass, expected", [(True, (5, 0)), (False, (4, 1))])
+    def test_increasing_with_nulls(self, tbl_increasing, na_pass, expected):
+        """With `order_by=`, the NULL fails (unless `na_pass=True`) and doesn't break the order."""
+        v = (
+            Validate(tbl_increasing)
+            .col_vals_increasing(columns="val", na_pass=na_pass, order_by="seq")
+            .interrogate()
+        )
 
-        with pytest.raises(InvalidOperationError):
-            Validate(tbl_increasing).col_vals_increasing(columns="val", na_pass=True).interrogate()
+        assert (v.n_passed(i=1, scalar=True), v.n_failed(i=1, scalar=True)) == expected
 
-    def test_increasing_with_nulls_na_pass_false(self, tbl_increasing):
-        """Increasing not supported on PySpark (order-dependent expressions)."""
-        from narwhals.exceptions import InvalidOperationError
+    @pytest.mark.parametrize("na_pass, expected", [(True, (5, 0)), (False, (4, 1))])
+    def test_decreasing_with_nulls(self, tbl_decreasing, na_pass, expected):
+        v = (
+            Validate(tbl_decreasing)
+            .col_vals_decreasing(columns="val", na_pass=na_pass, order_by="seq")
+            .interrogate()
+        )
 
-        with pytest.raises(InvalidOperationError):
-            Validate(tbl_increasing).col_vals_increasing(columns="val", na_pass=False).interrogate()
+        assert (v.n_passed(i=1, scalar=True), v.n_failed(i=1, scalar=True)) == expected
 
-    def test_decreasing_with_nulls_na_pass_true(self, tbl_decreasing):
-        """Decreasing not supported on PySpark (order-dependent expressions)."""
-        from narwhals.exceptions import InvalidOperationError
-
-        with pytest.raises(InvalidOperationError):
-            Validate(tbl_decreasing).col_vals_decreasing(columns="val", na_pass=True).interrogate()
-
-    def test_decreasing_with_nulls_na_pass_false(self, tbl_decreasing):
-        """Decreasing not supported on PySpark (order-dependent expressions)."""
-        from narwhals.exceptions import InvalidOperationError
-
-        with pytest.raises(InvalidOperationError):
-            Validate(tbl_decreasing).col_vals_decreasing(columns="val", na_pass=False).interrogate()
+    def test_without_order_by_is_eval_error(self, tbl_increasing, tbl_decreasing):
+        """PySpark DataFrames have no row order, so the step needs `order_by=`."""
+        for v in [
+            Validate(tbl_increasing).col_vals_increasing(columns="val").interrogate(),
+            Validate(tbl_decreasing).col_vals_decreasing(columns="val").interrogate(),
+        ]:
+            step = v.validation_info[0]
+            assert step.eval_error is True
+            assert "order_by=" in step.notes["eval_error"]["text"]
 
 
 # ---------------------------------------------------------------------------
