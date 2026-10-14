@@ -275,6 +275,11 @@ The `allow_stationary=` parameter lets you control whether consecutive identical
 validation. By default, stationary values (e.g., `[1, 2, 2, 3]`) will fail the increasing check,
 but setting `allow_stationary=True` will allow them to pass.
 
+The rows are compared in the table's own order. Database tables have no inherent row order, so for
+them (or to check a different order) use `order_by=` to name the column(s) that put the rows in
+order, such as `order_by="date"`. Missing values fail unless `na_pass=True`, and they don't break
+the sequence: with `[1, 2, None, 5]`, the `5` is compared with the `2`.
+
 ### Handling Missing Values with `na_pass=`
 
 When validating columns containing Null/None/NA values, you can control how these missing values are
