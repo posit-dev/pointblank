@@ -26,7 +26,7 @@ from great_tables import GT, from_column, google_font, html, loc, md, style, val
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
-from narwhals.dependencies import is_narwhals_lazyframe
+from narwhals.dependencies import is_narwhals_lazyframe, is_polars_lazyframe
 
 from pointblank._agg import (
     is_valid_agg,
@@ -5201,6 +5201,14 @@ def print_database_tables(connection_string: str) -> list[str]:
 
     except Exception as e:
         _handle_connection_errors(e, connection_string)
+
+
+def _extract_collect_backend() -> str | None:
+    """Get the library to collect lazy extracts into (Polars, then pandas, then PyArrow)."""
+    for lib in ("polars", "pandas"):
+        if _is_lib_present(lib):
+            return lib
+    return None  # pragma: no cover
 
 
 def _extract_steps_from_validate(validation: Validate) -> list:
@@ -17703,15 +17711,15 @@ class Validate:
                             break
 
             # If this is a row-based validation step, then extract the rows that failed
-            # TODO: Add support for extraction of rows for Ibis backends
             if (
                 collect_extracts
                 and assertion_type
                 in ROW_BASED_VALIDATION_TYPES
                 + ["rows_distinct", "rows_complete", "col_missing_consistent"]
-                and tbl_type not in IBIS_BACKENDS
+                and results_tbl is not None
             ):
-                # Add row numbers to the results table
+                # Add row numbers to the results table; tables without an inherent row order (e.g.,
+                # database tables) are numbered in the order of their first column
                 validation_extract_nw = _with_row_index(results_tbl, name="_row_num_")
 
                 validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
@@ -17720,6 +17728,13 @@ class Validate:
 
                 # Add 1 to the row numbers to make them 1-indexed
                 validation_extract_nw = validation_extract_nw.with_columns(nw.col("_row_num_") + 1)
+
+                # Filtering a table without a row order doesn't keep the rows in order, so sort
+                # them (this also makes `head()` below take the first failing rows)
+                if is_narwhals_lazyframe(validation_extract_nw) and not is_polars_lazyframe(
+                    validation_extract_nw.to_native()
+                ):
+                    validation_extract_nw = validation_extract_nw.sort("_row_num_")
 
                 # Apply any sampling or limiting to the number of rows to extract
                 if get_first_n is not None:
@@ -17772,20 +17787,9 @@ class Validate:
                             )  # pragma: no cover
                             validation_extract_nw = collected.head(sample_size)  # pragma: no cover
 
-                # Ensure a limit is set on the number of rows to extract
-                try:
-                    # For DataFrames, use len()
-                    extract_length = len(validation_extract_nw)
-                except TypeError:
-                    # For LazyFrames, collect to get length (or use a reasonable default)
-                    try:
-                        extract_length = len(validation_extract_nw.collect())
-                    except Exception:  # pragma: no cover
-                        # If collection fails, apply limit anyway as a safety measure
-                        extract_length = extract_limit + 1  # pragma: no cover
-
-                if extract_length > extract_limit:
-                    validation_extract_nw = validation_extract_nw.head(extract_limit)
+                # Limit the number of rows to extract (lazily, so that only those rows are
+                # collected from a database table)
+                validation_extract_nw = validation_extract_nw.head(extract_limit)
 
                 # If a 'rows_distinct' validation step, then the extract should have the
                 # duplicate rows arranged together
@@ -17826,9 +17830,13 @@ class Validate:
                     )
 
                 # Ensure that the extract is collected and set to its native format
-                # For LazyFrames (like PySpark), we need to collect before converting to native
+                # For LazyFrames (like PySpark), we need to collect before converting to native;
+                # database tables and PySpark are collected to a DataFrame (Narwhals would give a
+                # PyArrow table by default)
                 if is_narwhals_lazyframe(validation_extract_nw):
-                    validation_extract_nw = validation_extract_nw.collect()
+                    validation_extract_nw = validation_extract_nw.collect(
+                        backend=_extract_collect_backend()
+                    )
                 validation.extract = nw.to_native(validation_extract_nw)
 
             # Get the end time for this step
@@ -21907,22 +21915,27 @@ class Validate:
         # Get the `val_info` dictionary for the step
         val_info = self.validation_info[i - 1].val_info
 
-        # Get the column position in the table
-        if column is not None:
-            if isinstance(column, str):
-                column_list = list(self.data.columns)
-                column_position = column_list.index(column) + 1
-            elif isinstance(column, list):
-                column_position = [list(self.data.columns).index(col) + 1 for col in column]
-            else:
-                column_position = None  # pragma: no cover
-        else:
-            column_position = None
+        # A step that couldn't be evaluated (e.g., its column doesn't exist) has no results to
+        # report, so return a message with the reason from the step's notes
+        if validation_step["eval_error"]:
+            notes = self.validation_info[i - 1].notes or {}
+            reasons = " ".join(note["text"] for note in notes.values() if note.get("text"))
+            return f"Step {i} couldn't be evaluated. {reasons}".strip()
 
         # TODO: Show a report with the validation plan but state that the step is inactive
         # If the step is not active then return a message indicating that the step is inactive
         if not active:
             return "This validation step is inactive."
+
+        # Get the column position in the table (`None` for a column that isn't in the table, such
+        # as one created by `pre=`)
+        data_columns = list(self.data.columns)
+        if isinstance(column, str):
+            column_position = data_columns.index(column) + 1 if column in data_columns else None
+        elif isinstance(column, list) and all(col in data_columns for col in column):
+            column_position = [data_columns.index(col) + 1 for col in column]
+        else:
+            column_position = None
 
         # Create a table with a sample of ten rows, highlighting the column of interest (only the
         # row-based reports use it)
@@ -26577,8 +26590,8 @@ def _step_report_row_based(
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
         # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
-        # a specific column
-        if assertion_type == "col_vals_expr":
+        # a specific column (or when the column isn't in the table, e.g., created by `pre=`)
+        if assertion_type == "col_vals_expr" or column_position is None:
             success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
                 n=n
             )  # pragma: no cover
@@ -26670,7 +26683,8 @@ def _step_report_row_based(
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
         # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
-        if assertion_type == "col_vals_expr":
+        # (or when the column isn't in the table, e.g., created by `pre=`)
+        if assertion_type == "col_vals_expr" or column_position is None:
             failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
                 failure_rate=failure_rate_metrics
             )
