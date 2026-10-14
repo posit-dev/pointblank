@@ -4598,6 +4598,9 @@ def _validation_info_to_step(
         tol_key = "decreasing_tol" if at == "col_vals_increasing" else "increasing_tol"
         if info.get(tol_key):  # pragma: no cover
             params[tol_key] = info[tol_key]  # pragma: no cover
+        if info.get("order_by"):
+            order_by = info["order_by"]
+            params["order_by"] = order_by[0] if len(order_by) == 1 else list(order_by)
     elif at == "col_vals_expr":
         params["expr"] = _placeholder(
             code="lambda df: df",
@@ -9465,6 +9468,7 @@ class Validate:
         allow_stationary: bool = False,
         decreasing_tol: float | None = None,
         na_pass: bool = False,
+        order_by: str | list[str] | None = None,
         missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
@@ -9505,6 +9509,11 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        order_by
+            The column (or list of columns) that puts the rows in order before the values are
+            compared, in ascending order. If `None` (the default), the table's own row order is
+            used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+            PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9552,12 +9561,19 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-        `shift()`. Calling this method on a PySpark DataFrame will raise an
-        `InvalidOperationError` during interrogation.
+        Row Order and Missing Values
+        ----------------------------
+        Each value is compared with the value before it, so the rows need an order. Polars and
+        pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+        given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+        `order_by=` is needed for them; without it, the step is marked as having an evaluation
+        error. The results are reported against the table's own rows either way. If the
+        `order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+        A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+        non-missing value is compared with the last non-missing value before it. For example, with
+        `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+        to be compared with, so it always passes.
 
         Examples
         --------
@@ -9627,6 +9643,13 @@ class Validate:
         """
         assertion_type = "col_vals_increasing"
 
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        if order_by is not None and (
+            not isinstance(order_by, list) or not all(isinstance(c, str) for c in order_by)
+        ):
+            raise ValueError("`order_by=` must be a column name or a list of column names.")
+
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
@@ -9662,6 +9685,7 @@ class Validate:
                 val_info={
                     "allow_stationary": allow_stationary,
                     "decreasing_tol": decreasing_tol if decreasing_tol else 0.0,
+                    "order_by": order_by,
                 },
             )
 
@@ -9675,6 +9699,7 @@ class Validate:
         allow_stationary: bool = False,
         increasing_tol: float | None = None,
         na_pass: bool = False,
+        order_by: str | list[str] | None = None,
         missing: MissingSpec | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
@@ -9715,6 +9740,11 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        order_by
+            The column (or list of columns) that puts the rows in order before the values are
+            compared, in ascending order. If `None` (the default), the table's own row order is
+            used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+            PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9762,12 +9792,19 @@ class Validate:
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-        `shift()`. Calling this method on a PySpark DataFrame will raise an
-        `InvalidOperationError` during interrogation.
+        Row Order and Missing Values
+        ----------------------------
+        Each value is compared with the value before it, so the rows need an order. Polars and
+        pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+        given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+        `order_by=` is needed for them; without it, the step is marked as having an evaluation
+        error. The results are reported against the table's own rows either way. If the
+        `order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+        A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+        non-missing value is compared with the last non-missing value before it. For example, with
+        `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+        to be compared with, so it always passes.
 
         Examples
         --------
@@ -9837,6 +9874,13 @@ class Validate:
         """
         assertion_type = "col_vals_decreasing"
 
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        if order_by is not None and (
+            not isinstance(order_by, list) or not all(isinstance(c, str) for c in order_by)
+        ):
+            raise ValueError("`order_by=` must be a column name or a list of column names.")
+
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
@@ -9872,6 +9916,7 @@ class Validate:
                 val_info={
                     "allow_stationary": allow_stationary,
                     "increasing_tol": increasing_tol if increasing_tol else 0.0,
+                    "order_by": order_by,
                 },
             )
 
@@ -16815,6 +16860,7 @@ class Validate:
                                 allow_stationary=allow_stationary,
                                 decreasing_tol=decreasing_tol,
                                 na_pass=na_pass,
+                                order_by=validation.val_info.get("order_by"),
                             )
 
                         elif assertion_type == "col_vals_decreasing":
@@ -16830,6 +16876,7 @@ class Validate:
                                 allow_stationary=allow_stationary,
                                 increasing_tol=increasing_tol,
                                 na_pass=na_pass,
+                                order_by=validation.val_info.get("order_by"),
                             )
 
                         elif assertion_type == "col_vals_between":
