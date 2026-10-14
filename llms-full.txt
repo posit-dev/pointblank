@@ -4456,7 +4456,7 @@ validation
 This `"deleted"` value in the `status` column will fail since it matches one of the invalid
 statuses in the `InvalidStatus` enum.
 
-col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, order_by: 'str | list[str] | None' = None, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Are column data increasing by row?
 
@@ -4488,6 +4488,11 @@ decreasing_tol
 na_pass
     Should any encountered None, NA, or Null values be considered as passing test units? By
     default, this is `False`. Set to `True` to pass test units with missing values.
+order_by
+    The column (or list of columns) that puts the rows in order before the values are
+    compared, in ascending order. If `None` (the default), the table's own row order is
+    used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+    PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
 pre
     An optional preprocessing function or lambda to apply to the data table during
     interrogation. This function should take a table as input and return a modified table.
@@ -4535,12 +4540,19 @@ Returns
 Validate
     The `Validate` object with the added validation step.
 
-Notes
------
-This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-`shift()`. Calling this method on a PySpark DataFrame will raise an
-`InvalidOperationError` during interrogation.
+Row Order and Missing Values
+----------------------------
+Each value is compared with the value before it, so the rows need an order. Polars and
+pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+`order_by=` is needed for them; without it, the step is marked as having an evaluation
+error. The results are reported against the table's own rows either way. If the
+`order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+non-missing value is compared with the last non-missing value before it. For example, with
+`[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+to be compared with, so it always passes.
 
 Examples
 --------
@@ -4608,7 +4620,7 @@ validation = (
 validation
 ```
 
-col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, order_by: 'str | list[str] | None' = None, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Are column data decreasing by row?
 
@@ -4640,6 +4652,11 @@ increasing_tol
 na_pass
     Should any encountered None, NA, or Null values be considered as passing test units? By
     default, this is `False`. Set to `True` to pass test units with missing values.
+order_by
+    The column (or list of columns) that puts the rows in order before the values are
+    compared, in ascending order. If `None` (the default), the table's own row order is
+    used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+    PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
 pre
     An optional preprocessing function or lambda to apply to the data table during
     interrogation. This function should take a table as input and return a modified table.
@@ -4687,12 +4704,19 @@ Returns
 Validate
     The `Validate` object with the added validation step.
 
-Notes
------
-This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-`shift()`. Calling this method on a PySpark DataFrame will raise an
-`InvalidOperationError` during interrogation.
+Row Order and Missing Values
+----------------------------
+Each value is compared with the value before it, so the rows need an order. Polars and
+pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+`order_by=` is needed for them; without it, the step is marked as having an evaluation
+error. The results are reported against the table's own rows either way. If the
+`order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+non-missing value is compared with the last non-missing value before it. For example, with
+`[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+to be compared with, so it always passes.
 
 Examples
 --------
@@ -23775,6 +23799,11 @@ The `allow_stationary=` parameter lets you control whether consecutive identical
 validation. By default, stationary values (e.g., `[1, 2, 2, 3]`) will fail the increasing check,
 but setting `allow_stationary=True` will allow them to pass.
 
+The rows are compared in the table's own order. Database tables have no inherent row order, so for
+them (or to check a different order) use `order_by=` to name the column(s) that put the rows in
+order, such as `order_by="date"`. Missing values fail unless `na_pass=True`, and they don't break
+the sequence: with `[1, 2, None, 5]`, the `5` is compared with the `2`.
+
 ### Handling Missing Values with `na_pass=`
 
 When validating columns containing Null/None/NA values, you can control how these missing values are
@@ -30834,6 +30863,7 @@ Examples:
     allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
     decreasing_tol: 0.5                # OPTIONAL: Tolerance for negative movement (default: null)
     na_pass: false                     # OPTIONAL: Pass NULL values
+    order_by: date                     # OPTIONAL: Column(s) that put the rows in order
     pre: |                             # OPTIONAL: Data preprocessing
       lambda df: df.filter(condition)
     thresholds:                        # OPTIONAL: Step-level thresholds
@@ -30852,6 +30882,8 @@ Parameters:
 example, `[1, 2, 2, 3]` would pass when `true` but fail at the third value when `false`.
 - `decreasing_tol`: Absolute tolerance for negative movement. Setting this to `0.5` means values can
 decrease by up to 0.5 units and still pass. Setting any value also sets `allow_stationary` to `true`.
+- `order_by`: Column (or list of columns) that puts the rows in order before comparing values.
+Required for database tables, which have no inherent row order.
 
 Examples:
 
@@ -30882,6 +30914,7 @@ Examples:
     allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
     increasing_tol: 0.5                # OPTIONAL: Tolerance for positive movement (default: null)
     na_pass: false                     # OPTIONAL: Pass NULL values
+    order_by: date                     # OPTIONAL: Column(s) that put the rows in order
     pre: |                             # OPTIONAL: Data preprocessing
       lambda df: df.filter(condition)
     thresholds:                        # OPTIONAL: Step-level thresholds

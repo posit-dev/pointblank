@@ -12,6 +12,7 @@ Validate.col_vals_increasing(
     allow_stationary=False,
     decreasing_tol=None,
     na_pass=False,
+    order_by=None,
     missing=None,
     pre=None,
     segments=None,
@@ -42,6 +43,9 @@ An optional threshold value that allows for movement of numerical values in the 
 `na_pass: bool = ``False`  
 Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values.
 
+`order_by: str | list[str] | None = None`  
+The column (or list of columns) that puts the rows in order before the values are compared, in ascending order. If `None` (the default), the table's own row order is used. Tables without an inherent row order (e.g., database tables, Ibis tables, or PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
+
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.
 
@@ -71,9 +75,11 @@ An optional data quality dimension to categorize this validation step for health
 The [Validate](Validate.md#pointblank.Validate) object with the added validation step.
 
 
-## Notes
+## Row Order And Missing Values
 
-This validation method is not supported for PySpark DataFrames. PySpark DataFrames are represented as LazyFrames in Narwhals, which do not support order-dependent operations like `shift()`. Calling this method on a PySpark DataFrame will raise an `InvalidOperationError` during interrogation.
+Each value is compared with the value before it, so the rows need an order. Polars and pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so `order_by=` is needed for them; without it, the step is marked as having an evaluation error. The results are reported against the table's own rows either way. If the `order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next non-missing value is compared with the last non-missing value before it. For example, with `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing to be compared with, so it always passes.
 
 
 ## Examples

@@ -1603,7 +1603,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#row-order-and-missing-values" id="toc-row-order-and-missing-values" class="nav-link" data-scroll-target="#row-order-and-missing-values">Row Order And Missing Values</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -1635,7 +1635,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9462-L9670" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9465-L9694" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">col_vals_increasing</span>(</span>
@@ -1643,15 +1643,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">allow_stationary</span><span class="op">=</span><span class="cn-bool">False</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">decreasing_tol</span><span class="op">=</span><span class="cn-none">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">na_pass</span><span class="op">=</span><span class="cn-bool">False</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">missing</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">segments</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">order_by</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">missing</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">pre</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">segments</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">actions</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">brief</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">dimension</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link gdls-code">col_vals_increasing()</a> validation method checks whether column values in a table are increasing when moving down a table. There are options for allowing missing values in the target column, allowing stationary phases (where consecutive values don’t change), and even one for allowing decreasing movements up to a certain threshold. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
@@ -1675,6 +1676,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dt><code><span class="doc-parameter-name">na_pass</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
 <p>Should any encountered None, NA, or Null values be considered as passing test units? By default, this is <code>False</code>. Set to <code>True</code> to pass test units with missing values.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">order_by</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The column (or list of columns) that puts the rows in order before the values are compared, in ascending order. If <code>None</code> (the default), the table’s own row order is used. Tables without an inherent row order (e.g., database tables, Ibis tables, or PySpark DataFrames) need <code>order_by=</code>. See the <em>Row Order and Missing Values</em> section.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1718,14 +1723,15 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </dl>
 </div>
 </section>
-<section id="notes" class="level2 doc-notes">
-<h2 class="doc-notes anchored" data-anchor-id="notes">Notes</h2>
-<p>This validation method is not supported for PySpark DataFrames. PySpark DataFrames are represented as LazyFrames in Narwhals, which do not support order-dependent operations like <code>shift()</code>. Calling this method on a PySpark DataFrame will raise an <code>InvalidOperationError</code> during interrogation.</p>
+<section id="row-order-and-missing-values" class="level2 doc-row-order-and-missing-values">
+<h2 class="doc-row-order-and-missing-values anchored" data-anchor-id="row-order-and-missing-values">Row Order And Missing Values</h2>
+<p>Each value is compared with the value before it, so the rows need an order. Polars and pandas DataFrames (and Polars LazyFrames) have one, which is used unless <code>order_by=</code> is given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so <code>order_by=</code> is needed for them; without it, the step is marked as having an evaluation error. The results are reported against the table’s own rows either way. If the <code>order_by=</code> columns have ties, the order of the tied rows (and so the result) may vary.</p>
+<p>A missing value fails unless <code>na_pass=True</code>, and it doesn’t break the sequence: the next non-missing value is compared with the last non-missing value before it. For example, with <code>[1, 2, None, 5]</code> the <code>5</code> is compared with the <code>2</code>. The first non-missing value has nothing to be compared with, so it always passes.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with a numeric column (<code>a</code>). The table is shown below:</p>
-<div id="9a60672a" class="cell" data-execution_count="2">
+<div id="499b5e7a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1866,7 +1872,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are increasing. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="400f2434" class="cell" data-execution_count="3">
+<div id="0fe4b63f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"a"</span>)</span>
@@ -2029,7 +2035,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>The validation passed as all values in column <code>a</code> are increasing. Now let’s check column <code>b</code> which has a stationary value:</p>
-<div id="874d656d" class="cell" data-execution_count="4">
+<div id="830a9306" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>)</span>
@@ -2192,7 +2198,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>This validation fails at the third row because the value <code>2</code> is repeated. If we want to allow stationary values, we can use <code>allow_stationary=True</code>:</p>
-<div id="c093547c" class="cell" data-execution_count="5">
+<div id="d6620a02" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>, allow_stationary<span class="op">=</span><span class="va">True</span>)</span>
