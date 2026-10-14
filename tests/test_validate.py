@@ -2799,29 +2799,67 @@ def test_col_vals_ne(request, tbl_fixture) -> None:
     assert validation_2.n_failed(i=1, scalar=True) == 0
 
 
-@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "duckdb"])
-def test_col_vals_eq_column_missing_values(tbl_type) -> None:
-    # Rows with a missing value on either side fail (or pass with `na_pass=True`), and every row
-    # counts as either passing or failing
-    tbl = pl.DataFrame({"a": [1.0, 2.0, None, 5.0, 2.0], "b": [1.5, None, 3.0, 4.0, 2.0]})
+# Columns `a` and `b` with nulls in `a` only, in `b` only, or in both, and the expected
+# (n_passed, n_failed) for `col_vals_eq()`/`col_vals_ne()` with `na_pass=False`/`True`. A row with
+# a missing value on either side fails (or passes with `na_pass=True`); the others are compared.
+COLUMN_COMPARISON_NULL_CASES = {
+    "a_only": (
+        {"a": [1, 2, None, 5, 2, 7], "b": [1, 3, 3, 4, 2, 7]},
+        {("eq", False): (3, 3), ("eq", True): (4, 2), ("ne", False): (2, 4), ("ne", True): (3, 3)},
+    ),
+    "b_only": (
+        {"a": [1, 2, 3, 4, 2, 7], "b": [1, None, 4, None, 2, 8]},
+        {("eq", False): (2, 4), ("eq", True): (4, 2), ("ne", False): (2, 4), ("ne", True): (4, 2)},
+    ),
+    "both": (
+        {"a": [1, 2, None, 5, 2, None], "b": [1, None, 3, 4, 2, None]},
+        {("eq", False): (2, 4), ("eq", True): (5, 1), ("ne", False): (1, 5), ("ne", True): (4, 2)},
+    ),
+}
+
+
+@pytest.mark.parametrize(
+    "tbl_type",
+    ["polars", "polars_lazy", "pandas", "pandas_nullable", "pandas_object", "duckdb", "memtable"],
+)
+@pytest.mark.parametrize("nulls", list(COLUMN_COMPARISON_NULL_CASES))
+@pytest.mark.parametrize("method", ["eq", "ne"])
+@pytest.mark.parametrize("na_pass", [False, True])
+def test_col_vals_eq_ne_column_missing_values(tbl_type, nulls, method, na_pass) -> None:
+    data, expected = COLUMN_COMPARISON_NULL_CASES[nulls]
+
+    tbl = pl.DataFrame(data)
     if tbl_type == "polars_lazy":
         tbl = tbl.lazy()
     elif tbl_type == "pandas":
+        # Nulls become NaN in float64 columns
         tbl = tbl.to_pandas()
+    elif tbl_type == "pandas_nullable":
+        # `Int64` columns, where comparisons with `<NA>` give `<NA>`
+        tbl = tbl.to_pandas().convert_dtypes()
+    elif tbl_type == "pandas_object":
+        # `object` columns holding `pd.NA` (a column without nulls stays `int64`)
+        tbl = pd.DataFrame(
+            {
+                k: pd.Series([pd.NA if x is None else x for x in v], dtype=object)
+                if None in v
+                else v
+                for k, v in data.items()
+            }
+        )
     elif tbl_type == "duckdb":
-        tbl = ibis.memtable(tbl.to_pandas())
+        tbl = ibis.duckdb.connect().create_table("tbl", tbl)
+    elif tbl_type == "memtable":
+        tbl = ibis.memtable(tbl)
 
-    validation_1 = Validate(tbl).col_vals_eq(columns="a", value=col("b")).interrogate()
+    validation = getattr(Validate(tbl), f"col_vals_{method}")(
+        columns="a", value=col("b"), na_pass=na_pass
+    ).interrogate()
 
-    assert validation_1.n_passed(i=1, scalar=True) == 1
-    assert validation_1.n_failed(i=1, scalar=True) == 4
-
-    validation_2 = (
-        Validate(tbl).col_vals_eq(columns="a", value=col("b"), na_pass=True).interrogate()
-    )
-
-    assert validation_2.n_passed(i=1, scalar=True) == 3
-    assert validation_2.n_failed(i=1, scalar=True) == 2
+    assert (
+        validation.n_passed(i=1, scalar=True),
+        validation.n_failed(i=1, scalar=True),
+    ) == expected[(method, na_pass)]
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
