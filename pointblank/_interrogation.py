@@ -31,6 +31,7 @@ from pointblank._utils import (
     _get_tbl_type,
     _is_in,
     _is_lazy_frame,
+    _is_lib_present,
     _with_row_index,
 )
 from pointblank.column import Column
@@ -758,100 +759,62 @@ def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any
     Coerce two tables to the same backend if they differ.
 
     If the tables to compare have different backends (e.g., one is Polars and one is Pandas),
-    this function will convert the comparison table to match the data table's backend.
-    This ensures consistent dtype handling during comparison.
+    the data table is materialized first if it's a database (Ibis) table, and the comparison table
+    is then converted directly to the data table's (resulting) backend. Converting directly (rather
+    than through pandas) keeps dtypes intact: e.g., a nullable integer column stays an integer.
 
     Parameters
     ----------
     data_tbl
-        The primary table (backend is preserved).
+        The primary table (materialized to Polars, or pandas, if it's a database table).
     tbl_compare
-        The comparison table (may be converted to match data_tbl's backend).
+        The comparison table (converted to match the data table's backend).
 
     Returns
     -------
     tuple[Any, Any]
-        Both tables, with tbl_compare potentially converted to data_tbl's backend.
+        Both tables, on a common backend where possible.
+
+    Raises
+    ------
+    StepEvaluationError
+        If a table can't be converted.
     """
-    # Get backend types for both tables
     data_backend = _get_tbl_type(data_tbl)
     compare_backend = _get_tbl_type(tbl_compare)
 
-    # If backends match, no conversion needed
     if data_backend == compare_backend:
         return data_tbl, tbl_compare
 
-    # Define database backends (Ibis tables that need materialization)
     database_backends = set(IBIS_BACKENDS)
+    eager_backend = "polars" if _is_lib_present("polars") else "pandas"
 
-    #
-    # If backends differ, convert tbl_compare to match data_tbl's backend
-    #
-
-    # Handle Ibis/database tables: materialize them to match the target backend
-    if compare_backend in database_backends:  # pragma: no cover
-        # Materialize to Polars if data table is Polars, otherwise Pandas
-        if data_backend == "polars":
-            try:
-                tbl_compare = tbl_compare.to_polars()
-                compare_backend = "polars"
-            except Exception:
-                # Fallback: materialize to Pandas, then convert to Polars
-                try:
-                    tbl_compare = tbl_compare.execute()
-                    compare_backend = "pandas"
-                except Exception:
-                    try:
-                        tbl_compare = tbl_compare.to_pandas()
-                        compare_backend = "pandas"
-                    except Exception:
-                        pass
-        else:
-            # Materialize to Pandas for Pandas or other backends
-            try:
-                tbl_compare = tbl_compare.execute()  # Returns Pandas DataFrame
-                compare_backend = "pandas"
-            except Exception:
-                try:
-                    tbl_compare = tbl_compare.to_pandas()
-                    compare_backend = "pandas"
-                except Exception:
-                    pass
-
-    if data_backend in database_backends:  # pragma: no cover
-        # If data table itself is a database backend, materialize to Polars
-        # (Polars is the default modern backend for optimal performance)
+    def convert(tbl: Any, from_backend: str, to_backend: str, which: str) -> Any:
         try:
-            data_tbl = data_tbl.to_polars()
-            data_backend = "polars"
-        except Exception:
-            # Fallback to Pandas if Polars conversion fails
-            try:
-                data_tbl = data_tbl.execute()
-                data_backend = "pandas"
-            except Exception:
-                try:
-                    data_tbl = data_tbl.to_pandas()
-                    data_backend = "pandas"
-                except Exception:
-                    pass
+            if from_backend in database_backends:
+                return tbl.to_polars() if to_backend == "polars" else tbl.to_pandas()
+            if from_backend == "pandas" and to_backend == "polars":
+                import polars as pl
 
-    # Now handle the Polars/Pandas conversions
-    if data_backend == "polars" and compare_backend == "pandas":
-        try:
-            import polars as pl
+                return pl.from_pandas(tbl)
+            if from_backend == "polars" and to_backend == "pandas":
+                return tbl.to_pandas()
+        except Exception as e:
+            raise StepEvaluationError(
+                f"The {which} table couldn't be converted from {from_backend} to {to_backend} "
+                f"for the comparison ({_first_line(e)})."
+            ) from e
+        # Other backends (e.g., PySpark) are left as they are
+        return tbl
 
-            tbl_compare = pl.from_pandas(tbl_compare)
-        except Exception:  # pragma: no cover
-            # If conversion fails, return original tables
-            pass
+    # Materialize a database data table first, so that the comparison table is converted to the
+    # backend the data table ends up with
+    if data_backend in database_backends:
+        data_tbl = convert(data_tbl, data_backend, eager_backend, "target")
+        data_backend = eager_backend
 
-    elif data_backend == "pandas" and compare_backend == "polars":
-        try:
-            tbl_compare = tbl_compare.to_pandas()
-        except Exception:  # pragma: no cover
-            # If conversion fails, return original tables
-            pass
+    if compare_backend != data_backend:
+        tbl_compare = convert(tbl_compare, compare_backend, data_backend, "comparison")
 
     return data_tbl, tbl_compare
 
