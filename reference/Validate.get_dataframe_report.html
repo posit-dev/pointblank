@@ -1636,7 +1636,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22086-L22415" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22086-L22434" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-class">Validate</span><span class="op">.</span><span class="sig-name">get_dataframe_report</span>(<span class="va">tbl_type</span><span class="op">=</span><span class="st">"polars"</span>)</span></code></pre></div>
@@ -1689,9 +1689,9 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 <li><code>active</code>: Whether the validation step was active (<code>True</code>/<code>False</code>).</li>
 <li><code>step_number</code>: The 1-indexed step number.</li>
 <li><code>step_description</code>: The assertion type (e.g., <code>"col_vals_gt"</code>).</li>
-<li><code>columns</code>: The column name validated.</li>
-<li><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>: The comparison value used in the validation. For regex validations, just the pattern string is included.</li>
-<li><code>step_evaluated</code>: Whether the step was evaluated without error.</li>
+<li><code>columns</code>: The column name validated. For a step on several columns (e.g., a composite key), the names are joined with <code>", "</code>.</li>
+<li><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>: The comparison value used in the validation. For regex validations, just the pattern string is included. With <code>tbl_type="duckdb"</code>, each value is stored as JSON text in a string column (e.g., <code>"[a-z]"</code> for a pattern, <code>[1, 2]</code> for a set), which can be decoded with <code>json.loads()</code> or cast with <code>.cast("json")</code>.</li>
+<li><code>step_evaluated</code>: Whether the step was evaluated without error (<code>False</code> if it couldn’t be evaluated, e.g., because its column doesn’t exist).</li>
 <li><code>units</code>: Total number of test units.</li>
 <li><code>all_units_passed</code>: Whether every test unit passed.</li>
 <li><code>pass_n</code>: Number of passing test units.</li>
@@ -1703,12 +1703,12 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 <li><code>preprocessed</code>: Whether a preprocessing function was applied.</li>
 <li><code>segmented</code>: Whether the step used segmented validation.</li>
 </ul>
-<p>For inactive steps (<code>active=False</code>), the result columns (<code>step_evaluated</code> through <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical</a>) are set to <code>None</code>/<code>null</code>.</p>
+<p>For inactive steps (<code>active=False</code>), the result columns (<code>step_evaluated</code> through <a href="../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical</a>) are set to <code>None</code>/<code>null</code>; for steps that couldn’t be evaluated, <code>step_evaluated</code> is <code>False</code> and the other result columns are <code>None</code>/<code>null</code>.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Create a validation, interrogate, and get the results as a Polars DataFrame:</p>
-<div id="c560a8dd" class="cell" data-execution_count="1">
+<div id="22840e82" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1730,11 +1730,11 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (2, 18)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>active</th><th>step_number</th><th>step_description</th><th>columns</th><th>values</th><th>step_evaluated</th><th>units</th><th>all_units_passed</th><th>pass_n</th><th>pass_pct</th><th>failed_n</th><th>failed_pct</th><th>warning</th><th>error</th><th>critical</th><th>brief</th><th>preprocessed</th><th>segmented</th></tr><tr><td>bool</td><td>i64</td><td>str</td><td>str</td><td>object</td><td>bool</td><td>i64</td><td>bool</td><td>i64</td><td>f64</td><td>i64</td><td>f64</td><td>bool</td><td>bool</td><td>bool</td><td>str</td><td>bool</td><td>bool</td></tr></thead><tbody><tr><td>true</td><td>1</td><td>"col_vals_gt"</td><td>"d"</td><td>100</td><td>null</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `d` shou…</td><td>false</td><td>false</td></tr><tr><td>true</td><td>2</td><td>"col_vals_regex"</td><td>"b"</td><td>[0-9]-[a-z]{3}-[0-9]{3}</td><td>null</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `b` shou…</td><td>false</td><td>false</td></tr></tbody></table></div>
+<small>shape: (2, 18)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>active</th><th>step_number</th><th>step_description</th><th>columns</th><th>values</th><th>step_evaluated</th><th>units</th><th>all_units_passed</th><th>pass_n</th><th>pass_pct</th><th>failed_n</th><th>failed_pct</th><th>warning</th><th>error</th><th>critical</th><th>brief</th><th>preprocessed</th><th>segmented</th></tr><tr><td>bool</td><td>i64</td><td>str</td><td>str</td><td>object</td><td>bool</td><td>i64</td><td>bool</td><td>i64</td><td>f64</td><td>i64</td><td>f64</td><td>bool</td><td>bool</td><td>bool</td><td>str</td><td>bool</td><td>bool</td></tr></thead><tbody><tr><td>true</td><td>1</td><td>"col_vals_gt"</td><td>"d"</td><td>100</td><td>true</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `d` shou…</td><td>false</td><td>false</td></tr><tr><td>true</td><td>2</td><td>"col_vals_regex"</td><td>"b"</td><td>[0-9]-[a-z]{3}-[0-9]{3}</td><td>true</td><td>13</td><td>true</td><td>13</td><td>1.0</td><td>0</td><td>0.0</td><td>null</td><td>null</td><td>null</td><td>"Expect that values in `b` shou…</td><td>false</td><td>false</td></tr></tbody></table></div>
 </div>
 </div>
 <p>Get the results as a Pandas DataFrame instead:</p>
-<div id="63f5cd5d" class="cell" data-execution_count="2">
+<div id="e4856190" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_dataframe_report(tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
@@ -1771,7 +1771,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
       <td>col_vals_gt</td>
       <td>d</td>
       <td>100</td>
-      <td>None</td>
+      <td>True</td>
       <td>13</td>
       <td>True</td>
       <td>13</td>
@@ -1792,7 +1792,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
       <td>col_vals_regex</td>
       <td>b</td>
       <td>[0-9]-[a-z]{3}-[0-9]{3}</td>
-      <td>None</td>
+      <td>True</td>
       <td>13</td>
       <td>True</td>
       <td>13</td>

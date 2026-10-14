@@ -14710,10 +14710,14 @@ The returned DataFrame contains the following columns:
 - `active`: Whether the validation step was active (`True`/`False`).
 - `step_number`: The 1-indexed step number.
 - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
-- `columns`: The column name validated.
+- `columns`: The column name validated. For a step on several columns (e.g., a composite
+  key), the names are joined with `", "`.
 - `values`: The comparison value used in the validation. For regex validations, just the
-  pattern string is included.
-- `step_evaluated`: Whether the step was evaluated without error.
+  pattern string is included. With `tbl_type="duckdb"`, each value is stored as JSON text
+  in a string column (e.g., `"[a-z]"` for a pattern, `[1, 2]` for a set), which can be
+  decoded with `json.loads()` or cast with `.cast("json")`.
+- `step_evaluated`: Whether the step was evaluated without error (`False` if it couldn't
+  be evaluated, e.g., because its column doesn't exist).
 - `units`: Total number of test units.
 - `all_units_passed`: Whether every test unit passed.
 - `pass_n`: Number of passing test units.
@@ -14726,7 +14730,8 @@ The returned DataFrame contains the following columns:
 - `segmented`: Whether the step used segmented validation.
 
 For inactive steps (`active=False`), the result columns (`step_evaluated` through
-`critical`) are set to `None`/`null`.
+`critical`) are set to `None`/`null`; for steps that couldn't be evaluated,
+`step_evaluated` is `False` and the other result columns are `None`/`null`.
 
 Examples
 --------

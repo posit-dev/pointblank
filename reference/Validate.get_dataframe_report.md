@@ -47,9 +47,9 @@ The returned DataFrame contains the following columns:
 - `active`: Whether the validation step was active (`True`/`False`).
 - `step_number`: The 1-indexed step number.
 - `step_description`: The assertion type (e.g., `"col_vals_gt"`).
-- `columns`: The column name validated.
-- [values](MetadataPackage.md#pointblank.MetadataPackage.values): The comparison value used in the validation. For regex validations, just the pattern string is included.
-- `step_evaluated`: Whether the step was evaluated without error.
+- `columns`: The column name validated. For a step on several columns (e.g., a composite key), the names are joined with `", "`.
+- [values](MetadataPackage.md#pointblank.MetadataPackage.values): The comparison value used in the validation. For regex validations, just the pattern string is included. With `tbl_type="duckdb"`, each value is stored as JSON text in a string column (e.g., `"[a-z]"` for a pattern, `[1, 2]` for a set), which can be decoded with `json.loads()` or cast with `.cast("json")`.
+- `step_evaluated`: Whether the step was evaluated without error (`False` if it couldn't be evaluated, e.g., because its column doesn't exist).
 - `units`: Total number of test units.
 - `all_units_passed`: Whether every test unit passed.
 - `pass_n`: Number of passing test units.
@@ -61,7 +61,7 @@ The returned DataFrame contains the following columns:
 - `preprocessed`: Whether a preprocessing function was applied.
 - `segmented`: Whether the step used segmented validation.
 
-For inactive steps (`active=False`), the result columns (`step_evaluated` through [critical](Validate.critical.md#pointblank.Validate.critical)) are set to `None`/`null`.
+For inactive steps (`active=False`), the result columns (`step_evaluated` through [critical](Validate.critical.md#pointblank.Validate.critical)) are set to `None`/`null`; for steps that couldn't be evaluated, `step_evaluated` is `False` and the other result columns are `None`/`null`.
 
 
 ## Examples
@@ -91,8 +91,8 @@ shape: (2, 18)
 | active | step_number | step_description | columns | values | step_evaluated | units | all_units_passed | pass_n | pass_pct | failed_n | failed_pct | warning | error | critical | brief | preprocessed | segmented |
 |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
 | bool | i64 | str | str | object | bool | i64 | bool | i64 | f64 | i64 | f64 | bool | bool | bool | str | bool | bool |
-| true | 1 | "col_vals_gt" | "d" | 100 | null | 13 | true | 13 | 1.0 | 0 | 0.0 | null | null | null | "Expect that values in \`d\` shou… | false | false |
-| true | 2 | "col_vals_regex" | "b" | \[0-9\]-\[a-z\]{3}-\[0-9\]{3} | null | 13 | true | 13 | 1.0 | 0 | 0.0 | null | null | null | "Expect that values in \`b\` shou… | false | false |
+| true | 1 | "col_vals_gt" | "d" | 100 | true | 13 | true | 13 | 1.0 | 0 | 0.0 | null | null | null | "Expect that values in \`d\` shou… | false | false |
+| true | 2 | "col_vals_regex" | "b" | \[0-9\]-\[a-z\]{3}-\[0-9\]{3} | true | 13 | true | 13 | 1.0 | 0 | 0.0 | null | null | null | "Expect that values in \`b\` shou… | false | false |
 
 
 Get the results as a Pandas DataFrame instead:
@@ -105,5 +105,5 @@ validation.get_dataframe_report(tbl_type="pandas")
 
 |  | active | step_number | step_description | columns | values | step_evaluated | units | all_units_passed | pass_n | pass_pct | failed_n | failed_pct | warning | error | critical | brief | preprocessed | segmented |
 |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| 0 | True | 1 | col_vals_gt | d | 100 | None | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`d\` should be \> \`100\`. | False | False |
-| 1 | True | 2 | col_vals_regex | b | \[0-9\]-\[a-z\]{3}-\[0-9\]{3} | None | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`b\` should match the reg... | False | False |
+| 0 | True | 1 | col_vals_gt | d | 100 | True | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`d\` should be \> \`100\`. | False | False |
+| 1 | True | 2 | col_vals_regex | b | \[0-9\]-\[a-z\]{3}-\[0-9\]{3} | True | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`b\` should match the reg... | False | False |
