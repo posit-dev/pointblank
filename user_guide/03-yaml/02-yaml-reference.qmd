@@ -506,6 +506,7 @@ Examples:
     allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
     decreasing_tol: 0.5                # OPTIONAL: Tolerance for negative movement (default: null)
     na_pass: false                     # OPTIONAL: Pass NULL values
+    order_by: date                     # OPTIONAL: Column(s) that put the rows in order
     pre: |                             # OPTIONAL: Data preprocessing
       lambda df: df.filter(condition)
     thresholds:                        # OPTIONAL: Step-level thresholds
@@ -524,6 +525,8 @@ Parameters:
 example, `[1, 2, 2, 3]` would pass when `true` but fail at the third value when `false`.
 - `decreasing_tol`: Absolute tolerance for negative movement. Setting this to `0.5` means values can
 decrease by up to 0.5 units and still pass. Setting any value also sets `allow_stationary` to `true`.
+- `order_by`: Column (or list of columns) that puts the rows in order before comparing values.
+Required for database tables, which have no inherent row order.
 
 Examples:
 
@@ -554,6 +557,7 @@ Examples:
     allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
     increasing_tol: 0.5                # OPTIONAL: Tolerance for positive movement (default: null)
     na_pass: false                     # OPTIONAL: Pass NULL values
+    order_by: date                     # OPTIONAL: Column(s) that put the rows in order
     pre: |                             # OPTIONAL: Data preprocessing
       lambda df: df.filter(condition)
     thresholds:                        # OPTIONAL: Step-level thresholds
