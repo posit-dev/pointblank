@@ -4681,6 +4681,17 @@ def _validation_info_to_step(
         ):
             if name in values:
                 params[name] = values[name]
+    elif at == "col_vals_in_table":
+        values = vi.values or {}
+        params["columns"] = values.get("columns", vi.column)
+        params["ref_table"] = _placeholder(
+            code="your_reference_table",
+            note=(
+                "Step 'col_vals_in_table' checks against a reference table that cannot be "
+                "serialized; a placeholder was emitted and must be edited manually."
+            ),
+        )
+        params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
             code="[lambda df: df]",

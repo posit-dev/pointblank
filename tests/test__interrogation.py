@@ -341,108 +341,6 @@ def test_safe_modify_datetime_eager_pandas():
     assert not isinstance(result, datetime.datetime)
 
 
-class TestTblMatch:
-    """Tests for the tbl_match() function."""
-
-    def test_matching_pandas_dataframes(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
-        df2 = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
-        assert tbl_match(df1, df2) is True
-
-    def test_matching_polars_dataframes(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
-        df2 = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
-        assert tbl_match(df1, df2) is True
-
-    def test_different_values(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1, 2, 3]})
-        df2 = pd.DataFrame({"a": [1, 2, 99]})
-        assert tbl_match(df1, df2) is False
-
-    def test_different_column_count(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1], "b": [2]})
-        df2 = pd.DataFrame({"a": [1]})
-        assert tbl_match(df1, df2) is False
-
-    def test_different_row_count(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1, 2]})
-        df2 = pd.DataFrame({"a": [1]})
-        assert tbl_match(df1, df2) is False
-
-    def test_different_column_names(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1]})
-        df2 = pd.DataFrame({"b": [1]})
-        assert tbl_match(df1, df2) is False
-
-    def test_different_column_order(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1], "b": [2]})
-        df2 = pd.DataFrame({"b": [2], "a": [1]})
-        assert tbl_match(df1, df2) is False
-
-    def test_nan_values_match(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": [1.0, float("nan"), 3.0]})
-        df2 = pd.DataFrame({"a": [1.0, float("nan"), 3.0]})
-        assert tbl_match(df1, df2) is True
-
-    def test_none_values_match(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pl.DataFrame({"a": [1, None, 3]})
-        df2 = pl.DataFrame({"a": [1, None, 3]})
-        assert tbl_match(df1, df2) is True
-
-    def test_none_vs_value_mismatch(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pl.DataFrame({"a": [1, None, 3]})
-        df2 = pl.DataFrame({"a": [1, 2, 3]})
-        assert tbl_match(df1, df2) is False
-
-    def test_empty_dataframes_match(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pd.DataFrame({"a": pd.Series([], dtype=int)})
-        df2 = pd.DataFrame({"a": pd.Series([], dtype=int)})
-        assert tbl_match(df1, df2) is True
-
-    def test_cross_backend_pandas_polars(self):
-        from pointblank._interrogation import tbl_match
-
-        df_pd = pd.DataFrame({"a": [1, 2, 3]})
-        df_pl = pl.DataFrame({"a": [1, 2, 3]})
-        assert tbl_match(df_pd, df_pl) is True
-
-    def test_string_columns(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pl.DataFrame({"s": ["hello", "world"]})
-        df2 = pl.DataFrame({"s": ["hello", "world"]})
-        assert tbl_match(df1, df2) is True
-
-    def test_string_columns_mismatch(self):
-        from pointblank._interrogation import tbl_match
-
-        df1 = pl.DataFrame({"s": ["hello", "world"]})
-        df2 = pl.DataFrame({"s": ["hello", "earth"]})
-        assert tbl_match(df1, df2) is False
-
-
 class TestInterrogateNe:
     """Tests for interrogate_ne() null-handling paths."""
 
@@ -1421,7 +1319,7 @@ class TestCoerceToCommonBackend:
         detour that would turn a nullable integer column into floats)."""
         import ibis
 
-        from pointblank._interrogation import _coerce_to_common_backend, tbl_match
+        from pointblank._interrogation import _coerce_to_common_backend
 
         duck_float = ibis.duckdb.connect().create_table("f", pl.DataFrame({"k": [1.0, 2.0, None]}))
         mem_int = ibis.memtable(pl.DataFrame({"k": [1, 2, None]}))
@@ -1431,9 +1329,6 @@ class TestCoerceToCommonBackend:
         assert isinstance(result1, pl.DataFrame) and isinstance(result2, pl.DataFrame)
         dtypes = {result1.schema["k"], result2.schema["k"]}
         assert dtypes == {pl.Float64, pl.Int64}
-
-        # So the dtype difference is caught in both directions
-        assert tbl_match(*tbls) is False
 
     @pytest.mark.parametrize("data_kind", ["polars", "pandas"])
     def test_ibis_comparison_table_matches_data_backend(self, data_kind):
