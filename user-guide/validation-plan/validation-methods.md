@@ -4457,7 +4457,7 @@ data_freshness()
 <td colspan="14" class="gt_sourcenote" style="text-align: left;">
 <hr />
 <strong>Notes</strong>
-<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-15 03:32:50</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p></td>
+<p>Step 1 <span style="font-family: "IBM Plex Mono", monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-15 03:34:05</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p></td>
 </tr>
 </tfoot>
 

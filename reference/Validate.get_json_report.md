@@ -117,8 +117,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-15T04:26:02.702+00:00",
-            "proc_duration_s": 0.008652
+            "time_processed": "2026-10-15T04:27:16.324+00:00",
+            "proc_duration_s": 0.008427
         },
         {
             "i": 2,
@@ -144,8 +144,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-15T04:26:02.705+00:00",
-            "proc_duration_s": 0.003225
+            "time_processed": "2026-10-15T04:27:16.327+00:00",
+            "proc_duration_s": 0.003297
         }
     ]
 
