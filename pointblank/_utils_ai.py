@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import logging
 import pathlib
@@ -21,6 +22,35 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # LLM Configuration and Chat Interface
 # ============================================================================
+
+# All of the AI features' dependencies are in the `generate` extra
+_AI_INSTALL_HINT = '`pip install "pointblank[generate]"`'
+
+# The packages each provider needs, besides chatlas (Bedrock goes through `anthropic[bedrock]`)
+_PROVIDER_PACKAGES = {
+    "anthropic": ["anthropic"],
+    "openai": ["openai"],
+    "ollama": ["openai"],
+    "bedrock": ["anthropic", "boto3"],
+    "azure-openai": ["openai"],
+}
+
+
+def _check_ai_package(package: str, needed_for: str) -> None:
+    """Raise an `ImportError` with an install hint if a package needed for an AI feature is missing."""
+    try:
+        importlib.import_module(package)
+    except ImportError as e:
+        raise ImportError(
+            f"The `{package}` package is required {needed_for}. Install Pointblank's AI "
+            f"dependencies with {_AI_INSTALL_HINT}."
+        ) from e
+
+
+def _check_provider_packages(provider: str) -> None:
+    """Check that the packages a model provider needs are installed."""
+    for package in _PROVIDER_PACKAGES.get(provider, []):
+        _check_ai_package(package, f"to use the `{provider}` provider")
 
 
 @dataclass
@@ -94,14 +124,7 @@ def _create_chat_instance(
     -------
     Chat instance from chatlas.
     """
-    # Check if chatlas is installed
-    try:
-        import chatlas  # noqa
-    except ImportError:  # pragma: no cover
-        raise ImportError(
-            "The `chatlas` package is required for AI validation. "
-            "Please install it using `pip install chatlas`."
-        )
+    _check_ai_package("chatlas", "for AI validation")
 
     # Validate provider
     if provider not in MODEL_PROVIDERS:
@@ -110,32 +133,20 @@ def _create_chat_instance(
             f"Supported providers: {', '.join(MODEL_PROVIDERS)}"
         )
 
+    _check_provider_packages(provider)
+
     # Use the row-validation system prompt unless a caller supplies its own
     if system_prompt is None:
         system_prompt = _ROW_VALIDATION_SYSTEM_PROMPT
 
     # Create httpx client with SSL verification settings
-    try:
-        import httpx  # noqa
-    except ImportError:  # pragma: no cover
-        raise ImportError(  # pragma: no cover
-            "The `httpx` package is required for SSL configuration. "
-            "Please install it using `pip install httpx`."
-        )
+    _check_ai_package("httpx", "for SSL configuration")
+    import httpx
 
     http_client = httpx.AsyncClient(verify=verify_ssl)
 
     # Create provider-specific chat instance
-    if provider == "anthropic":  # pragma: no cover
-        # Check that the anthropic package is installed
-        try:
-            import anthropic  # noqa  # type: ignore[import-not-found]
-        except ImportError:
-            raise ImportError(
-                "The `anthropic` package is required to use AI validation with "
-                "`anthropic`. Please install it using `pip install anthropic`."
-            )
-
+    if provider == "anthropic":
         from chatlas import ChatAnthropic
 
         chat = ChatAnthropic(
@@ -146,15 +157,6 @@ def _create_chat_instance(
         )
 
     elif provider == "openai":  # pragma: no cover
-        # Check that the openai package is installed
-        try:
-            import openai  # noqa
-        except ImportError:
-            raise ImportError(
-                "The `openai` package is required to use AI validation with "
-                "`openai`. Please install it using `pip install openai`."
-            )
-
         from chatlas import ChatOpenAI
 
         chat = ChatOpenAI(
@@ -165,15 +167,6 @@ def _create_chat_instance(
         )
 
     elif provider == "ollama":  # pragma: no cover
-        # Check that the openai package is installed (required for Ollama)
-        try:
-            import openai  # noqa
-        except ImportError:
-            raise ImportError(
-                "The `openai` package is required to use AI validation with "
-                "`ollama`. Please install it using `pip install openai`."
-            )
-
         from chatlas import ChatOllama
 
         chat = ChatOllama(
@@ -182,7 +175,7 @@ def _create_chat_instance(
             kwargs={"http_client": http_client},
         )
 
-    elif provider == "bedrock":  # pragma: no cover
+    elif provider == "bedrock":
         from chatlas import ChatBedrockAnthropic
 
         # ChatBedrockAnthropic creates both a sync and async client internally,
@@ -194,14 +187,6 @@ def _create_chat_instance(
         )
 
     elif provider == "azure-openai":  # pragma: no cover
-        try:
-            import openai  # noqa
-        except ImportError:
-            raise ImportError(
-                "The `openai` package is required to use AI validation with "
-                "`azure-openai`. Please install it using `pip install openai`."
-            )
-
         import os
 
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -252,18 +237,13 @@ def _prepare_attachments(attachments: Optional[List[Any]]) -> List[Any]:
     if not isinstance(attachments, (list, tuple)):
         raise TypeError(f"attachments must be a list or tuple, got {type(attachments).__name__}")
 
-    try:
-        from chatlas import (
-            content_image_file,
-            content_image_url,
-            content_pdf_file,
-            content_pdf_url,
-        )
-    except ImportError:  # pragma: no cover
-        raise ImportError(
-            "The `chatlas` package is required for attachments support. "
-            "Please install it using `pip install chatlas`."
-        )
+    _check_ai_package("chatlas", "for attachments support")
+    from chatlas import (
+        content_image_file,
+        content_image_url,
+        content_pdf_file,
+        content_pdf_url,
+    )
 
     prepared: List[Any] = []
     for item in attachments:
@@ -945,21 +925,31 @@ class _AIValidationEngine:
                 logger.info(f"Successfully validated batch {batch['batch_id']}")
                 return results
 
-            except Exception as e:  # pragma: no cover
-                logger.error(
-                    f"Failed to validate batch {batch['batch_id']}: {e}"
-                )  # pragma: no cover
+            except Exception as e:
+                logger.error(f"Failed to validate batch {batch['batch_id']}: {e}")
+                errors.append(e)
                 # Return default results (all False) for failed batches
-                default_results = []  # pragma: no cover
-                for i in range(batch["start_row"], batch["end_row"]):  # pragma: no cover
-                    default_results.append({"index": i, "result": False})  # pragma: no cover
-                return default_results  # pragma: no cover
+                default_results = []
+                for i in range(batch["start_row"], batch["end_row"]):
+                    default_results.append({"index": i, "result": False})
+                return default_results
 
         # Execute all batch validations sequentially (chatlas is synchronous)
+        errors: List[Exception] = []
         final_results = []
         for batch in batches:
             result = validate_batch(batch)
             final_results.append(result)
+
+        # If no batch could be validated (e.g., an invalid API key), every row would be reported as
+        # failing, so treat the step as one that couldn't be evaluated instead
+        if batches and len(errors) == len(batches):
+            from pointblank._interrogation import StepEvaluationError, _first_line
+
+            raise StepEvaluationError(
+                f"None of the {len(batches)} requests to the model succeeded "
+                f"(the first failed with {_first_line(errors[0])})."
+            ) from errors[0]
 
         return final_results
 
