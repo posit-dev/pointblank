@@ -21,7 +21,7 @@ Or set the variable directly when running pytest:
 
 These tests are skipped automatically when CDISCPILOT01_PATH is not set.
 
-Validated against: SDTMIG 3.4 conformance catalog, 414 rules, CT 2024-09-27.
+Validated against: SDTMIG 3.4 conformance catalog, 362 rules, CT 2024-09-27.
 Study: CDISCPILOT01, Alzheimer's disease study, 306 subjects, 18 SDTM + 4 SUPP-- domains.
 """
 
@@ -135,8 +135,8 @@ def test_report_is_rules_type(pilot_report):
 
 
 def test_report_has_expected_rule_count(pilot_report):
-    """414 rules in the SDTMIG 3.4 catalog (after removing rules that contradict the IG)."""
-    assert len(pilot_report.native_result.rule_results) == 414
+    """362 rules in the SDTMIG 3.4 catalog (after removing rules that contradict the IG)."""
+    assert len(pilot_report.native_result.rule_results) == 362
 
 
 def test_report_overall_pass_rate(pilot_report):
