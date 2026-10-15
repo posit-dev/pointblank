@@ -345,68 +345,41 @@ class DataScan:
         )
 
         if "freqs" in formatted_data.columns:  # TODO: don't love this arbitrary check
-            # Extract HTML freqs:
-            try:
-                formatted_data = formatted_data.with_columns(
-                    __freq_true=nw.col("freqs").struct.field("True"),
-                    __freq_false=nw.col("freqs").struct.field("False"),
+            # Build the T/F summary for boolean columns straight from each column's profile.
+            # The `freqs` dict only has keys for the values present (e.g., `{"True": 3}` for an
+            # all-`True` column), so a missing key is a count of zero. The rows of `data` follow
+            # the order of `column_profiles`.
+            bool_unique_html: list[str | None] = []
+            for prof in self.profile.column_profiles:
+                freqs = next((stat.val for stat in prof.statistics if stat.name == "freqs"), None)
+                if not isinstance(freqs, dict):
+                    bool_unique_html.append(None)
+                    continue
+                pct_true, pct_false = _fmt_frac(
+                    [
+                        freqs.get("True", 0) / self.profile.row_count,
+                        freqs.get("False", 0) / self.profile.row_count,
+                    ]
                 )
-            except Exception:  # TODO: should be narrowed if possible
-                # if no struct implimentation exists, it must be done manually
-                freq_ser: nw.Series = formatted_data["freqs"]
-                trues: list[int | None] = []
-                falses: list[int | None] = []
-                for freq in freq_ser:
-                    try:
-                        trues.append(freq["True"])
-                        falses.append(freq["False"])
-                    except (KeyError, TypeError):
-                        trues.append(None)
-                        falses.append(None)
-                true_ser: nw.Series = nw.new_series(
-                    name="__freq_true", values=trues, backend=_backend
+                bool_unique_html.append(
+                    f"<span style='font-weight: bold;'>T</span>{pct_true}"
+                    f"<br><span style='font-weight: bold;'>F</span>{pct_false}"
                 )
-                false_ser: nw.Series = nw.new_series(
-                    name="__freq_false", values=falses, backend=_backend
-                )
-                formatted_data = formatted_data.with_columns(
-                    __freq_true=true_ser, __freq_false=false_ser
-                )
-
-            ## format pct true values
-            formatted_data = formatted_data.with_columns(
-                # for bools, UQs are represented as percentages
-                __pct_true=nw.col("__freq_true") / self.profile.row_count,
-                __pct_false=nw.col("__freq_false") / self.profile.row_count,
+            bool_ser: nw.Series = nw.new_series(
+                name="__bool_unique_html",
+                values=bool_unique_html,
+                dtype=nw.String(),
+                backend=_backend,
             )
-            for _fmt_col in ("__pct_true", "__pct_false"):
-                _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
-                formatted = nw.new_series(name=_fmt_col, values=_formatted, backend=_backend)
-                formatted_data = formatted_data.drop(_fmt_col)
-                formatted_data = formatted_data.with_columns(formatted.alias(_fmt_col))
 
             formatted_data = (
-                formatted_data.with_columns(
-                    __bool_unique_html=nw.concat_str(
-                        nw.lit("<span style='font-weight: bold;'>T</span>"),
-                        nw.col("__pct_true"),
-                        nw.lit("<br><span style='font-weight: bold;'>F</span>"),
-                        nw.col("__pct_false"),
-                    ),
-                )
+                formatted_data.with_columns(__bool_unique_html=bool_ser)
                 .with_columns(
                     n_unique=nw.when(~nw.col("__bool_unique_html").is_null())
                     .then(nw.col("__bool_unique_html"))
                     .otherwise(nw.col("n_unique"))
                 )
-                .drop(
-                    "__freq_true",
-                    "__freq_false",
-                    "__bool_unique_html",
-                    "freqs",
-                    "__pct_true",
-                    "__pct_false",
-                )
+                .drop("__bool_unique_html", "freqs")
             )
 
         ## Determine Value Formatting Selectors:
