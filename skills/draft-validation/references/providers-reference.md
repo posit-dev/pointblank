@@ -16,7 +16,7 @@ model="anthropic:claude-opus-4-8"
 
 Environment variable: `ANTHROPIC_API_KEY`
 
-Install: `pip install anthropic`
+Install: `pip install "pointblank[generate]"` (includes chatlas and every provider's SDK)
 
 ### OpenAI
 
@@ -28,7 +28,7 @@ model="openai:gpt-4-turbo"
 
 Environment variable: `OPENAI_API_KEY`
 
-Install: `pip install openai`
+Install: `pip install "pointblank[generate]"`
 
 ### Ollama (local)
 
@@ -38,7 +38,7 @@ model="ollama:mistral"
 model="ollama:codellama"
 ```
 
-No API key needed. Requires Ollama running locally.
+No API key needed. Requires Ollama running locally, and the `openai` package (`pip install "pointblank[generate]"`).
 
 Setup:
 ```bash
@@ -56,7 +56,7 @@ model="bedrock:anthropic.claude-haiku-4-5-20251001-v1:0"
 Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,
 AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles.
 
-Install: `pip install boto3`
+Install: `pip install "pointblank[generate]"` (Bedrock uses `anthropic[bedrock]`, which brings in boto3)
 
 ### Azure OpenAI
 
@@ -67,9 +67,9 @@ model="azure-openai:my-deployment-name"
 Environment variables:
 - `AZURE_OPENAI_API_KEY`
 - `AZURE_OPENAI_ENDPOINT`
-- `AZURE_OPENAI_API_VERSION`
+- `OPENAI_API_VERSION` (e.g., `2024-06-01`)
 
-Install: `pip install openai`
+Install: `pip install "pointblank[generate]"`
 
 ## API key options
 
