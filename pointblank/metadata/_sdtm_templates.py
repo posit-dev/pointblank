@@ -617,7 +617,7 @@ def _lb_template() -> SDTMDomainTemplate:
             ),
             SDTMVariableSpec(
                 "LBORNRLO",
-                "Reference Range Lower Limit-Orig Unit",
+                "Reference Range Lower Limit in Orig Unit",
                 "Char",
                 "Qualifier",
                 max_length=40,
@@ -625,7 +625,7 @@ def _lb_template() -> SDTMDomainTemplate:
             ),
             SDTMVariableSpec(
                 "LBORNRHI",
-                "Reference Range Upper Limit-Orig Unit",
+                "Reference Range Upper Limit in Orig Unit",
                 "Char",
                 "Qualifier",
                 max_length=40,
@@ -1058,7 +1058,9 @@ def _ds_template() -> SDTMDomainTemplate:
                 max_length=64,
                 core="Exp",
             ),
-            SDTMVariableSpec("DSSTDY", "Study Day of Start of Event", "Num", "Timing", core="Perm"),
+            SDTMVariableSpec(
+                "DSSTDY", "Study Day of Start of Disposition Event", "Num", "Timing", core="Perm"
+            ),
         ],
     )
 
@@ -1154,7 +1156,7 @@ def _mh_template() -> SDTMDomainTemplate:
             ),
             SDTMVariableSpec(
                 "MHSTDTC",
-                "Start Date/Time of Medical History",
+                "Start Date/Time of Medical History Event",
                 "Char",
                 "Timing",
                 max_length=64,
@@ -1162,7 +1164,7 @@ def _mh_template() -> SDTMDomainTemplate:
             ),
             SDTMVariableSpec(
                 "MHENDTC",
-                "End Date/Time of Medical History",
+                "End Date/Time of Medical History Event",
                 "Char",
                 "Timing",
                 max_length=64,
