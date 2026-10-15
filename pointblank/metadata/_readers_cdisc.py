@@ -200,6 +200,13 @@ def _read_define_xml_metadata(
     )
 
 
+def _is_extended_value(item, ns: dict[str, str]) -> bool:
+    """Whether a `CodeListItem`/`EnumeratedItem` is a sponsor extension (`def:ExtendedValue="Yes"`)."""
+    def_ns = ns.get("def")
+    value = item.get(f"{{{def_ns}}}ExtendedValue") if def_ns else None
+    return (value or "").strip().lower() == "yes"
+
+
 def _parse_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
     """Parse `CodeList` elements from `MetaDataVersion`.
 
@@ -241,9 +248,9 @@ def _parse_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
             decode_el = item.find("odm:Decode/odm:TranslatedText", ns)
             label = decode_el.text if decode_el is not None and decode_el.text else value
 
-            # Check for NCI code (extensible attribute)
-            # nci:ExtCodeID or similar
-            entry = CodelistEntry(value=value, label=str(label))
+            entry = CodelistEntry(
+                value=value, label=str(label), is_extended=_is_extended_value(item, ns)
+            )
             entries.append(entry)
 
         # Also check for EnumeratedItem (no Decode needed, value = label)
@@ -259,7 +266,11 @@ def _parse_codelists(mdv, ns: dict[str, str]) -> dict[str, Codelist]:
                     value = float(value)
                 except (ValueError, TypeError):
                     pass
-            entries.append(CodelistEntry(value=value, label=str(value)))
+            entries.append(
+                CodelistEntry(
+                    value=value, label=str(value), is_extended=_is_extended_value(item, ns)
+                )
+            )
 
         codelists[oid] = Codelist(
             name=name,
