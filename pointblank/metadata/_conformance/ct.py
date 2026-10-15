@@ -19,9 +19,15 @@ class ControlledTerminology:
         The CT package identifiers that were loaded (for provenance).
     """
 
-    def __init__(self, codelists: dict[str, set[str]], packages: list[str]) -> None:
+    def __init__(
+        self,
+        codelists: dict[str, set[str]],
+        packages: list[str],
+        extensible: set[str] | None = None,
+    ) -> None:
         self._codelists = codelists
         self.packages = packages
+        self._extensible = {name.upper() for name in (extensible or set())}
 
     @classmethod
     def load(cls, packages: list[str]) -> ControlledTerminology:
@@ -40,6 +46,7 @@ class ControlledTerminology:
             the same codelist appears in both.
         """
         codelists: dict[str, set[str]] = {}
+        extensible: set[str] = set()
         loaded: list[str] = []
         for pkg in packages:
             path = _CT_DIR / f"{pkg}.json"
@@ -52,8 +59,9 @@ class ControlledTerminology:
             data: dict = json.loads(path.read_text(encoding="utf-8"))
             for name, terms in data.get("codelists", {}).items():
                 codelists[name.upper()] = set(str(t) for t in terms)
+            extensible |= {name.upper() for name in data.get("extensible", [])}
             loaded.append(pkg)
-        return cls(codelists, loaded)
+        return cls(codelists, loaded, extensible)
 
     @classmethod
     def load_default(cls) -> ControlledTerminology:
@@ -81,6 +89,10 @@ class ControlledTerminology:
         if terms is None:
             return True  # unknown codelist: don't flag
         return str(value) in terms
+
+    def is_extensible(self, name: str) -> bool:
+        """Whether a codelist is extensible (sponsors may add terms, declared in Define-XML)."""
+        return name.upper() in self._extensible
 
     def get_codelist(self, name: str) -> set[str] | None:
         """Return the set of permitted values for a codelist, or `None` if unknown."""
