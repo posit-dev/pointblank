@@ -2297,7 +2297,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>Environment variable: <span class="in">`ANTHROPIC_API_KEY`</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install anthropic`</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install "pointblank[generate]"`</span> (includes chatlas and every provider's SDK)</span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">### OpenAI</span></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
@@ -2309,7 +2309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>Environment variable: <span class="in">`OPENAI_API_KEY`</span></span>
 <span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install openai`</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install "pointblank[generate]"`</span></span>
 <span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ollama (local)</span></span>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
@@ -2319,7 +2319,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:codellama"</span></span>
 <span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>No API key needed. Requires Ollama running locally.</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>No API key needed. Requires Ollama running locally, and the <span class="in">`openai`</span> package (<span class="in">`pip install "pointblank[generate]"`</span>).</span>
 <span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>Setup:</span>
 <span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
@@ -2337,7 +2337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,</span>
 <span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles.</span>
 <span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install boto3`</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install "pointblank[generate]"`</span> (Bedrock uses <span class="in">`anthropic[bedrock]`</span>, which brings in boto3)</span>
 <span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a><span class="fu">### Azure OpenAI</span></span>
 <span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a></span>
@@ -2348,9 +2348,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>Environment variables:</span>
 <span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_API_KEY`</span></span>
 <span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_ENDPOINT`</span></span>
-<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_API_VERSION`</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`OPENAI_API_VERSION`</span> (e.g., <span class="in">`2024-06-01`</span>)</span>
 <span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install openai`</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>Install: <span class="in">`pip install "pointblank[generate]"`</span></span>
 <span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## API key options</span></span>
 <span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a></span>
