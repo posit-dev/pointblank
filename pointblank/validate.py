@@ -16633,37 +16633,8 @@ class Validate:
                         else list(data_tbl_step.columns)
                     )
 
-                    # Read the text of the preprocessing function
-                    pre_text = _pre_processing_funcs_to_str(validation.pre)
-
-                    # Determine if the preprocessing function is a lambda function; return a boolean
-                    is_lambda = re.match(r"^lambda", pre_text) is not None
-
-                    # If the preprocessing function is a lambda function, then check if there is
-                    # a keyword argument called `dfn` in the lamda signature; if so, that's a cue
-                    # to use a Narwhalified version of the table
-                    if is_lambda:
-                        # Get the signature of the lambda function
-                        sig = inspect.signature(validation.pre)
-
-                        # Check if the lambda function has a keyword argument called `dfn`
-                        if "dfn" in sig.parameters:
-                            # Convert the table to a Narwhals DataFrame
-                            data_tbl_step = nw.from_native(data_tbl_step)
-
-                            # Apply the preprocessing function to the table
-                            data_tbl_step = validation.pre(dfn=data_tbl_step)
-
-                            # Convert the table back to its original format
-                            data_tbl_step = nw.to_native(data_tbl_step)
-
-                        else:
-                            # Apply the preprocessing function to the table
-                            data_tbl_step = validation.pre(data_tbl_step)
-
-                    # If the preprocessing function is a function, apply it to the table
-                    elif isinstance(validation.pre, Callable):
-                        data_tbl_step = validation.pre(data_tbl_step)
+                    # Apply the preprocessing function to the table
+                    data_tbl_step = _apply_pre(validation.pre, data_tbl_step)
 
                     # After successful preprocessing, check dimensions and create notes
                     # Use get_row_count() and get_column_count() for compatibility
@@ -22495,7 +22466,7 @@ class Validate:
                 if validation.pre is None:
                     table = self.data
                 else:
-                    table = validation.pre(self.data)
+                    table = _apply_pre(validation.pre, self.data)
 
                 # Get the columns from the table as a list
                 columns = list(table.columns)
@@ -22593,7 +22564,7 @@ class Validate:
                 if validation.pre is None:
                     table = self.data
                 else:
-                    table = validation.pre(self.data)
+                    table = _apply_pre(validation.pre, self.data)
 
                 # If the `segments` expression is a string, that string is taken as a column name
                 # for which segmentation should occur across unique values in the column
@@ -25264,6 +25235,26 @@ def _transform_assertion_str(
                 type_upd[i] = f"{segmentation_div} {type_upd[i]}"
 
     return type_upd
+
+
+def _apply_pre(pre: Callable, tbl: Any) -> Any:
+    """
+    Apply a `pre=` function to a table.
+
+    A function with a parameter named `dfn` (a lambda, a named function, or any other callable) is
+    given the table as a Narwhals DataFrame, so that it can use Narwhals expressions on any backend;
+    its result is converted back to the native table type. Other functions get the native table.
+    """
+    try:
+        parameters = inspect.signature(pre).parameters
+    except (TypeError, ValueError):  # pragma: no cover
+        # Some built-in callables have no inspectable signature
+        parameters = {}
+
+    if "dfn" in parameters:
+        return nw.to_native(pre(dfn=nw.from_native(tbl)), pass_through=True)
+
+    return pre(tbl)
 
 
 def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str] | None:
