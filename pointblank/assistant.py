@@ -5,6 +5,7 @@ from typing import Any
 from importlib_resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
+from pointblank._utils_ai import _check_ai_package, _check_provider_packages
 from pointblank.datascan import DataScan
 
 __all__ = [
@@ -162,23 +163,9 @@ def assistant(
     library. The loading preference is Polars first, then Pandas as a fallback.
     """
 
-    # Check that the chatlas package is installed
-    try:
-        import chatlas  # noqa
-    except ImportError:
-        raise ImportError(
-            "The `chatlas` package is required to use the `Assistant` class. "
-            "Please install it using `pip install chatlas`."
-        )
+    _check_ai_package("chatlas", "to use the `Assistant` class")
 
-    # Check that the shiny package is installed
-    try:
-        import shiny  # noqa
-    except ImportError:
-        raise ImportError(
-            "The `shiny` package is required to use the `Assistant` class. "
-            "Please install it using `pip install shiny`."
-        )
+    _check_ai_package("shiny", "to use the `Assistant` class")
 
     if display is None:
         display = "browser"
@@ -291,16 +278,9 @@ def assistant(
         "    per line)"
     )
 
-    if provider == "anthropic":  # pragma: no cover
-        # Check that the anthropic package is installed
-        try:
-            import anthropic  # noqa  # type: ignore[import-not-found]
-        except ImportError:  # pragma: no cover
-            raise ImportError(  # pragma: no cover
-                "The `anthropic` package is required to use the `DraftValidation` class with "
-                "the `anthropic` provider. Please install it using `pip install anthropic`."
-            )
+    _check_provider_packages(provider)
 
+    if provider == "anthropic":  # pragma: no cover
         from chatlas import ChatAnthropic  # pragma: no cover
 
         chat = ChatAnthropic(  # pragma: no cover
@@ -310,15 +290,6 @@ def assistant(
         )
 
     if provider == "openai":  # pragma: no cover
-        # Check that the openai package is installed
-        try:
-            import openai  # noqa
-        except ImportError:  # pragma: no cover
-            raise ImportError(  # pragma: no cover
-                "The `openai` package is required to use the `DraftValidation` class with the "
-                "`openai` provider. Please install it using `pip install openai`."
-            )
-
         from chatlas import ChatOpenAI  # pragma: no cover
 
         chat = ChatOpenAI(  # pragma: no cover
@@ -328,15 +299,6 @@ def assistant(
         )
 
     if provider == "ollama":  # pragma: no cover
-        # Check that the openai package is installed
-        try:
-            import openai  # noqa
-        except ImportError:  # pragma: no cover
-            raise ImportError(  # pragma: no cover
-                "The `openai` package is required to use the `DraftValidation` class with "
-                "`ollama`. Please install it using `pip install openai`."
-            )
-
         from chatlas import ChatOllama
 
         chat = ChatOllama(  # pragma: no cover

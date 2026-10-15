@@ -2478,54 +2478,16 @@ def interrogate_prompt(  # pragma: no cover
 
         return result_tbl
 
+    except StepEvaluationError:
+        raise
+
     except ImportError as e:
-        logger.error(f"Missing dependencies for AI validation: {e}")
-        logger.error("Install required packages: pip install openai anthropic aiohttp")
-
-        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
-        native_tbl = nw_tbl.to_native()
-        validation_results = [False] * total_rows
-
-        if hasattr(native_tbl, "with_columns"):  # Polars
-            import polars as pl
-
-            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
-
-        elif hasattr(native_tbl, "assign"):  # Pandas
-            import pandas as pd
-
-            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
-
-        else:
-            # Fallback
-            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
-            result_tbl["pb_is_good_"] = validation_results
-
-        return result_tbl
+        # A missing package (e.g., the provider's SDK); the message says how to install it
+        raise StepEvaluationError(f"The prompt() step couldn't be run: {e}") from e
 
     except Exception as e:
-        logger.error(f"AI validation failed: {e}")
-
-        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
-        native_tbl = nw_tbl.to_native()
-        validation_results = [False] * total_rows
-
-        if hasattr(native_tbl, "with_columns"):  # Polars
-            import polars as pl
-
-            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
-
-        elif hasattr(native_tbl, "assign"):  # Pandas
-            import pandas as pd
-
-            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
-
-        else:
-            # Fallback
-            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
-            result_tbl["pb_is_good_"] = validation_results
-
-        return result_tbl
+        # Anything else that stops the step as a whole (e.g., an invalid model configuration)
+        raise StepEvaluationError(f"The prompt() step couldn't be run ({_first_line(e)}).") from e
 
 
 def data_freshness(
