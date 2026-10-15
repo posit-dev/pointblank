@@ -341,7 +341,7 @@ def _adsl_template() -> ADaMDatasetTemplate:
             ),
             ADaMVariableSpec(
                 "DCTREAS",
-                "Reason for Discontinuation from Treatment",
+                "Reason for Discontinuation of Treatment",
                 "Char",
                 core="Perm",
                 max_length=200,
@@ -475,7 +475,7 @@ def _bds_template() -> ADaMDatasetTemplate:
             ),
             ADaMVariableSpec(
                 "ANL01FL",
-                "Analysis Record Flag 01",
+                "Analysis Flag 01",
                 "Char",
                 core="Perm",
                 max_length=1,
@@ -490,9 +490,9 @@ def _bds_template() -> ADaMDatasetTemplate:
                 controlled_term="NY",
             ),
             # ── Traceability ──
-            ADaMVariableSpec("SRCDOM", "Source Data Domain", "Char", core="Perm", max_length=8),
-            ADaMVariableSpec("SRCVAR", "Source Data Variable", "Char", core="Perm", max_length=40),
-            ADaMVariableSpec("SRCSEQ", "Source Data Sequence Number", "Num", core="Perm"),
+            ADaMVariableSpec("SRCDOM", "Source Data", "Char", core="Perm", max_length=8),
+            ADaMVariableSpec("SRCVAR", "Source Variable", "Char", core="Perm", max_length=40),
+            ADaMVariableSpec("SRCSEQ", "Source Sequence Number", "Num", core="Perm"),
             # ── Criterion Variables ──
             ADaMVariableSpec("CRIT1", "Analysis Criterion 1", "Char", core="Perm", max_length=200),
             ADaMVariableSpec(
@@ -639,12 +639,14 @@ def _adae_template() -> ADaMDatasetTemplate:
             ADaMVariableSpec("AENDTM", "Analysis End Datetime", "Num", core="Perm"),
             ADaMVariableSpec("ASTDY", "Analysis Start Relative Day", "Num", core="Perm"),
             ADaMVariableSpec("AENDY", "Analysis End Relative Day", "Num", core="Perm"),
-            ADaMVariableSpec("ADURN", "AE Duration (N)", "Num", core="Perm"),
-            ADaMVariableSpec("ADURU", "AE Duration Units", "Char", core="Perm", max_length=40),
+            ADaMVariableSpec("ADURN", "Analysis Duration (N)", "Num", core="Perm"),
+            ADaMVariableSpec(
+                "ADURU", "Analysis Duration Units", "Char", core="Perm", max_length=40
+            ),
             # ── Flags ──
             ADaMVariableSpec(
                 "TRTEMFL",
-                "Treatment Emergent Flag",
+                "Treatment Emergent Analysis Flag",
                 "Char",
                 core="Cond",
                 max_length=1,
@@ -721,13 +723,13 @@ def _adtte_template() -> ADaMDatasetTemplate:
             # ── Time-to-Event Variables ──
             ADaMVariableSpec("AVAL", "Analysis Value", "Num", required=True, core="Req"),
             ADaMVariableSpec(
-                "STARTDT", "Time-to-Event Origin Date", "Num", required=True, core="Req"
+                "STARTDT", "Time-to-Event Origin Date for Subject", "Num", required=True, core="Req"
             ),
             ADaMVariableSpec("ADT", "Analysis Date", "Num", required=True, core="Req"),
             ADaMVariableSpec("CNSR", "Censor", "Num", required=True, core="Req"),
             ADaMVariableSpec(
                 "EVNTDESC",
-                "Event Description",
+                "Event or Censoring Description",
                 "Char",
                 core="Cond",
                 max_length=200,
@@ -742,9 +744,9 @@ def _adtte_template() -> ADaMDatasetTemplate:
                 condition="Required for traceability",
             ),
             # ── Supporting Variables ──
-            ADaMVariableSpec("SRCDOM", "Source Data Domain", "Char", core="Perm", max_length=8),
-            ADaMVariableSpec("SRCVAR", "Source Data Variable", "Char", core="Perm", max_length=40),
-            ADaMVariableSpec("SRCSEQ", "Source Data Sequence Number", "Num", core="Perm"),
+            ADaMVariableSpec("SRCDOM", "Source Data", "Char", core="Perm", max_length=8),
+            ADaMVariableSpec("SRCVAR", "Source Variable", "Char", core="Perm", max_length=40),
+            ADaMVariableSpec("SRCSEQ", "Source Sequence Number", "Num", core="Perm"),
         ],
     )
 
