@@ -921,3 +921,42 @@ def test_create_chat_instance_bedrock(monkeypatch):
 
     assert isinstance(chat, chatlas.Chat)
     assert chat.provider.name == "AWS/Bedrock"
+
+
+def test_create_chat_instance_openai():
+    pytest.importorskip("openai")
+    chatlas = pytest.importorskip("chatlas")
+
+    chat = _create_chat_instance("openai", "gpt-4o", api_key="test-key")
+
+    assert isinstance(chat, chatlas.Chat)
+    assert chat.provider.name == "OpenAI"
+
+
+@pytest.mark.parametrize(
+    "requirements, library",
+    [
+        # anthropic >= 1.0 and openai >= 3.0
+        (["httpx2<3,>=2.0.0", "pydantic<3,>=1.9.0"], "httpx2"),
+        (["httpx2[http2]>=2.12.0"], "httpx2"),
+        # Earlier releases (`httpx-aiohttp` is a different package)
+        (["httpx<1,>=0.25.0", 'httpx-aiohttp>=0.1.9; extra == "aiohttp"'], "httpx"),
+    ],
+)
+def test_http_library_follows_the_sdk(requirements, library):
+    """The HTTP client must come from the library the provider SDK is built on."""
+    from pointblank._utils_ai import _http_library
+
+    with patch("importlib.metadata.requires", return_value=requirements):
+        assert _http_library("anthropic") == library
+
+
+@pytest.mark.parametrize("library", ["httpx", "httpx2"])
+def test_async_http_client_uses_the_sdk_library(library):
+    from pointblank._utils_ai import _async_http_client
+
+    module = pytest.importorskip(library)
+    with patch("pointblank._utils_ai._http_library", return_value=library):
+        client = _async_http_client("anthropic", verify_ssl=False)
+
+    assert isinstance(client, module.AsyncClient)
