@@ -2800,6 +2800,83 @@ def test_col_vals_ne(request, tbl_fixture) -> None:
     assert validation_2.n_failed(i=1, scalar=True) == 0
 
 
+def _type_mismatch_table(tbl_type: str):
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3],
+            "s": ["x", "y", "z"],
+            "d": [datetime.date(2024, 1, day) for day in (1, 2, 3)],
+            "f": [1.5, 2.5, 3.5],
+        }
+    )
+    if tbl_type == "polars_lazy":
+        return tbl.lazy()
+    if tbl_type == "pandas":
+        return tbl.to_pandas()
+    if tbl_type == "duckdb":
+        return ibis.duckdb.connect().create_table("tbl", tbl)
+    if tbl_type == "memtable":
+        return ibis.memtable(tbl)
+    return tbl
+
+
+TYPE_MISMATCH_TBL_TYPES = ["polars", "polars_lazy", "pandas", "duckdb", "memtable"]
+
+
+@pytest.mark.parametrize("tbl_type", TYPE_MISMATCH_TBL_TYPES)
+@pytest.mark.parametrize(
+    "method, kwargs, note",
+    [
+        # A column compared with a column of another type
+        ("col_vals_eq", {"columns": "a", "value": col("s")}, "can't be compared with column 's'"),
+        ("col_vals_ne", {"columns": "s", "value": col("a")}, "can't be compared with column 'a'"),
+        (
+            "col_vals_between",
+            {"columns": "a", "left": col("s"), "right": 10},
+            "can't be compared with column 's'",
+        ),
+        # A column compared with a value of another type
+        ("col_vals_gt", {"columns": "d", "value": 5}, "can't be compared with the value 5"),
+        ("col_vals_eq", {"columns": "s", "value": 5}, "can't be compared with the value 5"),
+        # A column of a type the method can't check
+        ("col_vals_lt", {"columns": "s", "value": 5}, "which col_vals_lt() can't check"),
+    ],
+)
+def test_comparison_type_mismatch_is_eval_error(tbl_type, method, kwargs, note) -> None:
+    # Instead of crashing `interrogate()` (lazy Polars, DuckDB, Ibis) or silently giving wrong
+    # results (pandas, and Polars for dates vs. numbers), the step can't be evaluated
+    validation = getattr(Validate(_type_mismatch_table(tbl_type)), method)(**kwargs)
+    validation = validation.col_vals_not_null(columns="a").interrogate()
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert step.n_passed is None
+    assert note in step.notes["eval_error"]["text"]
+
+    # The other steps are still interrogated
+    assert validation.n_passed(i=2, scalar=True) == 3
+
+
+@pytest.mark.parametrize("tbl_type", TYPE_MISMATCH_TBL_TYPES)
+@pytest.mark.parametrize(
+    "method, kwargs, n_passed",
+    [
+        ("col_vals_gt", {"columns": "d", "value": datetime.date(2024, 1, 1)}, 2),
+        # Date and datetime columns can be compared with date strings
+        ("col_vals_gt", {"columns": "d", "value": "2024-01-01"}, 2),
+        # Integers and floats are both numeric
+        ("col_vals_gt", {"columns": "a", "value": 1.5}, 2),
+        ("col_vals_lt", {"columns": "a", "value": col("f")}, 3),
+        ("col_vals_between", {"columns": "a", "left": 0, "right": col("f")}, 3),
+    ],
+)
+def test_comparison_compatible_types(tbl_type, method, kwargs, n_passed) -> None:
+    validation = getattr(Validate(_type_mismatch_table(tbl_type)), method)(**kwargs).interrogate()
+
+    assert validation.validation_info[0].eval_error is not True
+    assert validation.n_passed(i=1, scalar=True) == n_passed
+
+
 # Columns `a` and `b` with nulls in `a` only, in `b` only, or in both, and the expected
 # (n_passed, n_failed) for `col_vals_eq()`/`col_vals_ne()` with `na_pass=False`/`True`. A row with
 # a missing value on either side fails (or passes with `na_pass=True`); the others are compared.

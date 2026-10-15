@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import datetime
 import functools
+import numbers
 import operator
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -1083,6 +1085,8 @@ def interrogate_between(
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    _check_comparable(nw_tbl, column, low)
+    _check_comparable(nw_tbl, column, high)
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -1153,6 +1157,8 @@ def interrogate_outside(
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    _check_comparable(nw_tbl, column, low)
+    _check_comparable(nw_tbl, column, high)
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -1224,6 +1230,50 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
 
     result_tbl = nw_tbl.with_columns(pb_is_good_=base_expr)
     return result_tbl.to_native()
+
+
+def _value_kind(value: Any) -> str | None:
+    """Classify a Python comparison value like `_dtype_kind()` does dtypes (`None` if other)."""
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, numbers.Number):
+        return "numeric"
+    if isinstance(value, datetime.date):  # includes datetimes
+        return "temporal"
+    if isinstance(value, str):
+        return "string"
+    return None
+
+
+def _check_comparable(nw_tbl: Any, column: str, compare: Any) -> None:
+    """
+    Raise a `StepEvaluationError` if a column can't be compared with a value or another column.
+
+    Comparing, e.g., a numeric column with a string crashes on some backends and silently gives
+    wrong results on others (pandas compares `1 == "x"` as False; Polars compares dates with
+    integers). Columns that aren't in the table are skipped (their own error is clearer), as are
+    types that can't be classified. Date and datetime columns can be compared with date strings.
+    """
+    schema = nw_tbl.collect_schema()
+    if column not in schema:
+        return
+    kind = _dtype_kind(schema[column])
+
+    if isinstance(compare, Column):
+        if not isinstance(compare.exprs, str) or compare.exprs not in schema:
+            return
+        other_kind = _dtype_kind(schema[compare.exprs])
+        other = f"column '{compare.exprs}' ({schema[compare.exprs]})"
+    else:
+        other_kind = _value_kind(compare)
+        other = f"the value {compare!r}"
+        if kind == "temporal" and other_kind == "string":
+            return
+
+    if kind is not None and other_kind is not None and kind != other_kind:
+        raise StepEvaluationError(
+            f"Column '{column}' ({schema[column]}) can't be compared with {other}."
+        )
 
 
 def _dtype_kind(dtype: Any) -> str | None:
@@ -2205,6 +2255,7 @@ def _interrogate_comparison_base(
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    _check_comparable(nw_tbl, column, compare)
     compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
 
     compared_columns = [column, compare.name] if isinstance(compare, Column) else [column]
