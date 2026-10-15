@@ -61,12 +61,12 @@ validation.assert_passing()
          19 # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
     ---> 20 validation.assert_passing()
 
-    File ~/work/pointblank/pointblank/pointblank/validate.py:17949, in Validate.assert_passing(self)
-      17945             ]
-      17946             msg = "The following assertions failed:\n" + "\n".join(
-      17947                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-      17948             )
-    > 17949             raise AssertionError(msg)
+    File ~/work/pointblank/pointblank/pointblank/validate.py:17956, in Validate.assert_passing(self)
+      17952             ]
+      17953             msg = "The following assertions failed:\n" + "\n".join(
+      17954                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+      17955             )
+    > 17956             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.
