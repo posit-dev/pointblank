@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 import pandas as pd
 import polars as pl
@@ -576,3 +578,48 @@ def test_prompt_with_all_parameters():
     assert val_info.actions is actions
     assert val_info.brief == "Comprehensive test brief"
     assert val_info.active is True
+
+
+# ============================================================================
+# Test steps that can't be evaluated
+# ============================================================================
+
+
+def test_prompt_missing_provider_package_is_eval_error(monkeypatch, sample_data_pl):
+    """A missing provider package marks the step as an evaluation error (with an install hint)
+    instead of reporting every row as failing."""
+    pytest.importorskip("chatlas")
+    monkeypatch.setitem(sys.modules, "anthropic", None)
+
+    validation = (
+        Validate(data=sample_data_pl)
+        .prompt(prompt="Each row has a name", model="anthropic:claude-sonnet-4-5")
+        .col_exists(columns="name")
+        .interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert step.n_failed is None
+    assert 'pip install "pointblank[generate]"' in step.notes["eval_error"]["text"]
+
+    # The other steps are still interrogated
+    assert validation.n_passed(i=2, scalar=True) == 1
+
+
+def test_prompt_all_requests_failing_is_eval_error(monkeypatch, sample_data_pl):
+    """If no request to the model succeeds (e.g., an invalid API key), the step can't be
+    evaluated, rather than every row failing."""
+    chat = Mock()
+    chat.chat.side_effect = RuntimeError("401 invalid x-api-key")
+    monkeypatch.setattr("pointblank._utils_ai._create_chat_instance", lambda **kwargs: chat)
+
+    validation = (
+        Validate(data=sample_data_pl)
+        .prompt(prompt="Each row has a name", model="anthropic:claude-sonnet-4-5")
+        .interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert "401 invalid x-api-key" in step.notes["eval_error"]["text"]
