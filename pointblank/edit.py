@@ -9,6 +9,7 @@ from importlib_resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
 from pointblank._utils_ai import (
+    _check_ai_package,
     _check_syntax,
     _create_chat_instance,
     _diff_plan_steps,
@@ -201,13 +202,7 @@ class EditValidation:
 
     def __post_init__(self) -> None:
         # Verify chatlas is available (mirrors DraftValidation)
-        try:
-            import chatlas  # noqa
-        except ImportError:
-            raise ImportError(
-                "The `chatlas` package is required to use the `EditValidation` class. "
-                "Please install it using `pip install chatlas`."
-            )
+        _check_ai_package("chatlas", "to use the `EditValidation` class")
 
         # Validate the model string and provider up front
         if ":" not in self.model:
