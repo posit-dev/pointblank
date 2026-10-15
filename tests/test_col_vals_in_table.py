@@ -607,3 +607,64 @@ def test_failed_ref_conversion_is_eval_error():
     assert step.eval_error is True
     assert "connection lost" in step.notes["eval_error"]["text"]
     assert v.n_passed(i=2, scalar=True) == 2
+
+
+# ── Reference tables given as paths or connection strings ─────────────────────
+
+
+@pytest.fixture
+def ref_files(tmp_path):
+    """The reference table `x = [1, 2]` as a CSV file, a Parquet file, and a DuckDB table."""
+    import duckdb
+
+    ref = pl.DataFrame({"x": [1, 2]})
+    ref.write_csv(tmp_path / "ref.csv")
+    ref.write_parquet(tmp_path / "ref.parquet")
+    con = duckdb.connect(str(tmp_path / "ref.ddb"))
+    con.execute("CREATE TABLE refs AS SELECT * FROM (VALUES (1), (2)) AS t(x)")
+    con.close()
+    return tmp_path
+
+
+@pytest.mark.parametrize(
+    "make_ref",
+    [
+        lambda d: str(d / "ref.csv"),
+        lambda d: d / "ref.parquet",  # a pathlib.Path
+        lambda d: f"duckdb:///{d / 'ref.ddb'}::refs",
+        lambda d: lambda: str(d / "ref.csv"),  # a function returning a path
+    ],
+    ids=["csv", "parquet_path", "duckdb_connection", "callable"],
+)
+def test_ref_table_path_or_connection_string(ref_files, make_ref):
+    v = (
+        pb.Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+        .col_vals_in_table(columns="a", ref_table=make_ref(ref_files), ref_column="x")
+        .interrogate()
+    )
+
+    assert v.validation_info[0].eval_error is not True
+    assert v.n_passed(i=1, scalar=True) == 2
+    assert v.n_failed(i=1, scalar=True) == 1
+
+
+@pytest.mark.parametrize(
+    "ref_table, note",
+    [
+        ("does_not_exist.csv", "couldn't be loaded"),
+        (42, "must be a table, a file path, or a database connection string"),
+    ],
+)
+def test_ref_table_that_cannot_be_loaded_is_eval_error(ref_table, note):
+    """Before, these crashed `interrogate()` with a TypeError."""
+    v = (
+        pb.Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+        .col_vals_in_table(columns="a", ref_table=ref_table, ref_column="x")
+        .col_vals_not_null(columns="a")
+        .interrogate()
+    )
+
+    step = v.validation_info[0]
+    assert step.eval_error is True
+    assert note in step.notes["eval_error"]["text"]
+    assert v.n_passed(i=2, scalar=True) == 3
