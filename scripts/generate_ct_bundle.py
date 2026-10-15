@@ -3,348 +3,206 @@
 
 Usage
 -----
-    # Latest CDISC SDTM CT package:
+    # The 2024-09-27 CDISC SDTM CT package (downloaded from the NCI EVS archive):
     python scripts/generate_ct_bundle.py
 
-    # Specific package by NCI date identifier:
-    python scripts/generate_ct_bundle.py --package SDTM_CT_2024-09-27
+    # Another package, by its date:
+    python scripts/generate_ct_bundle.py --package 2025-03-28
 
-    # List packages available from NCI EVS:
-    python scripts/generate_ct_bundle.py --list
+    # From a CT file that was already downloaded:
+    python scripts/generate_ct_bundle.py --file "SDTM Terminology 2024-09-27.txt"
 
-No API key required. NCI EVS is a public API.
+    # Every codelist, not only the ones Pointblank uses:
+    python scripts/generate_ct_bundle.py --all
 
-NCI EVS API
------------
-Base URL: https://api-evsrest.nci.nih.gov/api/v1
+No API key is required: NCI EVS publishes each CDISC CT package as a tab-separated text file at
 
-Endpoints used:
+    https://evs.nci.nih.gov/ftp1/CDISC/SDTM/Archive/SDTM%20Terminology%20YYYY-MM-DD.txt
 
-  GET /concept/ncit/search?terminology=ncit&q=CDISC+SDTM+Terminology&type=match
-      Locate the CDISC SDTM CT root concept (C66830 for SDTM CT).
+Which codelists
+---------------
+By default the bundle holds the codelists that Pointblank uses: those named by `codelist_check`
+operations in the rule catalogs (`pointblank/data/conformance/rules/*.json`) and those named by
+`controlled_term=` in the SDTM and ADaM templates. Codelists are keyed by their CDISC short name
+(the codelist's "CDISC Submission Value", e.g., `ACN` for Action Taken with Study Treatment), and
+the script fails if any of them isn't in the CT file, so the bundle can't silently miss one.
 
-  GET /concept/ncit/{code}/descendants
-      All descendant codelist concepts.
+`COUNTRY` isn't CDISC CT: SDTMIG uses ISO 3166-1 alpha-3 codes, which are taken from
+`pointblank.countries`. Such codelists are listed under `external` in the bundle.
 
-  GET /concept/ncit/{code}?include=full
-      Full concept detail including synonyms and properties.
-
-Alternative source (flat file download)
----------------------------------------
-NCI publishes complete CDISC CT packages as flat text files:
-
-  https://evs.nci.nih.gov/ftp1/CDISC/SDTM/SDTM%20Terminology.txt
-
-This script uses the flat file approach by default (simpler, more complete).
-Pass `--api` to use the REST API instead (slower, useful for automated pipelines).
+A few values that an implementation guide requires but that the codelist lacks (e.g., `MULTIPLE`
+in `RACE`, which SDTMIG prescribes for subjects of several races) are added, and listed with the
+reason under `additions` in the bundle.
 
 Output
 ------
-Writes to `pointblank/data/conformance/ct/{package}.json` with format::
+Writes to `pointblank/data/conformance/ct/sdtm-ct-YYYY-MM-DD.json`::
 
     {
-      "package":   "sdtm-ct-2024-09-27",
-      "source":    "NCI EVS CDISC Controlled Terminology 2024-09-27",
-      "codelists": {
-        "SEX":  ["M", "F", "U", "UNDIFFERENTIATED"],
-        "NY":   ["N", "Y"],
-        ...
-      }
+      "package":    "sdtm-ct-2024-09-27",
+      "source":     "NCI EVS CDISC Controlled Terminology 2024-09-27",
+      "codelists":  {"ACN": ["DOSE INCREASED", ...], "NY": ["N", "NA", "U", "Y"], ...},
+      "extensible": ["EPOCH", "FREQ", ...],
+      "external":   {"COUNTRY": "ISO 3166-1 alpha-3 (pointblank.countries)"},
+      "additions":  {"RACE": {"MULTIPLE": "SDTMIG 3.4 DM assumptions: ..."}}
     }
 
-Codelist values are stored as sorted lists (sets in memory, lists in JSON for
-deterministic diffs). Only submission values (the `Submission Value` synonym
-type in NCI EVS) are included.
+Codelist values are the CDISC submission values, sorted for deterministic diffs.
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import re
 import sys
-import time
-import urllib.error
 import urllib.request
 from pathlib import Path
 
-_NCI_BASE = "https://api-evsrest.nci.nih.gov/api/v1"
-_NCI_FTP_BASE = "https://evs.nci.nih.gov/ftp1/CDISC/SDTM"
+_ROOT = Path(__file__).parent.parent
+_RULES_DIR = _ROOT / "pointblank" / "data" / "conformance" / "rules"
+_OUT_DIR = _ROOT / "pointblank" / "data" / "conformance" / "ct"
+_ARCHIVE_URL = "https://evs.nci.nih.gov/ftp1/CDISC/SDTM/Archive/SDTM%20Terminology%20{date}.txt"
 
-# NCI concept codes for CDISC CT root codelists (stable identifiers).
-# These are used when fetching via the REST API.
-_SDTM_CT_ROOT = "C66830"  # SDTM Terminology (top-level)
+# Codelists that aren't CDISC CT, and where their values come from
+_EXTERNAL = {"COUNTRY": "ISO 3166-1 alpha-3 (pointblank.countries)"}
 
-_OUT_DIR = Path(__file__).parent.parent / "pointblank" / "data" / "conformance" / "ct"
-
-# Only include codelists referenced by the native engine's rule catalog.
-# Set to None to include all codelists (produces a larger bundle).
-# This list is kept in sync with the operations in the rule catalog manually;
-# run with --all to include every codelist.
-_DEFAULT_CODELISTS = {
-    "SEX",
-    "NY",
-    "ETHNIC",
-    "RACE",
-    "COUNTRY",
-    "AEOUT",
-    "AESEV",
-    "AEREL",
-    "AETOXGR",
-    "AGEU",
-    "UNIT",
-    "NCOMPLT",
-    "VSRESU",
-    "LBSTRESU",
-    "EGSTRESU",
+# Values that an implementation guide requires but that the (non-extensible) codelist lacks
+_IG_ADDITIONS = {
+    "RACE": {
+        "MULTIPLE": (
+            "SDTMIG 3.4 DM assumptions: when several races are reported, RACE is MULTIPLE "
+            "(and the races go in SUPPDM)"
+        ),
+    },
 }
 
 
-# ── HTTP helpers ──────────────────────────────────────────────────────────────
+def used_codelists() -> set[str]:
+    """Get the codelists named by the rule catalogs and the SDTM/ADaM templates."""
+    sys.path.insert(0, str(_ROOT))
+    from pointblank.metadata._adam_templates import get_adam_dataset, list_adam_datasets
+    from pointblank.metadata._sdtm_templates import get_sdtm_domain, list_sdtm_domains
+
+    names: set[str] = set()
+    for path in sorted(_RULES_DIR.glob("*.json")):
+        for rule in json.loads(path.read_text(encoding="utf-8"))["rules"]:
+            for op in rule.get("operations", []):
+                if "codelist" in op.get("params", {}):
+                    names.add(op["params"]["codelist"].upper())
+
+    templates = [get_sdtm_domain(d) for d in list_sdtm_domains()]
+    templates += [get_adam_dataset(d) for d in list_adam_datasets()]
+    for template in templates:
+        names.update(v.controlled_term.upper() for v in template.variables if v.controlled_term)
+
+    return names
 
 
-def _get_json(url: str, retries: int = 3) -> dict | list:
-    req = urllib.request.Request(url, headers={"Accept": "application/json"})
-    for attempt in range(retries):
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                return json.loads(resp.read().decode())
-        except urllib.error.HTTPError as exc:
-            if exc.code == 429:
-                wait = 2 ** (attempt + 1)
-                print(f"  rate-limited, waiting {wait}s…", file=sys.stderr)
-                time.sleep(wait)
-            else:
-                raise
-    raise RuntimeError(f"Failed after {retries} attempts: {url}")
-
-
-def _get_text(url: str) -> str:
-    req = urllib.request.Request(url, headers={"Accept": "text/plain"})
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        return resp.read().decode("utf-8", errors="replace")
-
-
-# ── List available packages ───────────────────────────────────────────────────
-
-
-def _list_packages_from_ftp() -> list[str]:
-    """Parse directory listing from NCI FTP to find available SDTM CT packages."""
-    try:
-        html = _get_text(_NCI_FTP_BASE + "/")
-    except Exception:
-        # Fallback: known packages
-        return [
-            "SDTM_CT_2024-09-27",
-            "SDTM_CT_2024-06-28",
-            "SDTM_CT_2024-03-29",
-        ]
-    # Extract links to .txt files
-    packages = re.findall(r'SDTM[^"]*Terminology[^"]*\.txt', html, re.IGNORECASE)
-    return sorted(set(packages))
-
-
-# ── Flat-file parser ──────────────────────────────────────────────────────────
-
-
-def _parse_flat_file(
-    content: str, include_all: bool, filter_codelists: set[str] | None
-) -> dict[str, list[str]]:
-    """Parse NCI EVS CDISC CT flat file (tab-separated) into codelist → submission values.
-
-    The flat file has columns (tab-separated):
-      Code  Codelist Code  Codelist Extensible (Yes/No)  Codelist Name
-      CDISC Submission Value  CDISC Synonym(s)  CDISC Definition  NCI Preferred Term
-
-    Rows where `Codelist Code` is blank are codelist headers (the codelist itself);
-    rows where it is populated are terms within a codelist.
+def parse_ct_file(text: str) -> tuple[dict[str, list[str]], set[str]]:
     """
-    codelists: dict[str, list[str]] = {}
-    current_codelist: str | None = None
+    Parse an NCI EVS CDISC CT file into codelist short name → submission values.
 
-    for line in content.splitlines():
-        if not line.strip() or line.startswith("Code\t"):
-            continue  # skip header row and blank lines
-
-        parts = line.split("\t")
-        if len(parts) < 5:
-            continue
-
-        codelist_code = parts[1].strip()  # blank for codelist header rows
-        codelist_name = parts[3].strip()
-        submission_value = parts[4].strip()
-
-        if not codelist_code:
-            # This is a codelist header row; the submission value IS the codelist name/code.
-            current_codelist = submission_value or codelist_name
-            if current_codelist and (
-                include_all
-                or filter_codelists is None
-                or current_codelist.upper() in (filter_codelists or set())
-            ):
-                codelists.setdefault(current_codelist.upper(), [])
-        else:
-            # This is a term row; add the submission value to the current codelist.
-            if current_codelist and current_codelist.upper() in codelists and submission_value:
-                codelists[current_codelist.upper()].append(submission_value)
-
-    # Sort terms for deterministic output.
-    return {name: sorted(terms) for name, terms in codelists.items() if terms}
-
-
-def fetch_via_flat_file(
-    package_date: str, include_all: bool, filter_codelists: set[str] | None
-) -> dict[str, list[str]]:
-    """Download and parse the NCI EVS CDISC SDTM CT flat file for a given date."""
-    # NCI FTP URL format: /ftp1/CDISC/SDTM/SDTM%20Terminology.txt (latest)
-    # or versioned: /ftp1/CDISC/SDTM/SDTM_CT_2024-09-27/SDTM_CT_2024-09-27.txt
-    encoded_date = package_date.replace(" ", "%20")
-    versioned_url = f"{_NCI_FTP_BASE}/{encoded_date}/{package_date}.txt"
-    latest_url = f"{_NCI_FTP_BASE}/SDTM%20Terminology.txt"
-
-    for url in (versioned_url, latest_url):
-        try:
-            print(f"Downloading {url} …")
-            content = _get_text(url)
-            print(f"  {len(content):,} bytes received.")
-            return _parse_flat_file(content, include_all, filter_codelists)
-        except Exception as exc:
-            print(f"  Failed ({exc}), trying next URL…", file=sys.stderr)
-
-    raise RuntimeError(
-        f"Could not download CT flat file for package '{package_date}'. "
-        "Check the package name with --list or supply a direct URL."
-    )
-
-
-# ── REST API fetcher ──────────────────────────────────────────────────────────
-
-
-def _fetch_codelist_via_api(code: str) -> tuple[str, list[str]]:
-    """Fetch a single codelist by NCI concept code via the EVS REST API.
-
-    Returns (codelist_name, [submission_value, ...]).
+    Rows with an empty `Codelist Code` are codelist headers (whose submission value is the
+    codelist's short name); the others are terms of the codelist named by `Codelist Code`.
+    Returns the codelists and the names of the extensible ones.
     """
-    url = f"{_NCI_BASE}/concept/ncit/{code}?include=full"
-    concept = _get_json(url)
-    if isinstance(concept, list):
-        concept = concept[0] if concept else {}
+    rows = list(csv.DictReader(io.StringIO(text), delimiter="\t"))
+    short_names = {r["Code"]: r["CDISC Submission Value"] for r in rows if not r["Codelist Code"]}
+    extensible = {
+        r["CDISC Submission Value"]
+        for r in rows
+        if not r["Codelist Code"] and r["Codelist Extensible (Yes/No)"] == "Yes"
+    }
 
-    # Extract submission values from synonyms where type == "CDISC Submission Value".
-    submission_values: list[str] = []
-    for syn in concept.get("synonyms", []):
-        if syn.get("type") == "CDISC Submission Value":
-            val = syn.get("name", "").strip()
-            if val:
-                submission_values.append(val)
+    codelists: dict[str, set[str]] = {}
+    for r in rows:
+        if r["Codelist Code"] and r["CDISC Submission Value"]:
+            name = short_names[r["Codelist Code"]]
+            codelists.setdefault(name, set()).add(r["CDISC Submission Value"])
 
-    # The codelist name is the concept's preferred name or the first CDISC synonym.
-    name = concept.get("name", code)
-    return name, sorted(submission_values)
-
-
-def fetch_via_api(include_all: bool, filter_codelists: set[str] | None) -> dict[str, list[str]]:
-    """Fetch codelists via the NCI EVS REST API. Slower but API-friendly."""
-    print(f"Fetching SDTM CT root concept ({_SDTM_CT_ROOT}) descendants…")
-    url = f"{_NCI_BASE}/concept/ncit/{_SDTM_CT_ROOT}/descendants?include=minimal"
-    descendants = _get_json(url)
-    if not isinstance(descendants, list):
-        descendants = descendants.get("concepts", [])
-
-    print(f"  {len(descendants)} descendant concepts found.")
-    codelists: dict[str, list[str]] = {}
-
-    for desc in descendants:
-        code = desc.get("code", "")
-        name = desc.get("name", code)
-        short_name = name.split("(")[0].strip().upper()
-
-        if not include_all and filter_codelists and short_name not in filter_codelists:
-            continue
-
-        try:
-            cl_name, terms = _fetch_codelist_via_api(code)
-            if terms:
-                codelists[cl_name.upper()] = terms
-            time.sleep(0.05)
-        except Exception as exc:
-            print(f"  WARNING: could not fetch {code} ({name}): {exc}", file=sys.stderr)
-
-    return codelists
+    return {name: sorted(terms) for name, terms in codelists.items()}, extensible
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+def external_codelists() -> dict[str, list[str]]:
+    """Get the codelists that don't come from CDISC CT (see `_EXTERNAL`)."""
+    sys.path.insert(0, str(_ROOT))
+    from pointblank.countries import COUNTRY_INFO
+
+    return {"COUNTRY": sorted({alpha3 for alpha3, _ in COUNTRY_INFO.values()})}
 
 
-def generate(
-    package: str,
-    include_all: bool,
-    use_api: bool,
-) -> Path:
-    filter_codelists = None if include_all else _DEFAULT_CODELISTS
+def generate(date: str, text: str, include_all: bool) -> Path:
+    codelists, extensible = parse_ct_file(text)
+    external = external_codelists()
 
-    if use_api:
-        codelists = fetch_via_api(include_all, filter_codelists)
-    else:
-        codelists = fetch_via_flat_file(package, include_all, filter_codelists)
+    if not include_all:
+        wanted = used_codelists()
+        missing = sorted(wanted - set(codelists) - set(external))
+        if missing:
+            raise SystemExit(
+                f"These codelists are used by Pointblank but aren't in the CT file: {missing}. "
+                "Use their CDISC short names (e.g., `ACN`, not `AEACN`) in the rules and templates."
+            )
+        codelists = {name: terms for name, terms in codelists.items() if name in wanted}
 
-    # Derive a slug: "SDTM_CT_2024-09-27" → "sdtm-ct-2024-09-27"
-    slug = package.lower().replace("_", "-")
-    # Extract date portion for the source string.
-    date_match = re.search(r"\d{4}-\d{2}-\d{2}", package)
-    date_str = date_match.group() if date_match else package
+    codelists.update(external)
+    for name, values in _IG_ADDITIONS.items():
+        codelists[name] = sorted(set(codelists[name]) | set(values))
 
-    bundle: dict = {
+    slug = f"sdtm-ct-{date}"
+    bundle = {
         "package": slug,
-        "source": f"NCI EVS CDISC Controlled Terminology {date_str}",
-        "codelists": codelists,
+        "source": f"NCI EVS CDISC Controlled Terminology {date}",
+        "codelists": dict(sorted(codelists.items())),
+        "extensible": sorted(extensible & set(codelists)),
+        "external": _EXTERNAL,
+        "additions": _IG_ADDITIONS,
     }
 
     out_path = _OUT_DIR / f"{slug}.json"
     _OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False), encoding="utf-8")
+    out_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Wrote {len(codelists)} codelists → {out_path}")
     return out_path
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "--package",
-        default="SDTM_CT_2024-09-27",
-        help="NCI EVS package identifier (default: SDTM_CT_2024-09-27)",
+        default="2024-09-27",
+        help="Date of the CDISC SDTM CT package (default: 2024-09-27)",
+    )
+    parser.add_argument(
+        "--file",
+        type=Path,
+        help="An NCI EVS CT text file to use instead of downloading the package",
     )
     parser.add_argument(
         "--all",
         action="store_true",
         dest="include_all",
-        help="Include all codelists (default: only those referenced by the rule catalog)",
-    )
-    parser.add_argument(
-        "--api",
-        action="store_true",
-        dest="use_api",
-        help="Use NCI EVS REST API instead of flat file download (slower)",
-    )
-    parser.add_argument(
-        "--list",
-        action="store_true",
-        dest="list_packages",
-        help="List available CT packages from NCI FTP and exit",
+        help="Include every codelist (default: only the ones Pointblank uses)",
     )
     args = parser.parse_args()
 
-    if args.list_packages:
-        pkgs = _list_packages_from_ftp()
-        print("Available CDISC SDTM CT packages on NCI FTP:")
-        for p in pkgs:
-            print(f"  {p}")
-        return
+    if args.file is not None:
+        text = args.file.read_text(encoding="utf-8")
+        date = re.search(r"\d{4}-\d{2}-\d{2}", args.file.name)
+        date = date.group() if date else args.package
+    else:
+        url = _ARCHIVE_URL.format(date=args.package)
+        print(f"Downloading {url} …")
+        with urllib.request.urlopen(url, timeout=120) as resp:
+            text = resp.read().decode("utf-8")
+        date = args.package
 
-    generate(args.package, args.include_all, args.use_api)
+    generate(date, text, args.include_all)
 
 
 if __name__ == "__main__":
