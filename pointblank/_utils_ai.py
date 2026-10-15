@@ -5,6 +5,7 @@ import importlib
 import json
 import logging
 import pathlib
+import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -51,6 +52,32 @@ def _check_provider_packages(provider: str) -> None:
     """Check that the packages a model provider needs are installed."""
     for package in _PROVIDER_PACKAGES.get(provider, []):
         _check_ai_package(package, f"to use the `{provider}` provider")
+
+
+def _http_library(sdk: str) -> str:
+    """
+    Get the HTTP library a provider SDK is built on: `httpx2` or `httpx`.
+
+    `anthropic` (from 1.0) and `openai` (from 3.0) moved from `httpx` to `httpx2`, and they
+    reject (or fail later with) a client from the other library. Their package metadata says
+    which one they need.
+    """
+    from importlib.metadata import PackageNotFoundError, requires
+
+    try:
+        requirements = requires(sdk) or []
+    except PackageNotFoundError:  # pragma: no cover
+        requirements = []
+
+    names = {re.split(r"[\s;<>=!~\[]", r, maxsplit=1)[0].lower() for r in requirements}
+    return "httpx2" if "httpx2" in names else "httpx"
+
+
+def _async_http_client(sdk: str, verify_ssl: bool) -> Any:
+    """Create an async HTTP client (with the SSL setting) of the kind that a provider SDK accepts."""
+    library = _http_library(sdk)
+    _check_ai_package(library, "for SSL configuration")
+    return importlib.import_module(library).AsyncClient(verify=verify_ssl)
 
 
 @dataclass
@@ -139,12 +166,6 @@ def _create_chat_instance(
     if system_prompt is None:
         system_prompt = _ROW_VALIDATION_SYSTEM_PROMPT
 
-    # Create httpx client with SSL verification settings
-    _check_ai_package("httpx", "for SSL configuration")
-    import httpx
-
-    http_client = httpx.AsyncClient(verify=verify_ssl)
-
     # Create provider-specific chat instance
     if provider == "anthropic":
         from chatlas import ChatAnthropic
@@ -153,7 +174,7 @@ def _create_chat_instance(
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
-            kwargs={"http_client": http_client},
+            kwargs={"http_client": _async_http_client("anthropic", verify_ssl)},
         )
 
     elif provider == "openai":  # pragma: no cover
@@ -163,7 +184,7 @@ def _create_chat_instance(
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
-            kwargs={"http_client": http_client},
+            kwargs={"http_client": _async_http_client("openai", verify_ssl)},
         )
 
     elif provider == "ollama":  # pragma: no cover
@@ -172,7 +193,7 @@ def _create_chat_instance(
         chat = ChatOllama(
             model=model_name,
             system_prompt=system_prompt,
-            kwargs={"http_client": http_client},
+            kwargs={"http_client": _async_http_client("openai", verify_ssl)},
         )
 
     elif provider == "bedrock":
@@ -210,7 +231,7 @@ def _create_chat_instance(
             api_version=api_version,
             api_key=api_key,
             system_prompt=system_prompt,
-            kwargs={"http_client": http_client},
+            kwargs={"http_client": _async_http_client("openai", verify_ssl)},
         )
 
     else:
