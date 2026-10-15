@@ -258,6 +258,13 @@ marked `not_applicable`. Supplying the file allows the engine to verify that eve
 in your datasets is declared in Define-XML with the correct type and, where applicable, a valid
 codelist.
 
+Define-XML also tells the CT checks about sponsor extensions. Many CDISC codelists are extensible
+(EPOCH, FREQ, ROUTE, and UNIT among them): a sponsor may add terms, provided Define-XML declares
+them with `def:ExtendedValue="Yes"` on the codelist item. When `define_xml` is supplied, such
+declared terms pass the codelist checks for extensible codelists. For example, a crossover study can
+use the epochs `TREATMENT 1` and `TREATMENT 2`. Without Define-XML, or for a codelist that isn't
+extensible (such as SEX), terms outside the codelist are still reported.
+
 ### Loading XPT Files
 
 For datasets stored as SAS Transport (XPT) files, use `pyreadstat` to load them before passing to
