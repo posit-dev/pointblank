@@ -470,7 +470,7 @@ def test_engine_clean_dm_zero_issues(clean_result):
 
 
 def test_engine_rule_count(clean_result):
-    assert len(clean_result.rule_results) == 414
+    assert len(clean_result.rule_results) == 362
 
 
 def test_engine_result_types(clean_result):
@@ -1255,7 +1255,7 @@ def test_variable_metadata_check_fails_missing_sex():
     engine = NativeConformanceEngine("sdtmig", "3.4", rule_types=["VARIABLE_METADATA_CHECK"])
     result = engine.run({"DM": dm})
     vmc = {r.rule_id: r for r in result.rule_results if r.rule_type == "VARIABLE_METADATA_CHECK"}
-    # SDTM-032 checks SEX, RACE, ETHNIC, COUNTRY.
+    # SDTM-032 checks SEX, RACE, COUNTRY (ETHNIC is Permissible).
     assert vmc["SDTM-032"].status == "fail"
 
 
@@ -1614,7 +1614,7 @@ def test_engine_accepts_metadata_import_directly():
 def test_engine_rule_count_phase3():
     engine = NativeConformanceEngine("sdtmig", "3.4")
     result = engine.run({"DM": _clean_dm()})
-    assert len(result.rule_results) == 414
+    assert len(result.rule_results) == 362
 
 
 _FIXTURES_DIR = Path(__file__).parent / "metadata_fixtures"

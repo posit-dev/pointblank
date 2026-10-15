@@ -90,31 +90,34 @@ def conformant_sdtm_package() -> dict[str, pl.DataFrame]:
             "EXENDY": [57, 57],
         }
     )
-    # LB: original-unit reference ranges are Char (LBORNRLO/LBORNRHI); standard ones are Num
+    # LB: original-unit reference ranges are Char (LBORNRLO/LBORNRHI); standard ones are Num. The
+    # third record is a test that wasn't done, so its Expected results are null
     lb = pl.DataFrame(
         {
-            "STUDYID": [STUDY] * 2,
-            "DOMAIN": ["LB"] * 2,
-            "USUBJID": SUBJ,
-            "LBSEQ": [1, 1],
-            "LBTESTCD": ["HGB", "HGB"],
-            "LBTEST": ["Hemoglobin", "Hemoglobin"],
-            "LBCAT": ["HEMATOLOGY"] * 2,
-            "LBORRES": ["14.1", "12.9"],
-            "LBORRESU": ["g/dL"] * 2,
-            "LBORNRLO": ["13.5", "12.0"],
-            "LBORNRHI": ["17.5", "15.5"],
-            "LBSTRESC": ["14.1", "12.9"],
-            "LBSTRESN": [14.1, 12.9],
-            "LBSTRESU": ["g/dL"] * 2,
-            "LBSTNRLO": [13.5, 12.0],
-            "LBSTNRHI": [17.5, 15.5],
-            "LBNRIND": ["NORMAL", "NORMAL"],
-            "VISITNUM": [1.0, 1.0],
-            "VISIT": ["SCREENING"] * 2,
-            "EPOCH": ["SCREENING"] * 2,
-            "LBDTC": ["2024-01-02", "2024-01-03"],
-            "LBDY": [-6, -6],
+            "STUDYID": [STUDY] * 3,
+            "DOMAIN": ["LB"] * 3,
+            "USUBJID": [SUBJ[0], SUBJ[1], SUBJ[0]],
+            "LBSEQ": [1, 1, 2],
+            "LBTESTCD": ["HGB", "HGB", "PLAT"],
+            "LBTEST": ["Hemoglobin", "Hemoglobin", "Platelets"],
+            "LBCAT": ["HEMATOLOGY"] * 3,
+            "LBORRES": ["14.1", "12.9", None],
+            "LBORRESU": ["g/dL", "g/dL", None],
+            "LBORNRLO": ["13.5", "12.0", None],
+            "LBORNRHI": ["17.5", "15.5", None],
+            "LBSTRESC": ["14.1", "12.9", None],
+            "LBSTRESN": [14.1, 12.9, None],
+            "LBSTRESU": ["g/dL", "g/dL", None],
+            "LBSTNRLO": [13.5, 12.0, None],
+            "LBSTNRHI": [17.5, 15.5, None],
+            "LBNRIND": ["NORMAL", "NORMAL", None],
+            "LBSTAT": [None, None, "NOT DONE"],
+            "LBREASND": [None, None, "SAMPLE HEMOLYZED"],
+            "VISITNUM": [1.0, 1.0, 1.0],
+            "VISIT": ["SCREENING"] * 3,
+            "EPOCH": ["SCREENING"] * 3,
+            "LBDTC": ["2024-01-02", "2024-01-03", "2024-01-02"],
+            "LBDY": [-6, -6, -6],
         }
     )
     # VS: VISITNUM is Expected, so it's null for an unscheduled record
@@ -233,6 +236,9 @@ def test_incorrect_rules_are_not_in_the_catalog(report):
         "SDTM-371",  # LBSPEC required in LB (Permissible)
         "SDTM-435",  # duplicate of SDTM-066
         "SDTM-087",  # AETOXGR has no CDISC codelist (the grading scale is the sponsor's)
+        "SDTM-336",  # VISITNUM not null in LB (Expected)
+        "SDTM-266",  # VSORRES not null (Expected; null when not done)
+        "SDTM-196",  # DMSEQ (not an SDTMIG variable)
         "SDTM-135",  # AEREL has no CDISC codelist (SDTMIG only gives ICH examples)
     }
     assert not removed & rule_ids
@@ -429,3 +435,69 @@ def test_define_xml_extended_values_are_parsed(tmp_path):
     codelist = _read_define_xml_metadata(str(path)).codelists["EPOCH"]
 
     assert codelist.extended_values() == ["TREATMENT 1"]
+
+
+# ── Core designations (Req/Exp/Perm) ─────────────────────────────────────────
+
+
+def _sdtmig_core() -> dict[tuple[str, str], str]:
+    from pathlib import Path
+
+    path = Path(__file__).parent / "metadata_fixtures" / "sdtmig_3_4_core.tsv"
+    lines = [ln for ln in path.read_text().splitlines() if not ln.startswith("#")][1:]
+    return {(ds, var): core for ds, var, core in (ln.split("\t") for ln in lines)}
+
+
+def _plain_not_null_rules(rules):
+    """Rules that only say "X must not be null" (a single `is_null` condition on a variable)."""
+    for rule in rules:
+        conds = rule["conditions"]
+        items = conds.get("all") or conds.get("any") or []
+        if rule["rule_type"] == "RECORD_CHECK" and len(items) == 1:
+            cond = items[0]
+            if cond.get("operator") == "is_null" and not cond["name"].startswith("_pb_"):
+                yield rule, cond["name"]
+
+
+def test_rules_match_sdtmig_core_designations():
+    """Presence rules may only require Required/Expected variables, and not-null rules only
+    Required ones: Expected values may be null, and Permissible variables may be absent."""
+    import json
+
+    from pointblank.metadata._conformance.rule_loader import _DATA_DIR
+
+    core = _sdtmig_core()
+    covered = {ds for ds, _ in core}
+    rules = json.loads((_DATA_DIR / "sdtmig-3-4.json").read_text(encoding="utf-8"))["rules"]
+
+    wrong = []
+    for rule in rules:
+        for op in rule["operations"]:
+            if op["operator"] in ("column_presence", "has_required_variables"):
+                variables = op["params"].get("variables") or [op["params"]["column"]]
+                for ds in rule["domains"]:
+                    for var in variables:
+                        if ds in covered and core.get((ds, var)) not in ("Req", "Exp"):
+                            wrong.append(f"{rule['core_id']}: {ds}.{var} ({core.get((ds, var))})")
+    for rule, var in _plain_not_null_rules(rules):
+        for ds in rule["domains"]:
+            if ds in covered and core.get((ds, var)) != "Req":
+                wrong.append(f"{rule['core_id']}: non-null {ds}.{var} ({core.get((ds, var))})")
+
+    assert wrong == []
+
+
+def test_permissible_variables_can_be_left_out():
+    package = conformant_sdtm_package()
+    for ds, cols in {
+        "DM": ["ETHNIC"],
+        "AE": ["AESEV", "AEOUT"],
+        "EX": ["EXROUTE"],
+        "TA": ["ELEMENT"],
+        "TV": ["VISITDY"],
+    }.items():
+        package[ds] = package[ds].drop(cols)
+
+    report = pb.validate_sdtmig(package)
+
+    assert [r.rule_id for r in report.native_result.rule_results if r.status == "fail"] == []

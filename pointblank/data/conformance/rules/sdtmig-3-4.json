@@ -3,7 +3,7 @@
   "version": "3.4",
   "generated": "2026-07-14T00:00:00Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "d30d87abb0157429",
+  "checksum": "35364c22f2effabc",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -1310,7 +1310,7 @@
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "DM domain must contain required demographic variables (SEX, RACE, ETHNIC, COUNTRY).",
+      "description": "DM domain must contain required demographic variables (SEX, RACE, COUNTRY).",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -1329,7 +1329,6 @@
             "variables": [
               "SEX",
               "RACE",
-              "ETHNIC",
               "COUNTRY"
             ]
           }
@@ -1348,11 +1347,6 @@
             "value": false
           },
           {
-            "name": "_pb_ETHNIC_present",
-            "operator": "equal_to",
-            "value": false
-          },
-          {
             "name": "_pb_COUNTRY_present",
             "operator": "equal_to",
             "value": false
@@ -1362,7 +1356,7 @@
       "actions": {
         "id": "generate_variable_error",
         "params": {
-          "message": "DM domain is missing one or more required demographic variables (SEX, RACE, ETHNIC, COUNTRY)."
+          "message": "DM domain is missing one or more required demographic variables (SEX, RACE, COUNTRY)."
         }
       }
     },
@@ -1652,7 +1646,7 @@
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "AE domain must contain severity, seriousness, and outcome variables.",
+      "description": "AE domain must contain the seriousness variable (AESER).",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -1669,9 +1663,7 @@
           "operator": "has_required_variables",
           "params": {
             "variables": [
-              "AESEV",
-              "AESER",
-              "AEOUT"
+              "AESER"
             ]
           }
         }
@@ -1679,17 +1671,7 @@
       "conditions": {
         "any": [
           {
-            "name": "_pb_AESEV_present",
-            "operator": "equal_to",
-            "value": false
-          },
-          {
             "name": "_pb_AESER_present",
-            "operator": "equal_to",
-            "value": false
-          },
-          {
-            "name": "_pb_AEOUT_present",
             "operator": "equal_to",
             "value": false
           }
@@ -1698,7 +1680,7 @@
       "actions": {
         "id": "generate_variable_error",
         "params": {
-          "message": "AE domain must include AESEV (severity), AESER (serious flag), and AEOUT (outcome)."
+          "message": "AE domain must include AESER (serious flag)."
         }
       }
     },
@@ -4023,40 +4005,6 @@
       }
     },
     {
-      "core_id": "SDTM-088",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "AEBODSYS must not be null in AE.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "AEBODSYS",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AEBODSYS must not be null in AE."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-089",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -5020,55 +4968,6 @@
       }
     },
     {
-      "core_id": "SDTM-111",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "CM domain must contain timing variables CMSTDTC and CMENDTC.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "has_required_variables",
-          "params": {
-            "variables": [
-              "CMSTDTC",
-              "CMENDTC"
-            ]
-          }
-        }
-      ],
-      "conditions": {
-        "any": [
-          {
-            "name": "_pb_CMSTDTC_present",
-            "operator": "equal_to",
-            "value": false
-          },
-          {
-            "name": "_pb_CMENDTC_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "CM domain is missing one or more required timing variables (CMSTDTC, CMENDTC)."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-112",
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
@@ -5913,40 +5812,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "VISITNUM must not be null in TV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-130",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISIT must not be null in TV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VISIT",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VISIT must not be null in TV."
         }
       }
     },
@@ -6940,7 +6805,7 @@
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "TA must contain required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH, ELEMENT.",
+      "description": "TA must contain required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -6962,8 +6827,7 @@
               "ARMCD",
               "ARM",
               "TAETORD",
-              "EPOCH",
-              "ELEMENT"
+              "EPOCH"
             ]
           }
         }
@@ -6999,18 +6863,13 @@
             "name": "_pb_EPOCH_present",
             "operator": "equal_to",
             "value": false
-          },
-          {
-            "name": "_pb_ELEMENT_present",
-            "operator": "equal_to",
-            "value": false
           }
         ]
       },
       "actions": {
         "id": "generate_variable_error",
         "params": {
-          "message": "TA is missing one or more required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH, ELEMENT."
+          "message": "TA is missing one or more required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH."
         }
       }
     },
@@ -7080,7 +6939,7 @@
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "TV must contain required variables: STUDYID, DOMAIN, VISITNUM, VISIT.",
+      "description": "TV must contain required variables: STUDYID, DOMAIN, VISITNUM.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -7099,8 +6958,7 @@
             "variables": [
               "STUDYID",
               "DOMAIN",
-              "VISITNUM",
-              "VISIT"
+              "VISITNUM"
             ]
           }
         }
@@ -7121,18 +6979,13 @@
             "name": "_pb_VISITNUM_present",
             "operator": "equal_to",
             "value": false
-          },
-          {
-            "name": "_pb_VISIT_present",
-            "operator": "equal_to",
-            "value": false
           }
         ]
       },
       "actions": {
         "id": "generate_variable_error",
         "params": {
-          "message": "TV is missing one or more required variables: STUDYID, DOMAIN, VISITNUM, VISIT."
+          "message": "TV is missing one or more required variables: STUDYID, DOMAIN, VISITNUM."
         }
       }
     },
@@ -8477,40 +8330,6 @@
       }
     },
     {
-      "core_id": "SDTM-196",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "DMSEQ must not be null in the DM dataset.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Special-Purpose"
-      ],
-      "domains": [
-        "DM"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "DMSEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "DMSEQ must not be null in DM."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-197",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -8695,40 +8514,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "AECONTRT must contain a value from the NY codelist in AE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-201",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "MHDECOD (dictionary-derived term) must not be null in MH.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "MH"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "MHDECOD",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "MHDECOD must not be null in MH."
         }
       }
     },
@@ -9047,40 +8832,6 @@
       }
     },
     {
-      "core_id": "SDTM-209",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "DSCAT (category) must not be null in the DS dataset.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "DS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "DSCAT",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "DSCAT must not be null in DS."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-210",
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
@@ -9359,40 +9110,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "SVENDY must be a numeric variable in SV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-217",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "TSVAL (parameter value) must not be null in the TS dataset.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TSVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TSVAL must not be null in TS."
         }
       }
     },
@@ -10189,47 +9906,6 @@
       }
     },
     {
-      "core_id": "SDTM-237",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "MHSTDTC (start date/time of medical history event) must be present as a variable in the MH dataset.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "MH"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "MHSTDTC"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_MHSTDTC_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "MHSTDTC must be present in MH."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-238",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -11018,74 +10694,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "LBTEST must not be null in LB."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-266",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VSORRES (original result) must not be null in VS.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "VS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VSORRES",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VSORRES must not be null in VS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-267",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "LBORRES (original result) must not be null in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "LBORRES",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "LBORRES must not be null in LB."
         }
       }
     },
@@ -12184,48 +11792,6 @@
       }
     },
     {
-      "core_id": "SDTM-297",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "SVSEQ must be a numeric variable in SV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "SV"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "SVSEQ",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_SVSEQ_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "SVSEQ must be a numeric variable in SV."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-298",
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
@@ -12404,40 +11970,6 @@
       }
     },
     {
-      "core_id": "SDTM-303",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "AEBODSYS (body system or organ class) must not be null in AE.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "AEBODSYS",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AEBODSYS must not be null in AE."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-304",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -12468,40 +12000,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "CMTRT must not be null in CM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-305",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "CMDECOD (standardized medication name) must not be null in CM.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "CMDECOD",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "CMDECOD must not be null in CM."
         }
       }
     },
@@ -12638,108 +12136,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "EXTRT must not be null in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-310",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "EXDOSE (dose per administration) must not be null in EX.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXDOSE",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXDOSE must not be null in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-311",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VSSTRESC (standardized result in character format) must not be null in VS.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "VS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VSSTRESC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VSSTRESC must not be null in VS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-312",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "LBSTRESC (standardized result in character format) must not be null in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "LBSTRESC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "LBSTRESC must not be null in LB."
         }
       }
     },
@@ -13129,108 +12525,6 @@
       }
     },
     {
-      "core_id": "SDTM-323",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "ELEMENT (trial element name) must not be null in TA.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TA"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "ELEMENT",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "ELEMENT must not be null in TA."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-324",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "TEENRL (trial element end rule) must not be null in TE.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TEENRL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TEENRL must not be null in TE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-325",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISIT (visit description) must not be null in TV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VISIT",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VISIT must not be null in TV."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-328",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -13367,40 +12661,6 @@
       }
     },
     {
-      "core_id": "SDTM-332",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISIT must not be null in SV.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "SV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VISIT",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VISIT must not be null in SV."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-333",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -13489,40 +12749,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "SVENDTC must conform to ISO 8601 format in SV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-336",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "VISITNUM must not be null in LB.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "VISITNUM",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "VISITNUM must not be null in LB."
         }
       }
     },
@@ -14845,88 +14071,6 @@
       }
     },
     {
-      "core_id": "SDTM-372",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "CMROUTE (route of administration) column must be present in the CM domain.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "CMROUTE"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_CMROUTE_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "CMROUTE must be present in CM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-373",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "EXROUTE (route of administration) column must be present in the EX domain.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "column_presence",
-          "params": {
-            "column": "EXROUTE"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_EXROUTE_present",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "EXROUTE must be present in EX."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-374",
       "rule_type": "VARIABLE_METADATA_CHECK",
       "executability": "Fully Executable",
@@ -14964,74 +14108,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "EXDOSFRM must be present in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-375",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "LBSPEC must not be null in LB; specimen type is required for each lab result record.",
-      "classes": [
-        "Findings"
-      ],
-      "domains": [
-        "LB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "LBSPEC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "LBSPEC must not be null in LB."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-376",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "AESER must not be null in AE; the serious adverse event flag is required for each AE record.",
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "AESER",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AESER must not be null in AE."
         }
       }
     },
@@ -15374,278 +14450,6 @@
       }
     },
     {
-      "core_id": "SDTM-386",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVAR must not be null in SUPPDM; the linking variable name is required to connect supplemental records to the parent dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPDM"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVAR",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVAR must not be null in SUPPDM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-387",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVARVAL must not be null in SUPPDM; the linking variable value is required to connect supplemental records to the parent dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPDM"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVARVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVARVAL must not be null in SUPPDM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-388",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVAR must not be null in SUPPAE; the linking variable name is required to connect supplemental records to the parent AE dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPAE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVAR",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVAR must not be null in SUPPAE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-389",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVARVAL must not be null in SUPPAE; the linking variable value is required to connect supplemental records to the parent AE dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPAE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVARVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVARVAL must not be null in SUPPAE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-390",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVAR must not be null in SUPPLB; the linking variable name is required to connect supplemental records to the parent LB dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPLB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVAR",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVAR must not be null in SUPPLB."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-391",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVARVAL must not be null in SUPPLB; the linking variable value is required to connect supplemental records to the parent LB dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPLB"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVARVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVARVAL must not be null in SUPPLB."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-392",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVAR must not be null in SUPPVS; the linking variable name is required to connect supplemental records to the parent VS dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPVS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVAR",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVAR must not be null in SUPPVS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-393",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVARVAL must not be null in SUPPVS; the linking variable value is required to connect supplemental records to the parent VS dataset.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPVS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVARVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVARVAL must not be null in SUPPVS."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-394",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -15778,344 +14582,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "TAETORD must not be null in TA."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-398",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TVSEQ must not be null in TV; the sequence number is required for every trial visit record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TVSEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TVSEQ must not be null in TV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-399",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TVSEQ in TV must be a numeric type variable.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TV"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "TVSEQ",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_TVSEQ_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "TVSEQ must be numeric in TV."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-400",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TISEQ must not be null in TI; the sequence number is required for every trial inclusion/exclusion criteria record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TI"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TISEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TISEQ must not be null in TI."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-401",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TISEQ in TI must be a numeric type variable.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TI"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "TISEQ",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_TISEQ_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "TISEQ must be numeric in TI."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-402",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TASEQ must not be null in TA; the sequence number is required for every trial arm record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TA"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TASEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TASEQ must not be null in TA."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-403",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TASEQ in TA must be a numeric type variable.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TA"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "TASEQ",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_TASEQ_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "TASEQ must be numeric in TA."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-404",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TESEQ must not be null in TE; the sequence number is required for every trial element record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "TESEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "TESEQ must not be null in TE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-405",
-      "rule_type": "VARIABLE_METADATA_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "TESEQ in TE must be a numeric type variable.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "TE"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "variable_type_check",
-          "params": {
-            "column": "TESEQ",
-            "expected_type": "numeric"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "_pb_TESEQ_type_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_variable_error",
-        "params": {
-          "message": "TESEQ must be numeric in TE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-406",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "SVSEQ must not be null in SV; the sequence number is required for every subject visit record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "SV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "SVSEQ",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "SVSEQ must not be null in SV."
         }
       }
     },
@@ -16368,278 +14834,6 @@
         "id": "generate_variable_error",
         "params": {
           "message": "DSENDY must be numeric in DS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-413",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "EXDOSFRM must not be null in EX; the dose form is required for each exposure record.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXDOSFRM",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXDOSFRM must not be null in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-414",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "EXROUTE must not be null in EX; the route of administration is required for each exposure record.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXROUTE",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXROUTE must not be null in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-415",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "CMROUTE must not be null in CM; the route of administration is required for each concomitant medication record.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "CM"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "CMROUTE",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "CMROUTE must not be null in CM."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-416",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "AEACN must not be null in AE; the action taken with study treatment is required for each adverse event record.",
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "AEACN",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AEACN must not be null in AE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-417",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "AESTDTC must not be null in AE; the adverse event start date/time is required.",
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "AESTDTC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AESTDTC must not be null in AE."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-418",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "DSSTDTC must not be null in DS; the disposition date/time is required for each disposition record.",
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "DS"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "DSSTDTC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "DSSTDTC must not be null in DS."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-419",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "EXSTDTC must not be null in EX; the exposure start date/time is required for each exposure record.",
-      "classes": [
-        "Interventions"
-      ],
-      "domains": [
-        "EX"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "EXSTDTC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "EXSTDTC must not be null in EX."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-420",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "SVSTDTC must not be null in SV; the subject visit start date/time is required for each subject visit record.",
-      "classes": [
-        "Trial Design"
-      ],
-      "domains": [
-        "SV"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "SVSTDTC",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "SVSTDTC must not be null in SV."
         }
       }
     },
@@ -16952,74 +15146,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "DOMAIN value must be 'SUPPMH' in the SUPPMH dataset."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-429",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVAR must not be null in SUPPEG; the identifier variable name is required to link each supplemental qualifier record back to its parent EG record.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPEG"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVAR",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVAR must not be null in SUPPEG."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-430",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "description": "IDVARVAL must not be null in SUPPEG; the identifier variable value is required to link each supplemental qualifier record back to its parent EG record.",
-      "classes": [
-        "Relationship"
-      ],
-      "domains": [
-        "SUPPEG"
-      ],
-      "datasets": [],
-      "operations": [],
-      "conditions": {
-        "all": [
-          {
-            "name": "IDVARVAL",
-            "operator": "is_null",
-            "value": null
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "IDVARVAL must not be null in SUPPEG."
         }
       }
     },
