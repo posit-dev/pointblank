@@ -21,7 +21,7 @@ Or set the variable directly when running pytest:
 
 These tests are skipped automatically when CDISCPILOT01_PATH is not set.
 
-Validated against: SDTMIG 3.4 conformance catalog, 416 rules, CT 2024-09-27.
+Validated against: SDTMIG 3.4 conformance catalog, 414 rules, CT 2024-09-27.
 Study: CDISCPILOT01, Alzheimer's disease study, 306 subjects, 18 SDTM + 4 SUPP-- domains.
 """
 
@@ -135,8 +135,8 @@ def test_report_is_rules_type(pilot_report):
 
 
 def test_report_has_expected_rule_count(pilot_report):
-    """416 rules in the SDTMIG 3.4 catalog (after removing rules that contradict the IG)."""
-    assert len(pilot_report.native_result.rule_results) == 416
+    """414 rules in the SDTMIG 3.4 catalog (after removing rules that contradict the IG)."""
+    assert len(pilot_report.native_result.rule_results) == 414
 
 
 def test_report_overall_pass_rate(pilot_report):
@@ -186,23 +186,12 @@ def test_core_domains_present(pilot_datasets):
 # SDTMIG 3.4 / CT-2024-09-27, NOT bugs in the conformance engine.
 
 
-def test_aerel_finding_is_present(pilot_report):
-    """AEREL uses old CT terms (PROBABLE/POSSIBLE/REMOTE/NONE); current CT expects longer phrases.
-
-    This is an expected, legitimate finding — the pilot predates the current AEREL codelist.
-    If this test starts failing (0 issues) the AEREL rule may have been accidentally relaxed.
-    """
-    aerel = next(
-        (r for r in pilot_report.native_result.rule_results if r.rule_id == "SDTM-135"),
-        None,
-    )
-    assert aerel is not None, "SDTM-135 (AEREL CT check) not found in results"
-    assert aerel.n_issues > 0, (
-        "Expected AEREL findings against CDISCPILOT01 — "
-        "old CT terms should not be silently accepted."
-    )
-    # Upper bound: all 1,191 AE records
-    assert aerel.n_issues <= 1_200
+def test_aerel_has_no_codelist_rule(pilot_report):
+    """The pilot's AEREL terms (PROBABLE/POSSIBLE/REMOTE/NONE) are conformant: AEREL has no CDISC
+    codelist (SDTMIG gives the ICH E2A/E2B terms as examples), so the rule that checked it against
+    a made-up list (SDTM-135) was removed."""
+    rule_ids = {r.rule_id for r in pilot_report.native_result.rule_results}
+    assert "SDTM-135" not in rule_ids
 
 
 def test_no_findings_for_conformant_pilot_features(pilot_report):
@@ -356,18 +345,27 @@ def test_findings_df_has_usubjid_values(pilot_report):
     assert (df["usubjid"] != "").all(), "Some findings are missing USUBJID"
 
 
-def test_findings_df_aerel_findings(pilot_report):
-    """findings_df() for SDTM-135 (AEREL) must capture checked_column='AEREL'."""
+def test_findings_df_codelist_findings(pilot_report):
+    """findings_df() records the checked column of codelist-rule findings."""
+    import json
+
     import polars as pl
 
-    df = pilot_report.findings_df()
-    aerel = df.filter(pl.col("rule_id") == "SDTM-135")
-    assert len(aerel) > 0
-    assert (aerel["checked_column"] == "AEREL").all()
-    # checked_value should be one of the old CT terms
-    old_terms = {"PROBABLE", "POSSIBLE", "REMOTE", "NONE"}
-    actual_vals = set(aerel["checked_value"].unique().to_list())
-    assert actual_vals & old_terms, f"Expected old AEREL terms, got {actual_vals}"
+    from pointblank.metadata._conformance.rule_loader import _DATA_DIR
+
+    catalog = json.loads((_DATA_DIR / "sdtmig-3-4.json").read_text(encoding="utf-8"))
+    codelist_columns = {
+        rule["core_id"]: op["params"]["column"]
+        for rule in catalog["rules"]
+        for op in rule["operations"]
+        if op["operator"] == "codelist_check"
+    }
+
+    df = pilot_report.findings_df().filter(pl.col("rule_id").is_in(list(codelist_columns)))
+    if len(df) == 0:
+        pytest.skip("No codelist findings in the pilot")
+    for rule_id, column in df.select("rule_id", "checked_column").unique().iter_rows():
+        assert column == codelist_columns[rule_id]
 
 
 def test_get_findings_table_renders(pilot_report):

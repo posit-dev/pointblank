@@ -2049,7 +2049,7 @@ def validate_sdtmig(
 ) -> ConformanceReport:
     """Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.
 
-    Runs the bundled SDTMIG 3.4 rule catalog (416 rules) against the provided SDTM domain
+    Runs the bundled SDTMIG 3.4 rule catalog (414 rules) against the provided SDTM domain
     datasets using Pointblank's built-in conformance engine. No external tools, subprocesses,
     network calls, or CDISC CORE installation are required.
 

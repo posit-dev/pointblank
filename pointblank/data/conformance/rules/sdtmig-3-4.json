@@ -3,7 +3,7 @@
   "version": "3.4",
   "generated": "2026-07-14T00:00:00Z",
   "source": "CDISC SDTM Implementation Guide 3.4, hand-curated from public specification",
-  "checksum": "9b0573b3dc833d9d",
+  "checksum": "d30d87abb0157429",
   "rules": [
     {
       "core_id": "SDTM-001",
@@ -823,7 +823,7 @@
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "AEOUT in AE must use values from the AEOUT codelist when present.",
+      "description": "AEOUT in AE must use values from the OUT (Outcome of Event) codelist when present.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -840,7 +840,7 @@
           "operator": "codelist_check",
           "params": {
             "column": "AEOUT",
-            "codelist": "AEOUT"
+            "codelist": "OUT"
           }
         }
       ],
@@ -861,7 +861,7 @@
       "actions": {
         "id": "generate_record_error",
         "params": {
-          "message": "AEOUT value is not in the AEOUT codelist."
+          "message": "AEOUT value is not in the OUT (Outcome of Event) codelist."
         }
       }
     },
@@ -4023,53 +4023,6 @@
       }
     },
     {
-      "core_id": "SDTM-087",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "AETOXGR in AE must use AETOXGR codelist when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "AETOXGR",
-            "codelist": "AETOXGR"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "AETOXGR",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_AETOXGR_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AETOXGR value is not in the AETOXGR codelist."
-        }
-      }
-    },
-    {
       "core_id": "SDTM-088",
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
@@ -4108,7 +4061,7 @@
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "AEACN in AE must use AEACN codelist when present.",
+      "description": "AEACN in AE must use the ACN (Action Taken with Study Treatment) codelist when present.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -4125,7 +4078,7 @@
           "operator": "codelist_check",
           "params": {
             "column": "AEACN",
-            "codelist": "AEACN"
+            "codelist": "ACN"
           }
         }
       ],
@@ -4146,7 +4099,7 @@
       "actions": {
         "id": "generate_record_error",
         "params": {
-          "message": "AEACN value is not in the AEACN codelist."
+          "message": "AEACN value is not in the ACN (Action Taken with Study Treatment) codelist."
         }
       }
     },
@@ -4317,7 +4270,7 @@
       "rule_type": "RECORD_CHECK",
       "executability": "Fully Executable",
       "sensitivity": "Error",
-      "description": "LBSTRESU in LB must use LBSTRESU codelist when present.",
+      "description": "LBSTRESU in LB must use the UNIT codelist when present.",
       "authority": "CDISC",
       "standards": [
         "sdtmig"
@@ -4334,7 +4287,7 @@
           "operator": "codelist_check",
           "params": {
             "column": "LBSTRESU",
-            "codelist": "LBSTRESU"
+            "codelist": "UNIT"
           }
         }
       ],
@@ -4355,7 +4308,7 @@
       "actions": {
         "id": "generate_record_error",
         "params": {
-          "message": "LBSTRESU value is not in the LBSTRESU codelist."
+          "message": "LBSTRESU value is not in the UNIT codelist."
         }
       }
     },
@@ -6109,53 +6062,6 @@
         "id": "generate_record_error",
         "params": {
           "message": "IECAT in TI contains a value not in the IECAT codelist."
-        }
-      }
-    },
-    {
-      "core_id": "SDTM-135",
-      "rule_type": "RECORD_CHECK",
-      "executability": "Fully Executable",
-      "sensitivity": "Error",
-      "description": "AEREL in AE must use AEREL controlled terminology when present.",
-      "authority": "CDISC",
-      "standards": [
-        "sdtmig"
-      ],
-      "classes": [
-        "Events"
-      ],
-      "domains": [
-        "AE"
-      ],
-      "datasets": [],
-      "operations": [
-        {
-          "operator": "codelist_check",
-          "params": {
-            "column": "AEREL",
-            "codelist": "AEREL"
-          }
-        }
-      ],
-      "conditions": {
-        "all": [
-          {
-            "name": "AEREL",
-            "operator": "is_not_null",
-            "value": null
-          },
-          {
-            "name": "_pb_AEREL_valid",
-            "operator": "equal_to",
-            "value": false
-          }
-        ]
-      },
-      "actions": {
-        "id": "generate_record_error",
-        "params": {
-          "message": "AEREL in AE contains a value not in the AEREL codelist."
         }
       }
     },
