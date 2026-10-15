@@ -36,7 +36,7 @@ Cross-backend matching is supported: the reference table can be from a different
 The column (or list of columns for composite keys) in this table that should reference the other table. For composite keys, supply a list of column names.
 
 `ref_table: Any`  
-The reference table containing the valid values. Can be a DataFrame, database table, or a callable that returns one (resolved at interrogation time).
+The reference table containing the valid values. Can be a DataFrame, a database table, a file path (e.g., to a CSV or Parquet file), a database connection string (e.g., `"duckdb:///path/to/db.ddb::table_name"`), or a callable that returns one of these. A path or connection string is loaded at interrogation time, as with <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>tbl_match()</code></a>; if the reference table can't be loaded, the step is marked as having an evaluation error.
 
 `ref_column: str | list[str]`  
 The column (or list of columns for composite keys) in the reference table to check against. Must have the same length as `columns`.
