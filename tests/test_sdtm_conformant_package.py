@@ -317,3 +317,115 @@ def test_ct_bundle_has_no_variable_named_codelists():
     ct = ControlledTerminology.load_default()
     for name in ("AEACN", "AEOUT", "AEREL", "AETOXGR", "LBSTRESU"):
         assert name not in ct
+
+
+# ── Sponsor extensions of extensible codelists (declared in Define-XML) ────────────────────────
+
+
+def _define_xml(dataset: str, df: pl.DataFrame, column: str, codelist: str, values, extended):
+    """A minimal Define-XML 2.0 for one dataset, whose `column` uses the codelist `values`
+    (those in `extended` are marked `def:ExtendedValue="Yes"`)."""
+    item_refs, item_defs = [], []
+    for i, col in enumerate(df.columns, start=1):
+        oid = f"IT.{dataset}.{col}"
+        item_refs.append(f'<ItemRef ItemOID="{oid}" OrderNumber="{i}" Mandatory="No"/>')
+        dtype = df[col].dtype
+        data_type = "integer" if dtype.is_integer() else "float" if dtype.is_float() else "text"
+        cl_ref = f'<CodeListRef CodeListOID="CL.{codelist}"/>' if col == column else ""
+        item_defs.append(
+            f'<ItemDef OID="{oid}" Name="{col}" DataType="{data_type}" Length="40">{cl_ref}</ItemDef>'
+        )
+    extended_attr = ' def:ExtendedValue="Yes"'
+    items = "".join(
+        f'<EnumeratedItem CodedValue="{v}"{extended_attr if v in extended else ""}/>'
+        for v in values
+    )
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.0"
+     FileOID="DEF.S001" FileType="Snapshot" ODMVersion="1.3.2">
+  <Study OID="S001">
+    <GlobalVariables>
+      <StudyName>S001</StudyName><StudyDescription>S001</StudyDescription>
+      <ProtocolName>S001</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.S001" Name="S001" def:DefineVersion="2.0.0"
+                     def:StandardName="SDTM-IG" def:StandardVersion="3.4">
+      <ItemGroupDef OID="IG.{dataset}" Name="{dataset}" Repeating="No" Domain="{dataset}"
+                    def:Structure="One record per row">{"".join(item_refs)}</ItemGroupDef>
+      {"".join(item_defs)}
+      <CodeList OID="CL.{codelist}" Name="{codelist}" DataType="text">{items}</CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>
+"""
+
+
+# A two-period crossover, as in the SDTMIG 3.4 TA example: EPOCH is extensible, and the sponsor
+# adds TREATMENT 1 and TREATMENT 2
+CROSSOVER_TA = pl.DataFrame(
+    {
+        "STUDYID": ["S001"] * 5,
+        "DOMAIN": ["TA"] * 5,
+        "ARMCD": ["AB"] * 5,
+        "ARM": ["Drug A then Drug B"] * 5,
+        "TAETORD": [1, 2, 3, 4, 5],
+        "ETCD": ["SCRN", "A", "WO", "B", "FU"],
+        "ELEMENT": ["Screening", "Drug A", "Washout", "Drug B", "Follow-up"],
+        "EPOCH": ["SCREENING", "TREATMENT 1", "WASHOUT", "TREATMENT 2", "FOLLOW-UP"],
+    }
+)
+CROSSOVER_EPOCHS = ["SCREENING", "TREATMENT 1", "WASHOUT", "TREATMENT 2", "FOLLOW-UP"]
+
+
+@pytest.mark.parametrize(
+    "extended, n_issues",
+    [
+        (None, 2),  # no Define-XML: the sponsor terms aren't CDISC CT
+        ({"TREATMENT 1", "TREATMENT 2"}, 0),  # declared as extensions
+        (set(), 2),  # listed in Define-XML, but not marked as extensions
+    ],
+)
+def test_define_xml_extensions_of_extensible_codelist(tmp_path, extended, n_issues):
+    kwargs = {}
+    if extended is not None:
+        path = tmp_path / "define.xml"
+        path.write_text(
+            _define_xml("TA", CROSSOVER_TA, "EPOCH", "EPOCH", CROSSOVER_EPOCHS, extended)
+        )
+        kwargs["define_xml"] = path
+
+    report = pb.validate_sdtmig({"TA": CROSSOVER_TA}, **kwargs)
+
+    assert _rule(report, "SDTM-434").n_issues == n_issues
+
+
+def test_define_xml_cannot_extend_non_extensible_codelist(tmp_path):
+    # SEX (C66731) isn't extensible, so a value declared as an extension is still flagged
+    dm = conformant_sdtm_package()["DM"].with_columns(pl.Series("SEX", ["X", "F"]))
+    path = tmp_path / "define.xml"
+    path.write_text(_define_xml("DM", dm, "SEX", "SEX", ["M", "F", "X"], {"X"}))
+
+    report = pb.validate_sdtmig({"DM": dm}, define_xml=path)
+
+    assert _rule(report, "SDTM-007").n_issues == 1
+
+
+def test_ct_extensible_codelists():
+    from pointblank.metadata._conformance import ControlledTerminology
+
+    ct = ControlledTerminology.load_default()
+    assert ct.is_extensible("EPOCH") and ct.is_extensible("epoch")
+    assert not ct.is_extensible("SEX")
+
+
+def test_define_xml_extended_values_are_parsed(tmp_path):
+    from pointblank.metadata._readers_cdisc import _read_define_xml_metadata
+
+    path = tmp_path / "define.xml"
+    path.write_text(
+        _define_xml("TA", CROSSOVER_TA, "EPOCH", "EPOCH", CROSSOVER_EPOCHS, {"TREATMENT 1"})
+    )
+    # A Define-XML with one dataset gives that dataset's metadata
+    codelist = _read_define_xml_metadata(str(path)).codelists["EPOCH"]
+
+    assert codelist.extended_values() == ["TREATMENT 1"]
