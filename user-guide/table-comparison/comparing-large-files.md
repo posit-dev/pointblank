@@ -159,7 +159,7 @@ comparison
 </tr>
 <tr class="gt_heading">
 <th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
-<strong>/tmp/tmpqckpol4v/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpqckpol4v/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br />
+<strong>/tmp/tmphi5k6lpd/source.csv</strong> (200,000 rows) → <strong>/tmp/tmphi5k6lpd/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br />
 <span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br />
 
 
