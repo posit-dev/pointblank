@@ -47,8 +47,32 @@ Whether additional values beyond the codelist are allowed.
 
 | Name | Description |
 |----|----|
+| [extended_values()](#extended_values) | Get the values that extend an extensible codelist (sponsor extensions). |
 | [to_dict()](#to_dict) | Get a value → label mapping. |
 | [to_set()](#to_set) | Get the list of valid values (for col_vals_in_set). |
+
+------------------------------------------------------------------------
+
+
+### extended_values()
+
+
+Get the values that extend an extensible codelist (sponsor extensions).
+
+
+Usage
+
+``` python
+extended_values()
+```
+
+
+#### Returns
+
+
+`list`  
+The values of the entries marked as extended (e.g., with `def:ExtendedValue="Yes"` in Define-XML).
+
 
 ------------------------------------------------------------------------
 

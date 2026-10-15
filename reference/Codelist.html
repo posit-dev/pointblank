@@ -1601,6 +1601,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#extended_values" id="toc-extended_values" class="nav-link" data-scroll-target="#extended_values"><span class="doc-object-name doc-function doc-label doc-label-method">extended_values()</span></a></li>
   <li><a href="#to_dict" id="toc-to_dict" class="nav-link" data-scroll-target="#to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></a></li>
   <li><a href="#to_set" id="toc-to_set" class="nav-link" data-scroll-target="#to_set"><span class="doc-object-name doc-function doc-label doc-label-method">to_set()</span></a></li>
   </ul></li>
@@ -1634,7 +1635,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L46-L97" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L50-L112" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">Codelist</span>(</span>
@@ -1696,6 +1697,14 @@ Description
 <tbody>
 <tr>
 <td>
+<a href="#extended_values" class="doc-function doc-label doc-label-method">extended_values()</a>
+</td>
+<td>
+Get the values that extend an extensible codelist (sponsor extensions).
+</td>
+</tr>
+<tr>
+<td>
 <a href="#to_dict" class="doc-function doc-label doc-label-method">to_dict()</a>
 </td>
 <td>
@@ -1713,6 +1722,31 @@ Get the list of valid values (for col_vals_in_set).
 </tbody>
 </table>
 <hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
+<section id="extended_values" class="level3">
+<h3 class="anchored" data-anchor-id="extended_values"><span class="doc-object-name doc-function doc-label doc-label-method">extended_values()</span></h3>
+<div class="doc-subject">
+<p>Get the values that extend an extensible codelist (sponsor extensions).</p>
+</div>
+<div class="doc-usage-source">
+<p>Usage</p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L90-L99" target="_blank" rel="noopener">Source</a></p>
+</div>
+<div class="doc-signature doc-Kind.FUNCTION">
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>extended_values()</span></code></pre></div>
+</div>
+<section id="returns" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
+<dd>
+The values of the entries marked as extended (e.g., with <code>def:ExtendedValue="Yes"</code> in Define-XML).
+</dd>
+</dl>
+</div>
+</section>
+</section>
+<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_dict" class="level3">
 <h3 class="anchored" data-anchor-id="to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></h3>
 <div class="doc-subject">
@@ -1720,13 +1754,13 @@ Get the list of valid values (for col_vals_in_set).
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L86-L94" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L101-L109" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>to_dict()</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>to_dict()</span></code></pre></div>
 </div>
-<section id="returns" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-1" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict</span></code></dt>
@@ -1745,13 +1779,13 @@ Mapping of value to human-readable label.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L76-L84" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L80-L88" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>to_set()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>to_set()</span></code></pre></div>
 </div>
-<section id="returns-1" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-2" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list</span></code></dt>

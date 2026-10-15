@@ -21349,7 +21349,7 @@ source
 extensible
     Whether additional values beyond the codelist are allowed.
 
-CodelistEntry(value: 'Any', label: 'str', description: 'str | None' = None, synonyms: 'list[str] | None' = None, is_deprecated: 'bool' = False) -> None
+CodelistEntry(value: 'Any', label: 'str', description: 'str | None' = None, synonyms: 'list[str] | None' = None, is_deprecated: 'bool' = False, is_extended: 'bool' = False) -> None
 
 A single entry in a codelist (controlled terminology).
 
@@ -21365,6 +21365,9 @@ synonyms
     Alternative terms for this entry.
 is_deprecated
     Whether this entry is deprecated.
+is_extended
+    Whether this entry is a sponsor extension of an extensible codelist (declared in
+    Define-XML with `def:ExtendedValue="Yes"`).
 
 MissingValueCode(value: 'Any', label: 'str', category: 'str | None' = None, reason: 'str | None' = None) -> None
 
@@ -40936,6 +40939,13 @@ Without `define_xml`, the 76 `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_C
 marked `not_applicable`. Supplying the file allows the engine to verify that every variable present
 in your datasets is declared in Define-XML with the correct type and, where applicable, a valid
 codelist.
+
+Define-XML also tells the CT checks about sponsor extensions. Many CDISC codelists are extensible
+(EPOCH, FREQ, ROUTE, and UNIT among them): a sponsor may add terms, provided Define-XML declares
+them with `def:ExtendedValue="Yes"` on the codelist item. When `define_xml` is supplied, such
+declared terms pass the codelist checks for extensible codelists. For example, a crossover study can
+use the epochs `TREATMENT 1` and `TREATMENT 2`. Without Define-XML, or for a codelist that isn't
+extensible (such as SEX), terms outside the codelist are still reported.
 
 ### Loading XPT Files
 

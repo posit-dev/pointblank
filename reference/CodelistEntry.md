@@ -13,6 +13,7 @@ CodelistEntry(
     description=None,
     synonyms=None,
     is_deprecated=False,
+    is_extended=False,
 )
 ```
 
@@ -34,3 +35,6 @@ Alternative terms for this entry.
 
 `is_deprecated: bool = ``False`  
 Whether this entry is deprecated.
+
+`is_extended: bool = ``False`  
+Whether this entry is a sponsor extension of an extensible codelist (declared in Define-XML with `def:ExtendedValue="Yes"`).
