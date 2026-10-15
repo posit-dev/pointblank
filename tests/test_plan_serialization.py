@@ -168,6 +168,43 @@ def test_to_code_warns_on_specially(small_table):
 # ─── to_yaml() ───────────────────────────────────────────────────────────────────
 
 
+def test_to_code_col_vals_in_table_uses_ref_table_placeholder():
+    # The reference table can't be serialized, so it becomes a placeholder (with a warning); the
+    # step itself, with its columns and options, is kept
+    import polars as pl
+
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": ["p", "q", "r"]})
+    ref = pl.DataFrame({"x": [1, 2], "y": ["p", "q"]})
+    validation = (
+        Validate(data=tbl)
+        .col_vals_in_table(columns="a", ref_table=ref, ref_column="x", na_pass=True)
+        .col_vals_in_table(columns=["a", "b"], ref_table=ref, ref_column=["x", "y"])
+    )
+
+    with pytest.warns(UserWarning, match="reference table that cannot be serialized"):
+        code = validation.to_code()
+
+    assert (
+        '.col_vals_in_table(columns="a", ref_table=your_reference_table, ref_column="x", '
+        "na_pass=True)" in code
+    )
+
+    # With the placeholder bound to a table, the generated code gives the same plan
+    namespace = {}
+    exec(
+        code.replace("your_data", "data"),
+        {"pb": pb, "data": tbl, "your_reference_table": ref},
+        namespace,
+    )
+    rebuilt = namespace["validation"].interrogate()
+    original = validation.interrogate()
+    assert rebuilt.n_failed(scalar=False) == original.n_failed(scalar=False) == {1: 1, 2: 1}
+
+    with pytest.warns(UserWarning, match="reference table that cannot be serialized"):
+        yaml_text = validation.to_yaml()
+    assert "ref_table: your_reference_table" in yaml_text
+
+
 def test_to_yaml_roundtrips_via_yaml_interrogate(small_table):
     validation = (
         Validate(data=small_table, tbl_name="small_table", label="My Plan")
