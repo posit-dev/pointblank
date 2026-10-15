@@ -232,6 +232,8 @@ def test_incorrect_rules_are_not_in_the_catalog(report):
         "SDTM-335",  # VISITNUM not null in VS (Expected)
         "SDTM-371",  # LBSPEC required in LB (Permissible)
         "SDTM-435",  # duplicate of SDTM-066
+        "SDTM-087",  # AETOXGR has no CDISC codelist (the grading scale is the sponsor's)
+        "SDTM-135",  # AEREL has no CDISC codelist (SDTMIG only gives ICH examples)
     }
     assert not removed & rule_ids
 
@@ -241,6 +243,10 @@ def test_incorrect_rules_are_not_in_the_catalog(report):
     [
         # Action Taken with Study Treatment (C66767)
         ("SDTM-089", "AE", "AEACN", "DRUG WITHDRAWN", "DISCONTINUED"),
+        # Sex (C66731)
+        ("SDTM-007", "DM", "SEX", "INTERSEX", "UNDIFFERENTIATED"),
+        # Race (C74457), plus MULTIPLE, which SDTMIG prescribes for subjects of several races
+        ("SDTM-008", "DM", "RACE", "MULTIPLE", "MIXED"),
         # Frequency (C71113): submission values, not synonyms like DAILY
         ("SDTM-066", "EX", "EXDOSFRQ", "EVERY 8 WEEKS", "DAILY"),
         # Epoch (C99079)
@@ -258,3 +264,56 @@ def test_codelists_use_cdisc_submission_values(rule_id, domain, column, valid, i
         )
 
         assert _rule(pb.validate_sdtmig(package), rule_id).n_issues == n_issues, value
+
+
+def test_codelists_used_by_rules_and_templates_are_bundled():
+    """A codelist missing from the CT bundle would make its checks pass every value."""
+    import json
+
+    from pointblank.metadata._adam_templates import get_adam_dataset, list_adam_datasets
+    from pointblank.metadata._conformance import ControlledTerminology
+    from pointblank.metadata._conformance.rule_loader import _DATA_DIR
+    from pointblank.metadata._sdtm_templates import get_sdtm_domain, list_sdtm_domains
+
+    ct = ControlledTerminology.load_default()
+
+    used = {
+        op["params"]["codelist"]
+        for path in _DATA_DIR.glob("*.json")
+        for rule in json.loads(path.read_text(encoding="utf-8"))["rules"]
+        for op in rule["operations"]
+        if "codelist" in op.get("params", {})
+    }
+    templates = [get_sdtm_domain(d) for d in list_sdtm_domains()]
+    templates += [get_adam_dataset(d) for d in list_adam_datasets()]
+    used |= {v.controlled_term for t in templates for v in t.variables if v.controlled_term}
+
+    assert sorted(name for name in used if name not in ct) == []
+
+
+@pytest.mark.parametrize(
+    "codelist, values",
+    [
+        # Official CDISC CT 2024-09-27 values that the hand-made bundle lacked
+        ("NY", {"N", "NA", "U", "Y"}),
+        ("SEX", {"F", "INTERSEX", "M", "U"}),
+        ("OUT", {"FATAL", "RECOVERED/RESOLVED", "NOT RECOVERED/NOT RESOLVED"}),
+        ("ROUTE", {"ORAL", "INTRAVENOUS", "SUBCUTANEOUS"}),
+        # ISO 3166-1 alpha-3, territories included
+        ("COUNTRY", {"USA", "GBR", "PRI", "HKG"}),
+    ],
+)
+def test_ct_bundle_values(codelist, values):
+    from pointblank.metadata._conformance import ControlledTerminology
+
+    terms = ControlledTerminology.load_default().get_codelist(codelist)
+    assert values <= terms
+
+
+def test_ct_bundle_has_no_variable_named_codelists():
+    """Codelists are keyed by their CDISC short names (ACN, OUT, UNIT), not variable names."""
+    from pointblank.metadata._conformance import ControlledTerminology
+
+    ct = ControlledTerminology.load_default()
+    for name in ("AEACN", "AEOUT", "AEREL", "AETOXGR", "LBSTRESU"):
+        assert name not in ct
