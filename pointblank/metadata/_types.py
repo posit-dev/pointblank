@@ -34,6 +34,9 @@ class CodelistEntry:
         Alternative terms for this entry.
     is_deprecated
         Whether this entry is deprecated.
+    is_extended
+        Whether this entry is a sponsor extension of an extensible codelist (declared in
+        Define-XML with `def:ExtendedValue="Yes"`).
     """
 
     value: Any
@@ -41,6 +44,7 @@ class CodelistEntry:
     description: str | None = None
     synonyms: list[str] | None = None
     is_deprecated: bool = False
+    is_extended: bool = False
 
 
 @dataclass
@@ -82,6 +86,17 @@ class Codelist:
             All non-deprecated values in the codelist.
         """
         return [entry.value for entry in self.codes if not entry.is_deprecated]
+
+    def extended_values(self) -> list:
+        """Get the values that extend an extensible codelist (sponsor extensions).
+
+        Returns
+        -------
+        list
+            The values of the entries marked as extended (e.g., with `def:ExtendedValue="Yes"` in
+            Define-XML).
+        """
+        return [entry.value for entry in self.codes if entry.is_extended]
 
     def to_dict(self) -> dict:
         """Get a value → label mapping.
