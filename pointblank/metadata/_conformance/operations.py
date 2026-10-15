@@ -91,11 +91,25 @@ def _op_codelist_check(
         return df.with_columns(nw.lit(True).alias(result_col))
     # Build case-insensitive lookup; SAS/XPT missing values arrive as "" — treat as null.
     upper_terms = {t.upper() for t in terms}
+    # Sponsors may extend an extensible codelist, declaring the new terms in Define-XML
+    if ct.is_extensible(codelist):
+        upper_terms |= {str(v).upper() for v in _define_extended_values(define_meta, col)}
     values = df[col].to_list()
     mask = [
         True if (v is None or str(v) == "") else (str(v).upper() in upper_terms) for v in values
     ]
     return df.with_columns(_new_bool_series(result_col, mask, df))
+
+
+def _define_extended_values(define_meta: Any, col: str) -> list:
+    """Get the codelist extensions (`def:ExtendedValue="Yes"`) Define-XML declares for a variable."""
+    if define_meta is None:
+        return []
+    var_meta = next((v for v in define_meta.variables if v.name.upper() == col.upper()), None)
+    if var_meta is None or not var_meta.codelist_ref:
+        return []
+    codelist = define_meta.codelists.get(var_meta.codelist_ref)
+    return codelist.extended_values() if codelist is not None else []
 
 
 def _op_consistency_check(
