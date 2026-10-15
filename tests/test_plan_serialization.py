@@ -205,6 +205,31 @@ def test_to_code_col_vals_in_table_uses_ref_table_placeholder():
     assert "ref_table: your_reference_table" in yaml_text
 
 
+def test_col_vals_in_table_ref_path_roundtrips(tmp_path):
+    # A path (or connection string) is kept as-is, so the plan round-trips without a placeholder
+    import polars as pl
+
+    ref_path = tmp_path / "ref.csv"
+    pl.DataFrame({"x": [1, 2]}).write_csv(ref_path)
+    tbl = pl.DataFrame({"a": [1, 2, 3]})
+    validation = Validate(data=tbl).col_vals_in_table(
+        columns="a", ref_table=str(ref_path), ref_column="x"
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        code = validation.to_code()
+        yaml_text = validation.to_yaml()
+
+    assert f"ref_table={str(ref_path)!r}" in code or f'ref_table="{ref_path}"' in code
+    assert _exec_code(code, tbl).interrogate().n_failed(i=1, scalar=True) == 1
+
+    # `set_tbl=` replaces the table, but the placeholder table name must still be loadable
+    yaml_text = yaml_text.replace("tbl: your_data", "tbl: small_table")
+    rebuilt = yaml_interrogate(yaml_text, set_tbl=tbl)
+    assert rebuilt.n_failed(i=1, scalar=True) == 1
+
+
 def test_to_yaml_roundtrips_via_yaml_interrogate(small_table):
     validation = (
         Validate(data=small_table, tbl_name="small_table", label="My Plan")
