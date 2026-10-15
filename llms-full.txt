@@ -21746,7 +21746,7 @@ validate_sdtmig(datasets: 'dict', version: 'str' = '3-4', ct_packages: 'list[str
 
 Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.
 
-Runs the bundled SDTMIG 3.4 rule catalog (414 rules) against the provided SDTM domain
+Runs the bundled SDTMIG 3.4 rule catalog (362 rules) against the provided SDTM domain
 datasets using Pointblank's built-in conformance engine. No external tools, subprocesses,
 network calls, or CDISC CORE installation are required.
 
@@ -40705,7 +40705,7 @@ those preparing a final submission gate, Pointblank can also delegate to the ext
 
 Two engines are available:
 
-- **Built-in** (primary): Pointblank's own engine runs 414 SDTMIG 3.4 rules against your datasets
+- **Built-in** (primary): Pointblank's own engine runs 362 SDTMIG 3.4 rules against your datasets
 in-process. Results are immediately renderable in a notebook. No installation beyond Pointblank is
 required.
 - **CORE** (advanced): delegates to the open-source CDISC CORE CLI, which runs the authoritative
@@ -40875,7 +40875,7 @@ CORE engine, or to generate a custom summary report tailored to your team's work
 
 ### What the Rule Catalog Covers
 
-The bundled SDTMIG 3.4 catalog contains 414 rules across seven types:
+The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 
 | Type | Description | Examples |
 |---|---|---|

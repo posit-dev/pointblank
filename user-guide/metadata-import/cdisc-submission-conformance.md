@@ -4,7 +4,7 @@ Regulatory submissions require that every dataset in a study package passes CDIS
 
 Two engines are available:
 
-- **Built-in** (primary): Pointblank's own engine runs 414 SDTMIG 3.4 rules against your datasets in-process. Results are immediately renderable in a notebook. No installation beyond Pointblank is required.
+- **Built-in** (primary): Pointblank's own engine runs 362 SDTMIG 3.4 rules against your datasets in-process. Results are immediately renderable in a notebook. No installation beyond Pointblank is required.
 - **CORE** (advanced): delegates to the open-source CDISC CORE CLI, which runs the authoritative CDISC-certified rule set. Requires the CORE executable to be installed separately.
 
 
@@ -117,7 +117,7 @@ report
 <th colspan="6" class="gt_heading gt_title gt_font_normal">CDISC Conformance <span style="display:inline-block;padding:2px 9px;border-radius:10px;background:#ffebee;color:#FF3300;font-size:0.78em;font-weight:700;letter-spacing:0.04em;">FAIL</span></th>
 </tr>
 <tr class="gt_heading">
-<th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">SDTMIG 3-4 · 398 passed · 4 failed · 12 n/a</th>
+<th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a</th>
 </tr>
 <tr class="gt_col_headings">
 <th id="pb_conformance_tbl-status_color" class="gt_col_heading gt_columns_bottom_border gt_left" scope="col"></th>
@@ -415,7 +415,7 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DM</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DM domain must contain required demographic variables (SEX, RACE, ETHNIC, COUNTRY).</td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DM domain must contain required demographic variables (SEX, RACE, COUNTRY).</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -447,7 +447,7 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE domain must contain severity, seriousness, and outcome variables.</td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE domain must contain the seriousness variable (AESER).</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -739,14 +739,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-088</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AEBODSYS must not be null in AE.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-089</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
@@ -923,14 +915,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-111</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM domain must contain timing variables CMSTDTC and CMENDTC.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-112</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DS</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
@@ -1056,14 +1040,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VISITNUM must not be null in TV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-130</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VISIT must not be null in TV.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -1271,7 +1247,7 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA must contain required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH, ELEMENT.</td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA must contain required variables: STUDYID, DOMAIN, ARMCD, ARM, TAETORD, EPOCH.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -1287,7 +1263,7 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV must contain required variables: STUDYID, DOMAIN, VISITNUM, VISIT.</td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV must contain required variables: STUDYID, DOMAIN, VISITNUM.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -1547,14 +1523,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-196</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DMSEQ must not be null in the DM dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-197</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
@@ -1584,14 +1552,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AECONTRT (concomitant treatment given flag) must use the NY codelist when present in AE.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-201</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">MH</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">MHDECOD (dictionary-derived term) must not be null in MH.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -1651,14 +1611,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-209</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DSCAT (category) must not be null in the DS dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-210</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DS</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
@@ -1712,14 +1664,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SVENDY (study day of visit end) must be a numeric variable in SV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-217</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TSVAL (parameter value) must not be null in the TS dataset.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -1872,14 +1816,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXDOSE (dose per administration) must be present as a variable in the EX dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-237</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">MH</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">MHSTDTC (start date/time of medical history event) must be present as a variable in the MH dataset.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2048,22 +1984,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LBTEST (test name) must not be null in LB.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-266</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VSORRES (original result) must not be null in VS.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-267</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LBORRES (original result) must not be null in LB.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2291,14 +2211,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-297</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SVSEQ must be a numeric variable in SV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-298</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">MH</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
@@ -2339,27 +2251,11 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-303</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AEBODSYS (body system or organ class) must not be null in AE.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-304</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CMTRT (verbatim medication name) must not be null in CM.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-305</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CMDECOD (standardized medication name) must not be null in CM.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2392,30 +2288,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXTRT (treatment name administered) must not be null in EX.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-310</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXDOSE (dose per administration) must not be null in EX.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-311</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VSSTRESC (standardized result in character format) must not be null in VS.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-312</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LBSTRESC (standardized result in character format) must not be null in LB.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2499,30 +2371,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-323</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">ELEMENT (trial element name) must not be null in TA.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-324</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TEENRL (trial element end rule) must not be null in TE.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-325</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VISIT (visit description) must not be null in TV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-328</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TI</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
@@ -2555,14 +2403,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-332</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VISIT must not be null in SV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-333</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SV</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
@@ -2576,14 +2416,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SVENDTC must conform to ISO 8601 date/time format when present in SV.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-336</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">VISITNUM must not be null in LB.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2851,43 +2683,11 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-372</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CMROUTE (route of administration) column must be present in the CM domain.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-373</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXROUTE (route of administration) column must be present in the EX domain.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-374</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXDOSFRM (dose form) column must be present in the EX domain.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-375</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">LBSPEC must not be null in LB; specimen type is required for each lab result record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-376</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AESER must not be null in AE; the serious adverse event flag is required for each AE record.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -2963,70 +2763,6 @@ report
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-386</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPDM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVAR must not be null in SUPPDM; the linking variable name is required to connect supplemental records to the parent dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-387</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPDM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVARVAL must not be null in SUPPDM; the linking variable value is required to connect supplemental records to the parent dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-388</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPAE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVAR must not be null in SUPPAE; the linking variable name is required to connect supplemental records to the parent AE dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-389</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPAE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVARVAL must not be null in SUPPAE; the linking variable value is required to connect supplemental records to the parent AE dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-390</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPLB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVAR must not be null in SUPPLB; the linking variable name is required to connect supplemental records to the parent LB dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-391</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPLB</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVARVAL must not be null in SUPPLB; the linking variable value is required to connect supplemental records to the parent LB dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-392</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPVS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVAR must not be null in SUPPVS; the linking variable name is required to connect supplemental records to the parent VS dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-393</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPVS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVARVAL must not be null in SUPPVS; the linking variable value is required to connect supplemental records to the parent VS dataset.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-394</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TS</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
@@ -3056,78 +2792,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TAETORD must not be null in TA; the planned element order within the arm is required.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-398</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TVSEQ must not be null in TV; the sequence number is required for every trial visit record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-399</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TVSEQ in TV must be a numeric type variable.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-400</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TI</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TISEQ must not be null in TI; the sequence number is required for every trial inclusion/exclusion criteria record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-401</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TI</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TISEQ in TI must be a numeric type variable.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-402</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TASEQ must not be null in TA; the sequence number is required for every trial arm record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-403</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TA</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TASEQ in TA must be a numeric type variable.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-404</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TESEQ must not be null in TE; the sequence number is required for every trial element record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-405</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">TESEQ in TE must be a numeric type variable.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-406</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SVSEQ must not be null in SV; the sequence number is required for every subject visit record.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -3176,70 +2840,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Variable</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DSENDY in DS must be a numeric type variable.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-413</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXDOSFRM must not be null in EX; the dose form is required for each exposure record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-414</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXROUTE must not be null in EX; the route of administration is required for each exposure record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-415</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CM</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">CMROUTE must not be null in CM; the route of administration is required for each concomitant medication record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-416</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AEACN must not be null in AE; the action taken with study treatment is required for each adverse event record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-417</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AE</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">AESTDTC must not be null in AE; the adverse event start date/time is required.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-418</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DS</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DSSTDTC must not be null in DS; the disposition date/time is required for each disposition record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-419</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EX</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">EXSTDTC must not be null in EX; the exposure start date/time is required for each exposure record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-420</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SV</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SVSTDTC must not be null in SV; the subject visit start date/time is required for each subject visit record.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -3304,22 +2904,6 @@ report
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
 <td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
 <td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">DOMAIN must equal 'SUPPMH' in the SUPPMH dataset; each record must carry the correct supplemental qualifier domain code.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-429</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPEG</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVAR must not be null in SUPPEG; the identifier variable name is required to link each supplemental qualifier record back to its parent EG record.</td>
-</tr>
-<tr>
-<td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SDTM-430</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">SUPPEG</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">Record</td>
-<td class="gt_row gt_center" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">0</td>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 11px; padding-top: 2px; padding-bottom: 2px">IDVARVAL must not be null in SUPPEG; the identifier variable value is required to link each supplemental qualifier record back to its parent EG record.</td>
 </tr>
 <tr>
 <td class="gt_row gt_left" style="background-color: #4CA64C; color: transparent; font-size: 0px; padding-top: 2px; padding-bottom: 2px">#4CA64C</td>
@@ -3520,65 +3104,65 @@ report_with_issues.get_findings_table()
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#efovsghajc table {
+#tiizbwgwfb table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#efovsghajc thead, tbody, tfoot, tr, td, th { border-style: none; }
+#tiizbwgwfb thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#efovsghajc p { margin: 0; padding: 0; }
- #efovsghajc .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #efovsghajc .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #efovsghajc .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #efovsghajc .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #efovsghajc .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #efovsghajc .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #efovsghajc .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #efovsghajc .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #efovsghajc .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #efovsghajc .gt_column_spanner_outer:first-child { padding-left: 0; }
- #efovsghajc .gt_column_spanner_outer:last-child { padding-right: 0; }
- #efovsghajc .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #efovsghajc .gt_spanner_row { border-bottom-style: hidden; }
- #efovsghajc .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #efovsghajc .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #efovsghajc .gt_from_md> :first-child { margin-top: 0; }
- #efovsghajc .gt_from_md> :last-child { margin-bottom: 0; }
- #efovsghajc .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #efovsghajc .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #efovsghajc .gt_indent_1 { text-indent: 5px; }
- #efovsghajc .gt_indent_2 { text-indent: calc(5px * 2); }
- #efovsghajc .gt_indent_3 { text-indent: calc(5px * 3); }
- #efovsghajc .gt_indent_4 { text-indent: calc(5px * 4); }
- #efovsghajc .gt_indent_5 { text-indent: calc(5px * 5); }
- #efovsghajc .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #efovsghajc .gt_row_group_first td { border-top-width: 2px; }
- #efovsghajc .gt_row_group_first th { border-top-width: 2px; }
- #efovsghajc .gt_striped { color: #333333; background-color: #F4F4F4; }
- #efovsghajc .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #efovsghajc .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #efovsghajc .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #efovsghajc .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #efovsghajc .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #efovsghajc .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #efovsghajc .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #efovsghajc .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #efovsghajc .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #efovsghajc .gt_left { text-align: left; }
- #efovsghajc .gt_center { text-align: center; }
- #efovsghajc .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #efovsghajc .gt_font_normal { font-weight: normal; }
- #efovsghajc .gt_font_bold { font-weight: bold; }
- #efovsghajc .gt_font_italic { font-style: italic; }
- #efovsghajc .gt_super { font-size: 65%; }
- #efovsghajc .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #efovsghajc .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #efovsghajc .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #efovsghajc .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #efovsghajc .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #efovsghajc .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#tiizbwgwfb p { margin: 0; padding: 0; }
+ #tiizbwgwfb .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #tiizbwgwfb .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #tiizbwgwfb .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #tiizbwgwfb .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #tiizbwgwfb .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #tiizbwgwfb .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tiizbwgwfb .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #tiizbwgwfb .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #tiizbwgwfb .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #tiizbwgwfb .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #tiizbwgwfb .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #tiizbwgwfb .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #tiizbwgwfb .gt_spanner_row { border-bottom-style: hidden; }
+ #tiizbwgwfb .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #tiizbwgwfb .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #tiizbwgwfb .gt_from_md> :first-child { margin-top: 0; }
+ #tiizbwgwfb .gt_from_md> :last-child { margin-bottom: 0; }
+ #tiizbwgwfb .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #tiizbwgwfb .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #tiizbwgwfb .gt_indent_1 { text-indent: 5px; }
+ #tiizbwgwfb .gt_indent_2 { text-indent: calc(5px * 2); }
+ #tiizbwgwfb .gt_indent_3 { text-indent: calc(5px * 3); }
+ #tiizbwgwfb .gt_indent_4 { text-indent: calc(5px * 4); }
+ #tiizbwgwfb .gt_indent_5 { text-indent: calc(5px * 5); }
+ #tiizbwgwfb .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #tiizbwgwfb .gt_row_group_first td { border-top-width: 2px; }
+ #tiizbwgwfb .gt_row_group_first th { border-top-width: 2px; }
+ #tiizbwgwfb .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #tiizbwgwfb .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tiizbwgwfb .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #tiizbwgwfb .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #tiizbwgwfb .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tiizbwgwfb .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #tiizbwgwfb .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #tiizbwgwfb .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #tiizbwgwfb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tiizbwgwfb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #tiizbwgwfb .gt_left { text-align: left; }
+ #tiizbwgwfb .gt_center { text-align: center; }
+ #tiizbwgwfb .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #tiizbwgwfb .gt_font_normal { font-weight: normal; }
+ #tiizbwgwfb .gt_font_bold { font-weight: bold; }
+ #tiizbwgwfb .gt_font_italic { font-style: italic; }
+ #tiizbwgwfb .gt_super { font-size: 65%; }
+ #tiizbwgwfb .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tiizbwgwfb .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #tiizbwgwfb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tiizbwgwfb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #tiizbwgwfb .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #tiizbwgwfb .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 
@@ -3588,7 +3172,7 @@ report_with_issues.get_findings_table()
 <th colspan="8" class="gt_heading gt_title gt_font_normal">Findings Report for CDISC Conformance</th>
 </tr>
 <tr class="gt_heading">
-<th colspan="8" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">SDTMIG 3-4 · 7 failed (395 passed) · 12 n/a</th>
+<th colspan="8" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">SDTMIG 3-4 · 7 failed (343 passed) · 12 n/a</th>
 </tr>
 <tr class="gt_col_headings gt_spanner_row">
 <th rowspan="2" id="status_color" class="gt_col_heading gt_columns_bottom_border gt_left" scope="col"></th>
@@ -3709,9 +3293,9 @@ shape: (3, 2)
 | rule_id    | n_violations |
 |------------|--------------|
 | str        | u32          |
+| "SDTM-195" | 1            |
 | "SDTM-010" | 1            |
 | "SDTM-007" | 1            |
-| "SDTM-195" | 1            |
 
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.
@@ -3719,7 +3303,7 @@ The DataFrame is empty (with the same schema) when all rules pass, so it is safe
 
 ## What the Rule Catalog Covers
 
-The bundled SDTMIG 3.4 catalog contains 414 rules across seven types:
+The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 
 | Type | Description | Examples |
 |----|----|----|

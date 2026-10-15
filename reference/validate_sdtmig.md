@@ -17,7 +17,7 @@ validate_sdtmig(
 ```
 
 
-Runs the bundled SDTMIG 3.4 rule catalog (414 rules) against the provided SDTM domain datasets using Pointblank's built-in conformance engine. No external tools, subprocesses, network calls, or CDISC CORE installation are required.
+Runs the bundled SDTMIG 3.4 rule catalog (362 rules) against the provided SDTM domain datasets using Pointblank's built-in conformance engine. No external tools, subprocesses, network calls, or CDISC CORE installation are required.
 
 The catalog covers seven rule types:
 
