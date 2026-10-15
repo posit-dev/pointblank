@@ -191,17 +191,17 @@ cmp
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
 </tr>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
+<th colspan="2" id="pb_comparison_tbl-subtitle" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
 <strong>source</strong> (4 rows) → <strong>target</strong> (4 rows), aligned by key <code>id</code><br />
 <span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 5 rows fail (60.0%)<br />
 
@@ -213,36 +213,36 @@ cmp
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 2 columns)</th>
+<th colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 2 columns)</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns">amount</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 1 of 3 matched rows differ (33.3%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-rows-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">2</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">20</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">20.5</span> <span style="color:#888; font-size:11px;">(+0.5)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row">2</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">20</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">20.5</span> <span style="color:#888; font-size:11px;">(+0.5)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">3</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 30</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> E</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row">3</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 30</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> E</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">5</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 50</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> N</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row">5</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 50</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> N</span></td>
 </tr>
 </tbody>
 </table>

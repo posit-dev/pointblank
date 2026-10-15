@@ -148,18 +148,18 @@ comparison
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
 </tr>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
-<strong>/tmp/tmp4e7_e26v/source.csv</strong> (200,000 rows) → <strong>/tmp/tmp4e7_e26v/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br />
+<th colspan="2" id="pb_comparison_tbl-subtitle" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
+<strong>/tmp/tmp06ixqp2c/source.csv</strong> (200,000 rows) → <strong>/tmp/tmp06ixqp2c/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br />
 <span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br />
 
 
@@ -170,144 +170,144 @@ comparison
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 2 columns)</th>
+<th colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 2 columns)</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns">amount</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 400 of 199,800 matched rows differ (0.2%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (showing 10 of 400 rows)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (showing 10 of 400 rows)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">3</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">53.62</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">54.62</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">3</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">53.62</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">54.62</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">503</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">115.89</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">116.89</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">503</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">115.89</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">116.89</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">104.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">105.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">1003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">104.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">105.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1503</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">117.92</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">118.92</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">1503</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">117.92</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">118.92</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">2003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">56.37</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">57.37</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">2003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">56.37</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">57.37</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">2503</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">119.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">120.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">2503</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">119.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">120.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">3003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">88.82</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">89.82</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">3003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">88.82</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">89.82</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">3503</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">58.09</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">59.09</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">3503</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">58.09</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">59.09</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">4003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">86.61</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">87.61</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">4003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">86.61</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">87.61</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">4503</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">96.4</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">97.4</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows">4503</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">96.4</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">97.4</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (showing 10 of 200 rows)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (showing 10 of 200 rows)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">7</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 112.12</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">7</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 112.12</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 94.3</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">1007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 94.3</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">2007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.68</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">2007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.68</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">3007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 140</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">3007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 140</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">4007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.94</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">4007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.94</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">5007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.42</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">5007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.42</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">6007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 78.28</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">6007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 78.28</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">7007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 68.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">7007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 68.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">8007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 58.93</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">8007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 58.93</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">9007</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 95.88</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows">9007</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 95.88</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (showing 10 of 50 rows)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (showing 10 of 50 rows)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399950</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 104.47</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399950</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 104.47</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399951</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 102.32</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399951</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 102.32</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399952</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.29</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399952</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.29</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399953</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 91.71</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399953</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 91.71</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399954</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 103.78</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399954</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 103.78</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399955</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 134.2</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399955</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 134.2</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399956</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 133.98</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399956</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 133.98</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399957</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 107.84</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399957</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 107.84</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399958</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 76.61</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399958</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 76.61</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">399959</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 90.26</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows">399959</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 90.26</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
 </tr>
 </tbody>
 </table>

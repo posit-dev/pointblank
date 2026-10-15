@@ -83,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-8bef4248d47c217d1276046a23853121.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -126,6 +126,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
+<meta name="gd-wide-layout" data-default="normal" data-min-viewport="1600">
+<style id="gd-wide-layout-vars">:root{--gd-wide-content-scale:1.5;--gd-wide-sidebar-scale:1.2;}</style>
 <script src="../../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
@@ -153,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.0.1</code><br>Released 2026-10-07">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo" data-tippy-content="<code>v1.1.1</code><br>Released 2026-10-15">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
     <img src="../../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
@@ -188,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
     </span>
   </li>  
 </ul>
@@ -666,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Chunking done correctly.</strong> With <code>partitions=N</code>, the comparison runs in N passes, each covering the keys whose hash falls into one bucket, on <em>both</em> tables. A key’s rows always land in the same pass, so the results are exactly those of a single-pass comparison, while each pass only joins about <code>1/N</code> of the rows.</li>
 </ol>
 <p>Let’s try it on a pair of CSV files. We’ll generate a source file with 200,000 orders and a target file in which some orders are missing, some amounts changed, a few orders were added, and the rows were shuffled:</p>
-<div id="8b2b5dd4" class="cell" data-execution_count="2">
+<div id="1ba638fc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -700,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>target.write_csv(data_dir <span class="op">/</span> <span class="st">"target.csv"</span>)</span></code></pre></div>
 </div>
 <p>Now we compare the two files by giving <code>compare()</code> their paths:</p>
-<div id="b6f17d79" class="cell" data-execution_count="3">
+<div id="6b39cfb8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
@@ -776,7 +778,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:30%;">
   <col style="width:70%;">
@@ -785,149 +787,149 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmp4e7_e26v/source.csv</strong> (200,000 rows) → <strong>/tmp/tmp4e7_e26v/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmp06ixqp2c/source.csv</strong> (200,000 rows) → <strong>/tmp/tmp06ixqp2c/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:1.00%; height:100%; background:#E8A33D;"></div></div>400 of 199,800 matched rows differ (0.2%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:1.00%; height:100%; background:#E8A33D;"></div></div>400 of 199,800 matched rows differ (0.2%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (showing 10 of 400 rows)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (showing 10 of 400 rows)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">53.62</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">54.62</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">3</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">53.62</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">54.62</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">503</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">115.89</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">116.89</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">503</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">115.89</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">116.89</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">104.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">105.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">104.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">105.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1503</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">117.92</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">118.92</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">1503</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">117.92</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">118.92</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">56.37</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">57.37</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">2003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">56.37</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">57.37</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2503</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">119.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">120.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">2503</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">119.27</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">120.27</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">88.82</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">89.82</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">3003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">88.82</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">89.82</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3503</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">58.09</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">59.09</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">3503</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">58.09</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">59.09</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">86.61</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">87.61</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">4003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">86.61</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">87.61</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4503</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">96.4</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">97.4</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left">4503</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-showing-10-of-400-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">96.4</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">97.4</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (showing 10 of 200 rows)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (showing 10 of 200 rows)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">7</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 112.12</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">7</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 112.12</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 94.3</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">1007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 94.3</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">2007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.68</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">2007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.68</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">3007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 140</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">3007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 140</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">4007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.94</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">4007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.94</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">5007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.42</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">5007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 108.42</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> west</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">6007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 78.28</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">6007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 78.28</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">7007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 68.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">7007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 68.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">8007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 58.93</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">8007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 58.93</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">9007</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 95.88</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left">9007</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-showing-10-of-200-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 95.88</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (showing 10 of 50 rows)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (showing 10 of 50 rows)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399950</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 104.47</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399950</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 104.47</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399951</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 102.32</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399951</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 102.32</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399952</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.29</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399952</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 88.29</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399953</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 91.71</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399953</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 91.71</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399954</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 103.78</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399954</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 103.78</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399955</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 134.2</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399955</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 134.2</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> south</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399956</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 133.98</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399956</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 133.98</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399957</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 107.84</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399957</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 107.84</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399958</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 76.61</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399958</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 76.61</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> north</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">399959</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 90.26</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left">399959</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-showing-10-of-50-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 90.26</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> east</span></td>
   </tr>
 </tbody>
 
@@ -938,7 +940,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>All four questions are answered in one place: missing and extra rows, changed rows (with the <code>amount</code> column identified as the one that differs), and the schema check in the header.</p>
 <p>The same comparison in four partitions gives identical results:</p>
-<div id="b8a5e160" class="cell" data-execution_count="4">
+<div id="da41e76e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>partitioned <span class="op">=</span> pb.compare(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"source.csv"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"target.csv"</span>,</span>
@@ -1434,6 +1436,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../responsive-tables.js"></script>
 <script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'video-embed.js';document.body.appendChild(s);})();</script>
 <script src="../../navbar-widgets.js"></script>
+<script>(function(){var s=document.createElement('script');var m=document.querySelector('meta[name="quarto:offset"]');s.src=(m?m.content:'')+'wide-layout.js';document.body.appendChild(s);})();</script>
 
 
 
