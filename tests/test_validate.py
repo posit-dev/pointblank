@@ -19383,6 +19383,59 @@ def test_pre_parameter_with_multiple_steps_proper_isolation(request, tbl_fixture
     assert n_values[2] == 2
 
 
+def _times_ten_dfn(dfn):
+    return dfn.with_columns(b=nw.col("a") * 10)
+
+
+class _TimesTenDfn:
+    def __call__(self, dfn):
+        return dfn.with_columns(b=nw.col("a") * 10)
+
+
+# Defined away from the method call (the source text no longer starts with `lambda`)
+_times_ten_dfn_lambda = lambda dfn: dfn.with_columns(b=nw.col("a") * 10)  # noqa: E731
+
+DFN_PRE_FUNCTIONS = {
+    "lambda": _times_ten_dfn_lambda,
+    "named": _times_ten_dfn,
+    "callable_object": _TimesTenDfn(),
+    "partial": partial(lambda factor, dfn: dfn.with_columns(b=nw.col("a") * factor), 10),
+}
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+@pytest.mark.parametrize("kind", list(DFN_PRE_FUNCTIONS))
+def test_pre_dfn_any_callable(tbl_type, kind) -> None:
+    # Any `pre=` function with a `dfn` parameter gets a Narwhals table: with plain columns, with
+    # columns resolved by a selector, and with segments
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4], "g": ["x", "x", "y", "y"]})
+    tbl = tbl if tbl_type == "polars" else tbl.to_pandas()
+    pre = DFN_PRE_FUNCTIONS[kind]
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="b", value=15, pre=pre)
+        .col_vals_gt(columns=col(starts_with("b")), value=15, pre=pre)
+        .col_vals_gt(columns="b", value=15, pre=pre, segments="g")
+        .interrogate()
+    )
+
+    assert not any(step.eval_error for step in validation.validation_info)
+    assert validation.n_passed(scalar=False) == {1: 3, 2: 3, 3: 1, 4: 2}
+    assert validation.n_failed(scalar=False) == {1: 1, 2: 1, 3: 1, 4: 0}
+
+
+def test_pre_dfn_result_is_native() -> None:
+    # The Narwhals table a `dfn` function returns is converted back to the native type
+    from pointblank.validate import _apply_pre
+
+    tbl = pl.DataFrame({"a": [1, 2]})
+
+    assert isinstance(_apply_pre(_times_ten_dfn, tbl), pl.DataFrame)
+    # A function that already returns a native table is fine too
+    assert isinstance(_apply_pre(lambda dfn: dfn.to_native(), tbl), pl.DataFrame)
+
+
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
 def test_pre_parameter_native_lambda_isolation(request, tbl_fixture) -> None:
     """Test pre parameter isolation using native lambdas specific to each DataFrame type."""
