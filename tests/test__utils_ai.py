@@ -1,3 +1,6 @@
+import re
+import sys
+
 import pytest
 import pandas as pd
 import polars as pl
@@ -94,13 +97,6 @@ def test_llm_config_with_api_key():
 # ============================================================================
 # Test create_chat_instance
 # ============================================================================
-
-
-def test_create_chat_instance_missing_chatlas():
-    """Test error when chatlas is not installed."""
-    # We can't easily mock the import machinery, so we'll just test the error case
-    # This is covered by the integration tests anyway
-    pass  # Skip this complex mocking test
 
 
 def test_create_chat_instance_basic_functionality():
@@ -867,3 +863,61 @@ def test_default_results_creation():
     assert results[0]["index"] == 1
     assert results[1]["index"] == 2
     assert results[2]["index"] == 3
+
+
+# ============================================================================
+# Provider packages and chat construction (no network access needed)
+# ============================================================================
+
+
+@pytest.mark.parametrize(
+    "provider, package",
+    [
+        ("anthropic", "anthropic"),
+        ("bedrock", "anthropic"),
+        ("bedrock", "boto3"),
+        ("openai", "openai"),
+        ("ollama", "openai"),
+        ("azure-openai", "openai"),
+    ],
+)
+def test_create_chat_instance_missing_provider_package(monkeypatch, provider, package):
+    """A missing provider package gives an error that points to the `generate` extra."""
+    pytest.importorskip("chatlas")
+    monkeypatch.setitem(sys.modules, package, None)
+
+    with pytest.raises(ImportError, match=re.escape('pip install "pointblank[generate]"')) as e:
+        _create_chat_instance(provider, "model")
+    assert f"`{package}`" in str(e.value)
+
+
+def test_create_chat_instance_missing_chatlas(monkeypatch):
+    monkeypatch.setitem(sys.modules, "chatlas", None)
+
+    with pytest.raises(ImportError, match=re.escape('pip install "pointblank[generate]"')):
+        _create_chat_instance("anthropic", "model")
+
+
+def test_create_chat_instance_anthropic():
+    pytest.importorskip("anthropic")
+    chatlas = pytest.importorskip("chatlas")
+
+    chat = _create_chat_instance("anthropic", "claude-sonnet-4-5", api_key="test-key")
+
+    assert isinstance(chat, chatlas.Chat)
+    assert chat.provider.name == "Anthropic"
+
+
+def test_create_chat_instance_bedrock(monkeypatch):
+    pytest.importorskip("anthropic")
+    pytest.importorskip("boto3")
+    chatlas = pytest.importorskip("chatlas")
+    monkeypatch.delenv("AWS_PROFILE", raising=False)
+    monkeypatch.setenv("AWS_REGION", "us-east-1")
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "test")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "test")
+
+    chat = _create_chat_instance("bedrock", "us.anthropic.claude-sonnet-4-5-v1:0")
+
+    assert isinstance(chat, chatlas.Chat)
+    assert chat.provider.name == "AWS/Bedrock"
