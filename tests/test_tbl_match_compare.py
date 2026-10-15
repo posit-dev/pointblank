@@ -14,7 +14,6 @@ import polars as pl
 import pytest
 
 import pointblank as pb
-from pointblank._interrogation import tbl_match as tbl_match_legacy
 
 
 SOURCE = pl.DataFrame({"id": [1, 2, 3, 4], "x": [1.0, 2.0, 3.0, 4.0], "s": ["a", "b", "c", "d"]})
@@ -27,40 +26,37 @@ def _step(validation: pb.Validate, i: int = 1):
 
 
 # ----------------------------------------------------------------------------------------------
-# Verdict parity with the previous (single test unit) implementation
+# Verdicts of the previous (single test unit) implementation
 # ----------------------------------------------------------------------------------------------
 
 _BASE = {"a": [1, 2, 3, 4], "b": ["w", "x", "y", "z"], "c": [4.0, 5.0, 6.0, 7.0]}
 
 PARITY_CASES = {
-    "identical": (_BASE, _BASE),
-    "value_differs": (_BASE, {**_BASE, "c": [4.0, 5.5, 6.0, 7.0]}),
-    "fewer_rows": (_BASE, {k: v[:2] for k, v in _BASE.items()}),
-    "more_rows": ({k: v[:2] for k, v in _BASE.items()}, _BASE),
-    "renamed_column": (_BASE, {"a": _BASE["a"], "b": _BASE["b"], "d": _BASE["c"]}),
-    "column_order": (_BASE, {"a": _BASE["a"], "c": _BASE["c"], "b": _BASE["b"]}),
-    "column_case": (_BASE, {"A": _BASE["a"], "b": _BASE["b"], "c": _BASE["c"]}),
-    "extra_column": (_BASE, {**_BASE, "d": [0, 0, 0, 0]}),
-    "int_vs_float": (_BASE, {**_BASE, "a": [1.0, 2.0, 3.0, 4.0]}),
-    "nan_vs_null": (
-        {"a": [1, 2], "c": [float("nan"), 1.0]},
-        {"a": [1, 2], "c": [None, 1.0]},
-    ),
-    "nulls_equal": ({"a": [1, None], "b": [None, "x"]}, {"a": [1, None], "b": [None, "x"]}),
-    "null_vs_value": ({"a": [1, None]}, {"a": [1, 2]}),
-    "row_order": (_BASE, {k: list(reversed(v)) for k, v in _BASE.items()}),
+    "identical": (_BASE, _BASE, True),
+    "value_differs": (_BASE, {**_BASE, "c": [4.0, 5.5, 6.0, 7.0]}, False),
+    "fewer_rows": (_BASE, {k: v[:2] for k, v in _BASE.items()}, False),
+    "more_rows": ({k: v[:2] for k, v in _BASE.items()}, _BASE, False),
+    "renamed_column": (_BASE, {"a": _BASE["a"], "b": _BASE["b"], "d": _BASE["c"]}, False),
+    "column_order": (_BASE, {"a": _BASE["a"], "c": _BASE["c"], "b": _BASE["b"]}, False),
+    "column_case": (_BASE, {"A": _BASE["a"], "b": _BASE["b"], "c": _BASE["c"]}, False),
+    "extra_column": (_BASE, {**_BASE, "d": [0, 0, 0, 0]}, False),
+    "int_vs_float": (_BASE, {**_BASE, "a": [1.0, 2.0, 3.0, 4.0]}, False),
+    "nan_vs_null": ({"a": [1, 2], "c": [float("nan"), 1.0]}, {"a": [1, 2], "c": [None, 1.0]}, True),
+    "nulls_equal": ({"a": [1, None], "b": [None, "x"]}, {"a": [1, None], "b": [None, "x"]}, True),
+    "null_vs_value": ({"a": [1, None]}, {"a": [1, 2]}, False),
+    "row_order": (_BASE, {k: list(reversed(v)) for k, v in _BASE.items()}, False),
 }
 
 
 @pytest.mark.parametrize("backend", ["polars", "pandas"])
 @pytest.mark.parametrize("case", list(PARITY_CASES))
-def test_default_verdict_matches_legacy_implementation(case, backend):
-    data_dict, compare_dict = PARITY_CASES[case]
+def test_default_verdict_matches_previous_implementation(case, backend):
+    # `expected` is what the previous implementation (removed) gave for each case
+    data_dict, compare_dict, expected = PARITY_CASES[case]
     data, comparison = pl.DataFrame(data_dict), pl.DataFrame(compare_dict)
     if backend == "pandas":
         data, comparison = data.to_pandas(), comparison.to_pandas()
 
-    expected = tbl_match_legacy(data_tbl=data, tbl_compare=comparison)
     validation = pb.Validate(data=data).tbl_match(tbl_compare=comparison).interrogate()
 
     assert validation.all_passed() is expected
