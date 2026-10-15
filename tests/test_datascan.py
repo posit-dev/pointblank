@@ -216,6 +216,41 @@ def test_col_summary_tbl(df):
     assert isinstance(col_summary, GT)
 
 
+def _bool_summary_cells(col_summary: GT) -> list[str]:
+    tag = "<span style='font-weight: bold;'>"
+    return [
+        str(v).replace(tag, "").replace("</span>", "")
+        for v in nw.from_native(col_summary._tbl_data)["n_unique"]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("data", "expected"),
+    [
+        ({"flag": [True, True, True]}, ["T1<br>F0"]),
+        ({"flag": [True]}, ["T1<br>F0"]),
+        ({"flag": [True, None, True]}, ["T0.67<br>F0"]),
+        ({"flag": [False, False]}, ["T0<br>F1"]),
+        ({"a": [True, True, False], "b": [True, True, True]}, ["T0.67<br>F0.33", "T1<br>F0"]),
+        ({"a": [True, True, True], "b": [True, False, None]}, ["T1<br>F0", "T0.33<br>F0.33"]),
+    ],
+)
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+def test_col_summary_tbl_bool_missing_true_or_false(data, expected, backend):
+    if backend == "pandas":
+        pytest.importorskip("pandas")
+        if any(None in vals for vals in data.values()):
+            pytest.skip("pandas stores booleans with missing values as `object`")
+        tbl = pl.DataFrame(data).to_pandas()
+    elif backend == "duckdb":
+        ibis = pytest.importorskip("ibis")
+        tbl = ibis.memtable(pl.DataFrame(data).to_arrow())
+    else:
+        tbl = pl.DataFrame(data)
+
+    assert _bool_summary_cells(col_summary_tbl(tbl)) == expected
+
+
 def test_col_summary_tbl_polars_categorical_column():
     log_levels = pl.Enum(["debug", "info", "warning", "error"])
 
