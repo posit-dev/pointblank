@@ -16780,10 +16780,17 @@ class Validate:
                         "col_vals_within_spec",
                         "col_vals_str_len",
                     ]:
-                        # Process table for column validation
-                        tbl = _column_test_prep(
-                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                        )
+                        # Process table for column validation; a column of a type the method
+                        # can't check (e.g., a string column in `col_vals_gt()`) is an evaluation
+                        # error rather than a crash
+                        try:
+                            tbl = _column_test_prep(
+                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            )
+                        except TypeError as e:
+                            raise StepEvaluationError(
+                                f"{str(e).rstrip('.')}, which {assertion_type}() can't check."
+                            ) from e
 
                         if assertion_method == "gt":
                             results_tbl = interrogate_gt(
