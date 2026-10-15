@@ -25265,9 +25265,16 @@ have to go back to a Pandas DataFrame by using `.to_native()`). Pointblank is ab
 with the Narwhals DataFrame for validation purposes, which makes the workflow more concise.
 
 One more thing to note: Pointblank provides a convenient syntactic sugar for working with Narwhals.
-If you name the lambda parameter `dfn` instead of `df`, the system automatically applies
-`nw.from_native()` to the input DataFrame first. This lets you write more concise code without
-having to explicitly convert the DataFrame to a Narwhals format.
+If you name the parameter of the preprocessing function (a lambda or a regular function) `dfn`
+instead of `df`, the system automatically applies `nw.from_native()` to the input DataFrame first,
+and converts the result back to the original DataFrame type. This lets you write more concise code
+without having to explicitly convert the DataFrame to a Narwhals format. The function above could
+be written like this:
+
+```python
+def get_median_columns_c_and_a(dfn):
+    return dfn.select(nw.median("c"), nw.median("a"))
+```
 
 ## Swapping in a Totally Different DataFrame
 

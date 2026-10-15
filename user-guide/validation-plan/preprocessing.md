@@ -982,7 +982,12 @@ There's a bit to unpack here, so let's look at the preprocessing function first.
 
 We should note that the transformed table is, perhaps surprisingly, a Narwhals DataFrame (we didn't have to go back to a Pandas DataFrame by using `.to_native()`). Pointblank is able to work directly with the Narwhals DataFrame for validation purposes, which makes the workflow more concise.
 
-One more thing to note: Pointblank provides a convenient syntactic sugar for working with Narwhals. If you name the lambda parameter `dfn` instead of `df`, the system automatically applies `nw.from_native()` to the input DataFrame first. This lets you write more concise code without having to explicitly convert the DataFrame to a Narwhals format.
+One more thing to note: Pointblank provides a convenient syntactic sugar for working with Narwhals. If you name the parameter of the preprocessing function (a lambda or a regular function) `dfn` instead of `df`, the system automatically applies `nw.from_native()` to the input DataFrame first, and converts the result back to the original DataFrame type. This lets you write more concise code without having to explicitly convert the DataFrame to a Narwhals format. The function above could be written like this:
+
+``` python
+def get_median_columns_c_and_a(dfn):
+    return dfn.select(nw.median("c"), nw.median("a"))
+```
 
 
 # Swapping in a Totally Different DataFrame
@@ -1005,9 +1010,9 @@ shape: (3, 2)
 | f      | n   |
 |--------|-----|
 | str    | u32 |
-| "low"  | 5   |
-| "mid"  | 2   |
 | "high" | 6   |
+| "mid"  | 2   |
+| "low"  | 5   |
 
 
 Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:

@@ -659,7 +659,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="transforming-data-with-lambda-functions" class="level1">
 <h1>Transforming Data with Lambda Functions</h1>
 <p>Now, through examples, let’s look at the process of performing the validations mentioned above. We’ll use the <code>small_table</code> dataset for all of the examples. Here it is in its entirety:</p>
-<div id="0ebf7230" class="cell" data-execution_count="2">
+<div id="60de2530" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -909,7 +909,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>In getting to grips with the basics, we’ll try to validate that string lengths in the <code>b</code> column are less than 10 characters. We can’t directly use the <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link"><code>Validate.col_vals_lt()</code></a> validation method with that column because it is meant to be used with a column of numeric values. Let’s just give that method what it needs and create a column with string lengths!</p>
 <p>The target table is a Polars DataFrame so we’ll provide a lambda function that uses the Polars API to add in that numeric column:</p>
-<div id="f0efb311" class="cell" data-execution_count="3">
+<div id="027ea587" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1101,7 +1101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-custom-functions-for-preprocessing" class="level1">
 <h1>Using Custom Functions for Preprocessing</h1>
 <p>While lambda functions work well for simple transformations, custom named functions can make your validation code more organized and reusable, especially for complex preprocessing logic. Let’s implement the same string length validation using a dedicated function:</p>
-<div id="1e9b5150" class="cell" data-execution_count="4">
+<div id="44aca495" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_string_lengths(df):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This generates string length from a column `b`; the new column with</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the values is called `string_lengths` (will be placed as the last column)</span></span>
@@ -1294,7 +1294,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="creating-parameterized-preprocessing-functions" class="level1">
 <h1>Creating Parameterized Preprocessing Functions</h1>
 <p>So far we’ve used simple functions and lambdas, but sometimes you may want to create more flexible preprocessing functions that can be configured with parameters. Let’s create a reusable function that can calculate string lengths for any column:</p>
-<div id="e106274d" class="cell" data-execution_count="5">
+<div id="885b57cc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> string_length_calculator(column_name):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Returns a preprocessing function that calculates string lengths for the specified column."""</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> preprocessor(df):</span>
@@ -1492,7 +1492,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Using Narwhals to Preprocess Many Types of DataFrames</h1>
 <p>In this previous example we used a Polars table. You might have a situation where you perform data validation variously on Pandas and Polars DataFrames. This is where Narwhals becomes handy: it provides a single, consistent API that works across multiple DataFrame types, eliminating the need to learn and switch between different APIs depending on your data source.</p>
 <p>Let’s obtain <code>small_table</code> as a Pandas DataFrame. We’ll construct a validation step to verify that the median of column <code>c</code> is greater than the median in column <code>a</code>.</p>
-<div id="12198993" class="cell" data-execution_count="6">
+<div id="bb7e46de" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals <span class="im">as</span> nw</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define preprocessing function using Narwhals for cross-backend compatibility</span></span>
@@ -1679,17 +1679,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The goal is to check that the median value of <code>c</code> is greater than the corresponding median of column <code>a</code>, which we set up through the <code>columns=</code> and <code>value=</code> parameters in the <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>Validate.col_vals_gt()</code></a> method.</p>
 <p>There’s a bit to unpack here, so let’s look at the preprocessing function first. Narwhals can translate a Pandas DataFrame to a Narwhals DataFrame with its <code>from_native()</code> function. After that initiating step, you’re free to use the Narwhals API (which is modeled on a subset of the Polars API) to do the necessary data transformation. In this case, we are getting the medians of the <code>c</code> and <code>a</code> columns and ending up with a one-row, two-column table.</p>
 <p>We should note that the transformed table is, perhaps surprisingly, a Narwhals DataFrame (we didn’t have to go back to a Pandas DataFrame by using <code>.to_native()</code>). Pointblank is able to work directly with the Narwhals DataFrame for validation purposes, which makes the workflow more concise.</p>
-<p>One more thing to note: Pointblank provides a convenient syntactic sugar for working with Narwhals. If you name the lambda parameter <code>dfn</code> instead of <code>df</code>, the system automatically applies <code>nw.from_native()</code> to the input DataFrame first. This lets you write more concise code without having to explicitly convert the DataFrame to a Narwhals format.</p>
+<p>One more thing to note: Pointblank provides a convenient syntactic sugar for working with Narwhals. If you name the parameter of the preprocessing function (a lambda or a regular function) <code>dfn</code> instead of <code>df</code>, the system automatically applies <code>nw.from_native()</code> to the input DataFrame first, and converts the result back to the original DataFrame type. This lets you write more concise code without having to explicitly convert the DataFrame to a Narwhals format. The function above could be written like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_median_columns_c_and_a(dfn):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dfn.select(nw.median(<span class="st">"c"</span>), nw.median(<span class="st">"a"</span>))</span></code></pre></div>
 </section>
 <section id="swapping-in-a-totally-different-dataframe" class="level1">
 <h1>Swapping in a Totally Different DataFrame</h1>
 <p>Sometimes data validation requires looking at completely transformed versions of your data (such as aggregated summaries, pivoted views, or even reference tables). While this approach goes against the typical paradigm of validating a single <em>target table</em>, there are legitimate use cases where you might need to validate properties that only emerge after significant transformations.</p>
 <p>Let’s now try to prepare the final validation scenario, checking that there are at least three instances of every categorical value in column <code>f</code> (which contains string values in the set of <code>"low"</code>, <code>"mid"</code>, and <code>"high"</code>). This time, we’ll prepare the transformed table (transformed by Polars expressions) outside of the Pointblank code.</p>
-<div id="6ed3412a" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data_original <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>data_transformed <span class="op">=</span> data_original.group_by(<span class="st">"f"</span>).<span class="bu">len</span>(name<span class="op">=</span><span class="st">"n"</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>data_transformed</span></code></pre></div>
+<div id="aa0800dd" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>data_original <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>data_transformed <span class="op">=</span> data_original.group_by(<span class="st">"f"</span>).<span class="bu">len</span>(name<span class="op">=</span><span class="st">"n"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>data_transformed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><style>
 .dataframe > thead > tr,
@@ -1698,28 +1700,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (3, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>f</th><th>n</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"low"</td><td>5</td></tr><tr><td>"mid"</td><td>2</td></tr><tr><td>"high"</td><td>6</td></tr></tbody></table></div>
+<small>shape: (3, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>f</th><th>n</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"high"</td><td>6</td></tr><tr><td>"mid"</td><td>2</td></tr><tr><td>"low"</td><td>5</td></tr></tbody></table></div>
 </div>
 </div>
 <p>Then, we’ll plug in the <code>data_transformed</code> DataFrame with a preprocessing function:</p>
-<div id="802302b2" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define preprocessing function to use the transformed data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> use_transformed_data(df):</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data_transformed</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>data_original,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Category counts."</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"n"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        pre<span class="op">=</span>use_transformed_data</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div id="e8d270d9" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define preprocessing function to use the transformed data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> use_transformed_data(df):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data_transformed</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>data_original,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Category counts."</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"n"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        pre<span class="op">=</span>use_transformed_data</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
