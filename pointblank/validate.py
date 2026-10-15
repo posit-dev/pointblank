@@ -66,6 +66,7 @@ from pointblank._interrogation import (
     NumberOfTestUnits,
     SpeciallyValidation,
     StepEvaluationError,
+    _first_line,
     apply_missing_exclusion,
     col_count_match,
     col_exists,
@@ -4684,13 +4685,18 @@ def _validation_info_to_step(
     elif at == "col_vals_in_table":
         values = vi.values or {}
         params["columns"] = values.get("columns", vi.column)
-        params["ref_table"] = _placeholder(
-            code="your_reference_table",
-            note=(
-                "Step 'col_vals_in_table' checks against a reference table that cannot be "
-                "serialized; a placeholder was emitted and must be edited manually."
-            ),
-        )
+        ref_table = values.get("ref_table")
+        if isinstance(ref_table, (str, Path)):
+            # A file path or connection string round-trips as-is
+            params["ref_table"] = str(ref_table)
+        else:
+            params["ref_table"] = _placeholder(
+                code="your_reference_table",
+                note=(
+                    "Step 'col_vals_in_table' checks against a reference table that cannot be "
+                    "serialized; a placeholder was emitted and must be edited manually."
+                ),
+            )
         params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
@@ -14858,8 +14864,12 @@ class Validate:
             The column (or list of columns for composite keys) in this table that should reference
             the other table. For composite keys, supply a list of column names.
         ref_table
-            The reference table containing the valid values. Can be a DataFrame, database table, or
-            a callable that returns one (resolved at interrogation time).
+            The reference table containing the valid values. Can be a DataFrame, a database table,
+            a file path (e.g., to a CSV or Parquet file), a database connection string (e.g.,
+            `"duckdb:///path/to/db.ddb::table_name"`), or a callable that returns one of these. A
+            path or connection string is loaded at interrogation time, as with
+            [`tbl_match()`](`pointblank.Validate.tbl_match`); if the reference table can't be
+            loaded, the step is marked as having an evaluation error.
         ref_column
             The column (or list of columns for composite keys) in the reference table to check
             against. Must have the same length as ``columns``.
@@ -17265,8 +17275,7 @@ class Validate:
                         ref_column = value["ref_column"]
                         in_table_columns = value["columns"]
 
-                        if callable(ref_table):
-                            ref_table = ref_table()
+                        ref_table = _load_ref_table(ref_table)
 
                         results_tbl = interrogate_in_table(
                             tbl=data_tbl_step,
@@ -25253,6 +25262,36 @@ def _transform_assertion_str(
                 type_upd[i] = f"{segmentation_div} {type_upd[i]}"
 
     return type_upd
+
+
+def _load_ref_table(ref_table: Any) -> Any:
+    """
+    Resolve the `ref_table=` of `col_vals_in_table()` to a table at interrogation time.
+
+    A function is called to get the table, and a file path (CSV, Parquet, ...) or a database
+    connection string is loaded the way `tbl_match()` loads its comparison table. A reference that
+    can't be loaded, or isn't a table, raises a `StepEvaluationError`.
+    """
+    if callable(ref_table) and not hasattr(ref_table, "columns"):
+        ref_table = ref_table()
+
+    if isinstance(ref_table, (str, Path)):
+        try:
+            ref_table = _process_data(ref_table)
+        except Exception as e:
+            raise StepEvaluationError(
+                f"The reference table {str(ref_table)!r} couldn't be loaded ({_first_line(e)})."
+            ) from e
+
+    try:
+        _get_tbl_type(ref_table)
+    except TypeError as e:
+        raise StepEvaluationError(
+            "`ref_table=` must be a table, a file path, or a database connection string (or a "
+            f"function that returns one), not a {type(ref_table).__name__}."
+        ) from e
+
+    return ref_table
 
 
 def _apply_pre(pre: Callable, tbl: Any) -> Any:
