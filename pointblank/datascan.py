@@ -177,10 +177,12 @@ class DataScan:
             ## Handle dtyping:
             native_dtype = schema[column]
             if _TypeMap.is_illegal(native_dtype):
+                profile.skipped_columns[column] = str(native_dtype)
                 continue
             try:
                 prof: type[ColumnProfile] = _TypeMap.fetch_profile(native_dtype)
             except NotImplementedError:
+                profile.skipped_columns[column] = str(native_dtype)
                 continue
 
             col_profile = ColumnProfile(colname=column, coltype=str(native_dtype))
@@ -555,6 +557,7 @@ class DataScan:
         profile.columns = meta["columns"]
         profile.implementation = nw.Implementation.POLARS
         profile.column_profiles = []
+        profile.skipped_columns = {}
 
         stat_class_map: dict[str, type] = {
             stat_cls.name: stat_cls for stat_cls in COLUMN_ORDER_REGISTRY

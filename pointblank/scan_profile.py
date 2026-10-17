@@ -258,6 +258,8 @@ class _DataProfile:  # TODO: feels redundant and weird
         self.columns: list[str] = columns
         self.implementation = implementation
         self.column_profiles: list[ColumnProfile] = []
+        # Column name -> dtype of the columns whose type cannot be profiled.
+        self.skipped_columns: dict[str, str] = {}
 
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
@@ -267,7 +269,12 @@ class _DataProfile:  # TODO: feels redundant and weird
             self.row_count = len(data)
 
     def as_dataframe(self, *, strict: bool = True) -> DataFrame:
-        assert self.column_profiles
+        if not self.column_profiles:
+            detail = ", ".join(f"{name} ({dtype})" for name, dtype in self.skipped_columns.items())
+            msg = "No column could be summarized: none of them has a supported type."
+            if detail:
+                msg += f" Unsupported columns: {detail}."
+            raise ValueError(msg)
 
         cols: list[dict[str, Any]] = []
         for prof in self.column_profiles:

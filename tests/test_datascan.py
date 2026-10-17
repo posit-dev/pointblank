@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+import decimal
 import os
 import pytest
 import narwhals as nw
@@ -283,6 +285,25 @@ def test_datascan_class_raises():
 
     with pytest.raises(TypeError):
         DataScan(data=[1, 2, 3])
+
+
+@pytest.mark.parametrize(
+    "backend, data, skipped",
+    [
+        ("polars", {"amount": [decimal.Decimal("1.50")]}, "amount (Decimal"),
+        ("polars", {"t": [datetime.time(9, 0)]}, "t (Time)"),
+        ("pandas", {"flag": [True, None, False]}, "flag (Object)"),
+    ],
+)
+def test_col_summary_tbl_no_supported_columns(backend, data, skipped):
+    if backend == "polars":
+        df = pl.DataFrame(data)
+    else:
+        df = pytest.importorskip("pandas").DataFrame(data)
+
+    with pytest.raises(ValueError, match="No column could be summarized") as exc:
+        col_summary_tbl(df)
+    assert skipped in str(exc.value)
 
 
 def test_compact_integer_fmt():
