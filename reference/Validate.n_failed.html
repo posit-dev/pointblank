@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Provides a dictionary of the number of test units that failed for each validation step.">
 
 <title>Validate.n_failed() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -129,10 +131,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html">
 
 
+<meta property="og:title" content="Validate.n_failed() | Pointblank">
+<meta property="og:description" content="Provides a dictionary of the number of test units that failed for each validation step.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Validate.n_failed() | Pointblank">
+<meta name="twitter:description" content="Provides a dictionary of the number of test units that failed for each validation step.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="Validate.n_failed.md">
-  <meta name="description" content="Provides a dictionary of the number of test units that failed for each validation step.">
   <script type="application/ld+json">
 [
   {
@@ -160,14 +168,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Validate.n_failed() | Pointblank">
-  <meta property="og:description" content="Provides a dictionary of the number of test units that failed for each validation step.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Validate.n_failed() | Pointblank">
-  <meta name="twitter:description" content="Provides a dictionary of the number of test units that failed for each validation step.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1675,7 +1675,7 @@ A dictionary of the number of failing test units for each validation step or a s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps and, as it turns out, all of them will have failing test units. After interrogation, the <code>n_failed()</code> method is used to determine the number of failing test units for each validation step.</p>
-<div id="8915d6c1" class="cell" data-execution_count="1">
+<div id="50e4544c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1702,7 +1702,7 @@ A dictionary of the number of failing test units for each validation step or a s
 </div>
 <p>The returned dictionary shows that all validation steps had failing test units.</p>
 <p>If we wanted to check the number of failing test units for a single validation step, we can provide the step number. Also, we could forego the dictionary and get a scalar value by setting <code>scalar=True</code> (ensuring that <code>i=</code> is a scalar).</p>
-<div id="98352b12" class="cell" data-execution_count="2">
+<div id="a5a7621e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.n_failed(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{1: 1}</code></pre>

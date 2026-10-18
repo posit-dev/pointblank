@@ -9,6 +9,7 @@
 <meta name="description" content="A Parquet dataset can be used for data validation, thanks to Ibis.">
 
 <title>Using Parquet Data | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -133,17 +134,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/examples/advanced-topics/using-parquet-data.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/examples/advanced-topics/using-parquet-data.html">
 
 
+<meta property="og:title" content="Using Parquet Data | Pointblank">
+<meta property="og:description" content="A Parquet dataset can be used for data validation, thanks to Ibis.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Using Parquet Data | Pointblank">
+<meta name="twitter:description" content="A Parquet dataset can be used for data validation, thanks to Ibis.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="using-parquet-data.md">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Using Parquet Data | Pointblank">
-  <meta property="og:description" content="A Parquet dataset can be used for data validation, thanks to Ibis.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/examples/advanced-topics/using-parquet-data.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Using Parquet Data | Pointblank">
-  <meta name="twitter:description" content="A Parquet dataset can be used for data validation, thanks to Ibis.">
 </head>
 
 <body class="nav-sidebar floating nav-fixed fullcontent quarto-light">
@@ -188,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -455,7 +455,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="2c2c530c" class="cell" data-execution_count="1">
+<div id="a858c9af" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -775,7 +775,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-15 18:48:11 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-15 18:48:12 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-18 23:22:37 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-10-18 23:22:38 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
@@ -801,7 +801,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>
 Preview of Input Table
 </summary>
-<div id="38ccc5e5" class="cell" data-execution_count="2">
+<div id="d9d35bc6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>

@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Find out if your data is what you think it is.">
 
 <title>Comparing Two Tables | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -134,18 +136,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html">
 
 
+<meta property="og:title" content="Comparing Two Tables | Pointblank">
+<meta property="og:description" content="Find out if your data is what you think it is.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Comparing Two Tables | Pointblank">
+<meta name="twitter:description" content="Find out if your data is what you think it is.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="comparing-tables.md">
-  <meta name="description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Comparing Two Tables | Pointblank">
-  <meta property="og:description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Comparing Two Tables | Pointblank">
-  <meta name="twitter:description" content="A very common data question is how do these two tables differ? Maybe you refactored a pipeline and want to know whether its output changed, migrated a...">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light">
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -661,7 +661,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-first-comparison" class="level1">
 <h1>A First Comparison</h1>
 <p>Let’s make two small tables of orders. The target is a later extract of the same data: one order had its amount corrected, one order is gone, and a new order has appeared.</p>
-<div id="ccacb78d" class="cell" data-execution_count="2">
+<div id="d4abb099" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
@@ -683,7 +683,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Since every order has a unique <code>order_id</code>, we’ll use it as the <em>key</em> to line up the rows of the two tables:</p>
-<div id="d11610be" class="cell" data-execution_count="3">
+<div id="969824da" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -755,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:30%;">
   <col style="width:70%;">
@@ -764,41 +764,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
   </tr>
 </tbody>
 
@@ -843,20 +843,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>The counts are available directly on the <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object:</p>
-<div id="70ba2ed9" class="cell" data-execution_count="4">
+<div id="994513f3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
-<div id="36a121ad" class="cell" data-execution_count="5">
+<div id="86a6df1b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison.n_changed, comparison.n_missing, comparison.n_extra</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>(1, 1, 1)</code></pre>
 </div>
 </div>
 <p>A <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only if the tables match, so it can be used directly in a test or an <code>if</code> statement:</p>
-<div id="63f83a8a" class="cell" data-execution_count="6">
+<div id="920cb2e4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">bool</span>(comparison)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>False</code></pre>
@@ -866,7 +866,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-the-differing-rows" class="level1">
 <h1>Getting the Differing Rows</h1>
 <p>Use the <a href="../../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> method to get the rows with a given status as a table. Changed rows come with a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column:</p>
-<div id="cc6f8b2c" class="cell" data-execution_count="7">
+<div id="16126489" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><style>
@@ -880,7 +880,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Missing rows come from the source and extra rows from the target:</p>
-<div id="f1a37875" class="cell" data-execution_count="8">
+<div id="ff964ee7" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><style>
@@ -893,7 +893,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>status</th></tr><tr><td>i64</td><td>str</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>1003</td><td>"Cho"</td><td>12.75</td><td>"pending"</td></tr></tbody></table></div>
 </div>
 </div>
-<div id="282363f2" class="cell" data-execution_count="9">
+<div id="cee24900" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div><style>
@@ -907,7 +907,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Only up to <code>limit=</code> rows (100 by default) are collected, so this is safe even for very large tables. For a per-column view of the mismatches, use <a href="../../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
-<div id="f86a2967" class="cell" data-execution_count="10">
+<div id="cedd6f7a" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div><style>
@@ -930,7 +930,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>As multisets</strong> (<code>keys="*"</code>): whole rows are compared regardless of their order, with duplicates counted. This is for tables that have no key at all.</li>
 </ul>
 <p>Here’s what positional alignment makes of the same two tables. Since a row was removed and another added, most rows no longer line up:</p>
-<div id="4a6efa27" class="cell" data-execution_count="11">
+<div id="c774357f" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target).status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
@@ -940,7 +940,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tolerances-normalization-and-nulls" class="level1">
 <h1>Tolerances, Normalization, and Nulls</h1>
 <p>Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given for all numeric columns or per column. An absolute tolerance of <code>5</code> absorbs the corrected amount:</p>
-<div id="44b24822" class="cell" data-execution_count="12">
+<div id="d03b43a8" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">5</span>}).n_changed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0</code></pre>
@@ -953,7 +953,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schema-differences" class="level1">
 <h1>Schema Differences</h1>
 <p>Column differences are reported in the <em>Schema differences</em> section of the report and in the <code>schema_diff</code> attribute. Suppose the target renamed a column and added another:</p>
-<div id="e8dff99c" class="cell" data-execution_count="13">
+<div id="282bfae8" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>target_v2 <span class="op">=</span> target.rename({<span class="st">"customer"</span>: <span class="st">"customer_name"</span>}).with_columns(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    region<span class="op">=</span>pl.lit(<span class="st">"EU"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -966,7 +966,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>With the default <code>schema="strict"</code>, any schema difference means the tables don’t match and every row counts as failing. Two arguments help here. <code>column_map=</code> pairs up renamed columns, and <code>schema="common"</code> compares only the columns that both tables share (still reporting the schema differences, but without failing any rows):</p>
-<div id="eefd54c0" class="cell" data-execution_count="14">
+<div id="94cbce51" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pb.compare(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    source,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    target_v2,</span>
@@ -1040,7 +1040,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:30%;">
   <col style="width:70%;">
@@ -1049,52 +1049,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</td>
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">schema: common columns</span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">schema: common columns</span></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Schema differences</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Schema-differences" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Schema differences</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">region</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">region</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">customer</td>
-    <td style="font-size: 12px;" class="gt_row gt_left">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">customer</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
   </tr>
 </tbody>
 
@@ -1112,7 +1112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="table-comparison-as-a-validation-step" class="level1">
 <h1>Table Comparison as a Validation Step</h1>
 <p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
-<div id="55755b34" class="cell" data-execution_count="15">
+<div id="ebd5cbab" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>target, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.25</span>))</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>source, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -1225,26 +1225,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 40px; background-color: #EBBC14; color: transparent;font-size: 0px;" class="gt_row gt_left">#EBBC14</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+    <td style="height: 40px; background-color: #EBBC14; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#EBBC14</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>tbl_match</title>
-    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="tbl_match" transform="translate(0.000000, 0.758621)">
-            <path d="M56.712234,1.01466935 C59.1975153,1.01466935 61.4475153,2.02202867 63.076195,3.65070832 C64.7048747,5.27938798 65.712234,7.52938798 65.712234,10.0146694 L65.712234,10.0146694 L65.712234,65.0146694 L10.712234,65.0146694 C8.22695259,65.0146694 5.97695259,64.00731 4.34827294,62.3786304 C2.71959328,60.7499507 1.71223397,58.4999507 1.71223397,56.0146694 L1.71223397,56.0146694 L1.71223397,10.0146694 C1.71223397,7.52938798 2.71959328,5.27938798 4.34827294,3.65070832 C5.97695259,2.02202867 8.22695259,1.01466935 10.712234,1.01466935 L10.712234,1.01466935 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <g id="equal" transform="translate(46.026611, 20.710122) rotate(-90.000000) translate(-46.026611, -20.710122) translate(42.526611, 16.210122)" stroke="#000000" stroke-linecap="square">
-                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="Line"></line>
-                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line"></line>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-tbl_match" transform="translate(0.000000, 0.758621)">
+            <path d="M56.712234,1.01466935 C59.1975153,1.01466935 61.4475153,2.02202867 63.076195,3.65070832 C64.7048747,5.27938798 65.712234,7.52938798 65.712234,10.0146694 L65.712234,10.0146694 L65.712234,65.0146694 L10.712234,65.0146694 C8.22695259,65.0146694 5.97695259,64.00731 4.34827294,62.3786304 C2.71959328,60.7499507 1.71223397,58.4999507 1.71223397,56.0146694 L1.71223397,56.0146694 L1.71223397,10.0146694 C1.71223397,7.52938798 2.71959328,5.27938798 4.34827294,3.65070832 C5.97695259,2.02202867 8.22695259,1.01466935 10.712234,1.01466935 L10.712234,1.01466935 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="pb_tbl-type_upd-0-equal" transform="translate(46.026611, 20.710122) rotate(-90.000000) translate(-46.026611, -20.710122) translate(42.526611, 16.210122)" stroke="#000000" stroke-linecap="square">
+                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="pb_tbl-type_upd-0-Line"></line>
+                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="pb_tbl-type_upd-0-Line"></line>
             </g>
-            <g id="equal" transform="translate(21.397857, 45.319217) rotate(-90.000000) translate(-21.397857, -45.319217) translate(17.897857, 40.819217)" stroke="#000000" stroke-linecap="square">
-                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="Line"></line>
-                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line"></line>
+            <g id="pb_tbl-type_upd-0-equal" transform="translate(21.397857, 45.319217) rotate(-90.000000) translate(-21.397857, -45.319217) translate(17.897857, 40.819217)" stroke="#000000" stroke-linecap="square">
+                <line x1="2.21223397" y1="0.514669353" x2="2.21223397" y2="7.58573716" id="pb_tbl-type_upd-0-Line"></line>
+                <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="pb_tbl-type_upd-0-Line"></line>
             </g>
-            <path d="M21.3882419,7.77869783 C21.3584298,7.77935177 21.328704,7.78216367 21.2992996,7.78711914 L9.09014824,7.78711914 C8.75029431,7.78715312 8.47479677,8.06265067 8.47476279,8.4025046 L8.47476279,16.2991498 C8.46377874,16.3656061 8.46377874,16.4334149 8.47476279,16.4998713 L8.47476279,24.9145461 C8.46377874,24.9810025 8.46377874,25.0488112 8.47476279,25.1152676 L8.47476279,33.0179226 C8.47479677,33.3577766 8.75029431,33.6332741 9.09014824,33.6333081 L21.2944916,33.6333081 C21.3609479,33.6442921 21.4287567,33.6442921 21.4952131,33.6333081 L33.7055663,33.6333081 C34.0454202,33.6332741 34.3209178,33.3577766 34.3209517,33.0179226 L34.3209517,25.1212775 C34.3319358,25.0548211 34.3319358,24.9870123 34.3209517,24.920556 L34.3209517,16.5058811 C34.3319358,16.4394248 34.3319358,16.371616 34.3209517,16.3051596 L34.3209517,8.4025046 C34.3209178,8.06265067 34.0454202,7.78715312 33.7055663,7.78711914 L21.4928094,7.78711914 C21.4582565,7.78134369 21.4232736,7.77869783 21.3882419,7.77869783 Z M9.70553369,9.01789005 L20.7824718,9.01789005 L20.7824718,15.78713 L9.70553369,15.78713 L9.70553369,9.01789005 Z M22.0132427,9.01789005 L33.0901808,9.01789005 L33.0901808,15.78713 L22.0132427,15.78713 L22.0132427,9.01789005 Z M9.70553369,17.0179009 L20.7824718,17.0179009 L20.7824718,24.4025263 L9.70553369,24.4025263 L9.70553369,17.0179009 Z M22.0132427,17.0179009 L33.0901808,17.0179009 L33.0901808,24.4025263 L22.0132427,24.4025263 L22.0132427,17.0179009 Z M9.70553369,25.6332972 L20.7824718,25.6332972 L20.7824718,32.4025372 L9.70553369,32.4025372 L9.70553369,25.6332972 Z M22.0132427,25.6332972 L33.0901808,25.6332972 L33.0901808,32.4025372 L22.0132427,32.4025372 L22.0132427,25.6332972 Z" id="table" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M46.0169953,32.3877926 C45.9871832,32.3884465 45.9574575,32.3912584 45.928053,32.3962139 L33.7189016,32.3962139 C33.3790477,32.3962479 33.1035502,32.6717454 33.1035162,33.0115993 L33.1035162,40.9082445 C33.0925322,40.9747009 33.0925322,41.0425097 33.1035162,41.108966 L33.1035162,49.5236408 C33.0925322,49.5900972 33.0925322,49.657906 33.1035162,49.7243624 L33.1035162,57.6270174 C33.1035502,57.9668713 33.3790477,58.2423689 33.7189016,58.2424028 L45.923245,58.2424028 C45.9897014,58.2533869 46.0575101,58.2533869 46.1239665,58.2424028 L58.3343197,58.2424028 C58.6741736,58.2423689 58.9496712,57.9668713 58.9497051,57.6270174 L58.9497051,49.7303722 C58.9606892,49.6639158 58.9606892,49.5961071 58.9497051,49.5296507 L58.9497051,41.1149759 C58.9606892,41.0485195 58.9606892,40.9807107 58.9497051,40.9142544 L58.9497051,33.0115993 C58.9496712,32.6717454 58.6741736,32.3962479 58.3343197,32.3962139 L46.1215628,32.3962139 C46.0870099,32.3904384 46.052027,32.3877926 46.0169953,32.3877926 Z M34.3342871,33.6269848 L45.4112252,33.6269848 L45.4112252,40.3962248 L34.3342871,40.3962248 L34.3342871,33.6269848 Z M46.6419961,33.6269848 L57.7189342,33.6269848 L57.7189342,40.3962248 L46.6419961,40.3962248 L46.6419961,33.6269848 Z M34.3342871,41.6269957 L45.4112252,41.6269957 L45.4112252,49.0116211 L34.3342871,49.0116211 L34.3342871,41.6269957 Z M46.6419961,41.6269957 L57.7189342,41.6269957 L57.7189342,49.0116211 L46.6419961,49.0116211 L46.6419961,41.6269957 Z M34.3342871,50.242392 L45.4112252,50.242392 L45.4112252,57.0116319 L34.3342871,57.0116319 L34.3342871,50.242392 Z M46.6419961,50.242392 L57.7189342,50.242392 L57.7189342,57.0116319 L46.6419961,57.0116319 L46.6419961,50.242392 Z" id="table" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M21.3882419,7.77869783 C21.3584298,7.77935177 21.328704,7.78216367 21.2992996,7.78711914 L9.09014824,7.78711914 C8.75029431,7.78715312 8.47479677,8.06265067 8.47476279,8.4025046 L8.47476279,16.2991498 C8.46377874,16.3656061 8.46377874,16.4334149 8.47476279,16.4998713 L8.47476279,24.9145461 C8.46377874,24.9810025 8.46377874,25.0488112 8.47476279,25.1152676 L8.47476279,33.0179226 C8.47479677,33.3577766 8.75029431,33.6332741 9.09014824,33.6333081 L21.2944916,33.6333081 C21.3609479,33.6442921 21.4287567,33.6442921 21.4952131,33.6333081 L33.7055663,33.6333081 C34.0454202,33.6332741 34.3209178,33.3577766 34.3209517,33.0179226 L34.3209517,25.1212775 C34.3319358,25.0548211 34.3319358,24.9870123 34.3209517,24.920556 L34.3209517,16.5058811 C34.3319358,16.4394248 34.3319358,16.371616 34.3209517,16.3051596 L34.3209517,8.4025046 C34.3209178,8.06265067 34.0454202,7.78715312 33.7055663,7.78711914 L21.4928094,7.78711914 C21.4582565,7.78134369 21.4232736,7.77869783 21.3882419,7.77869783 Z M9.70553369,9.01789005 L20.7824718,9.01789005 L20.7824718,15.78713 L9.70553369,15.78713 L9.70553369,9.01789005 Z M22.0132427,9.01789005 L33.0901808,9.01789005 L33.0901808,15.78713 L22.0132427,15.78713 L22.0132427,9.01789005 Z M9.70553369,17.0179009 L20.7824718,17.0179009 L20.7824718,24.4025263 L9.70553369,24.4025263 L9.70553369,17.0179009 Z M22.0132427,17.0179009 L33.0901808,17.0179009 L33.0901808,24.4025263 L22.0132427,24.4025263 L22.0132427,17.0179009 Z M9.70553369,25.6332972 L20.7824718,25.6332972 L20.7824718,32.4025372 L9.70553369,32.4025372 L9.70553369,25.6332972 Z M22.0132427,25.6332972 L33.0901808,25.6332972 L33.0901808,32.4025372 L22.0132427,32.4025372 L22.0132427,25.6332972 Z" id="pb_tbl-type_upd-0-table" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M46.0169953,32.3877926 C45.9871832,32.3884465 45.9574575,32.3912584 45.928053,32.3962139 L33.7189016,32.3962139 C33.3790477,32.3962479 33.1035502,32.6717454 33.1035162,33.0115993 L33.1035162,40.9082445 C33.0925322,40.9747009 33.0925322,41.0425097 33.1035162,41.108966 L33.1035162,49.5236408 C33.0925322,49.5900972 33.0925322,49.657906 33.1035162,49.7243624 L33.1035162,57.6270174 C33.1035502,57.9668713 33.3790477,58.2423689 33.7189016,58.2424028 L45.923245,58.2424028 C45.9897014,58.2533869 46.0575101,58.2533869 46.1239665,58.2424028 L58.3343197,58.2424028 C58.6741736,58.2423689 58.9496712,57.9668713 58.9497051,57.6270174 L58.9497051,49.7303722 C58.9606892,49.6639158 58.9606892,49.5961071 58.9497051,49.5296507 L58.9497051,41.1149759 C58.9606892,41.0485195 58.9606892,40.9807107 58.9497051,40.9142544 L58.9497051,33.0115993 C58.9496712,32.6717454 58.6741736,32.3962479 58.3343197,32.3962139 L46.1215628,32.3962139 C46.0870099,32.3904384 46.052027,32.3877926 46.0169953,32.3877926 Z M34.3342871,33.6269848 L45.4112252,33.6269848 L45.4112252,40.3962248 L34.3342871,40.3962248 L34.3342871,33.6269848 Z M46.6419961,33.6269848 L57.7189342,33.6269848 L57.7189342,40.3962248 L46.6419961,40.3962248 L46.6419961,33.6269848 Z M34.3342871,41.6269957 L45.4112252,41.6269957 L45.4112252,49.0116211 L34.3342871,49.0116211 L34.3342871,41.6269957 Z M46.6419961,41.6269957 L57.7189342,41.6269957 L57.7189342,49.0116211 L46.6419961,49.0116211 L46.6419961,41.6269957 Z M34.3342871,50.242392 L45.4112252,50.242392 L45.4112252,57.0116319 L34.3342871,57.0116319 L34.3342871,50.242392 Z M46.6419961,50.242392 L57.7189342,50.242392 L57.7189342,57.0116319 L46.6419961,57.0116319 L46.6419961,50.242392 Z" id="pb_tbl-type_upd-0-table" fill="#000000" fill-rule="nonzero"></path>
         </g>
     </g>
 </svg>
@@ -1254,25 +1254,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">None</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXTERNAL TABLE<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #5A6B7B;">key: order_id</span></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">None</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">EXTERNAL TABLE<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #5A6B7B;">key: order_id</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
         </g>
     </g>
 </svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">6</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>0.50</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>0.50</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color: #AAAAAA;">●</span></td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,b3JkZXJfaWQsX3N0YXR1c18sY3VzdG9tZXJfc291cmNlLGN1c3RvbWVyX3RhcmdldCxhbW91bnRfc291cmNlLGFtb3VudF90YXJnZXQsc3RhdHVzX3NvdXJjZSxzdGF0dXNfdGFyZ2V0CjEwMDIsY2hhbmdlZCxCZW4sQmVuLDQwLjUsNDUuNSxzaGlwcGVkLHNoaXBwZWQKMTAwMyxtaXNzaW5nLENobywsMTIuNzUsLHBlbmRpbmcsCjEwMDYsZXh0cmEsLEZheSwsMTguMjUsLHBlbmRpbmcK" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">6</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.50</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">3<br>0.50</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center"><span style="color: #AAAAAA;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,b3JkZXJfaWQsX3N0YXR1c18sY3VzdG9tZXJfc291cmNlLGN1c3RvbWVyX3RhcmdldCxhbW91bnRfc291cmNlLGFtb3VudF90YXJnZXQsc3RhdHVzX3NvdXJjZSxzdGF0dXNfdGFyZ2V0CjEwMDIsY2hhbmdlZCxCZW4sQmVuLDQwLjUsNDUuNSxzaGlwcGVkLHNoaXBwZWQKMTAwMyxtaXNzaW5nLENobywsMTIuNzUsLHBlbmRpbmcsCjEwMDYsZXh0cmEsLEZheSwsMTguMjUsLHBlbmRpbmcK" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
 
@@ -1295,7 +1295,7 @@ Note
 </div>
 </div>
 <p>Three of the six aligned rows differ, exceeding both the ‘warning’ and ‘error’ thresholds. The step report holds the full comparison:</p>
-<div id="320fbaaa" class="cell" data-execution_count="16">
+<div id="f784eb7d" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1363,7 +1363,7 @@ Note
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:30%;">
   <col style="width:70%;">
@@ -1372,38 +1372,38 @@ Note
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_match(keys='order_id')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 rows) → <strong>orders</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></div></div></td>
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_match(keys='order_id')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 rows) → <strong>orders</strong> (5 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></div></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
   </tr>
 </tbody>
 
@@ -1413,7 +1413,7 @@ Note
 </div>
 </div>
 <p>The data extract for the step contains the failing rows from both tables, with a <code>_status_</code> column and source/target value pairs:</p>
-<div id="21960064" class="cell" data-execution_count="17">
+<div id="fe2450a1" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div><style>
@@ -1439,7 +1439,7 @@ Note
 <h1>Reconciling Aggregates</h1>
 <p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
 <p>Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:</p>
-<div id="367a78d6" class="cell" data-execution_count="18">
+<div id="5e10211f" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>order_lines <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1002</span>, <span class="dv">1004</span>, <span class="dv">1005</span>, <span class="dv">1006</span>],</span>
@@ -1521,7 +1521,7 @@ Note
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:30%;">
   <col style="width:70%;">
@@ -1530,38 +1530,38 @@ Note
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_reconcile(keys='customer', measures='amount', agg='sum')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 groups) → <strong>order_lines</strong> (5 groups), aligned by key <code>customer</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 groups fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;"><code>sum</code> by <code>customer</code></span></div></div></div></td>
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_reconcile(keys='customer', measures='amount', agg='sum')</code></span></div><div style="padding-top: 7px;"><div style="font-size:13px; line-height:1.9;"><strong>tbl_compare</strong> (5 groups) → <strong>order_lines</strong> (5 groups), aligned by key <code>customer</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 groups fail (50.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 3" style="width:50.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:16.667%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>3</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span><br><span style="border:1px solid #555; color:#555; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;"><code>sum</code> by <code>customer</code></span></div></div></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 1 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 1 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">amount_sum</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched groups differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left">amount_sum</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched groups differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed groups (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-groups-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed groups (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Ben</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left">Ben</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Cho</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left">Cho</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" class="gt_row gt_left">Fay</td>
-    <td style="font-size: 12px;" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left">Fay</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
   </tr>
 </tbody>
 
@@ -1575,7 +1575,7 @@ Note
 <section id="exporting-the-results" class="level1">
 <h1>Exporting the Results</h1>
 <p>The results can be serialized with <code>to_dict()</code> or <code>to_json()</code>, which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:</p>
-<div id="ef8ad3e7" class="cell" data-execution_count="19">
+<div id="8ef34c40" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{

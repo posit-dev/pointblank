@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Create a string column specification for use in a schema.">
 
 <title>string_field() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -132,10 +134,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/string_field.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/string_field.html">
 
 
+<meta property="og:title" content="string_field() | Pointblank">
+<meta property="og:description" content="Create a string column specification for use in a schema.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="string_field() | Pointblank">
+<meta name="twitter:description" content="Create a string column specification for use in a schema.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="string_field.md">
-  <meta name="description" content="Create a string column specification for use in a schema.">
   <script type="application/ld+json">
 [
   {
@@ -163,14 +171,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="string_field() | Pointblank">
-  <meta property="og:description" content="Create a string column specification for use in a schema.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/string_field.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="string_field() | Pointblank">
-  <meta name="twitter:description" content="Create a string column specification for use in a schema.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1749,7 +1749,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>preset=</code> parameter generates realistic personal data, while <code>allowed=</code> restricts values to a categorical set:</p>
-<div id="bbd3b412" class="cell" data-execution_count="1">
+<div id="7d79201f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1914,7 +1914,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>We can also generate strings that match a regular expression with <code>pattern=</code> (e.g., product codes, identifiers):</p>
-<div id="e98a7014" class="cell" data-execution_count="2">
+<div id="6416a182" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    batch_id<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"BATCH-</span><span class="pp">[A-Z][0-9]</span><span class="op">{3}</span><span class="vs">"</span>),</span>
@@ -2077,7 +2077,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>For random alphanumeric strings, <code>min_length=</code> and <code>max_length=</code> control the length. Adding <code>nullable=True</code> introduces missing values:</p>
-<div id="8eb28ea4" class="cell" data-execution_count="3">
+<div id="25ca2828" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    short_code<span class="op">=</span>pb.string_field(min_length<span class="op">=</span><span class="dv">3</span>, max_length<span class="op">=</span><span class="dv">5</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>pb.string_field(</span>
@@ -2230,7 +2230,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>It’s possible to combine business and internet presets to build a company directory:</p>
-<div id="b669db8d" class="cell" data-execution_count="4">
+<div id="2852eeda" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    company<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"company"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    domain<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"domain_name"</span>),</span>

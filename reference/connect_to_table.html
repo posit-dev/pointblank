@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Connect to a database table using a connection string.">
 
 <title>connect_to_table() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -132,10 +134,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/connect_to_table.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/connect_to_table.html">
 
 
+<meta property="og:title" content="connect_to_table() | Pointblank">
+<meta property="og:description" content="Connect to a database table using a connection string.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="connect_to_table() | Pointblank">
+<meta name="twitter:description" content="Connect to a database table using a connection string.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="connect_to_table.md">
-  <meta name="description" content="Connect to a database table using a connection string.">
   <script type="application/ld+json">
 [
   {
@@ -163,14 +171,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="connect_to_table() | Pointblank">
-  <meta property="og:description" content="Connect to a database table using a connection string.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/connect_to_table.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="connect_to_table() | Pointblank">
-  <meta name="twitter:description" content="Connect to a database table using a connection string.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1682,7 +1682,7 @@ Snowflake:  "snowflake://user:password@account/database/schema::table_name"</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Connect to a DuckDB table:</p>
-<div id="0e8f2f83" class="cell" data-execution_count="1">
+<div id="26fe5eb6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>

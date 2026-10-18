@@ -115,17 +115,17 @@ comparison
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
 </tr>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
+<th colspan="2" id="pb_comparison_tbl-subtitle" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
 <strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br />
 <span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br />
 
@@ -137,36 +137,36 @@ comparison
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</th>
+<th colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns">amount</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 1 of 4 matched rows differ (25.0%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-rows-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1002</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row">1002</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row">1003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1006</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row">1006</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
 </tr>
 </tbody>
 </table>
@@ -419,17 +419,17 @@ pb.compare(
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Table Comparison</th>
 </tr>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
+<th colspan="2" id="pb_comparison_tbl-subtitle" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div style="font-size:13px; line-height:1.9;">
 <strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>order_id</code><br />
 <span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 6 rows fail (50.0%)<br />
 
@@ -442,47 +442,47 @@ pb.compare(
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Schema differences</th>
+<th colspan="2" id="pb_comparison_tbl-Schema-differences" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Schema differences</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">region</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Schema-differences">region</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Schema-differences"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">customer</td>
-<td class="gt_row gt_left" style="font-size: 12px">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Schema-differences">customer</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Schema-differences">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</td>
+<td colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns">amount</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 1 of 4 matched rows differ (25.0%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-rows-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1002</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row">1002</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row">1003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1006</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row">1006</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
 </tr>
 </tbody>
 </table>
@@ -598,28 +598,28 @@ validation
 </thead>
 <tbody class="gt_table_body">
 <tr>
-<td class="gt_row gt_left" style="height: 40px; background-color: #EBBC14; color: transparent; font-size: 0px">#EBBC14</td>
-<td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold">1</td>
-<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Ym94PSIwIDAgNjcgNjciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+dGJsX21hdGNoPC90aXRsZT4KICAgIDxnIGlkPSJJY29ucyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9InRibF9tYXRjaCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuNzU4NjIxKSI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik01Ni43MTIyMzQsMS4wMTQ2NjkzNSBDNTkuMTk3NTE1MywxLjAxNDY2OTM1IDYxLjQ0NzUxNTMsMi4wMjIwMjg2NyA2My4wNzYxOTUsMy42NTA3MDgzMiBDNjQuNzA0ODc0Nyw1LjI3OTM4Nzk4IDY1LjcxMjIzNCw3LjUyOTM4Nzk4IDY1LjcxMjIzNCwxMC4wMTQ2Njk0IEw2NS43MTIyMzQsMTAuMDE0NjY5NCBMNjUuNzEyMjM0LDY1LjAxNDY2OTQgTDEwLjcxMjIzNCw2NS4wMTQ2Njk0IEM4LjIyNjk1MjU5LDY1LjAxNDY2OTQgNS45NzY5NTI1OSw2NC4wMDczMSA0LjM0ODI3Mjk0LDYyLjM3ODYzMDQgQzIuNzE5NTkzMjgsNjAuNzQ5OTUwNyAxLjcxMjIzMzk3LDU4LjQ5OTk1MDcgMS43MTIyMzM5Nyw1Ni4wMTQ2Njk0IEwxLjcxMjIzMzk3LDU2LjAxNDY2OTQgTDEuNzEyMjMzOTcsMTAuMDE0NjY5NCBDMS43MTIyMzM5Nyw3LjUyOTM4Nzk4IDIuNzE5NTkzMjgsNS4yNzkzODc5OCA0LjM0ODI3Mjk0LDMuNjUwNzA4MzIgQzUuOTc2OTUyNTksMi4wMjIwMjg2NyA4LjIyNjk1MjU5LDEuMDE0NjY5MzUgMTAuNzEyMjM0LDEuMDE0NjY5MzUgTDEwLjcxMjIzNCwxLjAxNDY2OTM1IFoiIGlkPSJyZWN0YW5nbGUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSIjRkZGRkZGIiAvPgogICAgICAgICAgICA8ZyBpZD0iZXF1YWwiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ2LjAyNjYxMSwgMjAuNzEwMTIyKSByb3RhdGUoLTkwLjAwMDAwMCkgdHJhbnNsYXRlKC00Ni4wMjY2MTEsIC0yMC43MTAxMjIpIHRyYW5zbGF0ZSg0Mi41MjY2MTEsIDE2LjIxMDEyMikiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+CiAgICAgICAgICAgICAgICA8bGluZSB4MT0iMi4yMTIyMzM5NyIgeTE9IjAuNTE0NjY5MzUzIiB4Mj0iMi4yMTIyMzM5NyIgeTI9IjcuNTg1NzM3MTYiIGlkPSJMaW5lIj48L2xpbmU+CiAgICAgICAgICAgICAgICA8bGluZSB4MT0iNS4yMTIyMzM5NyIgeTE9IjAuNTE0NjY5MzUzIiB4Mj0iNS4yMTIyMzM5NyIgeTI9IjcuNTg1NzM3MTYiIGlkPSJMaW5lIj48L2xpbmU+CiAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPGcgaWQ9ImVxdWFsIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMS4zOTc4NTcsIDQ1LjMxOTIxNykgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMjEuMzk3ODU3LCAtNDUuMzE5MjE3KSB0cmFuc2xhdGUoMTcuODk3ODU3LCA0MC44MTkyMTcpIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjIuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjIuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjUuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjUuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0iTGluZSI+PC9saW5lPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMS4zODgyNDE5LDcuNzc4Njk3ODMgQzIxLjM1ODQyOTgsNy43NzkzNTE3NyAyMS4zMjg3MDQsNy43ODIxNjM2NyAyMS4yOTkyOTk2LDcuNzg3MTE5MTQgTDkuMDkwMTQ4MjQsNy43ODcxMTkxNCBDOC43NTAyOTQzMSw3Ljc4NzE1MzEyIDguNDc0Nzk2NzcsOC4wNjI2NTA2NyA4LjQ3NDc2Mjc5LDguNDAyNTA0NiBMOC40NzQ3NjI3OSwxNi4yOTkxNDk4IEM4LjQ2Mzc3ODc0LDE2LjM2NTYwNjEgOC40NjM3Nzg3NCwxNi40MzM0MTQ5IDguNDc0NzYyNzksMTYuNDk5ODcxMyBMOC40NzQ3NjI3OSwyNC45MTQ1NDYxIEM4LjQ2Mzc3ODc0LDI0Ljk4MTAwMjUgOC40NjM3Nzg3NCwyNS4wNDg4MTEyIDguNDc0NzYyNzksMjUuMTE1MjY3NiBMOC40NzQ3NjI3OSwzMy4wMTc5MjI2IEM4LjQ3NDc5Njc3LDMzLjM1Nzc3NjYgOC43NTAyOTQzMSwzMy42MzMyNzQxIDkuMDkwMTQ4MjQsMzMuNjMzMzA4MSBMMjEuMjk0NDkxNiwzMy42MzMzMDgxIEMyMS4zNjA5NDc5LDMzLjY0NDI5MjEgMjEuNDI4NzU2NywzMy42NDQyOTIxIDIxLjQ5NTIxMzEsMzMuNjMzMzA4MSBMMzMuNzA1NTY2MywzMy42MzMzMDgxIEMzNC4wNDU0MjAyLDMzLjYzMzI3NDEgMzQuMzIwOTE3OCwzMy4zNTc3NzY2IDM0LjMyMDk1MTcsMzMuMDE3OTIyNiBMMzQuMzIwOTUxNywyNS4xMjEyNzc1IEMzNC4zMzE5MzU4LDI1LjA1NDgyMTEgMzQuMzMxOTM1OCwyNC45ODcwMTIzIDM0LjMyMDk1MTcsMjQuOTIwNTU2IEwzNC4zMjA5NTE3LDE2LjUwNTg4MTEgQzM0LjMzMTkzNTgsMTYuNDM5NDI0OCAzNC4zMzE5MzU4LDE2LjM3MTYxNiAzNC4zMjA5NTE3LDE2LjMwNTE1OTYgTDM0LjMyMDk1MTcsOC40MDI1MDQ2IEMzNC4zMjA5MTc4LDguMDYyNjUwNjcgMzQuMDQ1NDIwMiw3Ljc4NzE1MzEyIDMzLjcwNTU2NjMsNy43ODcxMTkxNCBMMjEuNDkyODA5NCw3Ljc4NzExOTE0IEMyMS40NTgyNTY1LDcuNzgxMzQzNjkgMjEuNDIzMjczNiw3Ljc3ODY5NzgzIDIxLjM4ODI0MTksNy43Nzg2OTc4MyBaIE05LjcwNTUzMzY5LDkuMDE3ODkwMDUgTDIwLjc4MjQ3MTgsOS4wMTc4OTAwNSBMMjAuNzgyNDcxOCwxNS43ODcxMyBMOS43MDU1MzM2OSwxNS43ODcxMyBMOS43MDU1MzM2OSw5LjAxNzg5MDA1IFogTTIyLjAxMzI0MjcsOS4wMTc4OTAwNSBMMzMuMDkwMTgwOCw5LjAxNzg5MDA1IEwzMy4wOTAxODA4LDE1Ljc4NzEzIEwyMi4wMTMyNDI3LDE1Ljc4NzEzIEwyMi4wMTMyNDI3LDkuMDE3ODkwMDUgWiBNOS43MDU1MzM2OSwxNy4wMTc5MDA5IEwyMC43ODI0NzE4LDE3LjAxNzkwMDkgTDIwLjc4MjQ3MTgsMjQuNDAyNTI2MyBMOS43MDU1MzM2OSwyNC40MDI1MjYzIEw5LjcwNTUzMzY5LDE3LjAxNzkwMDkgWiBNMjIuMDEzMjQyNywxNy4wMTc5MDA5IEwzMy4wOTAxODA4LDE3LjAxNzkwMDkgTDMzLjA5MDE4MDgsMjQuNDAyNTI2MyBMMjIuMDEzMjQyNywyNC40MDI1MjYzIEwyMi4wMTMyNDI3LDE3LjAxNzkwMDkgWiBNOS43MDU1MzM2OSwyNS42MzMyOTcyIEwyMC43ODI0NzE4LDI1LjYzMzI5NzIgTDIwLjc4MjQ3MTgsMzIuNDAyNTM3MiBMOS43MDU1MzM2OSwzMi40MDI1MzcyIEw5LjcwNTUzMzY5LDI1LjYzMzI5NzIgWiBNMjIuMDEzMjQyNywyNS42MzMyOTcyIEwzMy4wOTAxODA4LDI1LjYzMzI5NzIgTDMzLjA5MDE4MDgsMzIuNDAyNTM3MiBMMjIuMDEzMjQyNywzMi40MDI1MzcyIEwyMi4wMTMyNDI3LDI1LjYzMzI5NzIgWiIgaWQ9InRhYmxlIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIC8+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik00Ni4wMTY5OTUzLDMyLjM4Nzc5MjYgQzQ1Ljk4NzE4MzIsMzIuMzg4NDQ2NSA0NS45NTc0NTc1LDMyLjM5MTI1ODQgNDUuOTI4MDUzLDMyLjM5NjIxMzkgTDMzLjcxODkwMTYsMzIuMzk2MjEzOSBDMzMuMzc5MDQ3NywzMi4zOTYyNDc5IDMzLjEwMzU1MDIsMzIuNjcxNzQ1NCAzMy4xMDM1MTYyLDMzLjAxMTU5OTMgTDMzLjEwMzUxNjIsNDAuOTA4MjQ0NSBDMzMuMDkyNTMyMiw0MC45NzQ3MDA5IDMzLjA5MjUzMjIsNDEuMDQyNTA5NyAzMy4xMDM1MTYyLDQxLjEwODk2NiBMMzMuMTAzNTE2Miw0OS41MjM2NDA4IEMzMy4wOTI1MzIyLDQ5LjU5MDA5NzIgMzMuMDkyNTMyMiw0OS42NTc5MDYgMzMuMTAzNTE2Miw0OS43MjQzNjI0IEwzMy4xMDM1MTYyLDU3LjYyNzAxNzQgQzMzLjEwMzU1MDIsNTcuOTY2ODcxMyAzMy4zNzkwNDc3LDU4LjI0MjM2ODkgMzMuNzE4OTAxNiw1OC4yNDI0MDI4IEw0NS45MjMyNDUsNTguMjQyNDAyOCBDNDUuOTg5NzAxNCw1OC4yNTMzODY5IDQ2LjA1NzUxMDEsNTguMjUzMzg2OSA0Ni4xMjM5NjY1LDU4LjI0MjQwMjggTDU4LjMzNDMxOTcsNTguMjQyNDAyOCBDNTguNjc0MTczNiw1OC4yNDIzNjg5IDU4Ljk0OTY3MTIsNTcuOTY2ODcxMyA1OC45NDk3MDUxLDU3LjYyNzAxNzQgTDU4Ljk0OTcwNTEsNDkuNzMwMzcyMiBDNTguOTYwNjg5Miw0OS42NjM5MTU4IDU4Ljk2MDY4OTIsNDkuNTk2MTA3MSA1OC45NDk3MDUxLDQ5LjUyOTY1MDcgTDU4Ljk0OTcwNTEsNDEuMTE0OTc1OSBDNTguOTYwNjg5Miw0MS4wNDg1MTk1IDU4Ljk2MDY4OTIsNDAuOTgwNzEwNyA1OC45NDk3MDUxLDQwLjkxNDI1NDQgTDU4Ljk0OTcwNTEsMzMuMDExNTk5MyBDNTguOTQ5NjcxMiwzMi42NzE3NDU0IDU4LjY3NDE3MzYsMzIuMzk2MjQ3OSA1OC4zMzQzMTk3LDMyLjM5NjIxMzkgTDQ2LjEyMTU2MjgsMzIuMzk2MjEzOSBDNDYuMDg3MDA5OSwzMi4zOTA0Mzg0IDQ2LjA1MjAyNywzMi4zODc3OTI2IDQ2LjAxNjk5NTMsMzIuMzg3NzkyNiBaIE0zNC4zMzQyODcxLDMzLjYyNjk4NDggTDQ1LjQxMTIyNTIsMzMuNjI2OTg0OCBMNDUuNDExMjI1Miw0MC4zOTYyMjQ4IEwzNC4zMzQyODcxLDQwLjM5NjIyNDggTDM0LjMzNDI4NzEsMzMuNjI2OTg0OCBaIE00Ni42NDE5OTYxLDMzLjYyNjk4NDggTDU3LjcxODkzNDIsMzMuNjI2OTg0OCBMNTcuNzE4OTM0Miw0MC4zOTYyMjQ4IEw0Ni42NDE5OTYxLDQwLjM5NjIyNDggTDQ2LjY0MTk5NjEsMzMuNjI2OTg0OCBaIE0zNC4zMzQyODcxLDQxLjYyNjk5NTcgTDQ1LjQxMTIyNTIsNDEuNjI2OTk1NyBMNDUuNDExMjI1Miw0OS4wMTE2MjExIEwzNC4zMzQyODcxLDQ5LjAxMTYyMTEgTDM0LjMzNDI4NzEsNDEuNjI2OTk1NyBaIE00Ni42NDE5OTYxLDQxLjYyNjk5NTcgTDU3LjcxODkzNDIsNDEuNjI2OTk1NyBMNTcuNzE4OTM0Miw0OS4wMTE2MjExIEw0Ni42NDE5OTYxLDQ5LjAxMTYyMTEgTDQ2LjY0MTk5NjEsNDEuNjI2OTk1NyBaIE0zNC4zMzQyODcxLDUwLjI0MjM5MiBMNDUuNDExMjI1Miw1MC4yNDIzOTIgTDQ1LjQxMTIyNTIsNTcuMDExNjMxOSBMMzQuMzM0Mjg3MSw1Ny4wMTE2MzE5IEwzNC4zMzQyODcxLDUwLjI0MjM5MiBaIE00Ni42NDE5OTYxLDUwLjI0MjM5MiBMNTcuNzE4OTM0Miw1MC4yNDIzOTIgTDU3LjcxODkzNDIsNTcuMDExNjMxOSBMNDYuNjQxOTk2MSw1Ny4wMTE2MzE5IEw0Ni42NDE5OTYxLDUwLjI0MjM5MiBaIiBpZD0idGFibGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
+<td class="gt_row gt_left" style="height: 40px; background-color: #EBBC14; color: transparent; font-size: 0px" headers="pb_tbl-status_color">#EBBC14</td>
+<td class="gt_row gt_right" style="height: 40px; color: #666666; font-size: 13px; font-weight: bold" headers="pb_tbl-i">1</td>
+<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px" headers="pb_tbl-type_upd"><div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Ym94PSIwIDAgNjcgNjciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+dGJsX21hdGNoPC90aXRsZT4KICAgIDxnIGlkPSJwYl90YmwtdHlwZV91cGQtMC1JY29ucyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9InBiX3RibC10eXBlX3VwZC0wLXRibF9tYXRjaCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuNzU4NjIxKSI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik01Ni43MTIyMzQsMS4wMTQ2NjkzNSBDNTkuMTk3NTE1MywxLjAxNDY2OTM1IDYxLjQ0NzUxNTMsMi4wMjIwMjg2NyA2My4wNzYxOTUsMy42NTA3MDgzMiBDNjQuNzA0ODc0Nyw1LjI3OTM4Nzk4IDY1LjcxMjIzNCw3LjUyOTM4Nzk4IDY1LjcxMjIzNCwxMC4wMTQ2Njk0IEw2NS43MTIyMzQsMTAuMDE0NjY5NCBMNjUuNzEyMjM0LDY1LjAxNDY2OTQgTDEwLjcxMjIzNCw2NS4wMTQ2Njk0IEM4LjIyNjk1MjU5LDY1LjAxNDY2OTQgNS45NzY5NTI1OSw2NC4wMDczMSA0LjM0ODI3Mjk0LDYyLjM3ODYzMDQgQzIuNzE5NTkzMjgsNjAuNzQ5OTUwNyAxLjcxMjIzMzk3LDU4LjQ5OTk1MDcgMS43MTIyMzM5Nyw1Ni4wMTQ2Njk0IEwxLjcxMjIzMzk3LDU2LjAxNDY2OTQgTDEuNzEyMjMzOTcsMTAuMDE0NjY5NCBDMS43MTIyMzM5Nyw3LjUyOTM4Nzk4IDIuNzE5NTkzMjgsNS4yNzkzODc5OCA0LjM0ODI3Mjk0LDMuNjUwNzA4MzIgQzUuOTc2OTUyNTksMi4wMjIwMjg2NyA4LjIyNjk1MjU5LDEuMDE0NjY5MzUgMTAuNzEyMjM0LDEuMDE0NjY5MzUgTDEwLjcxMjIzNCwxLjAxNDY2OTM1IFoiIGlkPSJwYl90YmwtdHlwZV91cGQtMC1yZWN0YW5nbGUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSIjRkZGRkZGIiAvPgogICAgICAgICAgICA8ZyBpZD0icGJfdGJsLXR5cGVfdXBkLTAtZXF1YWwiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ2LjAyNjYxMSwgMjAuNzEwMTIyKSByb3RhdGUoLTkwLjAwMDAwMCkgdHJhbnNsYXRlKC00Ni4wMjY2MTEsIC0yMC43MTAxMjIpIHRyYW5zbGF0ZSg0Mi41MjY2MTEsIDE2LjIxMDEyMikiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+CiAgICAgICAgICAgICAgICA8bGluZSB4MT0iMi4yMTIyMzM5NyIgeTE9IjAuNTE0NjY5MzUzIiB4Mj0iMi4yMTIyMzM5NyIgeTI9IjcuNTg1NzM3MTYiIGlkPSJwYl90YmwtdHlwZV91cGQtMC1MaW5lIj48L2xpbmU+CiAgICAgICAgICAgICAgICA8bGluZSB4MT0iNS4yMTIyMzM5NyIgeTE9IjAuNTE0NjY5MzUzIiB4Mj0iNS4yMTIyMzM5NyIgeTI9IjcuNTg1NzM3MTYiIGlkPSJwYl90YmwtdHlwZV91cGQtMC1MaW5lIj48L2xpbmU+CiAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPGcgaWQ9InBiX3RibC10eXBlX3VwZC0wLWVxdWFsIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMS4zOTc4NTcsIDQ1LjMxOTIxNykgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMjEuMzk3ODU3LCAtNDUuMzE5MjE3KSB0cmFuc2xhdGUoMTcuODk3ODU3LCA0MC44MTkyMTcpIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjIuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjIuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0icGJfdGJsLXR5cGVfdXBkLTAtTGluZSI+PC9saW5lPgogICAgICAgICAgICAgICAgPGxpbmUgeDE9IjUuMjEyMjMzOTciIHkxPSIwLjUxNDY2OTM1MyIgeDI9IjUuMjEyMjMzOTciIHkyPSI3LjU4NTczNzE2IiBpZD0icGJfdGJsLXR5cGVfdXBkLTAtTGluZSI+PC9saW5lPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMS4zODgyNDE5LDcuNzc4Njk3ODMgQzIxLjM1ODQyOTgsNy43NzkzNTE3NyAyMS4zMjg3MDQsNy43ODIxNjM2NyAyMS4yOTkyOTk2LDcuNzg3MTE5MTQgTDkuMDkwMTQ4MjQsNy43ODcxMTkxNCBDOC43NTAyOTQzMSw3Ljc4NzE1MzEyIDguNDc0Nzk2NzcsOC4wNjI2NTA2NyA4LjQ3NDc2Mjc5LDguNDAyNTA0NiBMOC40NzQ3NjI3OSwxNi4yOTkxNDk4IEM4LjQ2Mzc3ODc0LDE2LjM2NTYwNjEgOC40NjM3Nzg3NCwxNi40MzM0MTQ5IDguNDc0NzYyNzksMTYuNDk5ODcxMyBMOC40NzQ3NjI3OSwyNC45MTQ1NDYxIEM4LjQ2Mzc3ODc0LDI0Ljk4MTAwMjUgOC40NjM3Nzg3NCwyNS4wNDg4MTEyIDguNDc0NzYyNzksMjUuMTE1MjY3NiBMOC40NzQ3NjI3OSwzMy4wMTc5MjI2IEM4LjQ3NDc5Njc3LDMzLjM1Nzc3NjYgOC43NTAyOTQzMSwzMy42MzMyNzQxIDkuMDkwMTQ4MjQsMzMuNjMzMzA4MSBMMjEuMjk0NDkxNiwzMy42MzMzMDgxIEMyMS4zNjA5NDc5LDMzLjY0NDI5MjEgMjEuNDI4NzU2NywzMy42NDQyOTIxIDIxLjQ5NTIxMzEsMzMuNjMzMzA4MSBMMzMuNzA1NTY2MywzMy42MzMzMDgxIEMzNC4wNDU0MjAyLDMzLjYzMzI3NDEgMzQuMzIwOTE3OCwzMy4zNTc3NzY2IDM0LjMyMDk1MTcsMzMuMDE3OTIyNiBMMzQuMzIwOTUxNywyNS4xMjEyNzc1IEMzNC4zMzE5MzU4LDI1LjA1NDgyMTEgMzQuMzMxOTM1OCwyNC45ODcwMTIzIDM0LjMyMDk1MTcsMjQuOTIwNTU2IEwzNC4zMjA5NTE3LDE2LjUwNTg4MTEgQzM0LjMzMTkzNTgsMTYuNDM5NDI0OCAzNC4zMzE5MzU4LDE2LjM3MTYxNiAzNC4zMjA5NTE3LDE2LjMwNTE1OTYgTDM0LjMyMDk1MTcsOC40MDI1MDQ2IEMzNC4zMjA5MTc4LDguMDYyNjUwNjcgMzQuMDQ1NDIwMiw3Ljc4NzE1MzEyIDMzLjcwNTU2NjMsNy43ODcxMTkxNCBMMjEuNDkyODA5NCw3Ljc4NzExOTE0IEMyMS40NTgyNTY1LDcuNzgxMzQzNjkgMjEuNDIzMjczNiw3Ljc3ODY5NzgzIDIxLjM4ODI0MTksNy43Nzg2OTc4MyBaIE05LjcwNTUzMzY5LDkuMDE3ODkwMDUgTDIwLjc4MjQ3MTgsOS4wMTc4OTAwNSBMMjAuNzgyNDcxOCwxNS43ODcxMyBMOS43MDU1MzM2OSwxNS43ODcxMyBMOS43MDU1MzM2OSw5LjAxNzg5MDA1IFogTTIyLjAxMzI0MjcsOS4wMTc4OTAwNSBMMzMuMDkwMTgwOCw5LjAxNzg5MDA1IEwzMy4wOTAxODA4LDE1Ljc4NzEzIEwyMi4wMTMyNDI3LDE1Ljc4NzEzIEwyMi4wMTMyNDI3LDkuMDE3ODkwMDUgWiBNOS43MDU1MzM2OSwxNy4wMTc5MDA5IEwyMC43ODI0NzE4LDE3LjAxNzkwMDkgTDIwLjc4MjQ3MTgsMjQuNDAyNTI2MyBMOS43MDU1MzM2OSwyNC40MDI1MjYzIEw5LjcwNTUzMzY5LDE3LjAxNzkwMDkgWiBNMjIuMDEzMjQyNywxNy4wMTc5MDA5IEwzMy4wOTAxODA4LDE3LjAxNzkwMDkgTDMzLjA5MDE4MDgsMjQuNDAyNTI2MyBMMjIuMDEzMjQyNywyNC40MDI1MjYzIEwyMi4wMTMyNDI3LDE3LjAxNzkwMDkgWiBNOS43MDU1MzM2OSwyNS42MzMyOTcyIEwyMC43ODI0NzE4LDI1LjYzMzI5NzIgTDIwLjc4MjQ3MTgsMzIuNDAyNTM3MiBMOS43MDU1MzM2OSwzMi40MDI1MzcyIEw5LjcwNTUzMzY5LDI1LjYzMzI5NzIgWiBNMjIuMDEzMjQyNywyNS42MzMyOTcyIEwzMy4wOTAxODA4LDI1LjYzMzI5NzIgTDMzLjA5MDE4MDgsMzIuNDAyNTM3MiBMMjIuMDEzMjQyNywzMi40MDI1MzcyIEwyMi4wMTMyNDI3LDI1LjYzMzI5NzIgWiIgaWQ9InBiX3RibC10eXBlX3VwZC0wLXRhYmxlIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIC8+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik00Ni4wMTY5OTUzLDMyLjM4Nzc5MjYgQzQ1Ljk4NzE4MzIsMzIuMzg4NDQ2NSA0NS45NTc0NTc1LDMyLjM5MTI1ODQgNDUuOTI4MDUzLDMyLjM5NjIxMzkgTDMzLjcxODkwMTYsMzIuMzk2MjEzOSBDMzMuMzc5MDQ3NywzMi4zOTYyNDc5IDMzLjEwMzU1MDIsMzIuNjcxNzQ1NCAzMy4xMDM1MTYyLDMzLjAxMTU5OTMgTDMzLjEwMzUxNjIsNDAuOTA4MjQ0NSBDMzMuMDkyNTMyMiw0MC45NzQ3MDA5IDMzLjA5MjUzMjIsNDEuMDQyNTA5NyAzMy4xMDM1MTYyLDQxLjEwODk2NiBMMzMuMTAzNTE2Miw0OS41MjM2NDA4IEMzMy4wOTI1MzIyLDQ5LjU5MDA5NzIgMzMuMDkyNTMyMiw0OS42NTc5MDYgMzMuMTAzNTE2Miw0OS43MjQzNjI0IEwzMy4xMDM1MTYyLDU3LjYyNzAxNzQgQzMzLjEwMzU1MDIsNTcuOTY2ODcxMyAzMy4zNzkwNDc3LDU4LjI0MjM2ODkgMzMuNzE4OTAxNiw1OC4yNDI0MDI4IEw0NS45MjMyNDUsNTguMjQyNDAyOCBDNDUuOTg5NzAxNCw1OC4yNTMzODY5IDQ2LjA1NzUxMDEsNTguMjUzMzg2OSA0Ni4xMjM5NjY1LDU4LjI0MjQwMjggTDU4LjMzNDMxOTcsNTguMjQyNDAyOCBDNTguNjc0MTczNiw1OC4yNDIzNjg5IDU4Ljk0OTY3MTIsNTcuOTY2ODcxMyA1OC45NDk3MDUxLDU3LjYyNzAxNzQgTDU4Ljk0OTcwNTEsNDkuNzMwMzcyMiBDNTguOTYwNjg5Miw0OS42NjM5MTU4IDU4Ljk2MDY4OTIsNDkuNTk2MTA3MSA1OC45NDk3MDUxLDQ5LjUyOTY1MDcgTDU4Ljk0OTcwNTEsNDEuMTE0OTc1OSBDNTguOTYwNjg5Miw0MS4wNDg1MTk1IDU4Ljk2MDY4OTIsNDAuOTgwNzEwNyA1OC45NDk3MDUxLDQwLjkxNDI1NDQgTDU4Ljk0OTcwNTEsMzMuMDExNTk5MyBDNTguOTQ5NjcxMiwzMi42NzE3NDU0IDU4LjY3NDE3MzYsMzIuMzk2MjQ3OSA1OC4zMzQzMTk3LDMyLjM5NjIxMzkgTDQ2LjEyMTU2MjgsMzIuMzk2MjEzOSBDNDYuMDg3MDA5OSwzMi4zOTA0Mzg0IDQ2LjA1MjAyNywzMi4zODc3OTI2IDQ2LjAxNjk5NTMsMzIuMzg3NzkyNiBaIE0zNC4zMzQyODcxLDMzLjYyNjk4NDggTDQ1LjQxMTIyNTIsMzMuNjI2OTg0OCBMNDUuNDExMjI1Miw0MC4zOTYyMjQ4IEwzNC4zMzQyODcxLDQwLjM5NjIyNDggTDM0LjMzNDI4NzEsMzMuNjI2OTg0OCBaIE00Ni42NDE5OTYxLDMzLjYyNjk4NDggTDU3LjcxODkzNDIsMzMuNjI2OTg0OCBMNTcuNzE4OTM0Miw0MC4zOTYyMjQ4IEw0Ni42NDE5OTYxLDQwLjM5NjIyNDggTDQ2LjY0MTk5NjEsMzMuNjI2OTg0OCBaIE0zNC4zMzQyODcxLDQxLjYyNjk5NTcgTDQ1LjQxMTIyNTIsNDEuNjI2OTk1NyBMNDUuNDExMjI1Miw0OS4wMTE2MjExIEwzNC4zMzQyODcxLDQ5LjAxMTYyMTEgTDM0LjMzNDI4NzEsNDEuNjI2OTk1NyBaIE00Ni42NDE5OTYxLDQxLjYyNjk5NTcgTDU3LjcxODkzNDIsNDEuNjI2OTk1NyBMNTcuNzE4OTM0Miw0OS4wMTE2MjExIEw0Ni42NDE5OTYxLDQ5LjAxMTYyMTEgTDQ2LjY0MTk5NjEsNDEuNjI2OTk1NyBaIE0zNC4zMzQyODcxLDUwLjI0MjM5MiBMNDUuNDExMjI1Miw1MC4yNDIzOTIgTDQ1LjQxMTIyNTIsNTcuMDExNjMxOSBMMzQuMzM0Mjg3MSw1Ny4wMTE2MzE5IEwzNC4zMzQyODcxLDUwLjI0MjM5MiBaIE00Ni42NDE5OTYxLDUwLjI0MjM5MiBMNTcuNzE4OTM0Miw1MC4yNDIzOTIgTDU3LjcxODkzNDIsNTcuMDExNjMxOSBMNDYuNjQxOTk2MSw1Ny4wMTE2MzE5IEw0Ni42NDE5OTYxLDUwLjI0MjM5MiBaIiBpZD0icGJfdGJsLXR5cGVfdXBkLTAtdGFibGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" />
 
 tbl_match()
 
 </div></td>
-<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">None</td>
-<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden">EXTERNAL TABLE<br />
+<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden" headers="pb_tbl-columns_upd">None</td>
+<td class="gt_row gt_left" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden" headers="pb_tbl-values_upd">EXTERNAL TABLE<br />
 <span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #5A6B7B;">key: order_id</span></td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjVweCIgaGVpZ2h0PSIyNXB4IiB2aWV3Ym94PSIwIDAgMjUgMjUiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgc3R5bGU9InZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Ij4KICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ1bmNoYW5nZWQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTAwMDAwLCAwLjU3MDE0NykiPgogICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiB4PSIwLjEyNTEzMjUwNiIgeT0iMCIgd2lkdGg9IjIzLjc0OTczNSIgaGVpZ2h0PSIyMy43ODk0NzM3IiAvPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44MDM3NTA0Niw4LjE4MTk0NzM2IEMzLjc3MTkxODMyLDguMTgxOTQ3MzYgMi4xMTg3NTA0Niw5LjgzNDk1MzI4IDIuMTE4NzUwNDYsMTEuODY2OTQ3NCBDMi4xMTg3NTA0NiwxMy44OTg5NDE0IDMuNzcxOTE4MzIsMTUuNTUxOTQ3NCA1LjgwMzc1MDQ2LDE1LjU1MTk0NzQgQzcuODM1NTgyNiwxNS41NTE5NDc0IDkuNDg4NzUwNDYsMTMuODk4OTQxNCA5LjQ4ODc1MDQ2LDExLjg2Njk0NzQgQzkuNDg4NzUwNDYsOS44MzQ5NTMyOCA3LjgzNTUyODYzLDguMTgxOTQ3MzYgNS44MDM3NTA0Niw4LjE4MTk0NzM2IFogTTUuODAzNzUwNDYsMTQuODE0OTE1IEM0LjE3ODIxOTk3LDE0LjgxNDkxNSAyLjg1NTc4Mjg1LDEzLjQ5MjQ3NzggMi44NTU3ODI4NSwxMS44NjY5NDc0IEMyLjg1NTc4Mjg1LDEwLjI0MTQxNjkgNC4xNzgyMTk5Nyw4LjkxODk3OTc1IDUuODAzNzUwNDYsOC45MTg5Nzk3NSBDNy40MjkyODA5NSw4LjkxODk3OTc1IDguNzUxNzE4MDcsMTAuMjQxNDE2OSA4Ljc1MTcxODA3LDExLjg2Njk0NzQgQzguNzUxNzE4MDcsMTMuNDkyNDc3OCA3LjQyOTI4MDk1LDE0LjgxNDkxNSA1LjgwMzc1MDQ2LDE0LjgxNDkxNSBaIiBpZD0iU2hhcGUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgLz4KICAgICAgICAgICAgPHBhdGggZD0iTTEzLjk2MzgxODksOC42OTkzMzUgQzEzLjkzNjQ2MjEsOC43MDQzMDkyNSAxMy45MDkxMDU5LDguNzExNzY5NjggMTMuODg0MjM1OSw4LjcxOTIzMDc0IEMxMy43ODIyNzA0LDguNzM2NjM5NjcgMTMuNjg3NzY1NCw4Ljc3NjQzMTE1IDEzLjYwNTY5NTYsOC44Mzg2MDUxOCBMMTAuMjQzMzE1NiwxMS4zODUyNTk4IEMxMC4wNzY2ODg2LDExLjUwNDYzNDMgOS45NzcyMDk5MywxMS42OTg2MTgxIDkuOTc3MjA5OTMsMTEuOTAyNTQ5MSBDOS45NzcyMDk5MywxMi4xMDY0ODA3IDEwLjA3NjY4ODYsMTIuMzAwNDYzOSAxMC4yNDMzMTU2LDEyLjQxOTgzODMgTDEzLjYwNTY5NTYsMTQuOTY2NDkzIEMxMy44OTE2OTcsMTUuMTgwMzcyNSAxNC4yOTcwNzI5LDE1LjEyMzE3MjEgMTQuNTEwOTUxNywxNC44MzcxNzA3IEMxNC43MjQ4MzEzLDE0LjU1MTE2OTIgMTQuNjY3NjMwOSwxNC4xNDU3OTQgMTQuMzgxNjI5NCwxMy45MzE5MTQ1IEwxMi41MzEzMjU3LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTIuNTM5MjEyNyBMMjEuODgxMjQ5NSwxMS4yNjU4ODU0IEwxMi41MzEzMjU3LDExLjI2NTg4NTQgTDE0LjM4MTYyOTQsOS44NzMxODM2NCBDMTQuNjM3Nzg3Miw5LjcxNjUwNDUzIDE0Ljc0OTcwMDYsOS40MDA2NjAxNCAxNC42NDc3MzUxLDkuMTE3MTQ1NTMgQzE0LjU0ODI1NjQsOC44MzM2MzE1NiAxNC4yNjIyNTUsOC42NTk1NDM1MiAxMy45NjM4MTg5LDguNjk5MzM1IFoiIGlkPSJhcnJvdyIgZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuOTI5MjMwLCAxMS44OTQ3MzcpIHJvdGF0ZSgtMTgwLjAwMDAwMCkgdHJhbnNsYXRlKC0xNS45MjkyMzAsIC0xMS44OTQ3MzcpICIgLz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" /></td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3"><span style="color:#4CA64C;">✓</span></td>
-<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px">6</td>
-<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">3<br />
+4IDEzLjg4NDIzNTksOC43MTkyMzA3NCBDMTMuNzgyMjcwNCw4LjczNjYzOTY3IDEzLjY4Nzc2NTQsOC43NzY0MzExNSAxMy42MDU2OTU2LDguODM4NjA1MTggTDEwLjI0MzMxNTYsMTEuMzg1MjU5OCBDMTAuMDc2Njg4NiwxMS41MDQ2MzQzIDkuOTc3MjA5OTMsMTEuNjk4NjE4MSA5Ljk3NzIwOTkzLDExLjkwMjU0OTEgQzkuOTc3MjA5OTMsMTIuMTA2NDgwNyAxMC4wNzY2ODg2LDEyLjMwMDQ2MzkgMTAuMjQzMzE1NiwxMi40MTk4MzgzIEwxMy42MDU2OTU2LDE0Ljk2NjQ5MyBDMTMuODkxNjk3LDE1LjE4MDM3MjUgMTQuMjk3MDcyOSwxNS4xMjMxNzIxIDE0LjUxMDk1MTcsMTQuODM3MTcwNyBDMTQuNzI0ODMxMywxNC41NTExNjkyIDE0LjY2NzYzMDksMTQuMTQ1Nzk0IDE0LjM4MTYyOTQsMTMuOTMxOTE0NSBMMTIuNTMxMzI1NywxMi41MzkyMTI3IEwyMS44ODEyNDk1LDEyLjUzOTIxMjcgTDIxLjg4MTI0OTUsMTEuMjY1ODg1NCBMMTIuNTMxMzI1NywxMS4yNjU4ODU0IEwxNC4zODE2Mjk0LDkuODczMTgzNjQgQzE0LjYzNzc4NzIsOS43MTY1MDQ1MyAxNC43NDk3MDA2LDkuNDAwNjYwMTQgMTQuNjQ3NzM1MSw5LjExNzE0NTUzIEMxNC41NDgyNTY0LDguODMzNjMxNTYgMTQuMjYyMjU1LDguNjU5NTQzNTIgMTMuOTYzODE4OSw4LjY5OTMzNSBaIiBpZD0icGJfdGJsLXRibC0wLWFycm93IiBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNS45MjkyMzAsIDExLjg5NDczNykgcm90YXRlKC0xODAuMDAwMDAwKSB0cmFuc2xhdGUoLTE1LjkyOTIzMCwgLTExLjg5NDczNykgIiAvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" /></td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3" headers="pb_tbl-eval"><span style="color:#4CA64C;">✓</span></td>
+<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px" headers="pb_tbl-test_units">6</td>
+<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5" headers="pb_tbl-pass">3<br />
 0.50</td>
-<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5">3<br />
+<td class="gt_row gt_right" style="height: 40px; color: black; font-family: IBM Plex Mono; font-size: 11px; border-left: 1px dashed #E5E5E5" headers="pb_tbl-fail">3<br />
 0.50</td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3"><span style="color: #AAAAAA;">●</span></td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC"><span style="color: #EBBC14;">●</span></td>
-<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3">--</td>
-<td class="gt_row gt_center" style="height: 40px">CSV</td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3" headers="pb_tbl-w_upd"><span style="color: #AAAAAA;">●</span></td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC" headers="pb_tbl-e_upd"><span style="color: #EBBC14;">●</span></td>
+<td class="gt_row gt_center" style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3" headers="pb_tbl-c_upd">--</td>
+<td class="gt_row gt_center" style="height: 40px" headers="pb_tbl-extract_upd">CSV</td>
 </tr>
 </tbody>
 </table>
@@ -702,14 +702,14 @@ validation.get_step_report(i=1)
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span>
 
 
 ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_match(keys='order_id')</code></span>
@@ -727,36 +727,36 @@ ASSERTION <span style="border-style: solid; border-width: thin; border-color: li
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</th>
+<th colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 3 columns)</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns">amount</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 1 of 4 matched rows differ (25.0%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-rows-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed rows (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1002</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row">1002</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-rows-1-row"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1003</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row">1003</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-1-row" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 row)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">1006</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row">1006</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-row"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
 </tr>
 </tbody>
 </table>
@@ -884,14 +884,14 @@ validation.get_step_report(i=1)
  
 </style>
 
-<table class="gt_table" style="table-layout: fixed;; width: 100%" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" style="table-layout: fixed;; width: 100%" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<th colspan="2" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span>
+<th colspan="2" id="pb_comparison_tbl-title" class="gt_heading gt_title gt_font_normal">Report for Validation Step 1 <span style="color: #CF142B;">✗</span>
 
 
 ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;">tbl_reconcile(keys='customer', measures='amount', agg='sum')</code></span>
@@ -910,36 +910,36 @@ ASSERTION <span style="border-style: solid; border-width: thin; border-color: li
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 1 columns)</th>
+<th colspan="2" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Column mismatches (1 of 1 columns)</th>
 </tr>
 
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">amount_sum</td>
-<td class="gt_row gt_left" style="font-size: 12px"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns">amount_sum</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;">
 
 
 1 of 4 matched groups differ (25.0%)</td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed groups (1 group)</td>
+<td colspan="2" id="pb_comparison_tbl-Changed-groups-1-group" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Changed groups (1 group)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">Ben</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Changed-groups-1-group">Ben</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Changed-groups-1-group"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="text-decoration:line-through; color:#999;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 group)</td>
+<td colspan="2" id="pb_comparison_tbl-Missing-from-target-1-group" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Missing from target (1 group)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">Cho</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-group">Cho</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Missing-from-target-1-group"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
 </tr>
 <tr class="gt_group_heading_row">
-<td colspan="2" class="gt_group_heading" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 group)</td>
+<td colspan="2" id="pb_comparison_tbl-Extra-in-target-1-group" class="gt_group_heading" scope="colgroup" style="font-size: 12px; font-weight: bold; background-color: #F6F7F8">Extra in target (1 group)</td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px">Fay</td>
-<td class="gt_row gt_left" style="font-size: 12px"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
+<td class="gt_row gt_left" style="font-family: IBM Plex Mono; font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-group">Fay</td>
+<td class="gt_row gt_left" style="font-size: 12px" headers="pb_comparison_tbl-Extra-in-target-1-group"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
 </tr>
 </tbody>
 </table>

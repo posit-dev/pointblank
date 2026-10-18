@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Write a Validate object to disk as a serialized file.">
 
 <title>write_file() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -129,10 +131,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/write_file.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/write_file.html">
 
 
+<meta property="og:title" content="write_file() | Pointblank">
+<meta property="og:description" content="Write a Validate object to disk as a serialized file.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="write_file() | Pointblank">
+<meta name="twitter:description" content="Write a Validate object to disk as a serialized file.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="write_file.md">
-  <meta name="description" content="Write a Validate object to disk as a serialized file.">
   <script type="application/ld+json">
 [
   {
@@ -160,14 +168,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="write_file() | Pointblank">
-  <meta property="og:description" content="Write a Validate object to disk as a serialized file.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/write_file.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="write_file() | Pointblank">
-  <meta name="twitter:description" content="Write a Validate object to disk as a serialized file.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1805,7 +1805,7 @@ This function doesn’t return anything but saves the validation object to disk.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a simple validation and save it to disk:</p>
-<div id="a27ab463" class="cell" data-execution_count="1">
+<div id="63911c55" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation</span></span>
@@ -1827,7 +1827,7 @@ This function doesn’t return anything but saves the validation object to disk.
 </div>
 </div>
 <p>To keep the original table data for later analysis:</p>
-<div id="eb55216d" class="cell" data-execution_count="2">
+<div id="cb021c73" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save with the original table data included</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pb.write_file(validation, <span class="st">"my_validation_with_data"</span>, keep_tbl<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">

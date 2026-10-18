@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Are column data increasing by row?">
 
 <title>Validate.col_vals_increasing() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -132,10 +134,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html">
 
 
+<meta property="og:title" content="Validate.col_vals_increasing() | Pointblank">
+<meta property="og:description" content="Are column data increasing by row?">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Validate.col_vals_increasing() | Pointblank">
+<meta name="twitter:description" content="Are column data increasing by row?">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="Validate.col_vals_increasing.md">
-  <meta name="description" content="Are column data increasing by row?">
   <script type="application/ld+json">
 [
   {
@@ -163,14 +171,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Validate.col_vals_increasing() | Pointblank">
-  <meta property="og:description" content="Are column data increasing by row?">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Validate.col_vals_increasing() | Pointblank">
-  <meta name="twitter:description" content="Are column data increasing by row?">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1733,7 +1733,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with a numeric column (<code>a</code>). The table is shown below:</p>
-<div id="15aa205a" class="cell" data-execution_count="2">
+<div id="b74b93d5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1874,7 +1874,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are increasing. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="1609e0b8" class="cell" data-execution_count="3">
+<div id="2399d48a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"a"</span>)</span>
@@ -2037,7 +2037,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>The validation passed as all values in column <code>a</code> are increasing. Now let’s check column <code>b</code> which has a stationary value:</p>
-<div id="8eabeba5" class="cell" data-execution_count="4">
+<div id="bb5188ca" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>)</span>
@@ -2200,7 +2200,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>This validation fails at the third row because the value <code>2</code> is repeated. If we want to allow stationary values, we can use <code>allow_stationary=True</code>:</p>
-<div id="a75e1df5" class="cell" data-execution_count="5">
+<div id="da9142de" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>, allow_stationary<span class="op">=</span><span class="va">True</span>)</span>

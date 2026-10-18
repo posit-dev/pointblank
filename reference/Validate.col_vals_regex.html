@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Validate whether column values match a regular expression pattern.">
 
 <title>Validate.col_vals_regex() | Pointblank</title>
+<meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -132,10 +134,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html">
 
 
+<meta property="og:title" content="Validate.col_vals_regex() | Pointblank">
+<meta property="og:description" content="Validate whether column values match a regular expression pattern.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Validate.col_vals_regex() | Pointblank">
+<meta name="twitter:description" content="Validate whether column values match a regular expression pattern.">
+<meta name="twitter:card" content="summary">
   <link rel="alternate" type="text/markdown" href="Validate.col_vals_regex.md">
-  <meta name="description" content="Validate whether column values match a regular expression pattern.">
   <script type="application/ld+json">
 [
   {
@@ -163,14 +171,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 ]
 </script>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Validate.col_vals_regex() | Pointblank">
-  <meta property="og:description" content="Validate whether column values match a regular expression pattern.">
-  <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html">
-  <meta property="og:site_name" content="Pointblank">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Validate.col_vals_regex() | Pointblank">
-  <meta name="twitter:description" content="Validate whether column values match a regular expression pattern.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="494" data-forks="37"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1759,7 +1759,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with two string columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="84ea601d" class="cell" data-execution_count="2">
+<div id="5a1752c1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1881,7 +1881,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that all of the values in column <code>a</code> match a particular regex pattern. We’ll determine if this validation had any failing test units (there are four test units, one for each row).</p>
-<div id="2e01a2d4" class="cell" data-execution_count="3">
+<div id="94503527" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"a"</span>, pattern<span class="op">=</span><span class="vs">r"r</span><span class="pp">[a-z]</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>)</span>
@@ -2046,7 +2046,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a>. All test units passed, and there are no failing test units.</p>
 <p>Now, let’s use the same regex for a validation on column <code>b</code>.</p>
-<div id="b1a4733a" class="cell" data-execution_count="4">
+<div id="fd59083b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"r</span><span class="pp">[a-z]</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>)</span>
