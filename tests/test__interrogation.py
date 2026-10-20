@@ -317,6 +317,22 @@ def test_safe_is_nan_or_null_expr_ibis_sqlite():
     assert evaluated == [False, True, False]
 
 
+def test_safe_is_nan_or_null_expr_ibis_duckdb():
+    """Works with an Ibis DuckDB backend (which supports NaN checks)."""
+    import ibis
+    import narwhals as nw
+
+    con = ibis.duckdb.connect()
+    t = con.create_table("test", pl.DataFrame({"x": [1.0, float("nan"), None]}).to_arrow())
+    nw_tbl = nw.from_native(t)
+    col_expr = nw.col("x")
+
+    result = _safe_is_nan_or_null_expr(nw_tbl, col_expr, "x")
+
+    evaluated = nw_tbl.select(result).to_native().to_pandas()["x"].tolist()
+    assert evaluated == [False, True, True]
+
+
 def test_safe_modify_datetime_lazy_polars():
     """Works with a Polars LazyFrame."""
     import datetime

@@ -4740,6 +4740,53 @@ def test_nan_none_null_handling_ibis_sqlite() -> None:
             os.unlink(temp_db_path)
 
 
+def test_nan_none_null_handling_ibis_duckdb() -> None:
+    """NaN is a missing value in comparison steps on DuckDB tables, as it is with Polars."""
+
+    df = pl.DataFrame(
+        {
+            "float_col": [1.0, 2.0, float("nan"), None, 5.0],
+            "int_col": [1, 1, 1, 1, 1],
+        }
+    )
+    tbl = ibis.duckdb.connect().create_table("nan_tbl", df.to_arrow())
+
+    for data in [df, tbl]:
+        # With `na_pass=False`, NaN and None both fail (DuckDB treats NaN as larger than any
+        # number, so without the NaN check `NaN > 0` would pass)
+        for method_name, method_args in [
+            ("col_vals_gt", {"value": 0}),
+            ("col_vals_ge", {"value": 1}),
+            ("col_vals_lt", {"value": 10}),
+            ("col_vals_le", {"value": 5}),
+            ("col_vals_ne", {"value": 3}),
+            ("col_vals_ge", {"value": col("int_col")}),
+        ]:
+            validation = getattr(Validate(data), method_name)(
+                columns="float_col", na_pass=False, **method_args
+            ).interrogate()
+
+            assert validation.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+            assert validation.n_failed(i=1, scalar=True) == 2  # NaN, None
+
+        # With `na_pass=True`, NaN and None both pass
+        validation = Validate(data).col_vals_lt(columns="float_col", value=0, na_pass=True)
+        validation = validation.interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 2  # NaN, None
+        assert validation.n_failed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+
+        # A NaN in the comparison column is also a missing value
+        validation = (
+            Validate(data)
+            .col_vals_gt(columns="int_col", value=col("float_col"), na_pass=True)
+            .interrogate()
+        )
+
+        assert validation.n_passed(i=1, scalar=True) == 2  # NaN, None
+        assert validation.n_failed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+
+
 def test_edge_case_nan_vs_none_distinction() -> None:
     """Test edge cases around NaN vs None distinction."""
 

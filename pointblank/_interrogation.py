@@ -156,10 +156,6 @@ def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, colum
 
     df: Frame = nw.from_native(data_frame, allow_series=False)
 
-    # Ibis backends (e.g. SQLite) don't support is_nan(), so only check nulls
-    if df.implementation.is_ibis():
-        return null_check
-
     schema: nw.Schema = df.collect_schema()
 
     dtype: nw.dtypes.DType = schema[column_name]
@@ -167,7 +163,24 @@ def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, colum
     if not dtype.is_numeric():
         return null_check
 
+    # Some Ibis backends (e.g. SQLite) don't support is_nan(), so only check nulls for those
+    if df.implementation.is_ibis() and not _ibis_backend_supports_is_nan(df.to_native()):
+        return null_check
+
     return null_check | column_expr.is_nan()
+
+
+def _ibis_backend_supports_is_nan(ibis_table: Any) -> bool:
+    """
+    Check whether the backend of an Ibis table can evaluate `is_nan()` (e.g., DuckDB can but
+    SQLite can't).
+    """
+    try:
+        import ibis.expr.operations as ops
+
+        return bool(ibis_table.get_backend().has_operation(ops.IsNan))
+    except Exception:
+        return False
 
 
 def _conjointly_expression_error(i: int, reason: str) -> StepEvaluationError:
