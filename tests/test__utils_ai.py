@@ -229,6 +229,22 @@ def test_data_batcher_invalid_columns(sample_pd_data):
         _DataBatcher(sample_pd_data, columns=["nonexistent"])
 
 
+def test_create_batches_polars_column_null_in_first_unique_rows():
+    """A column that is null in the first 100 unique rows must still be batched."""
+    df = pl.DataFrame(
+        {
+            "id": list(range(150)) + [150],
+            "note": [None] * 150 + ["late text"],
+        }
+    )
+
+    batches, _ = _DataBatcher(df).create_batches()
+
+    notes = [row["note"] for batch in batches for row in batch["data"]["rows"]]
+    assert len(notes) == 151
+    assert notes[-1] == "late text"
+
+
 def test_create_row_signature(sample_pd_data):
     """Test row signature creation."""
     batcher = _DataBatcher(sample_pd_data)

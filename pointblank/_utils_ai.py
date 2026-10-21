@@ -450,7 +450,9 @@ class _DataBatcher:
             if hasattr(native_data, "with_columns"):  # Polars
                 import polars as pl
 
-                unique_df = pl.DataFrame(unique_rows)
+                # Scan every row for the schema: a column that is null in the first rows
+                # would otherwise be typed as null and reject a later value
+                unique_df = pl.DataFrame(unique_rows, infer_schema_length=None)
             elif hasattr(native_data, "assign"):  # Pandas
                 import pandas as pd
 
