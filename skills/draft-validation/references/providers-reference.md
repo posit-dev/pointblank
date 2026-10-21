@@ -23,7 +23,7 @@ Install: `pip install "pointblank[generate]"` (includes chatlas and every provid
 ```python
 model="openai:gpt-4o"
 model="openai:gpt-4o-mini"
-model="openai:gpt-4-turbo"
+model="openai:gpt-5.6-sol"
 ```
 
 Environment variable: `OPENAI_API_KEY`
