@@ -711,13 +711,18 @@ class _ValidationResponseParser:
         response = response.strip()
 
         try:
-            return json.loads(response)
+            parsed = json.loads(response)
         except json.JSONDecodeError:
-            pass
+            parsed = None
 
-        # The model may wrap the array in prose or a code fence, and that text can itself contain
-        # square brackets (e.g., "rows [0-2]"). Try each '[' as the start of a JSON value and keep
-        # the first array of result objects.
+        # A bare array is the expected reply; anything else (e.g., an object wrapping the array,
+        # like {"results": [...]}) is searched for the array below
+        if isinstance(parsed, list):
+            return parsed
+
+        # The model may wrap the array in prose, a code fence or an object, and that text can
+        # itself contain square brackets (e.g., "rows [0-2]") or echoed input rows. Try each '['
+        # as the start of a JSON value and keep the first array of result objects.
         decoder = json.JSONDecoder()
         start = response.find("[")
         while start != -1:
@@ -728,12 +733,16 @@ class _ValidationResponseParser:
             if (
                 isinstance(candidate, list)
                 and candidate
-                and all(isinstance(item, dict) for item in candidate)
+                and all(
+                    isinstance(item, dict) and "index" in item and "result" in item
+                    for item in candidate
+                )
             ):
                 return candidate
             start = response.find("[", start + 1)
 
-        # Nothing usable found; raise the parser's usual error
+        # Nothing usable found; raise the parser's usual error (or return the non-array JSON so
+        # that the structure check reports it)
         return json.loads(response)
 
     def _validate_response_structure(
