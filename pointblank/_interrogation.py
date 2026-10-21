@@ -1031,7 +1031,11 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
+    # `is_in()` gives null for a missing value on Polars and nullable pandas dtypes, which is
+    # neither passing nor failing in the sundered data and the extracts
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(
+        False
+    )
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
