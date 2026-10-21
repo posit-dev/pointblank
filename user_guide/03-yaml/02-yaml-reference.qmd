@@ -804,7 +804,7 @@ For Pandas DataFrames (when using `df_library: pandas`):
 ```yaml
 - prompt:
     prompt: "Values should be positive and realistic"  # REQUIRED: Natural language criteria
-    model: "anthropic:claude-sonnet-4"                 # REQUIRED: Model identifier
+    model: "anthropic:claude-sonnet-5-5"               # REQUIRED: Model identifier
     columns_subset: [column1, column2]                 # OPTIONAL: Columns to validate
     batch_size: 1000                                   # OPTIONAL: Rows per batch (default: 1000)
     max_concurrent: 3                                  # OPTIONAL: Concurrent API requests (default: 3)
@@ -853,7 +853,7 @@ Examples:
 # Basic AI validation
 - prompt:
     prompt: "Email addresses should look realistic and professional"
-    model: "anthropic:claude-sonnet-4"
+    model: "anthropic:claude-sonnet-5-5"
     columns_subset: [email]
 
 # Complex semantic validation
@@ -867,7 +867,7 @@ Examples:
 # Sentiment analysis
 - prompt:
     prompt: "Customer feedback should express positive sentiment"
-    model: "anthropic:claude-sonnet-4"
+    model: "anthropic:claude-sonnet-5-5"
     columns_subset: [feedback_text, rating]
 
 # Context-dependent validation
