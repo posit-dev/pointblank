@@ -960,3 +960,76 @@ def test_async_http_client_uses_the_sdk_library(library):
         client = _async_http_client("anthropic", verify_ssl=False)
 
     assert isinstance(client, module.AsyncClient)
+
+
+def _two_batches():
+    def batch(batch_id, start):
+        return {
+            "batch_id": batch_id,
+            "start_row": start,
+            "end_row": start + 2,
+            "data": {
+                "columns": ["name", "age"],
+                "rows": [
+                    {"name": "Alice", "age": 25, "_pb_row_index": start},
+                    {"name": "Bob", "age": 17, "_pb_row_index": start + 1},
+                ],
+            },
+        }
+
+    return [batch(0, 0), batch(1, 2)]
+
+
+@patch("pointblank._utils_ai._create_chat_instance")
+@pytest.mark.parametrize(
+    "unparseable_reply",
+    [
+        "I'm sorry, but I can't help with that request.",
+        '[{"index": 0, "result": tr',
+    ],
+    ids=["refusal", "truncated-json"],
+)
+def test_validate_batches_raises_when_no_reply_can_be_parsed(
+    mock_create_chat, llm_config, unparseable_reply
+):
+    """Every row would be reported as failing, so the step could not be evaluated."""
+    from pointblank._interrogation import StepEvaluationError
+
+    mock_chat = Mock()
+    mock_chat.chat.return_value = unparseable_reply
+    mock_create_chat.return_value = mock_chat
+    engine = _AIValidationEngine(llm_config)
+
+    with pytest.raises(StepEvaluationError, match="None of the 2 requests"):
+        engine.validate_batches(_two_batches(), _PromptBuilder("Check if age > 18"))
+
+
+@patch("pointblank._utils_ai._create_chat_instance")
+def test_validate_batches_keeps_good_batches_when_one_reply_is_unparseable(
+    mock_create_chat, llm_config
+):
+    mock_chat = Mock()
+    mock_chat.chat.side_effect = [
+        '[{"index": 0, "result": true}, {"index": 1, "result": false}]',
+        "I'm sorry, but I can't help with that request.",
+    ]
+    mock_create_chat.return_value = mock_chat
+    engine = _AIValidationEngine(llm_config)
+
+    results = engine.validate_batches(_two_batches(), _PromptBuilder("Check if age > 18"))
+
+    assert results[0] == [{"index": 0, "result": True}, {"index": 1, "result": False}]
+    assert results[1] == [{"index": 2, "result": False}, {"index": 3, "result": False}]
+
+
+def test_parse_response_records_the_error_of_an_unparseable_reply():
+    parser = _ValidationResponseParser(total_rows=2)
+    batch_info = {"start_row": 0, "end_row": 2, "batch_id": 0}
+
+    parser.parse_response("no json here", batch_info)
+    assert parser.last_parse_error is not None
+
+    parser.parse_response(
+        '[{"index": 0, "result": true}, {"index": 1, "result": false}]', batch_info
+    )
+    assert parser.last_parse_error is None

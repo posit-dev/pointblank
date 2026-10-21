@@ -671,6 +671,9 @@ class _ValidationResponseParser:
         """
         self.total_rows = total_rows
 
+        # The error of the latest response that could not be parsed, or `None` if it could
+        self.last_parse_error: Optional[Exception] = None
+
     def parse_response(self, response: str, batch_info: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Parse an LLM response for a batch.
@@ -687,6 +690,8 @@ class _ValidationResponseParser:
         List[Dict[str, Any]]
             List of parsed results with 'index' and 'result' keys.
         """
+        self.last_parse_error = None
+
         try:
             # Try to extract JSON from the response
             json_response = self._extract_json(response)
@@ -697,6 +702,7 @@ class _ValidationResponseParser:
             return json_response
 
         except Exception as e:
+            self.last_parse_error = e
             logger.error(
                 f"Failed to parse response for batch {batch_info.get('batch_id', 'unknown')}: {e}"
             )
@@ -932,6 +938,12 @@ class _AIValidationEngine:
                 parser = _ValidationResponseParser(total_rows=1000)  # This will be set properly
                 results = parser.parse_response(response, batch)
 
+                # A reply that could not be parsed gives all-False results for the batch, which
+                # counts as a failed batch below just like a failed request does
+                if parser.last_parse_error is not None:
+                    errors.append(parser.last_parse_error)
+                    return results
+
                 # Debug: Log parsed results  # pragma: no cover
                 logger.debug(f"📊 Parsed results for batch {batch['batch_id']}:")
                 for i, result in enumerate(results[:5]):  # Show first 5 results
@@ -968,9 +980,15 @@ class _AIValidationEngine:
             from pointblank._interrogation import StepEvaluationError, _first_line
 
             raise StepEvaluationError(
-                f"None of the {len(batches)} requests to the model succeeded "
+                f"None of the {len(batches)} requests to the model gave a usable response "
                 f"(the first failed with {_first_line(errors[0])})."
             ) from errors[0]
+
+        if errors:
+            logger.warning(
+                f"{len(errors)} of {len(batches)} batches could not be validated "
+                f"and their rows are reported as failing."
+            )
 
         return final_results
 
