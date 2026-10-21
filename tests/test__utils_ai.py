@@ -1074,3 +1074,51 @@ def test_parse_response_records_the_error_of_an_unparseable_reply():
         '[{"index": 0, "result": true}, {"index": 1, "result": false}]', batch_info
     )
     assert parser.last_parse_error is None
+
+
+class _HistoryKeepingChat:
+    """Stands in for a chatlas `Chat`, which sends its whole history with every request."""
+
+    def __init__(self):
+        self.turns = []
+        self.messages_sent = []
+
+    def set_turns(self, turns):
+        self.turns = list(turns)
+
+    def chat(self, prompt, *args, **kwargs):
+        self.messages_sent.append(len(self.turns) + 1)
+        reply = '[{"index": 0, "result": true}]'
+        self.turns += [("user", prompt), ("assistant", reply)]
+        return reply
+
+
+def _one_row_batch(batch_id):
+    return {
+        "batch_id": batch_id,
+        "start_row": 0,
+        "end_row": 1,
+        "data": {"columns": ["name"], "rows": [{"name": "Alice", "_pb_row_index": 0}]},
+    }
+
+
+def test_validate_batches_does_not_resend_earlier_batches(llm_config):
+    """Each batch is its own conversation, not a continuation of the previous batches."""
+    chat = _HistoryKeepingChat()
+    with patch("pointblank._utils_ai._create_chat_instance", return_value=chat):
+        engine = _AIValidationEngine(llm_config)
+
+    engine.validate_batches([_one_row_batch(i) for i in range(3)], _PromptBuilder("Is it a name?"))
+
+    assert chat.messages_sent == [1, 1, 1]
+
+
+def test_validate_single_batch_does_not_resend_earlier_batches(llm_config):
+    chat = _HistoryKeepingChat()
+    with patch("pointblank._utils_ai._create_chat_instance", return_value=chat):
+        engine = _AIValidationEngine(llm_config)
+
+    for i in range(2):
+        engine.validate_single_batch(_one_row_batch(i), _PromptBuilder("Is it a name?"))
+
+    assert chat.messages_sent == [1, 1]
