@@ -85,7 +85,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-d0a021ea640ca3a39e1ad6839b31607a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-82efae2154657615710b7886db850821.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1289,7 +1289,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="../../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt</a>: validate rows using AI/LLM-powered analysis</p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values should be positive and realistic"</span><span class="co">  # REQUIRED: Natural language criteria</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span><span class="co">                 # REQUIRED: Model identifier</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-5-5"</span><span class="co">               # REQUIRED: Model identifier</span></span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column1</span><span class="kw">,</span><span class="at"> column2</span><span class="kw">]</span><span class="co">                 # OPTIONAL: Columns to validate</span></span>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">batch_size</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">                                   # OPTIONAL: Rows per batch (default: 1000)</span></span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_concurrent</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span><span class="co">                                  # OPTIONAL: Concurrent API requests (default: 3)</span></span>
@@ -1303,8 +1303,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Each row becomes a test unit that either passes or fails the validation criteria, producing binary True/False results that integrate with standard Pointblank reporting.</p>
 <p><strong>Supported models:</strong></p>
 <ul>
-<li><strong>Anthropic</strong>: <code>"anthropic:claude-sonnet-4"</code>, <code>"anthropic:claude-opus-4"</code></li>
-<li><strong>OpenAI</strong>: <code>"openai:gpt-4"</code>, <code>"openai:gpt-4-turbo"</code>, <code>"openai:gpt-3.5-turbo"</code></li>
+<li><strong>Anthropic</strong>: <code>"anthropic:claude-sonnet-5-5"</code>, <code>"anthropic:claude-opus-5-5"</code></li>
+<li><strong>OpenAI</strong>: <code>"openai:gpt-5.6-sol"</code>, <code>"openai:gpt-5.6-terra"</code></li>
 <li><strong>Ollama</strong>: <code>"ollama:&lt;model-name&gt;"</code> (e.g., <code>"ollama:llama3"</code>)</li>
 <li><strong>Bedrock</strong>: <code>"bedrock:&lt;model-name&gt;"</code></li>
 </ul>
@@ -1323,13 +1323,13 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <div class="sourceCode" id="cb46"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic AI validation</span></span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Email addresses should look realistic and professional"</span></span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-5-5"</span></span>
 <span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">email</span><span class="kw">]</span></span>
 <span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex semantic validation</span></span>
 <span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
 <span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Product descriptions should mention the product category and include at least one benefit"</span></span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-4"</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-5.6-sol"</span></span>
 <span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">product_name</span><span class="kw">,</span><span class="at"> description</span><span class="kw">,</span><span class="at"> category</span><span class="kw">]</span></span>
 <span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">batch_size</span><span class="kw">:</span><span class="at"> </span><span class="dv">500</span></span>
 <span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_concurrent</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
@@ -1337,13 +1337,13 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentiment analysis</span></span>
 <span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
 <span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Customer feedback should express positive sentiment"</span></span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-5-5"</span></span>
 <span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">feedback_text</span><span class="kw">,</span><span class="at"> rating</span><span class="kw">]</span></span>
 <span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Context-dependent validation</span></span>
 <span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
 <span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"For high-value transactions (amount &gt; 1000), a detailed justification should be provided"</span></span>
-<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-4"</span></span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-5.6-sol"</span></span>
 <span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">amount</span><span class="kw">,</span><span class="at"> justification</span><span class="kw">,</span><span class="at"> approver</span><span class="kw">]</span></span>
 <span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span></span>
 <span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>

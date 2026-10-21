@@ -262,7 +262,7 @@ When using [DraftValidation](../../reference/DraftValidation.md#pointblank.Draft
 pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 
 # Using OpenAI's GPT model
-pb.DraftValidation(data=data, model="openai:gpt-4-turbo")
+pb.DraftValidation(data=data, model="openai:gpt-5.6-sol")
 
 # Using a local model with Ollama
 pb.DraftValidation(data=data, model="ollama:llama3:latest")

@@ -28154,7 +28154,7 @@ When using `DraftValidation`, you specify the model in the format `"provider:mod
 pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
 
 # Using OpenAI's GPT model
-pb.DraftValidation(data=data, model="openai:gpt-4-turbo")
+pb.DraftValidation(data=data, model="openai:gpt-5.6-sol")
 
 # Using a local model with Ollama
 pb.DraftValidation(data=data, model="ollama:llama3:latest")
@@ -29830,7 +29830,7 @@ steps:
   # Validate sentiment
   - prompt:
       prompt: "Customer feedback should express positive sentiment"
-      model: "anthropic:claude-sonnet-4"
+      model: "anthropic:claude-sonnet-5-5"
       columns_subset: [feedback_text, rating]
       batch_size: 500
       thresholds:
@@ -29839,7 +29839,7 @@ steps:
   # Validate semantic correctness
   - prompt:
       prompt: "Product descriptions should mention the product category and at least one benefit"
-      model: "openai:gpt-4"
+      model: "openai:gpt-5.6-sol"
       columns_subset: [product_name, description, category]
 ```
 
@@ -31180,7 +31180,7 @@ For Pandas DataFrames (when using `df_library: pandas`):
 ```yaml
 - prompt:
     prompt: "Values should be positive and realistic"  # REQUIRED: Natural language criteria
-    model: "anthropic:claude-sonnet-4"                 # REQUIRED: Model identifier
+    model: "anthropic:claude-sonnet-5-5"               # REQUIRED: Model identifier
     columns_subset: [column1, column2]                 # OPTIONAL: Columns to validate
     batch_size: 1000                                   # OPTIONAL: Rows per batch (default: 1000)
     max_concurrent: 3                                  # OPTIONAL: Concurrent API requests (default: 3)
@@ -31199,8 +31199,8 @@ producing binary True/False results that integrate with standard Pointblank repo
 
 **Supported models:**
 
-- **Anthropic**: `"anthropic:claude-sonnet-4"`, `"anthropic:claude-opus-4"`
-- **OpenAI**: `"openai:gpt-4"`, `"openai:gpt-4-turbo"`, `"openai:gpt-3.5-turbo"`
+- **Anthropic**: `"anthropic:claude-sonnet-5-5"`, `"anthropic:claude-opus-5-5"`
+- **OpenAI**: `"openai:gpt-5.6-sol"`, `"openai:gpt-5.6-terra"`
 - **Ollama**: `"ollama:<model-name>"` (e.g., `"ollama:llama3"`)
 - **Bedrock**: `"bedrock:<model-name>"`
 
@@ -31229,13 +31229,13 @@ Examples:
 # Basic AI validation
 - prompt:
     prompt: "Email addresses should look realistic and professional"
-    model: "anthropic:claude-sonnet-4"
+    model: "anthropic:claude-sonnet-5-5"
     columns_subset: [email]
 
 # Complex semantic validation
 - prompt:
     prompt: "Product descriptions should mention the product category and include at least one benefit"
-    model: "openai:gpt-4"
+    model: "openai:gpt-5.6-sol"
     columns_subset: [product_name, description, category]
     batch_size: 500
     max_concurrent: 5
@@ -31243,13 +31243,13 @@ Examples:
 # Sentiment analysis
 - prompt:
     prompt: "Customer feedback should express positive sentiment"
-    model: "anthropic:claude-sonnet-4"
+    model: "anthropic:claude-sonnet-5-5"
     columns_subset: [feedback_text, rating]
 
 # Context-dependent validation
 - prompt:
     prompt: "For high-value transactions (amount > 1000), a detailed justification should be provided"
-    model: "openai:gpt-4"
+    model: "openai:gpt-5.6-sol"
     columns_subset: [amount, justification, approver]
     thresholds:
       warning: 0.05

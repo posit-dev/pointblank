@@ -461,7 +461,7 @@ steps:
   # Validate sentiment
   - prompt:
       prompt: "Customer feedback should express positive sentiment"
-      model: "anthropic:claude-sonnet-4"
+      model: "anthropic:claude-sonnet-5-5"
       columns_subset: [feedback_text, rating]
       batch_size: 500
       thresholds:
@@ -470,7 +470,7 @@ steps:
   # Validate semantic correctness
   - prompt:
       prompt: "Product descriptions should mention the product category and at least one benefit"
-      model: "openai:gpt-4"
+      model: "openai:gpt-5.6-sol"
       columns_subset: [product_name, description, category]
 ```
 
