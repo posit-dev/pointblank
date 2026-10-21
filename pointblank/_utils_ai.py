@@ -710,22 +710,31 @@ class _ValidationResponseParser:
         # Clean up the response
         response = response.strip()
 
-        # Look for JSON array patterns
-        import re
-
-        json_pattern = r"\[.*?\]"
-        matches = re.findall(json_pattern, response, re.DOTALL)
-
-        if matches:
-            # Try to parse the first match
-            try:
-                return json.loads(matches[0])
-            except json.JSONDecodeError:  # pragma: no cover
-                # If that fails, try the raw response
-                return json.loads(response)
-        else:
-            # Try to parse the raw response
+        try:
             return json.loads(response)
+        except json.JSONDecodeError:
+            pass
+
+        # The model may wrap the array in prose or a code fence, and that text can itself contain
+        # square brackets (e.g., "rows [0-2]"). Try each '[' as the start of a JSON value and keep
+        # the first array of result objects.
+        decoder = json.JSONDecoder()
+        start = response.find("[")
+        while start != -1:
+            try:
+                candidate, _ = decoder.raw_decode(response, start)
+            except json.JSONDecodeError:
+                candidate = None
+            if (
+                isinstance(candidate, list)
+                and candidate
+                and all(isinstance(item, dict) for item in candidate)
+            ):
+                return candidate
+            start = response.find("[", start + 1)
+
+        # Nothing usable found; raise the parser's usual error
+        return json.loads(response)
 
     def _validate_response_structure(
         self, json_response: List[Dict[str, Any]], batch_info: Dict[str, Any]

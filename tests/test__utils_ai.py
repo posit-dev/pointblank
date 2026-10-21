@@ -452,6 +452,23 @@ def test_parse_response_with_extra_text():
     assert results[1]["result"] is False
 
 
+@pytest.mark.parametrize(
+    "response",
+    [
+        'Results for rows [0-1]:\n[{"index": 0, "result": true}, {"index": 1, "result": false}]',
+        'Note [1]\n```json\n[{"index": 0, "result": true}, {"index": 1, "result": false}]\n```',
+    ],
+)
+def test_parse_response_with_brackets_before_json(response):
+    """Square brackets in the text before the JSON array do not hide the array."""
+    parser = _ValidationResponseParser(total_rows=100)
+    batch_info = {"batch_id": 0, "start_row": 0, "end_row": 2}
+
+    results = parser.parse_response(response, batch_info)
+
+    assert [r["result"] for r in results] == [True, False]
+
+
 def test_parse_response_invalid_json():
     """Test parsing invalid JSON response returns defaults."""
     response = "This is not JSON"
