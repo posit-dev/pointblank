@@ -1253,9 +1253,15 @@ def interrogate_regex(
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Polars has no string methods for Categorical and Enum columns
+    column_expr = nw.col(column)
+    if nw_tbl.collect_schema()[column] in (nw.Categorical, nw.Enum):
+        column_expr = column_expr.cast(nw.String)
+
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
-        pb_is_good_2=nw.col(column).str.contains(pattern, literal=False).fill_null(False),
+        pb_is_good_2=column_expr.str.contains(pattern, literal=False).fill_null(False),
     )
 
     # Apply inverse logic if needed
