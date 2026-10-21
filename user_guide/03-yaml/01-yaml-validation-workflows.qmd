@@ -491,7 +491,7 @@ steps:
   # Validate sentiment
   - prompt:
       prompt: "Customer feedback should express positive sentiment"
-      model: "anthropic:claude-sonnet-4"
+      model: "anthropic:claude-sonnet-5-5"
       columns_subset: [feedback_text, rating]
       batch_size: 500
       thresholds:
