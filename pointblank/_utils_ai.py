@@ -89,7 +89,7 @@ class _LLMConfig:
     provider
         LLM provider name (e.g., 'anthropic', 'openai', 'ollama', 'bedrock').
     model
-        Model name (e.g., 'claude-opus-4-6', 'gpt-4').
+        Model name (e.g., 'claude-opus-4-6', 'gpt-5.6-sol').
     api_key
         API key for the provider. If None, will be read from environment.
     verify_ssl
