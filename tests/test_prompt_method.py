@@ -623,3 +623,33 @@ def test_prompt_all_requests_failing_is_eval_error(monkeypatch, sample_data_pl):
     step = validation.validation_info[0]
     assert step.eval_error is True
     assert "401 invalid x-api-key" in step.notes["eval_error"]["text"]
+
+
+# ============================================================================
+# Test pandas frames with a non-default index
+# ============================================================================
+
+
+@pytest.mark.parametrize("index", [[10, 11, 12], [1, 2, 0]])
+def test_interrogate_prompt_pandas_non_default_index(index):
+    """The row verdicts are attached by position, whatever the frame's index is."""
+    from pointblank._interrogation import interrogate_prompt
+
+    tbl = pd.DataFrame({"text": ["a", "b", "c"]}, index=index)
+    verdicts = [True, False, True]
+    batch_results = [[{"index": i, "result": v} for i, v in enumerate(verdicts)]]
+
+    with (
+        patch("pointblank._utils_ai._AIValidationEngine.__init__", return_value=None),
+        patch(
+            "pointblank._utils_ai._AIValidationEngine.validate_batches",
+            return_value=batch_results,
+        ),
+    ):
+        result = interrogate_prompt(
+            tbl, None, {"prompt": "Is it text?", "llm_provider": "openai", "llm_model": "m"}
+        )
+
+    assert result["pb_is_good_"].tolist() == verdicts
+    assert result["pb_is_good_"].dtype == bool
+    assert list(result.index) == index
