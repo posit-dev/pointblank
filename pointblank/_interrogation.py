@@ -2323,7 +2323,10 @@ def interrogate_prompt(  # pragma: no cover
         elif hasattr(native_tbl, "assign"):  # Pandas
             import pandas as pd
 
-            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+            # Align by position: the frame's index need not be 0..n-1
+            result_tbl = native_tbl.assign(
+                pb_is_good_=pd.Series(validation_results, dtype=bool, index=native_tbl.index)
+            )
 
         else:
             # Generic fallback
