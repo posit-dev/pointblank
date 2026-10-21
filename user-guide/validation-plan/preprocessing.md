@@ -210,9 +210,9 @@ shape: (3, 2)
 | f      | n   |
 |--------|-----|
 | str    | u32 |
-| "mid"  | 2   |
 | "low"  | 5   |
 | "high" | 6   |
+| "mid"  | 2   |
 
 Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:
 
