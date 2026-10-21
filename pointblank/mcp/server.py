@@ -807,7 +807,7 @@ async def column_summary_table(ctx: Context, dataframe_id: str, table_name: str 
 async def draft_validation_plan(
     ctx: Context,
     dataframe_id: Annotated[str, "ID of the DataFrame to generate validation plan for."],
-    model: Annotated[str, "AI model in format 'provider:model'."] = "anthropic:claude-sonnet-4-5",
+    model: Annotated[str, "AI model in format 'provider:model'."] = "anthropic:claude-sonnet-5-5",
     api_key: Annotated[Optional[str], "API key for the model provider."] = None,
 ) -> Dict[str, Any]:
     """Uses Pointblank's DraftValidation to generate an AI-powered validation plan."""

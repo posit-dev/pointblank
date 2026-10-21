@@ -744,3 +744,15 @@ class TestGetAvailableBackends:
         backends = get_available_backends()
         assert isinstance(backends, list)
         assert "pandas" in backends
+
+
+@pytest.mark.asyncio
+async def test_draft_validation_plan_default_model_is_not_retired(mcp_server):
+    """The default is a current Sonnet; claude-sonnet-4-5 retires on 2026-11-30."""
+    async with Client(mcp_server) as client:
+        tools = await client.list_tools()
+
+    tool = next(t for t in tools if t.name == "draft_validation_plan")
+    default_model = tool.inputSchema["properties"]["model"]["default"]
+
+    assert default_model == "anthropic:claude-sonnet-5-5"
