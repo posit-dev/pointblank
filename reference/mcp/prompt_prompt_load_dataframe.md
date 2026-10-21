@@ -1,11 +1,10 @@
 # prompt_load_dataframe
 
+# prompt_load_dataframe
 
 Prompt to load a DataFrame from a file into the server's context for validation.
 
-
-## Arguments
-
+### Arguments
 
 `input_path: string`  
 No description.
@@ -13,8 +12,7 @@ No description.
 `df_id: string`  
 Provide a value matching the following JSON schema: {"anyOf":\[{"type":"string"},{"type":"null"}\]}. Encode non-string values as JSON.
 
-
-## Prompt Text
+### Prompt Text
 
 > **Note: Assistant**
 >

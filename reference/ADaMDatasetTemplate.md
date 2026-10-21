@@ -1,10 +1,10 @@
 # ADaMDatasetTemplate
 
-
 Structural template for an ADaM dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L57-L104)
 
 ``` python
 ADaMDatasetTemplate(
@@ -17,9 +17,7 @@ ADaMDatasetTemplate(
 )
 ```
 
-
 ## Parameters
-
 
 `name: str`  
 Dataset name (e.g., `"ADSL"`, `"ADVS"`, `"ADAE"`, `"ADTTE"`).
@@ -39,7 +37,6 @@ Ordered list of variable specifications.
 `natural_keys: list[str] = list()`  
 List of variable names that form the natural key.
 
-
 ## Attributes
 
 | Name | Description |
@@ -48,58 +45,37 @@ List of variable names that form the natural key.
 | [population_flags](#population_flags) | Get names of all population flag variables. |
 | [required_variables](#required_variables) | Get names of all required variables. |
 
-------------------------------------------------------------------------
-
-
 ### conditional_variables
-
 
 Get names of all conditionally required variables.
 
-
 `conditional_variables: list[str]`
-
-
-------------------------------------------------------------------------
-
 
 ### population_flags
 
-
 Get names of all population flag variables.
-
 
 `population_flags: list[str]`
 
-
-------------------------------------------------------------------------
-
-
 ### required_variables
-
 
 Get names of all required variables.
 
-
 `required_variables: list[str]`
-
 
 ## Methods
 
-| Name | Description |
-|----|----|
+| Name                            | Description                  |
+|---------------------------------|------------------------------|
 | [get_variable()](#get_variable) | Get a variable spec by name. |
-
-------------------------------------------------------------------------
-
 
 ### get_variable()
 
-
 Get a variable spec by name.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L99-L104)
 
 ``` python
 get_variable(name)

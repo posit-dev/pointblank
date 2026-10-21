@@ -4,11 +4,10 @@ Recently, I've been giving free workshops to data teams on Pointblank. These sor
 
 Workshops have been especially helpful for understanding how people use and share Pointblank's [validation results table](../../user-guide/index.md). For example, I learned that people like to email or pull up the table for stakeholders so they can walk through problem cases (it's a great conversation starter for getting to the heart of data quality issues).
 
-A couple of months ago, I gave a workshop to one of Apple's data teams. During the Q&A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a [`segments=` argument](../../user-guide/segmentation.qmd) to all of Pointblank's validation methods!
+A couple of months ago, I gave a workshop to one of Apple's data teams. During the Q&A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a [`segments=` argument](../../user-guide/segmentation.md) to all of Pointblank's validation methods!
 
 We are excited about how things are going with the Pointblank project and are *always up* for providing a workshop to your data team (at no cost). If this sounds interesting to you please feel free to contact me through email or via Discord. Don't be shy. Just know that if you have a need for data validation, we're here to help!
 
-
-# Acknowledgment
+## Acknowledgment
 
 I'd like to give special thanks to Rami Krispin for his interest in Pointblank and for facilitating a recent workshop. If you're interested in more data science insights, check out [Rami's Data Newsletter](https://ramikrispin.substack.com) where he shares valuable perspectives on data engineering, LLMs, and analytics.

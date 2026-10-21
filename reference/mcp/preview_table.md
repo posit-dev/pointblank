@@ -1,8 +1,8 @@
 # preview_table
 
+# preview_table
 
 Display a preview of the DataFrame showing rows from top and bottom.
-
 
 ``` json
 {
@@ -17,9 +17,7 @@ Display a preview of the DataFrame showing rows from top and bottom.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `dataframe_id: string`  
 required

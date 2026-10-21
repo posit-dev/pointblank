@@ -1,10 +1,10 @@
 # Comparison.get_tabular_report()
 
-
 Get a tabular report of the comparison.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1473-L1511)
 
 ``` python
 Comparison.get_tabular_report(
@@ -15,14 +15,11 @@ Comparison.get_tabular_report(
 )
 ```
 
-
 The report has a header with the verdict, the row status counts, and the comparison settings, followed by sections (as row groups) for schema differences, per-column mismatches, and samples of changed, missing, extra, and duplicate-key rows. Sections with nothing to show are omitted.
-
 
 ## Parameters
 
-
-`limit: int = ``10`  
+`limit: int = 10`  
 The maximum number of sample rows shown per row status.
 
 `title: str | None = None`  
@@ -34,9 +31,7 @@ The language of the report's labels, as a two-letter language code (e.g., `"fr"`
 `locale: str | None = None`  
 The locale used to format counts and percentages (e.g., the thousands separator). By default, it's the same as `lang=`.
 
-
 ## Returns
-
 
 `GT`  
 A Great Tables object.

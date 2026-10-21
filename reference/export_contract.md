@@ -1,10 +1,10 @@
 # export_contract()
 
-
 Export a Pointblank validation or contract to an external format.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L71-L116)
 
 ``` python
 export_contract(
@@ -16,12 +16,10 @@ export_contract(
 )
 ```
 
-
 ## Parameters
 
-
 `validation_or_contract: Any`  
-A [Validate](Validate.md#pointblank.Validate) or [Contract](Contract.md#pointblank.Contract) object to export.
+A [Validate](../reference/Validate.md#pointblank.Validate) or [Contract](../reference/Contract.md#pointblank.Contract) object to export.
 
 `destination: str | None = None`  
 Optional file path to write the output. If None, the result is returned without writing to disk.
@@ -32,20 +30,15 @@ The target format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, 
 `**kwargs: Any`  
 Format-specific options passed to the adapter.
 
-
 ## Returns
-
 
 `str | dict`  
 The exported content.
 
-
 ## Raises
-
 
 `ValueError`  
 If no adapter is registered for the format, or the adapter doesn't support export.
-
 
 ## Examples
 

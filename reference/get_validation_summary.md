@@ -1,25 +1,21 @@
 # get_validation_summary()
 
-
 Access validation summary information when authoring final actions.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L289-L404)
 
 ``` python
 get_validation_summary()
 ```
 
-
-This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> class.
-
+This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) class.
 
 ## Returns
 
-
 `dict | None`  
 A dictionary containing validation metrics. If called outside of an final action context, this function will return `None`.
-
 
 ## Description Of The Summary Fields
 
@@ -52,7 +48,6 @@ The summary dictionary contains the following fields:
 
 Note that the summary dictionary is only available within the context of a final action. If called outside of a final action (i.e., when no final action is being executed), this function will return `None`.
 
-
 ## Examples
 
 Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here's an example of a final action function (`send_report()`) that sends an alert when critical validation failures are detected:
@@ -81,7 +76,7 @@ validation = (
 
 Note that `send_alert_email()` in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.
 
-The [get_validation_summary()](get_validation_summary.md#pointblank.get_validation_summary) function can also be used to create custom reporting for validation results:
+The [get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary) function can also be used to create custom reporting for validation results:
 
 ``` python
 def log_validation_results():
@@ -102,9 +97,8 @@ def log_validation_results():
 
 Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.
 
-
 ## See Also
 
-`Have` a look at <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> for more information on how to create  
+`Have` a look at [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) for more information on how to create  
 
-`custom` actions that are executed after all validation steps have been completed.
+`custom` actions that are executed after all validation steps have been completed.  

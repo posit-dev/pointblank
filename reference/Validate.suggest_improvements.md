@@ -1,10 +1,10 @@
 # Validate.suggest_improvements()
 
-
 Propose AI-generated improvements to this validation plan.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19576-L19634)
 
 ``` python
 Validate.suggest_improvements(
@@ -15,12 +15,9 @@ Validate.suggest_improvements(
 )
 ```
 
-
-This is a thin, convenience wrapper over <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a>: it profiles the table with <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a>, derives an instruction that targets gaps in the current plan (columns with no coverage, missing thresholds), and asks the model to extend the plan accordingly. As with [EditValidation](EditValidation.md#pointblank.EditValidation), you review the proposed change as a diff and explicitly accept it.
-
+This is a thin, convenience wrapper over [`EditValidation`](../reference/EditValidation.md#pointblank.EditValidation): it profiles the table with [`DataScan`](../reference/DataScan.md#pointblank.DataScan), derives an instruction that targets gaps in the current plan (columns with no coverage, missing thresholds), and asks the model to extend the plan accordingly. As with [EditValidation](../reference/EditValidation.md#pointblank.EditValidation), you review the proposed change as a diff and explicitly accept it.
 
 ## Parameters
-
 
 `model: str`  
 The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`).
@@ -28,19 +25,16 @@ The model to use, in `provider:model` form (e.g., `"anthropic:claude-opus-4-8"`)
 `api_key: str | None = None`  
 The API key for the model provider.
 
-`verify_ssl: bool = ``True`  
+`verify_ssl: bool = True`  
 Whether to verify SSL certificates for provider requests. Defaults to `True`.
 
-`max_reprompts: int = ``1`  
+`max_reprompts: int = 1`  
 Maximum automatic re-prompts if the returned plan fails the syntax check.
-
 
 ## Returns
 
-
 `EditValidation`  
-An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> with the proposed improvements, ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
-
+An [`EditValidation`](../reference/EditValidation.md#pointblank.EditValidation) with the proposed improvements, ready to inspect via `.diff()`/`.changed_steps()` and finalize via `.accept()`.
 
 ## Examples
 

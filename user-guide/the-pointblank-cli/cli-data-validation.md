@@ -8,8 +8,7 @@ The `pb validate` command lets you perform common validation checks directly on 
 
 For more complex validation logic, the `pb run` command serves as a runner for validation scripts written with the Pointblank Python API, allowing you to execute custom validation workflows from the command line.
 
-
-# `pb validate`: Quick, One-Line Data Checks
+## `pb validate`: Quick, One-Line Data Checks
 
 The `pb validate` command is your go-to for running common validation checks directly on your data source. It's great for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the `--check` option, making your intent clear and your validation explicit.
 
@@ -21,8 +20,7 @@ pb validate worldcities.csv --check <check-name> [other options]
 
 You always provide the data source first, then specify one or more checks with `--check`. Each check can have its own options, such as `--column` or `--value`, depending on what you want to validate.
 
-
-## Checking for Duplicate and Complete Rows
+### Checking for Duplicate and Complete Rows
 
 To check for duplicate rows, use the `rows-distinct` check:
 
@@ -30,7 +28,7 @@ To check for duplicate rows, use the `rows-distinct` check:
 pb validate worldcities.csv --check rows-distinct
 ```
 
-<img src="../../assets/pb-validate-rows-distinct-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-rows-distinct-worldcities-csv.png)
 
 The output shows you whether your data contains any duplicate rows, how many rows were checked, and if any duplicates were found. The color-coding of the results helps you quickly interpret the results, using green for pass and red for fail. Here, no duplicate rows were detected out of the 41K rows checked.
 
@@ -40,12 +38,11 @@ To check that every row is complete (i.e., no missing values in any column), use
 pb validate worldcities.csv --check rows-complete
 ```
 
-<img src="../../assets/pb-validate-rows-complete-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-rows-complete-worldcities-csv.png)
 
 With this check we see that the `worldcities.csv` dataset has 739 rows containing at least one Null/missing value. And with any dataset, it's easy to quickly spot if there are any rows with missing data using this command.
 
-
-## Checking for Nulls and Value Ranges
+### Checking for Nulls and Value Ranges
 
 You can easily check for missing values in a column, or ensure that values fall within a certain range. Here's how to check that all values in the `population` column are not null:
 
@@ -53,7 +50,7 @@ You can easily check for missing values in a column, or ensure that values fall 
 pb validate worldcities.csv --check col-vals-not-null --column city_name
 ```
 
-<img src="../../assets/pb-validate-worldcities-not-null-city_name.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-worldcities-not-null-city_name.png)
 
 Perhaps surprisingly, we find that one row has a missing city name.
 
@@ -63,12 +60,11 @@ Let's now check whether all values in the `population` column are greater than z
 pb validate worldcities.csv --check col-vals-gt --column population --value 0
 ```
 
-<img src="../../assets/pb-validate-worldcities-gt-0-population.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-worldcities-gt-0-population.png)
 
 With that we find that there are 741 rows where the `population` value is not greater than 0 (note that this check also fails when cells are null or missing).
 
-
-## Multiple Checks in One Command
+### Multiple Checks in One Command
 
 You can chain several checks together in a single command. This is handy for comprehensive data quality checks:
 
@@ -76,12 +72,11 @@ You can chain several checks together in a single command. This is handy for com
 pb validate worldcities.csv --check rows-distinct --check col-vals-not-null --column city_name --check col-vals-gt --column population --value 0
 ```
 
-<img src="../../assets/pb-validate-multi-check.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-multi-check.png)
 
 Each check is shown one after the other in the terminal output, so you can review the result of each validation step individually as the command proceeds.
 
-
-## Seeing and Saving Failing Rows
+### Seeing and Saving Failing Rows
 
 If a check fails, you might want to see which rows caused the failure. Use the `--show-extract` option to display failing rows right in the terminal:
 
@@ -89,7 +84,7 @@ If a check fails, you might want to see which rows caused the failure. Use the `
 pb validate worldcities.csv --check rows-complete --show-extract
 ```
 
-<img src="../../assets/pb-validate-show-extract.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-show-extract.png)
 
 Or, save the failing rows to a CSV file for further investigation:
 
@@ -97,12 +92,11 @@ Or, save the failing rows to a CSV file for further investigation:
 pb validate worldcities.csv --check rows-complete --show-extract --write-extract incomplete_failing_rows
 ```
 
-<img src="../../assets/pb-validate-write-extract.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-write-extract.png)
 
 Note here in the output the additional lines stating that failing rows were saved to a folder (`incomplete_failing_rows`) and, within that folder the `step_01_rows_complete.csv` file was written. Using a folder for extracts is necessary in practice since there may be multiple validations defined in a `pb validate` command.
 
-
-## Advanced Options and CI/CD Integration
+### Advanced Options and CI/CD Integration
 
 - use `--exit-code` to make the command exit with a non-zero code if any check fails; useful for CI/CD pipelines
 - use `--limit` to control how many failing rows are shown or saved
@@ -112,10 +106,9 @@ Note here in the output the additional lines stating that failing rows were save
 pb validate worldcities.csv --check col-vals-not-null --column city_name --exit-code
 ```
 
-<img src="../../assets/pb-validate-exit-code.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-validate-exit-code.png)
 
-
-# `pb run`: Custom Validation Workflows with Python
+## `pb run`: Custom Validation Workflows with Python
 
 For more complex validation logic, use the `pb run` command. This lets you execute a Python script containing Pointblank validation steps, combining the flexibility of the Python API with the convenience of the CLI.
 
@@ -125,7 +118,7 @@ You can always scaffold a template script using the `pb make-template` command:
 pb make-template my_validation.py
 ```
 
-<img src="../../assets/pb-make-template.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-make-template.png)
 
 But for our example, we'll elect to make our own `worldcities_validation.py` file from scratch. It will:
 
@@ -172,12 +165,11 @@ Now, we'll run the .py script from the terminal:
 pb run worldcities_validation.py
 ```
 
-<img src="../../assets/pb-run-worldcities_validation.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-run-worldcities_validation.png)
 
 You'll see a summary table that lists all of the steps and their results and you can include as many steps and as much logic as you need.
 
-
-## Output Options
+### Output Options
 
 You could save the validation report as HTML or JSON (or both) for the purposes of sharing or for automation:
 
@@ -185,7 +177,7 @@ You could save the validation report as HTML or JSON (or both) for the purposes 
 pb run worldcities_validation.py --output-html report.html --output-json report.json
 ```
 
-<img src="../../assets/pb-run-worldcities_validation-output.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-run-worldcities_validation-output.png)
 
 There are also the options to produce extracts (subset of failing rows) with `--show-extract` or `--write-extract` (just like with `pb validate`). Let's do both in the following example:
 
@@ -193,12 +185,11 @@ There are also the options to produce extracts (subset of failing rows) with `--
 pb run worldcities_validation.py --show-extract --write-extract worldcities_failures
 ```
 
-<img src="../../assets/pb-run-worldcities_validation-extracts.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-run-worldcities_validation-extracts.png)
 
 This shows a preview of each extract for those validation steps where extracts were produced (steps 2, 3, and 4). Individual CSV files with extracted rows for those steps were written to the `worldcities_failures` directory.
 
-
-## Controlling Failure Behavior
+### Controlling Failure Behavior
 
 It's possible to use the `--fail-on` option to control when the command should exit with an error, based on the severity of validation failures. This is especially useful for automated workflows and CI/CD pipelines.
 
@@ -208,7 +199,7 @@ Let's try that with our `worldcities_validation.py` validation, which we've seen
 pb run worldcities_validation.py --fail-on warning
 ```
 
-<img src="../../assets/pb-run-worldcities_validation-fail-on-warning.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-run-worldcities_validation-fail-on-warning.png)
 
 Notice the final line states `Exiting with error due to warning, error, or critical validation failures`. Because we applied `--fail-on warning`, any presence of \`warning' (or higher levels such as 'error' or 'critical') will yield a non-zero exit code that should stop a pipeline process. We can prove this by running the following lines in the terminal
 
@@ -219,7 +210,6 @@ echo $?
 
 which returns `1`.
 
-
-# Wrapping Up
+## Wrapping Up
 
 Pointblank's CLI gives you powerful tools for validating your data, whether you need a quick check or a custom workflow. Use `pb validate` for fast, one-liner checks and `pb run` for more advanced, scriptable validation logic. With clear output and flexible options, you can catch data issues early and keep your workflows running smoothly.

@@ -1,10 +1,10 @@
 # validate_adam_structure()
 
-
 Validate structural conformance of a dataset against an ADaM template.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L799-L880)
 
 ``` python
 validate_adam_structure(
@@ -14,9 +14,7 @@ validate_adam_structure(
 )
 ```
 
-
 ## Parameters
-
 
 `data: Any`  
 A DataFrame (pandas, polars) to check.
@@ -24,12 +22,10 @@ A DataFrame (pandas, polars) to check.
 `dataset: str`  
 ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
 
-`strict: bool = ``False`  
+`strict: bool = False`  
 If True, also reports missing conditional variables and unknown variables.
 
-
 ## Returns
-
 
 `dict`  
 Validation results with keys:

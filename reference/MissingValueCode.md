@@ -1,10 +1,10 @@
 # MissingValueCode
 
-
 A structured missing value definition from an external standard.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L115-L137)
 
 ``` python
 MissingValueCode(
@@ -15,12 +15,9 @@ MissingValueCode(
 )
 ```
 
-
 In SPSS, SAS, and clinical data, missing values carry meaning (`REFUSED`, `NOT_APPLICABLE`, `NOT_ASKED`, etc.).
 
-
 ## Parameters
-
 
 `value: Any`  
 The sentinel value (e.g., `-99`, `".A"`, `""`).

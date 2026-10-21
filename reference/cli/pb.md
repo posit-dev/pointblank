@@ -1,13 +1,10 @@
 # pb
 
-
 Pointblank CLI: Data validation and quality tools for data engineers.
-
 
 ``` bash
 pb [OPTIONS] COMMAND [ARGS]...
 ```
-
 
 Use this CLI to validate data quality, explore datasets, and generate comprehensive reports for CSV, Parquet, and database sources. Suitable for data pipelines, ETL validation, and exploratory data analysis from the command line.
 
@@ -17,9 +14,7 @@ pb preview data.csv Preview your data pb scan data.csv Generate data profile pb 
 
 Use pb COMMAND -help for detailed help on any command.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb [OPTIONS] COMMAND [ARGS]...
 
@@ -56,49 +51,45 @@ Use pb COMMAND -help for detailed help on any command.
       requirements   Check installed dependencies and their availability.
       edit           Edit an existing validation plan with a natural-language...
 
-
 ## Options
-
 
 `-v, --version`  
 Show the version and exit.
 
-
 ## Commands
 
-
 `info`  
-[Display information about a data source.](../../reference/cli/info.md)
+[Display information about a data source.](info.md)
 
 `preview`  
-[Preview a data table showing head and tail rows.](../../reference/cli/preview.md)
+[Preview a data table showing head and tail rows.](preview.md)
 
 `scan`  
-[Generate a data scan profile report.](../../reference/cli/scan.md)
+[Generate a data scan profile report.](scan.md)
 
 `missing`  
-[Generate a missing values report for a data table.](../../reference/cli/missing.md)
+[Generate a missing values report for a data table.](missing.md)
 
 `validate`  
-[Perform single or multiple data validations.](../../reference/cli/validate.md)
+[Perform single or multiple data validations.](validate.md)
 
 `compare`  
-[Compare two tables row by row.](../../reference/cli/compare.md)
+[Compare two tables row by row.](compare.md)
 
 `datasets`  
-[List available built-in datasets.](../../reference/cli/datasets.md)
+[List available built-in datasets.](datasets.md)
 
 `requirements`  
-[Check installed dependencies and their availability.](../../reference/cli/requirements.md)
+[Check installed dependencies and their availability.](requirements.md)
 
 `make-template`  
-[Create a validation script or YAML configuration template.](../../reference/cli/make_template.md)
+[Create a validation script or YAML configuration template.](make_template.md)
 
 `run`  
-[Run a Pointblank validation script or YAML configuration.](../../reference/cli/run.md)
+[Run a Pointblank validation script or YAML configuration.](run.md)
 
 `edit`  
-[Edit an existing validation plan with a natural-language instruction (AI Validation Editor).](../../reference/cli/edit.md)
+[Edit an existing validation plan with a natural-language instruction (AI Validation Editor).](edit.md)
 
 `pl`  
-[Execute Polars expressions and display results.](../../reference/cli/pl.md)
+[Execute Polars expressions and display results.](pl.md)

@@ -1,19 +1,14 @@
 # pb edit
 
-
 Edit an existing validation plan with a natural-language instruction (AI Validation Editor).
-
 
 ``` bash
 pb edit [OPTIONS] [VALIDATION_FILE]
 ```
 
-
 VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validation plan. The instruction is sent, along with the current plan, to the specified model; the proposed change is shown as a diff for review and can optionally be written to a file.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb edit [OPTIONS] [VALIDATION_FILE]
 
@@ -43,16 +38,12 @@ VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validat
                               confirmation.
       --help                  Show this message and exit.
 
-
 ## Arguments
-
 
 `VALIDATION_FILE: PATH`  
 Optional.
 
-
 ## Options
-
 
 `-i, --instruction: TEXT`  
 Plain-English description of the change to make to the plan.
@@ -68,7 +59,6 @@ Write the revised plan to this file.
 
 `-y, --yes`  
 Write the output file without asking for confirmation.
-
 
 ## Examples
 

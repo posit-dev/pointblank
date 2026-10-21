@@ -1,10 +1,10 @@
 # Validate.get_json_report()
 
-
 Get a report of the validation results as a JSON-formatted string.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20061-L20233)
 
 ``` python
 Validate.get_json_report(
@@ -13,14 +13,11 @@ Validate.get_json_report(
 )
 ```
 
-
-The [get_json_report()](Validate.get_json_report.md#pointblank.Validate.get_json_report) method provides a machine-readable report of validation results in JSON format. This is particularly useful for programmatic processing, storing validation results, or integrating with other systems. The report includes detailed information about each validation step, such as assertion type, columns validated, threshold values, test results, and more.
+The [get_json_report()](../reference/Validate.get_json_report.md#pointblank.Validate.get_json_report) method provides a machine-readable report of validation results in JSON format. This is particularly useful for programmatic processing, storing validation results, or integrating with other systems. The report includes detailed information about each validation step, such as assertion type, columns validated, threshold values, test results, and more.
 
 By default, all available validation information fields are included in the report. However, you can customize the fields to include or exclude using the `use_fields=` and `exclude_fields=` parameters.
 
-
 ## Parameters
-
 
 `use_fields: list[str] | None = None`  
 An optional list of specific fields to include in the report. If provided, only these fields will be included in the JSON output. If `None` (the default), all standard validation report fields are included. Have a look at the *Available Report Fields* section below for a list of fields that can be included in the report.
@@ -28,13 +25,10 @@ An optional list of specific fields to include in the report. If provided, only 
 `exclude_fields: list[str] | None = None`  
 An optional list of fields to exclude from the report. If provided, these fields will be omitted from the JSON output. If `None` (the default), no fields are excluded. This parameter cannot be used together with `use_fields=`. The *Available Report Fields* provides a listing of fields that can be excluded from the report.
 
-
 ## Returns
-
 
 `str`  
 A JSON-formatted string representing the validation report, with each validation step as an object in the report array.
-
 
 ## Available Report Fields
 
@@ -44,7 +38,7 @@ The JSON report can include any of the standard validation report fields, includ
 - `i_o`: the original step index from the validation plan (pre-expansion)
 - `assertion_type`: the type of validation assertion (e.g., `"col_vals_gt"`, etc.)
 - `column`: the column being validated (or columns used in certain validations)
-- [values](MetadataPackage.md#pointblank.MetadataPackage.values): the comparison values or parameters used in the validation
+- [values](../reference/MetadataPackage.md#pointblank.MetadataPackage.values): the comparison values or parameters used in the validation
 - `inclusive`: whether the comparison is inclusive (for range-based validations)
 - `na_pass`: whether `NA`/`Null` values are considered passing (for certain validations)
 - `pre`: preprocessing function applied before validation
@@ -56,16 +50,14 @@ The JSON report can include any of the standard validation report fields, includ
 - `all_passed`: whether all test units passed in the step
 - `n`: total number of test units
 - `n_passed`, `n_failed`: number of test units that passed and failed
-- [f_passed](Validate.f_passed.md#pointblank.Validate.f_passed), [f_failed](Validate.f_failed.md#pointblank.Validate.f_failed): Fraction of test units that passed and failed
-- [warning](Validate.warning.md#pointblank.Validate.warning), [error](Validate.error.md#pointblank.Validate.error), [critical](Validate.critical.md#pointblank.Validate.critical): whether the namesake threshold level was exceeded (is `null` if threshold not set)
+- [f_passed](../reference/Validate.f_passed.md#pointblank.Validate.f_passed), [f_failed](../reference/Validate.f_failed.md#pointblank.Validate.f_failed): Fraction of test units that passed and failed
+- [warning](../reference/Validate.warning.md#pointblank.Validate.warning), [error](../reference/Validate.error.md#pointblank.Validate.error), [critical](../reference/Validate.critical.md#pointblank.Validate.critical): whether the namesake threshold level was exceeded (is `null` if threshold not set)
 - `time_processed`: when the validation step was processed (ISO 8601 format)
 - `proc_duration_s`: the processing duration in seconds
-
 
 ## Examples
 
 Let's create a validation plan with a few validation steps and generate a JSON report of the results:
-
 
 ``` python
 import pointblank as pb
@@ -90,7 +82,6 @@ json_report = validation.get_json_report()
 
 print(json_report)
 ```
-
 
     [
         {
@@ -117,8 +108,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-18T23:28:10.335+00:00",
-            "proc_duration_s": 0.006468
+            "time_processed": "2026-10-21T17:28:20.151+00:00",
+            "proc_duration_s": 0.007679
         },
         {
             "i": 2,
@@ -144,14 +135,12 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-18T23:28:10.337+00:00",
-            "proc_duration_s": 0.00231
+            "time_processed": "2026-10-21T17:28:20.154+00:00",
+            "proc_duration_s": 0.003043
         }
     ]
 
-
 You can also customize which fields to include:
-
 
 ``` python
 json_report = validation.get_json_report(
@@ -160,7 +149,6 @@ json_report = validation.get_json_report(
 
 print(json_report)
 ```
-
 
     [
         {
@@ -179,9 +167,7 @@ print(json_report)
         }
     ]
 
-
 Or which fields to exclude:
-
 
 ``` python
 json_report = validation.get_json_report(
@@ -195,7 +181,6 @@ json_report = validation.get_json_report(
 print(json_report)
 ```
 
-
     [
         {
             "i": 1,
@@ -229,9 +214,7 @@ print(json_report)
         }
     ]
 
-
 The JSON output can be further processed or analyzed programmatically:
-
 
 ``` python
 import json
@@ -244,19 +227,17 @@ failing_steps = [step for step in report_data if step["n_failed"] > 0]
 print(f"Number of failing validation steps: {len(failing_steps)}")
 ```
 
-
     Number of failing validation steps: 2
-
 
 ## See Also
 
-- <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>
+- [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report)
 
 : Get a formatted HTML
 
 `report` as a GT table  
 
-\- <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>  
+\- [`get_data_extracts()`](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)  
 Get rows that
 
-`failed` validation
+`failed` validation  

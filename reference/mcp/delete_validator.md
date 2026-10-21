@@ -1,8 +1,8 @@
 # delete_validator
 
+# delete_validator
 
 Remove a validator from the server context.
-
 
 ``` json
 {
@@ -13,9 +13,7 @@ Remove a validator from the server context.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `validator_id: string`  
 ID of the validator to delete. required

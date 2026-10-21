@@ -1,10 +1,10 @@
 # EditValidation
 
-
 Edit an existing validation plan with a plain-English instruction using an LLM.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L101-L517)
 
 ``` python
 EditValidation(
@@ -18,21 +18,18 @@ EditValidation(
 )
 ```
 
+While [`DraftValidation`](../reference/DraftValidation.md#pointblank.DraftValidation) generates a validation plan from scratch by profiling a table, [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) takes an *existing* plan plus a natural-language instruction (e.g., "add a freshness check on `updated_at`, tighten the email regex, and drop the `price > 0` check") and produces a revised plan. You review the change as a diff and explicitly [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept) it before anything runs, keeping a human in control.
 
-While <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, [EditValidation](EditValidation.md#pointblank.EditValidation) takes an *existing* plan plus a natural-language instruction (e.g., "add a freshness check on `updated_at`, tighten the email regex, and drop the `price > 0` check") and produces a revised plan. You review the change as a diff and explicitly <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.
+[EditValidation](../reference/EditValidation.md#pointblank.EditValidation) reuses the same provider abstraction as [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) (via the `chatlas` package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"` providers. Install the optional requirements with `pip install pointblank[generate]`.
 
-[EditValidation](EditValidation.md#pointblank.EditValidation) reuses the same provider abstraction as [DraftValidation](DraftValidation.md#pointblank.DraftValidation) (via the `chatlas` package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"` providers. Install the optional requirements with `pip install pointblank[generate]`.
-
-> **Warning: Warning**
+> **Warning**
 >
-> The [EditValidation](EditValidation.md#pointblank.EditValidation) class is experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
-
+> The [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) class is experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 ## Parameters
 
-
 `validation: Any`  
-The existing validation plan to edit. This can be a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a Python code string (such as the output of <a href="../reference/Validate.to_code.html#pointblank.Validate.to_code" class="gdls-link"><code>Validate.to_code()</code></a>), a YAML configuration string, or a path to a `.py` or `.yaml`/`.yml` file. All inputs are normalized to Pointblank code before being sent to the model.
+The existing validation plan to edit. This can be a [`Validate`](../reference/Validate.md#pointblank.Validate) object, a Python code string (such as the output of [`Validate.to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code)), a YAML configuration string, or a path to a `.py` or `.yaml`/`.yml` file. All inputs are normalized to Pointblank code before being sent to the model.
 
 `instruction: str`  
 A plain-English description of the changes to make to the plan.
@@ -41,29 +38,25 @@ A plain-English description of the changes to make to the plan.
 The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`.
 
 `data: Any = None`  
-Optional data table. When provided, a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link"><code>DataScan</code></a> summary of the table is included in the prompt so the model can make *informed* edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> via <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
+Optional data table. When provided, a [`DataScan`](../reference/DataScan.md#pointblank.DataScan) summary of the table is included in the prompt so the model can make *informed* edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a [`Validate`](../reference/Validate.md#pointblank.Validate) via [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept).
 
 `api_key: str | None = None`  
 The API key to be used for the model.
 
-`verify_ssl: bool = ``True`  
+`verify_ssl: bool = True`  
 Whether to verify SSL certificates when making requests to the LLM provider. Defaults to `True`. Use with caution as disabling SSL verification can pose security risks.
 
-`max_reprompts: int = ``1`  
+`max_reprompts: int = 1`  
 The maximum number of times to automatically re-prompt the model when the returned code fails the syntax/lint check, before surfacing the result to the user. Defaults to `1`.
-
 
 ## Returns
 
-
 `EditValidation`  
-An [EditValidation](EditValidation.md#pointblank.EditValidation) object exposing the revised plan through <a href="../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
-
+An [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) object exposing the revised plan through [`to_code()`](../reference/EditValidation.md#pointblank.EditValidation.to_code), [`diff()`](../reference/EditValidation.md#pointblank.EditValidation.diff), [`changed_steps()`](../reference/EditValidation.md#pointblank.EditValidation.changed_steps), and [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept).
 
 ## Notes On Data Sent To The Model Provider
 
-As with [DraftValidation](DraftValidation.md#pointblank.DraftValidation), only a JSON summary of the table (generated by [DataScan](DataScan.md#pointblank.DataScan)) is ever sent to the model, never the underlying rows. If `data=` is omitted, no table information is sent at all; the model edits the plan using only the plan code and your instruction.
-
+As with [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation), only a JSON summary of the table (generated by [DataScan](../reference/DataScan.md#pointblank.DataScan)) is ever sent to the model, never the underlying rows. If `data=` is omitted, no table information is sent at all; the model edits the plan using only the plan code and your instruction.
 
 ## Examples
 
@@ -89,104 +82,80 @@ print(edited.diff())        # review the change
 plan = edited.accept()      # a Validate you can .interrogate()
 ```
 
-
 ## Methods
 
 | Name | Description |
 |----|----|
-| [accept()](#accept) | Execute the revised plan and return the resulting [Validate](Validate.md#pointblank.Validate) object. |
+| [accept()](#accept) | Execute the revised plan and return the resulting [Validate](../reference/Validate.md#pointblank.Validate) object. |
 | [changed_steps()](#changed_steps) | Return a structured, step-level list of the changes between the plans. |
 | [diff()](#diff) | Return a unified textual diff of the original plan versus the revised plan. |
-| [from_plans()](#from_plans) | Build an [EditValidation](EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model. |
+| [from_plans()](#from_plans) | Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model. |
 | [review()](#review) | Return a `great_tables` GT object summarizing the step-level changes. |
 | [to_code()](#to_code) | Return the revised validation plan as Python code. |
 | [validate_syntax()](#validate_syntax) | Return whether the revised plan parses and uses only known validation methods. |
 
-------------------------------------------------------------------------
-
-
 ### accept()
 
-
-Execute the revised plan and return the resulting [Validate](Validate.md#pointblank.Validate) object.
-
+Execute the revised plan and return the resulting [Validate](../reference/Validate.md#pointblank.Validate) object.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L457-L511)
 
 ``` python
 accept(data=None)
 ```
 
-
-The returned [Validate](Validate.md#pointblank.Validate) has NOT been interrogated; call `.interrogate()` on it to run the validation.
-
+The returned [Validate](../reference/Validate.md#pointblank.Validate) has NOT been interrogated; call `.interrogate()` on it to run the validation.
 
 #### Parameters
 
-
 `data: Any = None`  
-The data table to bind to the plan's `your_data` placeholder. If omitted, the `data=` provided to [EditValidation](EditValidation.md#pointblank.EditValidation) is used. One of the two must be present.
-
+The data table to bind to the plan's `your_data` placeholder. If omitted, the `data=` provided to [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) is used. One of the two must be present.
 
 #### Returns
 
-
 `Validate`  
-The revised validation plan as a [Validate](Validate.md#pointblank.Validate) object.
-
-
-------------------------------------------------------------------------
-
+The revised validation plan as a [Validate](../reference/Validate.md#pointblank.Validate) object.
 
 ### changed_steps()
 
-
 Return a structured, step-level list of the changes between the plans.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L386-L404)
 
 ``` python
 changed_steps()
 ```
 
-
-Unlike <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
-
+Unlike [`diff()`](../reference/EditValidation.md#pointblank.EditValidation.diff), which is a textual diff sensitive to formatting, this compares the two plans at the level of validation steps and is robust to reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
 
 #### Returns
-
 
 `list[dict]`  
 One record per changed step, e.g. `[{"action": "modify", "method": "col_vals_gt", "old": "col_vals_gt(columns="d", " "value=100)", "new": "col_vals_gt(columns="d", value=50)"}]`.
 
-
-------------------------------------------------------------------------
-
-
 ### diff()
-
 
 Return a unified textual diff of the original plan versus the revised plan.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L369-L384)
 
 ``` python
 diff()
 ```
 
-
-------------------------------------------------------------------------
-
-
 ### from_plans()
 
-
-Build an [EditValidation](EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model.
-
+Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L296-L358)
 
 ``` python
 from_plans(
@@ -196,29 +165,23 @@ from_plans(
 )
 ```
 
-
-This is a lightweight way to compare an original plan against a revised one and review the difference with <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>. It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.
-
+This is a lightweight way to compare an original plan against a revised one and review the difference with [`diff()`](../reference/EditValidation.md#pointblank.EditValidation.diff), [`changed_steps()`](../reference/EditValidation.md#pointblank.EditValidation.changed_steps), and [`review()`](../reference/EditValidation.md#pointblank.EditValidation.review). It is useful for reviewing the change between two saved versions of a plan (for example, in code review) and does not require an LLM provider or any API key.
 
 #### Parameters
 
-
 `original: Any`  
-The original plan. Accepts anything the `validation=` argument accepts: a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, a code string, a YAML string, or a file path.
+The original plan. Accepts anything the `validation=` argument accepts: a [`Validate`](../reference/Validate.md#pointblank.Validate) object, a code string, a YAML string, or a file path.
 
 `revised: Any`  
 The revised plan, in any of the same forms as `original`.
 
-`instruction: str = ``"Manual plan comparison"`  
-An optional label describing the comparison (shown as the subtitle in <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>).
-
+`instruction: str = "Manual plan comparison"`  
+An optional label describing the comparison (shown as the subtitle in [`review()`](../reference/EditValidation.md#pointblank.EditValidation.review)).
 
 #### Returns
 
-
 `EditValidation`  
-An [EditValidation](EditValidation.md#pointblank.EditValidation) whose `original`/`revised` plans are the ones supplied, ready for <a href="../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a>, <a href="../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a>, and <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>.
-
+An [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) whose `original`/`revised` plans are the ones supplied, ready for [`diff()`](../reference/EditValidation.md#pointblank.EditValidation.diff), [`changed_steps()`](../reference/EditValidation.md#pointblank.EditValidation.changed_steps), [`review()`](../reference/EditValidation.md#pointblank.EditValidation.review), and [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept).
 
 #### Examples
 
@@ -232,58 +195,44 @@ comparison = pb.EditValidation.from_plans(v1, v2)
 print(comparison.diff())
 ```
 
-------------------------------------------------------------------------
-
-
 ### review()
-
 
 Return a `great_tables` GT object summarizing the step-level changes.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L406-L455)
 
 ``` python
 review()
 ```
 
-
-This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a>: review the change, then accept it.
-
+This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept): review the change, then accept it.
 
 #### Returns
-
 
 `GT`  
 A `great_tables` table with one row per changed step.
 
-
-------------------------------------------------------------------------
-
-
 ### to_code()
-
 
 Return the revised validation plan as Python code.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L360-L362)
 
 ``` python
 to_code()
 ```
 
-
-------------------------------------------------------------------------
-
-
 ### validate_syntax()
-
 
 Return whether the revised plan parses and uses only known validation methods.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L364-L367)
 
 ``` python
 validate_syntax()

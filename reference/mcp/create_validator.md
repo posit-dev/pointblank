@@ -1,8 +1,8 @@
 # create_validator
 
+# create_validator
 
 Create a Pointblank Validator for a previously loaded DataFrame.
-
 
 ``` json
 {
@@ -20,9 +20,7 @@ Create a Pointblank Validator for a previously loaded DataFrame.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `df_id: string`  
 ID of the DataFrame to validate. required

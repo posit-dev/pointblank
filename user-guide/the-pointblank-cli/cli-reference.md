@@ -2,10 +2,9 @@
 
 This page provides a complete reference for all Pointblank CLI commands. Each section shows the full help text as it appears in the terminal, giving you quick access to all available options and examples.
 
-For practical usage examples and workflows, see the [CLI Data Validation](../../user-guide/the-pointblank-cli/cli-data-validation.md) and [CLI Data Inspection](../../user-guide/the-pointblank-cli/cli-data-inspection.md) guides.
+For practical usage examples and workflows, see the [CLI Data Validation](cli-data-validation.md) and [CLI Data Inspection](cli-data-inspection.md) guides.
 
-
-# `pb` - Main Command
+## `pb` - Main Command
 
 The main entry point for all Pointblank CLI operations:
 
@@ -42,8 +41,7 @@ The main entry point for all Pointblank CLI operations:
 >       datasets       List available built-in datasets.
 >       requirements   Check installed dependencies and their availability.
 
-
-# `pb info` - Data Source Information
+## `pb info` - Data Source Information
 
 Display basic information about a data source:
 
@@ -64,8 +62,7 @@ Display basic information about a data source:
 >     Options:
 >       --help  Show this message and exit.
 
-
-# `pb preview` - Data Table Preview
+## `pb preview` - Data Table Preview
 
 Preview data showing head and tail rows:
 
@@ -111,8 +108,7 @@ Preview data showing head and tail rows:
 >       --output-html PATH         Save HTML output to file
 >       --help                     Show this message and exit.
 
-
-# `pb scan` - Data Profile Reports
+## `pb scan` - Data Profile Reports
 
 Generate comprehensive data profiles:
 
@@ -141,8 +137,7 @@ Generate comprehensive data profiles:
 >       -c, --columns TEXT  Comma-separated list of columns to scan
 >       --help              Show this message and exit.
 
-
-# `pb missing` - Missing Values Reports
+## `pb missing` - Missing Values Reports
 
 Generate reports focused on missing values:
 
@@ -163,8 +158,7 @@ Generate reports focused on missing values:
 >       --output-html PATH  Save HTML output to file
 >       --help              Show this message and exit.
 
-
-# `pb validate` - Quick Data Validations
+## `pb validate` - Quick Data Validations
 
 Perform single or multiple data validations:
 
@@ -242,8 +236,7 @@ Perform single or multiple data validations:
 >       --exit-code           Exit with non-zero code if validation fails
 >       --help                Show this message and exit.
 
-
-# `pb run` - Validation Scripts and YAML
+## `pb run` - Validation Scripts and YAML
 
 Run Python validation scripts or YAML configurations:
 
@@ -297,8 +290,7 @@ Run Python validation scripts or YAML configurations:
 >                                       reaches this threshold level
 >       --help                          Show this message and exit.
 
-
-# `pb compare` - Table Comparison
+## `pb compare` - Table Comparison
 
 Compare two tables row by row: rows missing from or extra in the target, rows whose values changed, duplicated keys, and schema differences. File inputs are scanned lazily. For very large files, `--engine duckdb --partitions N` keeps memory use low (about 0.8 GB for two 10-million-row CSV files with 8 partitions):
 
@@ -361,8 +353,7 @@ Compare two tables row by row: rows missing from or extra in the target, rows wh
 >                                     [default: exit-code]
 >       --help                        Show this message and exit.
 
-
-# `pb make-template` - Template Generation
+## `pb make-template` - Template Generation
 
 Create validation script or YAML configuration templates:
 
@@ -389,8 +380,7 @@ Create validation script or YAML configuration templates:
 >     Options:
 >       --help  Show this message and exit.
 
-
-# `pb pl` - Polars Expression Execution
+## `pb pl` - Polars Expression Execution
 
 Execute Polars expressions and display results:
 
@@ -455,8 +445,7 @@ Execute Polars expressions and display results:
 >       --pipe-format [parquet|csv]     Format for piped output (default: parquet)
 >       --help                          Show this message and exit.
 
-
-# `pb datasets` - Built-in Datasets
+## `pb datasets` - Built-in Datasets
 
 List available built-in datasets:
 
@@ -467,8 +456,7 @@ List available built-in datasets:
 >     Options:
 >       --help  Show this message and exit.
 
-
-# `pb requirements` - Dependency Check
+## `pb requirements` - Dependency Check
 
 Check installed dependencies and their availability:
 
@@ -479,8 +467,7 @@ Check installed dependencies and their availability:
 >     Options:
 >       --help  Show this message and exit.
 
-
-# Common Data Source Types
+## Common Data Source Types
 
 All commands that accept a `DATA_SOURCE` parameter support these formats:
 
@@ -491,8 +478,7 @@ All commands that accept a `DATA_SOURCE` parameter support these formats:
 - **Built-in datasets**: `small_table`, `game_revenue`, `nycflights`, `global_sales`
 - **Piped data**: Output from `pb pl` command (where supported)
 
-
-# Exit Codes and Automation
+## Exit Codes and Automation
 
 Many commands support options useful for automation and CI/CD:
 

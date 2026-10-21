@@ -1,8 +1,8 @@
 # column_summary_table
 
+# column_summary_table
 
 Generate a comprehensive column-level summary of the DataFrame.
-
 
 ``` json
 {
@@ -14,9 +14,7 @@ Generate a comprehensive column-level summary of the DataFrame.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `dataframe_id: string`  
 required

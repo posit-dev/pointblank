@@ -1,10 +1,10 @@
 # ContractImport
 
-
 Result of importing an external contract/schema.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L34-L229)
 
 ``` python
 ContractImport(
@@ -19,12 +19,9 @@ ContractImport(
 )
 ```
 
-
 Contains the parsed schema information, mapped validation steps, and any warnings about constraints that couldn't be fully translated.
 
-
 ## Parameters
-
 
 `source_format: str`  
 The adapter format name (e.g., `"json_schema"`, `"frictionless"`, etc.).
@@ -47,9 +44,8 @@ Any additional metadata from the source (title, description, etc.).
 `warnings: list[str] = list()`  
 Messages about constraints that couldn't be mapped.
 
-`coverage: float = ``1.0`  
+`coverage: float = 1.0`  
 Fraction of source constraints successfully mapped (`0.0` to `1.0`).
-
 
 ## Methods
 
@@ -61,39 +57,30 @@ Fraction of source constraints successfully mapped (`0.0` to `1.0`).
 | [to_validate()](#to_validate) | Build a Validate object from the imported contract. |
 | [to_yaml()](#to_yaml) | Generate Pointblank YAML configuration string. |
 
-------------------------------------------------------------------------
-
-
 ### summary()
-
 
 Return a human-readable summary of what was imported.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L195-L221)
 
 ``` python
 summary()
 ```
 
-
 #### Returns
-
 
 `str`  
 A formatted summary string.
 
-
-------------------------------------------------------------------------
-
-
 ### to_contract()
-
 
 Build a Contract object from the imported data.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L106-L143)
 
 ``` python
 to_contract(
@@ -102,57 +89,43 @@ to_contract(
 )
 ```
 
-
 #### Parameters
 
-
-`name: str = ``"imported_contract"`  
-Name for the created [Contract](Contract.md#pointblank.Contract).
+`name: str = "imported_contract"`  
+Name for the created [Contract](../reference/Contract.md#pointblank.Contract).
 
 `**kwargs: Any`  
-Additional keyword arguments passed to the [Contract](Contract.md#pointblank.Contract) constructor.
-
+Additional keyword arguments passed to the [Contract](../reference/Contract.md#pointblank.Contract) constructor.
 
 #### Returns
-
 
 `Contract`  
 A Contract object with schema and steps derived from the import.
 
-
-------------------------------------------------------------------------
-
-
 ### to_python()
-
 
 Generate Python code string for the validation workflow.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L145-L169)
 
 ``` python
 to_python()
 ```
 
-
 #### Returns
-
 
 `str`  
 Python source code that recreates the validation.
 
-
-------------------------------------------------------------------------
-
-
 ### to_validate()
-
 
 Build a Validate object from the imported contract.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L70-L104)
 
 ``` python
 to_validate(
@@ -161,9 +134,7 @@ to_validate(
 )
 ```
 
-
 #### Parameters
-
 
 `data: Any`  
 The data table to validate.
@@ -171,32 +142,24 @@ The data table to validate.
 `**kwargs: Any`  
 Additional keyword arguments passed to the Validate constructor.
 
-
 #### Returns
-
 
 `Validate`  
 A Validate object with all imported checks applied (not yet interrogated).
 
-
-------------------------------------------------------------------------
-
-
 ### to_yaml()
-
 
 Generate Pointblank YAML configuration string.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L171-L193)
 
 ``` python
 to_yaml()
 ```
 
-
 #### Returns
-
 
 `str`  
 YAML representation of the validation.

@@ -9,6 +9,7 @@
 <meta name="description" content="Specification for structured missing values in a column.">
 
 <title>MissingSpec | Pointblank</title>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "MissingSpec - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/MissingSpec.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/MissingSpec.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/MissingSpec.html">
+<link rel="alternate" type="text/markdown" href="MissingSpec.md">
 
 
 <meta property="og:title" content="MissingSpec | Pointblank">
@@ -140,34 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="MissingSpec | Pointblank">
 <meta name="twitter:description" content="Specification for structured missing values in a column.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="MissingSpec.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "MissingSpec - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/MissingSpec.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1725,105 +1699,57 @@ A missing-value specification that can be attached to a <code>Field</code> (via 
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
-<table class="gd-summary-table">
+<table class="gd-summary-table caption-top table">
 <thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="#from_cdisc" class="doc-function doc-label doc-label-method">from_cdisc()</a>
-</td>
-<td>
-Alias for <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.
-</td>
+<tr class="odd">
+<td><a href="#from_cdisc" class="doc-function doc-label doc-label-method">from_cdisc()</a></td>
+<td>Alias for <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>.</td>
 </tr>
-<tr>
-<td>
-<a href="#from_cdisc_null_flavors" class="doc-function doc-label doc-label-method">from_cdisc_null_flavors()</a>
-</td>
-<td>
-Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC <em>null flavors</em>.
-</td>
+<tr class="even">
+<td><a href="#from_cdisc_null_flavors" class="doc-function doc-label doc-label-method">from_cdisc_null_flavors()</a></td>
+<td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC <em>null flavors</em>.</td>
 </tr>
-<tr>
-<td>
-<a href="#from_sas" class="doc-function doc-label doc-label-method">from_sas()</a>
-</td>
-<td>
-Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for SAS special missing values.
-</td>
+<tr class="odd">
+<td><a href="#from_sas" class="doc-function doc-label doc-label-method">from_sas()</a></td>
+<td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for SAS special missing values.</td>
 </tr>
-<tr>
-<td>
-<a href="#from_spss" class="doc-function doc-label doc-label-method">from_spss()</a>
-</td>
-<td>
-Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from SPSS-style user-defined missing values.
-</td>
+<tr class="even">
+<td><a href="#from_spss" class="doc-function doc-label doc-label-method">from_spss()</a></td>
+<td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from SPSS-style user-defined missing values.</td>
 </tr>
-<tr>
-<td>
-<a href="#from_variable_metadata" class="doc-function doc-label doc-label-method">from_variable_metadata()</a>
-</td>
-<td>
-Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from an imported variable’s metadata.
-</td>
+<tr class="odd">
+<td><a href="#from_variable_metadata" class="doc-function doc-label doc-label-method">from_variable_metadata()</a></td>
+<td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from an imported variable’s metadata.</td>
 </tr>
-<tr>
-<td>
-<a href="#is_missing" class="doc-function doc-label doc-label-method">is_missing()</a>
-</td>
-<td>
-Check whether a value should be considered missing under this spec.
-</td>
+<tr class="even">
+<td><a href="#is_missing" class="doc-function doc-label doc-label-method">is_missing()</a></td>
+<td>Check whether a value should be considered missing under this spec.</td>
 </tr>
-<tr>
-<td>
-<a href="#reason_for" class="doc-function doc-label doc-label-method">reason_for()</a>
-</td>
-<td>
-Get the reason label for a specific value.
-</td>
+<tr class="odd">
+<td><a href="#reason_for" class="doc-function doc-label doc-label-method">reason_for()</a></td>
+<td>Get the reason label for a specific value.</td>
 </tr>
-<tr>
-<td>
-<a href="#reasons_list" class="doc-function doc-label doc-label-method">reasons_list()</a>
-</td>
-<td>
-Get the distinct reason labels defined by this spec.
-</td>
+<tr class="even">
+<td><a href="#reasons_list" class="doc-function doc-label doc-label-method">reasons_list()</a></td>
+<td>Get the distinct reason labels defined by this spec.</td>
 </tr>
-<tr>
-<td>
-<a href="#sentinel_values" class="doc-function doc-label doc-label-method">sentinel_values()</a>
-</td>
-<td>
-Get all sentinel values that encode missingness.
-</td>
+<tr class="odd">
+<td><a href="#sentinel_values" class="doc-function doc-label doc-label-method">sentinel_values()</a></td>
+<td>Get all sentinel values that encode missingness.</td>
 </tr>
-<tr>
-<td>
-<a href="#values_for_category" class="doc-function doc-label doc-label-method">values_for_category()</a>
-</td>
-<td>
-Get all sentinel values whose reason falls in a given category.
-</td>
+<tr class="even">
+<td><a href="#values_for_category" class="doc-function doc-label doc-label-method">values_for_category()</a></td>
+<td>Get all sentinel values whose reason falls in a given category.</td>
 </tr>
-<tr>
-<td>
-<a href="#values_for_reason" class="doc-function doc-label doc-label-method">values_for_reason()</a>
-</td>
-<td>
-Get all sentinel values that correspond to a given reason.
-</td>
+<tr class="odd">
+<td><a href="#values_for_reason" class="doc-function doc-label doc-label-method">values_for_reason()</a></td>
+<td>Get all sentinel values that correspond to a given reason.</td>
 </tr>
 </tbody>
 </table>

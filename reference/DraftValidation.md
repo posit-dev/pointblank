@@ -1,10 +1,10 @@
 # DraftValidation
 
-
 Draft a validation plan for a given table using an LLM.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L23-L388)
 
 ``` python
 DraftValidation(
@@ -16,16 +16,13 @@ DraftValidation(
 )
 ```
 
+By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]`.
 
-By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]`.
-
-> **Warning: Warning**
+> **Warning**
 >
-> The [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class is still experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
-
+> The [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class is still experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 ## Parameters
-
 
 `data: Any`  
 The data to be used for drafting a validation plan.
@@ -36,16 +33,13 @@ The model to be used. This should be in the form of `provider:model` (e.g., `"an
 `api_key: str | None = None`  
 The API key to be used for the model.
 
-`verify_ssl: bool = ``True`  
+`verify_ssl: bool = True`  
 Whether to verify SSL certificates when making requests to the LLM provider. Set to `False` to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose security risks.
-
 
 ## Returns
 
-
 `str`  
 The drafted validation plan.
-
 
 ## Constructing The `model` Argument
 
@@ -58,7 +52,6 @@ The `model=` argument should be constructed using the provider and model name se
 - `"azure-openai"` (Azure OpenAI)
 
 The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to be set.
-
 
 ## Notes On Authentication
 
@@ -74,7 +67,6 @@ OPENAI_API_KEY="your_openai_api_key_here"
 ```
 
 There's no need to have the `python-dotenv` package installed when using `.env` files in this way.
-
 
 ## Notes On Ssl Certificate Verification
 
@@ -95,14 +87,13 @@ pb.DraftValidation(
 )
 ```
 
-> **Warning: Warning**
+> **Warning**
 >
 > Disabling SSL verification (through `verify_ssl=False`) can expose your API keys and data to man-in-the-middle attacks. Only use this option in trusted network environments and when absolutely necessary.
 
-
 ## Notes On Data Sent To The Model Provider
 
-The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by [DraftValidation](DraftValidation.md#pointblank.DraftValidation) using the [DataScan](DataScan.md#pointblank.DataScan) class. The summary includes the following information:
+The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) using the [DataScan](../reference/DataScan.md#pointblank.DataScan) class. The summary includes the following information:
 
 - the number of rows and columns in the table
 - the type of dataset (e.g., Polars, DuckDB, Pandas, etc.)
@@ -110,14 +101,13 @@ The data sent to the model provider is a JSON summary of the table. This data su
 - column level statistics such as the number of missing values, min, max, mean, and median, etc.
 - a short list of data values in each column
 
-The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class since the contents of the table are not sent to the model provider.
+The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class since the contents of the table are not sent to the model provider.
 
 The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user's AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.
 
-
 ## Examples
 
-Let's look at how the [DraftValidation](DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function. The model to be used is `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
+Let's look at how the [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class can be used to draft a validation plan for a table. The table to be used is `"nycflights"`, which is available here via the [`load_dataset()`](../reference/load_dataset.md#pointblank.load_dataset) function. The model to be used is `"anthropic:claude-opus-4-6"` (which performs very well compared to other LLMs). The example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
 ``` python
 import pointblank as pb
@@ -190,4 +180,4 @@ validation
 
 The drafted validation plan can be copied and pasted into a Python script or notebook for further use. In other words, the generated plan can be adjusted as needed to suit the specific requirements of the table being validated.
 
-Note that the output does not know how the data was obtained, so it uses the placeholder `your_data` in the `data=` argument of the [Validate](Validate.md#pointblank.Validate) class. When adapted for use, this should be replaced with the actual data variable.
+Note that the output does not know how the data was obtained, so it uses the placeholder `your_data` in the `data=` argument of the [Validate](../reference/Validate.md#pointblank.Validate) class. When adapted for use, this should be replaced with the actual data variable.

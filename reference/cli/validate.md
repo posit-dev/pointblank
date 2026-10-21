@@ -1,13 +1,10 @@
 # pb validate
 
-
 Perform single or multiple data validations.
-
 
 ``` bash
 pb validate [OPTIONS] [DATA_SOURCE]
 ```
-
 
 Run one or more validation checks on your data in a single command. Use multiple `--check` options to perform multiple validations.
 
@@ -44,9 +41,7 @@ Require `--column` and `--set`:
 
 Use `--list-checks` to see all available validation methods with examples. The default CHECK_TYPE is `rows-distinct` which checks for duplicate rows.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb validate [OPTIONS] [DATA_SOURCE]
 
@@ -122,16 +117,12 @@ Use `--list-checks` to see all available validation methods with examples. The d
       --exit-code           Exit with non-zero code if validation fails
       --help                Show this message and exit.
 
-
 ## Arguments
-
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
-
 ## Options
-
 
 `--list-checks`  
 List available validation checks and exit
@@ -159,7 +150,6 @@ Maximum number of failing rows to save to CSV (default: 500)
 
 `--exit-code`  
 Exit with non-zero code if validation fails
-
 
 ## Examples
 

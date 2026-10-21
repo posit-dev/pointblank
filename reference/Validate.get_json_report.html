@@ -9,6 +9,7 @@
 <meta name="description" content="Get a report of the validation results as a JSON-formatted string.">
 
 <title>Validate.get_json_report() | Pointblank</title>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Validate.get_json_report - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html">
+<link rel="alternate" type="text/markdown" href="Validate.get_json_report.md">
 
 
 <meta property="og:title" content="Validate.get_json_report() | Pointblank">
@@ -140,34 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="Validate.get_json_report() | Pointblank">
 <meta name="twitter:description" content="Get a report of the validation results as a JSON-formatted string.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="Validate.get_json_report.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Validate.get_json_report - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1702,7 +1676,7 @@ A JSON-formatted string representing the validation report, with each validation
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
-<div id="f713e338" class="cell" data-execution_count="1">
+<div id="bfb87b54" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1750,8 +1724,8 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-10-18T23:28:10.335+00:00",
-        "proc_duration_s": 0.006468
+        "time_processed": "2026-10-21T17:28:20.151+00:00",
+        "proc_duration_s": 0.007679
     },
     {
         "i": 2,
@@ -1777,14 +1751,14 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-10-18T23:28:10.337+00:00",
-        "proc_duration_s": 0.00231
+        "time_processed": "2026-10-21T17:28:20.154+00:00",
+        "proc_duration_s": 0.003043
     }
 ]</code></pre>
 </div>
 </div>
 <p>You can also customize which fields to include:</p>
-<div id="ac9b9d61" class="cell" data-execution_count="2">
+<div id="709397e2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1810,7 +1784,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>Or which fields to exclude:</p>
-<div id="9392a1c4" class="cell" data-execution_count="3">
+<div id="dd2c7b4b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
@@ -1856,7 +1830,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>The JSON output can be further processed or analyzed programmatically:</p>
-<div id="9f733adf" class="cell" data-execution_count="4">
+<div id="e4f3604e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>

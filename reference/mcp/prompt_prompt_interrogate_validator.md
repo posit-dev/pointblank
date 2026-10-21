@@ -1,19 +1,17 @@
 # prompt_interrogate_validator
 
+# prompt_interrogate_validator
 
 Prompt to run validations and generate reports with Python code.
 
-
-## Arguments
-
+### Arguments
 
 `validator_id: string`  
 ID of the Validator to interrogate.
 
 Provide a value matching the following JSON schema: {"type":"string"}. Encode non-string values as JSON.
 
-
-## Prompt Text
+### Prompt Text
 
 > **Note: Assistant**
 >

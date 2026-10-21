@@ -1,10 +1,10 @@
 # write_file()
 
-
 Write a Validate object to disk as a serialized file.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1134-L1486)
 
 ``` python
 write_file(
@@ -17,8 +17,7 @@ write_file(
 )
 ```
 
-
-Writing a validation object to disk with [write_file()](write_file.md#pointblank.write_file) can be useful for keeping data validation results close at hand for later retrieval (with [read_file()](read_file.md#pointblank.read_file)). By default, any data table that the validation object holds will be removed before writing to disk (not applicable if no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as database connections cannot be serialized.
+Writing a validation object to disk with [write_file()](../reference/write_file.md#pointblank.write_file) can be useful for keeping data validation results close at hand for later retrieval (with [read_file()](../reference/read_file.md#pointblank.read_file)). By default, any data table that the validation object holds will be removed before writing to disk (not applicable if no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as database connections cannot be serialized.
 
 Extract data from failing validation steps can also be preserved by setting `keep_extracts=True`, which is useful for later analysis of data quality issues.
 
@@ -26,16 +25,14 @@ The serialized file uses Python's pickle format for storage of the validation ob
 
 **Important note.** If your validation uses custom preprocessing functions (via the `pre=` parameter), these functions must be defined at the module level (not interactively or as lambda functions) to ensure they can be properly restored when loading the validation in a different Python session. Read the *Creating Serializable Validations* section below for more information.
 
-> **Warning: Warning**
+> **Warning**
 >
-> The [write_file()](write_file.md#pointblank.write_file) function is currently experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
-
+> The [write_file()](../reference/write_file.md#pointblank.write_file) function is currently experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 ## Parameters
 
-
 `validation: Validate`  
-The [Validate](Validate.md#pointblank.Validate) object to write to disk.
+The [Validate](../reference/Validate.md#pointblank.Validate) object to write to disk.
 
 `filename: str`  
 The filename to create on disk for the validation object. Should not include the file extension as `.pkl` will be added automatically.
@@ -43,22 +40,19 @@ The filename to create on disk for the validation object. Should not include the
 `path: str | None = None`  
 An optional directory path where the file should be saved. If not provided, the file will be saved in the current working directory. The directory will be created if it doesn't exist.
 
-`keep_tbl: bool = ``False`  
+`keep_tbl: bool = False`  
 An option to keep the data table that is associated with the validation object. The default is `False` where the data table is removed before writing to disk. For database tables (e.g., Ibis tables with database backends), the table is always removed even if `keep_tbl=True`, as database connections cannot be serialized.
 
-`keep_extracts: bool = ``False`  
+`keep_extracts: bool = False`  
 An option to keep any collected extract data for failing rows from validation steps. By default, this is `False` (i.e., extract data is removed to save space).
 
-`quiet: bool = ``False`  
+`quiet: bool = False`  
 Should the function not inform when the file is written? By default, this is `False`, so a message will be printed when the file is successfully written.
-
 
 ## Returns
 
-
 `None`  
 This function doesn't return anything but saves the validation object to disk.
-
 
 ## Creating Serializable Validations
 
@@ -93,7 +87,6 @@ validation = (
 pb.write_file(validation, "my_validation", keep_tbl=True)
 ```
 
-
 ### Problematic Patterns to Avoid
 
 Don't use lambda functions as they will cause immediate errors.
@@ -116,21 +109,15 @@ validation = pb.Validate(data).col_vals_gt(
 )
 ```
 
-------------------------------------------------------------------------
-
-
 ### Automatic Analysis and Guidance
 
-When you call [write_file()](write_file.md#pointblank.write_file), it automatically analyzes your validation and provides:
+When you call [write_file()](../reference/write_file.md#pointblank.write_file), it automatically analyzes your validation and provides:
 
 - confirmation when all functions will work reliably
 - warnings for functions that may cause cross-session issues
 - clear errors for unsupported patterns (lambda functions)
 - specific recommendations and code examples
 - loading instructions tailored to your validation
-
-------------------------------------------------------------------------
-
 
 ### Loading Your Validation
 
@@ -154,11 +141,8 @@ To verify your validation works across sessions:
 1.  save your validation in one Python session
 2.  start a fresh Python session (restart kernel/interpreter)
 3.  import required preprocessing functions
-4.  load the validation using [read_file()](read_file.md#pointblank.read_file)
+4.  load the validation using [read_file()](../reference/read_file.md#pointblank.read_file)
 5.  test that preprocessing functions work as expected
-
-------------------------------------------------------------------------
-
 
 ### Performance and Storage
 
@@ -167,11 +151,9 @@ To verify your validation works across sessions:
 - set `quiet=True` to suppress guidance messages in automated scripts
 - files are saved using pickle's highest protocol for optimal performance
 
-
 ## Examples
 
 Let's create a simple validation and save it to disk:
-
 
 ``` python
 import pointblank as pb
@@ -188,29 +170,24 @@ validation = (
 pb.write_file(validation, "my_validation")
 ```
 
-
       Serialization Analysis:
        ✓ No preprocessing functions detected
        ✓ This validation should serialize and load reliably across sessions
     ✅ Validation object written to: my_validation.pkl
        📖 To load: validation = pb.read_file('my_validation.pkl')
 
-
 To keep the original table data for later analysis:
-
 
 ``` python
 # Save with the original table data included
 pb.write_file(validation, "my_validation_with_data", keep_tbl=True)
 ```
 
-
       Serialization Analysis:
        ✓ No preprocessing functions detected
        ✓ This validation should serialize and load reliably across sessions
     ✅ Validation object written to: my_validation_with_data.pkl
        📖 To load: validation = pb.read_file('my_validation_with_data.pkl')
-
 
 You can also specify a custom directory and keep extract data:
 
@@ -223,7 +200,6 @@ pb.write_file(
     keep_extracts=True
 )
 ```
-
 
 ### Working with Preprocessing Functions
 
@@ -262,9 +238,8 @@ pb.write_file(validation, "my_validation", keep_tbl=True)
 
 When you load this validation in a new session, simply import the preprocessing functions again and they will be automatically restored.
 
-
 ## See Also
 
-`Use` the <a href="../reference/read_file.html#pointblank.read_file" class="gdls-link"><code>read_file()</code></a> function to load a validation object that was  
+`Use` the [`read_file()`](../reference/read_file.md#pointblank.read_file) function to load a validation object that was  
 
-`previously` saved with [write_file()](write_file.md#pointblank.write_file).
+`previously` saved with [write_file()](../reference/write_file.md#pointblank.write_file).  

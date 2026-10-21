@@ -1,10 +1,10 @@
 # adam_to_metadata()
 
-
 Convert an ADaM dataset template to a MetadataImport object.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_validate.py#L19-L64)
 
 ``` python
 adam_to_metadata(
@@ -13,9 +13,7 @@ adam_to_metadata(
 )
 ```
 
-
 ## Parameters
-
 
 `dataset: str`  
 ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
@@ -23,9 +21,7 @@ ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-i
 `study_id: str | None = None`  
 Optional study identifier.
 
-
 ## Returns
-
 
 `MetadataImport`  
 A MetadataImport representing the ADaM dataset template.

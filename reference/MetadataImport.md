@@ -1,10 +1,10 @@
 # MetadataImport
 
-
 Parsed metadata from an external standard.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L257-L490)
 
 ``` python
 MetadataImport(
@@ -23,12 +23,9 @@ MetadataImport(
 )
 ```
 
-
 Contains variable definitions, value labels, missing value codes, controlled terminologies, and dataset-level metadata: all mapped to Pointblank concepts.
 
-
 ## Parameters
-
 
 `source_format: str`  
 The format this metadata was imported from (e.g., `"spss"`, `"xpt"`, `"stata"`).
@@ -66,24 +63,17 @@ Named codelists (controlled terminologies).
 `missing_value_codes: dict[str, list[MissingValueCode]] = dict()`  
 Named missing value code definitions.
 
-
 ## Attributes
 
-| Name | Description |
-|----|----|
+| Name                              | Description                         |
+|-----------------------------------|-------------------------------------|
 | [variable_names](#variable_names) | Get the list of all variable names. |
-
-------------------------------------------------------------------------
-
 
 ### variable_names
 
-
 Get the list of all variable names.
 
-
 `variable_names: list[str]`
-
 
 ## Methods
 
@@ -91,110 +81,83 @@ Get the list of all variable names.
 |----|----|
 | [get_codelist()](#get_codelist) | Get a specific codelist by name. |
 | [get_variable()](#get_variable) | Get metadata for a specific variable by name. |
-| [missing_specs()](#missing_specs) | Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables. |
+| [missing_specs()](#missing_specs) | Auto-generate [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects for all variables. |
 | [summary()](#summary) | Return a human-readable summary of the imported metadata. |
-| [to_schema()](#to_schema) | Convert imported metadata to a Pointblank [Schema](Schema.md#pointblank.Schema) with `Field` objects. |
-| [to_validate()](#to_validate) | Generate a [Validate](Validate.md#pointblank.Validate) workflow from the imported metadata. |
-
-------------------------------------------------------------------------
-
+| [to_schema()](#to_schema) | Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects. |
+| [to_validate()](#to_validate) | Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata. |
 
 ### get_codelist()
 
-
 Get a specific codelist by name.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L406-L426)
 
 ``` python
 get_codelist(name)
 ```
 
-
 #### Parameters
-
 
 `name: str`  
 The codelist name or identifier.
 
-
 #### Returns
-
 
 `Codelist`  
 The requested codelist.
 
-
 #### Raises
-
 
 `KeyError`  
 If no codelist with that name exists.
 
-
-------------------------------------------------------------------------
-
-
 ### get_variable()
-
 
 Get metadata for a specific variable by name.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L350-L371)
 
 ``` python
 get_variable(name)
 ```
 
-
 #### Parameters
-
 
 `name: str`  
 The variable name to look up.
 
-
 #### Returns
-
 
 `VariableMetadata`  
 The metadata for the named variable.
 
-
 #### Raises
-
 
 `KeyError`  
 If no variable with that name exists.
 
-
-------------------------------------------------------------------------
-
-
 ### missing_specs()
 
-
-Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
-
+Auto-generate [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects for all variables.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L373-L404)
 
 ``` python
 missing_specs()
 ```
 
-
-Builds a mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via `missing=`) or to <a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>.
-
+Builds a mapping of column name to [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) for every imported variable that declares missing values (e.g., SPSS user-defined missing values, SAS special missing). The result can be passed directly to validation methods (via `missing=`) or to [`missing_vals_tbl()`](../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl).
 
 #### Returns
 
-
 `dict[str, MissingSpec]`  
-A mapping of column name to [MissingSpec](MissingSpec.md#pointblank.MissingSpec). Variables without declared missing values are omitted.
-
+A mapping of column name to [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec). Variables without declared missing values are omitted.
 
 #### Examples
 
@@ -208,65 +171,49 @@ specs = meta.missing_specs()
 pb.missing_vals_tbl(data, missing=specs)
 ```
 
-------------------------------------------------------------------------
-
-
 ### summary()
-
 
 Return a human-readable summary of the imported metadata.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L433-L477)
 
 ``` python
 summary()
 ```
 
-
 #### Returns
-
 
 `str`  
 Formatted summary string.
 
-
-------------------------------------------------------------------------
-
-
 ### to_schema()
 
-
-Convert imported metadata to a Pointblank [Schema](Schema.md#pointblank.Schema) with `Field` objects.
-
+Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L313-L326)
 
 ``` python
 to_schema()
 ```
 
-
 Maps variable metadata to appropriate `Field` types with constraints (min/max, allowed values, nullable, etc.).
-
 
 #### Returns
 
-
 `Schema`  
-A Pointblank [Schema](Schema.md#pointblank.Schema) object with typed fields.
-
-
-------------------------------------------------------------------------
-
+A Pointblank [Schema](../reference/Schema.md#pointblank.Schema) object with typed fields.
 
 ### to_validate()
 
-
-Generate a [Validate](Validate.md#pointblank.Validate) workflow from the imported metadata.
-
+Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L328-L348)
 
 ``` python
 to_validate(
@@ -275,22 +222,17 @@ to_validate(
 )
 ```
 
-
 Creates validation steps for all constraints found in the metadata: value ranges, allowed values, required fields, string lengths, etc.
 
-
 #### Parameters
-
 
 `data: Any`  
 The DataFrame or table to validate.
 
 `**kwargs: Any`  
-Additional keyword arguments passed to the [Validate](Validate.md#pointblank.Validate) constructor.
-
+Additional keyword arguments passed to the [Validate](../reference/Validate.md#pointblank.Validate) constructor.
 
 #### Returns
 
-
-<a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
-A configured (but not yet interrogated) [Validate](Validate.md#pointblank.Validate) object.
+`Validate`  
+A configured (but not yet interrogated) [Validate](../reference/Validate.md#pointblank.Validate) object.

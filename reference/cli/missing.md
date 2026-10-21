@@ -1,13 +1,10 @@
 # pb missing
 
-
 Generate a missing values report for a data table.
-
 
 ``` bash
 pb missing [OPTIONS] [DATA_SOURCE]
 ```
-
 
 DATA_SOURCE can be:
 
@@ -18,9 +15,7 @@ DATA_SOURCE can be:
 - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 - Piped data from pb pl command
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb missing [OPTIONS] [DATA_SOURCE]
 
@@ -39,16 +34,12 @@ DATA_SOURCE can be:
       --output-html PATH  Save HTML output to file
       --help              Show this message and exit.
 
-
 ## Arguments
-
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
-
 ## Options
-
 
 `--output-html: PATH`  
 Save HTML output to file

@@ -1,10 +1,10 @@
 # validate_adam()
 
-
 Generate a comprehensive ADaM validation workflow for a dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_validate.py#L67-L184)
 
 ``` python
 validate_adam(
@@ -19,7 +19,6 @@ validate_adam(
 )
 ```
 
-
 Creates a Validate object with checks for:
 
 - Required variables present and non-null
@@ -29,9 +28,7 @@ Creates a Validate object with checks for:
 - TRT01P (planned treatment) present and non-null in ADSL
 - Traceability variable presence (SRCDOM/SRCVAR/SRCSEQ non-null when present)
 
-
 ## Parameters
-
 
 `data: Any`  
 The DataFrame to validate (pandas or polars).
@@ -42,13 +39,13 @@ ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-i
 `study_id: str | None = None`  
 Optional study identifier for the validation label.
 
-`check_population_flags: bool = ``True`  
+`check_population_flags: bool = True`  
 If `True`, validate population flag columns (Y/N values only).
 
-`check_bds_structure: bool = ``True`  
+`check_bds_structure: bool = True`  
 If `True`, validate BDS-specific structure (`PARAMCD`/`PARAM`/`AVAL`).
 
-`check_traceability: bool = ``True`  
+`check_traceability: bool = True`  
 If `True`, check that traceability variables are non-null when present.
 
 `label: str | None = None`  
@@ -57,9 +54,7 @@ Custom label for the Validate object.
 `**kwargs: Any`  
 Additional keyword arguments passed to the Validate constructor.
 
-
 ## Returns
-
 
 `Validate`  
 A configured (but not yet interrogated) Validate object.

@@ -4,8 +4,7 @@ Statistical software packages like SPSS, SAS, and Stata store rich metadata alon
 
 Pointblank can read this embedded metadata and translate it directly into validation rules. When you import a `.sav`, `.xpt`, or `.dta` file, Pointblank extracts the full metadata catalog and maps each element to the appropriate validation method. Value labels become [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks, data types become schema constraints, and missing value codes inform how validation handles sentinel values.
 
-
-# Prerequisites
+## Prerequisites
 
 Reading metadata from statistical package files requires the `pyreadstat` library. This is an optional dependency that you can install separately:
 
@@ -21,13 +20,11 @@ pip install pointblank[stats]
 
 The `pyreadstat` library reads SPSS, SAS, and Stata file metadata without loading the full dataset into memory. This makes the import fast even for large files, since only the metadata header is parsed.
 
-
-# SPSS (.sav) Files
+## SPSS (.sav) Files
 
 SPSS `.sav` files are the most metadata-rich of the statistical package formats. They carry variable labels, value labels for categorical variables, defined missing value codes, display formats, and variable measurement levels. Pointblank extracts all of these and maps them to validation concepts.
 
-
-## What Gets Extracted
+### What Gets Extracted
 
 When you import an SPSS file, Pointblank reads the following metadata:
 
@@ -41,8 +38,7 @@ When you import an SPSS file, Pointblank reads the following metadata:
 | Display formats (F8.2, A20, etc.) | Stored as `display_format` |
 | Date/time formats | Mapped to Date, Time, or Datetime dtypes |
 
-
-## Basic Usage
+### Basic Usage
 
 The simplest usage reads the file and converts to a validation workflow:
 
@@ -63,8 +59,7 @@ validation = meta.to_validate(data=my_data).interrogate()
 
 The `format="spss"` parameter is optional here because Pointblank auto-detects `.sav` files from their extension.
 
-
-## Value Labels and Codelists
+### Value Labels and Codelists
 
 SPSS value labels define the permitted values for categorical variables. For example, a variable `GENDER` might have labels `{1: "Male", 2: "Female", 3: "Non-binary"}`. Pointblank converts these into [Codelist](../../reference/Codelist.md#pointblank.Codelist) objects and generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks:
 
@@ -85,8 +80,7 @@ for cl_name, codelist in meta.codelists.items():
 
 When validation is generated, each variable with value labels gets a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step that ensures all data values appear in the labeled set. Values outside the set are flagged as failures in the validation report.
 
-
-## Missing Value Codes
+### Missing Value Codes
 
 SPSS supports up to three discrete missing value codes per variable, plus an optional range of missing values. These codes carry semantic meaning: a value of `-99` might indicate "question not asked", while `-98` means "respondent refused to answer".
 
@@ -101,10 +95,9 @@ for var_name, codes in meta.missing_value_codes.items():
 
 Missing value codes are preserved in the [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) object so downstream tools can handle them appropriately. When validation is generated, these codes are documented in the metadata rather than generating explicit exclusion rules, since the correct handling depends on your analysis context.
 
+#### Turning missing codes into [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects
 
-### Turning missing codes into [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects
-
-To put these codes to work in validation and reporting, convert them into <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_specs()</code></a> method does this for every variable that declares missing values, returning a `{column: MissingSpec}` mapping (the reason labels are derived from the variables' value labels):
+To put these codes to work in validation and reporting, convert them into [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) objects. The [`MetadataImport.missing_specs()`](../../reference/MetadataImport.md#pointblank.MetadataImport) method does this for every variable that declares missing values, returning a `{column: MissingSpec}` mapping (the reason labels are derived from the variables' value labels):
 
 ``` python
 meta = pb.import_metadata("survey.sav")
@@ -123,10 +116,9 @@ validation = (
 )
 ```
 
-You can also build a spec for a single variable with <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata.to_missing_spec()</code></a>, or construct one directly from SPSS-style values via `pb.MissingSpec.from_spss(missing_values=[...], labels={...})`. See the *Missing Values Reporting* and *Validation Methods* articles for what you can do with these specs.
+You can also build a spec for a single variable with [`VariableMetadata.to_missing_spec()`](../../reference/VariableMetadata.md#pointblank.VariableMetadata), or construct one directly from SPSS-style values via `pb.MissingSpec.from_spss(missing_values=[...], labels={...})`. See the *Missing Values Reporting* and *Validation Methods* articles for what you can do with these specs.
 
-
-## Type Detection from Formats
+### Type Detection from Formats
 
 SPSS stores numeric variables with format strings that indicate how they should be displayed. These formats also carry type information. A format like `DATE11` indicates a date variable, `DATETIME20` indicates a datetime, and `F8.0` (eight characters, zero decimal places) suggests an integer. Pointblank uses these format strings to infer the most appropriate Pointblank dtype:
 
@@ -141,13 +133,11 @@ SPSS stores numeric variables with format strings that indicate how they should 
 
 This inference makes the generated schema more precise than simply marking everything as numeric or string.
 
-
-# SAS Transport (.xpt) Files
+## SAS Transport (.xpt) Files
 
 SAS Transport (`.xpt`) files are the standard delivery format for regulatory submissions, particularly in pharmaceutical clinical trials. They carry variable names, labels, types, and length constraints. While less metadata-rich than SPSS files (no value labels), they provide the structural foundation for CDISC-compliant data packages.
 
-
-## What Gets Extracted
+### What Gets Extracted
 
 | Metadata Element | Pointblank Mapping |
 |----|----|
@@ -159,8 +149,7 @@ SAS Transport (`.xpt`) files are the standard delivery format for regulatory sub
 | Dataset name | `dataset_name` on [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) |
 | Dataset label | `dataset_label` on [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) |
 
-
-## Basic Usage
+### Basic Usage
 
 ``` python
 import pointblank as pb
@@ -183,15 +172,13 @@ for var in meta.variables:
         print(f"    Constraints: {', '.join(constraint_info)}")
 ```
 
-
-## Length Constraints
+### Length Constraints
 
 Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as `max_length` constraints on the [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object. When you call `to_validate()`, variables with length constraints get a [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) step that checks string length does not exceed the specified maximum.
 
 This is particularly important for CDISC submissions where variable lengths are strictly defined in the submission specification. A variable defined as `$200.` (200 characters) must not contain values longer than 200 characters, and Pointblank will flag any violations.
 
-
-## Format-Based Type Detection
+### Format-Based Type Detection
 
 Like SPSS, SAS formats encode type information. A variable with format `DATE9.` is a date, one with `DATETIME20.` is a datetime, and `$CHAR200.` is a 200-character string:
 
@@ -203,13 +190,11 @@ Like SPSS, SAS formats encode type information. A variable with format `DATE9.` 
 | `$CHAR200.`, `$50.`      | String         |
 | Numeric (no date format) | Float64        |
 
-
-# Stata (.dta) Files
+## Stata (.dta) Files
 
 Stata `.dta` files provide variable labels, value labels (similar to SPSS), and typed storage with distinct integer and floating-point types. The format is commonly used in economics, public health, and social science research.
 
-
-## What Gets Extracted
+### What Gets Extracted
 
 | Metadata Element | Pointblank Mapping |
 |----|----|
@@ -219,8 +204,7 @@ Stata `.dta` files provide variable labels, value labels (similar to SPSS), and 
 | Value labels | `allowed_values` list and [Codelist](../../reference/Codelist.md#pointblank.Codelist) objects |
 | Dataset label | `dataset_label` |
 
-
-## Basic Usage
+### Basic Usage
 
 ``` python
 import pointblank as pb
@@ -236,8 +220,7 @@ for var in meta.variables:
     print(f"  {var.name} {type_info}{label_info}")
 ```
 
-
-## Type Mapping
+### Type Mapping
 
 Stata has more granular numeric types than SPSS, which Pointblank maps to appropriate dtypes:
 
@@ -249,8 +232,7 @@ Stata has more granular numeric types than SPSS, which Pointblank maps to approp
 
 The distinction between integer and floating-point types is preserved, which produces more accurate schema validation. A variable stored as `int` in Stata should contain only integer values, and the generated schema reflects that expectation.
 
-
-# Generating Validation from Statistical Metadata
+## Generating Validation from Statistical Metadata
 
 Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The `to_validate()` method examines every variable's constraints and creates the appropriate validation steps.
 
@@ -291,7 +273,6 @@ validation = (
 )
 ```
 
-
-# Conclusion
+## Conclusion
 
 Statistical package metadata provides a ready-made specification of data expectations that you can leverage directly in Pointblank. Rather than manually inspecting a codebook and writing validation rules by hand, importing the metadata gives you instant, comprehensive coverage of the constraints that the data's creators intended. The next page covers CDISC standards for clinical trial data, which build on these same concepts with additional domain-specific validation rules for regulatory compliance.

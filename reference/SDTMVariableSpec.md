@@ -1,10 +1,10 @@
 # SDTMVariableSpec
 
-
 Specification for a single variable in an SDTM domain template.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L16-L48)
 
 ``` python
 SDTMVariableSpec(
@@ -19,9 +19,7 @@ SDTMVariableSpec(
 )
 ```
 
-
 ## Parameters
-
 
 `name: str`  
 Variable name (e.g., `"STUDYID"`, `"USUBJID"`).
@@ -35,7 +33,7 @@ Expected data type (`"Char"` or `"Num"`).
 `role: str`  
 SDTM role: `"Identifier"`, `"Topic"`, `"Qualifier"`, `"Timing"`, `"Rule"`, or `"Record Qualifier"`.
 
-`required: bool = ``False`  
+`required: bool = False`  
 Whether the variable is required (`Req="Yes"` in IG).
 
 `max_length: int | None = None`  
@@ -44,5 +42,5 @@ Maximum character length for Char variables.
 `controlled_term: str | None = None`  
 Name of the associated controlled terminology codelist.
 
-`core: str = ``"Perm"`  
+`core: str = "Perm"`  
 SDTM core designation: `"Req"`, `"Exp"`, or `"Perm"`.

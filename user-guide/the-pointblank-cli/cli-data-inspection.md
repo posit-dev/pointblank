@@ -2,8 +2,7 @@
 
 Pointblank's CLI (`pb`) makes it easy to view your data before running validations. It has several commands that are exceedingly useful for understanding your data's structure, checking for obvious issues, and confirming that your data source is being read correctly. We also make it easy to explore data in various formats and locations. Let's go through each of the commands for inspecting and exploring data.
 
-
-# `pb info`: Inspecting the Data Structure
+## `pb info`: Inspecting the Data Structure
 
 Use `pb info` to display basic information about your data source. Here's how this works with a local CSV file:
 
@@ -11,7 +10,7 @@ Use `pb info` to display basic information about your data source. Here's how th
 pb info worldcities.csv
 ```
 
-<img src="../../assets/pb-info-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-info-worldcities-csv.png)
 
 This command shows the (1) table type (e.g., `pandas`, `polars`, etc.), (2) the number of rows and columns, and (3) the data source path or identifier.
 
@@ -21,10 +20,9 @@ That example used a local CSV file. The same file is also present in Pointblank'
 pb info https://github.com/posit-dev/pointblank/blob/main/data_raw/worldcities.csv
 ```
 
-<img src="../../assets/pb-info-worldcities-github-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-info-worldcities-github-csv.png)
 
 The `pb info` command is useful before running validations to confirm your data source's dimensions, and, whether it can even be loaded.
-
 
 You can inspect a wide variety of data sources using the CLI! Here are some examples with `pb info`:
 
@@ -40,8 +38,7 @@ pb info https://github.com/posit-dev/pointblank/blob/main/data_raw/global_sales.
 
 And these input schemes work with all other commands that accept a `DATA_SOURCE`.
 
-
-# `pb preview`: Previewing Data
+## `pb preview`: Previewing Data
 
 Use `pb preview` to view the first and last rows of your data. Let's try it out with the `worldcities.csv` file:
 
@@ -49,7 +46,7 @@ Use `pb preview` to view the first and last rows of your data. Let's try it out 
 pb preview worldcities.csv
 ```
 
-<img src="../../assets/pb-preview-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-preview-worldcities-csv.png)
 
 As can be seen, `pb preview` gives you a preview of the dataset as a table in the console. The dataset has 41K rows but we're electing to show only five rows from the head and from the tail.
 
@@ -59,7 +56,7 @@ Let's go over some features of the table preview. First off, the table header pr
 pb preview worldcities.csv --no-row-numbers
 ```
 
-<img src="../../assets/pb-preview-worldcities-csv-no-row-numbers.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-preview-worldcities-csv-no-row-numbers.png)
 
 While `pb preview` purposefully displays only a few rows, the number of columns shown can be more than you might need. Furthermore, if a table has *a lot* of columns, you'll only see some of the first and some of the last columns. This is where column selection becomes useful and there are a few methods available for subsetting the preview table's columns. A good one (provided you know the column names) is to use the `--columns` option along with a comma-delimted set of column names. Let's look at a preview of the included `game_revenue` dataset before subsetting the columns:
 
@@ -67,7 +64,7 @@ While `pb preview` purposefully displays only a few rows, the number of columns 
 pb preview game_revenue
 ```
 
-<img src="../../assets/pb-preview-game_revenue-all-columns.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-preview-game_revenue-all-columns.png)
 
 That's 11 columns in total and while the all columns *are* shown (i.e., none in the middle are truncated from view), we start to see some necessary instances of abbreviating via `…` within the column names and in the displayed values.
 
@@ -77,7 +74,7 @@ Let's now use the `--columns` with a set of column names:
 pb preview game_revenue -columns "player_id, item_type, item_name, start_day"
 ```
 
-<img src="../../assets/pb-preview-game_revenue-column-names.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-preview-game_revenue-column-names.png)
 
 With that, the few columns that are displayed no longer have to abbreviate their data values. This is an important consideration since a selective display of column becomes more necessary if column content is large or if the width of the terminal (in terms of characters) cannot be increased.
 
@@ -87,14 +84,13 @@ You may want to view ranges of columns by their indices. This is convenient when
 pb preview game_revenue ---col-range "3:6"
 ```
 
-<img src="../../assets/pb-preview-game_revenue-column-range.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-preview-game_revenue-column-range.png)
 
 In the case that you want to save a table preview as an HTML table in a standalone file, you can add in the `--output-html` option (just add a path/filename with an .html extension).
 
 And there are many more options that allow for quick iteration while previewing a table. Use `pb preview --help` to get a helpful listing.
 
-
-# `pb scan`: Getting Column Summaries
+## `pb scan`: Getting Column Summaries
 
 We can use `pb scan` for fairly comprehensive summaries of column data, including:
 
@@ -109,7 +105,7 @@ Let's use this on the `worldcities.csv` dataset:
 pb scan worldcities.csv
 ```
 
-<img src="../../assets/pb-scan-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-scan-worldcities-csv.png)
 
 Each row in the summary table represents a column in the input dataset. Just as in `pb preview` we get simplified dtypes (in the `Type` column). The `NA` and `UQ` indicate how many missing and unique values are in the column. The remaining columns are statistical measures and there's an important thing to note here: the values provided for any string-based columns (here, `city_name` and `country`) are derived from string lengths.
 
@@ -124,8 +120,7 @@ There are two options for `pb scan`:
 
 Both of these options are also in the `pb preview` command and they behave the same way here.
 
-
-# `pb missing`: Reporting on Missing Values
+## `pb missing`: Reporting on Missing Values
 
 Use `pb missing` to generate a missing values report, visualizing missingness across columns and 10 *row sectors*. Here's an example using `worldcities.csv`:
 
@@ -133,7 +128,7 @@ Use `pb missing` to generate a missing values report, visualizing missingness ac
 pb missing worldcities.csv
 ```
 
-<img src="../../assets/pb-missing-worldcities-csv.png" class="img-fluid" style="width:100.0%" />
+![](../../assets/pb-missing-worldcities-csv.png)
 
 This report is arranged similarly to that of `pb scan`, where each column in the input table gets a row in this report table. Each of the 10 row sectors represents 1/10 of the rows in the dataset, where sector `1` encompasses the head of the table, and `10` the tail.
 
@@ -147,8 +142,7 @@ Seeing this type of missing value report can be really important! You might not 
 
 By way of options, there's only one for `pb missing` and it is `--output-html`. With that (as in the previous two commands discussed), we can write the missing values report to a standalone HTML file.
 
-
-# Wrapping Up
+## Wrapping Up
 
 Pointblank's CLI provides a set of commands that make it easy to inspect, understand, and diagnose your data before you move on to validation or analysis. Using these tools can help you catch issues early and gain confidence in your data sources.
 

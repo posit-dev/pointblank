@@ -1,10 +1,10 @@
 # SchemaDiff
 
-
 Differences between the schemas of the source and target tables.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L51-L100)
 
 ``` python
 SchemaDiff(
@@ -17,12 +17,9 @@ SchemaDiff(
 )
 ```
 
-
 Column names refer to the source table except in `only_in_target` (and the second element of `renamed` and `case_only` pairs), which refer to the target table.
 
-
 ## Attributes
-
 
 `only_in_source: list[str]`  
 Columns present in the source but not the target.
@@ -42,20 +39,14 @@ Columns present in the target but not the source.
 `reordered: bool`  
 `True` if the shared columns appear in a different order in the two tables.
 
-
 ## Attributes
 
 | Name | Description |
 |----|----|
 | [matches](#matches) | `True` if the schemas match (explicit renames through `column_map=` are allowed). |
 
-------------------------------------------------------------------------
-
-
 ### matches
 
-
 `True` if the schemas match (explicit renames through `column_map=` are allowed).
-
 
 `matches: bool`

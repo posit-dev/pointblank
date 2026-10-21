@@ -1,11 +1,10 @@
 # prompt_create_validator
 
+# prompt_create_validator
 
 Prompt to create a Pointblank Validator for a loaded DataFrame.
 
-
-## Arguments
-
+### Arguments
 
 `df_id: string`  
 ID of the DataFrame to validate.
@@ -32,8 +31,7 @@ Example thresholds for validation failures.
 
 Provide a value matching the following JSON schema: {"anyOf":\[{"additionalProperties":{"anyOf":\[{"type":"integer"},{"type":"number"}\]},"type":"object"},{"type":"null"}\]}. Encode non-string values as JSON.
 
-
-## Prompt Text
+### Prompt Text
 
 > **Note: Assistant**
 >

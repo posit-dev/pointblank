@@ -1,11 +1,10 @@
 # prompt_get_validation_step_output
 
+# prompt_get_validation_step_output
 
 Prompt to get validation output by specifying either a step index or a sundered type.
 
-
-## Arguments
-
+### Arguments
 
 `validator_id: string`  
 Example ID of the Validator.
@@ -22,8 +21,7 @@ Example sundered type ('pass' or 'fail') for the second mode of operation.
 
 Provide a value matching the following JSON schema: {"anyOf":\[{"type":"string"},{"type":"null"}\]}. Encode non-string values as JSON.
 
-
-## Prompt Text
+### Prompt Text
 
 > **Note: Assistant**
 >

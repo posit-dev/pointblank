@@ -1,10 +1,10 @@
 # validate_sdtm_structure()
 
-
 Validate the structural conformance of a dataset against an SDTM domain template.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1361-L1445)
 
 ``` python
 validate_sdtm_structure(
@@ -14,12 +14,9 @@ validate_sdtm_structure(
 )
 ```
 
-
 Checks required variables, variable ordering, data types, and domainvalue consistency. Does not interrogate but rather returns a dict of findings.
 
-
 ## Parameters
-
 
 `data: Any`  
 A DataFrame (Pandas, Polars) to check.
@@ -27,12 +24,10 @@ A DataFrame (Pandas, Polars) to check.
 `domain: str`  
 SDTM domain code (e.g., `"DM"`, `"AE"`). This is case-insensitive.
 
-`strict: bool = ``False`  
+`strict: bool = False`  
 If `True`, also report missing Expected variables and unknown variables.
 
-
 ## Returns
-
 
 `dict`  
 A dictionary with keys:

@@ -1,8 +1,8 @@
 # add_validation_step
 
+# add_validation_step
 
 Add a validation step to an existing Pointblank Validator.
-
 
 ``` json
 {
@@ -15,9 +15,7 @@ Add a validation step to an existing Pointblank Validator.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `validator_id: string`  
 ID of the Validator to add a step to. required

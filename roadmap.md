@@ -1,12 +1,10 @@
 # Roadmap
 
-
-# Planned -- Near Term
+## Planned -- Near Term
 
 High-priority features that build on existing infrastructure.
 
-
-## Contract Adapter Fixes & Additions
+### Contract Adapter Fixes & Additions
 
 Fill gaps in the contract adapter system (currently only `json_schema` and `frictionless` are registered; other advertised formats like `dbt` raise errors).
 
@@ -14,8 +12,7 @@ Fill gaps in the contract adapter system (currently only `json_schema` and `fric
 - Implement an **ODCS (Open Data Contract Standard)** adapter
 - Correct docstrings and examples to match the set of actually-registered adapters
 
-
-## Foreign-Key / Referential-Integrity Checks
+### Foreign-Key / Referential-Integrity Checks
 
 Expose a general-purpose referential-integrity validation (partial logic already exists in the CDISC conformance engine).
 
@@ -24,10 +21,9 @@ Expose a general-purpose referential-integrity validation (partial logic already
 - Referential integrity checks (orphan detection, cardinality)
 - Cross-table aggregate validations
 
+### Data Profiling & Drift Detection
 
-## Data Profiling & Drift Detection
-
-Expand [DataScan](./reference/DataScan.html#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
+Expand [DataScan](./reference/DataScan.md#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
 
 - `pb.DataProfile` class for comprehensive profiling
 - Profile persistence and comparison
@@ -36,17 +32,15 @@ Expand [DataScan](./reference/DataScan.html#pointblank.DataScan) into comprehens
 - Distribution visualization
 - Automatic validation generation from drift
 
-
-## Schema Export
+### Schema Export
 
 Export validation rules and schemas to standard interchange formats.
 
-- `.to_json_schema()` method on [Validate](./reference/Validate.html#pointblank.Validate) for JSON Schema output
+- `.to_json_schema()` method on [Validate](./reference/Validate.md#pointblank.Validate) for JSON Schema output
 - `.to_documentation()` for auto-generated data documentation (Markdown, HTML)
 - Round-trip compatibility with YAML validation configs
 
-
-## Rich Notification Ecosystem
+### Rich Notification Ecosystem
 
 Expand alerting beyond Slack to additional platforms.
 
@@ -57,16 +51,14 @@ Expand alerting beyond Slack to additional platforms.
 - `send_to_datadog()` -- Datadog events/metrics
 - `send_to_opsgenie()` -- Opsgenie alerts
 
-
-## Pipeline Integration Adapter
+### Pipeline Integration Adapter
 
 A concrete orchestrator integration to complement the Data-Engineering playbook.
 
 - Dagster asset-check adapter
 - dbt test adapter
 
-
-## Validation Registry
+### Validation Registry
 
 Organizational catalog for sharing and discovering validation definitions.
 
@@ -75,8 +67,7 @@ Organizational catalog for sharing and discovering validation definitions.
 - Version tracking for validation definitions
 - Integration with YAML-based validation configs
 
-
-## Semantic Validation Enhancements
+### Semantic Validation Enhancements
 
 Improve the existing `.prompt()` LLM-based validation method.
 
@@ -86,25 +77,22 @@ Improve the existing `.prompt()` LLM-based validation method.
 - Fallback strategies for rate limits
 - Custom prompt templates
 
+### Test Data Generation Enhancements
 
-## Test Data Generation Enhancements
+Extend the existing [generate_dataset()](./reference/generate_dataset.md#pointblank.generate_dataset) capabilities.
 
-Extend the existing [generate_dataset()](./reference/generate_dataset.html#pointblank.generate_dataset) capabilities.
-
-- Schema interoperability: use a [col_schema_match()](./reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match) schema to generate test data
+- Schema interoperability: use a [col_schema_match()](./reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) schema to generate test data
 - Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)
 - Edge case generation (nulls, boundaries, Unicode, etc.)
 - Hypothesis integration for property-based testing
 
 ------------------------------------------------------------------------
 
-
-# Planned -- Medium Term
+## Planned -- Medium Term
 
 Features that expand Pointblank's scope into new domains.
 
-
-## AI-Powered Data Documentation
+### AI-Powered Data Documentation
 
 Auto-generate data dictionaries and documentation from data and validations.
 
@@ -114,8 +102,7 @@ Auto-generate data dictionaries and documentation from data and validations.
 - Customizable documentation templates
 - Incremental documentation updates
 
-
-## Full Pipeline Integration Framework
+### Full Pipeline Integration Framework
 
 First-class integration with additional data orchestration tools.
 
@@ -124,8 +111,7 @@ First-class integration with additional data orchestration tools.
 - Luigi tasks
 - Kedro hooks
 
-
-## Data Observability Dashboard
+### Data Observability Dashboard
 
 Local web dashboard for monitoring data quality over time.
 
@@ -137,13 +123,11 @@ Local web dashboard for monitoring data quality over time.
 
 ------------------------------------------------------------------------
 
-
-# Planned -- Long Term
+## Planned -- Long Term
 
 Larger efforts for future milestones.
 
-
-## VS Code Extension
+### VS Code Extension
 
 Bring Pointblank directly into the IDE.
 
@@ -153,8 +137,7 @@ Bring Pointblank directly into the IDE.
 - Quick fix suggestions for validation errors
 - Data preview with quality indicators
 
-
-## Jupyter/Notebook Magic Commands
+### Jupyter/Notebook Magic Commands
 
 Delightful notebook validation experience.
 
@@ -164,8 +147,7 @@ Delightful notebook validation experience.
 - `%pb_report` inline report rendering
 - Automatic validation suggestions in notebooks
 
-
-## Schema Inference & Serialization
+### Schema Inference & Serialization
 
 Seamlessly move between data, schemas, and validations.
 
@@ -176,8 +158,7 @@ Seamlessly move between data, schemas, and validations.
 - Schema diff and merge operations
 - Schema evolution tracking
 
-
-## Type Hints & Static Analysis
+### Type Hints & Static Analysis
 
 Enable static type checking for validated data.
 
@@ -187,8 +168,7 @@ Enable static type checking for validated data.
 - Integration with Polars/Pandas type systems
 - Autocomplete for validated column names
 
-
-## Plugin Architecture
+### Plugin Architecture
 
 Allow third-party extensions to hook into the validation pipeline.
 
@@ -198,8 +178,7 @@ Allow third-party extensions to hook into the validation pipeline.
 - Plugin marketplace/registry
 - Plugin testing utilities
 
-
-## Backend Expansion
+### Backend Expansion
 
 Certify additional database and data lake backends.
 
@@ -211,8 +190,7 @@ Certify additional database and data lake backends.
 - Redshift
 - ClickHouse
 
-
-## Benchmarking & Performance
+### Benchmarking & Performance
 
 Establish Pointblank as the fastest Python validation library.
 

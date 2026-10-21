@@ -1,10 +1,10 @@
 # import_contract()
 
-
 Import a contract/schema from an external format.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L68)
 
 ``` python
 import_contract(
@@ -15,17 +15,14 @@ import_contract(
 )
 ```
 
-
-Reads an external schema definition and produces a [ContractImport](ContractImport.md#pointblank.ContractImport) with validation steps mapped to Pointblank methods. Use `pb.list_adapters()` to see all registered formats.
-
+Reads an external schema definition and produces a [ContractImport](../reference/ContractImport.md#pointblank.ContractImport) with validation steps mapped to Pointblank methods. Use `pb.list_adapters()` to see all registered formats.
 
 ## Parameters
-
 
 `source: Any`  
 The source to import from. Can be: (1) a file path (str) to a schema/contract file, or
 
-2.  a Python dict with schema content already loaded.
+2)  a Python dict with schema content already loaded.
 
 `format: str | None = None`  
 The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"`). If `None`, the format is auto-detected from file extension or content.
@@ -33,20 +30,15 @@ The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"
 `**kwargs: Any`  
 Format-specific options passed to the adapter.
 
-
 ## Returns
 
-
 `ContractImport`  
-An object containing the imported columns, constraints, and methods to generate [Validate](Validate.md#pointblank.Validate) objects, [Contract](Contract.md#pointblank.Contract) objects, Python code, or YAML.
-
+An object containing the imported columns, constraints, and methods to generate [Validate](../reference/Validate.md#pointblank.Validate) objects, [Contract](../reference/Contract.md#pointblank.Contract) objects, Python code, or YAML.
 
 ## Raises
 
-
 `ValueError`  
 If the format cannot be detected or no adapter is registered for it.
-
 
 ## Examples
 

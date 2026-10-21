@@ -1,10 +1,10 @@
 # Validate.prompt()
 
-
 Validate rows using AI/LLM-powered analysis.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13310-L13795)
 
 ``` python
 Validate.prompt(
@@ -24,18 +24,15 @@ Validate.prompt(
 )
 ```
 
+The [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Similar to other Pointblank validation methods, this generates binary test results (pass/fail) that integrate seamlessly with the standard reporting framework.
 
-The [prompt()](Validate.prompt.md#pointblank.Validate.prompt) validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Similar to other Pointblank validation methods, this generates binary test results (pass/fail) that integrate seamlessly with the standard reporting framework.
-
-Like `col_vals_*()` methods, [prompt()](Validate.prompt.md#pointblank.Validate.prompt) evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like [rows_distinct()](Validate.rows_distinct.md#pointblank.Validate.rows_distinct) and [rows_complete()](Validate.rows_complete.md#pointblank.Validate.rows_complete), it operates at the row level and allows you to specify a subset of columns for evaluation using `columns_subset=`.
+Like `col_vals_*()` methods, [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) and [rows_complete()](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete), it operates at the row level and allows you to specify a subset of columns for evaluation using `columns_subset=`.
 
 The system automatically combines your validation criteria from the `prompt=` parameter with the necessary technical context, data formatting instructions, and response structure requirements. This is all so you only need to focus on describing your validation logic in plain language.
 
 Each row becomes a test unit that either passes or fails the validation criteria, producing the familiar True/False results that appear in Pointblank validation reports. This method is particularly useful for complex validation rules that are difficult to express with traditional validation methods, such as semantic checks, context-dependent validation, or subjective quality assessments.
 
-
 ## Parameters
-
 
 `prompt: str`  
 A natural language description of the validation criteria. This prompt should clearly describe what constitutes valid vs invalid rows. Some examples: `"Each row should contain a valid email address and a realistic person name"`, `"Values should indicate positive sentiment"`, `"The description should mention a country name"`.
@@ -49,10 +46,10 @@ An optional list of reference files (images or PDFs) to attach as global context
 `model: str`  
 The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific model to be used from the provider (for `"azure-openai"`, the value after the colon is the Azure *deployment id*). Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
 
-`batch_size: int = ``1000`  
+`batch_size: int = 1000`  
 Number of rows to process in each batch. Larger batches are more efficient but may hit API limits. Default is `1000`.
 
-`max_concurrent: int = ``3`  
+`max_concurrent: int = 3`  
 Maximum number of concurrent API requests. Higher values speed up processing but may hit rate limits. Default is `3`.
 
 `pre: Callable | None = None`  
@@ -65,24 +62,21 @@ An optional directive on segmentation, which serves to split a validation step i
 Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will be set locally and global thresholds (if any) will take effect.
 
 `actions: Actions | None = None`  
-Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> class should be used to define the actions.
+Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the [`Actions`](../reference/Actions.md#pointblank.Actions) class should be used to define the actions.
 
 `brief: str | bool | None = None`  
 An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like `"{step}"` to insert the step number, or `"{auto}"` to include an automatically generated brief. If `True` the entire brief will be automatically generated. If `None` (the default) then there won't be a brief.
 
-`active: bool | Callable = ``True`  
-A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.
+`active: bool | Callable = True`  
+A boolean value or callable that determines whether the validation step should be active. Using `False` will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated *before* any `pre=` processing. Inspection functions like [`has_columns()`](../reference/has_columns.md#pointblank.has_columns) and [`has_rows()`](../reference/has_rows.md#pointblank.has_rows) can be used here to conditionally activate a step based on properties of the target table.
 
 `dimension: str | None = None`  
 An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 
-
 ## Returns
 
-
 `Validate`  
-The [Validate](Validate.md#pointblank.Validate) object with the added validation step.
-
+The [Validate](../reference/Validate.md#pointblank.Validate) object with the added validation step.
 
 ## Constructing The `model` Argument
 
@@ -95,7 +89,6 @@ The `model=` argument should be constructed using the provider and model name se
 - `"azure-openai"` (Azure OpenAI)
 
 The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id.
-
 
 ## Notes On Authentication
 
@@ -119,7 +112,6 @@ There's no need to have the `python-dotenv` package installed when using `.env` 
 - **Ollama**: no API key required, just ensure Ollama is running locally
 - **Bedrock**: configure AWS credentials through standard AWS methods
 - **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
-
 
 ## Ai Validation Process
 
@@ -157,7 +149,6 @@ The LLM returns validation results in this format:
 ]
 ```
 
-
 ## Prompt Design Tips
 
 For best results, design prompts that are:
@@ -182,7 +173,6 @@ Poor prompt examples (avoid these):
 - "Describe the quality of each row" (asks for description, not validation)
 - "How would you improve this data?" (asks for suggestions, not pass/fail)
 
-
 ## Multi-Modal Attachments
 
 Use `attachments=` to give the LLM a reference image or PDF that applies to every row. The attachment is sent as global context, while each row's values are still serialized as JSON and validated against your `prompt=`. Useful patterns:
@@ -206,7 +196,6 @@ Note: local image paths auto-coerced through `attachments=` use `resize="low"` (
 - keep attachments small (downscale images, crop PDFs to the relevant page)
 - use `columns_subset=` aggressively to maximize row-signature memoization (fewer unique rows means fewer batches)
 - raise `batch_size=` when the combined system prompt, attachment, and row JSON fit comfortably under the model's context window
-
 
 ## Performance Considerations
 
@@ -234,7 +223,6 @@ The row signature memoization optimization can reduce processing time significan
 - start with smaller batches: begin with `batch_size=100` for testing, then increase gradually
 - reduce concurrency: lower `max_concurrent=1` if hitting rate limits
 - use faster/cheaper models: consider using smaller or more efficient models for initial testing before switching to more capable models
-
 
 ## Examples
 

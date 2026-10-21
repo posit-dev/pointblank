@@ -2,32 +2,29 @@
 
 Pointblank can be installed using various package managers. The base installation gives you the core validation functionality, with optional dependencies for working with different data sources.
 
-
-# Basic Installation
+## Basic Installation
 
 You can install Pointblank using your preferred package manager:
 
-
-- <a href="" id="tabset-1-1-tab" class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">pip</a>
-- <a href="" id="tabset-1-2-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">uv</a>
-- <a href="" id="tabset-1-3-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">conda</a>
-- <a href="" id="tabset-1-4-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">pixi</a>
-
+**pip**
 
 ``` bash
 pip install pointblank
 ```
 
+**uv**
 
 ``` bash
 uv pip install pointblank
 ```
 
+**conda**
 
 ``` bash
 conda install -c conda-forge pointblank
 ```
 
+**pixi**
 
 ``` bash
 # add pointblank to project
@@ -36,15 +33,11 @@ cd name-of-project
 pixi add pointblank
 ```
 
-
-# DataFrame Libraries
+## DataFrame Libraries
 
 Pointblank requires a DataFrame library but doesn't include one by default, giving you the flexibility to choose either [Pandas](https://pandas.pydata.org) or [Polars](https://pola.rs):
 
-
-- <a href="" id="tabset-2-1-tab" class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Polars</a>
-- <a href="" id="tabset-2-2-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Pandas</a>
-
+**Polars**
 
 ``` bash
 # Using pip
@@ -54,6 +47,7 @@ pip install pointblank[pl]
 pip install polars>=1.24.0
 ```
 
+**Pandas**
 
 ``` bash
 # Using pip
@@ -63,23 +57,15 @@ pip install pointblank[pd]
 pip install pandas>=2.2.3
 ```
 
-
 Pointblank works seamlessly with both libraries, and you can choose the one that best fits your workflow and performance requirements.
 
+## Optional Dependencies
 
-# Optional Dependencies
-
-
-## Ibis Backends
+### Ibis Backends
 
 To work with various database systems through [Ibis](https://ibis-project.org), you can install additional backends:
 
-
-- <a href="" id="tabset-3-1-tab" class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">pip</a>
-- <a href="" id="tabset-3-2-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">uv</a>
-- <a href="" id="tabset-3-3-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">conda</a>
-- <a href="" id="tabset-3-4-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">pixi</a>
-
+**pip**
 
 ``` bash
 pip install pointblank[sqlite]      # SQLite
@@ -96,6 +82,7 @@ pip install pointblank[snowflake]   # Snowflake
 pip install pointblank[duckdb,postgres,sqlite]
 ```
 
+**uv**
 
 ``` bash
 uv pip install pointblank[sqlite]      # SQLite
@@ -112,6 +99,7 @@ uv pip install pointblank[snowflake]   # Snowflake
 uv pip install pointblank[duckdb,postgres,sqlite]
 ```
 
+**conda**
 
 ``` bash
 conda install -c conda-forge pointblank-sqlite      # SQLite
@@ -128,6 +116,7 @@ conda install -c conda-forge pointblank-snowflake   # Snowflake
 conda install -c conda-forge pointblank-duckdb pointblank-postgres pointblank-sqlite
 ```
 
+**pixi**
 
 ``` bash
 pixi add pointblank-sqlite      # SQLite
@@ -144,13 +133,11 @@ pixi add pointblank-snowflake   # Snowflake
 pixi add pointblank-duckdb pointblank-postgres pointblank-sqlite
 ```
 
-
-> **Note: Note**
+> **Note**
 >
 > Even when using exclusively Ibis backends, you still need either Pandas or Polars installed since Pointblank's reporting functionality (powered by [Great Tables](https://posit-dev.github.io/great-tables)) requires a DataFrame library for rendering tabular reporting results.
 
-
-## AI-Assisted Validation (Experimental)
+### AI-Assisted Validation (Experimental)
 
 Pointblank includes experimental support for AI-assisted validation plan generation:
 
@@ -158,10 +145,9 @@ Pointblank includes experimental support for AI-assisted validation plan generat
 pip install pointblank[generate]
 ```
 
-This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the [Draft Validation](../../user-guide/advanced-validation/draft-validation.md) article for how to create validation plans from existing data.
+This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the [Draft Validation](../advanced-validation/draft-validation.md) article for how to create validation plans from existing data.
 
-
-## Development Version
+### Development Version
 
 If you want the latest development version with the newest features, you can install directly from GitHub:
 
@@ -169,8 +155,7 @@ If you want the latest development version with the newest features, you can ins
 pip install git+https://github.com/posit-dev/pointblank.git
 ```
 
-
-# Verifying Your Installation
+## Verifying Your Installation
 
 You can verify your installation by importing Pointblank and checking the version:
 
@@ -179,17 +164,15 @@ import pointblank as pb
 print(pb.__version__)
 ```
 
-
-# System Requirements
+## System Requirements
 
 - Python 3.10 or higher
 - a supported DataFrame library (Pandas or Polars)
 - optional: Ibis (for database connectivity)
 
+## Next Steps
 
-# Next Steps
-
-Now that you've installed Pointblank, you're ready to start validating your data. If you haven't read the [Introduction](../../user-guide/getting-started/index.md) yet, consider starting there to learn the basic concepts.
+Now that you've installed Pointblank, you're ready to start validating your data. If you haven't read the [Introduction](index.md) yet, consider starting there to learn the basic concepts.
 
 If you encounter any installation issues, please [open an issue on GitHub](https://github.com/posit-dev/pointblank/issues/new) with details about your system and the specific error messages you're seeing. The maintainers actively monitor these issues and can help troubleshoot problems.
 
@@ -212,8 +195,7 @@ validation = (
 validation
 ```
 
-
-# Command Line Interface
+## Command Line Interface
 
 Once installed, Pointblank also provides a powerful command-line interface for quick data validation tasks:
 
@@ -238,4 +220,4 @@ The CLI is useful for:
 >
 > Watch our [interactive CLI demonstrations](../../examples/advanced-topics/cli-interactive.md) to see these commands executing in real-time with actual output formatting.
 
-Learn more about the CLI capabilities in the [Command Line Interface](../../user-guide/the-pointblank-cli/index.md) guide.
+Learn more about the CLI capabilities in the [Command Line Interface](../the-pointblank-cli/index.md) guide.

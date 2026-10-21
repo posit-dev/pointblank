@@ -1,36 +1,29 @@
 # get_sdtm_domain()
 
-
 Get the SDTM template for a specific domain.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1315-L1347)
 
 ``` python
 get_sdtm_domain(domain)
 ```
 
-
 ## Parameters
-
 
 `domain: str`  
 Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`, `"VS"`). This is case-insensitive.
 
-
 ## Returns
-
 
 `SDTMDomainTemplate`  
 The structural template for the domain.
 
-
 ## Raises
-
 
 `KeyError`  
 If the domain is not supported.
-
 
 ## Examples
 

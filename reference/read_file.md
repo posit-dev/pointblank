@@ -1,36 +1,30 @@
 # read_file()
 
-
-Read a Validate object from disk that was previously saved with [write_file()](write_file.md#pointblank.write_file).
-
+Read a Validate object from disk that was previously saved with [write_file()](../reference/write_file.md#pointblank.write_file).
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L736-L885)
 
 ``` python
 read_file(filepath)
 ```
 
+This function loads a validation object that was previously serialized to disk using the [write_file()](../reference/write_file.md#pointblank.write_file) function. The validation object will be restored with all its validation results, metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
 
-This function loads a validation object that was previously serialized to disk using the [write_file()](write_file.md#pointblank.write_file) function. The validation object will be restored with all its validation results, metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
-
-> **Warning: Warning**
+> **Warning**
 >
-> The [read_file()](read_file.md#pointblank.read_file) function is currently experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
-
+> The [read_file()](../reference/read_file.md#pointblank.read_file) function is currently experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 ## Parameters
-
 
 `filepath: str | Path`  
 The path to the saved validation file. Can be a string or Path object.
 
-
 ## Returns
-
 
 `Validate`  
 The restored validation object with all its original state, validation results, and metadata.
-
 
 ## Examples
 
@@ -64,9 +58,8 @@ if validation.data is not None:
     failing_rows = validation.get_sundered_data(type="fail")
 ```
 
-
 ## See Also
 
 `Use` the `write_file()` method to save a validation object  
 
-`to` disk for later retrieval with this function.
+`to` disk for later retrieval with this function.  

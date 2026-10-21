@@ -1,8 +1,8 @@
 # profile_dataframe
 
+# profile_dataframe
 
 Profile a loaded DataFrame using Pointblank's DataScan, returning column-level statistics.
-
 
 ``` json
 {
@@ -14,9 +14,7 @@ Profile a loaded DataFrame using Pointblank's DataScan, returning column-level s
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `df_id: string`  
 ID of the DataFrame to profile. required

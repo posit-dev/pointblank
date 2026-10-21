@@ -1,10 +1,10 @@
 # validate_sdtm()
 
-
 Generate a comprehensive SDTM validation workflow for a dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L91-L197)
 
 ``` python
 validate_sdtm(
@@ -18,8 +18,7 @@ validate_sdtm(
 )
 ```
 
-
-Creates a [Validate](Validate.md#pointblank.Validate) object with checks for:
+Creates a [Validate](../reference/Validate.md#pointblank.Validate) object with checks for:
 
 - Schema conformance (required variables present with correct types)
 - Required variables are non-null
@@ -28,9 +27,7 @@ Creates a [Validate](Validate.md#pointblank.Validate) object with checks for:
 - ISO 8601 date format for -DTC timing variables
 - Sequence number positivity and uniqueness per subject
 
-
 ## Parameters
-
 
 `data: Any`  
 The DataFrame to validate (Pandas or Polars).
@@ -41,25 +38,22 @@ SDTM domain code (e.g., `"DM"`, `"AE"`, `"LB"`). This is case-insensitive.
 `study_id: str | None = None`  
 Optional study identifier for the validation label.
 
-`check_dates: bool = ``True`  
+`check_dates: bool = True`  
 If `True`, validate ISO 8601 format for -DTC variables.
 
-`check_lengths: bool = ``True`  
+`check_lengths: bool = True`  
 If `True`, validate string length constraints.
 
 `label: str | None = None`  
-Custom label for the [Validate](Validate.md#pointblank.Validate) object. Defaults to `"SDTM {domain} Validation"`.
+Custom label for the [Validate](../reference/Validate.md#pointblank.Validate) object. Defaults to `"SDTM {domain} Validation"`.
 
 `**kwargs: Any`  
-Additional keyword arguments passed to the [Validate](Validate.md#pointblank.Validate) constructor.
-
+Additional keyword arguments passed to the [Validate](../reference/Validate.md#pointblank.Validate) constructor.
 
 ## Returns
 
-
-<a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code"><code>Validate</code></a>  
-A configured (but not yet interrogated) [Validate](Validate.md#pointblank.Validate) object.
-
+`Validate`  
+A configured (but not yet interrogated) [Validate](../reference/Validate.md#pointblank.Validate) object.
 
 ## Examples
 

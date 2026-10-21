@@ -1,10 +1,10 @@
 # MetadataPackage
 
-
-A collection of [MetadataImport](MetadataImport.md#pointblank.MetadataImport) objects from a multi-dataset source.
-
+A collection of [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) objects from a multi-dataset source.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L493-L584)
 
 ``` python
 MetadataPackage(
@@ -15,25 +15,21 @@ MetadataPackage(
 )
 ```
 
-
 Used for multi-domain CDISC studies, Frictionless Data Packages, etc.
 
-
 ## Parameters
-
 
 `name: str | None = None`  
 Package name/identifier.
 
 `items: dict[str, MetadataImport] = dict()`  
-Named [MetadataImport](MetadataImport.md#pointblank.MetadataImport) objects.
+Named [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) objects.
 
 `description: str | None = None`  
 Description of the package.
 
 `version: str | None = None`  
 Package/study version.
-
 
 ## Methods
 
@@ -44,92 +40,69 @@ Package/study version.
 | [summary()](#summary) | Return a human-readable summary of the package. |
 | [values()](#values) | Get all MetadataImport objects. |
 
-------------------------------------------------------------------------
-
-
 ### get_domain()
-
 
 Get metadata for a specific domain/dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L536-L558)
 
 ``` python
 get_domain(name)
 ```
 
-
 #### Parameters
-
 
 `name: str`  
 Domain or dataset name (e.g., `"DM"`, `"AE"`).
 
-
 #### Returns
-
 
 `MetadataImport`  
 The metadata for the named domain.
 
-
 #### Raises
-
 
 `KeyError`  
 If no domain with that name exists.
 
-
-------------------------------------------------------------------------
-
-
 ### keys()
-
 
 Get the names of all datasets/domains.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L528-L530)
 
 ``` python
 keys()
 ```
 
-
-------------------------------------------------------------------------
-
-
 ### summary()
-
 
 Return a human-readable summary of the package.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L560-L578)
 
 ``` python
 summary()
 ```
 
-
 #### Returns
-
 
 `str`  
 Formatted summary string.
 
-
-------------------------------------------------------------------------
-
-
 ### values()
-
 
 Get all MetadataImport objects.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L532-L534)
 
 ``` python
 values()

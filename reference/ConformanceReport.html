@@ -9,6 +9,7 @@
 <meta name="description" content="The result of a CDISC conformance validation run.">
 
 <title>ConformanceReport | Pointblank</title>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ConformanceReport - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ConformanceReport.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/ConformanceReport.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/ConformanceReport.html">
+<link rel="alternate" type="text/markdown" href="ConformanceReport.md">
 
 
 <meta property="og:title" content="ConformanceReport | Pointblank">
@@ -140,34 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="ConformanceReport | Pointblank">
 <meta name="twitter:description" content="The result of a CDISC conformance validation run.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="ConformanceReport.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "ConformanceReport - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/ConformanceReport.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1700,41 +1674,25 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 </section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="gd-summary-table">
+<table class="gd-summary-table caption-top table">
 <thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="#is_core" class="doc-attribute doc-label doc-label-property">is_core</a>
-</td>
-<td>
-Whether this report wraps CDISC CORE engine results (vs.&nbsp;built-in engine results).
-</td>
+<tr class="odd">
+<td><a href="#is_core" class="doc-attribute doc-label doc-label-property">is_core</a></td>
+<td>Whether this report wraps CDISC CORE engine results (vs.&nbsp;built-in engine results).</td>
 </tr>
-<tr>
-<td>
-<a href="#is_rules" class="doc-attribute doc-label doc-label-property">is_rules</a>
-</td>
-<td>
-Whether this report was produced by Pointblank’s built-in rule-based conformance engine.
-</td>
+<tr class="even">
+<td><a href="#is_rules" class="doc-attribute doc-label doc-label-property">is_rules</a></td>
+<td>Whether this report was produced by Pointblank’s built-in rule-based conformance engine.</td>
 </tr>
-<tr>
-<td>
-<a href="#n_datasets" class="doc-attribute doc-label doc-label-property">n_datasets</a>
-</td>
-<td>
-Number of datasets validated.
-</td>
+<tr class="odd">
+<td><a href="#n_datasets" class="doc-attribute doc-label doc-label-property">n_datasets</a></td>
+<td>Number of datasets validated.</td>
 </tr>
 </tbody>
 </table>
@@ -1771,113 +1729,61 @@ Number of datasets validated.
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
-<table class="gd-summary-table">
+<table class="gd-summary-table caption-top table">
 <thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="#all_passed" class="doc-function doc-label doc-label-method">all_passed()</a>
-</td>
-<td>
-Whether the run reported no conformance failures.
-</td>
+<tr class="odd">
+<td><a href="#all_passed" class="doc-function doc-label doc-label-method">all_passed()</a></td>
+<td>Whether the run reported no conformance failures.</td>
 </tr>
-<tr>
-<td>
-<a href="#findings" class="doc-function doc-label doc-label-method">findings()</a>
-</td>
-<td>
-Return the row-level findings.
-</td>
+<tr class="even">
+<td><a href="#findings" class="doc-function doc-label doc-label-method">findings()</a></td>
+<td>Return the row-level findings.</td>
 </tr>
-<tr>
-<td>
-<a href="#findings_df" class="doc-function doc-label doc-label-method">findings_df()</a>
-</td>
-<td>
-Return all row-level findings as a Polars DataFrame.
-</td>
+<tr class="odd">
+<td><a href="#findings_df" class="doc-function doc-label doc-label-method">findings_df()</a></td>
+<td>Return all row-level findings as a Polars DataFrame.</td>
 </tr>
-<tr>
-<td>
-<a href="#from_core_report" class="doc-function doc-label doc-label-method">from_core_report()</a>
-</td>
-<td>
-Build a CORE-backed <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a> from a CDISC CORE JSON report.
-</td>
+<tr class="even">
+<td><a href="#from_core_report" class="doc-function doc-label doc-label-method">from_core_report()</a></td>
+<td>Build a CORE-backed <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a> from a CDISC CORE JSON report.</td>
 </tr>
-<tr>
-<td>
-<a href="#get_findings_table" class="doc-function doc-label doc-label-method">get_findings_table()</a>
-</td>
-<td>
-Build a record-level findings table as a styled Great Tables object.
-</td>
+<tr class="odd">
+<td><a href="#get_findings_table" class="doc-function doc-label doc-label-method">get_findings_table()</a></td>
+<td>Build a record-level findings table as a styled Great Tables object.</td>
 </tr>
-<tr>
-<td>
-<a href="#get_tabular_report" class="doc-function doc-label doc-label-method">get_tabular_report()</a>
-</td>
-<td>
-Build a rule-level conformance summary table as a styled Great Tables object.
-</td>
+<tr class="even">
+<td><a href="#get_tabular_report" class="doc-function doc-label doc-label-method">get_tabular_report()</a></td>
+<td>Build a rule-level conformance summary table as a styled Great Tables object.</td>
 </tr>
-<tr>
-<td>
-<a href="#get_validation" class="doc-function doc-label doc-label-method">get_validation()</a>
-</td>
-<td>
-Get the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object for a single dataset (case-insensitive).
-</td>
+<tr class="odd">
+<td><a href="#get_validation" class="doc-function doc-label doc-label-method">get_validation()</a></td>
+<td>Get the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object for a single dataset (case-insensitive).</td>
 </tr>
-<tr>
-<td>
-<a href="#issues" class="doc-function doc-label doc-label-method">issues()</a>
-</td>
-<td>
-Return the conformance issues found.
-</td>
+<tr class="even">
+<td><a href="#issues" class="doc-function doc-label doc-label-method">issues()</a></td>
+<td>Return the conformance issues found.</td>
 </tr>
-<tr>
-<td>
-<a href="#rules" class="doc-function doc-label doc-label-method">rules()</a>
-</td>
-<td>
-Return the per-rule run results.
-</td>
+<tr class="odd">
+<td><a href="#rules" class="doc-function doc-label doc-label-method">rules()</a></td>
+<td>Return the per-rule run results.</td>
 </tr>
-<tr>
-<td>
-<a href="#summary" class="doc-function doc-label doc-label-method">summary()</a>
-</td>
-<td>
-Return a summary of the conformance run.
-</td>
+<tr class="even">
+<td><a href="#summary" class="doc-function doc-label doc-label-method">summary()</a></td>
+<td>Return a summary of the conformance run.</td>
 </tr>
-<tr>
-<td>
-<a href="#to_excel" class="doc-function doc-label doc-label-method">to_excel()</a>
-</td>
-<td>
-Save the conformance report as an Excel workbook.
-</td>
+<tr class="odd">
+<td><a href="#to_excel" class="doc-function doc-label doc-label-method">to_excel()</a></td>
+<td>Save the conformance report as an Excel workbook.</td>
 </tr>
-<tr>
-<td>
-<a href="#to_json" class="doc-function doc-label doc-label-method">to_json()</a>
-</td>
-<td>
-Save the conformance report as a JSON file.
-</td>
+<tr class="even">
+<td><a href="#to_json" class="doc-function doc-label doc-label-method">to_json()</a></td>
+<td>Save the conformance report as a JSON file.</td>
 </tr>
 </tbody>
 </table>

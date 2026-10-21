@@ -1,13 +1,10 @@
 # pb run
 
-
 Run a Pointblank validation script or YAML configuration.
-
 
 ``` bash
 pb run [OPTIONS] [VALIDATION_FILE]
 ```
-
 
 - VALIDATION_FILE can be:
 - A Python file (.py) that defines validation logic
@@ -27,9 +24,7 @@ DATA can be:
 - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
 - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb run [OPTIONS] [VALIDATION_FILE]
 
@@ -81,16 +76,12 @@ DATA can be:
                                       reaches this threshold level
       --help                          Show this message and exit.
 
-
 ## Arguments
-
 
 `VALIDATION_FILE: PATH`  
 Optional.
 
-
 ## Options
-
 
 `--data: TEXT`  
 Data source to replace in validation objects (Python scripts and YAML configs)
@@ -112,7 +103,6 @@ Maximum number of failing rows to save to CSV (default: 500)
 
 `--fail-on: CHOICE`  
 Exit with non-zero code when validation reaches this threshold level
-
 
 ## Examples
 

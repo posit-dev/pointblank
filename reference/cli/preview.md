@@ -1,13 +1,10 @@
 # pb preview
 
-
 Preview a data table showing head and tail rows.
-
 
 ``` bash
 pb preview [OPTIONS] [DATA_SOURCE]
 ```
-
 
 DATA_SOURCE can be:
 
@@ -29,9 +26,7 @@ For tables with many columns, use these options to control which columns are dis
 
 Tables with \>15 columns automatically show first 7 and last 7 columns with indicators.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb preview [OPTIONS] [DATA_SOURCE]
 
@@ -75,16 +70,12 @@ Tables with \>15 columns automatically show first 7 and last 7 columns with indi
       --output-html PATH         Save HTML output to file
       --help                     Show this message and exit.
 
-
 ## Arguments
-
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
-
 ## Options
-
 
 `--columns: TEXT`  
 Comma-separated list of columns to display

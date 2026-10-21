@@ -1,10 +1,10 @@
 # DataScanDiff
 
-
-The result of comparing two [DataScan](DataScan.md#pointblank.DataScan) profiles.
-
+The result of comparing two [DataScan](../reference/DataScan.md#pointblank.DataScan) profiles.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L826-L1125)
 
 ``` python
 DataScanDiff(
@@ -13,12 +13,9 @@ DataScanDiff(
 )
 ```
 
-
-Created by calling [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via `get_tabular_report()`.
-
+Created by calling [DataScan.compare()](../reference/DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via `get_tabular_report()`.
 
 ## Attributes
-
 
 `columns_added: list[str]`  
 Column names present in the current scan but not the baseline.
@@ -32,7 +29,6 @@ Column names whose data type changed between baseline and current.
 `column_diffs: list[_ColumnDiff]`  
 Per-column diff details for all columns that appear in either scan.
 
-
 ## Attributes
 
 | Name | Description |
@@ -40,29 +36,17 @@ Per-column diff details for all columns that appear in either scan.
 | [has_changes](#has_changes) | Return `True` if any schema or statistical changes were detected. |
 | [row_count_diff](#row_count_diff) | Return `(baseline_row_count, current_row_count)`. |
 
-------------------------------------------------------------------------
-
-
 ### has_changes
-
 
 Return `True` if any schema or statistical changes were detected.
 
-
 `has_changes: bool`
-
-
-------------------------------------------------------------------------
-
 
 ### row_count_diff
 
-
 Return `(baseline_row_count, current_row_count)`.
 
-
 `row_count_diff: tuple[int, int]`
-
 
 ## Methods
 
@@ -71,47 +55,36 @@ Return `(baseline_row_count, current_row_count)`.
 | [get_tabular_report()](#get_tabular_report) | Generate a GT table summarizing the differences between the two scans. |
 | [to_dict()](#to_dict) | Export the comparison results as a dictionary. |
 
-------------------------------------------------------------------------
-
-
 ### get_tabular_report()
-
 
 Generate a GT table summarizing the differences between the two scans.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L997-L1115)
 
 ``` python
 get_tabular_report()
 ```
 
-
 #### Returns
-
 
 `GT`  
 A styled Great Tables report showing schema and statistical drift.
 
-
-------------------------------------------------------------------------
-
-
 ### to_dict()
-
 
 Export the comparison results as a dictionary.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L959-L995)
 
 ``` python
 to_dict()
 ```
 
-
 #### Returns
-
 
 `dict[str, Any]`  
 A dictionary with schema changes, row count diff, and per-column stat diffs.

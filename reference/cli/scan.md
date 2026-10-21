@@ -1,13 +1,10 @@
 # pb scan
 
-
 Generate a data scan profile report.
-
 
 ``` bash
 pb scan [OPTIONS] [DATA_SOURCE]
 ```
-
 
 Produces a comprehensive data profile including:
 
@@ -25,9 +22,7 @@ DATA_SOURCE can be:
 - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 - Piped data from pb pl command
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb scan [OPTIONS] [DATA_SOURCE]
 
@@ -54,16 +49,12 @@ DATA_SOURCE can be:
       -c, --columns TEXT  Comma-separated list of columns to scan
       --help              Show this message and exit.
 
-
 ## Arguments
-
 
 `DATA_SOURCE: TEXT`  
 Optional.
 
-
 ## Options
-
 
 `--output-html: PATH`  
 Save HTML scan report to file

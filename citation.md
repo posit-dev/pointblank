@@ -2,18 +2,15 @@
 
 To cite this package in publications, please use the following citation.
 
-
-# Authors
+## Authors
 
 Richard Iannone. Maintainer.
 
-
-# Citation
+## Citation
 
 **Source:** [`CITATION.cff`](https://github.com/posit-dev/pointblank/blob/main/CITATION.cff)
 
-
-## BibTeX
+### BibTeX
 
 ``` bibtex
 @Manual{,
@@ -25,13 +22,11 @@ Richard Iannone. Maintainer.
 }
 ```
 
-
-## APA
+### APA
 
 Iannone, R. (2026). *Pointblank: data validation toolkit for assessing and monitoring data quality.* (Version 1.0.1) \[Computer software\]. https://posit-dev.github.io/pointblank/
 
-
-## RIS
+### RIS
 
 ``` ris
 TY  - COMP

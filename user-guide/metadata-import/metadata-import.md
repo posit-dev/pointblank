@@ -4,8 +4,7 @@ Many data files carry rich metadata that goes beyond raw values: variable labels
 
 Pointblank's metadata import system reads these external descriptions and converts them into validation workflows automatically. Rather than manually translating a Define-XML specification or an SPSS codebook into validation code, you can call [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) and let Pointblank generate the appropriate checks for you. The result is a [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) object that bridges between domain-specific formats and Pointblank's validation engine.
 
-
-# Quick Start
+## Quick Start
 
 The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call `to_validate()`. Here is the basic pattern:
 
@@ -21,8 +20,7 @@ validation = meta.to_validate(data=my_dataframe).interrogate()
 
 The [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) function is the single entry point for all supported formats. It returns a [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) object containing parsed variable definitions, codelists, missing value codes, and dataset-level metadata. From there, you can generate a [Schema](../../reference/Schema.md#pointblank.Schema), a full [Validate](../../reference/Validate.md#pointblank.Validate) workflow, or inspect individual variables and their constraints.
 
-
-# Supported Formats
+## Supported Formats
 
 Pointblank can import metadata from a range of domain-specific standards. Each format is handled by a dedicated reader that understands the structure and semantics of that standard.
 
@@ -41,8 +39,7 @@ Pointblank can import metadata from a range of domain-specific standards. Each f
 
 The format can be specified explicitly or auto-detected from the file extension in many cases. For ambiguous formats (like XML files that could be Define-XML or Controlled Terminology), Pointblank inspects the file content to determine the correct reader.
 
-
-# The [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) Object
+## The [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) Object
 
 Every call to [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) returns a [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) instance. This object holds all the information extracted from the source file, organized into a structure that Pointblank can work with. Understanding its components helps you get the most out of imported metadata.
 
@@ -60,8 +57,7 @@ The key attributes are:
 
 Each [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object describes a single column, including its name, data type, label, and any constraints that were defined in the source file. Constraints are automatically mapped to Pointblank validation methods when you call `to_validate()`.
 
-
-# Converting to a Schema
+## Converting to a Schema
 
 The [to_schema()](../../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) method produces a Pointblank [Schema](../../reference/Schema.md#pointblank.Schema) reflecting the column names and data types from the metadata. This is useful for structural validation (ensuring a DataFrame has the expected shape) without running value-level checks.
 
@@ -81,8 +77,7 @@ validation = (
 
 The schema captures what the metadata says the table *should* look like, not what the data actually contains. This makes it valuable for catching structural drift: columns that were renamed, retyped, or dropped since the metadata was last updated.
 
-
-# Converting to a Validation Workflow
+## Converting to a Validation Workflow
 
 The `to_validate()` method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
 
@@ -109,8 +104,7 @@ validation = (
 )
 ```
 
-
-# Format Auto-Detection
+## Format Auto-Detection
 
 When the format is unambiguous from the file extension, you can omit the `format=` parameter and let Pointblank detect it automatically:
 
@@ -126,8 +120,7 @@ meta = pb.import_metadata("panel.dta")       # detected as Stata
 
 For JSON files, you need to specify the format explicitly because a `.json` file could be a Frictionless Data Package, a Table Schema, or a CSVW document. For XML files, Pointblank inspects the content (namespace declarations and root element) to distinguish between Define-XML and Controlled Terminology formats.
 
-
-# Working with Variables
+## Working with Variables
 
 The `variables` list on a [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) contains one [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object per column. Each carries all the information that was available in the source file for that column.
 
@@ -145,8 +138,7 @@ for var in meta.variables:
 
 Different source formats populate different fields. An SPSS file provides value labels and missing value codes but not controlled terminology references. A CDISC Define-XML provides computational methods and codelist references but not display formats. The [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) dataclass is a superset that accommodates all source formats.
 
-
-# Working with Codelists
+## Working with Codelists
 
 Codelists represent controlled terminologies: named sets of permitted values with labels and optional descriptions. They appear in CDISC files, SPSS value labels, and Frictionless enum constraints.
 
@@ -168,8 +160,7 @@ sex_labels = meta.codelists["C66731"].to_dict()
 
 When `to_validate()` encounters a variable with a `codelist_ref`, it generates a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step using the codelist's values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).
 
-
-# Handling Missing Value Codes
+## Handling Missing Value Codes
 
 Statistical packages like SPSS and SAS use sentinel values to represent different kinds of missingness. A value of `-99` might mean "not asked", while `-98` means "refused". These are not null values in the data; they are valid numeric entries that carry semantic meaning.
 
@@ -186,7 +177,6 @@ for var_name, codes in meta.missing_value_codes.items():
 
 When generating validation, these codes inform Pointblank about which values should be treated as missing rather than as data errors. This prevents false positives where a valid missing code like `-99` would otherwise fail a `col_vals_ge(value=0)` check.
 
-
-# Conclusion
+## Conclusion
 
 The metadata import system transforms domain-specific data descriptions into actionable validation workflows. Whether you are working with statistical package files from survey research, CDISC documents from clinical trials, or Frictionless schemas from open data platforms, the pattern is the same: call [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata), inspect what was extracted, and then convert it to a [Schema](../../reference/Schema.md#pointblank.Schema) or [Validate](../../reference/Validate.md#pointblank.Validate) object. The following pages in this section cover each format family in detail, starting with statistical packages and then moving to CDISC clinical data standards.

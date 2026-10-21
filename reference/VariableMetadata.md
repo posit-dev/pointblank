@@ -1,10 +1,10 @@
 # VariableMetadata
 
-
 Metadata for a single variable/column, as imported from an external standard.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L140-L254)
 
 ``` python
 VariableMetadata(
@@ -39,9 +39,7 @@ VariableMetadata(
 )
 ```
 
-
 ## Parameters
-
 
 `name: str`  
 Variable/column name.
@@ -58,10 +56,10 @@ Data type (mapped to Narwhals/Polars type names).
 `role: str | None = None`  
 Variable role (e.g., `"identifier"`, `"measure"`, `"classifier"`).
 
-`required: bool = ``False`  
+`required: bool = False`  
 Whether the variable must be non-null.
 
-`unique: bool = ``False`  
+`unique: bool = False`  
 Whether all values must be distinct.
 
 `min_val: float | None = None`  
@@ -127,34 +125,27 @@ Unit of measurement (e.g., `"kg"`, `"mmHg"`, `"years"`).
 `unit_system: str | None = None`  
 Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
 
-
 ## Methods
 
 | Name | Description |
 |----|----|
-| [to_missing_spec()](#to_missing_spec) | Build a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values. |
-
-------------------------------------------------------------------------
-
+| [to_missing_spec()](#to_missing_spec) | Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) from this variable's missing values. |
 
 ### to_missing_spec()
 
-
-Build a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> from this variable's missing values.
-
+Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) from this variable's missing values.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L241-L254)
 
 ``` python
 to_missing_spec()
 ```
 
-
 Reads `missing_values` and derives reason labels from `missing_value_labels` or `value_labels` when available.
-
 
 #### Returns
 
-
 `MissingSpec | None`  
-A [MissingSpec](MissingSpec.md#pointblank.MissingSpec) for the variable, or `None` if no missing values are declared.
+A [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) for the variable, or `None` if no missing values are declared.

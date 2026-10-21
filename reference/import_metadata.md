@@ -1,10 +1,10 @@
 # import_metadata()
 
-
 Import metadata from an external standard or file.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_import.py#L304-L446)
 
 ``` python
 import_metadata(
@@ -14,12 +14,9 @@ import_metadata(
 )
 ```
 
-
 Reads metadata definitions from statistical package files (SPSS, SAS, Stata), standards documents (CDISC Define-XML, Frictionless), or scientific formats (NetCDF/CF) and returns a structured representation that can be converted to Pointblank validation workflows.
 
-
 ## Parameters
-
 
 `source: str | Path | Any`  
 Path to a metadata file, or an object containing metadata (e.g., an xarray Dataset). For file paths, the format will be auto-detected from the extension if not specified.
@@ -30,23 +27,18 @@ Explicit format identifier. If None, auto-detected from the file extension. Supp
 `**kwargs: Any`  
 Additional format-specific options passed to the reader.
 
-
 ## Returns
-
 
 `MetadataImport | MetadataPackage`  
 A MetadataImport for single-dataset sources, or a MetadataPackage for multi-dataset sources (e.g., multi-domain CDISC studies).
 
-
 ## Raises
-
 
 `ValueError`  
 If the format cannot be determined or is not supported.
 
 `ImportError`  
 If the required optional dependency is not installed.
-
 
 ## Examples
 

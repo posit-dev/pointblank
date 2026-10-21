@@ -2,11 +2,9 @@
 
 This reference provides a comprehensive guide to all YAML keys and parameters supported by Pointblank's YAML validation workflows. Use this document as a quick lookup when building validation configurations.
 
+## Global Configuration Keys
 
-# Global Configuration Keys
-
-
-## Top-level Structure
+### Top-level Structure
 
 ``` yaml
 tbl: data_source                       # REQUIRED: Data source specification
@@ -45,8 +43,7 @@ steps:                                 # REQUIRED: List of validation steps
       parameter: value
 ```
 
-
-## Data Source (`tbl`)
+### Data Source (`tbl`)
 
 The `tbl` key specifies the data source and supports multiple formats:
 
@@ -66,8 +63,7 @@ tbl:
     pl.scan_csv("data.csv").filter(pl.col("date") >= "2024-01-01")
 ```
 
-
-### Using Templates with `set_tbl=`
+#### Using Templates with `set_tbl=`
 
 For reusable validation templates that will always use a custom data source via the `set_tbl=` parameter in [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate), the `tbl` field is still required but its value doesn't matter since it will be overridden. Recommended approaches:
 
@@ -99,8 +95,7 @@ q1_result = pb.yaml_interrogate(template, set_tbl=q1_data)
 q2_result = pb.yaml_interrogate(template, set_tbl=q2_data)
 ```
 
-
-## DataFrame Library (`df_library`)
+### DataFrame Library (`df_library`)
 
 The `df_library` key controls which DataFrame library is used to load data sources. This parameter affects both built-in datasets and file loading:
 
@@ -148,8 +143,7 @@ The `df_library` parameter is particularly useful when:
 - optimizing performance for different data sizes and operations
 - ensuring compatibility with downstream processing steps
 
-
-## Global Thresholds
+### Global Thresholds
 
 Thresholds define when validation failures trigger different severity levels:
 
@@ -163,8 +157,7 @@ thresholds:
 - values: numbers between `0` and `1` (percentages) or integers (row counts)
 - levels: [warning](../../reference/Validate.warning.md#pointblank.Validate.warning), [error](../../reference/Validate.error.md#pointblank.Validate.error), [critical](../../reference/Validate.critical.md#pointblank.Validate.critical)
 
-
-## Global Actions
+### Global Actions
 
 Actions define responses when thresholds are exceeded. When supplying a string to a severity level ('warning', 'error', 'critical'), you can use template variables that will be automatically substituted with contextual information:
 
@@ -189,10 +182,9 @@ Template variables available for action strings:
 - `{level}`: severity level ('warning'/'error'/'critical')
 - `{time}`: timestamp of validation
 
+### Structured Missingness ([missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs))
 
-## Structured Missingness ([missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs))
-
-The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, `null_is_missing`, and `null_reason`:
+The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, `null_is_missing`, and `null_reason`:
 
 ``` yaml
 missing_specs:
@@ -242,14 +234,11 @@ steps:
           -98: refused
 ```
 
+## Validation Methods Reference
 
-# Validation Methods Reference
+### Column Value Validations
 
-
-## Column Value Validations
-
-
-### Comparison Methods
+#### Comparison Methods
 
 [col_vals_gt](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt): are column data greater than a fixed value or data in another column?
 
@@ -317,8 +306,7 @@ steps:
     # ... (same parameters as col_vals_gt)
 ```
 
-
-### Range Methods
+#### Range Methods
 
 [col_vals_between](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between): are column data between two specified values (inclusive)?
 
@@ -350,8 +338,7 @@ steps:
     # ... (same parameters as col_vals_between)
 ```
 
-
-### Set Membership Methods
+#### Set Membership Methods
 
 [col_vals_in_set](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set): are column data part of a specified set of values?
 
@@ -379,8 +366,7 @@ steps:
     # ... (same parameters as col_vals_in_set)
 ```
 
-
-### NULL Value Methods
+#### NULL Value Methods
 
 [col_vals_null](../../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null): are column data null (missing)?
 
@@ -404,8 +390,7 @@ steps:
     # ... (same parameters as col_vals_null)
 ```
 
-
-### Pattern Matching Methods
+#### Pattern Matching Methods
 
 [col_vals_regex](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex): do string-based column data match a regular expression?
 
@@ -474,8 +459,7 @@ Examples:
     spec: "iban[DE]"
 ```
 
-
-### Custom Expression Methods
+#### Custom Expression Methods
 
 [col_vals_expr](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr): do column data agree with a predicate expression?
 
@@ -495,8 +479,7 @@ Examples:
     brief: "Custom validation rule"    # OPTIONAL: Step description
 ```
 
-
-### Trend Validation Methods
+#### Trend Validation Methods
 
 [col_vals_increasing](../../reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing): are column data increasing row-by-row?
 
@@ -591,8 +574,7 @@ Examples:
     brief: "Stock levels decrease (small restocks allowed)"
 ```
 
-
-## Row-based Validations
+### Row-based Validations
 
 [rows_distinct](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct): are row data distinct?
 
@@ -626,8 +608,7 @@ Examples:
     brief: "Complete rows only"        # OPTIONAL: Step description
 ```
 
-
-## Structure Validations
+### Structure Validations
 
 [col_exists](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists): does column exist in the table?
 
@@ -742,8 +723,7 @@ Examples:
     brief: "Selected columns match reference"
 ```
 
-
-## Special Validation Methods
+### Special Validation Methods
 
 [conjointly](../../reference/Validate.conjointly.md#pointblank.Validate.conjointly): are multiple validations having a joint dependency?
 
@@ -789,8 +769,7 @@ For Pandas DataFrames (when using `df_library: pandas`):
     expr: "lambda df: df.assign(is_valid=df['a'] + df['d'] > 0)"
 ```
 
-
-## AI-Powered Validation
+### AI-Powered Validation
 
 [prompt](../../reference/Validate.prompt.md#pointblank.Validate.prompt): validate rows using AI/LLM-powered analysis
 
@@ -900,8 +879,7 @@ Examples:
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
-
-## Data Quality Methods
+### Data Quality Methods
 
 [col_pct_null](../../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null): is the percentage of null values in a column within bounds?
 
@@ -929,8 +907,7 @@ Examples:
     brief: "Data is recent"            # OPTIONAL: Step description
 ```
 
-
-## Aggregate Validations
+### Aggregate Validations
 
 Aggregate methods validate column-level statistics (sum, average, standard deviation) against a threshold. They follow the pattern `col_{stat}_{comparator}`:
 
@@ -962,8 +939,7 @@ Available aggregate methods:
 
 All aggregate methods accept these common parameters: `columns`, `value`, `thresholds`, `actions`, `brief`, `active`, and `pre`.
 
-
-# Column Selection Patterns
+## Column Selection Patterns
 
 All validation methods that accept a `columns` parameter support these selection patterns:
 
@@ -984,11 +960,9 @@ columns: [customer_id, order_id]     # Specific columns
 columns: user_email                  # Single column
 ```
 
+## Parameter Details
 
-# Parameter Details
-
-
-## Common Parameters
+### Common Parameters
 
 These parameters are available for most validation methods:
 
@@ -1000,8 +974,7 @@ These parameters are available for most validation methods:
 - `brief`: step description (string, boolean, or template)
 - `active`: whether the step is active (boolean, default: true)
 
-
-## Active Parameter
+### Active Parameter
 
 The `active` parameter controls whether a validation step runs. It defaults to `true`; set it to `false` to skip a step without removing it from the configuration:
 
@@ -1018,8 +991,7 @@ steps:
       columns: [customer_id]
 ```
 
-
-## Brief Parameter Options
+### Brief Parameter Options
 
 The `brief` parameter supports several formats:
 
@@ -1033,8 +1005,7 @@ brief: "Column '{col}' validation"  # Template with variables
 
 template variables: `{step}`, `{col}`, `{value}`, `{set}`, `{pattern}`, `{auto}`
 
-
-## Python Expressions
+### Python Expressions
 
 Several parameters support Python expressions using the `python:` block syntax:
 
@@ -1071,8 +1042,7 @@ pre: |
   lambda df: df.filter(pl.col("status") == "active")
 ```
 
-
-## Restricted Python Environment
+### Restricted Python Environment
 
 For security reasons, the Python environment in YAML configurations is restricted to a safe subset of functionality. The available namespace includes:
 
@@ -1124,19 +1094,16 @@ actions:
 
 For complex alerting, logging, or external system integration, use string template actions instead of callable actions, and handle the external communication in your application code after validation completes.
 
+## Best Practices
 
-# Best Practices
-
-
-## Organization
+### Organization
 
 - use descriptive `tbl_name` and `label` values
 - add `brief` descriptions for complex validations
 - group related validations logically
 - use consistent indentation and formatting
 
-
-## Performance
+### Performance
 
 - apply `pre` filters early to reduce data volume
 - order validations from fast to slow
@@ -1147,8 +1114,7 @@ For complex alerting, logging, or external system integration, use string templa
   - `pandas`: best for complex transformations and data science workflows
   - `duckdb`: optimal for analytical queries on very large datasets
 
-
-## Maintainability
+### Maintainability
 
 - store YAML files in version control
 - use template variables in actions and briefs
@@ -1157,8 +1123,7 @@ For complex alerting, logging, or external system integration, use string templa
 - specify `df_library` explicitly when using library-specific validation expressions
 - keep DataFrame library choice consistent within related validation workflows
 
-
-## Error Handling
+### Error Handling
 
 - set appropriate thresholds based on data patterns
 - use actions for monitoring and alerting

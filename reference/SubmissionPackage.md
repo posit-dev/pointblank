@@ -1,10 +1,10 @@
 # SubmissionPackage
 
-
 A data-level model of a study submission package for CDISC conformance validation.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L141-L846)
 
 ``` python
 SubmissionPackage(
@@ -17,33 +17,29 @@ SubmissionPackage(
 )
 ```
 
+A [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) groups the datasets of a study (SDTM domains, SUPP- qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the *relationships* between them. This enables cross-dataset conformance checks -- referential integrity, SUPP- linkage, RELREC resolution, and ADaM ⇄ SDTM traceability -- that single-dataset validation cannot express.
 
-A [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) groups the datasets of a study (SDTM domains, SUPP- qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the *relationships* between them. This enables cross-dataset conformance checks -- referential integrity, SUPP- linkage, RELREC resolution, and ADaM ⇄ SDTM traceability -- that single-dataset validation cannot express.
-
-This is the data-level analog of <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups *metadata* for many datasets.
-
+This is the data-level analog of [`MetadataPackage`](../reference/MetadataPackage.md#pointblank.MetadataPackage), which groups *metadata* for many datasets.
 
 ## Parameters
-
 
 `datasets: dict[str, Any] = dict()`  
 A mapping of dataset name (domain code, e.g., `"DM"`, `"AE"`, `"SUPPAE"`, `"ADSL"`) to the dataset itself (a Pandas or Polars DataFrame). Names are matched case-insensitively but conventionally uppercase.
 
 `define: Any = None`  
-Optional Define-XML context: a path to a `define.xml` file, or an already-imported <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.
+Optional Define-XML context: a path to a `define.xml` file, or an already-imported [`MetadataPackage`](../reference/MetadataPackage.md#pointblank.MetadataPackage). Used to supply variable definitions, codelists, and origins for define-context rules.
 
 `ct_version: str | None = None`  
 Optional Controlled Terminology version pin (e.g., `"2024-03-29"`), recorded for reproducible runs.
 
-`standard: str = ``"sdtmig"`  
+`standard: str = "sdtmig"`  
 The data standard the package follows (`"sdtmig"` or `"adamig"`). Defaults to `"sdtmig"`.
 
-`standard_version: str = ``"3.4"`  
+`standard_version: str = "3.4"`  
 The Implementation Guide version (e.g., `"3.4"` for SDTM IG). Defaults to `"3.4"`.
 
 `study_id: str | None = None`  
 Optional study identifier, used in report labels.
-
 
 ## Examples
 
@@ -69,7 +65,6 @@ study = pb.SubmissionPackage.from_folder("study_xyz/sdtm/")
 report = study.validate_conformance(agency="FDA")
 ```
 
-
 ## Attributes
 
 | Name | Description |
@@ -77,54 +72,38 @@ report = study.validate_conformance(agency="FDA")
 | [domains](#domains) | The names (domain codes) of all datasets in the package, sorted. |
 | [metadata](#metadata) | The imported Define-XML metadata, if `define` was supplied. |
 
-------------------------------------------------------------------------
-
-
 ### domains
-
 
 The names (domain codes) of all datasets in the package, sorted.
 
-
 `domains: list[str]`
-
-
-------------------------------------------------------------------------
-
 
 ### metadata
 
-
 The imported Define-XML metadata, if `define` was supplied.
-
 
 `metadata: MetadataPackage | None`
 
-
-Lazily imports the Define-XML document (via <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.
-
+Lazily imports the Define-XML document (via [`import_metadata()`](../reference/import_metadata.md#pointblank.import_metadata)) the first time it is accessed.
 
 ## Methods
 
 | Name | Description |
 |----|----|
-| [from_folder()](#from_folder) | Build a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets. |
+| [from_folder()](#from_folder) | Build a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets. |
 | [get_dataset()](#get_dataset) | Get a dataset by name (case-insensitive). |
 | [orphan_ids()](#orphan_ids) | Find values of `column` in `child` that do not exist in `parent`. |
 | [subject_ids()](#subject_ids) | Get the set of `USUBJID` values in a dataset. |
 | [summary()](#summary) | Return a human-readable summary of the package contents. |
 | [validate_conformance()](#validate_conformance) | Validate CDISC conformance across the whole submission package. |
 
-------------------------------------------------------------------------
-
-
 ### from_folder()
 
-
-Build a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets.
-
+Build a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets.
 
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L216-L288)
 
 ``` python
 from_folder(
@@ -137,23 +116,20 @@ from_folder(
 )
 ```
 
-
 Reads every SAS Transport (`.xpt`) and CDISC Dataset-JSON (`.json`) file in the folder, deriving the dataset name from the file stem (uppercased). If a `define.xml` is present in the folder and `define` is not supplied, it is picked up automatically.
 
-
 #### Parameters
-
 
 `path: str | Path`  
 Path to a folder containing the study datasets.
 
 `define: str | Path | Any | None = None`  
-Optional Define-XML path or <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If `None`, a `define.xml` in the folder is used when present.
+Optional Define-XML path or [`MetadataPackage`](../reference/MetadataPackage.md#pointblank.MetadataPackage). If `None`, a `define.xml` in the folder is used when present.
 
-`standard: str = ``"sdtmig"`  
+`standard: str = "sdtmig"`  
 The data standard (`"sdtmig"` or `"adamig"`). Defaults to `"sdtmig"`.
 
-`standard_version: str = ``"3.4"`  
+`standard_version: str = "3.4"`  
 The Implementation Guide version. Defaults to `"3.4"`.
 
 `ct_version: str | None = None`  
@@ -162,61 +138,45 @@ Optional Controlled Terminology version pin.
 `study_id: str | None = None`  
 Optional study identifier.
 
-
 #### Returns
-
 
 `SubmissionPackage`  
 A package populated with the folder's datasets.
 
-
-------------------------------------------------------------------------
-
-
 ### get_dataset()
-
 
 Get a dataset by name (case-insensitive).
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L306-L327)
 
 ``` python
 get_dataset(name)
 ```
 
-
 #### Parameters
-
 
 `name: str`  
 The dataset name / domain code.
 
-
 #### Returns
-
 
 `Any`  
 The dataset (DataFrame).
 
-
 #### Raises
-
 
 `KeyError`  
 If no dataset with that name exists.
 
-
-------------------------------------------------------------------------
-
-
 ### orphan_ids()
-
 
 Find values of `column` in `child` that do not exist in `parent`.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L375-L397)
 
 ``` python
 orphan_ids(
@@ -226,86 +186,65 @@ orphan_ids(
 )
 ```
 
-
 This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.
 
-
 #### Parameters
-
 
 `child: str`  
 The referencing dataset (e.g., `"AE"`).
 
-`parent: str = ``"DM"`  
+`parent: str = "DM"`  
 The referenced dataset (e.g., `"DM"`). Defaults to `"DM"`.
 
-`column: str = ``"USUBJID"`  
+`column: str = "USUBJID"`  
 The key column to check. Defaults to `"USUBJID"`.
 
-
 #### Returns
-
 
 `set`  
 The set of orphaned values (present in `child.column` but not `parent.column`).
 
-
-------------------------------------------------------------------------
-
-
 ### subject_ids()
-
 
 Get the set of `USUBJID` values in a dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L355-L373)
 
 ``` python
 subject_ids(dataset="DM")
 ```
 
-
 #### Parameters
 
-
-`dataset: str = ``"DM"`  
+`dataset: str = "DM"`  
 The dataset to read subject IDs from. Defaults to `"DM"` (the reference set of all enrolled subjects).
 
-
 #### Returns
-
 
 `set`  
 The set of non-null `USUBJID` values, or an empty set if the dataset or column is absent.
 
-
-------------------------------------------------------------------------
-
-
 ### summary()
-
 
 Return a human-readable summary of the package contents.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L826-L837)
 
 ``` python
 summary()
 ```
 
-
-------------------------------------------------------------------------
-
-
 ### validate_conformance()
-
 
 Validate CDISC conformance across the whole submission package.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L401-L526)
 
 ``` python
 validate_conformance(
@@ -327,33 +266,30 @@ validate_conformance(
 )
 ```
 
-
 Two engines are available:
 
-- **`"native"`** (default) -- Pointblank's own checks. For each dataset this builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when `cross_dataset=True`):
+- **`"native"`** (default) -- Pointblank's own checks. For each dataset this builds a [`Validate`](../reference/Validate.md#pointblank.Validate) plan combining the single-dataset structural checks (via [`validate_sdtm()`](../reference/validate_sdtm.md#pointblank.validate_sdtm) / [`validate_adam()`](../reference/validate_adam.md#pointblank.validate_adam)) and cross-dataset conformance checks (when `cross_dataset=True`):
   - **Referential integrity** -- every `USUBJID` in a finding/events/interventions domain exists in DM.
   - **SUPP- linkage** -- `RDOMAIN` references a present domain, `USUBJID` exists in DM, and `(USUBJID, IDVAR=IDVARVAL)` resolves to a record in the parent domain.
   - **RELREC** -- each relationship record's `RDOMAIN` is present and `USUBJID` exists in DM.
   - **ADaM ⇄ SDTM traceability** -- `ADSL.USUBJID ⊆ DM.USUBJID`, and every other ADaM dataset's `USUBJID ⊆ ADSL.USUBJID`.
-- **`"core"`** -- hands the package to the external CDISC CORE engine (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport). Requires an installed CORE executable (see `core`).
-
+- **`"core"`** -- hands the package to the external CDISC CORE engine (`cdisc-rules-engine`), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport). Requires an installed CORE executable (see `core`).
 
 #### Parameters
-
 
 `agency: str | None = None`  
 Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base rules).
 
-`engine: str = ``"native"`  
+`engine: str = "native"`  
 `"native"` (the default) or `"core"`.
 
-`cross_dataset: bool = ``True`  
+`cross_dataset: bool = True`  
 (Validate-based engine only.) Whether to add cross-dataset conformance checks. Defaults to `True`.
 
 `thresholds: Any = None`  
-(Validate-based engine only.) Optional thresholds passed to each dataset's [Validate](Validate.md#pointblank.Validate) (maps failing test units onto Pointblank's warning/error/critical severity model).
+(Validate-based engine only.) Optional thresholds passed to each dataset's [Validate](../reference/Validate.md#pointblank.Validate) (maps failing test units onto Pointblank's warning/error/critical severity model).
 
-`interrogate: bool = ``True`  
+`interrogate: bool = True`  
 (Validate-based engine only.) Whether to interrogate (run) the validations before returning.
 
 `standard: str | None = None`  
@@ -377,9 +313,7 @@ Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base r
 `workdir: str | Path | None = None`  
 (CORE only.) Directory for materialized XPT and the CORE report. If `None`, a temporary directory is used and cleaned up.
 
-
 #### Returns
-
 
 `ConformanceReport`  
 A built-in engine report (per-dataset validations) or a CORE-form report, depending on `engine`.

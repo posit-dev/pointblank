@@ -9,6 +9,7 @@
 <meta name="description" content="Create a dict of string field specifications representing a person profile.">
 
 <title>profile_fields() | Pointblank</title>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "profile_fields - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/profile_fields.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -66,7 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -135,6 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/profile_fields.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/profile_fields.html">
+<link rel="alternate" type="text/markdown" href="profile_fields.md">
 
 
 <meta property="og:title" content="profile_fields() | Pointblank">
@@ -143,34 +145,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="profile_fields() | Pointblank">
 <meta name="twitter:description" content="Create a dict of string field specifications representing a person profile.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="profile_fields.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "profile_fields - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/profile_fields.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -215,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1704,7 +1678,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The default call returns the <code>"standard"</code> set of profile columns. The <code>**</code> operator unpacks the returned dictionary directly into <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema()</a>, as if each <a href="../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a> call had been written by hand. All coherence rules apply automatically: emails are derived from names, and city/state/postcode/phone are internally consistent.</p>
-<div id="e0e57f44" class="cell" data-execution_count="1">
+<div id="a3510bfb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1928,7 +1902,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>Use <code>set=</code> to control how many columns are generated. The <code>"minimal"</code> set includes only <code>name</code>, <code>email</code>, and <code>phone</code>, while <code>"full"</code> adds <code>address</code>, <code>company</code>, and <code>job</code>. Setting <code>split_name=False</code> collapses <code>first_name</code> and <code>last_name</code> into a single combined <code>name</code> column:</p>
-<div id="c5e9ecf5" class="cell" data-execution_count="2">
+<div id="80972f4f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, split_name<span class="op">=</span><span class="va">False</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    balance<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="dv">0</span>, max_val<span class="op">=</span><span class="dv">10000</span>),</span>
@@ -2102,7 +2076,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>The <code>include=</code> and <code>exclude=</code> parameters let you customize the column set without switching to a different base set. Here we start from the <code>"full"</code> set but drop the business columns:</p>
-<div id="efb9d758" class="cell" data-execution_count="3">
+<div id="fff741c2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"full"</span>, exclude<span class="op">=</span>[<span class="st">"company"</span>, <span class="st">"job"</span>]),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -2323,7 +2297,7 @@ If <code>set=</code> is not one of <code>"minimal"</code>, <code>"standard"</cod
 </div>
 </div>
 <p>The <code>prefix=</code> parameter prepends a string to every column name, which is especially useful when a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group maintains its own coherence:</p>
-<div id="facf9071" class="cell" data-execution_count="4">
+<div id="99668384" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"sender_"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"recipient_"</span>),</span>

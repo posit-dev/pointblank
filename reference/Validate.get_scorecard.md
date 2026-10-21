@@ -1,34 +1,28 @@
 # Validate.get_scorecard()
 
-
 Get a data quality scorecard as a GT table.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19877-L20059)
 
 ``` python
 Validate.get_scorecard(title=":default:")
 ```
 
-
-The [get_scorecard()](Validate.get_scorecard.md#pointblank.Validate.get_scorecard) method produces a compact, standalone scorecard that summarizes data quality across dimensions. It shows the overall health score prominently, along with a per-dimension breakdown (a color-coded bar, the dimension's score, and its passing/total test units). Unlike the full validation report, the scorecard focuses purely on the aggregate health picture, making it well-suited for dashboards and executive summaries.
+The [get_scorecard()](../reference/Validate.get_scorecard.md#pointblank.Validate.get_scorecard) method produces a compact, standalone scorecard that summarizes data quality across dimensions. It shows the overall health score prominently, along with a per-dimension breakdown (a color-coded bar, the dimension's score, and its passing/total test units). Unlike the full validation report, the scorecard focuses purely on the aggregate health picture, making it well-suited for dashboards and executive summaries.
 
 The returned object is a Great Tables `GT` object, so it can be displayed directly, exported to HTML (via `.as_raw_html()`), or saved to an image file (via `.save()`).
 
-
 ## Parameters
 
-
-`title: str | None = ``":default:"`  
+`title: str | None = ":default:"`  
 Options for customizing the title of the scorecard. The default `":default:"` produces a generic title (optionally including the table name). Use `":tbl_name:"` to show just the table name, `":none:"` for no title, or provide your own Markdown text.
-
 
 ## Returns
 
-
 `GT`  
 A `GT` object representing the scorecard.
-
 
 ## Examples
 
@@ -46,13 +40,12 @@ validation = (
 validation.get_scorecard()
 ```
 
-
 ## See Also
 
-`Use` <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> and  
+`Use` [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores) and  
 
-<a href="../reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link"><code>get_health_score()</code></a> for the underlying numbers,  
+[`get_health_score()`](../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score) for the underlying numbers,  
 
-`and` <a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> for the full per-step  
+`and` [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) for the full per-step  
 
-`validation` report.
+`validation` report.  

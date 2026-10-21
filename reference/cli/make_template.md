@@ -1,13 +1,10 @@
 # pb make-template
 
-
 Create a validation script or YAML configuration template.
-
 
 ``` bash
 pb make-template [OUTPUT_FILE]
 ```
-
 
 - Creates a sample Python script or YAML configuration with examples showing how to use Pointblank
 - for data validation. The template type is determined by the file extension:
@@ -18,9 +15,7 @@ Edit the template to add your own data loading and validation rules, then run it
 
 OUTPUT_FILE is the path where the template will be created.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb make-template [OPTIONS] [OUTPUT_FILE]
 
@@ -45,13 +40,10 @@ OUTPUT_FILE is the path where the template will be created.
     Options:
       --help  Show this message and exit.
 
-
 ## Arguments
-
 
 `OUTPUT_FILE: PATH`  
 Optional.
-
 
 ## Examples
 

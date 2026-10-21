@@ -1,10 +1,10 @@
 # validate_cdisc_submission()
 
-
 Validate a CDISC submission with the CDISC CORE engine, in one call.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1927-L2040)
 
 ``` python
 validate_cdisc_submission(
@@ -23,24 +23,21 @@ validate_cdisc_submission(
 )
 ```
 
-
-Convenience wrapper that builds a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from `source` and runs <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with `engine="core"`. Requires an installed CORE executable (see `core`).
-
+Convenience wrapper that builds a [`SubmissionPackage`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) from `source` and runs [`validate_conformance()`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) with `engine="core"`. Requires an installed CORE executable (see `core`).
 
 ## Parameters
 
-
 `source: str | Path | dict | SubmissionPackage`  
-The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON, with an optional `define.xml`), a mapping of dataset name to DataFrame, or an already-built [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage).
+The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON, with an optional `define.xml`), a mapping of dataset name to DataFrame, or an already-built [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage).
 
 `standard: str | None = None`  
-The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's `standard` when `source` is a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage)).
+The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's `standard` when `source` is a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage)).
 
 `version: str | None = None`  
 The standard version (e.g., `"3.4"`). Defaults to `"3.4"` (or the package's value).
 
 `define: str | Path | Any | None = None`  
-Optional Define-XML path (ignored when `source` is a [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage) -- set it on the package instead). Auto-detected from a folder `source` when present.
+Optional Define-XML path (ignored when `source` is a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) -- set it on the package instead). Auto-detected from a folder `source` when present.
 
 `controlled_terminology: str | Sequence[str] | None = None`  
 CT package name(s) for CORE's `-ct` (e.g., `"sdtmct-2024-03-29"`).
@@ -66,13 +63,10 @@ Path to CORE's rules cache directory (`-ca`).
 `workdir: str | Path | None = None`  
 Directory for materialized XPT and the CORE report. If `None`, a temporary directory is used.
 
-
 ## Returns
 
-
 `ConformanceReport`  
-A CORE-form report ([is_core](ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`).
-
+A CORE-form report ([is_core](../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`).
 
 ## Examples
 

@@ -1,10 +1,10 @@
 # DataScan
 
-
 Get a summary of a dataset.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L29-L637)
 
 ``` python
 DataScan(
@@ -13,8 +13,7 @@ DataScan(
 )
 ```
 
-
-The [DataScan](DataScan.md#pointblank.DataScan) class provides a way to get a summary of a dataset. The summary includes the following information:
+The [DataScan](../reference/DataScan.md#pointblank.DataScan) class provides a way to get a summary of a dataset. The summary includes the following information:
 
 - the name of the table (if provided)
 - the type of the table (e.g., `"polars"`, `"pandas"`, etc.)
@@ -27,22 +26,19 @@ The [DataScan](DataScan.md#pointblank.DataScan) class provides a way to get a su
   - a sample of the data (the first 5 values)
   - statistics (if the column contains numbers, strings, or datetimes)
 
-To obtain a dictionary representation of the summary, you can use the `to_dict()` method. To get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON text to a file, the [save_to_json()](DataScan.save_to_json.md#pointblank.DataScan.save_to_json) method could be used.
+To obtain a dictionary representation of the summary, you can use the `to_dict()` method. To get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON text to a file, the [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json) method could be used.
 
-> **Warning: Warning**
+> **Warning**
 >
-> The [DataScan()](DataScan.md#pointblank.DataScan) class is still experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
-
+> The [DataScan()](../reference/DataScan.md#pointblank.DataScan) class is still experimental. Please report any issues you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 ## Parameters
-
 
 `data: Any`  
 The data to scan and summarize. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a database connection string.
 
 `tbl_name: str | None = None`  
 Optionally, the name of the table could be provided as `tbl_name`.
-
 
 ## Measures Of Missingness And Distinctness
 
@@ -54,7 +50,6 @@ For each column, the following measures are provided:
 - `f_unique_values`: the fraction of unique values in the column
 
 The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.
-
 
 ## Counts And Fractions Of Negative, Zero, And Positive Values
 
@@ -68,7 +63,6 @@ For numerical columns, the following measures are provided:
 - `f_positive_values`: the fraction of positive values in the column
 
 The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.
-
 
 ## Statistics For Numerical And String Columns
 
@@ -90,7 +84,6 @@ Additionally, the following quantiles are provided:
 - `max`: the maximum value in the column
 - `iqr`: the interquartile range of the column
 
-
 ## Statistics For Date And Datetime Columns
 
 For date/datetime columns, the following statistics are provided:
@@ -98,9 +91,7 @@ For date/datetime columns, the following statistics are provided:
 - `min`: the minimum date/datetime in the column
 - `max`: the maximum date/datetime in the column
 
-
 ## Returns
-
 
 `DataScan`  
 A DataScan object.

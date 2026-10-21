@@ -1,21 +1,18 @@
 # Comparison
 
-
 The result of comparing a source table with a target table.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L490-L1511)
 
 ``` python
 Comparison()
 ```
 
-
-[Comparison](Comparison.md#pointblank.Comparison) objects are created by <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. They hold the row status counts, per-column mismatch counts, and the schema differences, and can retrieve samples of differing rows on demand.
-
+[Comparison](../reference/Comparison.md#pointblank.Comparison) objects are created by [`compare()`](../reference/compare.md#pointblank.compare). They hold the row status counts, per-column mismatch counts, and the schema differences, and can retrieve samples of differing rows on demand.
 
 ## Attributes
-
 
 `source_name, target_name`  
 Labels for the two tables.
@@ -27,7 +24,7 @@ The key columns used to align rows (empty for positional alignment).
 `"keyed"` or `"positional"`.
 
 `schema_diff`  
-A <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link"><code>SchemaDiff</code></a> describing schema differences.
+A [`SchemaDiff`](../reference/SchemaDiff.md#pointblank.SchemaDiff) describing schema differences.
 
 `n_source_rows, n_target_rows`  
 Row counts of the two tables.

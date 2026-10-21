@@ -1,8 +1,8 @@
 # load_dataframe
 
+# load_dataframe
 
 Load a DataFrame from a CSV, Excel or Parquet file into the server's context.
-
 
 ``` json
 {
@@ -15,9 +15,7 @@ Load a DataFrame from a CSV, Excel or Parquet file into the server's context.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `input_path: string`  
 Path to the input CSV, Excel or Parquet file. required

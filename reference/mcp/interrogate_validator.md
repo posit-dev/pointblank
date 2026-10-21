@@ -1,8 +1,8 @@
 # interrogate_validator
 
+# interrogate_validator
 
 Run validations and return a JSON summary with Python code equivalent.
-
 
 ``` json
 {
@@ -13,9 +13,7 @@ Run validations and return a JSON summary with Python code equivalent.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `validator_id: string`  
 ID of the Validator to interrogate. required

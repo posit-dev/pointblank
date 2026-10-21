@@ -1,7 +1,6 @@
 # Security Policy
 
-
-# Reporting a Vulnerability
+## Reporting a Vulnerability
 
 If you believe you have found a security vulnerability in this project or any other software maintained by Posit, PBC, we encourage you to report it responsibly. Please do not open a public issue. Instead, please use the Report a vulnerability function available via the security tab.
 
@@ -14,8 +13,7 @@ Your report should include (if possible):
 
 We aim to acknowledge receipt of your report within 7 business days and provide an update on remediation progress within 14 business days.
 
-
-# Coordinated Disclosure
+## Coordinated Disclosure
 
 We follow a coordinated disclosure approach. Once the issue is confirmed and a fix is ready, we will:
 
@@ -24,8 +22,7 @@ We follow a coordinated disclosure approach. Once the issue is confirmed and a f
 - publish a security advisory and update affected versions
 - if severe enough, assist with publishing a CVE
 
-
-# Security Best Practices
+## Security Best Practices
 
 To minimize your exposure:
 

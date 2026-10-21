@@ -1,8 +1,8 @@
 # apply_validation_template
 
+# apply_validation_template
 
 Apply a pre-built validation template to a validator.
-
 
 ``` json
 {
@@ -15,9 +15,7 @@ Apply a pre-built validation template to a validator.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `validator_id: string`  
 ID of the Validator to apply template to. required

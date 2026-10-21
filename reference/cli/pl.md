@@ -1,21 +1,16 @@
 # pb pl
 
-
 Execute Polars expressions and display results.
-
 
 ``` bash
 pb pl [OPTIONS] [POLARS_EXPRESSION]
 ```
 
-
 Execute Polars DataFrame operations from the command line and display the results using Pointblank's visualization tools.
 
 POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame. The `pl` module is automatically imported and available.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
 
@@ -78,16 +73,12 @@ POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame. 
       --pipe-format [parquet|csv]     Format for piped output (default: parquet)
       --help                          Show this message and exit.
 
-
 ## Arguments
-
 
 `POLARS_EXPRESSION: TEXT`  
 Optional.
 
-
 ## Options
-
 
 `-e, --edit`  
 Open editor for multi-line input
@@ -115,7 +106,6 @@ Output data in a format suitable for piping to other pb commands
 
 `--pipe-format: CHOICE = parquet`  
 Format for piped output (default: parquet)
-
 
 ## Examples
 

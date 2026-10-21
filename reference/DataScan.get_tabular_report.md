@@ -1,7 +1,8 @@
 # DataScan.get_tabular_report()
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L213-L451)
 
 ``` python
 DataScan.get_tabular_report(

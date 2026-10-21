@@ -1,10 +1,10 @@
 # ADaMVariableSpec
 
-
 Specification for a single variable in an ADaM dataset template.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L16-L54)
 
 ``` python
 ADaMVariableSpec(
@@ -21,9 +21,7 @@ ADaMVariableSpec(
 )
 ```
 
-
 ## Parameters
-
 
 `name: str`  
 Variable name (e.g., `"USUBJID"`, `"AVAL"`, `"PARAMCD"`).
@@ -34,10 +32,10 @@ Variable label (e.g., `"Unique Subject Identifier"`).
 `dtype: str`  
 Expected data type (`"Char"` or `"Num"`).
 
-`core: str = ``"Perm"`  
+`core: str = "Perm"`  
 ADaM core designation: `"Req"` (required), `"Cond"` (conditionally required), or `"Perm"` (permissible).
 
-`required: bool = ``False`  
+`required: bool = False`  
 Whether the variable is unconditionally required.
 
 `max_length: int | None = None`  
@@ -52,5 +50,5 @@ Traceability: expected source (e.g., `"SDTM.DM"`, `"Derived"`).
 `condition: str | None = None`  
 For conditional variables, describes when they are required.
 
-`is_population_flag: bool = ``False`  
+`is_population_flag: bool = False`  
 Whether this is a population flag variable (e.g., `"SAFFL"`, `"ITTFL"`).

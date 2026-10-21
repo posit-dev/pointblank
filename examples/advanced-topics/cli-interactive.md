@@ -18,69 +18,54 @@ These CLI demos showcase practical data quality workflows that you can use!
 > pb --help  # Verify installation
 > ```
 
-
-## Getting Started with the CLI
+### Getting Started with the CLI
 
 Learn the basics of Pointblank's CLI and run your first validation:
 
+![Getting Started](../../assets/vhs/cli-getting-started.gif) *CLI overview and your first data quality validation*
 
-<img src="../../assets/vhs/cli-getting-started.gif" class="img-fluid" alt="Getting Started" /> *CLI overview and your first data quality validation*
-
-
-## Essential Data Quality Validations
+### Essential Data Quality Validations
 
 See the most commonly used validation checks that catch critical data issues:
 
+![Essential Validations](../../assets/vhs/cli-essential-validations.gif) *Duplicate detection, null checks, and data extract debugging*
 
-<img src="../../assets/vhs/cli-essential-validations.gif" class="img-fluid" alt="Essential Validations" /> *Duplicate detection, null checks, and data extract debugging*
-
-
-## Data Exploration Tools
+### Data Exploration Tools
 
 Discover how to profile and explore data using CLI tools that are quick and easy to use:
 
+![Data Exploration](../../assets/vhs/cli-data-exploration.gif) *Preview data, find missing values, and generate column summaries*
 
-<img src="../../assets/vhs/cli-data-exploration.gif" class="img-fluid" alt="Data Exploration" /> *Preview data, find missing values, and generate column summaries*
-
-
-## Using Polars
+### Using Polars
 
 You can use Polars in the CLI to load and transform data, and, pass the data to other CLI tools:
 
+![Using Polars](../../assets/vhs/cli-using-polars.gif) *Preview data, find missing values, and generate column summaries*
 
-<img src="../../assets/vhs/cli-using-polars.gif" class="img-fluid" alt="Using Polars" /> *Preview data, find missing values, and generate column summaries*
-
-
-## CI/CD Integration & Automation
+### CI/CD Integration & Automation
 
 Learn how to integrate data quality checks into automated pipelines:
 
+![CI/CD Integration](../../assets/vhs/cli-cicd-workflows.gif) *Exit codes, pipeline integration, and automated quality gates*
 
-<img src="../../assets/vhs/cli-cicd-workflows.gif" class="img-fluid" alt="CI/CD Integration" /> *Exit codes, pipeline integration, and automated quality gates*
-
-
-## Complete Data Quality Workflow
+### Complete Data Quality Workflow
 
 Follow an end-to-end data quality pipeline combining exploration, validation, and profiling:
 
+![Complete Workflow](../../assets/vhs/cli-complete-workflow.gif) *Full pipeline: explore → validate → automate*
 
-<img src="../../assets/vhs/cli-complete-workflow.gif" class="img-fluid" alt="Complete Workflow" /> *Full pipeline: explore → validate → automate*
-
-
-# Getting Started
+## Getting Started
 
 Ready to implement data quality workflows? Here's how to get started:
 
-
-### 1. Install and Verify
+#### 1. Install and Verify
 
 ``` bash
 pip install pointblank
 pb --help
 ```
 
-
-### 2. Explore Various Data Sources
+#### 2. Explore Various Data Sources
 
 ``` bash
 # Try previewing a built-in dataset
@@ -98,8 +83,7 @@ pb missing "https://raw.githubusercontent.com/user/repo/main/sales.parquet"
 pb info "duckdb:///warehouse/analytics.ddb::customers"
 ```
 
-
-### 3. Run Essential Validations
+#### 3. Run Essential Validations
 
 ``` bash
 # Check for duplicate rows
@@ -113,8 +97,7 @@ pb validate "https://github.com/user/repo/blob/main/sales.csv" --check rows-dist
 pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 ```
 
-
-### 4. Integrate with CI/CD
+#### 4. Integrate with CI/CD
 
 ``` bash
 # Use exit codes for automation (0 = pass, 1 = fail)

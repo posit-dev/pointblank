@@ -4,8 +4,7 @@ OpenTelemetry (OTel) is the industry-standard framework for vendor-neutral obser
 
 Instead of building separate integrations for each monitoring tool, one OTel export covers all of them. And when Pointblank runs inside an Airflow, Prefect, or Dagster task that already uses OTel instrumentation, validation spans appear inside the pipeline's distributed trace automatically.
 
-
-# Installation
+## Installation
 
 The OTel integration is an optional dependency. Install it with:
 
@@ -23,8 +22,7 @@ pip install opentelemetry-exporter-otlp-proto-http
 
 With these packages installed, Pointblank can push signals to any OTel-compatible backend. The following section describes exactly what gets sent.
 
-
-# What Gets Exported
+## What Gets Exported
 
 Pointblank maps its validation outputs onto three OTel signal types:
 
@@ -36,8 +34,7 @@ Pointblank maps its validation outputs onto three OTel signal types:
 
 Each signal type captures a different dimension of the validation run. Metrics provide aggregate counts and rates suitable for dashboards, traces capture timing and parent-child relationships for debugging, and logs produce structured records for incident review.
 
-
-## Metric Instruments
+### Metric Instruments
 
 The metrics signal is the most detailed. Twelve instruments cover step-level and aggregate statistics, all sharing a configurable name prefix (default: `pb.validation`).
 
@@ -60,16 +57,13 @@ Every metric carries attributes derived from the [Validate](../../reference/Vali
 
 Together these instruments give you enough information to build dashboards, set alerts, and track data quality SLAs across every table Pointblank validates.
 
-
-# Two Usage Patterns
+## Two Usage Patterns
 
 Pointblank offers two ways to export OTel signals, matching how different teams prefer to work.
 
-
-## Pattern A: Explicit Export
+### Pattern A: Explicit Export
 
 Import [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter), run your validation, then call [export()](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export). This gives you full control over when and how signals are emitted.
-
 
 ``` python
 from pointblank.integrations.otel import OTelExporter
@@ -85,14 +79,11 @@ otel = OTelExporter(enable_metrics=True, enable_tracing=True)
 otel.export(validation)
 ```
 
-
 Because the export happens after [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate), you can inspect the validation results first and decide whether to export at all. This pattern works well for ad-hoc analysis or when you want to conditionally emit signals based on the outcome.
 
-
-## Pattern B: FinalActions (Automatic)
+### Pattern B: FinalActions (Automatic)
 
 Use [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) inside [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) so metrics are emitted automatically at the end of every [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate) call (no extra code needed after the validation).
-
 
 ``` python
 import pointblank as pb
@@ -111,9 +102,7 @@ validation = (
 )
 ```
 
-
 You can combine [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) with other final actions like [send_slack_notification()](../../reference/send_slack_notification.md#pointblank.send_slack_notification):
-
 
 ``` python
 import os
@@ -132,19 +121,15 @@ validation = (
 )
 ```
 
-
 Both patterns produce identical OTel output. Choose explicit export when you want manual control, and [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) when you want every validation run to emit signals automatically.
 
-
-# Working Example with Console Output
+## Working Example with Console Output
 
 Let's walk through a complete example using in-memory providers so you can see exactly what gets emitted (no external collector needed).
 
-
-## Setup
+### Setup
 
 Before exporting any signals we need OTel providers to receive them. The SDK's in-memory providers are very useful for exploration: they capture every metric, span, and log record in Python lists so we can print them without running a collector.
-
 
 ``` python
 import polars as pl
@@ -172,14 +157,11 @@ logger_provider = LoggerProvider()
 logger_provider.add_log_record_processor(SimpleLogRecordProcessor(log_exporter))
 ```
 
-
 Each provider is paired with an in-memory reader or exporter that we'll query later to see what was captured.
 
-
-## Run Validation and Export
+### Run Validation and Export
 
 With the providers ready, we'll create a small DataFrame with some intentional quality issues (a negative amount, a zero amount, and a missing customer name), validate it, and then export the results.
-
 
 ``` python
 df = pl.DataFrame(
@@ -206,9 +188,7 @@ validation = (
 validation
 ```
 
-
 The report shows two steps with failures. Now we create an [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) with all three signal types enabled and export the validation results.
-
 
 ``` python
 otel = OTelExporter(
@@ -223,14 +203,11 @@ otel = OTelExporter(
 otel.export(validation)
 ```
 
-
 The [export()](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export) call is instantaneous as the in-memory providers simply store the data. In production, this is where the SDK would batch and send signals to your collector.
 
-
-## Inspect the Emitted Metrics
+### Inspect the Emitted Metrics
 
 The metric reader holds all counters, gauges, and histograms that were recorded. We can iterate through them to see every instrument and its current value.
-
 
 ``` python
 metrics_data = metric_reader.get_metrics_data()
@@ -243,14 +220,11 @@ for resource_metrics in metrics_data.resource_metrics:
                 print(f"{metric.name}: {val}")
 ```
 
-
 You'll see counters like `pb.validation.steps.total` and `pb.validation.test_units.failed`, the `pb.validation.pass_rate` gauge, and a histogram of step durations. These are the same instruments that would appear in Prometheus, Datadog, or any OTel-compatible metrics backend.
 
-
-## Inspect the Trace Spans
+### Inspect the Trace Spans
 
 Each [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate) call produces a root span with one child per validation step:
-
 
 ``` python
 spans = span_exporter.get_finished_spans()
@@ -265,14 +239,11 @@ for span in spans:
     print()
 ```
 
-
 The root span (`pb.validate`) carries table-level attributes and timing, while each child span (`pb.validate.step`) carries per-step details. Steps that breach a threshold also include an event recording the severity level.
 
-
-## Inspect the Log Records
+### Inspect the Log Records
 
 Log records are emitted for each validation step that exceeds a threshold. The severity of the log record corresponds to the highest threshold level breached by that step.
-
 
 ``` python
 logs = log_exporter.get_finished_logs()
@@ -284,18 +255,15 @@ for log in logs:
     print()
 ```
 
-
 Each log record includes the step index, assertion type, column name, and the threshold level that was breached. In a production setup these records would flow to your log aggregator (e.g., Loki, Elasticsearch, or CloudWatch) where you can search and alert on them.
 
 That completes the end-to-end walkthrough. The same three signal types (metrics, traces, logs) work identically whether you use in-memory providers for development or OTLP exporters in production.
 
-
-# Configuration Reference
+## Configuration Reference
 
 Both [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) and the [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory accept the same set of parameters. This section documents every option and how the log-level filter works.
 
-
-## [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) Parameters
+### [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) Parameters
 
 The table below lists all constructor parameters for [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter).
 
@@ -315,8 +283,7 @@ The table below lists all constructor parameters for [OTelExporter](../../refere
 
 The [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory function accepts the same parameters and returns a callable suitable for use in [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions).
 
-
-## Log Level Filtering
+### Log Level Filtering
 
 Not every threshold breach warrants a log record. The `log_level=` parameter controls which breaches produce log records, letting you filter out lower-severity noise.
 
@@ -328,11 +295,9 @@ Not every threshold breach warrants a log record. The `log_level=` parameter con
 
 For most production deployments, `"warning"` (the default) is a good starting point. Switch to `"error"` or `"critical"` if your log volume is too high or you only want to be notified about serious issues.
 
-
-# Bringing Your Own Provider
+## Bringing Your Own Provider
 
 The in-memory providers used in the walkthrough above are great during development, but in production you'll point the SDK at an actual collector. Here's how to configure a `MeterProvider` with the OTLP gRPC exporter.
-
 
 ``` python
 from opentelemetry.sdk.metrics import MeterProvider
@@ -348,13 +313,11 @@ otel = OTelExporter(meter_provider=provider)
 otel.export(validation)
 ```
 
-
 If you set the standard `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable and use the global provider (the default when `meter_provider=None`), no provider configuration is needed at all.
 
 The same approach works for `TracerProvider` and `LoggerProvider`. Pass your custom providers to [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) and they'll be used instead of the global defaults.
 
-
-# Pipeline Integration
+## Pipeline Integration
 
 Pointblank's OTel integration becomes especially powerful inside orchestrated data pipelines. When Pointblank runs inside an Airflow, Prefect, or Dagster task that has OTel auto-instrumentation, trace context propagation happens automatically. The `pb.validate` span attaches as a child of the current task span, giving you a unified view of pipeline and validation performance.
 
@@ -366,8 +329,7 @@ Pointblank's OTel integration becomes especially powerful inside orchestrated da
 
 This means validation timing and failures appear in your existing pipeline traces without any additional configuration. If a validation step is slow or failing, you can trace it back to the exact pipeline run and task that triggered it.
 
-
-# Example PromQL Queries
+## Example PromQL Queries
 
 Once metrics are flowing into a Prometheus-compatible backend, you can query them with PromQL. Below are a few starter queries that cover common data-quality monitoring scenarios.
 

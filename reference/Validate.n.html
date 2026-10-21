@@ -9,6 +9,7 @@
 <meta name="description" content="Provides a dictionary of the number of test units for each validation step.">
 
 <title>Validate.n() | Pointblank</title>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Validate.n - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Validate.n.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.n.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.n.html">
+<link rel="alternate" type="text/markdown" href="Validate.n.md">
 
 
 <meta property="og:title" content="Validate.n() | Pointblank">
@@ -140,34 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="Validate.n() | Pointblank">
 <meta name="twitter:description" content="Provides a dictionary of the number of test units for each validation step.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="Validate.n.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Validate.n - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/Validate.n.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1675,7 +1649,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Different types of validation steps can have different numbers of test units. In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the number of test units for each step will be a little bit different.</p>
-<div id="046c1ec3" class="cell" data-execution_count="1">
+<div id="58c978b9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1700,7 +1674,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The first validation step checks that all values in column <code>a</code> are greater than <code>0</code>. Let’s use the <code>n()</code> method to determine the number of test units this validation step.</p>
-<div id="5b923225" class="cell" data-execution_count="2">
+<div id="b39e1909" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">1</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>4</code></pre>
@@ -1708,7 +1682,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 </div>
 <p>The returned value of <code>4</code> is the number of test units for the first validation step. This value is the same as the number of rows in the table.</p>
 <p>The second validation step checks for the existence of column <code>b</code>. Using the <code>n()</code> method we can get the number of test units for this the second step.</p>
-<div id="66748b9e" class="cell" data-execution_count="3">
+<div id="d25469fa" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">2</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>1</code></pre>
@@ -1716,7 +1690,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 </div>
 <p>There’s a single test unit here because the validation step is checking for the presence of a single column.</p>
 <p>The third validation step checks that all values in column <code>b</code> are less than <code>9</code> after filtering the table to only include rows where the value in column <code>a</code> is greater than <code>1</code>. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let’s prove this by using the <code>n()</code> method.</p>
-<div id="a4366d99" class="cell" data-execution_count="4">
+<div id="1d901a8f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">3</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>3</code></pre>
@@ -1724,7 +1698,7 @@ A dictionary of the number of test units for each validation step or a scalar va
 </div>
 <p>The returned value of <code>3</code> is the number of test units for the third validation step. When using the <code>pre=</code> argument, the input table can be mutated before performing the validation. The <code>n()</code> method is a good way to determine whether the mutation performed as expected.</p>
 <p>In all of these examples, the <code>scalar=True</code> argument was used to return the value as a scalar integer value. If <code>scalar=False</code>, the method will return a dictionary with an entry for the validation step number (from the <code>i=</code> argument) and the number of test units. Futhermore, leaving out the <code>i=</code> argument altogether will return a dictionary with filled with the number of test units for each validation step. Here’s what that looks like:</p>
-<div id="59802893" class="cell" data-execution_count="5">
+<div id="b90f1225" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.n()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>{1: 4, 2: 1, 3: 3}</code></pre>

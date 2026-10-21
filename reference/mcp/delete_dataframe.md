@@ -1,8 +1,8 @@
 # delete_dataframe
 
+# delete_dataframe
 
 Remove a DataFrame from the server context to free up memory.
-
 
 ``` json
 {
@@ -13,9 +13,7 @@ Remove a DataFrame from the server context to free up memory.
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `df_id: string`  
 ID of the DataFrame to delete. required

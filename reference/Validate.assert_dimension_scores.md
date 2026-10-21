@@ -1,10 +1,10 @@
 # Validate.assert_dimension_scores()
 
-
 Raise an `AssertionError` if any dimension's health score falls below a minimum.
 
-
 Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19794-L19875)
 
 ``` python
 Validate.assert_dimension_scores(
@@ -13,12 +13,9 @@ Validate.assert_dimension_scores(
 )
 ```
 
-
-The [assert_dimension_scores()](Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) method checks each data quality dimension's score (from <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a>) against a minimum acceptable value. This is useful in automated testing and CI environments where you want to fail the run when, say, the completeness score drops below `95`.
-
+The [assert_dimension_scores()](../reference/Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) method checks each data quality dimension's score (from [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores)) against a minimum acceptable value. This is useful in automated testing and CI environments where you want to fail the run when, say, the completeness score drops below `95`.
 
 ## Parameters
-
 
 `thresholds: dict[str, float] | None = None`  
 A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`, the minimums set via `config(dimension_thresholds=...)` are used. A dimension present in the thresholds but absent from the validation is ignored.
@@ -26,19 +23,14 @@ A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`
 `message: str | None = None`  
 Custom error message to use if the assertion fails. If `None`, a default message that lists the offending dimensions (with actual vs. required scores) is generated.
 
-
 ## Returns
-
 
 `None`  
 
-
 ## Raises
-
 
 `AssertionError`  
 If any dimension's score is below its specified minimum.
-
 
 ## Examples
 
@@ -55,11 +47,10 @@ validation = (
 validation.assert_dimension_scores(thresholds={"completeness": 95})
 ```
 
-
 ## See Also
 
-`Use` <a href="../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link"><code>get_dimension_scores()</code></a> to retrieve the  
+`Use` [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores) to retrieve the  
 
 `scores` without raising, and `config()` to set default per-dimension  
 
-`thresholds` globally.
+`thresholds` globally.  

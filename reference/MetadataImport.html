@@ -9,6 +9,7 @@
 <meta name="description" content="Parsed metadata from an external standard.">
 
 <title>MetadataImport | Pointblank</title>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "MetadataImport - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/MetadataImport.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -83,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-728ecd11ec725c9fefd66e2d52244692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a699add0f2108d88e1df4312b71c9091.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/MetadataImport.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/MetadataImport.html">
+<link rel="alternate" type="text/markdown" href="MetadataImport.md">
 
 
 <meta property="og:title" content="MetadataImport | Pointblank">
@@ -140,34 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:title" content="MetadataImport | Pointblank">
 <meta name="twitter:description" content="Parsed metadata from an external standard.">
 <meta name="twitter:card" content="summary">
-  <link rel="alternate" type="text/markdown" href="MetadataImport.md">
-  <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "Pointblank",
-    "description": "Find out if your data is what you think it is.",
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://posit-dev.github.io/pointblank",
-    "documentation": "https://posit-dev.github.io/pointblank",
-    "programmingLanguage": {
-      "@type": "ComputerLanguage",
-      "name": "Python"
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "MetadataImport - Pointblank",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Pointblank"
-    },
-    "url": "https://posit-dev.github.io/pointblank/reference/MetadataImport.html"
-  }
-]
-</script>
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
@@ -212,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <span class="nav-link">
-<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="495" data-forks="38"></div>
+<div id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></div>
     </span>
   </li>  
 </ul>
@@ -1722,25 +1696,17 @@ Named missing value code definitions.
 </section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="gd-summary-table">
+<table class="gd-summary-table caption-top table">
 <thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="#variable_names" class="doc-attribute doc-label doc-label-property">variable_names</a>
-</td>
-<td>
-Get the list of all variable names.
-</td>
+<tr class="odd">
+<td><a href="#variable_names" class="doc-attribute doc-label doc-label-property">variable_names</a></td>
+<td>Get the list of all variable names.</td>
 </tr>
 </tbody>
 </table>
@@ -1757,65 +1723,37 @@ Get the list of all variable names.
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
-<table class="gd-summary-table">
+<table class="gd-summary-table caption-top table">
 <thead>
-<tr>
-<th>
-Name
-</th>
-<th>
-Description
-</th>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="#get_codelist" class="doc-function doc-label doc-label-method">get_codelist()</a>
-</td>
-<td>
-Get a specific codelist by name.
-</td>
+<tr class="odd">
+<td><a href="#get_codelist" class="doc-function doc-label doc-label-method">get_codelist()</a></td>
+<td>Get a specific codelist by name.</td>
 </tr>
-<tr>
-<td>
-<a href="#get_variable" class="doc-function doc-label doc-label-method">get_variable()</a>
-</td>
-<td>
-Get metadata for a specific variable by name.
-</td>
+<tr class="even">
+<td><a href="#get_variable" class="doc-function doc-label doc-label-method">get_variable()</a></td>
+<td>Get metadata for a specific variable by name.</td>
 </tr>
-<tr>
-<td>
-<a href="#missing_specs" class="doc-function doc-label doc-label-method">missing_specs()</a>
-</td>
-<td>
-Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.
-</td>
+<tr class="odd">
+<td><a href="#missing_specs" class="doc-function doc-label doc-label-method">missing_specs()</a></td>
+<td>Auto-generate <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects for all variables.</td>
 </tr>
-<tr>
-<td>
-<a href="#summary" class="doc-function doc-label doc-label-method">summary()</a>
-</td>
-<td>
-Return a human-readable summary of the imported metadata.
-</td>
+<tr class="even">
+<td><a href="#summary" class="doc-function doc-label doc-label-method">summary()</a></td>
+<td>Return a human-readable summary of the imported metadata.</td>
 </tr>
-<tr>
-<td>
-<a href="#to_schema" class="doc-function doc-label doc-label-method">to_schema()</a>
-</td>
-<td>
-Convert imported metadata to a Pointblank <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> with <code>Field</code> objects.
-</td>
+<tr class="odd">
+<td><a href="#to_schema" class="doc-function doc-label doc-label-method">to_schema()</a></td>
+<td>Convert imported metadata to a Pointblank <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> with <code>Field</code> objects.</td>
 </tr>
-<tr>
-<td>
-<a href="#to_validate" class="doc-function doc-label doc-label-method">to_validate()</a>
-</td>
-<td>
-Generate a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> workflow from the imported metadata.
-</td>
+<tr class="even">
+<td><a href="#to_validate" class="doc-function doc-label doc-label-method">to_validate()</a></td>
+<td>Generate a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> workflow from the imported metadata.</td>
 </tr>
 </tbody>
 </table>

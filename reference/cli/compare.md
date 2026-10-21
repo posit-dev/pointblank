@@ -1,21 +1,16 @@
 # pb compare
 
-
 Compare two tables row by row.
-
 
 ``` bash
 pb compare [OPTIONS] SOURCE TARGET
 ```
 
-
 SOURCE is the reference (expected) table and TARGET is the table to check. Each can be a CSV or Parquet file (scanned lazily, so large files work), a database connection string, or a built-in dataset name. Every row is classified as matching, changed, missing from the target, extra in the target, or having a duplicated key; schema differences are reported too.
 
 Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
 
-
-<span class="gd-details-chevron" aria-hidden="true"></span>Full --help output
-
+Full --help output
 
     Usage: pb compare [OPTIONS] SOURCE TARGET
 
@@ -76,9 +71,7 @@ Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
                                     [default: exit-code]
       --help                        Show this message and exit.
 
-
 ## Arguments
-
 
 `SOURCE: TEXT`  
 Required.
@@ -86,9 +79,7 @@ Required.
 `TARGET: TEXT`  
 Required.
 
-
 ## Options
-
 
 `-k, --key: TEXT`  
 Key column used to align rows (repeat for composite keys). Use '\*' to compare as multisets of rows. Without a key, rows are compared by position.
@@ -140,7 +131,6 @@ Leave sample row values out of JSON output (e.g., for sensitive data)
 
 `--exit-code, --no-exit-code`  
 Exit with code 1 when the tables differ
-
 
 ## Examples
 

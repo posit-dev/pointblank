@@ -1,10 +1,10 @@
 # prompt_add_validation_step_example
 
+# prompt_add_validation_step_example
 
 Prompt to add a validation step to a Pointblank Validator.
 
-
-## Prompt Text
+### Prompt Text
 
 > **Note: Assistant**
 >

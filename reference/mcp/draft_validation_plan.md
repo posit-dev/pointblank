@@ -1,28 +1,26 @@
 # draft_validation_plan
 
+# draft_validation_plan
 
 Generate an AI-powered validation plan using Pointblank's DraftValidation class.
-
 
 ``` json
 {
   "tool": "draft_validation_plan",
   "arguments": {
     "dataframe_id": ...,
-    "model": "anthropic:claude-sonnet-4-5",
+    "model": "anthropic:claude-sonnet-5-5",
     "api_key": ...  // optional
   }
 }
 ```
 
-
-## Parameters
-
+### Parameters
 
 `dataframe_id: string`  
 ID of the DataFrame to generate validation plan for. required
 
-`model: string = "anthropic:claude-sonnet-4-5"`  
+`model: string = "anthropic:claude-sonnet-5-5"`  
 AI model in format 'provider:model'.
 
 `api_key: any`  
