@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fcaa8ba736cf4e2cf4790a1a6ae86d56.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-723567b195ef916a85594ef888c0e6b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1762,7 +1762,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 </tr>
 </tbody>
 </table>
-<hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="is_core" class="level3">
 <h3 class="anchored" data-anchor-id="is_core"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_core</span></h3>
 <div class="doc-subject">
@@ -1772,7 +1771,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 <p><code><span class="doc-parameter-name">is_core</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></p>
 </div>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="is_rules" class="level3">
 <h3 class="anchored" data-anchor-id="is_rules"><span class="doc-object-name doc-attribute doc-label doc-label-property">is_rules</span></h3>
 <div class="doc-subject">
@@ -1782,7 +1780,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 <p><code><span class="doc-parameter-name">is_rules</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></p>
 </div>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="n_datasets" class="level3">
 <h3 class="anchored" data-anchor-id="n_datasets"><span class="doc-object-name doc-attribute doc-label doc-label-property">n_datasets</span></h3>
 <div class="doc-subject">
@@ -1853,7 +1850,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 </tr>
 </tbody>
 </table>
-<hr style="border: none; border-top: 2px solid #c5c8cd; margin: 1.5rem 0 1rem 0;">
 <section id="all_passed" class="level3">
 <h3 class="anchored" data-anchor-id="all_passed"><span class="doc-object-name doc-function doc-label doc-label-method">all_passed()</span></h3>
 <div class="doc-subject">
@@ -1870,7 +1866,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 <p>For built-in engine reports, this is <code>True</code> when every check in every dataset passed with no failing test units. For CORE reports, this is <code>True</code> when no rule reported an issue or execution error.</p>
 </div>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="findings" class="level3">
 <h3 class="anchored" data-anchor-id="findings"><span class="doc-object-name doc-function doc-label doc-label-method">findings()</span></h3>
 <div class="doc-subject">
@@ -1887,7 +1882,6 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 <p>For CORE reports, returns <code>CoreFinding</code> objects from CORE’s <code>Issue_Details</code>. For built-in engine reports, returns <code>NativeRowFinding</code> objects. For Validate-based reports, returns an empty list.</p>
 </div>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="findings_df" class="level3">
 <h3 class="anchored" data-anchor-id="findings_df"><span class="doc-object-name doc-function doc-label doc-label-method">findings_df()</span></h3>
 <div class="doc-subject">
@@ -1940,7 +1934,6 @@ If called on a CDISC CORE-backed report. Use <a href="../reference/ConformanceRe
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="from_core_report" class="level3">
 <h3 class="anchored" data-anchor-id="from_core_report"><span class="doc-object-name doc-function doc-label doc-label-method">from_core_report()</span></h3>
 <div class="doc-subject">
@@ -1988,7 +1981,6 @@ A report in CORE form (<a href="../reference/ConformanceReport.html#pointblank.C
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_findings_table" class="level3">
 <h3 class="anchored" data-anchor-id="get_findings_table"><span class="doc-object-name doc-function doc-label doc-label-method">get_findings_table()</span></h3>
 <div class="doc-subject">
@@ -2051,7 +2043,6 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_tabular_report" class="level3">
 <h3 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h3>
 <div class="doc-subject">
@@ -2104,7 +2095,6 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="get_validation" class="level3">
 <h3 class="anchored" data-anchor-id="get_validation"><span class="doc-object-name doc-function doc-label doc-label-method">get_validation()</span></h3>
 <div class="doc-subject">
@@ -2118,7 +2108,6 @@ If called on a CDISC CORE-backed report. The tabular report is only available fo
 <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>get_validation(name)</span></code></pre></div>
 </div>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="issues" class="level3">
 <h3 class="anchored" data-anchor-id="issues"><span class="doc-object-name doc-function doc-label doc-label-method">issues()</span></h3>
 <div class="doc-subject">
@@ -2162,7 +2151,6 @@ For a <strong>CORE</strong> report, one dict per (dataset, rule) with reported i
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="rules" class="level3">
 <h3 class="anchored" data-anchor-id="rules"><span class="doc-object-name doc-function doc-label doc-label-method">rules()</span></h3>
 <div class="doc-subject">
@@ -2190,7 +2178,6 @@ Optional status filter. For CORE: e.g.&nbsp;<code>"SUCCESS"</code>, <code>"SKIPP
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="summary" class="level3">
 <h3 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h3>
 <div class="doc-subject">
@@ -2216,7 +2203,6 @@ For a <strong>CORE</strong> report, a single dict with keys <code>standard</code
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_excel" class="level3">
 <h3 class="anchored" data-anchor-id="to_excel"><span class="doc-object-name doc-function doc-label doc-label-method">to_excel()</span></h3>
 <div class="doc-subject">
@@ -2267,7 +2253,6 @@ If <code>openpyxl</code> or <code>pandas</code> are not installed.
 </div>
 </section>
 </section>
-<hr style="border: none; border-top: 2px dotted #b0b4ba; margin: 1.5rem 0 1rem 0;">
 <section id="to_json" class="level3">
 <h3 class="anchored" data-anchor-id="to_json"><span class="doc-object-name doc-function doc-label doc-label-method">to_json()</span></h3>
 <div class="doc-subject">
