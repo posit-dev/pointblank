@@ -1805,7 +1805,7 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     if sentinels:
         mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
     if spec.null_is_missing:
-        null_expr = nw.col(column).is_null()
+        null_expr = _safe_is_nan_or_null_expr(results_tbl, nw.col(column), column)
         mask = null_expr if mask is None else (mask | null_expr)
 
     if mask is None:
@@ -1842,7 +1842,7 @@ def interrogate_missing_only_coded(
     if sentinels:
         _or(_is_in(column, sentinels, dtype).fill_null(False))
     if count_null:
-        _or(nw.col(column).is_null())
+        _or(_safe_is_nan_or_null_expr(tbl, nw.col(column), column))
     if allowed:
         _or(_is_in(column, allowed, dtype).fill_null(False))
     if min_val is not None or max_val is not None:
@@ -1881,7 +1881,7 @@ def interrogate_missing_consistent(
         else:
             col_expr = nw.lit(False)  # noqa
         if count_null:
-            col_expr = col_expr | nw.col(c).is_null()
+            col_expr = col_expr | _safe_is_nan_or_null_expr(tbl, nw.col(c), c)
         col_count = col_expr.cast(nw.Int32)
         count_expr = col_count if count_expr is None else (count_expr + col_count)
 
