@@ -905,6 +905,20 @@ class _AIValidationEngine:
             verify_ssl=llm_config.verify_ssl,
         )
 
+    def _start_fresh_conversation(self) -> None:
+        """
+        Drop the earlier batches from the chat history.
+
+        A chatlas `Chat` keeps every turn and sends all of them with each new request, so without
+        this each batch would carry all the previous batches (and their replies and attachments).
+        The system prompt is kept.
+        """
+        # Before chatlas 0.9.0, `set_turns()` also drops the system prompt (it is the first turn),
+        # and that prompt holds the reply-format instructions, so put it back
+        system_prompt = self.chat.system_prompt
+        self.chat.set_turns([])
+        self.chat.system_prompt = system_prompt
+
     def validate_batches(
         self, batches: List[Dict[str, Any]], prompt_builder: Any, max_concurrent: int = 3
     ) -> List[List[Dict[str, Any]]]:
@@ -946,6 +960,7 @@ class _AIValidationEngine:
 
                 # Get response from LLM using chatlas (synchronous). Attachments
                 # ride along as global context content blocks for every batch.
+                self._start_fresh_conversation()
                 response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
                 # Debug: Log the raw LLM response
@@ -1036,6 +1051,7 @@ class _AIValidationEngine:
 
             # Get response from LLM using chatlas (synchronous). Attachments
             # ride along as global context content blocks for every batch.
+            self._start_fresh_conversation()
             response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
 
             # Parse the response
