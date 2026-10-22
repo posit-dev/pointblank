@@ -913,10 +913,11 @@ class _AIValidationEngine:
         this each batch would carry all the previous batches (and their replies and attachments).
         The system prompt is kept.
         """
-        # `set_turns()` is missing from the oldest chatlas releases, where nothing is cleared
-        set_turns = getattr(self.chat, "set_turns", None)
-        if set_turns is not None:
-            set_turns([])
+        # Before chatlas 0.9.0, `set_turns()` also drops the system prompt (it is the first turn),
+        # and that prompt holds the reply-format instructions, so put it back
+        system_prompt = self.chat.system_prompt
+        self.chat.set_turns([])
+        self.chat.system_prompt = system_prompt
 
     def validate_batches(
         self, batches: List[Dict[str, Any]], prompt_builder: Any, max_concurrent: int = 3
