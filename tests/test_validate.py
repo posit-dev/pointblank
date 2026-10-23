@@ -5422,15 +5422,15 @@ def test_col_vals_regex_inverse(request, tbl_fixture) -> None:
     # Test inverse=True (should fail where pattern matches)
     # Data: [None, "5-egh-163", "8-kdg-938"] (pattern= matches the 2 strings)
     # Inverse=True means we want values that DON'T match the pattern
-    # Only None doesn't match the pattern, so with inverse=True, None passes
     # The 2 strings that match the pattern now fail with inverse=True
-    # So 1 value passes (None)
+    # None is missing and na_pass=False, so it fails too
+    # So no values pass
     assert (
         Validate(tbl)
         .col_vals_regex(columns="text", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}", inverse=True)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Test inverse=True with na_pass=True
