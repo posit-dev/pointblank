@@ -135,8 +135,8 @@ def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, colum
     Create an expression that safely checks for both Null and NaN values.
 
     This function handles the case where `is_nan()` is not supported for certain data types (like
-    strings) or backends (like `SQLite` via Ibis) by checking the backend type and column type
-    first.
+    strings or Polars decimals) or backends (like `SQLite` via Ibis) by checking the backend type
+    and column type first. Only float columns can hold NaN, so only those get the `is_nan()` check.
 
     Parameters
     ----------
@@ -160,7 +160,7 @@ def _safe_is_nan_or_null_expr(data_frame: IntoFrame, column_expr: nw.Expr, colum
 
     dtype: nw.dtypes.DType = schema[column_name]
 
-    if not dtype.is_numeric():
+    if not dtype.is_float():
         return null_check
 
     # Some Ibis backends (e.g. SQLite) don't support is_nan(), so only check nulls for those
@@ -721,7 +721,7 @@ def col_pct_missing(
     """Check that the percentage of missing values in a column does not exceed `max_pct`.
 
     Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
-    null values. The percentage is computed over the total number of rows.
+    null (or NaN) values. The percentage is computed over the total number of rows.
     """
     nw_frame = nw.from_native(data_tbl)
 
@@ -730,7 +730,7 @@ def col_pct_missing(
     if sentinels:
         missing_expr = _is_in(column, sentinels, nw_frame.collect_schema()[column])
     if count_null:
-        null_expr = nw.col(column).is_null()
+        null_expr = _safe_is_nan_or_null_expr(data_tbl, nw.col(column), column)
         missing_expr = null_expr if missing_expr is None else (missing_expr | null_expr)
 
     if missing_expr is None:
@@ -1031,7 +1031,11 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
+    # `is_in()` gives null for a missing value on Polars and nullable pandas dtypes, which is
+    # neither passing nor failing in the sundered data and the extracts
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(
+        False
+    )
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
@@ -1278,6 +1282,19 @@ def interrogate_regex(
     return result_tbl.to_native()
 
 
+def _string_expr(nw_tbl: Any, column: str) -> nw.Expr:
+    """
+    The column as an expression that the `.str` methods can be used on.
+
+    Polars has no string methods for Categorical and Enum columns (nor pandas for pyarrow
+    dictionary columns), so those are cast to strings. Narwhals < 2.27 casts a missing value in a
+    pandas `category` column to the string "nan", so missing values are kept missing.
+    """
+    if nw_tbl.collect_schema()[column] not in (nw.Categorical, nw.Enum):
+        return nw.col(column)
+    return nw.when(~nw.col(column).is_null()).then(nw.col(column).cast(nw.String))
+
+
 def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
     """String length interrogation."""
 
@@ -1287,6 +1304,8 @@ def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
+    column_expr = _string_expr(nw_tbl, column)
+
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
         pb_is_good_2=nw.lit(True),
@@ -1295,12 +1314,12 @@ def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool
 
     if min_val is not None:
         result_tbl = result_tbl.with_columns(
-            pb_is_good_2=(nw.col(column).str.len_chars() >= min_val).fill_null(False)
+            pb_is_good_2=(column_expr.str.len_chars() >= min_val).fill_null(False)
         )
 
     if max_val is not None:
         result_tbl = result_tbl.with_columns(
-            pb_is_good_3=(nw.col(column).str.len_chars() <= max_val).fill_null(False)
+            pb_is_good_3=(column_expr.str.len_chars() <= max_val).fill_null(False)
         )
 
     result_tbl = result_tbl.with_columns(
@@ -1359,11 +1378,11 @@ def interrogate_within_spec(
         # Use regex validation through Narwhals (works for all backends including Ibis!)
         pattern = regex_specs[spec_lower]
 
+        col_expr = _string_expr(nw_tbl, column)
+
         # For SWIFT/BIC, need to uppercase first
         if spec_lower in ("swift", "swift_bic", "bic"):
-            col_expr = nw.col(column).str.to_uppercase()
-        else:
-            col_expr = nw.col(column)
+            col_expr = col_expr.str.to_uppercase()
 
         result_tbl = nw_tbl.with_columns(
             pb_is_good_1=nw.col(column).is_null() & na_pass,
@@ -1811,7 +1830,7 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     if sentinels:
         mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
     if spec.null_is_missing:
-        null_expr = nw.col(column).is_null()
+        null_expr = _safe_is_nan_or_null_expr(results_tbl, nw.col(column), column)
         mask = null_expr if mask is None else (mask | null_expr)
 
     if mask is None:
@@ -1848,7 +1867,7 @@ def interrogate_missing_only_coded(
     if sentinels:
         _or(_is_in(column, sentinels, dtype).fill_null(False))
     if count_null:
-        _or(nw.col(column).is_null())
+        _or(_safe_is_nan_or_null_expr(tbl, nw.col(column), column))
     if allowed:
         _or(_is_in(column, allowed, dtype).fill_null(False))
     if min_val is not None or max_val is not None:
@@ -1887,7 +1906,7 @@ def interrogate_missing_consistent(
         else:
             col_expr = nw.lit(False)  # noqa
         if count_null:
-            col_expr = col_expr | nw.col(c).is_null()
+            col_expr = col_expr | _safe_is_nan_or_null_expr(tbl, nw.col(c), c)
         col_count = col_expr.cast(nw.Int32)
         count_expr = col_count if count_expr is None else (count_expr + col_count)
 
@@ -1902,13 +1921,15 @@ def interrogate_missing_consistent(
 def interrogate_missing_coded(tbl: IntoFrame, column: str) -> Any:
     """Missing-coded interrogation.
 
-    A row passes when its value is *not* a raw null. Under the structured-missingness model, every
-    absence should be expressed with an explicit sentinel code (which is non-null), so a raw null
-    represents *uncoded* missingness and fails the test unit.
+    A row passes when its value is *not* a raw null (or NaN). Under the structured-missingness
+    model, every absence should be expressed with an explicit sentinel code (which is non-null), so
+    a raw null represents *uncoded* missingness and fails the test unit.
     """
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_=~_safe_is_nan_or_null_expr(tbl, nw.col(column), column)
+    )
     return result_tbl.to_native()
 
 

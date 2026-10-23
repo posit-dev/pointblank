@@ -1090,3 +1090,73 @@ def test_parse_response_records_the_error_of_an_unparseable_reply():
         '[{"index": 0, "result": true}, {"index": 1, "result": false}]', batch_info
     )
     assert parser.last_parse_error is None
+
+
+class _HistoryKeepingChat:
+    """
+    Stands in for a chatlas `Chat`, which sends its whole history with every request.
+
+    The system prompt is the first turn, as in chatlas. With `keeps_system_prompt=False`,
+    `set_turns()` drops it too, as chatlas did before 0.9.0.
+    """
+
+    def __init__(self, keeps_system_prompt=True):
+        self.keeps_system_prompt = keeps_system_prompt
+        self.turns = [("system", "Reply with a JSON array")]
+        self.roles_sent = []
+
+    @property
+    def system_prompt(self):
+        return self.turns[0][1] if self.turns and self.turns[0][0] == "system" else None
+
+    @system_prompt.setter
+    def system_prompt(self, value):
+        if self.system_prompt is not None:
+            self.turns.pop(0)
+        if value is not None:
+            self.turns.insert(0, ("system", value))
+
+    def set_turns(self, turns):
+        system = self.turns[:1] if self.keeps_system_prompt and self.system_prompt else []
+        self.turns = system + list(turns)
+
+    def chat(self, prompt, *args, **kwargs):
+        self.turns.append(("user", prompt))
+        self.roles_sent.append([role for role, _ in self.turns])
+        reply = '[{"index": 0, "result": true}]'
+        self.turns.append(("assistant", reply))
+        return reply
+
+
+def _one_row_batch(batch_id):
+    return {
+        "batch_id": batch_id,
+        "start_row": 0,
+        "end_row": 1,
+        "data": {"columns": ["name"], "rows": [{"name": "Alice", "_pb_row_index": 0}]},
+    }
+
+
+@pytest.mark.parametrize("keeps_system_prompt", [True, False])
+def test_validate_batches_does_not_resend_earlier_batches(llm_config, keeps_system_prompt):
+    """Each batch is its own conversation, not a continuation of the previous batches."""
+    chat = _HistoryKeepingChat(keeps_system_prompt=keeps_system_prompt)
+    with patch("pointblank._utils_ai._create_chat_instance", return_value=chat):
+        engine = _AIValidationEngine(llm_config)
+
+    engine.validate_batches([_one_row_batch(i) for i in range(3)], _PromptBuilder("Is it a name?"))
+
+    assert chat.roles_sent == [["system", "user"]] * 3
+    assert chat.system_prompt == "Reply with a JSON array"
+
+
+@pytest.mark.parametrize("keeps_system_prompt", [True, False])
+def test_validate_single_batch_does_not_resend_earlier_batches(llm_config, keeps_system_prompt):
+    chat = _HistoryKeepingChat(keeps_system_prompt=keeps_system_prompt)
+    with patch("pointblank._utils_ai._create_chat_instance", return_value=chat):
+        engine = _AIValidationEngine(llm_config)
+
+    for i in range(2):
+        engine.validate_single_batch(_one_row_batch(i), _PromptBuilder("Is it a name?"))
+
+    assert chat.roles_sent == [["system", "user"]] * 2
