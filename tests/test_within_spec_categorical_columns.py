@@ -1,5 +1,6 @@
 import pandas as pd
 import polars as pl
+import pyarrow as pa
 import pytest
 
 from pointblank import Validate
@@ -21,6 +22,10 @@ def _table(tbl_type: str, values):
         return pl.LazyFrame({"a": values}, schema={"a": enum})
     if tbl_type == "pandas_category":
         return pd.DataFrame({"a": pd.Categorical(values)})
+    if tbl_type == "pandas_pyarrow_dictionary":
+        return pd.DataFrame({"a": pd.Categorical(values)}).astype(
+            {"a": pd.ArrowDtype(pa.dictionary(pa.int32(), pa.string()))}
+        )
     raise ValueError(tbl_type)
 
 
@@ -30,6 +35,7 @@ TBL_TYPES = [
     "polars_enum",
     "polars_lazy_enum",
     "pandas_category",
+    "pandas_pyarrow_dictionary",
 ]
 
 
