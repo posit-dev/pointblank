@@ -8,7 +8,7 @@ pb edit [OPTIONS] [VALIDATION_FILE]
 
 VALIDATION_FILE is a Python (.py) or YAML (.yaml/.yml) file containing a validation plan. The instruction is sent, along with the current plan, to the specified model; the proposed change is shown as a diff for review and can optionally be written to a file.
 
-Full --help output
+Full `--help` output
 
     Usage: pb edit [OPTIONS] [VALIDATION_FILE]
 

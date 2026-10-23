@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-723567b195ef916a85594ef888c0e6b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-ae7852ac5c72ea04490df4f1a846ace5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1690,12 +1690,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L37-L501" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">MissingSpec</span>(</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MissingSpec</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">reasons</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">categories</span><span class="op">=</span><span class="cn-none">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="cn-bool">True</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">categories</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"unknown"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="cn-none">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1829,7 +1829,7 @@ A missing-value specification that can be attached to a <code>Field</code> (via 
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L328-L331" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>from_cdisc(<span class="op">**</span>kwargs)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_cdisc</span>(<span class="op">**</span><span class="va">kwargs</span>)</span></code></pre></div>
 </div>
 </section>
 <section id="from_cdisc_null_flavors" class="level3">
@@ -1842,10 +1842,10 @@ A missing-value specification that can be attached to a <code>Field</code> (via 
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L272-L325" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>from_cdisc_null_flavors(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    null_is_missing<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    null_reason<span class="op">=</span><span class="st">"no_information"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    description<span class="op">=</span><span class="st">"CDISC/HL7 null flavors"</span>,</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_cdisc_null_flavors</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"no_information"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"CDISC/HL7 null flavors"</span>,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1899,12 +1899,12 @@ A spec with the standard null flavor codes.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L333-L392" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>from_sas(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    reasons<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    include_underscore<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    null_is_missing<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    null_reason<span class="op">=</span><span class="st">"system_missing"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    description<span class="op">=</span><span class="st">"SAS special missing values"</span>,</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_sas</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">reasons</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">include_underscore</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"system_missing"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"SAS special missing values"</span>,</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -1969,12 +1969,12 @@ A spec covering the SAS special missing values.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L394-L450" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>from_spss(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    missing_values,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    labels<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    null_is_missing<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    null_reason<span class="op">=</span><span class="st">"unknown"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    description<span class="op">=</span><span class="st">"SPSS user-defined missing values"</span>,</span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_spss</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">missing_values</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">labels</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"unknown"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"SPSS user-defined missing values"</span>,</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -2039,10 +2039,10 @@ A spec built from the SPSS missing values.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L452-L501" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>from_variable_metadata(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    variable,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    null_is_missing<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    null_reason<span class="op">=</span><span class="st">"unknown"</span>,</span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_variable_metadata</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">variable</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"unknown"</span>,</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
@@ -2089,7 +2089,7 @@ A spec built from the variable’s missing values, or <code>None</code> if the v
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L200-L216" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>is_missing(value)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_missing</span>(<span class="va">value</span>)</span></code></pre></div>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
@@ -2124,7 +2124,7 @@ A value from the data.
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L181-L198" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>reason_for(value)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reason_for</span>(<span class="va">value</span>)</span></code></pre></div>
 </div>
 <section id="parameters-6" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
@@ -2159,7 +2159,7 @@ The reason label if <code>value</code> is a declared sentinel value, <code>null_
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L252-L266" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>reasons_list()</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reasons_list</span>()</span></code></pre></div>
 </div>
 <section id="returns-7" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h4>
@@ -2183,7 +2183,7 @@ The distinct reason labels (in first-seen order), including <code>null_reason</c
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L169-L179" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sentinel_values()</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sentinel_values</span>()</span></code></pre></div>
 </div>
 <section id="returns-8" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-8">Returns</h4>
@@ -2207,7 +2207,7 @@ The keys of <code>reasons</code> (the actual values in the data that represent m
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L233-L250" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>values_for_category(category)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">values_for_category</span>(<span class="va">category</span>)</span></code></pre></div>
 </div>
 <section id="parameters-7" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
@@ -2242,7 +2242,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
 <p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L218-L231" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
-<div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>values_for_reason(reason)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">values_for_reason</span>(<span class="va">reason</span>)</span></code></pre></div>
 </div>
 <section id="parameters-8" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>

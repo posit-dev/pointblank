@@ -15,7 +15,7 @@ Edit the template to add your own data loading and validation rules, then run it
 
 OUTPUT_FILE is the path where the template will be created.
 
-Full --help output
+Full `--help` output
 
     Usage: pb make-template [OPTIONS] [OUTPUT_FILE]
 

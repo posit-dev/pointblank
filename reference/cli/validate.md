@@ -41,7 +41,7 @@ Require `--column` and `--set`:
 
 Use `--list-checks` to see all available validation methods with examples. The default CHECK_TYPE is `rows-distinct` which checks for duplicate rows.
 
-Full --help output
+Full `--help` output
 
     Usage: pb validate [OPTIONS] [DATA_SOURCE]
 

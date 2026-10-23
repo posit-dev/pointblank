@@ -10,7 +10,7 @@ Execute Polars DataFrame operations from the command line and display the result
 
 POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame. The `pl` module is automatically imported and available.
 
-Full --help output
+Full `--help` output
 
     Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
 

@@ -6,7 +6,7 @@ List available built-in datasets.
 pb datasets
 ```
 
-Full --help output
+Full `--help` output
 
     Usage: pb datasets [OPTIONS]
 

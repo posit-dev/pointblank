@@ -24,7 +24,7 @@ DATA can be:
 - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
 - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 
-Full --help output
+Full `--help` output
 
     Usage: pb run [OPTIONS] [VALIDATION_FILE]
 

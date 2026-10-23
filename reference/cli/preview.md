@@ -26,7 +26,7 @@ For tables with many columns, use these options to control which columns are dis
 
 Tables with \>15 columns automatically show first 7 and last 7 columns with indicators.
 
-Full --help output
+Full `--help` output
 
     Usage: pb preview [OPTIONS] [DATA_SOURCE]
 

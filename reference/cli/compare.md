@@ -10,7 +10,7 @@ SOURCE is the reference (expected) table and TARGET is the table to check. Each 
 
 Exit codes: 0 if the tables match, 1 if they differ, 2 on error.
 
-Full --help output
+Full `--help` output
 
     Usage: pb compare [OPTIONS] SOURCE TARGET
 

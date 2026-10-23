@@ -6,7 +6,7 @@ Check installed dependencies and their availability.
 pb requirements
 ```
 
-Full --help output
+Full `--help` output
 
     Usage: pb requirements [OPTIONS]
 

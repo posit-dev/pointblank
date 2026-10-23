@@ -14,7 +14,7 @@ pb preview data.csv Preview your data pb scan data.csv Generate data profile pb 
 
 Use pb COMMAND -help for detailed help on any command.
 
-Full --help output
+Full `--help` output
 
     Usage: pb [OPTIONS] COMMAND [ARGS]...
 

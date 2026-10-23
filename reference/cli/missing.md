@@ -15,7 +15,7 @@ DATA_SOURCE can be:
 - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 - Piped data from pb pl command
 
-Full --help output
+Full `--help` output
 
     Usage: pb missing [OPTIONS] [DATA_SOURCE]
 
