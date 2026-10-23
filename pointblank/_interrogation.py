@@ -1372,10 +1372,7 @@ def interrogate_within_spec(
         # Use regex validation through Narwhals (works for all backends including Ibis!)
         pattern = regex_specs[spec_lower]
 
-        # Polars has no string methods for Categorical and Enum columns
-        col_expr = nw.col(column)
-        if nw_tbl.collect_schema()[column] in (nw.Categorical, nw.Enum):
-            col_expr = col_expr.cast(nw.String)
+        col_expr = _string_expr(nw_tbl, column)
 
         # For SWIFT/BIC, need to uppercase first
         if spec_lower in ("swift", "swift_bic", "bic"):
