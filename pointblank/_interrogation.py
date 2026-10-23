@@ -1272,6 +1272,19 @@ def interrogate_regex(
     return result_tbl.to_native()
 
 
+def _string_expr(nw_tbl: Any, column: str) -> nw.Expr:
+    """
+    The column as an expression that the `.str` methods can be used on.
+
+    Polars has no string methods for Categorical and Enum columns (nor pandas for pyarrow
+    dictionary columns), so those are cast to strings. Narwhals < 2.27 casts a missing value in a
+    pandas `category` column to the string "nan", so missing values are kept missing.
+    """
+    if nw_tbl.collect_schema()[column] not in (nw.Categorical, nw.Enum):
+        return nw.col(column)
+    return nw.when(~nw.col(column).is_null()).then(nw.col(column).cast(nw.String))
+
+
 def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
     """String length interrogation."""
 
@@ -1281,10 +1294,7 @@ def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
-    # Polars has no string methods for Categorical and Enum columns
-    column_expr = nw.col(column)
-    if nw_tbl.collect_schema()[column] in (nw.Categorical, nw.Enum):
-        column_expr = column_expr.cast(nw.String)
+    column_expr = _string_expr(nw_tbl, column)
 
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
