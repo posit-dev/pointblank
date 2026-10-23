@@ -1372,11 +1372,11 @@ def interrogate_within_spec(
         # Use regex validation through Narwhals (works for all backends including Ibis!)
         pattern = regex_specs[spec_lower]
 
+        col_expr = _string_expr(nw_tbl, column)
+
         # For SWIFT/BIC, need to uppercase first
         if spec_lower in ("swift", "swift_bic", "bic"):
-            col_expr = nw.col(column).str.to_uppercase()
-        else:
-            col_expr = nw.col(column)
+            col_expr = col_expr.str.to_uppercase()
 
         result_tbl = nw_tbl.with_columns(
             pb_is_good_1=nw.col(column).is_null() & na_pass,
