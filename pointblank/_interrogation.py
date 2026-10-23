@@ -1258,10 +1258,7 @@ def interrogate_regex(
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
-    # Polars has no string methods for Categorical and Enum columns
-    column_expr = nw.col(column)
-    if nw_tbl.collect_schema()[column] in (nw.Categorical, nw.Enum):
-        column_expr = column_expr.cast(nw.String)
+    column_expr = _string_expr(nw_tbl, column)
 
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
@@ -1270,9 +1267,12 @@ def interrogate_regex(
 
     # Apply inverse logic if needed
     if inverse:
-        # Use explicit boolean logic instead of bitwise NOT for pandas compatibility
+        # Use explicit boolean logic instead of bitwise NOT for pandas compatibility; a missing
+        # value doesn't pass either way, so it's left to `na_pass=` (through `pb_is_good_1`)
         result_tbl = result_tbl.with_columns(
-            pb_is_good_2=nw.when(nw.col("pb_is_good_2")).then(False).otherwise(True)
+            pb_is_good_2=nw.when(nw.col("pb_is_good_2") | nw.col(column).is_null())
+            .then(False)
+            .otherwise(True)
         )
 
     result_tbl = result_tbl.with_columns(
