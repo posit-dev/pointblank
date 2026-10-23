@@ -69,3 +69,51 @@ def test_nan_counts_as_the_null_reason_in_col_missing_consistent(tbl_type) -> No
     )
 
     assert _counts(validation) == (4, 1)
+
+
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
+def test_nan_is_uncoded_missingness_in_col_missing_coded(tbl_type) -> None:
+    tbl = _table(tbl_type, {"n": [1.0, -99.0, NAN, None, 5.0]})
+    spec = pb.MissingSpec(reasons={-99.0: "refused"})
+
+    validation = pb.Validate(tbl).col_missing_coded("n", missing=spec).interrogate()
+
+    assert _counts(validation) == (3, 2)
+
+
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
+@pytest.mark.parametrize("max_pct, passes", [(0.4, False), (0.7, True)])
+def test_nan_is_missing_in_col_pct_missing(tbl_type, max_pct, passes) -> None:
+    tbl = _table(tbl_type, {"n": [1.0, NAN, None]})
+    spec = pb.MissingSpec(reasons={-99.0: "refused"})
+
+    validation = pb.Validate(tbl).col_pct_missing("n", missing=spec, max_pct=max_pct).interrogate()
+
+    assert validation.all_passed() is passes
+
+
+# Integers and decimals can't hold NaN, and Polars has no `is_nan()` for decimals, so those columns
+# are only checked for nulls
+@pytest.mark.parametrize(
+    "dtype", [pl.Int64, pl.Decimal(10, 2)], ids=lambda dtype: str(dtype).split("(")[0]
+)
+def test_missing_spec_checks_on_columns_that_cant_hold_nan(dtype) -> None:
+    tbl = pl.DataFrame(
+        {"a": [1, -99, None, 5], "b": [2, -99, None, None]}, schema={"a": dtype, "b": dtype}
+    )
+    spec = pb.MissingSpec(reasons={-99: "refused"})
+
+    validation = (
+        pb.Validate(tbl)
+        .col_vals_gt("a", 0, missing=spec)
+        .col_missing_only_coded("a", missing=spec, min_val=0)
+        .col_missing_consistent(["a", "b"], missing=spec, when_reason=spec.null_reason)
+        .col_missing_coded("a", missing=spec)
+        .col_pct_missing("a", missing=spec, max_pct=0.5)
+        .interrogate()
+    )
+
+    assert [
+        (validation.n_passed(i=i, scalar=True), validation.n_failed(i=i, scalar=True))
+        for i in range(1, 6)
+    ] == [(4, 0), (4, 0), (3, 1), (3, 1), (1, 0)]
