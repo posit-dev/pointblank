@@ -1031,7 +1031,11 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
-    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column])
+    # `is_in()` gives null for a missing value on Polars and nullable pandas dtypes, which is
+    # neither passing nor failing in the sundered data and the extracts
+    base_expr: nw.Expr = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(
+        False
+    )
     if can_be_null:
         base_expr = base_expr | nw.col(column).is_null()
 
@@ -1272,6 +1276,19 @@ def interrogate_regex(
     return result_tbl.to_native()
 
 
+def _string_expr(nw_tbl: Any, column: str) -> nw.Expr:
+    """
+    The column as an expression that the `.str` methods can be used on.
+
+    Polars has no string methods for Categorical and Enum columns (nor pandas for pyarrow
+    dictionary columns), so those are cast to strings. Narwhals < 2.27 casts a missing value in a
+    pandas `category` column to the string "nan", so missing values are kept missing.
+    """
+    if nw_tbl.collect_schema()[column] not in (nw.Categorical, nw.Enum):
+        return nw.col(column)
+    return nw.when(~nw.col(column).is_null()).then(nw.col(column).cast(nw.String))
+
+
 def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool) -> Any:
     """String length interrogation."""
 
@@ -1281,6 +1298,8 @@ def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
+    column_expr = _string_expr(nw_tbl, column)
+
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
         pb_is_good_2=nw.lit(True),
@@ -1289,12 +1308,12 @@ def interrogate_str_len(tbl: IntoFrame, column: str, values: dict, na_pass: bool
 
     if min_val is not None:
         result_tbl = result_tbl.with_columns(
-            pb_is_good_2=(nw.col(column).str.len_chars() >= min_val).fill_null(False)
+            pb_is_good_2=(column_expr.str.len_chars() >= min_val).fill_null(False)
         )
 
     if max_val is not None:
         result_tbl = result_tbl.with_columns(
-            pb_is_good_3=(nw.col(column).str.len_chars() <= max_val).fill_null(False)
+            pb_is_good_3=(column_expr.str.len_chars() <= max_val).fill_null(False)
         )
 
     result_tbl = result_tbl.with_columns(
