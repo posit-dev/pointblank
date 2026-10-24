@@ -22022,6 +22022,224 @@ def test_aggregate_step_report_custom_header() -> None:
 
 
 # =============================================================================
+# Tests for table-level step reports (col_exists(), row_count_match(), etc.)
+# =============================================================================
+
+
+def _table_level_validation(tbl_type: str = "polars", passing: bool = True) -> Validate:
+    """A validation with each table-level step type, all passing or all failing."""
+
+    tbl = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    return (
+        Validate(tbl)
+        .col_exists(columns="a" if passing else "dat_time")
+        .row_count_match(count=13 if passing else 20)
+        .col_count_match(count=8 if passing else 5)
+        .col_pct_null(columns="c", p=2 / 13 if passing else 0.5)
+        .col_pct_missing(
+            columns="c", missing=MissingSpec(reasons={}), max_pct=0.2 if passing else 0.1
+        )
+        .data_freshness(
+            column="date_time",
+            max_age="30 days" if passing else "6 hours",
+            reference_time="2016-01-31 00:00:00",
+        )
+        .specially(expr=lambda df: [True, passing, True])
+        .interrogate()
+    )
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("passing", [True, False])
+def test_table_level_step_reports(tbl_type, passing) -> None:
+    """Test that every table-level step type produces a step report."""
+
+    validation = _table_level_validation(tbl_type=tbl_type, passing=passing)
+
+    for step in validation.validation_info:
+        assert step.all_passed is passing
+
+        report = validation.get_step_report(i=step.i)
+
+        assert isinstance(report, GT.GT), step.assertion_type
+
+        html = report.as_raw_html()
+
+        assert ("ALL PASSED" in html) is passing
+        assert ("TEST UNIT FAILURES" in html) is not passing
+
+
+def test_table_level_step_report_contents() -> None:
+    """Test the measured and expected values shown in table-level step reports."""
+
+    from html import unescape
+
+    validation = _table_level_validation(passing=False)
+
+    def cells(i: int) -> list[str]:
+        html = validation.get_step_report(i=i).as_raw_html()
+        return re.findall(r'<td [^>]*class="gt_row[^"]*"[^>]*>(.*?)</td>', html, flags=re.S)
+
+    def header(i: int) -> str:
+        html = validation.get_step_report(i=i).as_raw_html()
+        return unescape(re.search(r"ASSERTION.*?</code></span>", html, re.S).group())
+
+    # col_exists(): the column is missing, and the closest match is suggested
+    assert "EXISTS(dat_time)" in header(1)
+    assert [c.strip() for c in cells(1)[:4]] == ["dat_time", "—", "8", "date_time"]
+
+    # row_count_match(): actual, expected, tolerance, and difference
+    assert "ROWS = 20" in header(2)
+    assert [c.strip() for c in cells(2)[:4]] == ["13", "20", "—", "-7"]
+
+    # col_count_match(): actual, expected, and difference
+    assert "COLUMNS = 5" in header(3)
+    assert [c.strip() for c in cells(3)[:3]] == ["8", "5", "+3"]
+
+    # col_pct_null(): nulls, rows, actual and expected percentages, allowed number of nulls
+    assert "PCT_NULL(c) = 50%" in header(4)
+    assert [c.strip() for c in cells(4)[:5]] == ["2", "13", "15.38%", "50%", "6"]
+
+    # col_pct_missing(): missing values, rows, actual and maximum percentages
+    assert "PCT_MISSING(c) ≤ 10%" in header(5)
+    assert [c.strip() for c in cells(5)[:4]] == ["2", "13", "15.38%", "10%"]
+
+    # data_freshness(): most recent datetime, reference time, age, maximum age
+    assert "AGE(MAX(date_time)) ≤ 6.0h" in header(6)
+    assert [c.strip() for c in cells(6)[:4]] == [
+        "2016-01-30 11:23:00",
+        "2016-01-31 00:00:00",
+        "12.6h",
+        "6.0h",
+    ]
+
+    # specially(): test units, passed, failed
+    assert "SPECIALLY(<lambda>)" in header(7)
+    assert [c.strip() for c in cells(7)[:3]] == ["3", "2", "1"]
+
+
+def test_table_level_step_report_variants() -> None:
+    """Test tolerance, inverse, filtered, and named-function variants of table-level reports."""
+
+    def check_rows(df):
+        return True
+
+    validation = (
+        Validate(pl.DataFrame({"a": [1, None, 3], "b": [-99, -98, 1]}))
+        .row_count_match(count=4, tol=(2, 1))
+        .row_count_match(count=3, tol=1)
+        .row_count_match(count=3, inverse=True)
+        .col_count_match(count=3, inverse=True)
+        .col_pct_missing(
+            columns="b",
+            missing=MissingSpec(reasons={-99: "refused", -98: "dont_know"}),
+            max_pct=0.5,
+            reason="refused",
+        )
+        .col_exists(columns="a")
+        .specially(expr=check_rows)
+        .interrogate()
+    )
+
+    html = [validation.get_step_report(i=i).as_raw_html() for i in range(1, 8)]
+
+    assert "(-2, +1)" in html[0]
+    assert "±1" in html[1]
+    assert "ROWS &ne; 3" in html[2]
+    assert "COLUMNS &ne; 3" in html[3]
+    assert "reason=&#x27;refused&#x27;" in html[4] or "reason='refused'" in html[4]
+
+    # The legend of missing-value codes is appended to the col_pct_missing() report
+    assert "refused" in html[4] and "dont_know" in html[4]
+
+    # A column that's present shows its position and no closest-match column
+    assert "POSITION" in html[5]
+    assert "CLOSEST MATCH" not in html[5]
+
+    # A column name that differs only in case is matched case-insensitively
+    html_case = (
+        (Validate(pl.DataFrame({"a": [1]})).col_exists(columns="A").interrogate())
+        .get_step_report(i=1)
+        .as_raw_html()
+    )
+
+    assert "CLOSEST MATCH" in html_case
+    assert re.search(r'headers="pb_step_tbl-closest_match"[^>]*>a</td>', html_case)
+
+    assert "SPECIALLY(check_rows)" in html[6]
+
+
+def test_table_level_step_report_escapes_column_names() -> None:
+    """Test that column names with Markdown/HTML characters are shown literally."""
+
+    name = "*x*_<b>y</b>"
+
+    validation = (
+        Validate(pl.DataFrame({name: [1, None]}))
+        .col_exists(columns=name)
+        .col_pct_null(columns=name, p=0.5)
+        .interrogate()
+    )
+
+    for i in (1, 2):
+        html = validation.get_step_report(i=i).as_raw_html()
+
+        assert "*x*_&lt;b&gt;y&lt;/b&gt;" in html
+        assert "<b>y</b>" not in html
+        assert "<em>x</em>" not in html
+
+
+def test_table_level_step_report_header_options() -> None:
+    """Test custom headers, no header, and translated text in table-level step reports."""
+
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2]}), lang="fr")
+        .row_count_match(count=2)
+        .col_count_match(count=2)
+        .interrogate()
+    )
+
+    html_default = validation.get_step_report(i=1).as_raw_html()
+
+    assert "Rapport pour l'étape de validation 1" in html_default
+    assert "UNITÉS DE TEST" in html_default
+
+    html_custom = validation.get_step_report(i=2, header="Custom: {title}").as_raw_html()
+
+    assert "Custom: Rapport pour l'étape de validation 2" in html_custom
+    assert "ASSERTION" not in html_custom
+
+    html_no_header = validation.get_step_report(i=2, header=None).as_raw_html()
+
+    assert "Rapport pour" not in html_no_header
+    assert "ACTUAL" in html_no_header
+
+
+def test_table_level_step_report_empty_table() -> None:
+    """Test table-level step reports for a table with no rows."""
+
+    tbl = pl.DataFrame({"a": pl.Series([], dtype=pl.Int64), "d": pl.Series([], dtype=pl.Datetime)})
+
+    validation = (
+        Validate(tbl)
+        .row_count_match(count=0)
+        .col_count_match(count=2)
+        .col_exists(columns="a")
+        .data_freshness(column="d", max_age="1 day")
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        assert isinstance(validation.get_step_report(i=step.i), GT.GT), step.assertion_type
+
+    # With no datetime values, the most recent datetime and age are blank
+    html_freshness = validation.get_step_report(i=4).as_raw_html()
+
+    assert html_freshness.count("—") >= 2
+
+
+# =============================================================================
 # data_freshness() tests
 # =============================================================================
 
