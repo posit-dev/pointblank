@@ -197,6 +197,18 @@ ROW_BASED_VALIDATION_TYPES = [
     "prompt",
 ]
 
+# Validation steps that don't check values row by row; their step reports show a summary of the
+# measured and expected values
+TABLE_LEVEL_STEP_REPORT_TYPES = [
+    "col_exists",
+    "row_count_match",
+    "col_count_match",
+    "col_pct_null",
+    "col_pct_missing",
+    "data_freshness",
+    "specially",
+]
+
 IBIS_BACKENDS = [
     "bigquery",
     "databricks",
