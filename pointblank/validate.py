@@ -4,6 +4,7 @@ import base64
 import contextlib
 import copy
 import datetime
+import difflib
 import html as html_module
 import inspect
 import json
@@ -54,6 +55,7 @@ from pointblank._constants import (
     SEVERITY_LEVEL_COLORS,
     SVG_ICONS_FOR_ASSERTION_TYPES,
     SVG_ICONS_FOR_TBL_STATUS,
+    TABLE_LEVEL_STEP_REPORT_TYPES,
     VALIDATION_REPORT_FIELDS,
 )
 from pointblank._constants_translations import (
@@ -68,10 +70,10 @@ from pointblank._interrogation import (
     StepEvaluationError,
     _first_line,
     apply_missing_exclusion,
-    col_count_match,
-    col_exists,
-    col_pct_missing,
-    col_pct_null,
+    col_count_match_details,
+    col_exists_details,
+    col_pct_missing_details,
+    col_pct_null_details,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -93,7 +95,7 @@ from pointblank._interrogation import (
     interrogate_regex,
     interrogate_str_len,
     interrogate_rows_distinct,
-    row_count_match,
+    row_count_match_details,
     rows_complete,
 )
 from pointblank._typing import SegmentSpec
@@ -16940,13 +16942,17 @@ class Validate:
                             )
 
                     elif assertion_type == "col_pct_null":
-                        result_bool = col_pct_null(
+                        pct_null_result = col_pct_null_details(
                             data_tbl=data_tbl_step,
                             column=column,
                             p=value["p"],
                             bound_finder=value["bound_finder"],
                         )
 
+                        # Store the observed null count for the step report
+                        validation.val_info = pct_null_result
+
+                        result_bool = pct_null_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -16955,7 +16961,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_pct_missing":
-                        result_bool = col_pct_missing(
+                        pct_missing_result = col_pct_missing_details(
                             data_tbl=data_tbl_step,
                             column=column,
                             sentinels=value["sentinels"],
@@ -16963,6 +16969,10 @@ class Validate:
                             max_pct=value["max_pct"],
                         )
 
+                        # Store the observed missing-value count for the step report
+                        validation.val_info = pct_missing_result
+
+                        result_bool = pct_missing_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -16999,11 +17009,15 @@ class Validate:
                         )
 
                     elif assertion_type == "col_exists":
-                        result_bool = col_exists(
+                        col_exists_result = col_exists_details(
                             data_tbl=data_tbl_step,
                             column=column,
                         )
 
+                        # Store the table's columns for the step report
+                        validation.val_info = col_exists_result
+
+                        result_bool = col_exists_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -17056,13 +17070,17 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "row_count_match":
-                        result_bool = row_count_match(
+                        row_count_result = row_count_match_details(
                             data_tbl=data_tbl_step,
                             count=value["count"],
                             inverse=value["inverse"],
                             abs_tol_bounds=value["abs_tol_bounds"],
                         )
 
+                        # Store the observed row count for the step report
+                        validation.val_info = row_count_result
+
+                        result_bool = row_count_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -17071,10 +17089,14 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_count_match":
-                        result_bool = col_count_match(
+                        col_count_result = col_count_match_details(
                             data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
                         )
 
+                        # Store the observed column count for the step report
+                        validation.val_info = col_count_result
+
+                        result_bool = col_count_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -21783,7 +21805,12 @@ class Validate:
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
         - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
+        - [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`)
+        - [`col_vals_in_table()`](`pointblank.Validate.col_vals_in_table`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
+        - [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`)
+        - [`col_missing_only_coded()`](`pointblank.Validate.col_missing_only_coded`)
+        - [`col_missing_consistent()`](`pointblank.Validate.col_missing_consistent`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
         - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
@@ -21795,6 +21822,29 @@ class Validate:
         The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation step will
         produce a report that shows the schema of the data table and the schema of the validation
         step. The report will indicate whether the schemas match or not.
+
+        The [`tbl_match()`](`pointblank.Validate.tbl_match`) and
+        [`tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`) validation steps will produce a
+        report comparing the target table to the comparison table, with samples of the rows (or key
+        groups) that differ.
+
+        The remaining validation steps check the table, or a column, as a whole. Each produces a
+        summary report with the measured value(s) beside the expected value(s):
+
+        - the aggregate methods (e.g., [`col_sum_gt()`](`pointblank.Validate.col_sum_gt`),
+          [`col_avg_eq()`](`pointblank.Validate.col_avg_eq`),
+          [`col_sd_le()`](`pointblank.Validate.col_sd_le`)): the computed aggregate value
+        - [`col_exists()`](`pointblank.Validate.col_exists`): the column's position in the table
+          (and, if it's missing, the closest-matching column name)
+        - [`row_count_match()`](`pointblank.Validate.row_count_match`) and
+          [`col_count_match()`](`pointblank.Validate.col_count_match`): the row or column count
+        - [`col_pct_null()`](`pointblank.Validate.col_pct_null`) and
+          [`col_pct_missing()`](`pointblank.Validate.col_pct_missing`): the number and percentage
+          of null or missing values
+        - [`data_freshness()`](`pointblank.Validate.data_freshness`): the most recent datetime
+          value and its age
+        - [`specially()`](`pointblank.Validate.specially`): the number of passing and failing test
+          units
 
         Examples
         --------
@@ -22053,6 +22103,20 @@ class Validate:
                 column=column,
                 values=values,
                 all_passed=all_passed,
+                val_info=val_info,
+                header=header,
+                lang=lang,
+            )
+
+        elif assertion_type in TABLE_LEVEL_STEP_REPORT_TYPES:
+            step_report = _step_report_table_level(
+                assertion_type=assertion_type,
+                i=i,
+                column=column,
+                values=values,
+                all_passed=all_passed,
+                n=n,
+                n_failed=n_failed,
                 val_info=val_info,
                 header=header,
                 lang=lang,
@@ -26959,10 +27023,6 @@ def _step_report_aggregate(
     along with tolerance and pass/fail status.
     """
 
-    # Determine whether the `lang` value represents a right-to-left language
-    is_rtl_lang = lang in RTL_LANGUAGES
-    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
-
     # Parse assertion type to get aggregate function and comparison operator
     # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
     parts = assertion_type.split("_")
@@ -27035,14 +27095,6 @@ def _step_report_aggregate(
     else:
         difference = None  # pragma: no cover
 
-    # Format values for display
-    def format_value(v) -> str:  # pragma: no cover
-        if v is None:  # pragma: no cover
-            return "&mdash;"  # pragma: no cover
-        if isinstance(v, float):  # pragma: no cover
-            return f"{v:,.6g}"  # pragma: no cover
-        return f"{v:,}"  # pragma: no cover
-
     # Format tolerance for display
     if tol == 0:
         tol_display = "&mdash;"
@@ -27066,13 +27118,86 @@ def _step_report_aggregate(
     else:
         diff_display = "&mdash;"  # pragma: no cover
 
-    # Create pass/fail indicator
     if all_passed:
-        status_html = CHECK_MARK_SPAN
-        status_color = "#4CA64C"
+        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
+        )
     else:
-        status_html = CROSS_MARK_SPAN
-        status_color = "#CF142B"
+        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
+        )
+    if isinstance(result_stmt, str) and "{column}" in result_stmt:
+        result_stmt = result_stmt.format(column=column_display)
+
+    return _step_report_summary(
+        i=i,
+        cells=[
+            ("actual", "ACTUAL", _step_report_fmt_value(actual), "200px"),
+            ("target", "EXPECTED", _step_report_fmt_value(target), "200px"),
+            ("tolerance", "TOL", tol_display, "150px"),
+            ("difference", "DIFFERENCE", diff_display, "200px"),
+        ],
+        all_passed=all_passed,
+        assertion_text=assertion_text,
+        result_stmt=result_stmt,
+        header=header,
+        lang=lang,
+    )
+
+
+def _step_report_fmt_value(v: Any) -> str:
+    """
+    Format a number (or `None`) for a cell of a summary step report.
+    """
+    if v is None:
+        return "&mdash;"
+    if isinstance(v, float):
+        return f"{v:,.6g}"
+    return f"{v:,}"
+
+
+def _step_report_fmt_pct(p: float | None) -> str:
+    """
+    Format a fraction (or `None`) as a percentage for a cell of a summary step report.
+    """
+    if p is None:
+        return "&mdash;"
+    return f"{p * 100:,.4g}%"
+
+
+def _step_report_md_escape(text: Any) -> str:
+    """
+    Escape text (e.g., a column name) for a Markdown-formatted cell of a summary step report.
+    """
+    return re.sub(r"([!-/:-@\[-`{-~])", r"\\\1", str(text))
+
+
+def _step_report_summary(
+    i: int,
+    cells: list[tuple[str, str, str, str]],
+    all_passed: bool,
+    assertion_text: str,
+    result_stmt: str,
+    header: str | None,
+    lang: str,
+) -> GT:
+    """
+    Generate a summary step report: a 1-row table of the step's measured and expected values
+    (followed by a pass/fail status cell) under the standard step-report header.
+
+    Each item in `cells` is a tuple of the column ID, column label, Markdown-formatted cell value,
+    and column width. The `assertion_text` (HTML) is shown in the header after the `ASSERTION`
+    label, followed by the `result_stmt` (HTML).
+    """
+
+    # Determine whether the `lang` value represents a right-to-left language
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Create pass/fail indicator
+    status_html = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Select DataFrame library (prefer Polars, fall back to Pandas)
     if _is_lib_present("polars"):
@@ -27088,15 +27213,11 @@ def _step_report_aggregate(
             "Neither Polars nor Pandas is available for step report generation"
         )  # pragma: no cover
 
+    value_columns = [key for key, _, _, _ in cells]
+
     # Create the data for the 1-row table
     report_data = df_lib.DataFrame(
-        {
-            "actual": [format_value(actual)],
-            "target": [format_value(target)],
-            "tolerance": [tol_display],
-            "difference": [diff_display],
-            "status": [status_html],
-        }
+        {**{key: [value] for key, _, value, _ in cells}, "status": [status_html]}
     )
 
     # Create GT table with styling matching preview() and other step reports
@@ -27104,18 +27225,12 @@ def _step_report_aggregate(
         GT(report_data, id="pb_step_tbl")
         .opt_table_font(font=google_font(name="IBM Plex Sans"))
         .opt_align_table_header(align="left")
-        .cols_label(
-            actual="ACTUAL",
-            target="EXPECTED",
-            tolerance="TOL",
-            difference="DIFFERENCE",
-            status="",
-        )
+        .cols_label(**{key: label for key, label, _, _ in cells}, status="")
         .cols_align(align="center")
-        .fmt_markdown(columns=["actual", "target", "tolerance", "difference", "status"])
+        .fmt_markdown(columns=value_columns + ["status"])
         .tab_style(
             style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
-            locations=loc.body(columns=["actual", "target", "tolerance", "difference"]),
+            locations=loc.body(columns=value_columns),
         )
         .tab_style(
             style=style.text(size="13px"),
@@ -27139,15 +27254,7 @@ def _step_report_aggregate(
             column_labels_vlines_width="1px",
             column_labels_vlines_color="#F2F2F2",
         )
-        .cols_width(
-            cases={
-                "actual": "200px",
-                "target": "200px",
-                "tolerance": "150px",
-                "difference": "200px",
-                "status": "50px",
-            }
-        )
+        .cols_width(cases={**{key: width for key, _, _, width in cells}, "status": "50px"})
     )
 
     # Apply styling based on pass/fail
@@ -27185,22 +27292,7 @@ def _step_report_aggregate(
         f"{assertion_text}</code>"
     )
 
-    if all_passed:
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
-        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
-            lang,
-            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
-        )
-        if isinstance(result_stmt, str) and "{column}" in result_stmt:
-            result_stmt = result_stmt.format(column=column_display)
-    else:
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
-        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
-            lang,
-            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
-        )
-        if isinstance(result_stmt, str) and "{column}" in result_stmt:
-            result_stmt = result_stmt.format(column=column_display)
+    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + status_html
 
     details = (
         f"<div style='font-size: 13.6px; {direction_rtl}'>"
@@ -27230,6 +27322,194 @@ def _step_report_aggregate(
     step_report = step_report.tab_header(title=md(header))
 
     return step_report
+
+
+def _step_report_table_level(
+    assertion_type: str,
+    i: int,
+    column: Any,
+    values: Any,
+    all_passed: bool,
+    n: int,
+    n_failed: int,
+    val_info: dict | None,
+    header: str | None,
+    lang: str,
+) -> GT:
+    """
+    Generate a summary step report for a validation step that doesn't check values row by row
+    (`col_exists()`, `row_count_match()`, `col_count_match()`, `col_pct_null()`,
+    `col_pct_missing()`, `data_freshness()`, and `specially()`).
+
+    The report is a 1-row table with the measured and expected values for the step.
+    """
+    info = val_info or {}
+    params = values if isinstance(values, dict) else {}
+    column_html = html_module.escape(str(column)) if column is not None else ""
+
+    if assertion_type == "col_exists":
+        tbl_columns = info.get("tbl_columns") or []
+        found = column in tbl_columns
+        assertion_text = f"EXISTS({column_html})"
+        cells = [
+            ("column", "COLUMN", _step_report_md_escape(column), "200px"),
+            (
+                "position",
+                "POSITION",
+                _step_report_fmt_value(tbl_columns.index(column) + 1 if found else None),
+                "120px",
+            ),
+            (
+                "tbl_columns",
+                "TABLE COLUMNS",
+                _step_report_fmt_value(len(tbl_columns) if "tbl_columns" in info else None),
+                "150px",
+            ),
+        ]
+        if not found:
+            # Suggest the table column with the most similar name (e.g., a case mismatch or typo)
+            close_matches = difflib.get_close_matches(str(column), tbl_columns, n=1, cutoff=0.6)
+            if not close_matches:
+                close_matches = [c for c in tbl_columns if c.lower() == str(column).lower()][:1]
+            cells.append(
+                (
+                    "closest_match",
+                    "CLOSEST MATCH",
+                    _step_report_md_escape(close_matches[0]) if close_matches else "&mdash;",
+                    "200px",
+                )
+            )
+
+    elif assertion_type in ("row_count_match", "col_count_match"):
+        count = info.get("count", params.get("count"))
+        operator = "&ne;" if info.get("inverse", params.get("inverse")) else "="
+        noun = "ROWS" if assertion_type == "row_count_match" else "COLUMNS"
+        assertion_text = f"{noun} {operator} {_step_report_fmt_value(count)}"
+        actual = info.get("actual")
+        cells = [
+            ("actual", "ACTUAL", _step_report_fmt_value(actual), "200px"),
+            ("target", "EXPECTED", _step_report_fmt_value(count), "200px"),
+        ]
+        if assertion_type == "row_count_match":
+            lower_tol, upper_tol = params.get("abs_tol_bounds", (0, 0))
+            if lower_tol == 0 and upper_tol == 0:
+                tol_display = "&mdash;"
+            elif lower_tol == upper_tol:
+                tol_display = f"&plusmn;{lower_tol:,}"
+            else:
+                tol_display = f"(-{lower_tol:,}, +{upper_tol:,})"
+            cells.append(("tolerance", "TOL", tol_display, "150px"))
+        if actual is not None and count is not None:
+            difference = actual - count
+            diff_display = f"+{difference:,}" if difference > 0 else f"{difference:,}"
+        else:
+            diff_display = "&mdash;"
+        cells.append(("difference", "DIFFERENCE", diff_display, "200px"))
+
+    elif assertion_type == "col_pct_null":
+        p = info.get("p", params.get("p"))
+        assertion_text = f"PCT_NULL({column_html}) = {_step_report_fmt_pct(p)}"
+        n_null = info.get("n_null")
+        total_rows = info.get("total_rows")
+        min_null = info.get("min_null")
+        max_null = info.get("max_null")
+        if min_null is None or max_null is None:
+            allowed_display = "&mdash;"
+        elif min_null == max_null:
+            allowed_display = _step_report_fmt_value(min_null)
+        else:
+            allowed_display = (
+                f"{_step_report_fmt_value(max(min_null, 0))}&ndash;"
+                f"{_step_report_fmt_value(max_null)}"
+            )
+        cells = [
+            ("n_null", "NULLS", _step_report_fmt_value(n_null), "120px"),
+            ("total_rows", "ROWS", _step_report_fmt_value(total_rows), "120px"),
+            (
+                "actual",
+                "ACTUAL",
+                _step_report_fmt_pct(n_null / total_rows if total_rows else None),
+                "150px",
+            ),
+            ("target", "EXPECTED", _step_report_fmt_pct(p), "150px"),
+            ("allowed", "ALLOWED NULLS", allowed_display, "150px"),
+        ]
+
+    elif assertion_type == "col_pct_missing":
+        max_pct = info.get("max_pct", params.get("max_pct"))
+        qualifiers = [
+            f"{key}={html_module.escape(repr(params[key]))}"
+            for key in ("reason", "category")
+            if params.get(key) is not None
+        ]
+        assertion_text = (
+            f"PCT_MISSING({', '.join([column_html] + qualifiers)}) "
+            f"&le; {_step_report_fmt_pct(max_pct)}"
+        )
+        cells = [
+            ("n_missing", "MISSING", _step_report_fmt_value(info.get("n_missing")), "120px"),
+            ("total_rows", "ROWS", _step_report_fmt_value(info.get("total_rows")), "120px"),
+            ("actual", "ACTUAL", _step_report_fmt_pct(info.get("pct_missing")), "150px"),
+            ("target", "MAX", _step_report_fmt_pct(max_pct), "150px"),
+        ]
+
+    elif assertion_type == "data_freshness":
+        max_age = info.get("max_age", params.get("max_age"))
+        max_age_display = _format_timedelta(max_age) if max_age is not None else "&mdash;"
+        assertion_text = f"AGE(MAX({column_html})) &le; {max_age_display}"
+
+        def format_datetime(dt: Any) -> str:
+            if dt is None:
+                return "&mdash;"
+            if isinstance(dt, datetime.datetime):
+                dt = dt.replace(microsecond=0)
+            return _step_report_md_escape(dt)
+
+        age = info.get("age")
+        cells = [
+            ("max_datetime", "MOST RECENT", format_datetime(info.get("max_datetime")), "220px"),
+            (
+                "reference_time",
+                "REFERENCE TIME",
+                format_datetime(info.get("reference_time")),
+                "220px",
+            ),
+            ("age", "AGE", _format_timedelta(age) if age is not None else "&mdash;", "120px"),
+            ("max_age", "MAX AGE", max_age_display, "120px"),
+        ]
+
+    else:  # assertion_type == "specially"
+        fn_name = getattr(values, "__name__", None) or "expr"
+        assertion_text = f"SPECIALLY({html_module.escape(fn_name)})"
+        cells = [
+            ("n", "TEST UNITS", _step_report_fmt_value(n), "150px"),
+            (
+                "n_passed",
+                "PASSED",
+                _step_report_fmt_value(
+                    n - n_failed if n is not None and n_failed is not None else None
+                ),
+                "150px",
+            ),
+            ("n_failed", "FAILED", _step_report_fmt_value(n_failed), "150px"),
+        ]
+
+    if all_passed:
+        result_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(n=n)
+    else:
+        result_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
+            failure_rate=f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
+        )
+
+    return _step_report_summary(
+        i=i,
+        cells=cells,
+        all_passed=all_passed,
+        assertion_text=assertion_text,
+        result_stmt=result_stmt,
+        header=header,
+        lang=lang,
+    )
 
 
 def _step_report_tbl_match(
