@@ -636,8 +636,19 @@ def col_exists(data_tbl: IntoFrame, column: str) -> bool:
     bool
         `True` if the column exists, `False` otherwise.
     """
+    return col_exists_details(data_tbl=data_tbl, column=column)["passed"]
+
+
+def col_exists_details(data_tbl: IntoFrame, column: str) -> dict:
+    """
+    Check if a column exists in a DataFrame, returning the details for reporting.
+
+    The returned dictionary has the result (`passed`) along with the `column` checked and the
+    columns of the table (`tbl_columns`).
+    """
     tbl = _convert_to_narwhals(df=data_tbl)
-    return column in tbl.columns
+    tbl_columns = list(tbl.columns)
+    return {"passed": column in tbl_columns, "column": column, "tbl_columns": tbl_columns}
 
 
 def col_schema_match(
@@ -672,6 +683,20 @@ def row_count_match(
     """
     Check if DataFrame row count matches expected count.
     """
+    return row_count_match_details(
+        data_tbl=data_tbl, count=count, inverse=inverse, abs_tol_bounds=abs_tol_bounds
+    )["passed"]
+
+
+def row_count_match_details(
+    data_tbl: IntoFrame, count: Any, inverse: bool, abs_tol_bounds: AbsoluteBounds
+) -> dict:
+    """
+    Check if DataFrame row count matches expected count, returning the details for reporting.
+
+    The returned dictionary has the result (`passed`) along with the observed row count
+    (`actual`), the expected `count`, and the range of matching row counts (`min_val`, `max_val`).
+    """
     from pointblank.validate import get_row_count
 
     row_count: int = get_row_count(data=data_tbl)
@@ -679,16 +704,38 @@ def row_count_match(
     min_val: int = count - lower_abs_limit
     max_val: int = count + upper_abs_limit
 
-    if inverse:
-        return not (row_count >= min_val and row_count <= max_val)
-    else:
-        return row_count >= min_val and row_count <= max_val
+    in_range = row_count >= min_val and row_count <= max_val
+
+    return {
+        "passed": not in_range if inverse else in_range,
+        "actual": row_count,
+        "count": count,
+        "min_val": min_val,
+        "max_val": max_val,
+        "inverse": inverse,
+    }
 
 
 def col_pct_null(
     data_tbl: IntoFrame, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
 ) -> bool:
     """Check if the percentage of null vales are within p given the absolute bounds."""
+    return col_pct_null_details(data_tbl=data_tbl, column=column, p=p, bound_finder=bound_finder)[
+        "passed"
+    ]
+
+
+def col_pct_null_details(
+    data_tbl: IntoFrame, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+) -> dict:
+    """
+    Check if the percentage of null values are within p given the absolute bounds, returning the
+    details for reporting.
+
+    The returned dictionary has the result (`passed`) along with the number of null values
+    (`n_null`), the number of rows (`total_rows`), the expected percentage (`p`), and the range of
+    passing null counts (`min_null`, `max_null`).
+    """
     nw_frame = nw.from_native(data_tbl)
 
     # Use lazy-compatible aggregation to get total rows and null count
@@ -707,8 +754,17 @@ def col_pct_null(
 
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
+    min_null = abs_target - lower_bound
+    max_null = abs_target + upper_bound
 
-    return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
+    return {
+        "passed": n_null >= min_null and n_null <= max_null,
+        "n_null": n_null,
+        "total_rows": total_rows,
+        "p": p,
+        "min_null": min_null,
+        "max_null": max_null,
+    }
 
 
 def col_pct_missing(
@@ -723,6 +779,31 @@ def col_pct_missing(
     Missing values are those equal to one of the `sentinels` and, when `count_null=True`, actual
     null (or NaN) values. The percentage is computed over the total number of rows.
     """
+    return col_pct_missing_details(
+        data_tbl=data_tbl,
+        column=column,
+        sentinels=sentinels,
+        count_null=count_null,
+        max_pct=max_pct,
+    )["passed"]
+
+
+def col_pct_missing_details(
+    data_tbl: IntoFrame,
+    column: str,
+    sentinels: list,
+    count_null: bool,
+    max_pct: float,
+) -> dict:
+    """
+    Check that the percentage of missing values in a column does not exceed `max_pct`, returning
+    the details for reporting.
+
+    The returned dictionary has the result (`passed`) along with the number of missing values
+    (`n_missing`), the number of rows (`total_rows`), the percentage of missing values
+    (`pct_missing`), and `max_pct`. The number of rows isn't counted when nothing counts as missing
+    (it's `None` then).
+    """
     nw_frame = nw.from_native(data_tbl)
 
     # Build a boolean expression that flags missing values
@@ -735,7 +816,13 @@ def col_pct_missing(
 
     if missing_expr is None:
         # Nothing counts as missing under this spec/filter
-        return 0.0 <= max_pct
+        return {
+            "passed": 0.0 <= max_pct,
+            "n_missing": 0,
+            "total_rows": None,
+            "pct_missing": 0.0,
+            "max_pct": max_pct,
+        }
 
     # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
     if is_narwhals_lazyframe(nw_frame):
@@ -751,22 +838,48 @@ def col_pct_missing(
         n_missing = int(nw_frame.select(missing_expr.cast(nw.Int32).sum()).item())
 
     if total_rows == 0:
-        return True
+        return {
+            "passed": True,
+            "n_missing": n_missing,
+            "total_rows": total_rows,
+            "pct_missing": None,
+            "max_pct": max_pct,
+        }
 
     pct_missing = n_missing / total_rows
-    return pct_missing <= max_pct
+    return {
+        "passed": pct_missing <= max_pct,
+        "n_missing": n_missing,
+        "total_rows": total_rows,
+        "pct_missing": pct_missing,
+        "max_pct": max_pct,
+    }
 
 
 def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
     """
     Check if DataFrame column count matches expected count.
     """
+    return col_count_match_details(data_tbl=data_tbl, count=count, inverse=inverse)["passed"]
+
+
+def col_count_match_details(data_tbl: IntoFrame, count: Any, inverse: bool) -> dict:
+    """
+    Check if DataFrame column count matches expected count, returning the details for reporting.
+
+    The returned dictionary has the result (`passed`) along with the observed column count
+    (`actual`) and the expected `count`.
+    """
     from pointblank.validate import get_column_count
 
-    if not inverse:
-        return get_column_count(data=data_tbl) == count
-    else:
-        return get_column_count(data=data_tbl) != count
+    col_count: int = get_column_count(data=data_tbl)
+
+    return {
+        "passed": col_count != count if inverse else col_count == count,
+        "actual": col_count,
+        "count": count,
+        "inverse": inverse,
+    }
 
 
 def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any]:
