@@ -27147,6 +27147,10 @@ def _step_report_aggregate(
     )
 
 
+# Width (in px) of the summary step reports, matching that of the `col_schema_match()` step reports
+STEP_REPORT_SUMMARY_WIDTH = 900
+
+
 def _step_report_fmt_value(v: Any) -> str:
     """
     Format a number (or `None`) for a cell of a summary step report.
@@ -27188,8 +27192,9 @@ def _step_report_summary(
     (followed by a pass/fail status cell) under the standard step-report header.
 
     Each item in `cells` is a tuple of the column ID, column label, Markdown-formatted cell value,
-    and column width. The `assertion_text` (HTML) is shown in the header after the `ASSERTION`
-    label, followed by the `result_stmt` (HTML).
+    and relative column width (in px). The table has a fixed width (the same as that of the
+    `col_schema_match()` step reports) and the widths are scaled to fill it. The `assertion_text`
+    (HTML) is shown in the header after the `ASSERTION` label, followed by the `result_stmt` (HTML).
     """
 
     # Determine whether the `lang` value represents a right-to-left language
@@ -27214,6 +27219,13 @@ def _step_report_summary(
         )  # pragma: no cover
 
     value_columns = [key for key, _, _, _ in cells]
+
+    # Scale the column widths so that, with the status column, they fill the fixed table width
+    status_width = 50
+    weights = [int(width.removesuffix("px")) for _, _, _, width in cells]
+    available = STEP_REPORT_SUMMARY_WIDTH - status_width
+    col_widths = [available * weight // sum(weights) for weight in weights]
+    col_widths[-1] += available - sum(col_widths)
 
     # Create the data for the 1-row table
     report_data = df_lib.DataFrame(
@@ -27254,7 +27266,12 @@ def _step_report_summary(
             column_labels_vlines_width="1px",
             column_labels_vlines_color="#F2F2F2",
         )
-        .cols_width(cases={**{key: width for key, _, _, width in cells}, "status": "50px"})
+        .cols_width(
+            cases={
+                **{key: f"{width}px" for key, width in zip(value_columns, col_widths)},
+                "status": f"{status_width}px",
+            }
+        )
     )
 
     # Apply styling based on pass/fail
@@ -27494,7 +27511,12 @@ def _step_report_table_level(
             ("n_failed", "FAILED", _step_report_fmt_value(n_failed), "150px"),
         ]
 
-    if all_passed:
+    if assertion_type != "specially":
+        # These steps have a single test unit, so state the outcome rather than count test units
+        result_stmt = STEP_REPORT_TEXT[
+            "table_check_success_statement" if all_passed else "table_check_failure_statement"
+        ][lang]
+    elif all_passed:
         result_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(n=n)
     else:
         result_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
