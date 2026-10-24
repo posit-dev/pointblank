@@ -22250,6 +22250,63 @@ def test_table_level_step_report_empty_table() -> None:
     assert html_freshness.count("—") >= 2
 
 
+@pytest.mark.parametrize("passing", [True, False])
+def test_step_report_title_status_mark(passing) -> None:
+    """Test that the step report title has a check mark (passing) or a cross mark (failing)."""
+
+    # The failing table has a duplicate row
+    tbl = pl.DataFrame({"a": [1, 2, 3 if passing else 2]})
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="a", value=0 if passing else 1)
+        .rows_distinct()
+        .col_exists(columns="a" if passing else "z")
+        .tbl_match(tbl_compare=tbl if passing else tbl.head(2))
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        assert step.all_passed is passing, step.assertion_type
+
+        title = validation.get_step_report(i=step.i).as_raw_html().split("ASSERTION")[0]
+
+        assert ("&check;" in title) is passing, step.assertion_type
+        assert ("&cross;" in title) is not passing, step.assertion_type
+
+
+@pytest.mark.parametrize("passing", [True, False])
+def test_rows_distinct_step_report_assertion(passing) -> None:
+    """Test that the `rows_distinct()` step report shows the assertion after `ASSERTION`."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3 if passing else 2]})
+
+    html = Validate(tbl).rows_distinct().interrogate().get_step_report(i=1).as_raw_html()
+
+    assert re.search(r"ASSERTION <span[^>]*><code[^>]*><code[^>]*>All rows are distinct", html)
+
+
+@pytest.mark.parametrize("header", [":default:", None])
+def test_tbl_match_step_report_fixed_width(header) -> None:
+    """Test that `tbl_match()` and `tbl_reconcile()` step reports have a fixed width."""
+
+    tbl = pl.DataFrame({"k": ["x", "y"], "a": [1, 2]})
+
+    validation = (
+        Validate(tbl)
+        .tbl_match(tbl_compare=tbl)
+        .tbl_reconcile(tbl_compare=tbl, keys="k", measures="a")
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        html = validation.get_step_report(i=step.i, header=header).as_raw_html()
+
+        table_style = re.search(r'<table style="([^"]*)" class="gt_table"', html).group(1)
+
+        assert "width: 900px" in table_style
+
+
 # =============================================================================
 # data_freshness() tests
 # =============================================================================
