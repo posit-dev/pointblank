@@ -574,6 +574,112 @@ class TestColPctMissing:
         assert result is True
 
 
+class TestTableLevelCheckDetails:
+    """Tests for the `*_details()` functions that return the measured values for step reports."""
+
+    def test_col_exists_details(self):
+        from pointblank._interrogation import col_exists_details
+
+        df = pl.DataFrame({"a": [1], "b": [2]})
+
+        assert col_exists_details(df, "b") == {
+            "passed": True,
+            "column": "b",
+            "tbl_columns": ["a", "b"],
+        }
+        assert col_exists_details(df, "z")["passed"] is False
+
+    def test_row_count_match_details(self):
+        from pointblank._interrogation import row_count_match_details
+
+        df = pl.DataFrame({"a": [1, 2, 3]})
+
+        assert row_count_match_details(df, count=4, inverse=False, abs_tol_bounds=(1, 2)) == {
+            "passed": True,
+            "actual": 3,
+            "count": 4,
+            "min_val": 3,
+            "max_val": 6,
+            "inverse": False,
+        }
+        assert (
+            row_count_match_details(df, count=3, inverse=True, abs_tol_bounds=(0, 0))["passed"]
+            is False
+        )
+
+    def test_col_count_match_details(self):
+        from pointblank._interrogation import col_count_match_details
+
+        df = pl.DataFrame({"a": [1], "b": [2]})
+
+        assert col_count_match_details(df, count=3, inverse=False) == {
+            "passed": False,
+            "actual": 2,
+            "count": 3,
+            "inverse": False,
+        }
+        assert col_count_match_details(df, count=3, inverse=True)["passed"] is True
+
+    def test_col_pct_null_details(self):
+        from functools import partial
+
+        from pointblank._interrogation import col_pct_null_details
+        from pointblank._utils import _derive_bounds
+
+        df = pl.DataFrame({"a": [1, None, 3, None, 5]})
+
+        result = col_pct_null_details(df, "a", p=0.6, bound_finder=partial(_derive_bounds, tol=1))
+
+        assert result == {
+            "passed": True,
+            "n_null": 2,
+            "total_rows": 5,
+            "p": 0.6,
+            "min_null": 2,
+            "max_null": 4,
+        }
+
+    @pytest.mark.parametrize("lazy", [False, True])
+    def test_col_pct_missing_details(self, lazy):
+        from pointblank._interrogation import col_pct_missing_details
+
+        df = pl.DataFrame({"a": [1.0, -99.0, None, 4.0]})
+        df = df.lazy() if lazy else df
+
+        result = col_pct_missing_details(df, "a", sentinels=[-99.0], count_null=True, max_pct=0.4)
+
+        assert result == {
+            "passed": False,
+            "n_missing": 2,
+            "total_rows": 4,
+            "pct_missing": 0.5,
+            "max_pct": 0.4,
+        }
+
+    def test_col_pct_missing_details_nothing_counts_as_missing(self):
+        from pointblank._interrogation import col_pct_missing_details
+
+        df = pl.DataFrame({"a": [1, None]})
+
+        result = col_pct_missing_details(df, "a", sentinels=[], count_null=False, max_pct=0.0)
+
+        assert result["passed"] is True
+        assert result["n_missing"] == 0
+        assert result["total_rows"] is None
+        assert result["pct_missing"] == 0.0
+
+    def test_col_pct_missing_details_empty_table(self):
+        from pointblank._interrogation import col_pct_missing_details
+
+        df = pl.DataFrame({"a": pl.Series([], dtype=pl.Float64)})
+
+        result = col_pct_missing_details(df, "a", sentinels=[-99], count_null=True, max_pct=0.0)
+
+        assert result["passed"] is True
+        assert result["total_rows"] == 0
+        assert result["pct_missing"] is None
+
+
 class TestInterrogateWithinSpec:
     """Tests for interrogate_within_spec() checksum-based specs."""
 
