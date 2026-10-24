@@ -4,7 +4,7 @@ Provides a dictionary of the number of test units that failed for each validatio
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18478-L18559)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18500-L18581)
 
 ``` python
 Validate.n_failed(

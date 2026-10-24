@@ -540,9 +540,9 @@ shape: (3, 2)
 | rule_id    | n_violations |
 |------------|--------------|
 | str        | u32          |
-| "SDTM-195" | 1            |
-| "SDTM-010" | 1            |
 | "SDTM-007" | 1            |
+| "SDTM-010" | 1            |
+| "SDTM-195" | 1            |
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.
 

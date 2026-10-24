@@ -71,6 +71,7 @@ It's important to note that step reports vary in appearance and structure depend
 - Value-based validations (like [`Validate.col_vals_gt()`](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [`Validate.col_vals_in_set()`](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set)): show individual rows that failed validation
 - Uniqueness checks ([`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct)): group together the duplicate records in order of appearance
 - Schema validations ([`Validate.col_schema_match()`](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match)): display column-level information about expected vs. actual data types
+- Aggregate and table-level validations (like [`Validate.col_sum_gt()`](../../reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [`Validate.row_count_match()`](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match), [`Validate.col_exists()`](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists), [`Validate.col_pct_null()`](../../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), and [`Validate.data_freshness()`](../../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness)): show a one-row summary of the measured value next to the expected one
 
 Additionally, step reports for value-based validations and uniqueness checks operate in two distinct modes:
 
@@ -199,6 +200,43 @@ validation_schema.get_step_report(i=1)
 |  Supplied Column Schema: `[('date_time', 'timestamp'), ('dates', 'date'), ('a', 'int64'), ('b',), ('c',), ('d', 'float64'), ('e', ['bool', 'boolean']), ('f', 'str')]` |  |  |  |  |  |  |  |
 
 This report style focuses on comparing the expected schema against the actual table structure, highlighting mismatches in data types or missing/extra columns. The table format makes it easy to see exactly where the schema expectations differ from reality.
+
+### Summary Step Reports
+
+Validations that check the table (or a column) as a whole, rather than row by row, produce a compact summary step report. It's a single-row table that puts the measured value (e.g., the row count, the percentage of null values, or the age of the most recent data) beside the expected value, along with a pass/fail indicator.
+
+``` python
+validation_summary = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        tbl_name="small_table",
+    )
+    .row_count_match(count=15, tol=1)
+    .col_pct_null(columns="c", p=0.1)
+    .interrogate()
+)
+
+# Display the step report for the row count check
+validation_summary.get_step_report(i=1)
+```
+
+| Report for Validation Step 1 ✗ ASSERTION `ROWS = 15` The table does not satisfy the condition. |  |  |  |  |
+|----|----|----|----|----|
+| ACTUAL | EXPECTED | TOL | DIFFERENCE |  |
+| 13 | 15 | ±1 | -2 | ✗ |
+
+The row count is outside of the tolerated range, so the report shows both counts and how far apart they are. The second step's report gives the number and percentage of null values in column `c`:
+
+``` python
+validation_summary.get_step_report(i=2)
+```
+
+| Report for Validation Step 2 ✗ ASSERTION `PCT_NULL(c) = 10%` The table does not satisfy the condition. |  |  |  |  |  |
+|----|----|----|----|----|----|
+| NULLS | ROWS | ACTUAL | EXPECTED | ALLOWED NULLS |  |
+| 2 | 13 | 15.38% | 10% | 1 | ✗ |
+
+The same kind of report is available for [`Validate.col_exists()`](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists) (where a missing column's closest match in the table is suggested), [`Validate.col_count_match()`](../../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match), [`Validate.col_pct_missing()`](../../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [`Validate.data_freshness()`](../../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness), and [`Validate.specially()`](../../reference/Validate.specially.md#pointblank.Validate.specially) (which summarizes the passing and failing test units).
 
 ## Customizing Step Reports
 

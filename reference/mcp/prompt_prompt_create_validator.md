@@ -1,7 +1,5 @@
 # prompt_create_validator
 
-# prompt_create_validator
-
 Prompt to create a Pointblank Validator for a loaded DataFrame.
 
 ### Arguments

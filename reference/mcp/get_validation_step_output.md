@@ -1,7 +1,5 @@
 # get_validation_step_output
 
-# get_validation_step_output
-
 Retrieve output for a validation step and save it to a CSV file.
 
 ``` json

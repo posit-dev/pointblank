@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<style>html:not(.theme-loaded){visibility:hidden}html:not(.theme-loaded) body{visibility:hidden;opacity:0}</style>
+<noscript><style>html:not(.theme-loaded),html:not(.theme-loaded) body{visibility:visible!important;opacity:1!important}</style></noscript>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -84,7 +86,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b53abb0bb3266abed866cb33decb759d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0158e586ba661c38853d0fb84a3c8340.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1677,7 +1679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21714-L22082" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21736-L22146" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">get_step_report</span>(</span>
@@ -1757,18 +1759,33 @@ A GT table object that represents the detailed report for the validation step.
 <li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link"><code>col_vals_not_null()</code></a></li>
 <li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a></li>
 <li><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link"><code>col_vals_within_spec()</code></a></li>
+<li><a href="../reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len" class="gdls-link"><code>col_vals_str_len()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link"><code>col_vals_in_table()</code></a></li>
 <li><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a></li>
+<li><a href="../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link"><code>col_missing_coded()</code></a></li>
+<li><a href="../reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="gdls-link"><code>col_missing_only_coded()</code></a></li>
+<li><a href="../reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link"><code>col_missing_consistent()</code></a></li>
 <li><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link"><code>conjointly()</code></a></li>
 <li><a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link"><code>prompt()</code></a></li>
 <li><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link"><code>rows_complete()</code></a></li>
 </ul>
 <p>The <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a> validation step will produce a report that shows duplicate rows (or duplicate values in one or a set of columns as defined in that method’s <code>columns_subset=</code> parameter.</p>
 <p>The <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>col_schema_match()</code></a> validation step will produce a report that shows the schema of the data table and the schema of the validation step. The report will indicate whether the schemas match or not.</p>
+<p>The <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>tbl_match()</code></a> and <a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link"><code>tbl_reconcile()</code></a> validation steps will produce a report comparing the target table to the comparison table, with samples of the rows (or key groups) that differ.</p>
+<p>The remaining validation steps check the table, or a column, as a whole. Each produces a summary report with the measured value(s) beside the expected value(s):</p>
+<ul>
+<li>the aggregate methods (e.g., <a href="../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link"><code>col_sum_gt()</code></a>, <a href="../reference/Validate.col_avg_eq.html#pointblank.Validate.col_avg_eq" class="gdls-link"><code>col_avg_eq()</code></a>, <a href="../reference/Validate.col_sd_le.html#pointblank.Validate.col_sd_le" class="gdls-link"><code>col_sd_le()</code></a>): the computed aggregate value</li>
+<li><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a>: the column’s position in the table (and, if it’s missing, the closest-matching column name)</li>
+<li><a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link"><code>row_count_match()</code></a> and <a href="../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link"><code>col_count_match()</code></a>: the row or column count</li>
+<li><a href="../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link"><code>col_pct_null()</code></a> and <a href="../reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link"><code>col_pct_missing()</code></a>: the number and percentage of null or missing values</li>
+<li><a href="../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link"><code>data_freshness()</code></a>: the most recent datetime value and its age</li>
+<li><a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link"><code>specially()</code></a>: the number of passing and failing test units</li>
+</ul>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and interrogate the data. With that, we’ll have a look at the validation reporting table for the entire collection of steps and what went well or what failed.</p>
-<div id="6703727a" class="cell" data-execution_count="2">
+<div id="36954cf6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -2065,7 +2082,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>There were four validation steps performed, where the first three steps had failing test units and the last step had no failures. Let’s get a detailed report for the first step by using the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> method.</p>
-<div id="593d156d" class="cell" data-execution_count="3">
+<div id="6ed1d090" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2196,7 +2213,7 @@ A GT table object that represents the detailed report for the validation step.
 <p>The report for the first step is displayed. The report includes a summary of the validation step and a detailed breakdown of the interrogation results. The report provides details on what the validation step was checking, the extent to which the test units failed, and a table that shows the failing rows of the data with the column of interest highlighted.</p>
 <p>The second and third steps also had failing test units. Reports for those steps can be viewed by using <code>get_step_report(i=2)</code> and <code>get_step_report(i=3)</code> respectively.</p>
 <p>The final step did not have any failing test units. A report for the final step can still be viewed by using <code>get_step_report(i=4)</code>. The report will indicate that every test unit passed and a prview of the target table will be provided.</p>
-<div id="011c7b9c" class="cell" data-execution_count="4">
+<div id="857293b5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2413,7 +2430,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>If you’d like to trim down the number of columns shown in the report, you can provide a subset of columns to display. For example, if you only want to see the columns <code>a</code>, <code>b</code>, and <code>c</code>, you can provide those column names as a list.</p>
-<div id="a7739a87" class="cell" data-execution_count="5">
+<div id="df3ba4dd" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, columns_subset<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2522,7 +2539,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>If you’d like to increase or reduce the maximum number of rows shown in the report, you can provide a different value for the <code>limit</code> parameter. For example, if you’d like to see only up to 5 rows, you can set <code>limit=5</code>.</p>
-<div id="4e61beb9" class="cell" data-execution_count="6">
+<div id="059e90c2" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>, limit<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

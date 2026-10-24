@@ -1,7 +1,5 @@
 # prompt_interrogate_validator
 
-# prompt_interrogate_validator
-
 Prompt to run validations and generate reports with Python code.
 
 ### Arguments

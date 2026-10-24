@@ -1,7 +1,5 @@
 # interrogate_validator
 
-# interrogate_validator
-
 Run validations and return a JSON summary with Python code equivalent.
 
 ``` json

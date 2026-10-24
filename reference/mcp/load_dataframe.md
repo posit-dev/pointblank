@@ -1,7 +1,5 @@
 # load_dataframe
 
-# load_dataframe
-
 Load a DataFrame from a CSV, Excel or Parquet file into the server's context.
 
 ``` json

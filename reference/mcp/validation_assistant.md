@@ -1,7 +1,5 @@
 # validation_assistant
 
-# validation_assistant
-
 Generate data-aware validation suggestions based on actual column types and statistics.
 
 Analyzes your data's structure (types, null counts, value ranges, cardinality) to produce actionable Pointblank validation code tailored to your dataset.

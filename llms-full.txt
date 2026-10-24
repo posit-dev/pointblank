@@ -14457,7 +14457,12 @@ report that shows the rows of the data that failed:
 - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
 - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
 - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
+- [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`)
+- [`col_vals_in_table()`](`pointblank.Validate.col_vals_in_table`)
 - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
+- [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`)
+- [`col_missing_only_coded()`](`pointblank.Validate.col_missing_only_coded`)
+- [`col_missing_consistent()`](`pointblank.Validate.col_missing_consistent`)
 - [`conjointly()`](`pointblank.Validate.conjointly`)
 - [`prompt()`](`pointblank.Validate.prompt`)
 - [`rows_complete()`](`pointblank.Validate.rows_complete`)
@@ -14469,6 +14474,29 @@ in that method's `columns_subset=` parameter.
 The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation step will
 produce a report that shows the schema of the data table and the schema of the validation
 step. The report will indicate whether the schemas match or not.
+
+The [`tbl_match()`](`pointblank.Validate.tbl_match`) and
+[`tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`) validation steps will produce a
+report comparing the target table to the comparison table, with samples of the rows (or key
+groups) that differ.
+
+The remaining validation steps check the table, or a column, as a whole. Each produces a
+summary report with the measured value(s) beside the expected value(s):
+
+- the aggregate methods (e.g., [`col_sum_gt()`](`pointblank.Validate.col_sum_gt`),
+  [`col_avg_eq()`](`pointblank.Validate.col_avg_eq`),
+  [`col_sd_le()`](`pointblank.Validate.col_sd_le`)): the computed aggregate value
+- [`col_exists()`](`pointblank.Validate.col_exists`): the column's position in the table
+  (and, if it's missing, the closest-matching column name)
+- [`row_count_match()`](`pointblank.Validate.row_count_match`) and
+  [`col_count_match()`](`pointblank.Validate.col_count_match`): the row or column count
+- [`col_pct_null()`](`pointblank.Validate.col_pct_null`) and
+  [`col_pct_missing()`](`pointblank.Validate.col_pct_missing`): the number and percentage
+  of null or missing values
+- [`data_freshness()`](`pointblank.Validate.data_freshness`): the most recent datetime
+  value and its age
+- [`specially()`](`pointblank.Validate.specially`): the number of passing and failing test
+  units
 
 Examples
 --------
@@ -32249,6 +32277,10 @@ individual rows that failed validation
 appearance
 - Schema validations ([`Validate.col_schema_match()`](`Validate.col_schema_match`)): display column-level information about
 expected vs. actual data types
+- Aggregate and table-level validations (like [`Validate.col_sum_gt()`](`Validate.col_sum_gt`),
+[`Validate.row_count_match()`](`Validate.row_count_match`), [`Validate.col_exists()`](`Validate.col_exists`),
+[`Validate.col_pct_null()`](`Validate.col_pct_null`), and [`Validate.data_freshness()`](`Validate.data_freshness`)):
+show a one-row summary of the measured value next to the expected one
 
 Additionally, step reports for value-based validations and uniqueness checks operate in two distinct
 modes:
@@ -32363,6 +32395,43 @@ validation_schema.get_step_report(i=1)
 This report style focuses on comparing the expected schema against the actual table structure,
 highlighting mismatches in data types or missing/extra columns. The table format makes it easy to
 see exactly where the schema expectations differ from reality.
+
+### Summary Step Reports
+
+Validations that check the table (or a column) as a whole, rather than row by row, produce a compact
+summary step report. It's a single-row table that puts the measured value (e.g., the row count, the
+percentage of null values, or the age of the most recent data) beside the expected value, along
+with a pass/fail indicator.
+
+```{python}
+validation_summary = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        tbl_name="small_table",
+    )
+    .row_count_match(count=15, tol=1)
+    .col_pct_null(columns="c", p=0.1)
+    .interrogate()
+)
+
+# Display the step report for the row count check
+validation_summary.get_step_report(i=1)
+```
+
+The row count is outside of the tolerated range, so the report shows both counts and how far apart
+they are. The second step's report gives the number and percentage of null values in column `c`:
+
+```{python}
+validation_summary.get_step_report(i=2)
+```
+
+The same kind of report is available for [`Validate.col_exists()`](`Validate.col_exists`) (where a
+missing column's closest match in the table is suggested),
+[`Validate.col_count_match()`](`Validate.col_count_match`),
+[`Validate.col_pct_missing()`](`Validate.col_pct_missing`),
+[`Validate.data_freshness()`](`Validate.data_freshness`), and
+[`Validate.specially()`](`Validate.specially`) (which summarizes the passing and failing test
+units).
 
 ## Customizing Step Reports
 

@@ -1,7 +1,5 @@
 # get_pointblank_api_reference
 
-# get_pointblank_api_reference
-
 Get API reference for Pointblank validation methods and common patterns.
 
 ``` json

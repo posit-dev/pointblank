@@ -1,7 +1,5 @@
 # draft_validation_plan
 
-# draft_validation_plan
-
 Generate an AI-powered validation plan using Pointblank's DraftValidation class.
 
 ``` json

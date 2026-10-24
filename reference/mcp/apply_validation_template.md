@@ -1,7 +1,5 @@
 # apply_validation_template
 
-# apply_validation_template
-
 Apply a pre-built validation template to a validator.
 
 ``` json

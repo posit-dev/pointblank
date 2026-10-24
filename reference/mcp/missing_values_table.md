@@ -1,7 +1,5 @@
 # missing_values_table
 
-# missing_values_table
-
 Generate a table showing missing values analysis for the DataFrame.
 
 ``` json

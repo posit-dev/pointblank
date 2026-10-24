@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<style>html:not(.theme-loaded){visibility:hidden}html:not(.theme-loaded) body{visibility:hidden;opacity:0}</style>
+<noscript><style>html:not(.theme-loaded),html:not(.theme-loaded) body{visibility:visible!important;opacity:1!important}</style></noscript>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -84,7 +86,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b53abb0bb3266abed866cb33decb759d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0158e586ba661c38853d0fb84a3c8340.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1789,7 +1791,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>preset=</code> parameter generates realistic personal data, while <code>allowed=</code> restricts values to a categorical set:</p>
-<div id="939a2380" class="cell" data-execution_count="1">
+<div id="82310e63" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1954,7 +1956,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>We can also generate strings that match a regular expression with <code>pattern=</code> (e.g., product codes, identifiers):</p>
-<div id="1410bbb2" class="cell" data-execution_count="2">
+<div id="f12bf429" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    batch_id<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"BATCH-</span><span class="pp">[A-Z][0-9]</span><span class="op">{3}</span><span class="vs">"</span>),</span>
@@ -2117,7 +2119,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>For random alphanumeric strings, <code>min_length=</code> and <code>max_length=</code> control the length. Adding <code>nullable=True</code> introduces missing values:</p>
-<div id="84b87b40" class="cell" data-execution_count="3">
+<div id="98b1024d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    short_code<span class="op">=</span>pb.string_field(min_length<span class="op">=</span><span class="dv">3</span>, max_length<span class="op">=</span><span class="dv">5</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>pb.string_field(</span>
@@ -2270,7 +2272,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>It’s possible to combine business and internet presets to build a company directory:</p>
-<div id="8e7cd975" class="cell" data-execution_count="4">
+<div id="f4306fb4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    company<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"company"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    domain<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"domain_name"</span>),</span>

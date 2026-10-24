@@ -1,7 +1,5 @@
 # prompt_get_validation_step_output
 
-# prompt_get_validation_step_output
-
 Prompt to get validation output by specifying either a step index or a sundered type.
 
 ### Arguments

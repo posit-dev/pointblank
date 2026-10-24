@@ -1,7 +1,5 @@
 # delete_validator
 
-# delete_validator
-
 Remove a validator from the server context.
 
 ``` json

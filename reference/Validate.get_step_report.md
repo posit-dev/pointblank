@@ -4,7 +4,7 @@ Get a detailed report for a single validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21714-L22082)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21736-L22146)
 
 ``` python
 Validate.get_step_report(
@@ -60,7 +60,12 @@ The [get_step_report()](../reference/Validate.get_step_report.md#pointblank.Vali
 - [`col_vals_not_null()`](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null)
 - [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex)
 - [`col_vals_within_spec()`](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec)
+- [`col_vals_str_len()`](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len)
+- [`col_vals_in_table()`](../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)
 - [`col_vals_expr()`](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)
+- [`col_missing_coded()`](../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded)
+- [`col_missing_only_coded()`](../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded)
+- [`col_missing_consistent()`](../reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent)
 - [`conjointly()`](../reference/Validate.conjointly.md#pointblank.Validate.conjointly)
 - [`prompt()`](../reference/Validate.prompt.md#pointblank.Validate.prompt)
 - [`rows_complete()`](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete)
@@ -68,6 +73,17 @@ The [get_step_report()](../reference/Validate.get_step_report.md#pointblank.Vali
 The [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) validation step will produce a report that shows duplicate rows (or duplicate values in one or a set of columns as defined in that method's `columns_subset=` parameter.
 
 The [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) validation step will produce a report that shows the schema of the data table and the schema of the validation step. The report will indicate whether the schemas match or not.
+
+The [`tbl_match()`](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) and [`tbl_reconcile()`](../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) validation steps will produce a report comparing the target table to the comparison table, with samples of the rows (or key groups) that differ.
+
+The remaining validation steps check the table, or a column, as a whole. Each produces a summary report with the measured value(s) beside the expected value(s):
+
+- the aggregate methods (e.g., [`col_sum_gt()`](../reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [`col_avg_eq()`](../reference/Validate.col_avg_eq.md#pointblank.Validate.col_avg_eq), [`col_sd_le()`](../reference/Validate.col_sd_le.md#pointblank.Validate.col_sd_le)): the computed aggregate value
+- [`col_exists()`](../reference/Validate.col_exists.md#pointblank.Validate.col_exists): the column's position in the table (and, if it's missing, the closest-matching column name)
+- [`row_count_match()`](../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match) and [`col_count_match()`](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match): the row or column count
+- [`col_pct_null()`](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null) and [`col_pct_missing()`](../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing): the number and percentage of null or missing values
+- [`data_freshness()`](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness): the most recent datetime value and its age
+- [`specially()`](../reference/Validate.specially.md#pointblank.Validate.specially): the number of passing and failing test units
 
 ## Examples
 

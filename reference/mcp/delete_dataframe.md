@@ -1,7 +1,5 @@
 # delete_dataframe
 
-# delete_dataframe
-
 Remove a DataFrame from the server context to free up memory.
 
 ``` json

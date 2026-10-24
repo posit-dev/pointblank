@@ -1,7 +1,5 @@
 # create_validator
 
-# create_validator
-
 Create a Pointblank Validator for a previously loaded DataFrame.
 
 ``` json

@@ -4,7 +4,7 @@ Validate whether one or more columns exist in the table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11489-L11674)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11491-L11676)
 
 ``` python
 Validate.col_exists(

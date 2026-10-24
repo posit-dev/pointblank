@@ -1,7 +1,5 @@
 # column_summary_table
 
-# column_summary_table
-
 Generate a comprehensive column-level summary of the DataFrame.
 
 ``` json

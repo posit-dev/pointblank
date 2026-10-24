@@ -1,7 +1,5 @@
 # prompt_load_dataframe
 
-# prompt_load_dataframe
-
 Prompt to load a DataFrame from a file into the server's context for validation.
 
 ### Arguments

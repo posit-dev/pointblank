@@ -1,7 +1,5 @@
 # add_validation_step
 
-# add_validation_step
-
 Add a validation step to an existing Pointblank Validator.
 
 ``` json

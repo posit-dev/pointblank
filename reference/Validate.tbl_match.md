@@ -4,7 +4,7 @@ Validate whether the target table matches a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15009-L15370)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15011-L15372)
 
 ``` python
 Validate.tbl_match(
