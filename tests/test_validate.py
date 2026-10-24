@@ -22066,8 +22066,19 @@ def test_table_level_step_reports(tbl_type, passing) -> None:
 
         html = report.as_raw_html()
 
-        assert ("ALL PASSED" in html) is passing
-        assert ("TEST UNIT FAILURES" in html) is not passing
+        # The report has the same fixed width as the `col_schema_match()` step reports
+        col_widths = re.findall(r'<col style="width:(\d+)px;"/>', html)
+        assert sum(int(width) for width in col_widths) == 900
+
+        if step.assertion_type == "specially":
+            # A `specially()` step can have many test units, so they're counted
+            assert ("ALL PASSED" in html) is passing
+            assert ("TEST UNIT FAILURES" in html) is not passing
+        else:
+            # The other steps have a single test unit, so the outcome is stated instead
+            assert ("The table satisfies the condition." in html) is passing
+            assert ("The table does not satisfy the condition." in html) is not passing
+            assert "TEST UNIT" not in html
 
 
 def test_table_level_step_report_contents() -> None:
@@ -22203,7 +22214,7 @@ def test_table_level_step_report_header_options() -> None:
     html_default = validation.get_step_report(i=1).as_raw_html()
 
     assert "Rapport pour l'étape de validation 1" in html_default
-    assert "UNITÉS DE TEST" in html_default
+    assert "La table satisfait la condition." in html_default
 
     html_custom = validation.get_step_report(i=2, header="Custom: {title}").as_raw_html()
 
