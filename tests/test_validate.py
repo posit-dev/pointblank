@@ -22126,7 +22126,7 @@ def test_table_level_step_report_contents() -> None:
     ]
 
     # specially(): test units, passed, failed
-    assert "SPECIALLY(<lambda>)" in header(7)
+    assert "SPECIALLY(expr)" in header(7)
     assert [c.strip() for c in cells(7)[:3]] == ["3", "2", "1"]
 
 
@@ -22305,6 +22305,105 @@ def test_tbl_match_step_report_fixed_width(header) -> None:
         table_style = re.search(r'<table style="([^"]*)" class="gt_table"', html).group(1)
 
         assert "width: 900px" in table_style
+
+
+def _step_report_text(validation, i: int = 1) -> str:
+    """Get the text of a step report, with HTML tags removed and whitespace collapsed."""
+
+    html = validation.get_step_report(i=i).as_raw_html()
+
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+def test_step_report_extract_text_spacing() -> None:
+    """Test that the extract text has no space before its colon (with or without the red note)."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": [1, None, 3]})
+
+    # With the note on the failures in red (the target column is in the extract)
+    html = Validate(tbl).col_vals_gt("a", 1).interrogate().get_step_report(i=1).as_raw_html()
+
+    assert "ROW" in html
+    assert "</span>):</div>" in html
+    assert "NOT SHOWN" not in html
+
+    # Without the note (no target column)
+    html = Validate(tbl).rows_complete().interrogate().get_step_report(i=1).as_raw_html()
+
+    assert "ROW:</div>" in html
+    assert "ROW :" not in html
+
+
+def test_step_report_singular_text() -> None:
+    """Test that step reports use singular forms for a single test unit or extracted row."""
+
+    tbl = pl.DataFrame({"a": [5]})
+
+    def check_tbl(df):
+        return True
+
+    # A single passing test unit, with and without a column
+    assert "1 TEST UNIT PASSED IN COLUMN 1 " in _step_report_text(
+        Validate(tbl).col_vals_gt("a", 1).interrogate()
+    )
+    assert "1 TEST UNIT PASSED " in _step_report_text(Validate(tbl).rows_distinct().interrogate())
+    assert "1 TEST UNIT PASSED " in _step_report_text(
+        Validate(tbl).specially(check_tbl).interrogate()
+    )
+
+    # Multiple passing test units keep the plural form
+    assert "2 TEST UNITS ALL PASSED IN COLUMN 1 " in _step_report_text(
+        Validate(pl.DataFrame({"a": [5, 6]})).col_vals_gt("a", 1).interrogate()
+    )
+
+    # A single extracted row
+    text = _step_report_text(Validate(pl.DataFrame({"a": [5, None]})).rows_complete().interrogate())
+
+    assert "EXTRACT OF 1 ROW:" in text
+    assert "ALL 1 ROWS" not in text
+
+    # Other languages also get the singular form
+    assert "1 UNITÉ DE TEST RÉUSSIE DANS LA COLONNE 1 " in _step_report_text(
+        Validate(tbl, lang="fr").col_vals_gt("a", 1).interrogate()
+    )
+
+
+def test_col_missing_consistent_step_report_text() -> None:
+    """Test that `col_missing_consistent()` step reports don't give a list as a column position."""
+
+    spec = MissingSpec(reasons={-99: "refused", -98: "na"})
+
+    for m, n in [([1, -98], [1, 2]), ([1, -98], [1, -98])]:
+        text = _step_report_text(
+            Validate(pl.DataFrame({"m": m, "n": n}))
+            .col_missing_consistent(["m", "n"], missing=spec, when_reason="na")
+            .interrogate()
+        )
+
+        assert "[1, 2]" not in text
+        assert "IN COLUMN" not in text
+        assert "TEST UNIT" in text
+
+
+def test_conjointly_step_report_assertion() -> None:
+    """Test that `conjointly()` step reports name each of the expressions in the assertion."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    def a_gt_1(df):
+        return pl.col("a") > 1
+
+    text = _step_report_text(
+        Validate(tbl).conjointly(a_gt_1, lambda df: pl.col("b") < 6).interrogate()
+    )
+
+    assert "ASSERTION CONJOINTLY(a_gt_1, expr_2) " in text
+    assert "conjointly" not in text
+
+    # Lambdas given to `specially()` are named in the same way
+    text = _step_report_text(Validate(tbl).specially(lambda df: True).interrogate())
+
+    assert "SPECIALLY(expr)" in text
 
 
 # =============================================================================

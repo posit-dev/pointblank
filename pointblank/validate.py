@@ -26676,6 +26676,14 @@ def _step_report_row_based(
         cols = ", ".join(column) if isinstance(column, (list, tuple)) else str(column)
         reason = values.get("when_reason") if isinstance(values, dict) else None
         text = f"consistent &ldquo;{reason}&rdquo; across {{{cols}}}"
+    elif assertion_type == "conjointly":
+        # Name each expression by its function name, numbering any anonymous (lambda) ones
+        exprs = values.get("expressions", ()) if isinstance(values, dict) else ()
+        names = []
+        for k, expr in enumerate(exprs, start=1):
+            name = getattr(expr, "__name__", None)
+            names.append(name if name and name != "<lambda>" else f"expr_{k}")
+        text = f"CONJOINTLY({html_module.escape(', '.join(names))})"
     else:
         # Fallback for any other assertion type: show the assertion type name
         text = str(assertion_type)  # pragma: no cover
@@ -26721,15 +26729,17 @@ def _step_report_row_based(
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
         # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
-        # a specific column (or when the column isn't in the table, e.g., created by `pre=`)
-        if assertion_type == "col_vals_expr" or column_position is None:
-            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
-                n=n
-            )  # pragma: no cover
+        # a specific column (or when the column isn't in the table, e.g., created by `pre=`, or
+        # there are several columns, as with `col_missing_consistent()`)
+        if (
+            assertion_type == "col_vals_expr"
+            or column_position is None
+            or isinstance(column_position, list)
+        ):
+            success_stmt = _step_report_success_stmt(n=n, lang=lang)
         else:
-            success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
-                n=n,
-                column_position=column_position,
+            success_stmt = _step_report_success_stmt(
+                n=n, lang=lang, column_position=column_position
             )
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
@@ -26802,11 +26812,10 @@ def _step_report_row_based(
                 locations=loc.column_labels(columns=column),
             )
 
-            not_shown = ""
-            shown_failures = STEP_REPORT_TEXT["shown_failures"][lang]
+            # The note on the failures in red follows the row count (with a separating space)
+            shown_failures = " " + STEP_REPORT_TEXT["shown_failures"][lang]
         else:
             step_report = extract_tbl
-            not_shown = STEP_REPORT_TEXT["not_shown"][lang]
             shown_failures = ""
 
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
@@ -26814,8 +26823,13 @@ def _step_report_row_based(
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
         # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
-        # (or when the column isn't in the table, e.g., created by `pre=`)
-        if assertion_type == "col_vals_expr" or column_position is None:
+        # (or when the column isn't in the table, e.g., created by `pre=`, or there are several
+        # columns, as with `col_missing_consistent()`)
+        if (
+            assertion_type == "col_vals_expr"
+            or column_position is None
+            or isinstance(column_position, list)
+        ):
             failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
                 failure_rate=failure_rate_metrics
             )
@@ -26833,7 +26847,8 @@ def _step_report_row_based(
 
         else:
             extract_length_resolved = extract_length
-            extract_text = STEP_REPORT_TEXT["extract_text_all"][lang].format(
+            key = "extract_text_one" if extract_length == 1 else "extract_text_all"
+            extract_text = STEP_REPORT_TEXT[key][lang].format(
                 extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
             )
 
@@ -26846,7 +26861,7 @@ def _step_report_row_based(
             f"position: relative; bottom: 1px;'>{text}</code></span>"
             "</div>"
             "<div style='padding-top: 7px;'>"
-            f"{failure_rate_stmt} {not_shown}"
+            f"{failure_rate_stmt}"
             "</div>"
             f"{extract_text}"
             "</div>"
@@ -26915,10 +26930,7 @@ def _step_report_rows_distinct(
 
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
 
-        success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
-            n=n,
-            column_position=column_position,
-        )
+        success_stmt = _step_report_success_stmt(n=n, lang=lang)
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
         details = (
@@ -26977,6 +26989,13 @@ def _step_report_rows_distinct(
             extract_length_resolved = limit
             extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][lang].format(
                 extract_length_resolved=extract_length_resolved
+            )
+
+        elif extract_length == 1:  # pragma: no cover
+            # Duplicated rows come in at least pairs, so this guards an unexpected extract
+            extract_length_resolved = extract_length
+            extract_text = STEP_REPORT_TEXT["extract_text_one"][lang].format(
+                extract_length_resolved=extract_length_resolved, shown_failures=""
             )
 
         else:
@@ -27161,6 +27180,17 @@ def _step_report_aggregate(
 # Width (in px) of the step reports that don't show the target table's columns (summary and table
 # comparison reports), matching that of the `col_schema_match()` step reports
 STEP_REPORT_WIDTH = 900
+
+
+def _step_report_success_stmt(n: int, lang: str, column_position: int | None = None) -> str:
+    """
+    Get the statement that all `n` test units passed (in the column at `column_position`, if
+    given), using the singular form of the statement for a single test unit.
+    """
+    key = "success_statement" if column_position is not None else "success_statement_no_column"
+    if n == 1:
+        key += "_one"
+    return STEP_REPORT_TEXT[key][lang].format(n=n, column_position=column_position)
 
 
 def _step_report_fmt_value(v: Any) -> str:
@@ -27508,7 +27538,9 @@ def _step_report_table_level(
         ]
 
     else:  # assertion_type == "specially"
-        fn_name = getattr(values, "__name__", None) or "expr"
+        fn_name = getattr(values, "__name__", None)
+        if not fn_name or fn_name == "<lambda>":
+            fn_name = "expr"
         assertion_text = f"SPECIALLY({html_module.escape(fn_name)})"
         cells = [
             ("n", "TEST UNITS", _step_report_fmt_value(n), "150px"),
@@ -27529,7 +27561,7 @@ def _step_report_table_level(
             "table_check_success_statement" if all_passed else "table_check_failure_statement"
         ][lang]
     elif all_passed:
-        result_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(n=n)
+        result_stmt = _step_report_success_stmt(n=n, lang=lang)
     else:
         result_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
             failure_rate=f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
