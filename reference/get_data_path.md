@@ -4,7 +4,7 @@ Get the file path to a dataset included with the Pointblank package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1491-L1654)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1490-L1653)
 
 ``` python
 get_data_path(
@@ -67,7 +67,7 @@ validation = (
 validation
 ```
 
-    /tmp/tmpns18bt_4.csv
+    /tmp/tmp5g62lk1p.csv
 
 [TABLE]
 

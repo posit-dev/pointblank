@@ -69,7 +69,7 @@ small_table_validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | date_time | Datetime(time_unit='us', time_zone=None) | 1 | date_time | ✓ | -- |  |
 | 2 | date | Date | 2 | date | ✓ | -- |  |
@@ -324,7 +324,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | id | ✓ | Int64 | ✓ |
 | 2 | name | String | 2 | name | ✓ | String | ✓ |
@@ -366,7 +366,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 3 | id | ✓ | Int64 | ✓ |
 | 2 | name | String | 1 | name | ✓ | String | ✓ |
@@ -403,7 +403,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN = column DTYPE = dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | ID | ✓ | int64 | ✓ |
 | 2 | name | String | 2 | NAME | ✓ | string | ✓ |
@@ -442,7 +442,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE = dtype float = float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | id | ✓ | int | ✓ |
 | 2 | name | String | 2 | name | ✓ | str | ✓ |
@@ -475,7 +475,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | id | ✓ | -- |  |
 | 2 | name | String | 2 | name | ✓ | -- |  |
@@ -510,7 +510,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | id | ✓ | Int64 | ✓ |
 | 2 | name | String | 2 | name | ✓ | String | ✓ |
@@ -559,7 +559,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | id | Int64 | 1 | id | ✓ | Int64 | ✓ |
 | 2 | name | String | 2 | name | ✓ | String | ✓ |

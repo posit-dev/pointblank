@@ -4,7 +4,7 @@
 
 | Report for Validation Step 1 ✗ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-| TARGET |  |  | EXPECTED |  |  |  |  |
+| TABLE |  |  | SCHEMA |  |  |  |  |
 |  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
 | 1 | date_time | timestamp(6) | 1 | date_time | ✓ | timestamp | ✗ |
 | 2 | date | date | 2 | dates | ✗ | date | -- |

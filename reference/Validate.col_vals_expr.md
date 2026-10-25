@@ -4,7 +4,7 @@ Validate column values using a custom expression.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11244-L11489)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11243-L11488)
 
 ``` python
 Validate.col_vals_expr(
