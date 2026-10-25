@@ -40,6 +40,10 @@ tox: ## Run tox tests across isolated environments (pandas, polars, ibis)
 test-update:
 	pytest --snapshot-update
 
+.PHONY: gallery-schema
+gallery-schema: ## Generate (and open) the gallery of col_schema_match() step reports
+	@uv run python scripts/schema_step_report_gallery.py --open
+
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks
 	@uvx pre-commit run --all-files

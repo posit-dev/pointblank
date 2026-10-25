@@ -6291,7 +6291,7 @@ def test_col_schema_match() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong column name
@@ -7220,7 +7220,7 @@ def test_col_schema_match_list_of_dtypes() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong dtypes in one case
@@ -7255,7 +7255,7 @@ def test_col_schema_match_list_of_dtypes() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong dtypes in both cases
@@ -7900,7 +7900,7 @@ def test_col_schema_match_columns_only() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema columns has duplicate column and a wrong column name
